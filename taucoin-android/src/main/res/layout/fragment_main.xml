@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:visibility="visible"
+                android:id="@+id/ll_warning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/widget_size_44"
+                android:background="@color/color_red_bg"
+                android:paddingStart="@dimen/widget_size_10"
+                android:paddingEnd="@dimen/widget_size_10"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/widget_size_20"
+                    android:layout_height="@dimen/widget_size_20"
+                    android:src="@mipmap/icon_warning"
+                    android:contentDescription="@null"/>
+
+                <TextView
+                    android:id="@+id/tv_warning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="@string/main_connecting"
+                    android:textColor="@color/gray_dark"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/refresh_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                    android:id="@+id/group_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingBottom="@{@dimen/fab_size + @dimen/fab_margin}"
+                    android:nestedScrollingEnabled="false"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:focusable="true"
+                    android:scrollbarStyle="outsideOverlay" />
+
+                <LinearLayout
+                    android:id="@+id/empty_view_group_list"
+                    android:visibility="visible"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_add_friends"
+                        android:layout_width="@dimen/widget_size_220"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:text="@string/main_empty_add_friends"
+                        android:background="@drawable/primary_rect_round_bg"
+                        android:gravity="center_vertical|center"
+                        android:textColor="@color/color_white"
+                        android:onClick="@{listener::onClick}"
+                        style="@style/TextAppearanceBody1" />
+
+                    <TextView
+                        android:id="@+id/tv_create_communities"
+                        android:layout_width="@dimen/widget_size_220"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:layout_marginTop="@dimen/widget_size_25"
+                        android:lineSpacingExtra="@dimen/widget_size_5"
+                        android:background="@drawable/black_rect_round_bg"
+                        android:gravity="center_vertical|center"
+                        android:textColor="@color/color_white"
+                        android:text="@string/main_empty_create_communities"
+                        android:onClick="@{listener::onClick}"
+                        style="@style/TextAppearanceBody1" />
+
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

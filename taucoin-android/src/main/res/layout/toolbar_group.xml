@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/toolbarColor"
+        app:layout_scrollFlags="enterAlways"
+        android:transitionName="actionBar"
+        app:popupTheme="?attr/popupTheme"
+        android:elevation="@dimen/toolbar_elevation"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        android:focusable="true" >
+
+        <RelativeLayout
+            android:id="@+id/toolbar_title"
+            android:onClick="@{listener::onClick}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_group_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textSize="@dimen/font_size_18"
+                android:textAppearance="@style/TextAppearanceHeadline5"/>
+
+            <TextView
+                android:layout_below="@+id/tv_group_name"
+                android:id="@+id/tv_users_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textAppearance="@style/TextAppearanceBody2"/>
+
+        </RelativeLayout>
+
+    </androidx.appcompat.widget.Toolbar>
+</layout>

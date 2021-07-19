@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+            android:id="@+id/tx_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@{@dimen/fab_size + @dimen/fab_margin}"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:focusable="true"
+            android:scrollbarStyle="outsideOverlay" />
+
+        <io.taucoin.torrent.publishing.ui.customviews.ThemedSpeedDialView
+            android:id="@+id/fab_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            app:sdMainFabClosedSrc="@drawable/ic_add_36dp"
+            app:sdMainFabAnimationRotateAngle="0" />
+
+    </RelativeLayout>
+</layout>

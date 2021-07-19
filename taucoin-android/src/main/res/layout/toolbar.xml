@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:background="?attr/toolbarColor"
+        android:gravity="center_vertical"
+        app:layout_scrollFlags="enterAlways"
+        android:transitionName="actionBar"
+        app:popupTheme="?attr/popupTheme"
+        android:elevation="@dimen/toolbar_elevation"
+        app:titleTextAppearance="@style/Toolbar.TitleText"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        android:focusable="true">
+    </androidx.appcompat.widget.Toolbar>
+</layout>

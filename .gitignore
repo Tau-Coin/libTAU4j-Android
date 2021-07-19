@@ -1,0 +1,9 @@
+/.gradle/
+/.idea/
+/taucoin-android/build/
+/taucoin-android/schemas/
+/taucoin-android/taucoin-android.iml
+/taucoin-core/build/
+/taucoin-core/taucoin-core.iml
+/libTAU4j-Android.iml
+/local.properties

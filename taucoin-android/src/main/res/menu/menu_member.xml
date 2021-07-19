@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/member_ban"
+        app:showAsAction="always"
+        android:icon="@mipmap/icon_ban"
+        android:title="@string/community_blacklist" />
+
+    <item android:id="@+id/member_add"
+        app:showAsAction="always"
+        android:icon="@mipmap/icon_add_member"
+        android:title="@string/community_add_member" />
+
+    <item android:id="@+id/community_qr_code"
+        app:showAsAction="always"
+        android:icon="@mipmap/icon_qr_code_white"
+        android:title="@string/community_qr_code" />
+
+</menu>

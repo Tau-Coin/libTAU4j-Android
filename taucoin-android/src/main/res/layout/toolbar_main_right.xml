@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:background="?attr/toolbarColor">
+
+        <ImageView
+            android:visibility="visible"
+            android:id="@+id/iv_back"
+            android:layout_width="@dimen/widget_size_35"
+            android:layout_height="@dimen/widget_size_35"
+            android:src="@mipmap/icon_back"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/widget_size_10"
+            android:layout_marginEnd="@dimen/widget_size_10"
+            android:padding="@dimen/widget_size_5"
+            android:contentDescription="@null"/>
+
+        <RelativeLayout
+            android:layout_toEndOf="@+id/iv_back"
+            android:layout_toStartOf="@+id/iv_action"
+            android:layout_centerVertical="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_size_18"
+                android:textColor="@color/color_white"
+                android:textAppearance="@style/TextAppearanceHeadline5"/>
+
+            <TextView
+                android:visibility="gone"
+                android:layout_below="@+id/tv_title"
+                android:id="@+id/tv_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/color_white"
+                android:textAppearance="@style/TextAppearanceBody2"/>
+
+        </RelativeLayout>
+
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/iv_action"
+            android:layout_width="@dimen/widget_size_35"
+            android:layout_height="@dimen/widget_size_35"
+            android:src="@mipmap/icon_more"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/widget_size_10"
+            android:layout_marginEnd="@dimen/widget_size_10"
+            android:padding="@dimen/widget_size_5"
+            android:contentDescription="@null"/>
+
+    </RelativeLayout>
+</layout>

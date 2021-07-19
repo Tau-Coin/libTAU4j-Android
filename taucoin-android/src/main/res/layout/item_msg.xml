@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/widget_size_10"
+        android:layout_marginTop="@dimen/widget_size_10"
+        android:gravity="bottom">
+
+        <include android:id="@+id/left_view"
+            layout="@layout/msg_left_view"/>
+
+        <LinearLayout
+            android:id="@+id/middle_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/icon_chat_bg"
+            android:minHeight="@dimen/widget_size_50"
+            android:layout_marginEnd="@dimen/widget_size_60"
+            android:layout_marginBottom="@dimen/widget_size_3"
+            android:paddingStart="@dimen/widget_size_20"
+            android:paddingEnd="@dimen/widget_size_10"
+            android:paddingTop="@dimen/widget_size_5"
+            android:paddingBottom="@dimen/widget_size_5"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:textColor="@color/color_yellow"
+                android:textAppearance="@style/TextAppearanceBody2" />
+
+            <LinearLayout
+                android:id="@+id/ll_reply"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/widget_size_2"
+                android:layout_marginTop="@dimen/widget_size_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:layout_width="@dimen/widget_size_2"
+                    android:layout_height="match_parent"
+                    android:background="@color/primary"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_10">
+
+                    <TextView
+                        android:id="@+id/tv_reply_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:ellipsize="middle"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/primary"
+                        android:textAppearance="@style/TextAppearanceBody2" />
+
+                    <TextView
+                        android:id="@+id/tv_reply_msg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/widget_size_2"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false"
+                        android:textAppearance="@style/TextAppearanceBody2" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_size_2"
+                android:textAppearance="@style/TextAppearanceBody2" />
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody3" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

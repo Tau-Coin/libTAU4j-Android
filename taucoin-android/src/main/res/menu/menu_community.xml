@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/community_search"
+        app:showAsAction="always"
+        android:visible="false"
+        android:icon="@mipmap/ic_search_white_24dp"
+        android:title="@string/menu_search" />
+
+    <item android:id="@+id/menu_members"
+        app:showAsAction="always"
+        android:icon="@mipmap/icon_info"
+        android:title="@string/menu_members" />
+
+</menu>

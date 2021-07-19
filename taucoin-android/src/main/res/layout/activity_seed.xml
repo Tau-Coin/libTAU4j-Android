@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <ScrollView
+            android:fillViewport="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:background="@color/color_white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    android:id="@+id/item_import_seed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_50"
+                    android:gravity="center_vertical"
+                    android:onClick="@{listener::onClick}"
+                    app:leftImage="@mipmap/icon_import"
+                    app:rightText="@string/user_import_seed"/>
+
+                <include
+                    android:layout_marginStart="@dimen/widget_size_55"
+                    layout="@layout/view_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_1" />
+
+                <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    android:id="@+id/item_export_seed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_50"
+                    android:gravity="center_vertical"
+                    android:onClick="@{listener::onClick}"
+                    app:leftImage="@mipmap/icon_export"
+                    app:rightText="@string/user_export_seed"/>
+
+                <include
+                    android:layout_marginStart="@dimen/widget_size_55"
+                    layout="@layout/view_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_1" />
+
+                <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    android:id="@+id/item_generate_seed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_50"
+                    android:gravity="center_vertical"
+                    android:onClick="@{listener::onClick}"
+                    app:leftImage="@mipmap/icon_generate"
+                    app:rightText="@string/user_generate_seed"/>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:background="@color/color_white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:paddingTop="@dimen/widget_size_15"
+            android:paddingStart="@dimen/widget_size_20"
+            android:paddingEnd="@dimen/widget_size_0"
+            android:paddingBottom="@dimen/widget_size_0">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/user_seeds_history"
+                android:textAppearance="@style/TextAppearanceBody1"
+                android:textColor="@color/primary"
+                android:paddingBottom="@dimen/widget_size_10"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/history_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</layout>

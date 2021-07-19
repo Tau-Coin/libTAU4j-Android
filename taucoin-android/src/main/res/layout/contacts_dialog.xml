@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_white">
+
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="@dimen/widget_size_18"
+            android:layout_height="@dimen/widget_size_18"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/widget_size_10"
+            android:layout_marginBottom="@dimen/widget_size_20"
+            android:contentDescription="@null"
+            android:src="@mipmap/icon_close" />
+
+        <TextView
+            android:layout_below="@+id/iv_close"
+            android:id="@+id/tv_title"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginBottom="@dimen/widget_size_15"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+        <EditText
+            android:layout_below="@+id/tv_title"
+            android:visibility="gone"
+            android:id="@+id/et_chat_name"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_50"
+            android:singleLine="true"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:gravity="center_horizontal|bottom"
+            android:hint="@string/contacts_chat_name_hint"
+            android:inputType="text"
+            android:textAppearance="@style/TextAppearanceBody1"
+            android:autofillHints="@string/user_seed_import_hint" />
+
+        <EditText
+            android:layout_below="@+id/et_chat_name"
+            android:id="@+id/et_public_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_50"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:gravity="center_horizontal|bottom"
+            android:hint="@string/contacts_public_key_hint"
+            android:inputType="textMultiLine"
+            android:textAppearance="@style/TextAppearanceBody1"
+            android:autofillHints="@string/user_nickname" />
+
+        <TextView
+            android:layout_below="@+id/et_public_key"
+            android:id="@+id/tv_submit"
+            android:minWidth="@dimen/widget_size_240"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_50"
+            android:layout_centerHorizontal="true"
+            android:text="@string/common_submit"
+            android:layout_marginTop="@dimen/widget_size_35"
+            android:textAllCaps="true"
+            android:gravity="center_horizontal|center"
+            android:textColor="@color/color_white"
+            android:textAppearance="@style/TextAppearanceBody1"
+            android:background="@drawable/primary_rect_round_bg" />
+
+        <TextView
+            android:id="@+id/tv_do_not_show"
+            android:visibility="gone"
+            android:layout_below="@+id/tv_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/widget_size_30"
+            android:textColor="@color/gray_dark"
+            android:text="@string/common_do_not_show"
+            android:textAppearance="@style/TextAppearanceBody2"/>
+
+    </RelativeLayout>
+</layout>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#f19322</color>
+    <color name="colorPrimaryDark">#f19322</color>
+    <color name="colorAccent">#FB9500</color>
+
+    <color name="primary">#f19322</color>
+    <color name="primary_dark">#f19322</color>
+    <color name="primary_light">#FB9500</color>
+    <color name="accent">#f19322</color>
+    <color name="accent_dark">#f19322</color>
+    <color name="accent_light">#FB9500</color>
+    <color name="toolbar">@color/primary</color>
+    <color name="toolbar_dark">#272727</color>
+    <color name="background">#FFFFFF</color>
+    <color name="background_grey">#F5F5F5</color>
+    <color name="background_dark">#121212</color>
+    <color name="background_blank">#EDEDED</color>
+    <color name="background_blank_dark">#1D1D1D</color>
+    <color name="background_dialog">#FFFFFF</color>
+    <color name="background_dialog_dark">#373737</color>
+    <color name="background_dialog_black">#121212</color>
+    <color name="foreground">#FFFFFF</color>
+    <color name="foreground_dark">#2D2D2D</color>
+    <color name="foreground_black">#121212</color>
+    <color name="gray_dark">#727272</color>
+    <color name="gray_light">#B7B6BC</color>
+    <color name="gray">#E0E0E0</color>
+    <color name="divider">#E0E0E0</color>
+    <color name="divider_dark">#202020</color>
+    <color name="text_primary">#DE000000</color>
+    <color name="text_secondary">#9E9E9E</color>
+    <color name="text_primary_inverse">#FFFFFF</color>
+    <color name="action_mode">#757575</color>
+    <color name="action_mode_dark">#272727</color>
+    <color name="selectable">#EDE7F6</color>
+    <color name="selectable_dark">#23183B</color>
+    <color name="selectable_drawer">#EDE7F6</color>
+    <color name="selectable_drawer_dark">#3D374C</color>
+    <color name="error">#B00020</color>
+    <color name="error_light">#CF6679</color>
+    <color name="ok">#20B000</color>
+    <color name="ok_light">#9CD791</color>
+    <color name="piece_cell">#BDBDBD</color>
+    <color name="piece_cell_dark">#373737</color>
+    <color name="speed_dial_overlay">#80FFFFFF</color>
+    <color name="speed_dial_overlay_dark">#80121212</color>
+    <color name="speed_dial_overlay_black">#80000000</color>
+    <color name="switchBar_off">#80868B</color>
+
+    <color name="color_logo">#d06a00</color>
+    <color name="color_yellow">#f19322</color>
+    <color name="color_yellow_dark">#E1B447</color>
+    <color name="color_yellow_light">#FB9500</color>
+
+    <color name="color_white">#FFFFFF</color>
+    <color name="color_bg">#F5F5F5</color>
+    <color name="color_pay_bg">#F0F0F0</color>
+    <color name="color_chat_pop">#F7F7F7</color>
+    <color name="color_chat_bg">#F3F3F3</color>
+
+    <color name="color_red">#FF0000</color>
+    <color name="color_red_light">#FF4E55</color>
+    <color name="color_red_dark">#CD6660</color>
+    <color name="color_red_bg">#FBEFEF</color>
+
+    <color name="color_blue">#477df9</color>
+    <color name="color_blue_light">#0E88EF</color>
+    <color name="color_blue_white">#9FC5EB</color>
+
+    <color name="color_black_transparent">#66000000</color>
+    <color name="color_black">#000000</color>
+    <color name="color_black_light">#454545</color>
+
+    <color name="color_transparent">#00000000</color>
+
+    <color name="ic_launcher_background">#f19322</color>
+
+    <color name="viewfinder_corner">#FF1FB3E2</color>
+    <color name="viewfinder_frame">#7F1FB3E2</color>
+    <color name="viewfinder_laser">#FF1FB3E2</color>
+    <color name="viewfinder_mask">#60000000</color>
+    <color name="viewfinder_result_point_color">#C0FFBD21</color>
+    <color name="viewfinder_text_color">#FFC0C0C0</color>
+</resources>
