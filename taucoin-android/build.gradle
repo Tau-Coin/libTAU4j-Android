@@ -151,7 +151,7 @@ dependencies {
     implementation 'com.github.czy1121:roundbutton:1.1.0'
     implementation 'com.yanzhenjie.recyclerview:x:1.3.2'
     //    implementation 'com.facebook.stetho:stetho:1.5.0'
-    implementation 'com.github.hf:leveldb:1.19.0@aar'
+//    implementation 'com.github.hf:leveldb:1.19.0@aar'
     // 数据库调试
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
     // 内存检测工具，2.X无需在Application中添加代码
