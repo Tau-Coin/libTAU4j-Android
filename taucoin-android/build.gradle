@@ -1,0 +1,161 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://dl.bintray.com/stojan/android' }
+    maven { url 'https://dl.bintray.com/jenly/maven' }
+}
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        applicationId "io.taucoin.torrent.publishing"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        vectorDrawables.useSupportLibrary = true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        resConfigs "en"
+        renderscriptTargetApi 21
+        renderscriptSupportModeEnabled true
+
+        ndk {
+            abiFilters 'arm64-v8a', 'x86_64'
+        }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
+
+    sourceSets {
+        release {
+            assets.srcDirs = ['assets', 'src/main/assets/release']
+        }
+        debug {
+            assets.srcDirs = ['assets', 'src/main/assets/debug']
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+        exclude 'META-INF/proguard/coroutines.pro'
+        exclude 'META-INF/androidx.preference_preference.version'
+        exclude 'kotlin/collections/MapWithDefault.kotlin_metadata'
+    }
+
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:2.0.1'
+    }
+
+}
+
+configurations {
+    // This package is excluded here. This package will be connected with com.google.guava
+    // Conflicts, resulting in compilation failure
+    all*.exclude group: 'com.google.guava', module: 'listenablefuture'
+}
+
+def ROOM_VERSION = "2.2.6"
+def DAGGER_VERSION = "2.27"
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation(project(':taucoin-core')) {
+        exclude group: "org.slf4j", module: "slf4j-log4j12"
+        exclude group: "log4j", module: "apache-log4j-extras"
+    }
+    /* Testing */
+    testImplementation 'junit:junit:4.13'
+    testImplementation 'org.robolectric:robolectric:4.3.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation "androidx.room:room-testing:$ROOM_VERSION"
+    androidTestImplementation "com.google.dagger:dagger:$DAGGER_VERSION"
+    testAnnotationProcessor "com.google.auto.service:auto-service:1.0-rc6"
+    /* AndroidX libraries */
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.0-beta02'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview-selection:1.2.0-alpha01'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation "androidx.room:room-runtime:$ROOM_VERSION"
+    implementation "androidx.room:room-rxjava2:$ROOM_VERSION"
+    annotationProcessor "androidx.room:room-compiler:$ROOM_VERSION"
+    /* For schemas import */
+    implementation 'androidx.work:work-runtime:2.5.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.paging:paging-runtime:2.1.2'
+    /* ReactiveX */
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    /* Logger */
+    implementation 'com.github.tony19:logback-android-core:1.1.1-6'
+    implementation('com.github.tony19:logback-android-classic:1.1.1-6') {
+        exclude group: 'com.google.android'
+    }
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    /* PictureSelector */
+    implementation 'com.github.LuckSiege.PictureSelector:picture_library:v2.4.6'
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'
+    /* Other */
+    implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
+    implementation 'com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:1.0.0'
+    implementation 'com.github.anthonynsimon:jurl:v0.4.2'
+    implementation 'com.jaredrummler:colorpicker:1.1.0'
+    /* Don't use Commons IO >= 2.6, because they uses Java NIO, supported only from API 26 */
+    implementation 'commons-io:commons-io:2.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.takisoft.preferencex:preferencex:1.1.0'
+    implementation 'com.leinardi.android:speed-dial:3.1.1'
+    implementation 'net.java.dev.jna:jna:5.5.0@aar'
+    // 此库只支持API >= 21
+    //    implementation 'com.github.minminaya:LGMRoundButton:v1.2'
+    implementation 'com.github.czy1121:roundbutton:1.1.0'
+    implementation 'com.yanzhenjie.recyclerview:x:1.3.2'
+    //    implementation 'com.facebook.stetho:stetho:1.5.0'
+    implementation 'com.github.hf:leveldb:1.19.0@aar'
+    // 数据库调试
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+    // 内存检测工具，2.X无需在Application中添加代码
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+    // 图表
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+}

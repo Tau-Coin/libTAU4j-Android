@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <RelativeLayout
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/widget_size_15"
+            android:paddingBottom="@dimen/widget_size_15"
+            android:background="@color/color_white">
+
+            <io.taucoin.torrent.publishing.ui.customviews.RoundButton
+                android:id="@+id/left_view"
+                android:layout_width="@dimen/widget_size_50"
+                android:layout_height="@dimen/widget_size_50"
+                android:layout_marginStart="@dimen/widget_size_15"
+                android:layout_marginEnd="@dimen/widget_size_7"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:textAllCaps="true"
+                android:textColor="@color/color_white"
+                android:textAppearance="@style/TextAppearanceHeadline6"
+                app:btnStrokeColor="@color/primary_light"
+                app:btnStrokeWidth="0dp"
+                app:btnCornerRadius="@dimen/widget_size_10"
+                app:btnSolidColor="@color/primary_light"
+                app:btnPressedRatio="1.5" />
+
+            <LinearLayout
+                android:layout_toEndOf="@+id/left_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/widget_size_15"
+                android:paddingStart="@dimen/widget_size_5"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textAppearance="@style/TextAppearanceHeadline6" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:id="@+id/ll_public_key"
+                    android:paddingEnd="@dimen/widget_size_30"
+                    android:paddingStart="0dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_public_key"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:layout_marginTop="@dimen/widget_size_2"
+                        android:singleLine="true"
+                        android:onClick="@{listener::onClick}"
+                        android:ellipsize="end"
+                        android:textAppearance="@style/TextAppearanceBody1" />
+
+                    <ImageView
+                        android:id="@+id/iv_public_key_copy"
+                        android:layout_width="@dimen/widget_size_25"
+                        android:layout_height="@dimen/widget_size_25"
+                        android:padding="@dimen/widget_size_5"
+                        android:onClick="@{listener::onClick}"
+                        android:contentDescription="@null"
+                        android:layout_marginStart="@dimen/widget_size_5"
+                        android:src="@mipmap/icon_copy"/>
+
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/ll_mutual_communities"
+                    android:background="@color/color_white"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text="@string/user_mutual_communities"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginTop="@dimen/widget_size_15"
+                        android:layout_marginBottom="@dimen/widget_size_10"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody2" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:background="@color/color_white"
+                        android:id="@+id/recycler_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:scrollbars="vertical"
+                        android:focusable="true"
+                        android:scrollbarStyle="outsideOverlay" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/tv_add_to_contact"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_44"
+                    android:onClick="@{listener::onClick}"
+                    android:background="@color/color_white"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:textAppearance="@style/TextAppearanceBody1"
+                    android:textColor="@color/color_yellow"
+                    android:gravity="center_horizontal|center"
+                    android:text="@string/user_add_to_contact"/>
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/tv_share_qr"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_44"
+                    android:onClick="@{listener::onClick}"
+                    android:background="@color/color_white"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:textAppearance="@style/TextAppearanceBody1"
+                    android:textColor="@color/color_yellow"
+                    android:gravity="center_horizontal|center"
+                    android:text="@string/user_share_qr"/>
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/tv_start_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_44"
+                    android:onClick="@{listener::onClick}"
+                    android:background="@color/color_white"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:textAppearance="@style/TextAppearanceBody1"
+                    android:textColor="@color/color_yellow"
+                    android:gravity="center_horizontal|center"
+                    android:text="@string/user_start_chat"/>
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/tv_ban"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_44"
+                    android:onClick="@{listener::onClick}"
+                    android:background="@color/color_white"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:textAppearance="@style/TextAppearanceBody1"
+                    android:textColor="@color/color_red"
+                    android:gravity="center_horizontal|center"
+                    android:text="@string/user_ban"/>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</layout>

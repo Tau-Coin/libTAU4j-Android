@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_qr_code"
+                android:layout_width="@dimen/widget_size_40"
+                android:layout_height="@dimen/widget_size_40"
+                android:padding="@dimen/widget_size_10"
+                android:onClick="onClick"
+                android:layout_gravity="start|bottom"
+                android:layout_marginStart="@dimen/widget_size_20"
+                android:layout_marginBottom="@dimen/widget_size_50"
+                android:layout_above="@+id/ll_bottom"
+                android:src="@mipmap/icon_pkqr"
+                android:background="@drawable/circle_black"
+                android:contentDescription="@null"/>
+
+            <ImageView
+                android:id="@+id/iv_gallery"
+                android:layout_width="@dimen/widget_size_40"
+                android:layout_height="@dimen/widget_size_40"
+                android:padding="@dimen/widget_size_10"
+                android:layout_gravity="end|bottom"
+                android:onClick="onClick"
+                android:layout_marginEnd="@dimen/widget_size_20"
+                android:layout_marginBottom="@dimen/widget_size_50"
+                android:layout_alignParentEnd="true"
+                android:layout_above="@+id/ll_bottom"
+                android:background="@drawable/circle_black"
+                android:src="@mipmap/icon_album"
+                android:contentDescription="@null"/>
+
+            <LinearLayout
+                android:id="@+id/ll_bottom"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical"
+                android:background="@color/color_black"
+                android:layout_gravity="bottom"
+                android:gravity="center_horizontal|center"
+                android:minHeight="@dimen/widget_size_60"
+                android:paddingTop="@dimen/widget_size_5"
+                android:paddingBottom="@dimen/widget_size_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_no_qr_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_20"
+                    android:textColor="@color/color_white"
+                    android:gravity="center_horizontal|center"
+                    android:text="@string/qr_code_scan_qr"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/tv_continue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_secondary"
+                    android:gravity="center_horizontal|center"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:text="@string/qr_code_not_found_continue"
+                    android:textAppearance="@style/TextAppearanceBody3"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="@dimen/widget_size_30"
+                android:layout_height="@dimen/widget_size_30"
+                android:layout_marginStart="@dimen/widget_size_12"
+                android:layout_marginTop="@dimen/widget_size_25"
+                android:padding="@dimen/widget_size_2"
+                android:onClick="onClick"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:src="@mipmap/icon_back_circle"
+                android:contentDescription="@null"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
+</layout>

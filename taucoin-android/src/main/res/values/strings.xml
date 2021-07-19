@@ -1,0 +1,381 @@
+<resources>
+    <string name="app_name">TAU</string>
+    <string name="app_name_alpha">TAU Alpha Test</string>
+    <string name="app_share">Share app link via</string>
+    <string name="app_share_error">Can\'t find share component to share</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="common_balance_unit">TAU</string>
+    <string name="common_numerical_value">0</string>
+    <string name="common_install_browser">Please install mobile browser first!</string>
+    <string name="common_parentheses">(%1$s)</string>
+    <string name="common_proceed">Proceed</string>
+    <string name="common_back">Back</string>
+    <string name="common_slant">(%1$d/%2$d)</string>
+    <string name="common_submit">Submit</string>
+    <string name="common_percent">%1$d%%</string>
+    <string name="common_on">ON</string>
+    <string name="common_off">OFF</string>
+    <string name="common_do_not_show">Do not show this dialog again</string>
+    <string name="common_start">Start</string>
+    <string name="common_yes">Yes</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="exit">Exit</string>
+    <string name="common_default">Default</string>
+    <string name="common_share">Share</string>
+    <string name="common_later">Later</string>
+    <string name="common_debug_digit1">1-100</string>
+    <string name="common_debug_digit2">1-1000</string>
+    <string name="common_debug_str1">100*10KB</string>
+    <string name="common_debug_str2">1000*1KB</string>
+
+    <string name="open_navigation_drawer">Open navigation drawer</string>
+    <string name="close_navigation_drawer">Close navigation drawer</string>
+
+    <string name="main_title">TAU</string>
+    <string name="main_empty_title">Welcome to TAU</string>
+    <string name="main_empty_add_friends">Add Friend</string>
+    <string name="main_empty_create_communities">Create Coin Community</string>
+    <string name="main_exit">Click again to exit the application!</string>
+    <string name="main_balance_power">Balance %1$s, Power %2$s</string>
+    <string name="main_read_only">READ\nONLY</string>
+    <string name="main_open_link">Open the link?</string>
+
+    <string name="main_publish_video">Publish Video</string>
+    <string name="main_new_community">New Community</string>
+    <string name="main_community_settings">Community Settings</string>
+    <string name="main_other_transaction">Other Transaction</string>
+    <string name="main_no_messages">[No messages]</string>
+    <string name="main_pic_messages">[Picture]</string>
+    <string name="main_connecting">Joining phone swarm &#8230;</string>
+    <string name="main_data_used_up">Daily Data Limit Used Up</string>
+    <string name="main_insufficient_device_space">Insufficient device space</string>
+
+    <!-- Strings used for main drawer content -->
+    <string name="drawer_new_community">New Community</string>
+    <string name="drawer_peers">Friends</string>
+    <string name="drawer_setting">Settings</string>
+    <string name="drawer_data_cost">Data Cost</string>
+    <string name="drawer_share">Share</string>
+    <string name="drawer_frequency">Working Frequency/%1$s</string>
+    <string name="drawer_dht_nodes">Peers/%1$d</string>
+    <string name="drawer_daily_data">%1$s</string>
+    <string name="drawer_cpu_usage">CPU/%1$s</string>
+    <string name="drawer_mem_data">Memory/%1$s</string>
+    <string name="drawer_export_seed">Export Key</string>
+    <string name="drawer_wifi">Wifi</string>
+    <string name="drawer_telecom">Tele\ncom</string>
+
+    <!-- Strings used for menu -->
+    <string name="menu_share">Share</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_alert">Alert</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_members">Members</string>
+    <string name="menu_done">Done</string>
+    <string name="menu_rank_c">Last Seen</string>
+    <string name="menu_rank_a">Last Communication</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_community_info">Community Info</string>
+
+    <string name="community_settings">Settings</string>
+    <string name="community_blacklist">Ban</string>
+    <string name="community_mining_info">Mining Info</string>
+    <string name="community_sync_rate">Sync Rate</string>
+    <string name="community_miners_online">Miners Online</string>
+    <string name="community_total_blocks">Total Blocks</string>
+    <string name="community_mining_power">Mining Power</string>
+    <string name="community_info">Info</string>
+    <string name="community_invite_link">Invite Link</string>
+    <string name="community_add_member">Add Member via Wiring</string>
+    <string name="community_qr_code">Community QR Code</string>
+    <string name="community_ban_community">Do you want to ban this community?</string>
+
+    <string name="community_input_hint">Message</string>
+    <string name="community_users_stats">%1$d members, %2$d online</string>
+    <string name="common_loading">loading&#8230;</string>
+
+    <string name="community_community_name">e.g.Paris(required)</string>F
+    <string name="community_coin_name">Coin Name(optional)</string>
+    <string name="community_announce">Announce on TAU</string>
+    <string name="community_total_coin">Total Coins</string>
+    <string name="community_avg_block">Avg Block</string>
+    <string name="community_avg_block_time">%1$d min</string>
+    <string name="community_intro">Introduction(optional)</string>
+    <string name="community_more_settings">More Settings</string>
+    <string name="community_bootstrap_node">DHT Bootstrap Node</string>
+    <string name="community_message">Message</string>
+    <string name="community_comment">Comment</string>
+    <string name="community_transaction">Transaction</string>
+    <string name="community_nickname">Community Nickname</string>
+    <string name="community_choose_community">Choose Community</string>
+    <string name="community_mining_status">Mining Status</string>
+    <string name="community_mining_online">Mining online</string>
+    <string name="community_mining_income">Mining Income</string>
+    <string name="community_state">Total Blocks %1$s, Sync Blocks %2$s</string>
+    <string name="community_chain_note">Chain Content</string>
+    <string name="community_instant_chat">Chat</string>
+    <string name="community_wired">Transaction</string>
+    <string name="community_queue">Queue</string>
+    <string name="community_on_chain">Onchain</string>
+
+    <string name="error_community_name_empty">Community name cannot be empty!</string>
+    <string name="error_coin_name_empty">Coin name cannot be empty!</string>
+    <string name="error_telegram_id_illegal">Telegram ID is illegal!</string>
+    <string name="community_added_successfully">Create Community Successful!</string>
+    <string name="community_added_members">+ Add Members Now</string>
+
+    <string name="setting_title">Settings</string>
+    <string name="setting_key_explain">Secret key is your private ID to be kept confidential, public key is your open ID for friends.</string>
+    <string name="setting_account">My Public Key</string>
+    <string name="setting_nickname">Nickname</string>
+    <string name="setting_import_seed">Tap to import secret key</string>
+    <string name="setting_username_app">Nickname in app</string>
+    <string name="setting_privacy_security">Privacy and Security</string>
+    <string name="setting_community_setting">Community Setting</string>
+    <string name="setting_journal">Journal</string>
+    <string name="setting_font_size">Font Size</string>
+    <string name="setting_journal_share">Share journal to</string>
+    <string name="setting_help">Help</string>
+    <string name="setting_community">Community</string>
+    <string name="setting_favorites">Favorites</string>
+
+    <!-- Strings used for Dashboard -->
+    <string name="setting_storage">Storage</string>
+    <string name="setting_data_statistics">24h Data Statistics</string>
+    <string name="setting_metered_statistics">Metered Statistics</string>
+    <string name="setting_wifi_statistics">WiFi Statistics</string>
+    <string name="setting_memory_statistics">24h Memory Statistics</string>
+    <string name="setting_cpu_statistics">24h CPU Statistics</string>
+    <string name="setting_journal_path">Journal storage path</string>
+    <string name="setting_share_journal">Share All Journal</string>
+    <string name="setting_wifi_network_title">WiFi - likely free internet</string>
+    <string name="setting_metered_network_title">Metered - likely paid internet</string>
+    <string name="setting_data_reset_time">Data Daily Reset Time</string>
+    <string name="setting_data_reset_time_value">%d am</string>
+    <string name="setting_work_frequency">Working Frequency</string>
+    <string name="setting_fore_mode">Foreground Mode</string>
+    <string name="setting_bg_mode">Background Mode</string>
+    <string name="setting_survival_mode">Survival Mode</string>
+    <string name="setting_running_time">Running time: %1$s</string>
+    <string name="setting_doze_time">Doze time: %1$s</string>
+    <string name="setting_running_time_hours">%1$s hours</string>
+    <string name="setting_running_time_minutes">%1$s minutes</string>
+    <string name="setting_running_time_seconds">%1$s seconds</string>
+    <string name="setting_work_frequency_in_screen_time">%1$d hours daily, now spent %2$s.</string>
+    <string name="setting_work_frequency_not_in_screen_time">%1$d hours daily, now over %2$d hours.
+        Please increase data limit to add foreground time.</string>
+    <string name="setting_daily_quota">Daily Data Limit</string>
+    <string name="setting_daily_quota_unit_m">%1$dM</string>
+    <string name="setting_daily_quota_unit_g">%1$dG</string>
+    <string name="setting_network_current_speed">Current Speed</string>
+    <string name="setting_average_speed_screen_time">Foreground Target Speed</string>
+    <string name="setting_average_speed_background">Background Target Speed</string>
+    <string name="setting_network_average_speed">Average Speed</string>
+    <string name="setting_network_available_data">Today Remaining Data</string>
+    <string name="setting_metered_network_limit_speed">%1$s/s</string>
+    <string name="setting_master_node">Master node</string>
+    <string name="setting_charging">Charging</string>
+    <string name="setting_internet">Internet</string>
+    <string name="setting_wake_lock">Always Awake</string>
+    <string name="setting_upnp">UPnP</string>
+    <string name="setting_nat_pmp">NAT-PMP</string>
+    <string name="setting_main_loop_interval">Main Loop Interval(ms)</string>
+    <string name="setting_gossip_interval">Gossip Interval(s)</string>
+    <string name="setting_daily_traffic_limit_used_up">Data limit used, proceed to use more data?</string>
+    <string name="setting_metered_limit_select_tips">Using telecom data may incur additional fees.\n
+        How much traffic do you want to use per day?</string>
+
+    <!-- Strings used for privacy and security -->
+    <string name="setting_privacy">Privacy</string>
+    <string name="setting_blacklist_users">Banlist Users</string>
+    <string name="setting_blacklist_communities">Banlist Communities</string>
+    <string name="setting_Unblock">&#160;Unblock&#160;</string>
+    <string name="setting_security">Security</string>
+    <string name="setting_seeds">Keys</string>
+    <string name="setting_login_devices">Login Devices</string>
+    <string name="setting_device_id">Device ID</string>
+
+    <string name="user_generate_seed">Generate Key</string>
+    <string name="user_import_seed">Import Key</string>
+    <string name="user_export_seed">Export Key</string>
+    <string name="user_seeds_history">History</string>
+    <string name="user_nickname">Nickname (optional)</string>
+    <string name="user_seed_import_hint">Secrete Key (required)</string>
+    <string name="user_seed_import">Import</string>
+    <string name="user_seed_generate">Generate New Key</string>
+    <string name="user_seed_empty">Key cannot be empty!</string>
+    <string name="user_seed_invalid">Key is invalid!</string>
+    <string name="user_seed_save_tips">Please make sure your key\nhas been saved</string>
+    <string name="user_show_name">%1$s(%2$s)</string>
+    <string name="user_ban">Ban</string>
+    <string name="user_ban_list">Banlist</string>
+    <string name="user_edit_name">Edit Name</string>
+    <string name="user_mutual_communities">Mutual Communities:</string>
+    <string name="user_community_name">C/%1$s</string>
+    <string name="user_new_name_hint">Nick Name</string>
+    <string name="user_invalid_new_name">Invalid Nickname</string>
+    <string name="user_invalid_friend_pk">Invalid Friend\'s Public Key</string>
+    <string name="user_new_name_too_long">Nickname too long</string>
+    <string name="user_no_messages_from">No messages from</string>
+    <string name="user_until_removed">until removed from the ban list.</string>
+    <string name="user_start_chat">Chat</string>
+    <string name="user_add_to_contact">Add To Friends</string>
+    <string name="user_share_qr">Share QR To Friend</string>
+    <string name="user_share_qr_dialog_tips">Share your QR code to friends for 100% connection</string>
+
+    <string name="copy_seed">Key copied</string>
+    <string name="copy_public_key">My Public Key copied</string>
+    <string name="copy_share_link">Share link copied</string>
+    <string name="copy_message_hash">Message hash copied</string>
+    <string name="copy_successfully">Copy successfully</string>
+    <string name="copy_link_successfully">Copy link successfully</string>
+    <string name="blacklist_successfully">Blacklist successfully</string>
+    <string name="favourite_successfully">Added favourite successfully</string>
+    <string name="share_link_successfully">Share successfully</string>
+
+    <!-- Strings used for transactions -->
+    <string name="tx_send">Send</string>
+    <string name="tx_public_key_hint">My Public Key</string>
+    <string name="tx_amount_hint">Amount</string>
+    <string name="tx_memo_hint">Memo</string>
+    <string name="tx_median_fee">Transaction median fee/%1$s %2$s</string>
+    <string name="tx_new_name">Nick Name(required)</string>
+    <string name="tx_personal_profile">Personal profile(Optional)</string>
+    <string name="tx_message">Comment(required)</string>
+    <string name="tx_contact_id">%1$s(Optional)</string>
+    <string name="tx_bootstrap_node">Bootstrap node(required)</string>
+    <string name="tx_comment">Comment(required)</string>
+    <string name="tx_operation_reply">Reply</string>
+    <string name="tx_operation_copy">Copy</string>
+    <string name="tx_operation_copy_link">Copy link</string>
+    <string name="tx_operation_forward">Forward</string>
+    <string name="tx_operation_blacklist">Blacklist</string>
+    <string name="tx_operation_favorite">Favorite</string>
+    <string name="tx_operation_msg_hash">Message Hash</string>
+    <string name="tx_error_type">No such transaction type!</string>
+    <string name="tx_on_chain_msg">On-Chain Message</string>
+    <string name="tx_fee_hint">Fee</string>
+    <string name="tx_median_fee_tips">Transaction median fee:%1$s</string>
+    <string name="tx_fee_tips">*More transaction fees more opportunities be packaged miners.</string>
+    <string name="tx_error_invalid_pk">Invalid receiver\'s Public Key!</string>
+    <string name="tx_error_invalid_amount">Invalid Transaction amount</string>
+    <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Balance</string>
+    <string name="tx_error_no_enough_coins_for_fee">Insufficient Balance :\nTransaction Fee > Balance</string>
+    <string name="tx_error_no_enough_coins_for_airdrop">Insufficient Balance</string>
+    <string name="tx_error_invalid_name">Invalid Name</string>
+    <string name="tx_error_invalid_message">Invalid Message</string>
+    <string name="tx_error_invalid_comment">Invalid Comment</string>
+
+    <string name="tx_result_successfully">Successfully</string>
+    <string name="tx_result_processing">In processing,expected to confirm</string>
+    <string name="tx_result_failed">Failed</string>
+    <string name="tx_to">To/</string>
+    <string name="tx_fee">Fee/</string>
+    <string name="tx_hash">Hash/</string>
+    <string name="tx_memo">Memo/</string>
+    <string name="tx_memo_airdrop">Airdrop coins</string>
+
+    <!-- Strings used for notifier -->
+    <string name="app_running_in_the_background">TAU running in the background</string>
+    <string name="app_shutdown">Shutdown</string>
+    <string name="chat_channel">Chat</string>
+    <string name="finished">Finished</string>
+    <string name="foreground_notification">Foreground notification</string>
+
+    <!-- Strings used for connected peers -->
+    <string name="contacts_exchange_qr">Exchange QR code to add friend</string>
+    <string name="contacts_import_friend_pk">Import Public Key to add friend</string>
+    <string name="contacts_have_added">I have added you as a friend.</string>
+    <string name="contacts_yourself">&#160;-&#160;yourself</string>
+    <string name="contacts_discovered">Discovered</string>
+    <string name="contacts_added">Added</string>
+    <string name="contacts_share_qr_code">Share QR Code to</string>
+    <string name="contacts_empty">No contacts！</string>
+    <string name="contacts_community_from">From&#160;</string>
+    <string name="contacts_community_more">,C/%1$s</string>
+    <string name="contacts_last_seen">Last seen %1$s</string>
+    <string name="contacts_last_communication">Last comm %1$s</string>
+    <string name="contacts_share_link_via">Share community link via</string>
+    <string name="contacts_copy_link">Copy Link</string>
+    <string name="contacts_community">TAU</string>
+    <string name="contacts_sms">SMS</string>
+    <string name="contacts_chat_name_hint">Chat Name(Optional)</string>
+    <string name="contacts_public_key_hint">Friend\'s Public Key</string>
+    <string name="contacts_chatting" formatted="false"><Data><![CDATA[Chatting with <font color="#f19322">%1$s</font> now]]></Data></string>
+    <string name="contacts_add_successfully">Add successfully!</string>
+    <string name="contacts_confirm_shared">Friend added, please share your QR code to the friend.</string>
+    <string name="contacts_friend_already_exists">Friend already exists!</string>
+    <string name="contacts_error_invalid_qr">Invalid QR code, please copy/paste key text instead.</string>
+    <string name="contacts_airdrop_successfully">You have send %1$s coins to your friends!</string>
+    <string name="contacts_total_pay" formatted="false"><Data><![CDATA[Invite&nbsp;<font color="#f19322">%1$d</font>&nbsp;friends,&nbsp;total
+    &nbsp;<font color="#f19322">%2$s</font>&nbsp;%3$s&nbsp;(including %4$s fee).]]></Data></string>
+
+    <!-- Strings used for QRCode -->
+    <string name="qr_code_title">My Public Key QR Code</string>
+    <string name="key_qr_code_title">My Key QR Code</string>
+    <string name="qr_code_two_steps">Two steps to connect a friend</string>
+    <string name="qr_code_step_one">Share QR code to friends</string>
+    <string name="qr_code_step_two">Scan friend’s QR code</string>
+    <string name="qr_code_scan_friend_qr">Scan Friend\'s QR Code</string>
+    <string name="qr_code_scan_key_qr">Scan secrete key QR code</string>
+    <string name="qr_code_scan_qr">Scan QR</string>
+    <string name="qr_code_scan_cancelled">Cancelled</string>
+    <string name="qr_code_not_found">No QR code found</string>
+    <string name="qr_code_not_found_continue">Tap the screen to continue scanning</string>
+    <string name="qr_code_tau_id">Public Key</string>
+    <string name="qr_code_tau_key">TAU key</string>
+    <string name="qr_code_tau_key_kept_secret">Key must be kept secret.\n\n\nTap to display.</string>
+
+    <!-- Send text to clipboard -->
+    <string name="send_text_to_clipboard">Copy</string>
+    <string name="text_copied_to_clipboard">Text copied to clipboard</string>
+
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_empty">No notifications！</string>
+    <string name="notifications_join">Join</string>
+    <string name="notifications_from">From %1$s</string>
+
+    <string name="app_upgrade_description">TAU downloading&#8230;</string>
+
+    <!--version upgrade-->
+    <string name="app_upgrade_progress">Updating progress&#8230;</string>
+    <string name="app_upgrade_title">Update Log</string>
+    <string name="app_upgrade_install">Install</string>
+    <string name="app_upgrade_fail">Failed</string>
+    <string name="app_upgrade_retry">Retry</string>
+    <string name="app_upgrade_latest">latest version</string>
+
+    <!--permission tip-->
+    <string name="permission_tip_camera_denied">
+         Please enable camera rights for TAU, it is disabled.
+    </string>
+
+    <string name="permission_tip_camera_never_ask_again">
+        Please enable camera rights for TAU, it is forbidden now.
+    </string>
+
+    <string name="permission_tip_upgrade_denied">
+         Please enable storage rights for TAU, it is disabled.
+    </string>
+
+    <string name="permission_tip_upgrade_never_ask_again">
+        Please enable storage rights for TAU, it is forbidden now.
+    </string>
+
+    <string name="permission_install_unknown_apk_note">
+        Please allow installation of TAU.
+    </string>
+    <string name="byteShort">B</string>
+    <string name="kilobyteShort">KB</string>
+    <string name="megabyteShort">MB</string>
+    <string name="gigabyteShort">GB</string>
+    <string name="terabyteShort">TB</string>
+    <string name="petabyteShort">PB</string>
+
+    <string name="chat_take_picture">Camera</string>
+    <string name="chat_album">Album</string>
+</resources>

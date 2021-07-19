@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <LinearLayout
+            android:id="@+id/ll_data_statistics"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_44"
+            android:paddingStart="@dimen/widget_size_20"
+            android:paddingEnd="@dimen/widget_size_20"
+            android:gravity="center_vertical"
+            android:background="@color/color_white">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/setting_data_statistics"
+                android:textAppearance="@style/TextAppearanceBody1" />
+
+            <ImageView
+                android:layout_width="@dimen/widget_size_16"
+                android:layout_height="@dimen/widget_size_16"
+                android:src="@mipmap/icon_arrow"
+                android:contentDescription="@null"
+                android:textColor="@color/primary_light" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_memory_statistics"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_44"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:paddingStart="@dimen/widget_size_20"
+            android:paddingEnd="@dimen/widget_size_20"
+            android:gravity="center_vertical"
+            android:background="@color/color_white">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/setting_memory_statistics"
+                android:textAppearance="@style/TextAppearanceBody1" />
+
+            <ImageView
+                android:layout_width="@dimen/widget_size_16"
+                android:layout_height="@dimen/widget_size_16"
+                android:src="@mipmap/icon_arrow"
+                android:contentDescription="@null"
+                android:textColor="@color/primary_light" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_white"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:paddingStart="@dimen/widget_size_20"
+            android:paddingEnd="@dimen/widget_size_20"
+            android:paddingTop="@dimen/widget_size_10"
+            android:paddingBottom="@dimen/widget_size_10">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/setting_journal_path"
+                android:textAppearance="@style/TextAppearanceBody1" />
+
+            <TextView
+                android:id="@+id/tv_journal_directory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:layout_marginTop="@dimen/widget_size_10"
+                android:textColor="@color/primary_light"
+                android:textAppearance="@style/TextAppearanceBody2"/>
+
+        </LinearLayout>
+
+        <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:focusable="true"
+            android:scrollbarStyle="outsideOverlay" />
+
+        <TextView
+            android:visibility="visible"
+            android:id="@+id/tv_share_all"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_44"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginTop="@dimen/widget_size_7"
+            android:layout_marginBottom="@dimen/widget_size_5"
+            android:onClick="@{listener::onClick}"
+            android:gravity="center_horizontal|center"
+            android:textColor="@color/color_white"
+            android:text="@string/setting_share_journal"
+            android:textAppearance="@style/TextAppearanceBody1"
+            android:background="@drawable/primary_rect_round_bg"/>
+
+    </LinearLayout>
+</layout>

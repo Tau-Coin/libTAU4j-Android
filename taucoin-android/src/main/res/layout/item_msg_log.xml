@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:paddingEnd="@dimen/widget_size_15"
+        android:paddingStart="@dimen/widget_size_5"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="@dimen/widget_size_50"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <View
+                    android:id="@+id/time_line_top"
+                    android:layout_width="@dimen/widget_size_2"
+                    android:layout_height="@dimen/widget_size_2"
+                    android:background="@color/gray_dark"/>
+
+                <View
+                    android:id="@+id/time_line_bottom"
+                    android:layout_width="@dimen/widget_size_2"
+                    android:layout_marginTop="@dimen/widget_size_16"
+                    android:layout_height="match_parent"
+                    android:background="@color/gray_dark"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/time_point"
+                android:layout_width="@dimen/widget_size_20"
+                android:layout_height="@dimen/widget_size_20"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:layout_marginEnd="@dimen/widget_size_10"
+                android:layout_centerHorizontal="true"
+                android:src="@mipmap/icon_msg_built"
+                android:contentDescription="@null"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/widget_size_20">
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody2" />
+
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_size_2"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody2" />
+
+        </LinearLayout>
+    </LinearLayout>
+</layout>

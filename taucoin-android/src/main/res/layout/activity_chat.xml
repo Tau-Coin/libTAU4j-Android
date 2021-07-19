@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/ll_root"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+            android:background="@color/color_chat_bg"
+            android:id="@+id/msg_list"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp"
+            android:paddingBottom="@{@dimen/fab_size + @dimen/fab_margin}"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:focusable="true"
+            android:scrollbarStyle="outsideOverlay" />
+
+        <LinearLayout
+            android:id="@+id/ll_bottom_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/widget_size_10"
+            android:paddingEnd="@dimen/widget_size_10"
+            android:paddingTop="@dimen/widget_size_5"
+            android:paddingBottom="@dimen/widget_size_5"
+            android:background="@color/color_white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/widget_size_44"
+                android:layout_weight="1"
+                android:paddingStart="@dimen/widget_size_10"
+                android:paddingEnd="@dimen/widget_size_10"
+                android:paddingTop="@dimen/widget_size_5"
+                android:paddingBottom="@dimen/widget_size_5"
+                android:hint="@string/community_input_hint"
+                android:maxLines="5"
+                android:inputType="textMultiLine"
+                android:autofillHints="@string/community_input_hint"
+                android:background="@drawable/white_rect_round_bg"/>
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/tv_send"
+                android:layout_width="@dimen/widget_size_65"
+                android:layout_height="@dimen/widget_size_40"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:textAllCaps="false"
+                android:onClick="@{listener::onClick}"
+                android:gravity="center_vertical|center"
+                android:text="@string/tx_send"
+                android:background="@drawable/primary_rect_round_bg"
+                android:textColor="@color/color_white"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+            <ImageView
+                android:id="@+id/iv_add"
+                android:layout_width="@dimen/widget_size_28"
+                android:layout_height="@dimen/widget_size_28"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:src="@mipmap/icon_add"
+                android:onClick="@{listener::onClick}"
+                android:contentDescription="@null"/>
+        </LinearLayout>
+
+        <io.taucoin.torrent.publishing.ui.customviews.ChatAddView
+            android:id="@+id/chat_add"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_280" />
+    </LinearLayout>
+</layout>

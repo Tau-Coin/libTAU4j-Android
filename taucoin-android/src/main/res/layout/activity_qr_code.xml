@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/widget_size_30">
+
+            <TextView
+                android:id="@+id/tv_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_40"
+                android:layout_marginEnd="@dimen/widget_size_40"
+                android:includeFontPadding="false"
+                android:gravity="center_horizontal"
+                android:textColor="@color/primary"
+                android:text="@string/user_share_qr_dialog_tips"
+                android:layout_marginBottom="@dimen/widget_size_20"
+                android:textAppearance="@style/TextAppearanceBody1" />
+
+            <include
+                android:id="@+id/qr_code"
+                layout="@layout/qr_code"/>
+
+            <LinearLayout
+                android:id="@+id/ll_scan_qr_code"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/widget_size_44"
+                android:background="@drawable/white_rect_round_bg_big_radius"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_vertical"
+                android:onClick="@{listener::onClick}"
+                android:layout_marginStart="@dimen/widget_size_30"
+                android:layout_marginEnd="@dimen/widget_size_30"
+                android:layout_marginTop="@dimen/widget_size_40"
+                android:paddingStart="@dimen/widget_size_15"
+                android:paddingEnd="@dimen/widget_size_15">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_scan_orange"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary_light"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_20"
+                    android:text="@string/qr_code_scan_friend_qr"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</layout>

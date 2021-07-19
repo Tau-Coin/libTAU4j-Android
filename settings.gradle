@@ -1,0 +1,3 @@
+rootProject.name='libTAU4j-Android'
+include ':taucoin-android'
+include ':taucoin-core'

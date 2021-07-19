@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="BaseTheme">
+        <item name="android:statusBarColor">?attr/statusBarColor</item>
+    </style>
+
+    <style name="AppTheme.Dark" parent="BaseTheme.Dark">
+        <item name="android:statusBarColor">?attr/statusBarColor</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+
+    <style name="AppTheme.Black" parent="BaseTheme.Black">
+        <item name="android:statusBarColor">?attr/statusBarColor</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+
+    <style name="AppTheme.Translucent" parent="BaseTheme.Translucent">
+        <item name="android:statusBarColor">?attr/statusBarColor</item>
+    </style>
+
+    <style name="AppTheme.Translucent.Dark" parent="BaseTheme.Translucent.Dark">
+        <item name="android:statusBarColor">?attr/statusBarColor</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+
+    <style name="AppTheme.Translucent.Black" parent="BaseTheme.Translucent.Black">
+        <item name="android:statusBarColor">?attr/statusBarColor</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+
+    <style name="AppTheme.Launcher" parent="BaseTheme.Launcher">
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+
+    <style name="TextAppearanceBody1" parent="TextAppearance.AppCompat.Body2">
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/font_size_16</item>
+        <item name="android:letterSpacing">0.03125</item>
+    </style>
+
+    <style name="TextAppearanceBody2" parent="TextAppearance.AppCompat.Body1">
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/font_size_14</item>
+        <item name="android:letterSpacing">0.0178571429</item>
+    </style>
+
+    <style name="TextAppearanceBody3" parent="TextAppearance.AppCompat.Body1">
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/font_size_12</item>
+        <item name="android:letterSpacing">0.0178571429</item>
+    </style>
+
+    <style name="TextAppearanceBody4" parent="TextAppearance.AppCompat.Body1">
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/font_size_10</item>
+        <item name="android:letterSpacing">0.0178571429</item>
+    </style>
+</resources>

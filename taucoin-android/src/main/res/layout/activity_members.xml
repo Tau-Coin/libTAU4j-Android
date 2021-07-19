@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_white"
+        android:fitsSystemWindows="true">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar_group_left" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_height="@dimen/widget_size_40"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_10"
+            android:layout_marginEnd="@dimen/widget_size_10"
+            app:tabMinWidth="@dimen/widget_size_65"
+            app:tabMode="scrollable"
+            app:tabTextAppearance="@style/TabLayout"
+            app:tabIndicatorHeight="@dimen/widget_size_3"
+            app:tabIndicatorColor="@color/primary"
+            app:tabSelectedTextColor="@color/primary"
+            app:tabTextColor="@color/gray_dark"
+            app:tabBackground="@color/color_transparent"
+            app:tabRippleColor="@color/color_transparent"/>
+
+        <View
+            android:id="@+id/tab_layout_line"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_1"
+            android:background="@color/divider"/>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+</layout>

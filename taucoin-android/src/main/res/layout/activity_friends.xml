@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <RelativeLayout
+            android:id="@+id/refresh_layout"
+            android:background="@color/color_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/ll_exchange_qr"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@color/color_white"
+                android:paddingStart="@dimen/widget_size_20"
+                android:paddingEnd="@dimen/widget_size_0"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/widget_size_44"
+                android:onClick="@{listener::onClick}">
+
+                <ImageView
+                    android:layout_width="@dimen/widget_size_20"
+                    android:layout_height="@dimen/widget_size_20"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_qr_code"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_15"
+                    android:text="@string/contacts_exchange_qr"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+            </LinearLayout>
+
+            <include
+                android:id="@+id/view_line"
+                android:layout_below="@+id/ll_exchange_qr"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/widget_size_1"
+                layout="@layout/view_line"/>
+
+            <LinearLayout
+                android:layout_below="@+id/view_line"
+                android:id="@+id/ll_add_friend"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/widget_size_7"
+                android:gravity="center_vertical"
+                android:background="@color/color_white"
+                android:paddingStart="@dimen/widget_size_20"
+                android:paddingEnd="@dimen/widget_size_0"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/widget_size_44"
+                android:onClick="@{listener::onClick}">
+
+                <ImageView
+                    android:layout_width="@dimen/widget_size_20"
+                    android:layout_height="@dimen/widget_size_20"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_invite_friends"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_15"
+                    android:text="@string/contacts_import_friend_pk"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+            </LinearLayout>
+
+            <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                android:layout_above="@+id/ll_total_pay"
+                android:background="@color/color_white"
+                android:id="@+id/recycler_list"
+                android:layout_below="@+id/ll_add_friend"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:scrollbars="vertical"
+                android:focusable="true"
+                android:scrollbarStyle="outsideOverlay" />
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/ll_total_pay"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical"
+                android:background="@color/color_pay_bg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include layout="@layout/view_line"/>
+
+                <TextView
+                    android:id="@+id/tv_total_pay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"
+                    android:textAppearance="@style/TextAppearanceBody2"
+                    android:layout_marginEnd="@dimen/widget_size_10"
+                    android:layout_marginStart="@dimen/widget_size_10"/>
+
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</layout>

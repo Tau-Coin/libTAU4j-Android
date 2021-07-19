@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_white"
+            android:paddingTop="@dimen/widget_size_20"
+            android:paddingStart="@dimen/widget_size_20"
+            android:paddingEnd="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setting_privacy"
+                android:textAppearance="@style/TextAppearanceBody1"
+                android:textColor="@color/primary_light"
+                android:includeFontPadding="false"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_blacklist_users"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/widget_size_7"
+                android:paddingBottom="@dimen/widget_size_7"
+                android:minHeight="@dimen/widget_size_50"
+                android:includeFontPadding="false"
+                android:onClick="@{listener::onClick}"
+                android:layout_marginTop="@dimen/widget_size_10"
+                android:gravity="center_vertical"
+                android:text="@string/setting_blacklist_users"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+
+            <include
+                android:visibility="gone"
+                layout="@layout/view_line"/>
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/tv_blacklist_communities"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/widget_size_50"
+                android:includeFontPadding="false"
+                android:onClick="@{listener::onClick}"
+                android:gravity="center_vertical"
+                android:text="@string/setting_blacklist_communities"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_15"
+            android:background="@color/color_white"
+            android:paddingStart="@dimen/widget_size_20"
+            android:paddingEnd="@dimen/widget_size_20"
+            android:paddingTop="@dimen/widget_size_20"
+            android:paddingBottom="@dimen/widget_size_5">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setting_security"
+                android:textAppearance="@style/TextAppearanceBody1"
+                android:textColor="@color/primary_light"
+                android:includeFontPadding="false"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/ll_seeds"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/widget_size_7"
+                android:paddingBottom="@dimen/widget_size_7"
+                android:minHeight="@dimen/widget_size_50"
+                android:onClick="@{listener::onClick}"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:includeFontPadding="false"
+                    android:text="@string/setting_seeds"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+                <ImageView
+                    android:layout_width="@dimen/widget_size_16"
+                    android:layout_height="@dimen/widget_size_16"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_arrow"/>
+
+            </LinearLayout>
+
+            <include layout="@layout/view_line"/>
+
+            <LinearLayout
+                android:id="@+id/ll_devices"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/widget_size_7"
+                android:paddingBottom="@dimen/widget_size_7"
+                android:minHeight="@dimen/widget_size_50"
+                android:onClick="@{listener::onClick}"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:includeFontPadding="false"
+                    android:text="@string/setting_login_devices"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+                <ImageView
+                    android:layout_width="@dimen/widget_size_16"
+                    android:layout_height="@dimen/widget_size_16"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_arrow"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>
