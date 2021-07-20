@@ -39,8 +39,10 @@ class MsgAlertHandler {
     private FriendRepository friendRepo;
     private DeviceRepository deviceRepo;
     private UserRepository userRepo;
+    private TauDaemon daemon;
 
-    MsgAlertHandler(Context appContext) {
+    MsgAlertHandler(Context appContext, TauDaemon daemon) {
+        this.daemon = daemon;
         chatRepo = RepositoryHelper.getChatRepository(appContext);
         friendRepo = RepositoryHelper.getFriendsRepository(appContext);
         deviceRepo = RepositoryHelper.getDeviceRepository(appContext);
@@ -250,6 +252,9 @@ class MsgAlertHandler {
                 userRepo.updateUser(user);
             }
         }
+        // 更新libTAU朋友信息
+        // 多设备同步，可直接更新朋友信息
+        daemon.updateFriendInfo(user);
         // 多设备朋友关系状态同步
         if (StringUtil.isNotEquals(userPk, friendPkStr)) {
             Friend friend = friendRepo.queryFriend(userPk, friendPkStr);

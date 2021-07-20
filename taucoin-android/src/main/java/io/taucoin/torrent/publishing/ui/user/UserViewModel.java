@@ -223,6 +223,8 @@ public class UserViewModel extends AndroidViewModel {
                 if (null == friend) {
                     friend = new Friend(publicKey, publicKey, FriendStatus.CONNECTED.getStatus());
                     friendRepo.addFriend(friend);
+                    // 更新libTAU朋友信息
+                    daemon.updateFriendInfo(user);
                 }
                 // 3、更新本地的用户公钥
                 MainApplication.getInstance().setCurrentUser(user);
@@ -456,7 +458,13 @@ public class UserViewModel extends AndroidViewModel {
                     user.nickname = name;
                     user.updateTime = DateUtil.getTime();
                 }
+                String currentUserPk = userRepo.getCurrentUser().publicKey;
                 userRepo.updateUser(user);
+                Friend friend = friendRepo.queryFriend(currentUserPk, publicKey);
+                // 必须是朋友关系，才能更新朋友
+                if (friend != null) {
+                    daemon.updateFriendInfo(user);
+                }
             }
             emitter.onNext(true);
             emitter.onComplete();
@@ -533,6 +541,9 @@ public class UserViewModel extends AndroidViewModel {
                 // 1、添加朋友
                 friend = new Friend(userPK, publicKey, FriendStatus.ADDED.getStatus());
                 friendRepo.addFriend(friend);
+
+                // 更新libTAU朋友信息
+                daemon.updateFriendInfo(user);
 
                 isExist = false;
                 // 2、发送默认消息

@@ -20,12 +20,4 @@ public abstract class TauDaemonAlertListener implements AlertListener {
     public void alert(Alert<?> alert) {
 
     }
-
-    void onTauStarted(boolean success, String errMsg) {
-
-    }
-
-    void onTauStopped() {
-
-    }
 }

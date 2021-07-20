@@ -6,11 +6,11 @@ import android.content.Intent;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.alerts.Alert;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
+import org.libTAU4j.alerts.AlertType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -25,10 +25,12 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.core.FriendInfo;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
@@ -103,14 +105,18 @@ public class TauDaemon {
     private void observeTauDaemon() {
         // 监听libTAU启动成功
         sessionManager.addListener(new TauDaemonAlertListener() {
+
             @Override
-            public void onTauStarted(boolean success, String errMsg) {
-                if (success) {
+            public int[] types() {
+                return new int[]{AlertType.SES_START_OVER.swig()};
+            }
+
+            @Override
+            public void alert(Alert<?> alert) {
+                if (alert != null && alert.type() == AlertType.SES_START_OVER) {
                     logger.debug("Tau start successfully");
                     isRunning = true;
                     handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
-                } else {
-                    logger.error("Tau failed to start::{}", errMsg);
                 }
             }
         });
@@ -269,15 +275,19 @@ public class TauDaemon {
             TauDaemonAlertListener listener = new TauDaemonAlertListener() {
 
                 @Override
-                public void onTauStarted(boolean success, String errMsg) {
-                    if (!emitter.isCancelled() && success)
-                        emitter.onNext(true);
+                public int[] types() {
+                    return new int[]{AlertType.SES_START_OVER.swig(), AlertType.SES_STOP_OVER.swig()};
                 }
 
                 @Override
-                public void onTauStopped() {
-                    if (!emitter.isCancelled())
-                        emitter.onNext(false);
+                public void alert(Alert<?> alert) {
+                    if (alert != null && alert.type() == AlertType.SES_START_OVER) {
+                        if (!emitter.isCancelled())
+                            emitter.onNext(true);
+                    } else if (alert != null && alert.type() == AlertType.SES_STOP_OVER) {
+                        if (!emitter.isCancelled())
+                            emitter.onNext(false);
+                    }
                 }
             };
 
@@ -544,7 +554,7 @@ public class TauDaemon {
      * 添加新的朋友
      * @param friendPk 朋友公钥
      */
-    public void addNewFriend(String friendPk) {
+    private void addNewFriend(String friendPk) {
         if (isRunning) {
             sessionManager.addNewFriend(friendPk);
         }
@@ -555,9 +565,32 @@ public class TauDaemon {
      * @param friendPk 朋友公钥
      * @param friendInfo 朋友信息
      */
-    public void updateFriendInfo(String friendPk, byte[] friendInfo) {
+    private void updateFriendInfo(String friendPk, byte[] friendInfo) {
         if (isRunning) {
             sessionManager.updateFriendInfo(friendPk, friendInfo);
+        }
+    }
+
+    /**
+     *  更新libTAU朋友信息
+     *  包含加朋友和朋友信息
+     * @param friend 朋友对象
+     */
+    public void updateFriendInfo(User friend) {
+        if (friend != null) {
+            String friendPk = friend.publicKey;
+            // 添加新朋友
+            addNewFriend(friend.publicKey);
+
+            byte[] nickname = null;
+            BigInteger timestamp = BigInteger.ZERO;
+            if (StringUtil.isNotEmpty(friend.nickname)) {
+                nickname = Utils.textStringToBytes(friend.nickname);
+                timestamp = BigInteger.valueOf(friend.updateTime);
+            }
+            FriendInfo friendInfo = new FriendInfo(ByteUtil.toByte(friendPk), nickname, timestamp);
+            // 更新朋友信息
+            updateFriendInfo(friendPk, friendInfo.getEncoded());
         }
     }
 }

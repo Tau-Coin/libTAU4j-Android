@@ -35,7 +35,7 @@ class TauDaemonAlertHandler {
 
     TauDaemonAlertHandler(Context appContext, TauDaemon daemon){
         this.daemon = daemon;
-        this.msgListenHandler = new MsgAlertHandler(appContext);
+        this.msgListenHandler = new MsgAlertHandler(appContext, daemon);
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
     }
 
@@ -96,8 +96,6 @@ class TauDaemonAlertHandler {
             String friendPk = ByteUtil.toHexString(bean.getPubKey());
             // 发现朋友，添加朋友或者更新朋友lastSeenTime
             msgListenHandler.onDiscoveryFriend(friendPk, alert.timestamp());
-            daemon.addNewFriend(friendPk);
-            daemon.updateFriendInfo(friendPk, friendInfo);
             // 更新朋友信息：昵称
             msgListenHandler.onNewFriendFromMultiDevice(userPk, bean.getPubKey(), bean.getNickname(),
                     bean.getTimestamp());

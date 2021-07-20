@@ -4,6 +4,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import org.libTAU4j.alerts.Alert;
+import org.libTAU4j.alerts.AlertType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,9 +131,17 @@ public class TauService extends Service {
      */
     private final TauDaemonAlertListener daemonListener = new TauDaemonAlertListener() {
 
-        public void onTauStopped() {
-            logger.debug("Tau stopped");
-            stopService();
+        @Override
+        public int[] types() {
+            return new int[]{AlertType.SES_STOP_OVER.swig()};
+        }
+
+        @Override
+        public void alert(Alert<?> alert) {
+            if(alert != null && alert.type() == AlertType.SES_STOP_OVER) {
+                logger.debug("Tau stopped");
+                stopService();
+            }
         }
     };
 
@@ -140,6 +150,7 @@ public class TauService extends Service {
      */
     private void shutdown() {
         logger.info("shutdown");
+        stopService();
         disposables.add(Completable.fromRunnable(() -> daemon.doStop())
                 .subscribeOn(Schedulers.computation())
                 .subscribe());
