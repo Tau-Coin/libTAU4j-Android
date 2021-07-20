@@ -1,5 +1,11 @@
 package io.taucoin.torrent.publishing.core.model;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.FileAlreadyExistsException;
+
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.swig.session_params;
 import org.libTAU4j.swig.settings_pack;
@@ -36,7 +42,24 @@ class SessionSettings {
          * @param dbDir database dir
          */
         SessionParamsBuilder setDatabaseDir(String dbDir) {
-            dbDir += "/libTAU/db/.tau";
+            //dbDir += "/libTAU/db/.tau";
+            dbDir = "/storage/emulated/0/Android/data/io.taucoin.torrent.publishing/files/libTAU/db/.tau";
+
+			String kvdbDir = dbDir + "/kvdb";
+			String sqldbDir = dbDir + "/sqldb";
+
+			Path kv = Paths.get(kvdbDir);
+			Path sql = Paths.get(sqldbDir);
+			try {
+				Path pp = Files.createDirectories(kv);
+				pp = Files.createDirectories(sql);
+			} catch (FileAlreadyExistsException e){
+    			// the directory already exists.
+    			e.printStackTrace();
+			} catch (IOException e){
+    			// the directory already exists.
+    			e.printStackTrace();
+			}
             LoggerFactory.getLogger("SessionSetting").debug("DatabaseDir::{}", dbDir);
             sp.set_str(settings_pack.string_types.db_dir.swigValue(), dbDir);
             return this;
