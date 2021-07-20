@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.core.model;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.swig.session_params;
 import org.libTAU4j.swig.settings_pack;
+import org.slf4j.LoggerFactory;
 
 class SessionSettings {
 
@@ -34,8 +35,9 @@ class SessionSettings {
          * set database dir
          * @param dbDir database dir
          */
-        SessionParamsBuilder setDatabaseDir(String dbDir){
-//            String dbDir = context.getApplicationInfo().dataDir;
+        SessionParamsBuilder setDatabaseDir(String dbDir) {
+            dbDir += "/libTAU/db/.tau";
+            LoggerFactory.getLogger("SessionSetting").debug("DatabaseDir::{}", dbDir);
             sp.set_str(settings_pack.string_types.db_dir.swigValue(), dbDir);
             return this;
         }
