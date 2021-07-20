@@ -45,6 +45,7 @@ class SessionSettings {
             //dbDir += "/libTAU/db/.tau";
             dbDir = "/storage/emulated/0/Android/data/io.taucoin.torrent.publishing/files/libTAU/db/.tau";
 
+			/*
 			String kvdbDir = dbDir + "/kvdb";
 			String sqldbDir = dbDir + "/sqldb";
 
@@ -60,6 +61,7 @@ class SessionSettings {
     			// the directory already exists.
     			e.printStackTrace();
 			}
+			*/
             LoggerFactory.getLogger("SessionSetting").debug("DatabaseDir::{}", dbDir);
             sp.set_str(settings_pack.string_types.db_dir.swigValue(), dbDir);
             return this;
