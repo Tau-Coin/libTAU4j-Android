@@ -71,8 +71,8 @@ class SessionSettings {
          *  set device id
          * @param deviceId device id
          */
-        SessionParamsBuilder setDeviceID(String deviceId){
-            sp.set_str(settings_pack.string_types.db_dir.swigValue(), deviceId);
+        SessionParamsBuilder setDeviceID(String deviceId) {
+            sp.set_str(settings_pack.string_types.device_id.swigValue(), deviceId);
             return this;
         }
 
