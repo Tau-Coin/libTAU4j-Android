@@ -6,8 +6,6 @@ import android.content.Intent;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.alerts.Alert;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +24,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
@@ -141,7 +140,7 @@ public class TauDaemon {
      * 选择BUFFER背压策略
      */
     private void observeTauDaemonAlertListener() {
-        Flowable.create((FlowableOnSubscribe<Alert>) emitter -> {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<AlertAndUser>) emitter -> {
             if (emitter.isCancelled()) {
                 return;
             }
@@ -149,11 +148,10 @@ public class TauDaemon {
                 @Override
                 public void alert(Alert<?> alert) {
                     if (!emitter.isCancelled() && alert != null) {
-                        emitter.onNext(alert);
+                        emitter.onNext(new AlertAndUser(alert, seed));
                     }
                 }
             };
-            emitter.requested();
             if (!emitter.isCancelled()) {
                 registerListener(listener);
                 emitter.setDisposable(Disposables.fromAction(() -> unregisterListener(listener)));
@@ -161,28 +159,8 @@ public class TauDaemon {
         }, BackpressureStrategy.BUFFER)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .subscribe(new Subscriber<Alert>() {
-                    @Override
-                    public void onSubscribe(Subscription s) {
-                    }
-
-                    @Override
-                    public void onNext(Alert alert) {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable t) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-//                .subscribe(alert -> tauDaemonAlertHandler.handleAlert(alert));
-//        disposables.add(disposable);
+                .subscribe(alert -> tauDaemonAlertHandler.handleAlertAndUser(alert));
+        disposables.add(disposable);
     }
 
     /**
@@ -206,7 +184,7 @@ public class TauDaemon {
             return;
         }
         // 更新用户登录的设备信息
-        tauDaemonAlertHandler.addNewDeviceID(deviceID);
+        tauDaemonAlertHandler.addNewDeviceID(deviceID, seed);
         logger.debug("updateUserDeviceInfo deviceID::{}", deviceID);
 
         this.seed = seed;
@@ -550,12 +528,21 @@ public class TauDaemon {
         }
     }
 
+    /**
+     * 添加新的朋友
+     * @param friendPk 朋友公钥
+     */
     public void addNewFriend(String friendPk) {
         if (isRunning) {
             sessionManager.addNewFriend(friendPk);
         }
     }
 
+    /**
+     * 更新朋友信息
+     * @param friendPk 朋友公钥
+     * @param friendInfo 朋友信息
+     */
     public void updateFriendInfo(String friendPk, byte[] friendInfo) {
         if (isRunning) {
             sessionManager.updateFriendInfo(friendPk, friendInfo);

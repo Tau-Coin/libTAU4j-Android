@@ -33,14 +33,14 @@ import io.taucoin.util.ByteUtil;
 /**
  * MsgListener处理程序
  */
-class MsgListenHandler {
+class MsgAlertHandler {
     private static final Logger logger = LoggerFactory.getLogger("MsgListenHandler");
     private ChatRepository chatRepo;
     private FriendRepository friendRepo;
     private DeviceRepository deviceRepo;
     private UserRepository userRepo;
 
-    MsgListenHandler(Context appContext) {
+    MsgAlertHandler(Context appContext) {
         chatRepo = RepositoryHelper.getChatRepository(appContext);
         friendRepo = RepositoryHelper.getFriendsRepository(appContext);
         deviceRepo = RepositoryHelper.getDeviceRepository(appContext);
@@ -184,7 +184,7 @@ class MsgListenHandler {
      * @param friendPk 朋友公钥
      * @param lastSeenTime 和朋友通信时间
      */
-    public void onDiscoveryFriend(String friendPk, long lastSeenTime) {
+    void onDiscoveryFriend(String friendPk, long lastSeenTime) {
         logger.debug("onDiscoveryFriend friendPk::{}", friendPk);
         User user = userRepo.getCurrentUser();
         String userPk = user.publicKey;
@@ -211,10 +211,9 @@ class MsgListenHandler {
     /**
      * 新device ID通知
      * @param deviceID device id
+     * @param userPk 当前用户的公钥
      */
-    public void onNewDeviceID(byte[] deviceID) {
-        User user = userRepo.getCurrentUser();
-        String userPk = user.publicKey;
+    void onNewDeviceID(byte[] deviceID, String userPk) {
         String deviceIDStr = new String(deviceID);
         logger.debug("onNewDeviceID userPk::{}, deviceID::{}",
                 userPk, deviceIDStr);
@@ -224,13 +223,12 @@ class MsgListenHandler {
 
     /**
      * 多设备的新朋友通知
+     * @param userPk 当前用户的公钥
      * @param friendPk 发现的新朋友公钥
      * @param nickname 昵称
      * @param timestamp 起名字的时间戳
      */
-    void onNewFriendFromMultiDevice(byte[] friendPk, byte[] nickname, BigInteger timestamp) {
-        User currentUser = userRepo.getCurrentUser();
-        String userPk = currentUser.publicKey;
+    void onNewFriendFromMultiDevice(String userPk, byte[] friendPk, byte[] nickname, BigInteger timestamp) {
         String friendPkStr = ByteUtil.toHexString(friendPk);
         logger.debug("onNewFriend userPk::{}, friendPk::{}",
                 userPk, friendPkStr);

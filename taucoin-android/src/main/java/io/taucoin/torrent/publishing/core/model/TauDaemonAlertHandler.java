@@ -2,6 +2,8 @@ package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
 
+import org.libTAU4j.Ed25519;
+import org.libTAU4j.Pair;
 import org.libTAU4j.PortmapTransport;
 import org.libTAU4j.Vectors;
 import org.libTAU4j.alerts.Alert;
@@ -12,20 +14,14 @@ import org.libTAU4j.alerts.PortmapErrorAlert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.core.FriendInfo;
+import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.util.ByteUtil;
-
-import static org.spongycastle.crypto.tls.ContentType.alert;
 
 /**
  * TauDaemonListener处理程序
@@ -34,20 +30,21 @@ class TauDaemonAlertHandler {
 
     private static final Logger logger = LoggerFactory.getLogger("AlertHandler");
     private TauDaemon daemon;
-    private MsgListenHandler msgListenHandler;
+    private MsgAlertHandler msgListenHandler;
     private SettingsRepository settingsRepo;
 
     TauDaemonAlertHandler(Context appContext, TauDaemon daemon){
         this.daemon = daemon;
-        this.msgListenHandler = new MsgListenHandler(appContext);
+        this.msgListenHandler = new MsgAlertHandler(appContext);
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
     }
 
     /**
-     * 处理Alert
-     * @param alert LibTAU上报的Alert事件
+     * 处理AlertAndUser, 包含libTAU上报的alert， 还有当前用户信息
+     * @param alertAndUser LibTAU上报的Alert事件
      */
-    void handleAlert(Alert alert) {
+    void handleAlertAndUser(AlertAndUser alertAndUser) {
+        Alert alert = alertAndUser.getAlert();
         switch (alert.type()) {
             case PORTMAP:
                 // 端口映射
@@ -62,14 +59,12 @@ class TauDaemonAlertHandler {
             case COMM_NEW_DEVICE_ID:
                 // 多设备新的DeviceID
                 logger.info(alert.message());
-                CommNewDeviceIdAlert deviceIdAlert = (CommNewDeviceIdAlert) alert;
-                byte[] deviceID = Vectors.byte_vector2bytes(deviceIdAlert.swig().get_device_id());
-                msgListenHandler.onNewDeviceID(deviceID);
+                addNewDeviceID(alert, alertAndUser.getUserPk());
                 break;
             case COMM_FRIEND_INFO:
                 // 朋友信息
                 logger.info(alert.message());
-                updateLocalFriendInfo(alert);
+                updateLocalFriendInfo(alert, alertAndUser.getUserPk());
                 break;
             default:
                 logger.info(alert.message());
@@ -78,9 +73,22 @@ class TauDaemonAlertHandler {
     }
 
     /**
-     * 更新本地朋友信息
+     * 多设备新的DeviceID
+     * @param alert libTAU上报
+     * @param userPk 当前用户公钥
      */
-    private void updateLocalFriendInfo(Alert alert) {
+    private void addNewDeviceID(Alert alert, String userPk) {
+        CommNewDeviceIdAlert deviceIdAlert = (CommNewDeviceIdAlert) alert;
+        byte[] deviceID = Vectors.byte_vector2bytes(deviceIdAlert.swig().get_device_id());
+        msgListenHandler.onNewDeviceID(deviceID, userPk);
+    }
+
+    /**
+     * 更新本地朋友信息
+     * @param alert libTAU上报
+     * @param userPk 当前用户公钥
+     */
+    private void updateLocalFriendInfo(Alert alert, String userPk) {
         CommFriendInfoAlert friendInfoAlert = (CommFriendInfoAlert) alert;
         byte[] friendInfo = Vectors.byte_vector2bytes(friendInfoAlert.swig().get_friend_info());
         if (friendInfo.length > 0) {
@@ -91,7 +99,7 @@ class TauDaemonAlertHandler {
             daemon.addNewFriend(friendPk);
             daemon.updateFriendInfo(friendPk, friendInfo);
             // 更新朋友信息：昵称
-            msgListenHandler.onNewFriendFromMultiDevice(bean.getPubKey(), bean.getNickname(),
+            msgListenHandler.onNewFriendFromMultiDevice(userPk, bean.getPubKey(), bean.getNickname(),
                     bean.getTimestamp());
         }
         logger.info(alert.message());
@@ -101,9 +109,12 @@ class TauDaemonAlertHandler {
      * 为自己添加新的DeviceID
      * @param deviceID String
      */
-    void addNewDeviceID(String deviceID) {
+    void addNewDeviceID(String deviceID, String seed) {
         Observable.create((ObservableOnSubscribe<Void>) emitter -> {
-            msgListenHandler.onNewDeviceID(deviceID.getBytes());
+            byte[] seedBytes = ByteUtil.toByte(seed);
+            Pair<byte[], byte[]> keypair = Ed25519.createKeypair(seedBytes);
+            String userPk = ByteUtil.toHexString(keypair.first);
+            msgListenHandler.onNewDeviceID(deviceID.getBytes(), userPk);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .subscribe();
@@ -117,7 +128,7 @@ class TauDaemonAlertHandler {
         PortmapAlert a = (PortmapAlert) alert;
         if (a.mapTransport() == PortmapTransport.UPNP) {
             logger.info("UPnP mapped::{}", true);
-            settingsRepo.setNATPMPMapped(true);
+            settingsRepo.setUPnpMapped(true);
         } else if (a.mapTransport() == PortmapTransport.NAT_PMP) {
             logger.info("Nat-PMP mapped::{}", true);
             settingsRepo.setNATPMPMapped(true);
@@ -132,7 +143,7 @@ class TauDaemonAlertHandler {
         PortmapErrorAlert a = (PortmapErrorAlert) alert;
         if (a.mapTransport() == PortmapTransport.UPNP) {
             logger.info("UPnP mapped::{}", false);
-            settingsRepo.setNATPMPMapped(false);
+            settingsRepo.setUPnpMapped(false);
         } else if (a.mapTransport() == PortmapTransport.NAT_PMP) {
             logger.info("Nat-PMP mapped::{}", false);
             settingsRepo.setNATPMPMapped(false);

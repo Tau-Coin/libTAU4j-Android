@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "io.taucoin.torrent.publishing"
-        minSdkVersion 21
+        minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -20,7 +20,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         resConfigs "en"
-        renderscriptTargetApi 21
+        renderscriptTargetApi 22
         renderscriptSupportModeEnabled true
 
         ndk {
