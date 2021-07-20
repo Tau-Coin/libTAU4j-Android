@@ -6,6 +6,8 @@ import android.content.Intent;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.alerts.Alert;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,7 +150,17 @@ public class TauDaemon {
                 @Override
                 public void alert(Alert<?> alert) {
                     if (!emitter.isCancelled() && alert != null) {
-                        emitter.onNext(new AlertAndUser(alert, seed));
+                        switch (alert.type()) {
+                            case PORTMAP:
+                            case PORTMAP_ERROR:
+                            case COMM_NEW_DEVICE_ID:
+                            case COMM_FRIEND_INFO:
+                                emitter.onNext(new AlertAndUser(alert, seed));
+                                break;
+                            default:
+                                logger.info(alert.message());
+                                break;
+                        }
                     }
                 }
             };
