@@ -28,13 +28,11 @@ import io.taucoin.util.ByteUtil;
  */
 class TauDaemonAlertHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger("AlertHandler");
-    private TauDaemon daemon;
+    private static final Logger logger = LoggerFactory.getLogger("libTAU");
     private MsgAlertHandler msgListenHandler;
     private SettingsRepository settingsRepo;
 
     TauDaemonAlertHandler(Context appContext, TauDaemon daemon){
-        this.daemon = daemon;
         this.msgListenHandler = new MsgAlertHandler(appContext, daemon);
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
     }
@@ -48,26 +46,26 @@ class TauDaemonAlertHandler {
         switch (alert.type()) {
             case PORTMAP:
                 // 端口映射
-                logger.info(alert.message());
+                logger.info(alertAndUser.getMessage());
                 onPortMapped(alert);
                 break;
             case PORTMAP_ERROR:
                 // 端口映射出错
-                logger.info(alert.message());
+                logger.info(alertAndUser.getMessage());
                 onPortUnmapped(alert);
                 break;
             case COMM_NEW_DEVICE_ID:
                 // 多设备新的DeviceID
-                logger.info(alert.message());
+                logger.info(alertAndUser.getMessage());
                 addNewDeviceID(alert, alertAndUser.getUserPk());
                 break;
             case COMM_FRIEND_INFO:
                 // 朋友信息
-                logger.info(alert.message());
+                logger.info(alertAndUser.getMessage());
                 updateLocalFriendInfo(alert, alertAndUser.getUserPk());
                 break;
             default:
-                logger.info(alert.message());
+                logger.info(alertAndUser.getMessage());
                 break;
         }
     }

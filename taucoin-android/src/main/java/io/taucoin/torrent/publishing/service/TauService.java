@@ -108,7 +108,7 @@ public class TauService extends Service {
         TauNotifier.makeForegroundNotify(this);
 
         daemon.doStart(seed);
-        daemon.registerListener(daemonListener);
+        daemon.registerAlertListener(daemonAlertListener);
     }
 
     /**
@@ -117,7 +117,7 @@ public class TauService extends Service {
     private void stopService() {
         logger.info("stopService");
         disposables.clear();
-        daemon.unregisterListener(daemonListener);
+        daemon.unregisterAlertListener(daemonAlertListener);
 
         isAlreadyRunning.set(false);
         TauNotifier.getInstance().cancelAllNotify();
@@ -129,7 +129,7 @@ public class TauService extends Service {
     /**
      * TauDaemon事件监听
      */
-    private final TauDaemonAlertListener daemonListener = new TauDaemonAlertListener() {
+    private final TauDaemonAlertListener daemonAlertListener = new TauDaemonAlertListener() {
 
         @Override
         public int[] types() {

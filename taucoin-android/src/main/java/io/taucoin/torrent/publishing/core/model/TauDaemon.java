@@ -156,6 +156,7 @@ public class TauDaemon {
                 @Override
                 public void alert(Alert<?> alert) {
                     if (!emitter.isCancelled() && alert != null) {
+                        emitter.onNext(new AlertAndUser(alert, seed));
                         switch (alert.type()) {
                             case PORTMAP:
                             case PORTMAP_ERROR:
@@ -171,8 +172,8 @@ public class TauDaemon {
                 }
             };
             if (!emitter.isCancelled()) {
-                registerListener(listener);
-                emitter.setDisposable(Disposables.fromAction(() -> unregisterListener(listener)));
+                registerAlertListener(listener);
+                emitter.setDisposable(Disposables.fromAction(() -> unregisterAlertListener(listener)));
             }
         }, BackpressureStrategy.BUFFER)
                 .subscribeOn(Schedulers.io())
@@ -293,8 +294,8 @@ public class TauDaemon {
 
             if (!emitter.isCancelled()) {
                 emitter.onNext(isRunning);
-                registerListener(listener);
-                emitter.setDisposable(Disposables.fromAction(() -> unregisterListener(listener)));
+                registerAlertListener(listener);
+                emitter.setDisposable(Disposables.fromAction(() -> unregisterAlertListener(listener)));
             }
 
         }, BackpressureStrategy.LATEST);
@@ -338,18 +339,18 @@ public class TauDaemon {
     }
 
     /**
-     * 注册监听事件
-     * @param listener TauDaemonListener
+     * 注册Alert监听事件
+     * @param listener TauDaemonAlertListener
      */
-    public void registerListener(TauDaemonAlertListener listener) {
+    public void registerAlertListener(TauDaemonAlertListener listener) {
         sessionManager.addListener(listener);
     }
 
     /**
-     * 反注册监听事件
-     * @param listener TauDaemonListener
+     * 反注册Alert监听事件
+     * @param listener TauDaemonAlertListener
      */
-    public void unregisterListener(TauDaemonAlertListener listener) {
+    public void unregisterAlertListener(TauDaemonAlertListener listener) {
         sessionManager.removeListener(listener);
     }
 
@@ -481,7 +482,7 @@ public class TauDaemon {
     /**
      * 重新打开网络
      */
-    void reopenNetworks() {
+    private void reopenNetworks() {
         if (!isRunning) {
             return;
         }
@@ -492,7 +493,7 @@ public class TauDaemon {
     /**
      * 重新启动Sessions
      */
-    void restartSessions() {
+    private void restartSessions() {
         if (!isRunning) {
             return;
         }
