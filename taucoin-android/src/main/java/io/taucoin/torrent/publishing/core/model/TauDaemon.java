@@ -156,7 +156,6 @@ public class TauDaemon {
                 @Override
                 public void alert(Alert<?> alert) {
                     if (!emitter.isCancelled() && alert != null) {
-                        emitter.onNext(new AlertAndUser(alert, seed));
                         switch (alert.type()) {
                             case PORTMAP:
                             case PORTMAP_ERROR:
@@ -165,7 +164,7 @@ public class TauDaemon {
                                 emitter.onNext(new AlertAndUser(alert, seed));
                                 break;
                             default:
-                                logger.info(alert.message());
+                                tauDaemonAlertHandler.handleLogAlert(alert);
                                 break;
                         }
                     }

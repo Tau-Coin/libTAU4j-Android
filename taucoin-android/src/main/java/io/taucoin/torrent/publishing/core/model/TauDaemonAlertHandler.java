@@ -145,4 +145,12 @@ class TauDaemonAlertHandler {
             settingsRepo.setNATPMPMapped(false);
         }
     }
+
+    /**
+     * 处理日志Alert
+     * @param alert libTAU上报
+     */
+    void handleLogAlert(Alert<?> alert) {
+        logger.info(alert.message());
+    }
 }
