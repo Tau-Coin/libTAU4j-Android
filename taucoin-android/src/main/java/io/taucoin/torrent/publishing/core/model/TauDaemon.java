@@ -20,6 +20,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -117,6 +118,8 @@ public class TauDaemon {
                     logger.debug("Tau start successfully");
                     isRunning = true;
                     handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
+                    // 把自己当作朋友添加进libTAU
+                    addYourselfAsFriend();
                 }
             }
         });
@@ -201,11 +204,11 @@ public class TauDaemon {
         if (StringUtil.isEmpty(seed) || StringUtil.isEquals(seed, this.seed)) {
             return;
         }
+        this.seed = seed;
         // 更新用户登录的设备信息
         tauDaemonAlertHandler.addNewDeviceID(deviceID, seed);
         logger.debug("updateUserDeviceInfo deviceID::{}", deviceID);
 
-        this.seed = seed;
         logger.debug("updateSeed ::{}", seed);
         byte[] bytesSeed = ByteUtil.toByte(seed);
         sessionManager.updateAccountSeed(bytesSeed);
@@ -557,6 +560,7 @@ public class TauDaemon {
     private void addNewFriend(String friendPk) {
         if (isRunning) {
             sessionManager.addNewFriend(friendPk);
+            logger.debug("addNewFriend friendPk::{}", friendPk);
         }
     }
 
@@ -568,7 +572,21 @@ public class TauDaemon {
     private void updateFriendInfo(String friendPk, byte[] friendInfo) {
         if (isRunning) {
             sessionManager.updateFriendInfo(friendPk, friendInfo);
+            logger.debug("updateFriendInfo friendPk::{}", friendPk);
         }
+    }
+
+    /**
+     * 更新朋友信息
+     */
+    private void addYourselfAsFriend() {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+            User user = RepositoryHelper.getUserRepository(appContext).getCurrentUser();
+            updateFriendInfo(user);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .subscribe();
+        disposables.add(disposable);
     }
 
     /**
