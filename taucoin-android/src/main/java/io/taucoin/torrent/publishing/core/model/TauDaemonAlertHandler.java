@@ -98,7 +98,6 @@ class TauDaemonAlertHandler {
             msgListenHandler.onNewFriendFromMultiDevice(userPk, bean.getPubKey(), bean.getNickname(),
                     bean.getTimestamp());
         }
-        logger.info(alert.message());
     }
 
     /**

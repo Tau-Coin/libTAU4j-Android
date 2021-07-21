@@ -149,6 +149,8 @@ public class TauDaemon {
     /**
      * 观察TauDaemonAlert变化
      * 选择BUFFER背压策略
+     *
+     * TODO: APP正常或异常退出数据管理
      */
     private void observeTauDaemonAlertListener() {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<AlertAndUser>) emitter -> {
@@ -211,7 +213,10 @@ public class TauDaemon {
 
         logger.debug("updateSeed ::{}", seed);
         byte[] bytesSeed = ByteUtil.toByte(seed);
-        sessionManager.updateAccountSeed(bytesSeed);
+        if (isRunning) {
+            // SessionManager Start()之后再更新，
+            sessionManager.updateAccountSeed(bytesSeed);
+        }
     }
 
     /**
