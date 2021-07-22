@@ -10,12 +10,10 @@ import org.libTAU4j.alerts.AlertType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
@@ -28,7 +26,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.core.FriendInfo;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
@@ -39,7 +36,6 @@ import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.receiver.ConnectionReceiver;
@@ -47,16 +43,15 @@ import io.taucoin.torrent.publishing.service.SystemServiceManager;
 import io.taucoin.torrent.publishing.receiver.PowerReceiver;
 import io.taucoin.torrent.publishing.service.TauService;
 import io.taucoin.torrent.publishing.ui.setting.TrafficTipsActivity;
-import io.taucoin.util.ByteUtil;
 
 /**
  * 区块链业务Daemon
  */
-public class TauDaemon {
+public abstract class TauDaemon {
     private static final String TAG = TauDaemon.class.getSimpleName();
-    private static final Logger logger = LoggerFactory.getLogger(TAG);
+    static final Logger logger = LoggerFactory.getLogger(TAG);
     private static final int REOPEN_NETWORKS_THRESHOLD = 15; // 单位s
-    private static final int ALERT_QUEUE_CAPACITY = 10000; // Alert缓存队列
+    static final int ALERT_QUEUE_CAPACITY = 10000; // Alert缓存队列
     private static volatile TauDaemon instance;
 
     private Context appContext;
@@ -64,28 +59,26 @@ public class TauDaemon {
     private CompositeDisposable disposables = new CompositeDisposable();
     private PowerReceiver powerReceiver = new PowerReceiver();
     private ConnectionReceiver connectionReceiver = new ConnectionReceiver();
-    private SessionManager sessionManager;
+    SessionManager sessionManager;
     private SystemServiceManager systemServiceManager;
     private ExecutorService exec = Executors.newSingleThreadExecutor();
-    private TauDaemonAlertHandler tauDaemonAlertHandler;
     private TauInfoProvider tauInfoProvider;
     private Disposable restartSessionTimer; // 重启Sessions定时任务
-    private ObservableEmitter alertObservableEmitter;
-    private volatile boolean isRunning = false;
+    volatile boolean isRunning = false;
     private volatile boolean trafficTips = true; // 剩余流量用完提示
-    private volatile String seed;
-    private String deviceID;
+    volatile String seed;
+    String deviceID;
     private long noRemainingDataTimes = 0; // 触发无剩余流量的次数
     private int noNodesCount = 0; // 无节点计数, nodes查询频率为1s
 
     // libTAU上报的Alert缓存队列
-    private LinkedBlockingQueue<AlertAndUser> alertQueue = new LinkedBlockingQueue<>();
+    LinkedBlockingQueue<AlertAndUser> alertQueue = new LinkedBlockingQueue<>();
 
     public static TauDaemon getInstance(@NonNull Context appContext) {
         if (instance == null) {
             synchronized (TauDaemon.class) {
                 if (instance == null)
-                    instance = new TauDaemon(appContext);
+                    instance = new TauDaemonImpl(appContext);
             }
         }
         return instance;
@@ -94,11 +87,10 @@ public class TauDaemon {
     /**
      * TauDaemon构造函数
      */
-    private TauDaemon(@NonNull Context appContext) {
+    TauDaemon(@NonNull Context appContext) {
         this.appContext = appContext;
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
         systemServiceManager = SystemServiceManager.getInstance();
-        tauDaemonAlertHandler = new TauDaemonAlertHandler(appContext, this);
         tauInfoProvider = TauInfoProvider.getInstance(this);
 
         deviceID = DeviceUtils.getCustomDeviceID(appContext);
@@ -153,84 +145,6 @@ public class TauDaemon {
     }
 
     /**
-     * 观察TauDaemonAlert变化
-     * 直接进队列，然后单独线程处理
-     *
-     * TODO: APP正常或异常退出数据管理
-     */
-    private void observeTauDaemonAlertListener() {
-        // alertQueue 生产线程
-        AtomicBoolean isSessionStopped = new AtomicBoolean(false);
-        Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
-            if (emitter.isDisposed()) {
-                return;
-            }
-            TauDaemonAlertListener listener = new TauDaemonAlertListener() {
-                @Override
-                public void alert(Alert<?> alert) {
-                    if (!emitter.isDisposed() && alert != null) {
-                        switch (alert.type()) {
-                            case PORTMAP:
-                            case PORTMAP_ERROR:
-                            case COMM_NEW_DEVICE_ID:
-                            case COMM_FRIEND_INFO:
-                                // 防止OOM，此处超过队列容量，直接丢弃
-                                if (alertQueue.size() > ALERT_QUEUE_CAPACITY) {
-                                    alertQueue.offer(new AlertAndUser(alert, seed));
-                                }
-                                break;
-                            case SES_STOP_OVER:
-                                tauDaemonAlertHandler.handleLogAlert(alert);
-                                isSessionStopped.set(true);
-                                // 如果Session已停止结束，队列为空，消费者线程直接结束
-                                if (alertQueue.isEmpty() && alertObservableEmitter != null) {
-                                    alertObservableEmitter.onComplete();
-                                }
-                                break;
-                            default:
-                                tauDaemonAlertHandler.handleLogAlert(alert);
-                                break;
-                        }
-                    }
-                }
-            };
-            if (!emitter.isDisposed()) {
-                registerAlertListener(listener);
-                emitter.setDisposable(Disposables.fromAction(() -> unregisterAlertListener(listener)));
-            }
-        }).subscribeOn(Schedulers.io())
-                .subscribe();
-
-        // alertQueue 消费线程
-        Observable.create((ObservableOnSubscribe<Void>) emitter -> {
-            this.alertObservableEmitter = emitter;
-            while (!emitter.isDisposed()) {
-                // 如果Session已停止结束，队列为空，生产者和消费者线程都结束
-                if (isSessionStopped.get() && alertQueue.isEmpty()) {
-                    disposable.dispose();
-                    emitter.onComplete();
-                    break;
-                }
-                logger.trace("alertQueue size::{}", alertQueue.size());
-                try {
-                    AlertAndUser alertAndUser = alertQueue.take();
-                    tauDaemonAlertHandler.handleAlertAndUser(alertAndUser);
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-        }).subscribeOn(Schedulers.io())
-                .subscribe();
-    }
-
-    /**
-     * 获取Alert发射器
-     */
-    public ObservableEmitter getAlertObservableEmitter() {
-        return alertObservableEmitter;
-    }
-
-    /**
      * 初始化本地参数
      */
     private void initLocalParam() {
@@ -240,27 +154,6 @@ public class TauDaemon {
         settingsRepo.setNATPMPMapped(false);
         // 初始化主循环频率
         FrequencyUtil.clearMainLoopIntervalList();
-    }
-
-    /**
-     * 更新用户Seed
-     * @param seed Seed
-     */
-    public void updateSeed(String seed) {
-        if (StringUtil.isEmpty(seed) || StringUtil.isEquals(seed, this.seed)) {
-            return;
-        }
-        this.seed = seed;
-        // 更新用户登录的设备信息
-        tauDaemonAlertHandler.addNewDeviceID(deviceID, seed);
-        logger.debug("updateUserDeviceInfo deviceID::{}", deviceID);
-
-        logger.debug("updateSeed ::{}", seed);
-        byte[] bytesSeed = ByteUtil.toByte(seed);
-        if (isRunning) {
-            // SessionManager Start()之后再更新，
-            sessionManager.updateAccountSeed(bytesSeed);
-        }
     }
 
     /**
@@ -393,7 +286,7 @@ public class TauDaemon {
      * 注册Alert监听事件
      * @param listener TauDaemonAlertListener
      */
-    private void registerAlertListener(TauDaemonAlertListener listener) {
+    void registerAlertListener(TauDaemonAlertListener listener) {
         sessionManager.addListener(listener);
     }
 
@@ -401,7 +294,7 @@ public class TauDaemon {
      * 反注册Alert监听事件
      * @param listener TauDaemonAlertListener
      */
-    private void unregisterAlertListener(TauDaemonAlertListener listener) {
+    void unregisterAlertListener(TauDaemonAlertListener listener) {
         sessionManager.removeListener(listener);
     }
 
@@ -603,29 +496,6 @@ public class TauDaemon {
     }
 
     /**
-     * 添加新的朋友
-     * @param friendPk 朋友公钥
-     */
-    private void addNewFriend(String friendPk) {
-        if (isRunning) {
-            sessionManager.addNewFriend(friendPk);
-            logger.debug("addNewFriend friendPk::{}", friendPk);
-        }
-    }
-
-    /**
-     * 更新朋友信息
-     * @param friendPk 朋友公钥
-     * @param friendInfo 朋友信息
-     */
-    private void updateFriendInfo(String friendPk, byte[] friendInfo) {
-        if (isRunning) {
-            sessionManager.updateFriendInfo(friendPk, friendInfo);
-            logger.debug("updateFriendInfo friendPk::{}", friendPk);
-        }
-    }
-
-    /**
      * 更新朋友信息
      */
     private void addYourselfAsFriend() {
@@ -639,25 +509,26 @@ public class TauDaemon {
     }
 
     /**
+     * 获取Alert消费者的发射器
+     */
+    public abstract ObservableEmitter getAlertConsumerEmitter();
+
+    /**
+     * 更新用户Seed
+     * @param seed Seed
+     */
+    public abstract void updateSeed(String seed);
+
+    /**
+     * 观察TauDaemonAlert变化
+     * 直接进队列，然后单独线程处理
+     */
+    abstract void observeTauDaemonAlertListener();
+
+    /**
      *  更新libTAU朋友信息
      *  包含加朋友和朋友信息
      * @param friend 朋友对象
      */
-    public void updateFriendInfo(User friend) {
-        if (friend != null) {
-            String friendPk = friend.publicKey;
-            // 添加新朋友
-            addNewFriend(friend.publicKey);
-
-            byte[] nickname = null;
-            BigInteger timestamp = BigInteger.ZERO;
-            if (StringUtil.isNotEmpty(friend.nickname)) {
-                nickname = Utils.textStringToBytes(friend.nickname);
-                timestamp = BigInteger.valueOf(friend.updateTime);
-            }
-            FriendInfo friendInfo = new FriendInfo(ByteUtil.toByte(friendPk), nickname, timestamp);
-            // 更新朋友信息
-            updateFriendInfo(friendPk, friendInfo.getEncoded());
-        }
-    }
+    public abstract void updateFriendInfo(User friend);
 }

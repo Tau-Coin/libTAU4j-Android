@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.Nullable;
 import io.reactivex.Completable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposables;
@@ -139,10 +138,9 @@ public class TauService extends Service {
      * 等待Alert被处理完停止服务
      */
     private void stopServiceWaitAlertDisposed() {
-        ObservableEmitter emitter = daemon.getAlertObservableEmitter();
-        if (emitter != null) {
+        if (daemon.getAlertConsumerEmitter() != null) {
             logger.info("Wait alert disposed");
-            emitter.setDisposable(Disposables.fromAction(this::stopService));
+            daemon.getAlertConsumerEmitter().setDisposable(Disposables.fromAction(this::stopService));
         } else {
             stopService();
         }
