@@ -4,8 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import org.libTAU4j.alerts.Alert;
-import org.libTAU4j.alerts.AlertType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,11 +11,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.Nullable;
 import io.reactivex.Completable;
+import io.reactivex.ObservableEmitter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
-import io.taucoin.torrent.publishing.core.model.TauDaemonAlertListener;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
@@ -108,7 +107,6 @@ public class TauService extends Service {
         TauNotifier.makeForegroundNotify(this);
 
         daemon.doStart(seed);
-        daemon.registerAlertListener(daemonAlertListener);
     }
 
     /**
@@ -117,7 +115,6 @@ public class TauService extends Service {
     private void stopService() {
         logger.info("stopService");
         disposables.clear();
-        daemon.unregisterAlertListener(daemonAlertListener);
 
         isAlreadyRunning.set(false);
         TauNotifier.getInstance().cancelAllNotify();
@@ -127,38 +124,34 @@ public class TauService extends Service {
     }
 
     /**
-     * TauDaemon事件监听
-     */
-    private final TauDaemonAlertListener daemonAlertListener = new TauDaemonAlertListener() {
-
-        @Override
-        public int[] types() {
-            return new int[]{AlertType.SES_STOP_OVER.swig()};
-        }
-
-        @Override
-        public void alert(Alert<?> alert) {
-            if(alert != null && alert.type() == AlertType.SES_STOP_OVER) {
-                logger.debug("Tau stopped");
-                stopService();
-            }
-        }
-    };
-
-    /**
      * 关闭APP
      */
     private void shutdown() {
         logger.info("shutdown");
-        stopService();
         disposables.add(Completable.fromRunnable(() -> daemon.doStop())
-                .subscribeOn(Schedulers.computation())
+                .subscribeOn(Schedulers.io())
                 .subscribe());
+//        stopServiceWaitAlertDisposed();
+        stopService();
+    }
+
+    /**
+     * 等待Alert被处理完停止服务
+     */
+    private void stopServiceWaitAlertDisposed() {
+        ObservableEmitter emitter = daemon.getAlertObservableEmitter();
+        if (emitter != null) {
+            logger.info("Wait alert disposed");
+            emitter.setDisposable(Disposables.fromAction(this::stopService));
+        } else {
+            stopService();
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        disposables.clear();
         logger.info("Stop {}", TAG);
         AppUtil.killProcess();
     }

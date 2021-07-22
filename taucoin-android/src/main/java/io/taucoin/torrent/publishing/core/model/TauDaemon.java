@@ -13,13 +13,15 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -54,6 +56,8 @@ public class TauDaemon {
     private static final String TAG = TauDaemon.class.getSimpleName();
     private static final Logger logger = LoggerFactory.getLogger(TAG);
     private static final int REOPEN_NETWORKS_THRESHOLD = 15; // 单位s
+    private static final int ALERT_QUEUE_CAPACITY = 10000; // Alert缓存队列
+    private static volatile TauDaemon instance;
 
     private Context appContext;
     private SettingsRepository settingsRepo;
@@ -66,6 +70,7 @@ public class TauDaemon {
     private TauDaemonAlertHandler tauDaemonAlertHandler;
     private TauInfoProvider tauInfoProvider;
     private Disposable restartSessionTimer; // 重启Sessions定时任务
+    private ObservableEmitter alertObservableEmitter;
     private volatile boolean isRunning = false;
     private volatile boolean trafficTips = true; // 剩余流量用完提示
     private volatile String seed;
@@ -73,7 +78,8 @@ public class TauDaemon {
     private long noRemainingDataTimes = 0; // 触发无剩余流量的次数
     private int noNodesCount = 0; // 无节点计数, nodes查询频率为1s
 
-    private static volatile TauDaemon instance;
+    // libTAU上报的Alert缓存队列
+    private LinkedBlockingQueue<AlertAndUser> alertQueue = new LinkedBlockingQueue<>();
 
     public static TauDaemon getInstance(@NonNull Context appContext) {
         if (instance == null) {
@@ -148,25 +154,38 @@ public class TauDaemon {
 
     /**
      * 观察TauDaemonAlert变化
-     * 选择BUFFER背压策略
+     * 直接进队列，然后单独线程处理
      *
      * TODO: APP正常或异常退出数据管理
      */
     private void observeTauDaemonAlertListener() {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<AlertAndUser>) emitter -> {
-            if (emitter.isCancelled()) {
+        // alertQueue 生产线程
+        AtomicBoolean isSessionStopped = new AtomicBoolean(false);
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+            if (emitter.isDisposed()) {
                 return;
             }
             TauDaemonAlertListener listener = new TauDaemonAlertListener() {
                 @Override
                 public void alert(Alert<?> alert) {
-                    if (!emitter.isCancelled() && alert != null) {
+                    if (!emitter.isDisposed() && alert != null) {
                         switch (alert.type()) {
                             case PORTMAP:
                             case PORTMAP_ERROR:
                             case COMM_NEW_DEVICE_ID:
                             case COMM_FRIEND_INFO:
-                                emitter.onNext(new AlertAndUser(alert, seed));
+                                // 防止OOM，此处超过队列容量，直接丢弃
+                                if (alertQueue.size() > ALERT_QUEUE_CAPACITY) {
+                                    alertQueue.offer(new AlertAndUser(alert, seed));
+                                }
+                                break;
+                            case SES_STOP_OVER:
+                                tauDaemonAlertHandler.handleLogAlert(alert);
+                                isSessionStopped.set(true);
+                                // 如果Session已停止结束，队列为空，消费者线程直接结束
+                                if (alertQueue.isEmpty() && alertObservableEmitter != null) {
+                                    alertObservableEmitter.onComplete();
+                                }
                                 break;
                             default:
                                 tauDaemonAlertHandler.handleLogAlert(alert);
@@ -175,15 +194,40 @@ public class TauDaemon {
                     }
                 }
             };
-            if (!emitter.isCancelled()) {
+            if (!emitter.isDisposed()) {
                 registerAlertListener(listener);
                 emitter.setDisposable(Disposables.fromAction(() -> unregisterAlertListener(listener)));
             }
-        }, BackpressureStrategy.BUFFER)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(alert -> tauDaemonAlertHandler.handleAlertAndUser(alert));
-        disposables.add(disposable);
+        }).subscribeOn(Schedulers.io())
+                .subscribe();
+
+        // alertQueue 消费线程
+        Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+            this.alertObservableEmitter = emitter;
+            while (!emitter.isDisposed()) {
+                // 如果Session已停止结束，队列为空，生产者和消费者线程都结束
+                if (isSessionStopped.get() && alertQueue.isEmpty()) {
+                    disposable.dispose();
+                    emitter.onComplete();
+                    break;
+                }
+                logger.trace("alertQueue size::{}", alertQueue.size());
+                try {
+                    AlertAndUser alertAndUser = alertQueue.take();
+                    tauDaemonAlertHandler.handleAlertAndUser(alertAndUser);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }).subscribeOn(Schedulers.io())
+                .subscribe();
+    }
+
+    /**
+     * 获取Alert发射器
+     */
+    public ObservableEmitter getAlertObservableEmitter() {
+        return alertObservableEmitter;
     }
 
     /**
@@ -349,7 +393,7 @@ public class TauDaemon {
      * 注册Alert监听事件
      * @param listener TauDaemonAlertListener
      */
-    public void registerAlertListener(TauDaemonAlertListener listener) {
+    private void registerAlertListener(TauDaemonAlertListener listener) {
         sessionManager.addListener(listener);
     }
 
@@ -357,7 +401,7 @@ public class TauDaemon {
      * 反注册Alert监听事件
      * @param listener TauDaemonAlertListener
      */
-    public void unregisterAlertListener(TauDaemonAlertListener listener) {
+    private void unregisterAlertListener(TauDaemonAlertListener listener) {
         sessionManager.removeListener(listener);
     }
 
