@@ -75,49 +75,49 @@ public class RaeSeekBar extends AppCompatSeekBar {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
         try {
-        // 刻度长度
-        int maxLength = getMax();
-        int width = getWidth();
-        int height = getHeight();
-        int h2 = height / 2; // 居中
+            // 刻度长度
+            int maxLength = getMax();
+            int width = getWidth();
+            int height = getHeight();
+            int h2 = height / 2; // 居中
 
-        // 画刻度背景
-        mRect.left = getPaddingLeft();
-        mRect.right = width - getPaddingRight();
-        mRect.top = h2 - getSize(R.dimen.widget_size_1); // 居中
-        mRect.bottom = mRect.top + getSize(R.dimen.widget_size_2); // 1.5f为直线的高度
-        // 直线的长度
-        int lineWidth = mRect.width();
-        // 画直线
-        mTickMarkTitlePaint.setColor(ContextCompat.getColor(getContext(), R.color.gray_light));
-        canvas.drawRect(mRect, mTickMarkTitlePaint);
-
-        //  遍历刻度，画分割线和刻度文本
-        for (int i = 0; i <= maxLength; i++) {
-
-            // 刻度的起始间隔 = 左间距 + (线条的宽度 * 当前刻度位置 / 刻度长度)
-            int thumbPos = getPaddingLeft() + (lineWidth * i / maxLength);
-            // 画分割线
-            mRect.top = h2 - mLineHeight / 2;
-            mRect.bottom = h2 + mLineHeight / 2;
-            mRect.left = thumbPos;
-            mRect.right = thumbPos + getSize(R.dimen.widget_size_2); // 直线的宽度为1.5
+            // 画刻度背景
+            mRect.left = getPaddingLeft();
+            mRect.right = width - getPaddingRight();
+            mRect.top = h2 - getSize(R.dimen.widget_size_1); // 居中
+            mRect.bottom = mRect.top + getSize(R.dimen.widget_size_2); // 1.5f为直线的高度
+            // 直线的长度
+            int lineWidth = mRect.width();
+            // 画直线
             mTickMarkTitlePaint.setColor(ContextCompat.getColor(getContext(), R.color.gray_light));
             canvas.drawRect(mRect, mTickMarkTitlePaint);
 
-            // 画刻度文本
-            String title = mTickMarkTitles[i % mTickMarkTitles.length]; // 拿到刻度文本
-            mTickMarkTitlePaint.setColor(ContextCompat.getColor(getContext(), R.color.color_black));
-            mTickMarkTitlePaint.getTextBounds(title, 0, title.length(), mRect); // 计算刻度文本的大小以及位置
-            mTickMarkTitlePaint.setTextSize(mTextSize[i % mTickMarkTitles.length]); // 设置刻度文字大小
-            // 画文本
-            canvas.drawText(title, thumbPos, mTextSize[mTextSize.length - 1], mTickMarkTitlePaint);
-        }
+            //  遍历刻度，画分割线和刻度文本
+            for (int i = 0; i <= maxLength; i++) {
+
+                // 刻度的起始间隔 = 左间距 + (线条的宽度 * 当前刻度位置 / 刻度长度)
+                int thumbPos = getPaddingLeft() + (lineWidth * i / maxLength);
+                // 画分割线
+                mRect.top = h2 - mLineHeight / 2;
+                mRect.bottom = h2 + mLineHeight / 2;
+                mRect.left = thumbPos;
+                mRect.right = thumbPos + getSize(R.dimen.widget_size_2); // 直线的宽度为1.5
+                mTickMarkTitlePaint.setColor(ContextCompat.getColor(getContext(), R.color.gray_light));
+                canvas.drawRect(mRect, mTickMarkTitlePaint);
+
+                // 画刻度文本
+                String title = mTickMarkTitles[i % mTickMarkTitles.length]; // 拿到刻度文本
+                mTickMarkTitlePaint.setColor(ContextCompat.getColor(getContext(), R.color.color_black));
+                mTickMarkTitlePaint.getTextBounds(title, 0, title.length(), mRect); // 计算刻度文本的大小以及位置
+                mTickMarkTitlePaint.setTextSize(mTextSize[i % mTickMarkTitles.length]); // 设置刻度文字大小
+                // 画文本
+                canvas.drawText(title, thumbPos, mTextSize[mTextSize.length - 1], mTickMarkTitlePaint);
+            }
         } catch (Exception e) {
             LoggerFactory.getLogger("SeekBar").error("test=", e);
         }
+        super.onDraw(canvas);
     }
 
     @Override
