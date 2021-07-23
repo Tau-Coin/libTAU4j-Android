@@ -2,11 +2,9 @@ package io.taucoin.torrent.publishing.core.storage;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
-import io.taucoin.repository.AppRepository;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.AppRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
@@ -45,7 +43,6 @@ public class RepositoryHelper {
     private static FriendRepositoryImpl friendRepo;
     private static ChatRepositoryImpl chatRepo;
     private static DeviceRepositoryImpl deviceRepo;
-    private static AppRepositoryImpl appRepo;
     private static StatisticRepositoryImpl statisticRepo;
 
     /**
@@ -187,19 +184,6 @@ public class RepositoryHelper {
                     AppDatabase.getInstance(appContext));
 
         return deviceRepo;
-    }
-
-    /**
-     * 获取AppRepository单例 供taucoin-core使用
-     * @param appContext 上下文
-     * @return DeviceRepository
-     */
-    public synchronized static AppRepository getAppRepository(@NonNull Context appContext) {
-        if (appRepo == null)
-            appRepo = new AppRepositoryImpl(appContext,
-                    AppDatabase.getInstance(appContext));
-
-        return appRepo;
     }
 
     /**

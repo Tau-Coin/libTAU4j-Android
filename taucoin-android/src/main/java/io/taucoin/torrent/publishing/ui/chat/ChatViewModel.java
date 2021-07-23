@@ -17,9 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -32,7 +29,6 @@ import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndUser;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
-import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -60,20 +56,19 @@ public class ChatViewModel extends AndroidViewModel {
     private static final Logger logger = LoggerFactory.getLogger("ChatViewModel");
     private ChatRepository chatRepo;
     private UserRepository userRepo;
-    private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> chatResult = new MutableLiveData<>();
     private MutableLiveData<List<ChatMsgAndUser>> chatMessages = new MutableLiveData<>();
     private TauDaemon daemon;
+    private Disposable chattingDisposable = null;
     public ChatViewModel(@NonNull Application application) {
         super(application);
         chatRepo = RepositoryHelper.getChatRepository(getApplication());
         userRepo = RepositoryHelper.getUserRepository(getApplication());
-        settingsRepo = RepositoryHelper.getSettingsRepository(getApplication());
         daemon = TauDaemon.getInstance(application);
     }
 
-    public MutableLiveData<Result> getChatResult() {
+    MutableLiveData<Result> getChatResult() {
         return chatResult;
     }
 
@@ -111,12 +106,11 @@ public class ChatViewModel extends AndroidViewModel {
      * @param type 消息类型
      */
     void sendMessage(String friendPk, String msg, int type) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Result>) emitter -> {
             Result result = syncSendMessageTask(friendPk, msg, type);
             emitter.onNext(result);
             emitter.onComplete();
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(Schedulers.single())
+        }).subscribeOn(Schedulers.single())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> chatResult.postValue(result));
         disposables.add(disposable);
@@ -128,14 +122,14 @@ public class ChatViewModel extends AndroidViewModel {
      * @param friendPk 朋友公钥
      */
     void sendBatchDebugMessage(String friendPk, int time, int msgSize) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             InputStream inputStream = null;
             try {
                 inputStream = getApplication().getAssets().open("HarryPotter1-8.txt");
                 byte[] bytes = new byte[msgSize];
                 StringBuilder msg = new StringBuilder();
                 for (int i = 0; i < time; i++) {
-                    if (emitter.isCancelled()) {
+                    if (emitter.isDisposed()) {
                         break;
                     }
                     logger.debug("sendBatchDebugMessage available::{}", inputStream.available());
@@ -164,10 +158,8 @@ public class ChatViewModel extends AndroidViewModel {
                     }
                 }
             }
-            emitter.onNext(true);
             emitter.onComplete();
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(Schedulers.single())
+        }).subscribeOn(Schedulers.single())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
         disposables.add(disposable);
@@ -190,11 +182,11 @@ public class ChatViewModel extends AndroidViewModel {
      */
     private int testChatPos = 0;
     void sendBatchDebugDigitMessage(String friendPk, int time) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             try {
                 char randomChar = getMsgPosition();
                 for (int i = 0; i < time; i++) {
-                    if (emitter.isCancelled()) {
+                    if (emitter.isDisposed()) {
                         break;
                     }
                     String msg = randomChar + FmtMicrometer.fmtTestData( i + 1);
@@ -202,10 +194,8 @@ public class ChatViewModel extends AndroidViewModel {
                 }
             } catch (Exception ignore) {
             }
-            emitter.onNext(true);
             emitter.onComplete();
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(Schedulers.single())
+        }).subscribeOn(Schedulers.single())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
         disposables.add(disposable);
@@ -217,7 +207,7 @@ public class ChatViewModel extends AndroidViewModel {
      * @param msg 消息
      * @param type 消息类型
      */
-    public Result syncSendMessageTask(String friendPkStr, String msg, int type) {
+    private Result syncSendMessageTask(String friendPkStr, String msg, int type) {
         Result result = new Result();
         AppDatabase.getInstance(getApplication()).runInTransaction(() -> {
             try {
@@ -264,9 +254,11 @@ public class ChatViewModel extends AndroidViewModel {
                             null == encryptedContent ? 0 : encryptedContent.length,
                             logicMsgHashStr, DateUtil.format(millisTime, DateUtil.pattern9));
 
+                    boolean isSuccess = daemon.addNewMessage(message.getEncoded());
                     // 组织Message的结构，并发送到DHT和数据入库
-                    messages[nonce] = new ChatMsg(hash, senderPkStr, friendPkStr, encryptedContent, type,
-                            timestamp, nonce, logicMsgHashStr);
+                    ChatMsg chatMsg = new ChatMsg(hash, senderPkStr, friendPkStr, encryptedContent, type,
+                            timestamp, nonce, logicMsgHashStr, isSuccess ? 1 : 0);
+                    messages[nonce] = chatMsg;
 
                     // 更新消息日志信息
                     chatMsgLogs[nonce] = new ChatMsgLog(hash,
@@ -300,17 +292,27 @@ public class ChatViewModel extends AndroidViewModel {
         if (StringUtil.isEmpty(friendPk)) {
             return;
         }
-        settingsRepo.setChattingFriend(friendPk);
+        chattingDisposable = daemon.observeDaemonRunning()
+                .subscribeOn(Schedulers.io())
+                .subscribe(isRunning -> {
+                    if (isRunning) {
+                        daemon.setChattingFriend(friendPk);
+                        chattingDisposable.dispose();
+                    }
+                });
     }
 
     /**
      * 当离开朋友聊天页面时，取消对朋友的单独访问
      */
     public void stopVisitFriend() {
-        settingsRepo.setChattingFriend(null);
+        if (chattingDisposable != null && !chattingDisposable.isDisposed()) {
+            chattingDisposable.dispose();
+        }
+        daemon.unsetChattingFriend();
     }
 
-    public void loadMessagesData(String friendPk, int pos) {
+    void loadMessagesData(String friendPk, int pos) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<List<ChatMsgAndUser>>) emitter -> {
             List<ChatMsgAndUser> messages = new ArrayList<>();
             try {

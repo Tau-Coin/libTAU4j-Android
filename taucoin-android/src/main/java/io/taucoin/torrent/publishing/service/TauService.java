@@ -11,6 +11,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.Nullable;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposables;
@@ -127,18 +130,21 @@ public class TauService extends Service {
      */
     private void shutdown() {
         logger.info("shutdown");
-        disposables.add(Completable.fromRunnable(() -> daemon.doStop())
-                .subscribeOn(Schedulers.io())
-                .subscribe());
-//        stopServiceWaitAlertDisposed();
-        stopService();
+        disposables.add(Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            daemon.doStop();
+            emitter.onNext(true);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::stopServiceWaitAlertDisposed));
     }
 
     /**
      * 等待Alert被处理完停止服务
      */
-    private void stopServiceWaitAlertDisposed() {
-        if (daemon.getAlertConsumerEmitter() != null) {
+    private void stopServiceWaitAlertDisposed(Boolean aBoolean) {
+        ObservableEmitter alertConsumerEmitter = daemon.getAlertConsumerEmitter();
+        if (alertConsumerEmitter != null && !alertConsumerEmitter.isDisposed()) {
             logger.info("Wait alert disposed");
             daemon.getAlertConsumerEmitter().setDisposable(Disposables.fromAction(this::stopService));
         } else {

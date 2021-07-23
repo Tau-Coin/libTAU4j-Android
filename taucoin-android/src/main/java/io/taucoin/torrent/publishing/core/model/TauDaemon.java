@@ -10,10 +10,12 @@ import org.libTAU4j.alerts.AlertType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
@@ -56,7 +58,7 @@ public abstract class TauDaemon {
 
     private Context appContext;
     private SettingsRepository settingsRepo;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    CompositeDisposable disposables = new CompositeDisposable();
     private PowerReceiver powerReceiver = new PowerReceiver();
     private ConnectionReceiver connectionReceiver = new ConnectionReceiver();
     SessionManager sessionManager;
@@ -73,6 +75,7 @@ public abstract class TauDaemon {
 
     // libTAU上报的Alert缓存队列
     LinkedBlockingQueue<AlertAndUser> alertQueue = new LinkedBlockingQueue<>();
+    AtomicBoolean isSessionStopped = new AtomicBoolean(false);
 
     public static TauDaemon getInstance(@NonNull Context appContext) {
         if (instance == null) {
@@ -263,7 +266,15 @@ public abstract class TauDaemon {
     }
 
     /**
+     * Session通知结束
+     */
+    abstract void sessionStopOver();
+
+    /**
      * Only calls from TauService
+     * Session停止结束方案：直接是stop()方法执行结束，就认为Session内存已释放结束；
+     *
+     * TODO:: 这种方案是否可行，有待商榷
      */
     public void doStop() {
         if (!isRunning)
@@ -271,6 +282,8 @@ public abstract class TauDaemon {
         isRunning = false;
         disposables.clear();
         sessionManager.stop();
+
+        sessionStopOver();
     }
 
     /**
@@ -355,6 +368,8 @@ public abstract class TauDaemon {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
             logger.info("SettingsChanged, UPnP mapped::{}", settingsRepo.isUPnpMapped());
+        } else if (key.equals(appContext.getString(R.string.pref_key_main_loop_interval_list))) {
+            setMainLoopInterval(FrequencyUtil.getMainLoopInterval());
         }
     }
 
@@ -531,4 +546,30 @@ public abstract class TauDaemon {
      * @param friend 朋友对象
      */
     public abstract void updateFriendInfo(User friend);
+
+    /**
+     * 设置正在聊天的朋友
+     * @param friendPk 朋友公钥
+     */
+    public abstract void setChattingFriend(String friendPk);
+
+    /**
+     * 取消正在聊天的朋友
+     */
+    public abstract void unsetChattingFriend();
+
+    /**
+     * 设置活跃的朋友
+     */
+    public abstract void setActiveFriends(List<String> friends);
+
+    /**
+     * 设置libTAU主循环时间间隔
+     */
+    public abstract void setMainLoopInterval(int interval);
+
+    /**
+     * 添加新消息
+     */
+    public abstract boolean addNewMessage(byte[] msg);
 }

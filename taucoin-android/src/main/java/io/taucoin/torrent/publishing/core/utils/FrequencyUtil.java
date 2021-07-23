@@ -74,7 +74,7 @@ public class FrequencyUtil {
     /**
      * 更新主循环时间间隔
      */
-    public static void updateMainLoopInterval(int interval) {
+    static void updateMainLoopInterval(int interval) {
         Context context = MainApplication.getInstance();
         List<Integer> list = settingsRepo.getListData(context.getString(R.string.pref_key_main_loop_interval_list),
                 Integer.class);

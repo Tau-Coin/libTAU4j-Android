@@ -2,7 +2,6 @@
 <resources>
 
     <!-- Behavior and appearance settings -->
-    <string name="pref_key_boot_start" translatable="false">pref_key_boot_start</string>
     <string name="pref_key_charging_state" translatable="false">pref_key_charging_state</string>
     <string name="pref_key_internet_state" translatable="false">pref_key_internet_state</string>
     <string name="pref_key_internet_type" translatable="false">pref_key_internet_type</string>
@@ -39,8 +38,6 @@
 
     <string name="pref_key_upnp_mapped" translatable="false">pref_key_upnp_mapped</string>
     <string name="pref_key_nat_pmp_mapped" translatable="false">pref_key_nat_pmp_mapped</string>
-
-    <string name="pref_key_chatting_friend" translatable="false">pref_key_chatting_friend</string>
 
     <string name="pref_key_cpu_usage" translatable="false">pref_key_cpu_usage</string>
     <string name="pref_key_memory_usage" translatable="false">pref_key_memory_usage</string>

@@ -7,6 +7,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+import io.reactivex.Flowable;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 
 /**
@@ -55,5 +56,5 @@ public interface FriendDao {
      * @return 活跃的朋友列表
      */
     @Query(QUERY_ACTIVE_FRIENDS)
-    List<String> getActiveFriends();
+    Flowable<List<String>> getActiveFriends();
 }

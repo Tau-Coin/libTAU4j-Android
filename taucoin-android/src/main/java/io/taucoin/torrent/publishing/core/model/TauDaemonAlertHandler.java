@@ -5,14 +5,20 @@ import android.content.Context;
 import org.libTAU4j.Ed25519;
 import org.libTAU4j.Pair;
 import org.libTAU4j.PortmapTransport;
-import org.libTAU4j.Vectors;
 import org.libTAU4j.alerts.Alert;
+import org.libTAU4j.alerts.CommConfirmRootAlert;
 import org.libTAU4j.alerts.CommFriendInfoAlert;
+import org.libTAU4j.alerts.CommLastSeenAlert;
 import org.libTAU4j.alerts.CommNewDeviceIdAlert;
+import org.libTAU4j.alerts.CommNewMsgAlert;
+import org.libTAU4j.alerts.CommSyncMsgAlert;
 import org.libTAU4j.alerts.PortmapAlert;
 import org.libTAU4j.alerts.PortmapErrorAlert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
@@ -54,15 +60,35 @@ class TauDaemonAlertHandler {
                 logger.info(alertAndUser.getMessage());
                 onPortUnmapped(alert);
                 break;
+            case COMM_LAST_SEEN:
+                // 多设备新的DeviceID
+                logger.info(alertAndUser.getMessage());
+                onDiscoverFriend(alert, alertAndUser.getUserPk());
+                break;
             case COMM_NEW_DEVICE_ID:
                 // 多设备新的DeviceID
                 logger.info(alertAndUser.getMessage());
-                addNewDeviceID(alert, alertAndUser.getUserPk());
+                onNewDeviceID(alert, alertAndUser.getUserPk());
                 break;
             case COMM_FRIEND_INFO:
                 // 朋友信息
                 logger.info(alertAndUser.getMessage());
-                updateLocalFriendInfo(alert, alertAndUser.getUserPk());
+                onFriendInfo(alert, alertAndUser.getUserPk());
+                break;
+            case COMM_NEW_MSG:
+                // 新消息
+                logger.info(alertAndUser.getMessage());
+                onNewMessage(alert, alertAndUser.getUserPk());
+                break;
+            case COMM_CONFIRM_ROOT:
+                // 消息确认
+                logger.info(alertAndUser.getMessage());
+                onConfirmRoot(alert);
+                break;
+            case COMM_SYNC_MSG:
+                // 消息同步
+                logger.info(alertAndUser.getMessage());
+                onSyncMessage(alert);
                 break;
             default:
                 logger.info(alertAndUser.getMessage());
@@ -71,13 +97,57 @@ class TauDaemonAlertHandler {
     }
 
     /**
+     * 消息正在同步
+     * @param alert libTAU上报
+     * @param userPk 当前用户公钥
+     */
+    private void onDiscoverFriend(Alert alert, String userPk) {
+        CommLastSeenAlert lastSeenAlert = (CommLastSeenAlert) alert;
+        byte[] friendPk = lastSeenAlert.get_peer();
+        long lastSeenTime = lastSeenAlert.timestamp();
+        msgListenHandler.onDiscoveryFriend(ByteUtil.toHexString(friendPk), lastSeenTime, userPk);
+    }
+
+    /**
+     * 消息正在同步
+     * @param alert libTAU上报
+     */
+    private void onSyncMessage(Alert alert) {
+        CommSyncMsgAlert syncMsgAlert = (CommSyncMsgAlert) alert;
+        byte[] hash = syncMsgAlert.getSyncing_msg_hash();
+        long timestamp = syncMsgAlert.timestamp();
+        msgListenHandler.onSyncMessage(hash, timestamp);
+    }
+
+    /**
+     * 消息确认（已接收）
+     * @param alert libTAU上报
+     */
+    private void onConfirmRoot(Alert alert) {
+        CommConfirmRootAlert confirmRootAlert = (CommConfirmRootAlert) alert;
+        long timestamp = confirmRootAlert.timestamp();
+        List<byte[]> rootList = confirmRootAlert.getConfirmation_roots();
+        msgListenHandler.onReadMessageRoot(rootList, BigInteger.valueOf(timestamp));
+    }
+
+    /**
+     * 新消息
+     * @param alert libTAU上报
+     */
+    private void onNewMessage(Alert alert, String userPk) {
+        CommNewMsgAlert newMsgAlert = (CommNewMsgAlert) alert;
+        byte[] message = newMsgAlert.get_new_message();
+        msgListenHandler.onNewMessage(message, userPk);
+    }
+
+    /**
      * 多设备新的DeviceID
      * @param alert libTAU上报
      * @param userPk 当前用户公钥
      */
-    private void addNewDeviceID(Alert alert, String userPk) {
+    private void onNewDeviceID(Alert alert, String userPk) {
         CommNewDeviceIdAlert deviceIdAlert = (CommNewDeviceIdAlert) alert;
-        byte[] deviceID = Vectors.byte_vector2bytes(deviceIdAlert.swig().get_device_id());
+        byte[] deviceID = deviceIdAlert.get_device_id();
         msgListenHandler.onNewDeviceID(deviceID, userPk);
     }
 
@@ -86,14 +156,11 @@ class TauDaemonAlertHandler {
      * @param alert libTAU上报
      * @param userPk 当前用户公钥
      */
-    private void updateLocalFriendInfo(Alert alert, String userPk) {
+    private void onFriendInfo(Alert alert, String userPk) {
         CommFriendInfoAlert friendInfoAlert = (CommFriendInfoAlert) alert;
-        byte[] friendInfo = Vectors.byte_vector2bytes(friendInfoAlert.swig().get_friend_info());
+        byte[] friendInfo = friendInfoAlert.get_friend_info();
         if (friendInfo.length > 0) {
             FriendInfo bean = new FriendInfo(friendInfo);
-            String friendPk = ByteUtil.toHexString(bean.getPubKey());
-            // 发现朋友，添加朋友或者更新朋友lastSeenTime
-            msgListenHandler.onDiscoveryFriend(friendPk, alert.timestamp());
             // 更新朋友信息：昵称
             msgListenHandler.onNewFriendFromMultiDevice(userPk, bean.getPubKey(), bean.getNickname(),
                     bean.getTimestamp());

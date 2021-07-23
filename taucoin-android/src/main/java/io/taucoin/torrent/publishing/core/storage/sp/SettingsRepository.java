@@ -15,18 +15,6 @@ public interface SettingsRepository {
     Flowable<String> observeSettingsChanged();
 
     /**
-     * 随设备启动
-     * @return boolean 是否启动
-     */
-    boolean bootStart();
-
-    /**
-     * 设置随设备启动
-     * @param val 是否启动
-     */
-    void bootStart(boolean val);
-
-    /**
      * 设置充电状态
      * @param val 是否在充电
      */
@@ -136,17 +124,6 @@ public interface SettingsRepository {
      * @param isMapped
      */
     void setNATPMPMapped(boolean isMapped);
-
-    /**
-     * 设置正在聊天的朋友
-     * @param friend 朋友公钥
-     */
-    void setChattingFriend(String friend);
-
-    /**
-     * 获取正在聊天的朋友
-     */
-    String getChattingFriend();
 
     /**
      * 设置CPU使用率

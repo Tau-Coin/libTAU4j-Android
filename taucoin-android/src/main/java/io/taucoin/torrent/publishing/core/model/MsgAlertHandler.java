@@ -53,79 +53,76 @@ class MsgAlertHandler {
      * 0、如果没和朋友建立Chat, 创建Chat
      * 1、更新朋友状态
      * 2、保存Chat的聊天信息
-     * @param friendPk byte[] 朋友公钥
-     * @param messages List<Message>
+     * @param msg byte[]
+     * @param userPk byte[] 当前用户的公钥
      */
-    public void onNewMessage(byte[] friendPk, List<Message> messages) {
+    void onNewMessage(byte[] msg, String userPk) {
         try {
-            logger.trace("onNewMessage messages.size::{}", messages.size());
-            for (Message message : messages) {
-                // 朋友默认为发送者
-                String senderPk = ByteUtil.toHexString(message.getSender());
-                String receiverPk = ByteUtil.toHexString(message.getReceiver());
-                String hash = ByteUtil.toHexString(message.getHash());
-                String logicMsgHash = ByteUtil.toHexString(message.getLogicMsgHash());
+            Message message = new Message(msg);
+            // 朋友默认为发送者
+            String senderPk = ByteUtil.toHexString(message.getSender());
+            String receiverPk = ByteUtil.toHexString(message.getReceiver());
+            String hash = ByteUtil.toHexString(message.getHash());
+            String logicMsgHash = ByteUtil.toHexString(message.getLogicMsgHash());
 
-                long sentTime = message.getTimestamp().longValue();
-                long receivedTime = DateUtil.getTime();
+            long sentTime = message.getTimestamp().longValue();
+            long receivedTime = DateUtil.getTime();
 
-                ChatMsg chatMsg = chatRepo.queryChatMsg(senderPk, hash);
-                logger.debug("TAU messaging onNewMessage senderPk::{}, receiverPk::{}, hash::{}, " +
-                                "SentTime::{}, ReceivedTime::{}, DelayTime::{}s, exist::{}",
-                        senderPk, receiverPk, hash,
-                        DateUtil.formatTime(sentTime, DateUtil.pattern6),
-                        DateUtil.formatTime(receivedTime, DateUtil.pattern6),
-                        receivedTime - sentTime, chatMsg != null);
-                // 上报的Message有可能重复, 如果本地已存在不处理
-                if (null == chatMsg) {
-                    User user = userRepo.getCurrentUser();
-                    // 判断消息的发送者是否是自己
-                    String friendPkStr;
-                    if (StringUtil.isEquals(senderPk, user.publicKey)) {
-                        friendPkStr = receiverPk;
-                    } else {
-                        friendPkStr = senderPk;
+            ChatMsg chatMsg = chatRepo.queryChatMsg(senderPk, hash);
+            logger.debug("TAU messaging onNewMessage senderPk::{}, receiverPk::{}, hash::{}, " +
+                            "SentTime::{}, ReceivedTime::{}, DelayTime::{}s, exist::{}",
+                    senderPk, receiverPk, hash,
+                    DateUtil.formatTime(sentTime, DateUtil.pattern6),
+                    DateUtil.formatTime(receivedTime, DateUtil.pattern6),
+                    receivedTime - sentTime, chatMsg != null);
+            // 上报的Message有可能重复, 如果本地已存在不处理
+            if (null == chatMsg) {
+                User user = userRepo.getUserByPublicKey(userPk);
+                // 判断消息的发送者是否是自己
+                String friendPkStr;
+                if (StringUtil.isEquals(senderPk, user.publicKey)) {
+                    friendPkStr = receiverPk;
+                } else {
+                    friendPkStr = senderPk;
+                }
+                // 原始数据解密
+                byte[] cryptoKey = Utils.keyExchange(friendPkStr, user.seed);
+                message.decrypt(cryptoKey);
+
+                // 保存消息数据
+                byte[] encryptedContent = message.getEncryptedContent();
+                chatMsg = new ChatMsg(hash, senderPk, receiverPk, encryptedContent,
+                        message.getType().ordinal(), sentTime, message.getNonce().longValue(),
+                        logicMsgHash, 1);
+                chatRepo.addChatMsg(chatMsg);
+
+                // 标记消息未读, 更新上次交流的时间
+                Friend friend = friendRepo.queryFriend(user.publicKey, friendPkStr);
+                boolean isNeedUpdate = false;
+                if (friend != null) {
+                    if (friend.msgUnread == 0) {
+                        friend.msgUnread = 1;
+                        isNeedUpdate = true;
                     }
-                    // 原始数据解密
-                    byte[] cryptoKey = Utils.keyExchange(friendPkStr, user.seed);
-                    message.decrypt(cryptoKey);
-
-                    // 保存消息数据
-                    byte[] encryptedContent = message.getEncryptedContent();
-                    ChatMsg msg = new ChatMsg(hash, senderPk, receiverPk, encryptedContent,
-                            message.getType().ordinal(), sentTime, message.getNonce().longValue(),
-                            logicMsgHash);
-                    msg.unsent = 1;
-                    chatRepo.addChatMsg(msg);
-
-                    // 标记消息未读, 更新上次交流的时间
-                    Friend friend = friendRepo.queryFriend(user.publicKey, friendPkStr);
-                    boolean isNeedUpdate = false;
-                    if (friend != null) {
-                        if (friend.msgUnread == 0) {
-                            friend.msgUnread = 1;
-                            isNeedUpdate = true;
-                        }
-                        long lastCommTime = friend.lastCommTime;
-                        if (sentTime > lastCommTime) {
-                            friend.lastCommTime = sentTime;
-                            isNeedUpdate = true;
-                        }
-                        if (isNeedUpdate) {
-                            friendRepo.updateFriend(friend);
-                        }
+                    long lastCommTime = friend.lastCommTime;
+                    if (sentTime > lastCommTime) {
+                        friend.lastCommTime = sentTime;
+                        isNeedUpdate = true;
                     }
-                    // 只通知朋友的消息
-                    if (StringUtil.isNotEquals(senderPk, user.publicKey)) {
-                        // 通知栏消息通知
-                        User friendUser = userRepo.getUserByPublicKey(senderPk);
-                        if (msg.contentType == MessageType.TEXT.ordinal()) {
-                            String content = Utils.textBytesToString(message.getRawContent());
-                            TauNotifier.getInstance().makeChatMsgNotify(friendUser, content);
-                        } else if (msg.contentType == MessageType.PICTURE.ordinal()) {
-                            TauNotifier.getInstance().makeChatMsgNotify(friendUser,
-                                    R.string.main_pic_messages);
-                        }
+                    if (isNeedUpdate) {
+                        friendRepo.updateFriend(friend);
+                    }
+                }
+                // 只通知朋友的消息
+                if (StringUtil.isNotEquals(senderPk, user.publicKey)) {
+                    // 通知栏消息通知
+                    User friendUser = userRepo.getUserByPublicKey(senderPk);
+                    if (chatMsg.contentType == MessageType.TEXT.ordinal()) {
+                        String content = Utils.textBytesToString(message.getRawContent());
+                        TauNotifier.getInstance().makeChatMsgNotify(friendUser, content);
+                    } else if (chatMsg.contentType == MessageType.PICTURE.ordinal()) {
+                        TauNotifier.getInstance().makeChatMsgNotify(friendUser,
+                                R.string.main_pic_messages);
                     }
                 }
             }
@@ -136,18 +133,17 @@ class MsgAlertHandler {
 
     /**
      * 消息正在同步
-     * @param message 当前同步的消息
+     * @param msgHash 当前同步的消息
      * @param timestamp 开始同步时间
      */
-    public void onSyncMessage(Message message, BigInteger timestamp) {
+    void onSyncMessage(byte[] msgHash, long timestamp) {
         try {
-            String hash = ByteUtil.toHexString(message.getHash());
+            String hash = ByteUtil.toHexString(msgHash);
             ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
                     ChatMsgStatus.SYNCING.getStatus());
             logger.trace("onSyncMessage MessageHash::{}, exist::{}", hash, msgLog != null);
             if (null == msgLog) {
-                msgLog = new ChatMsgLog(hash, ChatMsgStatus.SYNCING.getStatus(),
-                        timestamp.longValue());
+                msgLog = new ChatMsgLog(hash, ChatMsgStatus.SYNCING.getStatus(), timestamp);
                 chatRepo.addChatMsgLogs(msgLog);
             }
         } catch (SQLiteConstraintException ignore) {
@@ -158,10 +154,9 @@ class MsgAlertHandler {
 
     /**
      * 消息已被接收
-     * @param friendPk byte[] 朋友公钥
      * @param hashList 消息root
      */
-    public void onReadMessageRoot(byte[] friendPk, List<byte[]> hashList, BigInteger timestamp) {
+    void onReadMessageRoot(List<byte[]> hashList, BigInteger timestamp) {
         try {
             logger.trace("onReadMessageRoot hashList.size::{}", hashList.size());
             for (byte[] root : hashList) {
@@ -185,11 +180,10 @@ class MsgAlertHandler {
      * 发现朋友
      * @param friendPk 朋友公钥
      * @param lastSeenTime 和朋友通信时间
+     * @param userPk 当前用户公钥
      */
-    void onDiscoveryFriend(String friendPk, long lastSeenTime) {
+    void onDiscoveryFriend(String friendPk, long lastSeenTime, String userPk) {
         logger.debug("onDiscoveryFriend friendPk::{}", friendPk);
-        User user = userRepo.getCurrentUser();
-        String userPk = user.publicKey;
         Friend friend = friendRepo.queryFriend(userPk, friendPk);
         if (friend != null) {
             boolean isUpdate = false;

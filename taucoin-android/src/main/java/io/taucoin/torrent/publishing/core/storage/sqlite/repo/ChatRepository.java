@@ -54,21 +54,13 @@ public interface ChatRepository {
     Observable<DataChanged> observeDataSetChanged();
 
     /**
-     * 提交数据变化
+     * 提交数据变
      */
     void submitDataSetChanged(ChatMsg chat);
 
     void submitDataSetChangedDirect(String usersPk);
 
-    int getNumMessages(String friendPk);
-
     List<ChatMsgAndUser> getMessages(String friendPk, int pos, int loadSize);
-
-    /**
-     * 获取未入队列的消息
-     * @return
-     */
-    List<ChatMsg> getUnsentMessages();
 
     /**
      * 添加消息日志

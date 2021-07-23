@@ -62,18 +62,6 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public boolean bootStart() {
-        return pref.getBoolean(appContext.getString(R.string.pref_key_boot_start),
-                Default.bootStart);
-    }
-
-    @Override
-    public void bootStart(boolean val) {
-        pref.edit().putBoolean(appContext.getString(R.string.pref_key_boot_start),val)
-                .apply();
-    }
-
-    @Override
     public void chargingState(boolean val) {
         pref.edit().putBoolean(appContext.getString(R.string.pref_key_charging_state),val)
                 .apply();
@@ -304,17 +292,6 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public void setFloatValue(String key, float value) {
         pref.edit().putFloat(key, value)
                 .apply();
-    }
-
-    @Override
-    public void setChattingFriend(String friend) {
-        pref.edit().putString(appContext.getString(R.string.pref_key_chatting_friend), friend)
-                .apply();
-    }
-
-    @Override
-    public String getChattingFriend() {
-        return pref.getString(appContext.getString(R.string.pref_key_chatting_friend), null);
     }
 
     @Override

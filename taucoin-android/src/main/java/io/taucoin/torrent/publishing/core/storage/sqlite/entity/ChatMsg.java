@@ -47,7 +47,7 @@ public class ChatMsg implements Parcelable {
 
     @Ignore
     public ChatMsg(@NonNull String hash, String senderPk, String receiverPk, byte[] content,
-                   int contentType, long timestamp, long nonce, String logicMsgHash){
+                   int contentType, long timestamp, long nonce, String logicMsgHash, int unsent){
         this.hash = hash;
         this.senderPk = senderPk;
         this.receiverPk = receiverPk;
@@ -56,6 +56,7 @@ public class ChatMsg implements Parcelable {
         this.timestamp = timestamp;
         this.nonce = nonce;
         this.logicMsgHash = logicMsgHash;
+        this.unsent = unsent;
     }
 
     @Ignore

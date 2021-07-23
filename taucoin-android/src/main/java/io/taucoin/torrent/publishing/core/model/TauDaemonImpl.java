@@ -5,6 +5,9 @@ import android.content.Context;
 import org.libTAU4j.alerts.Alert;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
@@ -16,7 +19,9 @@ import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.core.FriendInfo;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
+import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.util.ByteUtil;
@@ -30,10 +35,13 @@ public class TauDaemonImpl extends TauDaemon {
     private ObservableEmitter alertConsumerEmitter;
     // libTAU上报的Alert处理程序
     private TauDaemonAlertHandler tauDaemonAlertHandler;
+    private FriendRepository friendRepo;
 
     TauDaemonImpl(@NonNull Context appContext) {
         super(appContext);
         tauDaemonAlertHandler = new TauDaemonAlertHandler(appContext, this);
+        friendRepo = RepositoryHelper.getFriendsRepository(appContext);
+        observeActiveFriends();
     }
 
     /**
@@ -67,7 +75,6 @@ public class TauDaemonImpl extends TauDaemon {
     @Override
     void observeTauDaemonAlertListener() {
         // alertQueue 生产线程
-        AtomicBoolean isSessionStopped = new AtomicBoolean(false);
         Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             if (emitter.isDisposed()) {
                 return;
@@ -81,18 +88,20 @@ public class TauDaemonImpl extends TauDaemon {
                             case PORTMAP_ERROR:
                             case COMM_NEW_DEVICE_ID:
                             case COMM_FRIEND_INFO:
+                            case COMM_NEW_MSG:
+                            case COMM_CONFIRM_ROOT:
+                            case COMM_SYNC_MSG:
+                            case COMM_LAST_SEEN:
                                 // 防止OOM，此处超过队列容量，直接丢弃
-                                if (alertQueue.size() > ALERT_QUEUE_CAPACITY) {
+                                if (alertQueue.size() <= ALERT_QUEUE_CAPACITY) {
                                     alertQueue.offer(new AlertAndUser(alert, seed));
+                                } else {
+                                    logger.warn("Queue full, Alert data is discarded::{}", alert.message());
                                 }
                                 break;
                             case SES_STOP_OVER:
                                 tauDaemonAlertHandler.handleLogAlert(alert);
-                                isSessionStopped.set(true);
-                                // 如果Session已停止结束，队列为空，消费者线程直接结束
-                                if (alertQueue.isEmpty() && alertConsumerEmitter != null) {
-                                    alertConsumerEmitter.onComplete();
-                                }
+                                sessionStopOver();
                                 break;
                             default:
                                 tauDaemonAlertHandler.handleLogAlert(alert);
@@ -128,6 +137,19 @@ public class TauDaemonImpl extends TauDaemon {
             }
         }).subscribeOn(Schedulers.io())
                 .subscribe();
+    }
+
+    /**
+     * Session通知结束
+     */
+    @Override
+    public void sessionStopOver() {
+        isSessionStopped.set(true);
+        logger.info("Session stopped");
+        // 如果Session已停止结束，队列为空，消费者线程直接结束
+        if (alertQueue.isEmpty() && alertConsumerEmitter != null) {
+            alertConsumerEmitter.onComplete();
+        }
     }
 
     /**
@@ -183,5 +205,75 @@ public class TauDaemonImpl extends TauDaemon {
             sessionManager.updateFriendInfo(friendPk, friendInfo);
             logger.debug("updateFriendInfo friendPk::{}", friendPk);
         }
+    }
+
+    /**
+     * 设置正在聊天的朋友
+     * @param friendPk 朋友公钥
+     */
+    @Override
+    public void setChattingFriend(String friendPk) {
+        if (isRunning) {
+            sessionManager.setChattingFriend(friendPk);
+            logger.debug("setChattingFriend friendPk::{}", friendPk);
+        }
+    }
+
+    /**
+     * 取消正在聊天的朋友
+     */
+    @Override
+    public void unsetChattingFriend() {
+        if (isRunning) {
+            sessionManager.unsetChattingFriend();
+            logger.debug("unsetChattingFriend success");
+        }
+    }
+
+    /**
+     * 观察活跃朋友的变化
+     */
+    private void observeActiveFriends() {
+        Disposable disposable = friendRepo.getActiveFriends()
+                .subscribeOn(Schedulers.io())
+                .sample(1, TimeUnit.MINUTES, true)
+                .subscribe(this::setActiveFriends);
+        disposables.add(disposable);
+    }
+
+    /**
+     * 设置活跃的朋友
+     */
+    @Override
+    public void setActiveFriends(List<String> friends) {
+        if (isRunning) {
+            ArrayList<String> activeFriends = new ArrayList<>(friends);
+            sessionManager.setActiveFriends(activeFriends);
+            logger.debug("setActiveFriends size::{}", activeFriends.size());
+        }
+    }
+
+    /**
+     * 设置libTAU主循环时间间隔
+     */
+    @Override
+    public void setMainLoopInterval(int interval) {
+        if (isRunning) {
+            sessionManager.setLoopTimeInterval(interval);
+            logger.debug("setMainLoopInterval interval::{}ms", interval);
+        }
+    }
+
+    /**
+     * 添加新消息
+     */
+    @Override
+    public boolean addNewMessage(byte[] msg) {
+        if (isRunning) {
+            boolean isAddSuccess = sessionManager.addNewMsg(msg);
+            logger.debug("addNewMessage success::{}", isAddSuccess);
+            return isAddSuccess;
+        }
+        return false;
     }
 }
