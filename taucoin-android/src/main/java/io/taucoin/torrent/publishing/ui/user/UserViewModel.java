@@ -785,6 +785,7 @@ public class UserViewModel extends AndroidViewModel {
                 HashMap<EncodeHintType, Object> hints = new HashMap<>();
                 hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
                 hints.put(EncodeHintType.MARGIN, 0);
+                hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
                 QRCodeWriter writer = new QRCodeWriter();
                 Bitmap bitmap = writer.encode(content, BarcodeFormat.QR_CODE, widthPix, heightPix,
                         hints, logoBitmap, context);
