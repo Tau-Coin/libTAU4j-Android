@@ -34,7 +34,7 @@ import io.taucoin.util.ByteUtil;
  * MsgListener处理程序
  */
 class MsgAlertHandler {
-    private static final Logger logger = LoggerFactory.getLogger("MsgListenHandler");
+    private static final Logger logger = LoggerFactory.getLogger("MsgAlertHandler");
     private ChatRepository chatRepo;
     private FriendRepository friendRepo;
     private DeviceRepository deviceRepo;

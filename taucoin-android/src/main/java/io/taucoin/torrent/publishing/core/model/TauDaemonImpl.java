@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
@@ -99,10 +98,10 @@ public class TauDaemonImpl extends TauDaemon {
                                     logger.warn("Queue full, Alert data is discarded::{}", alert.message());
                                 }
                                 break;
-                            case SES_STOP_OVER:
-                                tauDaemonAlertHandler.handleLogAlert(alert);
-                                sessionStopOver();
-                                break;
+//                            case SES_STOP_OVER:
+//                                tauDaemonAlertHandler.handleLogAlert(alert);
+//                                sessionStopOver();
+//                                break;
                             default:
                                 tauDaemonAlertHandler.handleLogAlert(alert);
                                 break;
@@ -133,6 +132,8 @@ public class TauDaemonImpl extends TauDaemon {
                     tauDaemonAlertHandler.handleAlertAndUser(alertAndUser);
                 } catch (InterruptedException e) {
                     break;
+                } catch (Exception e) {
+                    logger.error("alertConsumer error::", e);
                 }
             }
         }).subscribeOn(Schedulers.io())

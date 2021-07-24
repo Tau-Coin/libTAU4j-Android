@@ -65,7 +65,7 @@ public abstract class TauDaemon {
     private SystemServiceManager systemServiceManager;
     private ExecutorService exec = Executors.newSingleThreadExecutor();
     private TauInfoProvider tauInfoProvider;
-    private Disposable restartSessionTimer; // 重启Sessions定时任务
+    private Disposable reopenNetworkTimer; // 重启Network定时任务
     volatile boolean isRunning = false;
     private volatile boolean trafficTips = true; // 剩余流量用完提示
     volatile String seed;
@@ -354,16 +354,16 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
             logger.info("isMeteredNetwork::{}", NetworkSetting.isMeteredNetwork());
         } else if (key.equals(appContext.getString(R.string.pref_key_current_speed))) {
-            if (restartSessionTimer != null && !restartSessionTimer.isDisposed()
+            if (reopenNetworkTimer != null && !reopenNetworkTimer.isDisposed()
                     && NetworkSetting.getCurrentSpeed() > 0) {
-                restartSessionTimer.dispose();
-                disposables.remove(restartSessionTimer);
-                logger.info("restartSessionTimer dispose");
+                reopenNetworkTimer.dispose();
+                disposables.remove(reopenNetworkTimer);
+                logger.info("reopenNetworkTimer dispose");
             }
         } else if (key.equals(appContext.getString(R.string.pref_key_foreground_running))) {
             boolean isForeground = settingsRepo.getBooleanValue(key);
             logger.info("foreground running::{}", isForeground);
-            restartSessionTimer();
+            reopenNetworkTimer();
         } else if (key.equals(appContext.getString(R.string.pref_key_nat_pmp_mapped))) {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
@@ -376,16 +376,16 @@ public abstract class TauDaemon {
     /**
      * 定时任务：APP从后台到前台触发, 网速采样时间后，网速依然为0，重启Sessions
      */
-    private void restartSessionTimer() {
+    private void reopenNetworkTimer() {
         boolean isForeground = settingsRepo.getBooleanValue(appContext.getString(R.string.pref_key_foreground_running));
         if (!isForeground) {
             return;
         }
-        if (restartSessionTimer != null && !restartSessionTimer.isDisposed()) {
+        if (reopenNetworkTimer != null && !reopenNetworkTimer.isDisposed()) {
             return;
         }
-        logger.info("restartSessionTimer start");
-        restartSessionTimer = Observable.timer(10, TimeUnit.SECONDS)
+        logger.info("reopenNetworkTimer start");
+        reopenNetworkTimer = Observable.timer(10, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(time -> {
@@ -393,13 +393,13 @@ public abstract class TauDaemon {
                     boolean isHaveAvailableData = NetworkSetting.isHaveAvailableData();
                     boolean isRestart = settingsRepo.internetState() && isHaveAvailableData
                             && NetworkSetting.getCurrentSpeed() == 0;
-                    logger.info("restartSessionTimer isRestart::{}", isRestart);
+                    logger.info("reopenNetworkTimer isRestart::{}", isRestart);
                     if (isRestart) {
                         rescheduleTAUBySettings(true);
                     }
 
                 });
-        disposables.add(restartSessionTimer);
+        disposables.add(reopenNetworkTimer);
     }
 
     /**

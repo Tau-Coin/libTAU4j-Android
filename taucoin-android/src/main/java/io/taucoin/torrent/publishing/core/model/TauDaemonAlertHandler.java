@@ -104,7 +104,7 @@ class TauDaemonAlertHandler {
     private void onDiscoverFriend(Alert alert, String userPk) {
         CommLastSeenAlert lastSeenAlert = (CommLastSeenAlert) alert;
         byte[] friendPk = lastSeenAlert.get_peer();
-        long lastSeenTime = lastSeenAlert.timestamp();
+        long lastSeenTime = lastSeenAlert.get_last_seen();
         msgListenHandler.onDiscoveryFriend(ByteUtil.toHexString(friendPk), lastSeenTime, userPk);
     }
 
@@ -115,7 +115,7 @@ class TauDaemonAlertHandler {
     private void onSyncMessage(Alert alert) {
         CommSyncMsgAlert syncMsgAlert = (CommSyncMsgAlert) alert;
         byte[] hash = syncMsgAlert.getSyncing_msg_hash();
-        long timestamp = syncMsgAlert.timestamp();
+        long timestamp = syncMsgAlert.get_timestamp();
         msgListenHandler.onSyncMessage(hash, timestamp);
     }
 
@@ -125,7 +125,7 @@ class TauDaemonAlertHandler {
      */
     private void onConfirmRoot(Alert alert) {
         CommConfirmRootAlert confirmRootAlert = (CommConfirmRootAlert) alert;
-        long timestamp = confirmRootAlert.timestamp();
+        long timestamp = confirmRootAlert.get_timestamp();
         List<byte[]> rootList = confirmRootAlert.getConfirmation_roots();
         msgListenHandler.onReadMessageRoot(rootList, BigInteger.valueOf(timestamp));
     }
