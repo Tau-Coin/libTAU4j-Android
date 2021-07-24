@@ -53,7 +53,8 @@ import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.constant.QRContent;
+import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
+import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.user.SeedActivity;
@@ -271,7 +272,9 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
                     openChainLink(chainID, scanResult);
                     return;
                 }
-                if (Utils.isKeyValid(scanResult)) {
+                SeedQRContent content = new Gson().fromJson(scanResult, SeedQRContent.class);
+                String seed = content.getSeed();
+                if (Utils.isKeyValid(seed)) {
                     if (scanKeyOnly) {
                         // 返回上一个页面扫描结果
                         Intent intent = new Intent();
@@ -280,15 +283,15 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
                         onBackPressed();
                     } else {
                         // 直接导入扫描结果
-                        userViewModel.importSeed(scanResult, null);
+                        userViewModel.importSeed(seed, content.getNickName());
                     }
                     return;
                 }
-                QRContent content = new Gson().fromJson(scanResult, QRContent.class);
-                if (content != null &&
-                        ByteUtil.toByte(content.getPublicKey()).length == Ed25519.PUBLIC_KEY_SIZE) {
-                    friendPk = content.getPublicKey();
-                    userViewModel.addFriend(content.getPublicKey(), content.getNickName());
+                PublicKeyQRContent publicKeyQRContent = new Gson().fromJson(scanResult, PublicKeyQRContent.class);
+                if (publicKeyQRContent != null &&
+                        ByteUtil.toByte(publicKeyQRContent.getPublicKey()).length == Ed25519.PUBLIC_KEY_SIZE) {
+                    friendPk = publicKeyQRContent.getPublicKey();
+                    userViewModel.addFriend(publicKeyQRContent.getPublicKey(), content.getNickName());
                     return;
                 }
             }

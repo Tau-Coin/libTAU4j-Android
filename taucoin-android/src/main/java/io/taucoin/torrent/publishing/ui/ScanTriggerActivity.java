@@ -4,7 +4,8 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +14,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.PermissionUtils;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
 import io.taucoin.torrent.publishing.ui.customviews.permission.EasyPermissions;
 import io.taucoin.torrent.publishing.ui.qrcode.ScanQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
@@ -103,8 +105,9 @@ public abstract class ScanTriggerActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == SCAN_CODE) {
             if (data != null && viewModel != null) {
-                String key = data.getStringExtra(IntentExtra.DATA);
-                viewModel.importSeed(key, null);
+                String scanResult = data.getStringExtra(IntentExtra.DATA);
+                SeedQRContent content = new Gson().fromJson(scanResult, SeedQRContent.class);
+                viewModel.importSeed(content.getSeed(), content.getNickName());
             }
         }
     }

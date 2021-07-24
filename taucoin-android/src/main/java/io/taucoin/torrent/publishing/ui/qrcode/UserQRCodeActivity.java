@@ -20,6 +20,7 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityQrCodeBinding;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
@@ -77,7 +78,8 @@ public class UserQRCodeActivity extends ScanTriggerActivity implements View.OnCl
      * 显示QRCode图片
      */
     private void showQRCOdeImage(QRContent content) {
-        String midHideName = UsersUtil.getMidHideName(content.getPublicKey());
+        PublicKeyQRContent publicKeyQRContent = (PublicKeyQRContent) content;
+        String midHideName = UsersUtil.getMidHideName(publicKeyQRContent.getPublicKey());
         SpannableStringBuilder stringBuilder = new SpanUtils()
                 .append(getString(R.string.qr_code_tau_id))
                 .setForegroundColor(getResources().getColor(R.color.gray_dark))
@@ -85,7 +87,7 @@ public class UserQRCodeActivity extends ScanTriggerActivity implements View.OnCl
                 .append(midHideName)
                 .create();
         binding.qrCode.tvName.setText(stringBuilder);
-        binding.qrCode.tvName.setTag(content.getPublicKey());
+        binding.qrCode.tvName.setTag(publicKeyQRContent.getPublicKey());
         DrawablesUtil.setEndDrawable(binding.qrCode.tvName, R.mipmap.icon_copy_text,
                 getResources().getDimension(R.dimen.widget_size_16));
         userViewModel.generateQRCode(UserQRCodeActivity.this, content);

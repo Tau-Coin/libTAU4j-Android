@@ -71,7 +71,8 @@ import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.constant.Constants;
-import io.taucoin.torrent.publishing.ui.constant.KeyQRContent;
+import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
+import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
@@ -308,7 +309,7 @@ public class UserViewModel extends AndroidViewModel {
             try {
                 User user = userRepo.getCurrentUser();
                 String showName = UsersUtil.getShowName(user);
-                QRContent content = new QRContent();
+                PublicKeyQRContent content = new PublicKeyQRContent();
                 content.setPublicKey(user.publicKey);
                 content.setNickName(showName);
                 emitter.onNext(content);
@@ -331,9 +332,8 @@ public class UserViewModel extends AndroidViewModel {
             try {
                 User user = userRepo.getCurrentUser();
                 String showName = UsersUtil.getShowName(user);
-                KeyQRContent content = new KeyQRContent();
+                SeedQRContent content = new SeedQRContent();
                 content.setSeed(user.seed);
-                content.setPublicKey(user.publicKey);
                 content.setNickName(showName);
                 emitter.onNext(content);
             }catch (Exception e){
@@ -769,13 +769,16 @@ public class UserViewModel extends AndroidViewModel {
     public void generateQRCode(Context context, QRContent qrContent) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Bitmap>) emitter -> {
             try {
-                String content;
-                if (qrContent instanceof KeyQRContent) {
-                    content = ((KeyQRContent) qrContent).getSeed();
-                } else {
-                    content = new Gson().toJson(qrContent);
+                String publicKey = null;
+                if (qrContent instanceof SeedQRContent) {
+                    String seed = ((SeedQRContent) qrContent).getSeed();
+                    Pair<byte[], byte[]> keypair = Ed25519.createKeypair(ByteUtil.toByte(seed));
+                    publicKey = ByteUtil.toHexString(keypair.first);
+                } else if (qrContent instanceof PublicKeyQRContent) {
+                    publicKey = ((PublicKeyQRContent) qrContent).getPublicKey();
                 }
-                int bgColor = Utils.getGroupColor(qrContent.getPublicKey());
+                String content = new Gson().toJson(qrContent);
+                int bgColor = Utils.getGroupColor(publicKey);
                 String firstLettersName = UsersUtil.getQRCodeName(qrContent.getNickName());
                 Bitmap logoBitmap = BitmapUtil.createLogoBitmap(bgColor, firstLettersName);
 

@@ -20,7 +20,7 @@ import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityKeyQrCodeBinding;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
-import io.taucoin.torrent.publishing.ui.constant.KeyQRContent;
+import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
@@ -79,7 +79,7 @@ public class KeyQRCodeActivity extends ScanTriggerActivity implements View.OnCli
      * 显示QRCode图片
      */
     private void showQRCOdeImage(QRContent content) {
-        KeyQRContent keyContent = (KeyQRContent) content;
+        SeedQRContent keyContent = (SeedQRContent) content;
         String midHideName = UsersUtil.getMidHideName(keyContent.getSeed());
         SpannableStringBuilder stringBuilder = new SpanUtils()
                 .append(getString(R.string.qr_code_tau_key))

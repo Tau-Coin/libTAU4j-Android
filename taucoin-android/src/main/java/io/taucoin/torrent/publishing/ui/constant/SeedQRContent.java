@@ -3,7 +3,7 @@ package io.taucoin.torrent.publishing.ui.constant;
 /**
  * QR内容
  */
-public class KeyQRContent extends QRContent{
+public class SeedQRContent extends QRContent{
     private String seed;
 
     public String getSeed() {
