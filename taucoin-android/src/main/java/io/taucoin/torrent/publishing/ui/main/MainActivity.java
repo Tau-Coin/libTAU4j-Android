@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
+import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -397,6 +398,9 @@ public class MainActivity extends ScanTriggerActivity {
             case R.id.item_data_cost:
                 ActivityUtil.startActivity(this, DataCostActivity.class);
                 break;
+        }
+        if (binding != null) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
         }
     }
 
