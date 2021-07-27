@@ -68,18 +68,17 @@ public class CameraView extends FrameLayout implements TextureView.SurfaceTextur
     private DecelerateInterpolator interpolator = new DecelerateInterpolator();
 
     public CameraView(@NonNull Context context) {
-        super(context, null);
-        initCameraView(context);
+        this(context, null);
     }
 
-//    public CameraView(@NonNull Context context, @Nullable AttributeSet attrs) {
-//        this(context, attrs, 0);
-//    }
-//
-//    public CameraView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-//        super(context, attrs, defStyleAttr);
-//        initCameraView(context);
-//    }
+    public CameraView(@NonNull Context context, @Nullable AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public CameraView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        initCameraView(context);
+    }
 
     private void initCameraView(@NonNull Context context) {
         initialFrontface = isFrontface = false;

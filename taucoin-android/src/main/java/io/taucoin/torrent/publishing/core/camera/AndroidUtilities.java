@@ -11,6 +11,7 @@ package io.taucoin.torrent.publishing.core.camera;
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.net.Uri;
@@ -29,10 +30,42 @@ import io.taucoin.torrent.publishing.R;
 
 public class AndroidUtilities {
 
-    public static float density = 1;
-    public static Point displaySize = new Point();
-    public static Integer photoSize = null;
-    public static DisplayMetrics displayMetrics = new DisplayMetrics();
+    private static float density = 1;
+    static Point displaySize = new Point();
+    private static Integer photoSize = null;
+    private static DisplayMetrics displayMetrics = new DisplayMetrics();
+
+    static {
+        checkDisplaySize(MainApplication.getInstance());
+    }
+
+    private static void checkDisplaySize(Context context) {
+        try {
+            density = context.getResources().getDisplayMetrics().density;
+            Configuration configuration = context.getResources().getConfiguration();
+            WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            if (manager != null) {
+                Display display = manager.getDefaultDisplay();
+                if (display != null) {
+                    display.getMetrics(displayMetrics);
+                    display.getSize(displaySize);
+                }
+            }
+            if (configuration.screenWidthDp != Configuration.SCREEN_WIDTH_DP_UNDEFINED) {
+                int newSize = (int) Math.ceil(configuration.screenWidthDp * density);
+                if (Math.abs(displaySize.x - newSize) > 3) {
+                    displaySize.x = newSize;
+                }
+            }
+            if (configuration.screenHeightDp != Configuration.SCREEN_HEIGHT_DP_UNDEFINED) {
+                int newSize = (int) Math.ceil(configuration.screenHeightDp * density);
+                if (Math.abs(displaySize.y - newSize) > 3) {
+                    displaySize.y = newSize;
+                }
+            }
+        } catch (Exception ignore) {
+        }
+    }
 
     public static int dimen(int reid) {
         return MainApplication.getInstance().getResources().getDimensionPixelSize(reid);
