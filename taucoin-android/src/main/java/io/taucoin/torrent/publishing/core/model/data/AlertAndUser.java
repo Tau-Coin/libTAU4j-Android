@@ -33,11 +33,9 @@ import io.taucoin.util.ByteUtil;
 public class AlertAndUser {
     private Alert alert;
     private String userPk;
-    private String message;
 
     public AlertAndUser(Alert alert, String seed) {
         this.alert = alert;
-        this.message = alert.message();
 
         if (StringUtil.isNotEmpty(seed)) {
             byte[] seedBytes = ByteUtil.toByte(seed);
@@ -60,13 +58,5 @@ public class AlertAndUser {
 
     public void setUserPk(String userPk) {
         this.userPk = userPk;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 }

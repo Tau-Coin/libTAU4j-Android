@@ -58,6 +58,7 @@ public class ChatViewModel extends AndroidViewModel {
     private UserRepository userRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> chatResult = new MutableLiveData<>();
+    private MutableLiveData<Result> resentResult = new MutableLiveData<>();
     private MutableLiveData<List<ChatMsgAndUser>> chatMessages = new MutableLiveData<>();
     private TauDaemon daemon;
     private Disposable chattingDisposable = null;
@@ -70,6 +71,13 @@ public class ChatViewModel extends AndroidViewModel {
 
     MutableLiveData<Result> getChatResult() {
         return chatResult;
+    }
+
+    /**
+     * 获取消息重发的结果
+     */
+    MutableLiveData<Result> getResentResult() {
+        return resentResult;
     }
 
     public void observeNeedStartDaemon () {
@@ -215,10 +223,10 @@ public class ChatViewModel extends AndroidViewModel {
                 String logicMsgHashStr;
                 if (type == MessageType.PICTURE.ordinal()) {
                     String progressivePath = MsgSplitUtil.compressAndScansPic(msg);
-                    logicMsgHashStr = HashUtil.makeFileSha1HashWithTimeStamp(progressivePath);
+                    logicMsgHashStr = HashUtil.makeFileSha256HashWithTimeStamp(progressivePath);
                     contents = MsgSplitUtil.splitPicMsg(progressivePath);
                 } else if(type == MessageType.TEXT.ordinal()) {
-                    logicMsgHashStr = HashUtil.makeSha1HashWithTimeStamp(msg);
+                    logicMsgHashStr = HashUtil.makeSha256HashWithTimeStamp(msg);
                     contents = MsgSplitUtil.splitTextMsg(msg);
                 } else {
                     throw new Exception("Unknown message type");
@@ -275,6 +283,40 @@ public class ChatViewModel extends AndroidViewModel {
         });
         chatRepo.submitDataSetChangedDirect(friendPkStr);
         return result;
+    }
+
+    /**
+     * 重发消息
+     * @param msg
+     */
+    void resendMessage(ChatMsg msg, int pos) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Result>) emitter -> {
+            ChatMsg chatMsg = chatRepo.queryChatMsg(msg.hash);
+            Result result = new Result();
+            BigInteger timestamp = BigInteger.valueOf(chatMsg.timestamp);
+            byte[] sender = ByteUtil.toByte(chatMsg.senderPk);
+            byte[] receiver = ByteUtil.toByte(chatMsg.receiverPk);
+            byte[] logicMsgHash = ByteUtil.toByte(chatMsg.logicMsgHash);
+            BigInteger nonce = BigInteger.valueOf(chatMsg.nonce);
+            Message message = Message.createTextMessage(timestamp, sender, receiver, logicMsgHash,
+                    nonce, null);
+            message.setEncryptedContent(chatMsg.content);
+            boolean isSuccess = daemon.addNewMessage(message.getEncoded());
+            if (isSuccess) {
+                // 更新界面数据
+                msg.unsent = 1;
+                // 更新数据库值
+                chatMsg.unsent = 1;
+                chatRepo.updateMsgSendStatus(chatMsg);
+            }
+            result.setMsg(String.valueOf(pos));
+            result.setSuccess(isSuccess);
+            emitter.onNext(result);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> resentResult.postValue(result));
+        disposables.add(disposable);
     }
 
     /**

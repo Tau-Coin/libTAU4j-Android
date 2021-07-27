@@ -35,10 +35,10 @@ import java.security.NoSuchAlgorithmException;
 public class HashUtil {
     private static final Logger logger = LoggerFactory.getLogger("HashUtil");
 
-    public static byte[] sha1hash(byte[] bytes){
+    public static byte[] sha256hash(byte[] bytes){
        MessageDigest digest;
        try {
-           digest = MessageDigest.getInstance("SHA-1");
+           digest = MessageDigest.getInstance("SHA-256");
        } catch (NoSuchAlgorithmException e) {
            return null;
        }
@@ -61,7 +61,7 @@ public class HashUtil {
         System.arraycopy(prefix, 0, getPrefixBytes, 0, prefix.length);
         System.arraycopy(bytes, 0, getPrefixBytes, prefix.length, bytes.length);
 
-        return HashUtil.sha1hash(getPrefixBytes);
+        return HashUtil.sha256hash(getPrefixBytes);
 
     }
 }

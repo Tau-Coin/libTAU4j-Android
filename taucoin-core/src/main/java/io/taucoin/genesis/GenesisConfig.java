@@ -83,7 +83,7 @@ public class GenesisConfig {
         // According to POT consensus,
         // generationSignature = hash(previous block generationSignature + pubkey)
         // here previous block generationSignature is null.
-        this.generationSignature = HashUtil.sha1hash(this.pubkey);
+        this.generationSignature = HashUtil.sha256hash(this.pubkey);
         this.signature = signature;
         this.genesisTx = genesisTx;
         HorizontalItem item = HorizontalItem.with(this.genesisTx.getTxID());
@@ -126,7 +126,7 @@ public class GenesisConfig {
         this.pubkey = new byte[senderKey.first.length];
         System.arraycopy(senderKey.first, 0, this.pubkey, 0, senderKey.first.length);
 
-        this.generationSignature = HashUtil.sha1hash(this.pubkey);
+        this.generationSignature = HashUtil.sha256hash(this.pubkey);
         this.signature = null;
 
         // construct genesis block
@@ -246,7 +246,7 @@ public class GenesisConfig {
 
         System.arraycopy(pubkey, 0, hashData, 0, pubkey.length);
         System.arraycopy(timeBytes, 0, hashData, pubkey.length, timeBytes.length);
-        byte[] hash = HashUtil.sha1hash(hashData);
+        byte[] hash = HashUtil.sha256hash(hashData);
 
         String idStr = communityName + ChainParam.ChainidDelimeter + Hex.toHexString(hash);
         return idStr.getBytes(UTF_8);

@@ -16,14 +16,14 @@ import java.security.NoSuchAlgorithmException;
 public class HashUtil {
 
     /**
-     * 对文本做Sha1Hash
+     * 对文本做Sha256Hash
      * @param str
      * @return
      */
-    public static String makeSha1Hash(String str) {
+    public static String makeSha256Hash(String str) {
         MessageDigest messageDigest;
         try {
-            messageDigest = MessageDigest.getInstance("SHA1");
+            messageDigest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             return null;
         }
@@ -32,13 +32,13 @@ public class HashUtil {
     }
 
     /**
-     * 对文本做Sha1Hash, 带时间戳
+     * 对文本做Sha256Hash, 带时间戳
      * @param str
      * @return
      */
-    public static String makeSha1HashWithTimeStamp(String str) {
+    public static String makeSha256HashWithTimeStamp(String str) {
         str = System.currentTimeMillis() + str;
-        return makeSha1Hash(str);
+        return makeSha256Hash(str);
     }
 
     private static String bytesToString(byte[] bytes) {
@@ -52,14 +52,14 @@ public class HashUtil {
     }
 
     /**
-     * 对文件做Sha1Hash
+     * 对文件做Sha256Hash
      * @param filePath
      * @return
      */
-    public static String makeFileSha1Hash(String filePath) {
+    public static String makeFileSha256Hash(String filePath) {
         MessageDigest messageDigest;
         try {
-            messageDigest = MessageDigest.getInstance("SHA1");
+            messageDigest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             return null;
         }
@@ -79,14 +79,14 @@ public class HashUtil {
     }
 
     /**
-     * 对文件做Sha1Hash, 带时间戳
+     * 对文件做Sha256Hash, 带时间戳
      * @param filePath
      * @return
      */
-    public static String makeFileSha1HashWithTimeStamp(String filePath) {
+    public static String makeFileSha256HashWithTimeStamp(String filePath) {
         MessageDigest messageDigest;
         try {
-            messageDigest = MessageDigest.getInstance("SHA1");
+            messageDigest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             return null;
         }

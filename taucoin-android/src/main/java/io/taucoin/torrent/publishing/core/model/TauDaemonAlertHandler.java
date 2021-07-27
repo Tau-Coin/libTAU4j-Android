@@ -52,46 +52,37 @@ class TauDaemonAlertHandler {
         switch (alert.type()) {
             case PORTMAP:
                 // 端口映射
-                logger.info(alertAndUser.getMessage());
                 onPortMapped(alert);
                 break;
             case PORTMAP_ERROR:
                 // 端口映射出错
-                logger.info(alertAndUser.getMessage());
                 onPortUnmapped(alert);
                 break;
             case COMM_LAST_SEEN:
                 // 多设备新的DeviceID
-                logger.info(alertAndUser.getMessage());
                 onDiscoverFriend(alert, alertAndUser.getUserPk());
                 break;
             case COMM_NEW_DEVICE_ID:
                 // 多设备新的DeviceID
-                logger.info(alertAndUser.getMessage());
                 onNewDeviceID(alert, alertAndUser.getUserPk());
                 break;
             case COMM_FRIEND_INFO:
                 // 朋友信息
-                logger.info(alertAndUser.getMessage());
                 onFriendInfo(alert, alertAndUser.getUserPk());
                 break;
             case COMM_NEW_MSG:
                 // 新消息
-                logger.info(alertAndUser.getMessage());
                 onNewMessage(alert, alertAndUser.getUserPk());
                 break;
             case COMM_CONFIRM_ROOT:
                 // 消息确认
-                logger.info(alertAndUser.getMessage());
                 onConfirmRoot(alert);
                 break;
             case COMM_SYNC_MSG:
                 // 消息同步
-                logger.info(alertAndUser.getMessage());
                 onSyncMessage(alert);
                 break;
             default:
-                logger.info(alertAndUser.getMessage());
                 break;
         }
     }
@@ -103,6 +94,7 @@ class TauDaemonAlertHandler {
      */
     private void onDiscoverFriend(Alert alert, String userPk) {
         CommLastSeenAlert lastSeenAlert = (CommLastSeenAlert) alert;
+        logger.info(lastSeenAlert.get_message());
         byte[] friendPk = lastSeenAlert.get_peer();
         long lastSeenTime = lastSeenAlert.get_last_seen();
         msgListenHandler.onDiscoveryFriend(ByteUtil.toHexString(friendPk), lastSeenTime, userPk);
@@ -114,6 +106,7 @@ class TauDaemonAlertHandler {
      */
     private void onSyncMessage(Alert alert) {
         CommSyncMsgAlert syncMsgAlert = (CommSyncMsgAlert) alert;
+        logger.info(syncMsgAlert.get_message());
         byte[] hash = syncMsgAlert.getSyncing_msg_hash();
         long timestamp = syncMsgAlert.get_timestamp();
         msgListenHandler.onSyncMessage(hash, timestamp);
@@ -125,6 +118,7 @@ class TauDaemonAlertHandler {
      */
     private void onConfirmRoot(Alert alert) {
         CommConfirmRootAlert confirmRootAlert = (CommConfirmRootAlert) alert;
+        logger.info(confirmRootAlert.get_message());
         long timestamp = confirmRootAlert.get_timestamp();
         List<byte[]> rootList = confirmRootAlert.getConfirmation_roots();
         msgListenHandler.onReadMessageRoot(rootList, BigInteger.valueOf(timestamp));
@@ -136,6 +130,7 @@ class TauDaemonAlertHandler {
      */
     private void onNewMessage(Alert alert, String userPk) {
         CommNewMsgAlert newMsgAlert = (CommNewMsgAlert) alert;
+        logger.info(newMsgAlert.get_message());
         byte[] message = newMsgAlert.get_new_message();
         msgListenHandler.onNewMessage(message, userPk);
     }
@@ -147,7 +142,8 @@ class TauDaemonAlertHandler {
      */
     private void onNewDeviceID(Alert alert, String userPk) {
         CommNewDeviceIdAlert deviceIdAlert = (CommNewDeviceIdAlert) alert;
-        byte[] deviceID = deviceIdAlert.get_device_id();
+        logger.info(deviceIdAlert.get_message());
+        String deviceID = deviceIdAlert.get_device_id();
         msgListenHandler.onNewDeviceID(deviceID, userPk);
     }
 
@@ -158,6 +154,7 @@ class TauDaemonAlertHandler {
      */
     private void onFriendInfo(Alert alert, String userPk) {
         CommFriendInfoAlert friendInfoAlert = (CommFriendInfoAlert) alert;
+        logger.info(friendInfoAlert.get_message());
         byte[] friendInfo = friendInfoAlert.get_friend_info();
         if (friendInfo.length > 0) {
             FriendInfo bean = new FriendInfo(friendInfo);
@@ -176,7 +173,7 @@ class TauDaemonAlertHandler {
             byte[] seedBytes = ByteUtil.toByte(seed);
             Pair<byte[], byte[]> keypair = Ed25519.createKeypair(seedBytes);
             String userPk = ByteUtil.toHexString(keypair.first);
-            msgListenHandler.onNewDeviceID(deviceID.getBytes(), userPk);
+            msgListenHandler.onNewDeviceID(deviceID, userPk);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .subscribe();

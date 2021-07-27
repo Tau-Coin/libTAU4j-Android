@@ -105,7 +105,7 @@ public class TransactionTest {
     @Test
     public void createForumNoteTx(){
         byte[] forumNote = "Hello, Taucoin!".getBytes();
-        byte[] forumNoteHash = HashUtil.sha1hash(forumNote);
+        byte[] forumNoteHash = HashUtil.sha256hash(forumNote);
         ForumNoteTx tx = new ForumNoteTx(version, chainid, timestamp, txFee, sender, nonce, forumNoteHash);
         tx.signTransactionWithSeed(seed);
         System.out.println("verison: " + tx.getVersion());

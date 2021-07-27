@@ -273,6 +273,17 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                 ToastUtils.showShortToast(result.getMsg());
             }
         });
+
+        chatViewModel.getResentResult().observe(this, result -> {
+            if (!result.isSuccess()) {
+                ToastUtils.showShortToast(R.string.chatting_resend_failed);
+            } else {
+                int pos = StringUtil.getIntString(result.getMsg());
+                if (pos >= 0 && pos < adapter.getCurrentList().size()) {
+                    adapter.notifyItemChanged(pos);
+                }
+            }
+        });
     }
 
     @Override
@@ -333,6 +344,11 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::showMsgLogsDialog);
         disposables.add(logsDisposable);
+    }
+
+    @Override
+    public void onResendClicked(ChatMsg msg) {
+        chatViewModel.resendMessage(msg, adapter.getCurrentList().indexOf(msg));
     }
 
     @Override

@@ -209,11 +209,10 @@ class MsgAlertHandler {
      * @param deviceID device id
      * @param userPk 当前用户的公钥
      */
-    void onNewDeviceID(byte[] deviceID, String userPk) {
-        String deviceIDStr = new String(deviceID);
+    void onNewDeviceID(String deviceID, String userPk) {
         logger.debug("onNewDeviceID userPk::{}, deviceID::{}",
-                userPk, deviceIDStr);
-        Device device = new Device(userPk, deviceIDStr, DateUtil.getTime());
+                userPk, deviceID);
+        Device device = new Device(userPk, deviceID, DateUtil.getTime());
         deviceRepo.addDevice(device);
     }
 

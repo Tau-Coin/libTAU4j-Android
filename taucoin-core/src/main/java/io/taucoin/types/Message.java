@@ -156,18 +156,10 @@ public class Message {
 
     public byte[] getHash() {
         if (null == this.hash) {
-            this.hash = HashUtil.bencodeHash(getEncoded());
+            this.hash = HashUtil.sha256hash(getEncoded());
         }
 
         return this.hash;
-    }
-
-    public byte[] getSha1Hash() {
-        if (null == this.sha1Hash) {
-            this.sha1Hash = HashUtil.sha1hash(getEncoded());
-        }
-
-        return this.sha1Hash;
     }
 
     private void parseRLP() {
@@ -246,7 +238,6 @@ public class Message {
         byte[] sender = getSender();
         byte[] receiver = getReceiver();
         MessageType type = getType();
-//        byte[] content = getContent();
         byte[] hash = getHash();
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -284,10 +275,6 @@ public class Message {
             stringBuilder.append(", type=");
             stringBuilder.append(type);
         }
-//        if (null != content) {
-//            stringBuilder.append(", content=");
-//            stringBuilder.append(new String(content));
-//        }
 
         stringBuilder.append("}");
 

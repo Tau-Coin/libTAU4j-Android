@@ -378,4 +378,7 @@
 
     <string name="chat_take_picture">Camera</string>
     <string name="chat_album">Album</string>
+
+    <!-- Send text to clipboard -->
+    <string name="chatting_resend_failed">Resend failed, please try again later!</string>
 </resources>

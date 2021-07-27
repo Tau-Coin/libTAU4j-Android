@@ -152,7 +152,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
             if (null == binding || null == msg) {
                 return;
             }
-            showStatusView(binding.ivStats, binding.tvProgress, msg, true);
+            showStatusView(binding.ivStats, binding.tvProgress, binding.ivWarning, msg);
             bindText(binding.roundButton, binding.tvTime, binding.tvMsg, msg, previousChat);
         }
 
@@ -160,7 +160,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
             if (null == binding || null == msg) {
                 return;
             }
-            showStatusView(binding.ivStats, binding.tvProgress, msg, false);
             bindText(binding.roundButton, binding.tvTime, binding.tvMsg, msg, previousChat);
         }
 
@@ -193,21 +192,25 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
             tvMsg.setTextContent(msg.content, msg.rawContent, msg.senderPk, msg.receiverPk);
         }
 
-        private void showStatusView(ImageView ivStats, ProgressBar tvProgress, ChatMsg msg, boolean isMine) {
-            if (isMine) {
-                ivStats.setImageResource(R.mipmap.icon_logs);
-                ivStats.setVisibility(View.VISIBLE);
-                tvProgress.setVisibility(View.GONE);
-
-                ivStats.setOnClickListener(v -> {
-                    if (listener != null) {
-                        listener.onMsgLogsClicked(msg);
-                    }
-                });
-            } else {
-                ivStats.setVisibility(View.GONE);
-                tvProgress.setVisibility(View.GONE);
+        private void showStatusView(ImageView ivStats, ProgressBar tvProgress, ImageView ivWarning, ChatMsg msg) {
+            if (null == ivWarning) {
+                return;
             }
+            ivStats.setImageResource(R.mipmap.icon_logs);
+            ivStats.setVisibility(View.VISIBLE);
+            tvProgress.setVisibility(View.GONE);
+            ivWarning.setVisibility(msg.unsent == 1 ? View.GONE : View.VISIBLE);
+            ivWarning.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onResendClicked(msg);
+                }
+            });
+
+            ivStats.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onMsgLogsClicked(msg);
+                }
+            });
         }
 
         private boolean isShowTime(ChatMsgAndUser chat, ChatMsgAndUser previousChat) {
@@ -222,7 +225,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
             if (null == binding || null == msg) {
                 return;
             }
-            showStatusView(binding.ivStats, binding.tvProgress, msg, true);
+            showStatusView(binding.ivStats, binding.tvProgress, null, msg);
             bindPicture(binding.roundButton, binding.tvTime, binding.tvImage, msg, previousChat);
         }
 
@@ -230,7 +233,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
             if(null == binding || null == msg){
                 return;
             }
-            showStatusView(binding.ivStats, binding.tvProgress, msg, false);
             bindPicture(binding.roundButton, binding.tvTime, binding.tvImage, msg, previousChat);
         }
 
@@ -265,6 +267,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
 
     public interface ClickListener {
         void onMsgLogsClicked(ChatMsg msg);
+        void onResendClicked(ChatMsg msg);
         void onUserClicked(ChatMsg msg);
     }
 
@@ -273,7 +276,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
         public boolean areContentsTheSame(@NonNull ChatMsgAndUser oldItem, @NonNull ChatMsgAndUser newItem) {
             return oldItem.equals(newItem)
                     && StringUtil.isEquals(oldItem.logicMsgHash, newItem.logicMsgHash)
-                    && oldItem.nonce == newItem.nonce;
+                    && oldItem.nonce == newItem.nonce && oldItem.unsent == newItem.unsent;
         }
 
         @Override
