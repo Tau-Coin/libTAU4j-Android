@@ -42,9 +42,7 @@ public class HashUtil {
        } catch (NoSuchAlgorithmException e) {
            return null;
        }
-       byte_vector bvs = Vectors.bytes2byte_vector(digest.digest(bytes));
-       sha1_hash hash = new sha1_hash(bvs);
-       return  Vectors.byte_vector2bytes(hash.to_bytes());
+       return digest.digest(bytes);
     }
 
     public static byte[] bencodeHash(byte[] bytes){
