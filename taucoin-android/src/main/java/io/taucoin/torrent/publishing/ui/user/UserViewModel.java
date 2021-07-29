@@ -511,9 +511,11 @@ public class UserViewModel extends AndroidViewModel {
      */
     public void addFriend(String publicKey, String nickname) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
+            logger.debug("AddFriendsLocally, publicKey::{}, nickname::{}", publicKey, nickname);
             Result result = new Result();
             User user = userRepo.getUserByPublicKey(publicKey);
             if(null == user){
+                logger.debug("AddFriendsLocally, new user");
                 user = new User(publicKey);
                 if (StringUtil.isNotEmpty(nickname)) {
                     user.nickname = nickname;
@@ -521,6 +523,7 @@ public class UserViewModel extends AndroidViewModel {
                 }
                 userRepo.addUser(user);
             } else {
+                logger.debug("AddFriendsLocally, user exist");
                 if (StringUtil.isEmpty(user.nickname) && StringUtil.isNotEmpty(nickname)) {
                     user.nickname = nickname;
                     user.updateTime = DateUtil.getTime();
@@ -532,6 +535,7 @@ public class UserViewModel extends AndroidViewModel {
 
             // 更新libTAU朋友信息
             boolean isSuccess = daemon.updateFriendInfo(user);
+            logger.debug("AddFriendsLocally, libTAU updateFriendInfo success::{}", isSuccess);
             boolean isExist = true;
             if (null == friend) {
                 // 添加朋友
@@ -544,11 +548,14 @@ public class UserViewModel extends AndroidViewModel {
                     // 发送默认消息
                     String msg = getApplication().getString(R.string.contacts_have_added);
                     chatViewModel.syncSendMessageTask(publicKey, msg, MessageType.TEXT.ordinal());
+                    logger.debug("AddFriendsLocally, syncSendMessageTask::{}", msg);
                 } else {
                     result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));
+                    logger.debug("AddFriendsLocally, {}", result.getMsg());
                 }
             } else {
                 result.setMsg(getApplication().getString(R.string.contacts_friend_already_exists));
+                logger.debug("AddFriendsLocally, {}", result.getMsg());
             }
             result.setSuccess(isExist);
             emitter.onNext(result);

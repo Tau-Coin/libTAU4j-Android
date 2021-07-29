@@ -192,12 +192,12 @@ public class TauDaemonImpl extends TauDaemon {
      * @param friendPk 朋友公钥
      */
     private boolean addNewFriend(String friendPk) {
+        boolean isSuccess = false;
         if (isRunning) {
-            sessionManager.addNewFriend(friendPk);
-            logger.debug("addNewFriend friendPk::{}", friendPk);
-            return true;
+            isSuccess = sessionManager.addNewFriend(friendPk);
+            logger.debug("addNewFriend friendPk::{}, isSuccess::{}", friendPk, isSuccess);
         }
-        return false;
+        return isSuccess;
     }
 
     /**
@@ -205,11 +205,13 @@ public class TauDaemonImpl extends TauDaemon {
      * @param friendPk 朋友公钥
      * @param friendInfo 朋友信息
      */
-    private void updateFriendInfo(String friendPk, byte[] friendInfo) {
+    private boolean updateFriendInfo(String friendPk, byte[] friendInfo) {
+        boolean isSuccess = false;
         if (isRunning) {
-            sessionManager.updateFriendInfo(friendPk, friendInfo);
-            logger.debug("updateFriendInfo friendPk::{}", friendPk);
+            isSuccess = sessionManager.updateFriendInfo(friendPk, friendInfo);
+            logger.debug("updateFriendInfo friendPk::{}, isSuccess::{}", friendPk, isSuccess);
         }
+        return isSuccess;
     }
 
     /**
