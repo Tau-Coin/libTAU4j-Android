@@ -117,7 +117,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         userViewModel.getAddFriendResult().observe(this, result -> {
             closeProgressDialog();
             if (result.isSuccess()) {
-                ToastUtils.showShortToast(R.string.contacts_friend_already_exists);
+                ToastUtils.showShortToast(result.getMsg());
             } else {
                 binding.tvAddToContact.setVisibility(View.GONE);
                 binding.tvShareQr.setVisibility(View.VISIBLE);

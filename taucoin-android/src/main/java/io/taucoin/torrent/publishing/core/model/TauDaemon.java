@@ -545,7 +545,7 @@ public abstract class TauDaemon {
      *  包含加朋友和朋友信息
      * @param friend 朋友对象
      */
-    public abstract void updateFriendInfo(User friend);
+    public abstract boolean updateFriendInfo(User friend);
 
     /**
      * 设置正在聊天的朋友

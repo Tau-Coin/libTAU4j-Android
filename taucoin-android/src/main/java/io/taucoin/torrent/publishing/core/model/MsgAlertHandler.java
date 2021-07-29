@@ -246,8 +246,9 @@ class MsgAlertHandler {
             }
         }
         // 更新libTAU朋友信息
-        // 多设备同步，可直接更新朋友信息
-        daemon.updateFriendInfo(user);
+        // 多设备同步，可直接更新朋友信息,
+        // 如果又把数据更新到libTAU，则状态为ADDED，否则为DISCOVERED
+        boolean isSuccess = daemon.updateFriendInfo(user);
         // 多设备朋友关系状态同步
         if (StringUtil.isNotEquals(userPk, friendPkStr)) {
             Friend friend = friendRepo.queryFriend(userPk, friendPkStr);
@@ -257,7 +258,8 @@ class MsgAlertHandler {
                     friendRepo.updateFriend(friend);
                 }
             } else {
-                friend = new Friend(userPk, friendPkStr, FriendStatus.ADDED.getStatus());
+                int status = isSuccess ? FriendStatus.ADDED.getStatus() : FriendStatus.DISCOVERED.getStatus();
+                friend = new Friend(userPk, friendPkStr, status);
                 friendRepo.addFriend(friend);
             }
         }

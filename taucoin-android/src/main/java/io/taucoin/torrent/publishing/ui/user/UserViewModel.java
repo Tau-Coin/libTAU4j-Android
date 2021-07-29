@@ -77,6 +77,7 @@ import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
+import io.taucoin.types.MessageType;
 import io.taucoin.util.ByteUtil;
 
 /**
@@ -438,13 +439,6 @@ public class UserViewModel extends AndroidViewModel {
     /**
      * 保存用户名
      */
-    public void saveUserName(String name) {
-        saveUserName(null, name);
-    }
-
-    /**
-     * 保存用户名
-     */
     private void saveUserName(String publicKey, String name) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
             User user;
@@ -462,7 +456,7 @@ public class UserViewModel extends AndroidViewModel {
                 userRepo.updateUser(user);
                 Friend friend = friendRepo.queryFriend(currentUserPk, publicKey);
                 // 必须是朋友关系，才能更新朋友
-                if (friend != null) {
+                if (friend != null && friend.status != FriendStatus.DISCOVERED.getStatus()) {
                     daemon.updateFriendInfo(user);
                 }
             }
@@ -518,7 +512,6 @@ public class UserViewModel extends AndroidViewModel {
     public void addFriend(String publicKey, String nickname) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             Result result = new Result();
-            result.setMsg(publicKey);
             User user = userRepo.getUserByPublicKey(publicKey);
             if(null == user){
                 user = new User(publicKey);
@@ -536,19 +529,26 @@ public class UserViewModel extends AndroidViewModel {
             }
             String userPK = MainApplication.getInstance().getPublicKey();
             Friend friend = friendRepo.queryFriend(userPK, publicKey);
+
+            // 更新libTAU朋友信息
+            boolean isSuccess = daemon.updateFriendInfo(user);
             boolean isExist = true;
             if (null == friend) {
-                // 1、添加朋友
-                friend = new Friend(userPK, publicKey, FriendStatus.ADDED.getStatus());
+                // 添加朋友
+                int status = isSuccess ? FriendStatus.ADDED.getStatus() : FriendStatus.DISCOVERED.getStatus();
+                friend = new Friend(userPK, publicKey, status);
                 friendRepo.addFriend(friend);
-
-                // 更新libTAU朋友信息
-                daemon.updateFriendInfo(user);
-
-                isExist = false;
-                // 2、发送默认消息
-//                String msg = getApplication().getString(R.string.contacts_have_added);
-//                chatViewModel.syncSendMessageTask(publicKey, msg, MessageType.TEXT.ordinal());
+                if (isSuccess) {
+                    isExist = false;
+                    result.setMsg(publicKey);
+                    // 发送默认消息
+                    String msg = getApplication().getString(R.string.contacts_have_added);
+                    chatViewModel.syncSendMessageTask(publicKey, msg, MessageType.TEXT.ordinal());
+                } else {
+                    result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));
+                }
+            } else {
+                result.setMsg(getApplication().getString(R.string.contacts_friend_already_exists));
             }
             result.setSuccess(isExist);
             emitter.onNext(result);

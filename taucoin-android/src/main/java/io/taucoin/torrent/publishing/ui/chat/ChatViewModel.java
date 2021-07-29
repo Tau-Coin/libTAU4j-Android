@@ -215,7 +215,7 @@ public class ChatViewModel extends AndroidViewModel {
      * @param msg 消息
      * @param type 消息类型
      */
-    private Result syncSendMessageTask(String friendPkStr, String msg, int type) {
+    public Result syncSendMessageTask(String friendPkStr, String msg, int type) {
         Result result = new Result();
         AppDatabase.getInstance(getApplication()).runInTransaction(() -> {
             try {

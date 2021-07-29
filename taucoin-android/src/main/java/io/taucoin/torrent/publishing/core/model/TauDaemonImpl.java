@@ -167,11 +167,12 @@ public class TauDaemonImpl extends TauDaemon {
      * @param friend 朋友对象
      */
     @Override
-    public void updateFriendInfo(User friend) {
+    public boolean updateFriendInfo(User friend) {
+        boolean isSuccess = false;
         if (friend != null) {
             String friendPk = friend.publicKey;
             // 添加新朋友
-            addNewFriend(friend.publicKey);
+            isSuccess = addNewFriend(friend.publicKey);
 
             byte[] nickname = null;
             BigInteger timestamp = BigInteger.ZERO;
@@ -183,17 +184,20 @@ public class TauDaemonImpl extends TauDaemon {
             // 更新朋友信息
             updateFriendInfo(friendPk, friendInfo.getEncoded());
         }
+        return isSuccess;
     }
 
     /**
      * 添加新的朋友
      * @param friendPk 朋友公钥
      */
-    private void addNewFriend(String friendPk) {
+    private boolean addNewFriend(String friendPk) {
         if (isRunning) {
             sessionManager.addNewFriend(friendPk);
             logger.debug("addNewFriend friendPk::{}", friendPk);
+            return true;
         }
+        return false;
     }
 
     /**

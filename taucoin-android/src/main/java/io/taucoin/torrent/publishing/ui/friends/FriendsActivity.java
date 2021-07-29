@@ -142,7 +142,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
 
         userViewModel.getAddFriendResult().observe(this, result -> {
             if (result.isSuccess()) {
-                ToastUtils.showShortToast(R.string.contacts_friend_already_exists);
+                ToastUtils.showShortToast(result.getMsg());
             } else {
                 userViewModel.closeDialog();
                 chatViewModel.startVisitFriend(friendPk);
