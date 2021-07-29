@@ -155,7 +155,7 @@ public class Message {
 
     public byte[] getHash() {
         if (null == this.hash) {
-            this.hash = HashUtil.sha256hash(getEncoded());
+            this.hash = HashUtil.bencodeHash(getEncoded());
         }
 
         return this.hash;

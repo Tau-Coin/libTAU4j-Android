@@ -16,10 +16,6 @@
  */
 package io.taucoin.util;
 
-import org.libTAU4j.swig.sha1_hash;
-import org.libTAU4j.Vectors;
-import org.libTAU4j.swig.byte_vector;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
