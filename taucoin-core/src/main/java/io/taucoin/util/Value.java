@@ -1,7 +1,5 @@
 package io.taucoin.util;
 
-import com.cedarsoftware.util.DeepEquals;
-//import io.taucoin.crypto.HashUtil;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
@@ -151,16 +149,6 @@ public class Value {
         if (rlp == null)
             rlp = RLP.encode(value);
         return rlp;
-    }
-
-//    public byte[] hash(){
-//        if (sha3 == null)
-//            sha3 = HashUtil.sha3(encode());
-//        return sha3;
-//    }
-
-    public boolean cmp(Value o) {
-        return DeepEquals.deepEquals(this, o);
     }
 
     /* *****************
