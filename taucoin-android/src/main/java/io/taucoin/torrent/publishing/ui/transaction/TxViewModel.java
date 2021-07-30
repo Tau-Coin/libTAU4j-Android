@@ -8,7 +8,6 @@ import android.widget.TextView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -50,9 +49,6 @@ import io.taucoin.torrent.publishing.databinding.EditFeeDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.Chain;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
-import io.taucoin.types.ForumNoteTx;
-import io.taucoin.types.Transaction;
-import io.taucoin.types.WiringCoinsTx;
 import io.taucoin.util.ByteUtil;
 
 /**
@@ -195,33 +191,33 @@ public class TxViewModel extends AndroidViewModel {
             // 交易签名
             long timestamp = DateUtil.getTime();
             byte[] chainID = tx.chainID.getBytes();
-            Transaction transaction;
-            if(tx.txType == TypesConfig.TxType.WCoinsType.ordinal()){
-                byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
-                transaction = new WiringCoinsTx(1, chainID, timestamp, BigInteger.valueOf(tx.fee),
-                        senderPk, BigInteger.valueOf(nonce), receiverPk,
-                        BigInteger.valueOf(tx.amount), tx.memo.getBytes());
-            } else {
-                // DHT PUT
-//                byte[] forumNoteHash = daemon.putForumNote(tx.memo);
-                byte[] forumNoteHash = new byte[0];
-                transaction = new ForumNoteTx(1, chainID, timestamp, BigInteger.valueOf(tx.fee),
-                        senderPk, BigInteger.valueOf(nonce), forumNoteHash);
-            }
-            transaction.signTransactionWithSeed(senderSeed);
-            // 把交易数据transaction.getEncoded()提交给链端
-//            daemon.submitTransaction(transaction);
-            // 保存交易数据到本地数据库
-            tx.txID = ByteUtil.toHexString(transaction.getTxID());
-            tx.timestamp = timestamp;
-            tx.senderPk = currentUser.publicKey;
-            tx.nonce = nonce;
-            txRepo.addTransaction(tx);
-            logger.debug("adding transaction txID::{}", tx.txID);
-            // 如果是WiringTransaction交易
-            addUserInfo(tx);
-            addMemberInfo(tx);
-            settingsRepo.lastTxFee(tx.chainID, String.valueOf(tx.fee));
+//            Transaction transaction;
+//            if(tx.txType == TypesConfig.TxType.WCoinsType.ordinal()){
+//                byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
+//                transaction = new WiringCoinsTx(1, chainID, timestamp, BigInteger.valueOf(tx.fee),
+//                        senderPk, BigInteger.valueOf(nonce), receiverPk,
+//                        BigInteger.valueOf(tx.amount), tx.memo.getBytes());
+//            } else {
+//                // DHT PUT
+////                byte[] forumNoteHash = daemon.putForumNote(tx.memo);
+//                byte[] forumNoteHash = new byte[0];
+//                transaction = new ForumNoteTx(1, chainID, timestamp, BigInteger.valueOf(tx.fee),
+//                        senderPk, BigInteger.valueOf(nonce), forumNoteHash);
+//            }
+//            transaction.signTransactionWithSeed(senderSeed);
+//            // 把交易数据transaction.getEncoded()提交给链端
+////            daemon.submitTransaction(transaction);
+//            // 保存交易数据到本地数据库
+//            tx.txID = ByteUtil.toHexString(transaction.getTxID());
+//            tx.timestamp = timestamp;
+//            tx.senderPk = currentUser.publicKey;
+//            tx.nonce = nonce;
+//            txRepo.addTransaction(tx);
+//            logger.debug("adding transaction txID::{}", tx.txID);
+//            // 如果是WiringTransaction交易
+//            addUserInfo(tx);
+//            addMemberInfo(tx);
+//            settingsRepo.lastTxFee(tx.chainID, String.valueOf(tx.fee));
         }catch (Exception e){
             result = e.getMessage();
             logger.debug("Error adding transaction::{}", result);

@@ -5,17 +5,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.taucoin.torrent.publishing.service.LibJpegManager;
-import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
-import io.taucoin.types.HashList;
-import io.taucoin.util.ByteUtil;
-import io.taucoin.util.HashUtil;
 
 /**
  * 聊天消息拆分工具

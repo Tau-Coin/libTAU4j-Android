@@ -1,9 +1,9 @@
 package io.taucoin.torrent.publishing.core.utils;
 
 import androidx.annotation.NonNull;
-import io.taucoin.param.ChainParam;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 
 /**
@@ -135,7 +135,7 @@ public class UsersUtil {
      */
     public static String getCommunityName(@NonNull String chainID) {
        if(StringUtil.isNotEmpty(chainID)){
-           String[] splits = chainID.split(ChainParam.ChainidDelimeter);
+           String[] splits = chainID.split(Constants.ChainidDelimeter);
            if(splits.length > 1){
                return splits[0];
            }

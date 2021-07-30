@@ -29,8 +29,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.genesis.GenesisConfig;
-import io.taucoin.genesis.GenesisItem;
-import io.taucoin.param.ChainParam;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
@@ -165,9 +163,7 @@ public class CommunityViewModel extends AndroidViewModel {
     GenesisConfig createGenesisConfig(@NonNull Community community){
         byte[] publicKey = ByteUtil.toByte(community.publicKey);
         BigInteger totalCoin = BigInteger.valueOf(community.totalCoin);
-        GenesisItem item = new GenesisItem(publicKey, totalCoin);
-        ArrayList<GenesisItem> list = new ArrayList<>();
-        list.add(item);
+        ArrayList<?> list = new ArrayList<>();
         return new GenesisConfig(community.communityName, list);
     }
 
@@ -218,7 +214,7 @@ public class CommunityViewModel extends AndroidViewModel {
                     community.communityName, community.chainID);
             // 把社区创建者添加为社区成员
             Member member = new Member(community.chainID, community.publicKey,
-                    community.totalCoin, ChainParam.DefaultGeneisisPower.longValue());
+                    community.totalCoin, Constants.DefaultGeneisisPower.longValue());
             memberRepo.addMember(member);
         }catch (Exception e){
             result.setFailMsg(e.getMessage());

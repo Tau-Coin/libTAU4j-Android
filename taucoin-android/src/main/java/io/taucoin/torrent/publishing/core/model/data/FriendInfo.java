@@ -1,4 +1,4 @@
-package io.taucoin.core;
+package io.taucoin.torrent.publishing.core.model.data;
 
 import org.spongycastle.util.encoders.Hex;
 

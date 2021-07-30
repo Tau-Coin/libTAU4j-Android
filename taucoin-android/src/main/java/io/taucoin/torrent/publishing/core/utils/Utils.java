@@ -28,7 +28,6 @@ import org.libTAU4j.Pair;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
-import io.taucoin.param.ChainParam;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
@@ -501,7 +500,7 @@ public class Utils {
     }
 
     public static String getCommunityName(String chainID) {
-        String[] splits = chainID.split(ChainParam.ChainidDelimeter);
+        String[] splits = chainID.split(Constants.ChainidDelimeter);
         if(splits.length > 0){
             return splits[0];
         }

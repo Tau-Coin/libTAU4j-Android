@@ -16,7 +16,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.core.FriendInfo;
+import io.taucoin.torrent.publishing.core.model.data.FriendInfo;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
