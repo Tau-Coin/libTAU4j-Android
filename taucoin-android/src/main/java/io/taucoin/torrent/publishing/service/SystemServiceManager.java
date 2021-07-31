@@ -4,24 +4,34 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.LinkAddress;
+import android.net.LinkProperties;
+import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
-import android.os.PowerManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.util.List;
 
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 
 /**
  * 系统服务管理
  */
 public class SystemServiceManager {
+    private static final Logger logger = LoggerFactory.getLogger("SystemService");
     private ConnectivityManager connectivityManager;
-    private PowerManager powerManager;
     private Context appContext;
     private static volatile SystemServiceManager instance;
     private SystemServiceManager(){
         this.appContext = MainApplication.getInstance();;
         connectivityManager = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        powerManager = (PowerManager) appContext.getSystemService(Context.POWER_SERVICE);
     }
 
     public static SystemServiceManager getInstance() {
@@ -88,5 +98,68 @@ public class SystemServiceManager {
             return acPlugged || usbPlugged || wirePlugged;
         }
         return false;
+    }
+
+    /**
+     * 获取网络地址
+     * 如果有IPV4直接取IPV4，否则获取第一个IPV6
+     */
+    public String getNetworkAddress() {
+        Network[] networks = connectivityManager.getAllNetworks();
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        String networkAddress = null;
+        if (networks != null && activeNetworkInfo != null) {
+            for (Network network : networks) {
+                NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
+                if (networkInfo.toString().equals(activeNetworkInfo.toString())) {
+                    LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
+                    String name = linkProperties.getInterfaceName();
+                    logger.debug("ActiveNetworkInfo InterfaceName::{}", name);
+                    List<LinkAddress> linkAddresses = linkProperties.getLinkAddresses();
+                    if (linkAddresses != null) {
+                        for (LinkAddress linkAddress : linkAddresses) {
+                            logger.debug("ActiveNetworkInfo Flags::{}, PrefixLength::{},Scope::{}",
+                                    linkAddress.getFlags(), linkAddress.getPrefixLength(), linkAddress.getScope());
+                            InetAddress address = linkAddress.getAddress();
+                            if (isIPv4(address)) {
+                                networkAddress = address.getHostAddress();
+                                logger.debug("ActiveNetworkInfo IPv4 HostAddress::{}", networkAddress);
+                            } else {
+                                if (StringUtil.isEmpty(networkAddress)) {
+                                    networkAddress = address.getHostAddress();
+                                }
+                                logger.debug("ActiveNetworkInfo IPv6 HostAddress::{}, isIPv6ULA::{}",
+                                        networkAddress, isIPv6ULA(address));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return networkAddress;
+    }
+
+    private boolean isIPv6ULA(InetAddress address) {
+        if (isIPv6(address)) {
+            byte[] bytes = address.getAddress();
+            return ((bytes[0] & (byte)0xfe) == (byte)0xfc);
+        }
+        return false;
+    }
+
+    /**
+     * @return true if the address is IPv6.
+     * @hide
+     */
+    public boolean isIPv6(InetAddress address) {
+        return address instanceof Inet6Address;
+    }
+
+    /**
+     * @return true if the address is IPv4 or is a mapped IPv4 address.
+     * @hide
+     */
+    public boolean isIPv4(InetAddress address) {
+        return address instanceof Inet4Address;
     }
 }

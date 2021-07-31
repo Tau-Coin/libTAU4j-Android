@@ -38,6 +38,7 @@ import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.receiver.ConnectionReceiver;
@@ -252,6 +253,11 @@ public abstract class TauDaemon {
      * Only calls from TauService
      */
     public void doStart(String seed) {
+        String networkAddress = SystemServiceManager.getInstance().getNetworkAddress();
+        if (StringUtil.isEmpty(networkAddress)) {
+            logger.info("Failed to get network address");
+            return;
+        }
         logger.info("doStart");
         if (isRunning)
             return;
@@ -259,6 +265,7 @@ public abstract class TauDaemon {
         // 设置SessionManager启动参数
         SessionParams sessionParams = SessionSettings.getSessionParamsBuilder()
                 .setAccountSeed(seed)
+                .setNetworkInterface(networkAddress + ":0")
                 .setDeviceID(deviceID)
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
                 .build();

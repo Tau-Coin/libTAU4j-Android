@@ -3,10 +3,11 @@ package io.taucoin.torrent.publishing.core.model;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.swig.session_params;
 import org.libTAU4j.swig.settings_pack;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class SessionSettings {
-
+    private static final Logger logger = LoggerFactory.getLogger("SessionSetting");
     static SessionParamsBuilder getSessionParamsBuilder() {
         return new SessionParamsBuilder();
     }
@@ -37,7 +38,7 @@ class SessionSettings {
          */
         SessionParamsBuilder setDatabaseDir(String dbDir) {
             dbDir += "/libTAU/db";
-            LoggerFactory.getLogger("SessionSetting").debug("DatabaseDir::{}", dbDir);
+            logger.debug("DatabaseDir::{}", dbDir);
             sp.set_str(settings_pack.string_types.db_dir.swigValue(), dbDir);
             return this;
         }
@@ -47,7 +48,18 @@ class SessionSettings {
          * @param deviceId device id
          */
         SessionParamsBuilder setDeviceID(String deviceId) {
+            logger.debug("DeviceID::{}", deviceId);
             sp.set_str(settings_pack.string_types.device_id.swigValue(), deviceId);
+            return this;
+        }
+
+        /**
+         * set network interface
+         * @param networkInterface network interface
+         */
+        SessionParamsBuilder setNetworkInterface(String networkInterface) {
+            logger.debug("NetworkInterface::{}", networkInterface);
+            sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), networkInterface);
             return this;
         }
 
