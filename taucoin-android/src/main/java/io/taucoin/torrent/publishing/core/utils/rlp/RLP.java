@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the ethereumJ library. If not, see <http://www.gnu.org/licenses/>.
  */
-package io.taucoin.util;
+package io.taucoin.torrent.publishing.core.utils.rlp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ import org.spongycastle.util.encoders.Hex;
 import java.math.BigInteger;
 import java.util.*;
 
-import static io.taucoin.util.ByteUtil.*;
+import static io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil.*;
 import static java.util.Arrays.copyOfRange;
 import static org.spongycastle.util.Arrays.concatenate;
 import static org.spongycastle.util.BigIntegers.asUnsignedByteArray;

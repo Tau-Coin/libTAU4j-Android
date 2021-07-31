@@ -1,11 +1,11 @@
-package io.taucoin.util;
+package io.taucoin.torrent.publishing.core.utils.rlp;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.taucoin.util.ByteUtil.appendByte;
+import static io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil.appendByte;
 import static java.util.Arrays.copyOf;
 import static java.util.Arrays.copyOfRange;
 import static org.spongycastle.util.Arrays.concatenate;

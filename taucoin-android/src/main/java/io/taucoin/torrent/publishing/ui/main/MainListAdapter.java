@@ -22,7 +22,7 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemChatListBinding;
 import io.taucoin.torrent.publishing.databinding.ItemGroupListBinding;
-import io.taucoin.types.MessageType;
+import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 
 /**
  * 主页显示的群组列表的Adapter

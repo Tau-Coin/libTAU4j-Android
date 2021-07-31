@@ -26,7 +26,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.ui.constant.Page;
-import io.taucoin.types.TypesConfig;
+import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
@@ -49,7 +49,7 @@ import io.taucoin.torrent.publishing.databinding.EditFeeDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.Chain;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
-import io.taucoin.util.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
  * 交易模块相关的ViewModel

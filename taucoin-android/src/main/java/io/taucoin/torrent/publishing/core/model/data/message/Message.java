@@ -1,14 +1,14 @@
-package io.taucoin.types;
+package io.taucoin.torrent.publishing.core.model.data.message;
 
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import io.taucoin.util.CryptoUtil;
-import io.taucoin.util.HashUtil;
-import io.taucoin.util.RLP;
-import io.taucoin.util.RLPList;
+import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.HashUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.RLP;
+import io.taucoin.torrent.publishing.core.utils.rlp.RLPList;
 
 public class Message {
     private MessageVersion version; // 标识消息版本

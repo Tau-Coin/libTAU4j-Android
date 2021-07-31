@@ -43,10 +43,10 @@ import io.taucoin.torrent.publishing.core.utils.MsgSplitUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.ui.constant.Page;
-import io.taucoin.types.Message;
-import io.taucoin.types.MessageType;
-import io.taucoin.util.ByteUtil;
-import io.taucoin.util.CryptoUtil;
+import io.taucoin.torrent.publishing.core.model.data.message.Message;
+import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
 
 /**
  * 聊天相关的ViewModel

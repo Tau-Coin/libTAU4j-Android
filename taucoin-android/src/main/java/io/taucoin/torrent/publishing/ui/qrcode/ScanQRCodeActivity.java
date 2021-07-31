@@ -59,7 +59,7 @@ import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.user.SeedActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
-import io.taucoin.util.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
  * 用户QR Code扫描页面

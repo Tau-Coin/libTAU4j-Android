@@ -20,8 +20,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
-import io.taucoin.util.ByteUtil;
-import io.taucoin.util.CryptoUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
 
 /**
  * 根据文本信息的Hash，递归获取全部信息并显示

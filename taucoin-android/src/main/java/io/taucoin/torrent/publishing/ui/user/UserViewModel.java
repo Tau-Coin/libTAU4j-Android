@@ -77,8 +77,8 @@ import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
-import io.taucoin.types.MessageType;
-import io.taucoin.util.ByteUtil;
+import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
  * 用户相关的ViewModel

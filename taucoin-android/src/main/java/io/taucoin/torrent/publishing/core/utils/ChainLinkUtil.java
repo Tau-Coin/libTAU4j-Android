@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import io.taucoin.util.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 public class ChainLinkUtil {
     private static String SCHEMA = "tauchain:?";

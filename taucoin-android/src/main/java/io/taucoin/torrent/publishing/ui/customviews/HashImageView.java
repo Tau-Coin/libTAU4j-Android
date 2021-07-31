@@ -23,8 +23,8 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.utils.Formatter;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.util.ByteUtil;
-import io.taucoin.util.CryptoUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
 
 /**
  * 根据图片信息的Hash，递归获取全部信息并显示

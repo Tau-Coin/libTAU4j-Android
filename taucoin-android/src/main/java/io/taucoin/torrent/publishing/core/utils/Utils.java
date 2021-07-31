@@ -32,8 +32,8 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.receiver.BootReceiver;
-import io.taucoin.util.ByteUtil;
-import io.taucoin.util.CryptoUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
 
 import java.io.File;
 import java.nio.charset.Charset;

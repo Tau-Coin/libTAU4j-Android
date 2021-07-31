@@ -56,7 +56,7 @@ import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.UserQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
-import io.taucoin.types.MessageType;
+import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 
 import static android.app.Activity.RESULT_OK;
 

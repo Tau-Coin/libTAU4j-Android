@@ -21,7 +21,7 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemFavoriteBinding;
 import io.taucoin.torrent.publishing.databinding.ItemFavoriteWiringBinding;
-import io.taucoin.types.TypesConfig;
+import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
 
 /**
  * 收藏列表显示的Adapter

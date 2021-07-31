@@ -14,25 +14,13 @@ SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 OR OTHER DEALINGS IN THE SOFTWARE.
 */
-package io.taucoin.genesis;
-
-import java.util.ArrayList;
+package io.taucoin.torrent.publishing.core.model.data.message;
 
 /**
- * Configuration for new blockchain genesis block.
+ * types config parameters.
  */
-public class GenesisConfig {
-
-    /**
-     * GenesisConfig constructor.
-     *
-     * This constructor is only used for creating new community. 
-     */
-    public GenesisConfig(String communityName,
-            ArrayList<?> genesisItems) {
-    }
-
-    public byte[] getChainID() {
-        return null;
+public class TypesConfig {
+    public enum TxType {
+        GenesisType, FNoteType, WCoinsType
     }
 }

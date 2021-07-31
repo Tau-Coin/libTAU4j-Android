@@ -28,7 +28,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.genesis.GenesisConfig;
+import io.taucoin.torrent.publishing.core.model.data.GenesisConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
@@ -50,7 +50,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.ui.constant.Page;
-import io.taucoin.util.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
  * Community模块的ViewModel

@@ -23,7 +23,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
-import io.taucoin.util.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
  * 对TauDaemon的详细实现

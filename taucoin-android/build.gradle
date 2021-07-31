@@ -90,13 +90,10 @@ configurations {
 
 def ROOM_VERSION = "2.2.6"
 def DAGGER_VERSION = "2.27"
+def CASTLE_VERSION = '1.51.0.0'
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation(project(':taucoin-core')) {
-        exclude group: "org.slf4j", module: "slf4j-log4j12"
-        exclude group: "log4j", module: "apache-log4j-extras"
-    }
     /* Testing */
     testImplementation 'junit:junit:4.13'
     testImplementation 'org.robolectric:robolectric:4.3.1'
@@ -158,4 +155,9 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
     // 图表
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    // 加密
+    implementation "com.madgag.spongycastle:core:${CASTLE_VERSION}"
+    implementation "com.madgag.spongycastle:prov:${CASTLE_VERSION}"
+    implementation 'com.google.guava:guava:24.1-jre'
 }

@@ -24,7 +24,7 @@ import org.libTAU4j.Pair;
 import org.libTAU4j.alerts.Alert;
 
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.util.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
  * libTAU上报的Alert

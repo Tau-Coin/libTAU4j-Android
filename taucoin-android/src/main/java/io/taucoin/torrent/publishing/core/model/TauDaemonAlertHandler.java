@@ -27,7 +27,7 @@ import io.taucoin.torrent.publishing.core.model.data.FriendInfo;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
-import io.taucoin.util.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
  * TauDaemonListener处理程序

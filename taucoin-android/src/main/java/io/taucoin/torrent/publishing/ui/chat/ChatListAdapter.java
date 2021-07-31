@@ -29,7 +29,7 @@ import io.taucoin.torrent.publishing.databinding.ItemTextRightBinding;
 import io.taucoin.torrent.publishing.ui.customviews.HashImageView;
 import io.taucoin.torrent.publishing.ui.customviews.HashTextView;
 import io.taucoin.torrent.publishing.ui.customviews.RoundButton;
-import io.taucoin.types.MessageType;
+import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 
 /**
  * 聊天消息的Adapter

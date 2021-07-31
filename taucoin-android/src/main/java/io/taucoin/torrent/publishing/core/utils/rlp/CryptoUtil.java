@@ -1,4 +1,4 @@
-package io.taucoin.util;
+package io.taucoin.torrent.publishing.core.utils.rlp;
 
 import org.libTAU4j.Vectors;
 import org.libTAU4j.swig.byte_vector;

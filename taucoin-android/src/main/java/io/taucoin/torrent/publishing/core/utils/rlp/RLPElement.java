@@ -1,4 +1,4 @@
-package io.taucoin.util;
+package io.taucoin.torrent.publishing.core.utils.rlp;
 
 import java.io.Serializable;
 

@@ -23,7 +23,7 @@ import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemNoteBinding;
 import io.taucoin.torrent.publishing.databinding.ItemWiringTxBinding;
 import io.taucoin.torrent.publishing.databinding.MsgLeftViewBinding;
-import io.taucoin.types.TypesConfig;
+import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
 
 /**
  * 消息/交易列表显示的Adapter

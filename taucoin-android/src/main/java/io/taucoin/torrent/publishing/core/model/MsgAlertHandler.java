@@ -26,9 +26,9 @@ import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.ui.TauNotifier;
-import io.taucoin.types.Message;
-import io.taucoin.types.MessageType;
-import io.taucoin.util.ByteUtil;
+import io.taucoin.torrent.publishing.core.model.data.message.Message;
+import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
  * MsgListener处理程序

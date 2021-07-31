@@ -22,7 +22,7 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.setting.FavoriteViewModel;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
-import io.taucoin.types.TypesConfig;
+import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;

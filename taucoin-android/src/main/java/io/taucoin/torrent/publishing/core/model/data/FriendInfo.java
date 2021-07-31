@@ -5,8 +5,8 @@ import org.spongycastle.util.encoders.Hex;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import io.taucoin.util.RLP;
-import io.taucoin.util.RLPList;
+import io.taucoin.torrent.publishing.core.utils.rlp.RLP;
+import io.taucoin.torrent.publishing.core.utils.rlp.RLPList;
 
 public class FriendInfo {
     byte[] pubKey;

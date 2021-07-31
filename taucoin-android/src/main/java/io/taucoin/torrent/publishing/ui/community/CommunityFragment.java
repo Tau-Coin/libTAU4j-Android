@@ -1,6 +1,5 @@
 package io.taucoin.torrent.publishing.ui.community;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -34,7 +33,7 @@ import io.taucoin.torrent.publishing.ui.chat.ChatsTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
-import io.taucoin.types.TypesConfig;
+import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
 
 /**
  * 单个群组页面

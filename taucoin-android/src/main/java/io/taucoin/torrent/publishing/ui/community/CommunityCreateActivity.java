@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import io.taucoin.genesis.GenesisConfig;
+import io.taucoin.torrent.publishing.core.model.data.GenesisConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;

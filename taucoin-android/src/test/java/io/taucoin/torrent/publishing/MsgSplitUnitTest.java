@@ -1,17 +1,10 @@
 package io.taucoin.torrent.publishing;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.NonNull;
-import io.taucoin.util.HashUtil;
 
 import static org.junit.Assert.assertEquals;
 
