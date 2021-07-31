@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.core.model;
 import android.content.Context;
 import android.content.Intent;
 
+import org.libTAU4j.SessionHandle;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.alerts.Alert;
@@ -66,7 +67,7 @@ public abstract class TauDaemon {
     private SystemServiceManager systemServiceManager;
     private ExecutorService exec = Executors.newSingleThreadExecutor();
     private TauInfoProvider tauInfoProvider;
-    private Disposable reopenNetworkTimer; // 重启Network定时任务
+    private Disposable updateInterfacesTimer; // 更新libTAU监听接口定时任务
     volatile boolean isRunning = false;
     private volatile boolean trafficTips = true; // 剩余流量用完提示
     volatile String seed;
@@ -101,8 +102,8 @@ public abstract class TauDaemon {
         sessionManager = new SessionManager(true);
 
         observeTauDaemon();
-        rescheduleTAUBySettings();
         initLocalParam();
+        handleNoRemainingDataTips();
     }
 
     private void observeTauDaemon() {
@@ -253,7 +254,7 @@ public abstract class TauDaemon {
      * Only calls from TauService
      */
     public void doStart(String seed) {
-        String networkAddress = SystemServiceManager.getInstance().getNetworkAddress();
+        String networkAddress = getNetworkInterface();
         if (StringUtil.isEmpty(networkAddress)) {
             logger.info("Failed to get network address");
             return;
@@ -265,7 +266,7 @@ public abstract class TauDaemon {
         // 设置SessionManager启动参数
         SessionParams sessionParams = SessionSettings.getSessionParamsBuilder()
                 .setAccountSeed(seed)
-                .setNetworkInterface(networkAddress + ":0")
+                .setNetworkInterface(networkAddress)
                 .setDeviceID(deviceID)
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
                 .build();
@@ -355,22 +356,22 @@ public abstract class TauDaemon {
             logger.info("SettingsChanged, internet state::{}", settingsRepo.internetState());
         } else if (key.equals(appContext.getString(R.string.pref_key_internet_type))) {
             logger.info("SettingsChanged, internet type::{}", settingsRepo.getInternetType());
-            rescheduleTAUBySettings(true);
+            updateListenInterfaces();
         } else if (key.equals(appContext.getString(R.string.pref_key_charging_state))) {
             logger.info("SettingsChanged, charging state::{}", settingsRepo.chargingState());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
             logger.info("isMeteredNetwork::{}", NetworkSetting.isMeteredNetwork());
         } else if (key.equals(appContext.getString(R.string.pref_key_current_speed))) {
-            if (reopenNetworkTimer != null && !reopenNetworkTimer.isDisposed()
+            if (updateInterfacesTimer != null && !updateInterfacesTimer.isDisposed()
                     && NetworkSetting.getCurrentSpeed() > 0) {
-                reopenNetworkTimer.dispose();
-                disposables.remove(reopenNetworkTimer);
-                logger.info("reopenNetworkTimer dispose");
+                updateInterfacesTimer.dispose();
+                disposables.remove(updateInterfacesTimer);
+                logger.info("updateInterfacesTimer dispose");
             }
         } else if (key.equals(appContext.getString(R.string.pref_key_foreground_running))) {
             boolean isForeground = settingsRepo.getBooleanValue(key);
             logger.info("foreground running::{}", isForeground);
-            reopenNetworkTimer();
+            updateInterfacesTimer();
         } else if (key.equals(appContext.getString(R.string.pref_key_nat_pmp_mapped))) {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
@@ -381,18 +382,18 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 定时任务：APP从后台到前台触发, 网速采样时间后，网速依然为0，重启Sessions
+     * 定时任务：APP从后台到前台触发, 网速采样时间后，网速依然为0，更新网络监听接口
      */
-    private void reopenNetworkTimer() {
+    private void updateInterfacesTimer() {
         boolean isForeground = settingsRepo.getBooleanValue(appContext.getString(R.string.pref_key_foreground_running));
         if (!isForeground) {
             return;
         }
-        if (reopenNetworkTimer != null && !reopenNetworkTimer.isDisposed()) {
+        if (updateInterfacesTimer != null && !updateInterfacesTimer.isDisposed()) {
             return;
         }
-        logger.info("reopenNetworkTimer start");
-        reopenNetworkTimer = Observable.timer(10, TimeUnit.SECONDS)
+        logger.info("updateInterfacesTimer start");
+        updateInterfacesTimer = Observable.timer(10, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(time -> {
@@ -400,61 +401,65 @@ public abstract class TauDaemon {
                     boolean isHaveAvailableData = NetworkSetting.isHaveAvailableData();
                     boolean isRestart = settingsRepo.internetState() && isHaveAvailableData
                             && NetworkSetting.getCurrentSpeed() == 0;
-                    logger.info("reopenNetworkTimer isRestart::{}", isRestart);
+                    logger.info("updateInterfacesTimer isRestart::{}", isRestart);
                     if (isRestart) {
-                        rescheduleTAUBySettings(true);
+                        updateListenInterfaces();
                     }
 
                 });
-        disposables.add(reopenNetworkTimer);
+        disposables.add(updateInterfacesTimer);
     }
 
     /**
-     * 根据当前设置重新调度DHT
+     * 根据当前的流量包的使用，判断是否给用户更换流量包的提示
      */
-    void rescheduleTAUBySettings() {
-        rescheduleTAUBySettings(false);
-    }
-
-    /**
-     * 根据当前设置重新调度DHT
-     * @param isRestart 是否重启Session
-     */
-    private synchronized void rescheduleTAUBySettings(boolean isRestart) {
+    void handleNoRemainingDataTips() {
         if (!isRunning) {
             return;
         }
-        try {
-            // 判断有无网络连接
-            if (settingsRepo.internetState()) {
-                if (isRestart) {
-                    reopenNetworks();
-                } else {
-                    if (NetworkSetting.isHaveAvailableData()) {
-                        // 重置无可用流量提示对话框的参数
-                        trafficTips = true;
-                        noRemainingDataTimes = 0;
-                    } else {
-                        showNoRemainingDataTipsDialog();
-                    }
-                }
-
+        // 判断有无网络连接
+        if (settingsRepo.internetState()) {
+            if (NetworkSetting.isHaveAvailableData()) {
+                // 重置无可用流量提示对话框的参数
+                trafficTips = true;
+                noRemainingDataTimes = 0;
+            } else {
+                showNoRemainingDataTipsDialog();
             }
-        } catch (Exception e) {
-            logger.error("rescheduleDHTBySettings errors", e);
         }
     }
 
     /**
-     * 重新打开网络
+     * 更新libTAU监听接口
+     * 必须有网络才会更新
      */
-    private void reopenNetworks() {
-        if (!isRunning) {
+    private void updateListenInterfaces() {
+        if (!settingsRepo.internetState()) {
             return;
         }
-        sessionManager.reopenNetworkSockets();
-        logger.debug("reopenNetworks...");
+        if (!isRunning && StringUtil.isNotEmpty(seed)) {
+            doStart(seed);
+        } else {
+            String networkInterface = getNetworkInterface();
+            if (StringUtil.isNotEmpty(networkInterface)) {
+                new SessionHandle(sessionManager.swig()).updateListenInterfaces(networkInterface);
+            }
+            logger.debug("updateListenInterfaces::{}", networkInterface);
+        }
     }
+
+    /**
+     * 获取网络接口
+     */
+    private static String getNetworkInterface() {
+        String networkAddress = SystemServiceManager.getInstance().getNetworkAddress();
+        if (StringUtil.isNotEmpty(networkAddress)) {
+            networkAddress += ":0";
+            return networkAddress;
+        }
+        return null;
+    }
+
 
     /**
      * 重新启动Sessions

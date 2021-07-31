@@ -102,7 +102,7 @@ public class SystemServiceManager {
 
     /**
      * 获取网络地址
-     * 如果有IPV4直接取IPV4，否则获取第一个IPV6
+     * 如果有IPV4直接取IPv4，否则获取第一个IPv6
      */
     public String getNetworkAddress() {
         Network[] networks = connectivityManager.getAllNetworks();
@@ -118,19 +118,21 @@ public class SystemServiceManager {
                     List<LinkAddress> linkAddresses = linkProperties.getLinkAddresses();
                     if (linkAddresses != null) {
                         for (LinkAddress linkAddress : linkAddresses) {
-                            logger.debug("ActiveNetworkInfo Flags::{}, PrefixLength::{},Scope::{}",
+                            logger.debug("ActiveNetworkInfo Flags::{}, PrefixLength::{}, Scope::{}",
                                     linkAddress.getFlags(), linkAddress.getPrefixLength(), linkAddress.getScope());
                             InetAddress address = linkAddress.getAddress();
                             if (isIPv4(address)) {
                                 networkAddress = address.getHostAddress();
                                 logger.debug("ActiveNetworkInfo IPv4 HostAddress::{}", networkAddress);
                             } else {
+                                String ipv6 = address.getHostAddress();
                                 if (StringUtil.isEmpty(networkAddress)) {
-                                    networkAddress = address.getHostAddress();
+                                    networkAddress = ipv6;
                                 }
                                 logger.debug("ActiveNetworkInfo IPv6 HostAddress::{}, isIPv6ULA::{}",
-                                        networkAddress, isIPv6ULA(address));
+                                        ipv6, isIPv6ULA(address));
                             }
+                            logger.debug("ActiveNetworkInfo ****************************************");
                         }
                     }
                 }

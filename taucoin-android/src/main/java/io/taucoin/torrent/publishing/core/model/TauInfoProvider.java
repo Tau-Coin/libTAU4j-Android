@@ -171,8 +171,8 @@ public class TauInfoProvider {
         NetworkSetting.updateNetworkSpeed(statistics);
         // 更新UI展示链端主循环时间间隔
         NetworkSetting.calculateMainLoopInterval();
-        // 重新调度TAU工作通过设置
-        daemon.rescheduleTAUBySettings();
+        // 根据当前的流量包的使用，判断是否给用户更换流量包的提示
+        daemon.handleNoRemainingDataTips();
         logger.debug("Network statistical:: totalDownload::{}({}), totalUpload::{}({})" +
                         ", downloadRate::{}/s, uploadRate::{}/s",
                 Formatter.formatFileSize(context, statistics.getTotalDownload()),
