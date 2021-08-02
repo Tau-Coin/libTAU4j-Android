@@ -437,11 +437,14 @@ public abstract class TauDaemon {
         if (!settingsRepo.internetState()) {
             return;
         }
-        if (!isRunning && StringUtil.isNotEmpty(seed)) {
-            doStart(seed);
+        if (!isRunning) {
+            // 必须有用户seed才能启动
+            if (StringUtil.isNotEmpty(seed)) {
+                doStart(seed);
+            }
         } else {
             String networkInterface = getNetworkInterface();
-            if (StringUtil.isNotEmpty(networkInterface)) {
+            if (StringUtil.isNotEmpty(networkInterface) && sessionManager.swig() != null) {
                 new SessionHandle(sessionManager.swig()).updateListenInterfaces(networkInterface);
             }
             logger.debug("updateListenInterfaces::{}", networkInterface);
@@ -452,12 +455,7 @@ public abstract class TauDaemon {
      * 获取网络接口
      */
     private static String getNetworkInterface() {
-        String networkAddress = SystemServiceManager.getInstance().getNetworkAddress();
-        if (StringUtil.isNotEmpty(networkAddress)) {
-            networkAddress += ":0";
-            return networkAddress;
-        }
-        return null;
+        return SystemServiceManager.getInstance().getNetworkAddress();
     }
 
 

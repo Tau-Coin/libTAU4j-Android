@@ -122,12 +122,14 @@ public class SystemServiceManager {
                                     linkAddress.getFlags(), linkAddress.getPrefixLength(), linkAddress.getScope());
                             InetAddress address = linkAddress.getAddress();
                             if (isIPv4(address)) {
-                                networkAddress = address.getHostAddress();
-                                logger.debug("ActiveNetworkInfo IPv4 HostAddress::{}", networkAddress);
+                                String ipv4 = address.getHostAddress();
+                                networkAddress = ipv4 + ":0";
+                                logger.debug("ActiveNetworkInfo IPv4 HostAddress::{}", ipv4);
                             } else {
                                 String ipv6 = address.getHostAddress();
                                 if (StringUtil.isEmpty(networkAddress)) {
-                                    networkAddress = ipv6;
+                                    // 需要加中括号，代表地址（地址可能用::被省略）
+                                    networkAddress = "[" + ipv6 + "]:0";
                                 }
                                 logger.debug("ActiveNetworkInfo IPv6 HostAddress::{}, isIPv6ULA::{}",
                                         ipv6, isIPv6ULA(address));
