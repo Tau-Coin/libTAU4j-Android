@@ -48,7 +48,6 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.FragmentChatBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
-import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.customviews.MsgLogsDialog;
@@ -262,8 +261,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             binding.refreshLayout.setRefreshing(false);
             binding.refreshLayout.setEnabled(messages.size() != 0 && messages.size() % Page.PAGE_SIZE == 0);
 
-            // 关闭当前朋友的消息通知
-            TauNotifier.getInstance().cancelChatMsgNotify(friendPK);
             userViewModel.clearMsgUnread(friendPK);
             logger.debug("messages.size::{}", messages.size());
         });

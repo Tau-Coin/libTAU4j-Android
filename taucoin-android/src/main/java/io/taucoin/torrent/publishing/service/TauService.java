@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.Nullable;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -119,7 +118,6 @@ public class TauService extends Service {
         disposables.clear();
 
         isAlreadyRunning.set(false);
-        TauNotifier.getInstance().cancelAllNotify();
         WorkloadManager.stopWakeUpWorker(getApplicationContext());
         stopForeground(true);
         stopSelf();

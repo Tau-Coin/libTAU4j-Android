@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.List;
 
-import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -25,9 +24,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
-import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.core.model.data.message.Message;
-import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
@@ -111,18 +108,6 @@ class MsgAlertHandler {
                     }
                     if (isNeedUpdate) {
                         friendRepo.updateFriend(friend);
-                    }
-                }
-                // 只通知朋友的消息
-                if (StringUtil.isNotEquals(senderPk, user.publicKey)) {
-                    // 通知栏消息通知
-                    User friendUser = userRepo.getUserByPublicKey(senderPk);
-                    if (chatMsg.contentType == MessageType.TEXT.ordinal()) {
-                        String content = Utils.textBytesToString(message.getRawContent());
-                        TauNotifier.getInstance().makeChatMsgNotify(friendUser, content);
-                    } else if (chatMsg.contentType == MessageType.PICTURE.ordinal()) {
-                        TauNotifier.getInstance().makeChatMsgNotify(friendUser,
-                                R.string.main_pic_messages);
                     }
                 }
             }

@@ -138,7 +138,7 @@ public class TauNotifier {
      * @param friend
      * @param msg
      */
-    public void makeChatMsgNotify(User friend, String msg) {
+    private void makeChatMsgNotify(User friend, String msg) {
         String friendPk = friend.publicKey;
         String friendName = UsersUtil.getShowName(friend);
         int bgColor = Utils.getGroupColor(friendPk);

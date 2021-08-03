@@ -68,7 +68,6 @@ import io.taucoin.torrent.publishing.databinding.ContactsDialogBinding;
 import io.taucoin.torrent.publishing.databinding.SeedDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
-import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.constant.Constants;
 import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
@@ -233,8 +232,6 @@ public class UserViewModel extends AndroidViewModel {
                 /* 保证数据不会错乱，必须顺序执行以下逻辑 */
                 // 4、更新链端seed
                 daemon.updateSeed(seed);
-                // 5、关闭所有消息通知
-                TauNotifier.getInstance().cancelAllNotify();
             } catch (Exception e){
                 result = getApplication().getString(R.string.user_seed_invalid);
                 logger.debug("import seed error::{}", result);
