@@ -327,7 +327,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
      */
     private void sendMessage() {
         String message = ViewUtils.getText(binding.etMessage);
-        chatViewModel.sendMessage(friendPK, message, MessageType.TEXT.ordinal());
+        chatViewModel.sendMessage(friendPK, message, MessageType.TEXT.getType());
         binding.etMessage.getText().clear();
     }
 
@@ -399,7 +399,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                                 imagePath = localMedia.getAndroidQToPath();
                             }
                             chatViewModel.sendMessage(friendPK, imagePath,
-                                    MessageType.PICTURE.ordinal());
+                                    MessageType.PICTURE.getType());
                             return;
                         }
                     }

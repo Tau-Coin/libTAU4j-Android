@@ -120,9 +120,9 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 binding.leftView.setBgColor(bgColor);
 
                 byte[] msg = bean.msg;
-                if (bean.msgType == MessageType.PICTURE.ordinal()) {
+                if (bean.msgType == MessageType.PICTURE.getType()) {
                     binding.tvUserMessage.setText(context.getString(R.string.main_pic_messages));
-                } else if (bean.msgType == MessageType.TEXT.ordinal() && msg != null) {
+                } else if (bean.msgType == MessageType.TEXT.getType() && msg != null) {
                     binding.tvUserMessage.setTextContent(bean.msg, bean.senderPk, bean.receiverPk);
                 } else if (null == msg) {
                     binding.tvUserMessage.setText(context.getString(R.string.main_no_messages));

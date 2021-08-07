@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.core.model;
 import android.content.Context;
 import android.content.Intent;
 
+import org.libTAU4j.Message;
 import org.libTAU4j.SessionHandle;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
@@ -581,5 +582,5 @@ public abstract class TauDaemon {
     /**
      * 添加新消息
      */
-    public abstract boolean addNewMessage(byte[] msg);
+    public abstract boolean addNewMessage(String receiver, Message msg);
 }

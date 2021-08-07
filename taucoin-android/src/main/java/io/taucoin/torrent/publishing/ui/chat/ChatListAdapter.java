@@ -97,13 +97,13 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
         String userPk = MainApplication.getInstance().getPublicKey();
         if (chat != null) {
             if (StringUtil.isEquals(userPk, chat.senderPk) ) {
-                if (chat.contentType == MessageType.PICTURE.ordinal()) {
+                if (chat.contentType == MessageType.PICTURE.getType()) {
                     return ViewType.RIGHT_PICTURE.ordinal();
                 } else {
                     return ViewType.RIGHT_TEXT.ordinal();
                 }
             } else {
-                if (chat.contentType == MessageType.PICTURE.ordinal()) {
+                if (chat.contentType == MessageType.PICTURE.getType()) {
                     return ViewType.LEFT_PICTURE.ordinal();
                 } else {
                     return ViewType.LEFT_TEXT.ordinal();

@@ -21,11 +21,13 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.DeviceRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
+import io.taucoin.torrent.publishing.core.utils.BeanUtils;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.model.data.message.Message;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
 
 /**
  * MsgListener处理程序
@@ -50,19 +52,18 @@ class MsgAlertHandler {
      * 0、如果没和朋友建立Chat, 创建Chat
      * 1、更新朋友状态
      * 2、保存Chat的聊天信息
-     * @param msg byte[]
+     * @param tauMsg 消息
      * @param userPk byte[] 当前用户的公钥
      */
-    void onNewMessage(byte[] msg, String userPk) {
+    void onNewMessage(org.libTAU4j.Message tauMsg, String userPk) {
         try {
-            Message message = new Message(msg);
+            Message message = BeanUtils.map2bean(tauMsg.value(), Message.class);
             // 朋友默认为发送者
-            String senderPk = ByteUtil.toHexString(message.getSender());
-            String receiverPk = ByteUtil.toHexString(message.getReceiver());
-            String hash = ByteUtil.toHexString(message.getHash());
-            String logicMsgHash = ByteUtil.toHexString(message.getLogicMsgHash());
-
-            long sentTime = message.getTimestamp().longValue();
+            String hash = tauMsg.sha256().toHex();
+            long sentTime = tauMsg.timestamp();
+            String senderPk = message.getSender();
+            String receiverPk = message.getReceiver();
+            String logicMsgHash = message.getLogicHash();
             long receivedTime = DateUtil.getTime();
 
             ChatMsg chatMsg = chatRepo.queryChatMsg(senderPk, hash);
@@ -84,12 +85,10 @@ class MsgAlertHandler {
                 }
                 // 原始数据解密
                 byte[] cryptoKey = Utils.keyExchange(friendPkStr, user.seed);
-                message.decrypt(cryptoKey);
-
                 // 保存消息数据
-                byte[] encryptedContent = message.getEncryptedContent();
+                byte[] encryptedContent = CryptoUtil.decrypt(message.getContent(), cryptoKey);
                 chatMsg = new ChatMsg(hash, senderPk, receiverPk, encryptedContent,
-                        message.getType().ordinal(), sentTime, message.getNonce().longValue(),
+                        message.getType(), sentTime, message.getNonce().longValue(),
                         logicMsgHash, 1);
                 chatRepo.addChatMsg(chatMsg);
 

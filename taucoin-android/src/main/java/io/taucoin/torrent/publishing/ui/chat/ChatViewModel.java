@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -36,6 +36,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
+import io.taucoin.torrent.publishing.core.utils.BeanUtils;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.HashUtil;
@@ -45,7 +46,6 @@ import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.core.model.data.message.Message;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
-import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
 
 /**
@@ -152,7 +152,7 @@ public class ChatViewModel extends AndroidViewModel {
                     msg.append(new String(bytes, StandardCharsets.UTF_8));
                     long startTime = System.currentTimeMillis();
 
-                    syncSendMessageTask(friendPk, msg.toString(), MessageType.TEXT.ordinal());
+                    syncSendMessageTask(friendPk, msg.toString(), MessageType.TEXT.getType());
                     long endTime = System.currentTimeMillis();
                     logger.debug("sendBatchDebugMessage no::{}, time::{}", i, endTime - startTime);
                     msg.setLength(0);
@@ -198,7 +198,7 @@ public class ChatViewModel extends AndroidViewModel {
                         break;
                     }
                     String msg = randomChar + FmtMicrometer.fmtTestData( i + 1);
-                    syncSendMessageTask(friendPk, msg, MessageType.TEXT.ordinal());
+                    syncSendMessageTask(friendPk, msg, MessageType.TEXT.getType());
                 }
             } catch (Exception ignore) {
             }
@@ -211,66 +211,59 @@ public class ChatViewModel extends AndroidViewModel {
 
     /**
      * 同步给朋友发信息任务
-     * @param friendPkStr 朋友公钥
-     * @param msg 消息
+     * @param friendPk 朋友公钥
+     * @param msgContent 消息
      * @param type 消息类型
      */
-    public Result syncSendMessageTask(String friendPkStr, String msg, int type) {
+    public Result syncSendMessageTask(String friendPk, String msgContent, int type) {
         Result result = new Result();
         AppDatabase.getInstance(getApplication()).runInTransaction(() -> {
             try {
                 List<byte[]> contents;
-                String logicMsgHashStr;
-                if (type == MessageType.PICTURE.ordinal()) {
-                    String progressivePath = MsgSplitUtil.compressAndScansPic(msg);
-                    logicMsgHashStr = HashUtil.makeFileSha256HashWithTimeStamp(progressivePath);
-                    contents = MsgSplitUtil.splitPicMsg(progressivePath);
-                } else if(type == MessageType.TEXT.ordinal()) {
-                    logicMsgHashStr = HashUtil.makeSha256HashWithTimeStamp(msg);
-                    contents = MsgSplitUtil.splitTextMsg(msg);
+                String logicMsgHash;
+                if(type == MessageType.TEXT.getType()) {
+                    logicMsgHash = HashUtil.makeSha256HashWithTimeStamp(msgContent);
+                    contents = MsgSplitUtil.splitTextMsg(msgContent);
                 } else {
                     throw new Exception("Unknown message type");
                 }
-                byte[] logicMsgHash = ByteUtil.toByte(logicMsgHashStr);
                 User user = userRepo.getCurrentUser();
-                String senderPkStr = user.publicKey;
-                byte[] senderPk = ByteUtil.toByte(senderPkStr);
-                byte[] friendPk = ByteUtil.toByte(friendPkStr);
+                String senderPk = user.publicKey;
                 ChatMsg[] messages = new ChatMsg[contents.size()];
                 ChatMsgLog[] chatMsgLogs = new ChatMsgLog[contents.size()];
                 int contentSize = contents.size();
-                byte[] key = Utils.keyExchange(friendPkStr, user.seed);
+                byte[] key = Utils.keyExchange(friendPk, user.seed);
                 for (int nonce = 0; nonce < contentSize; nonce++) {
                     byte[] content = contents.get(nonce);
                     long millisTime = DateUtil.getMillisTime();
-                    long timestamp = millisTime / 1000;
                     Message message;
-                    if (type == MessageType.TEXT.ordinal()) {
-                        message = Message.createTextMessage(BigInteger.valueOf(timestamp), senderPk,
-                                friendPk, logicMsgHash, BigInteger.valueOf(nonce), content);
+                    byte[] encryptedContent = CryptoUtil.encrypt(content, key);
+                    if (type == MessageType.TEXT.getType()) {
+                        message = Message.createTextMessage(senderPk,
+                                friendPk, logicMsgHash, nonce, encryptedContent);
                     } else {
-                        message = Message.createPictureMessage(BigInteger.valueOf(timestamp), senderPk,
-                                friendPk, logicMsgHash, BigInteger.valueOf(nonce), content);
+                        throw new Exception("Unknown message type");
                     }
-                    message.encrypt(key);
-                    String hash = ByteUtil.toHexString(message.getHash());
-                    byte[] encryptedContent = message.getEncryptedContent();
+                    Map map = BeanUtils.bean2map(message);
+                    org.libTAU4j.Message tauMsg = new org.libTAU4j.Message(map);
+                    long timestamp = tauMsg.timestamp();
+                    String hash = tauMsg.sha256().toHex();
                     logger.debug("sendMessageTask newMsgHash::{}, contentType::{}, " +
                                     "nonce::{}, rawLength::{}, encryptedLength::{}, " +
                                     "logicMsgHash::{}, millisTime::{}",
                             hash, type, nonce, content.length,
                             null == encryptedContent ? 0 : encryptedContent.length,
-                            logicMsgHashStr, DateUtil.format(millisTime, DateUtil.pattern9));
+                            logicMsgHash, DateUtil.format(millisTime, DateUtil.pattern9));
 
-                    boolean isSuccess = daemon.addNewMessage(message.getEncoded());
+                    boolean isSuccess = daemon.addNewMessage(friendPk, tauMsg);
                     // 组织Message的结构，并发送到DHT和数据入库
-                    ChatMsg chatMsg = new ChatMsg(hash, senderPkStr, friendPkStr, encryptedContent, type,
-                            timestamp, nonce, logicMsgHashStr, isSuccess ? 1 : 0);
+                    ChatMsg chatMsg = new ChatMsg(hash, senderPk, friendPk, encryptedContent, type,
+                            timestamp, nonce, logicMsgHash, isSuccess ? 1 : 0);
                     messages[nonce] = chatMsg;
 
                     // 更新消息日志信息
                     // 如何是自己给自己发，直接确认接收
-                    boolean isConfirmed = isSuccess && StringUtil.isEquals(senderPkStr, friendPkStr);
+                    boolean isConfirmed = isSuccess && StringUtil.isEquals(senderPk, friendPk);
                     ChatMsgStatus status = isConfirmed ? ChatMsgStatus.SYNC_CONFIRMED : ChatMsgStatus.BUILT;
                     // 确认接收的时间精确到秒
                     millisTime = isConfirmed ? millisTime / 1000 : millisTime;
@@ -281,12 +274,12 @@ public class ChatViewModel extends AndroidViewModel {
                 // 批量添加到数据库
                 chatRepo.addChatMsgLogs(chatMsgLogs);
                 chatRepo.addChatMessages(messages);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("sendMessageTask error", e);
                 result.setFailMsg(e.getMessage());
             }
         });
-        chatRepo.submitDataSetChangedDirect(friendPkStr);
+        chatRepo.submitDataSetChangedDirect(friendPk);
         return result;
     }
 
@@ -298,15 +291,15 @@ public class ChatViewModel extends AndroidViewModel {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Result>) emitter -> {
             ChatMsg chatMsg = chatRepo.queryChatMsg(msg.hash);
             Result result = new Result();
-            BigInteger timestamp = BigInteger.valueOf(chatMsg.timestamp);
-            byte[] sender = ByteUtil.toByte(chatMsg.senderPk);
-            byte[] receiver = ByteUtil.toByte(chatMsg.receiverPk);
-            byte[] logicMsgHash = ByteUtil.toByte(chatMsg.logicMsgHash);
-            BigInteger nonce = BigInteger.valueOf(chatMsg.nonce);
+            long timestamp = chatMsg.timestamp;
+            String sender = chatMsg.senderPk;
+            String receiver = chatMsg.receiverPk;
+            String logicMsgHash = chatMsg.logicMsgHash;
+            long nonce = chatMsg.nonce;
             Message message = Message.createTextMessage(timestamp, sender, receiver, logicMsgHash,
-                    nonce, null);
-            message.setEncryptedContent(chatMsg.content);
-            boolean isSuccess = daemon.addNewMessage(message.getEncoded());
+                    nonce, chatMsg.content);
+            org.libTAU4j.Message tauMsg = new org.libTAU4j.Message(BeanUtils.bean2map(message));
+            boolean isSuccess = daemon.addNewMessage(receiver, tauMsg);
             if (isSuccess) {
                 // 更新界面数据
                 msg.unsent = 1;

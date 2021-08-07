@@ -544,7 +544,7 @@ public class UserViewModel extends AndroidViewModel {
                     result.setMsg(publicKey);
                     // 发送默认消息
                     String msg = getApplication().getString(R.string.contacts_have_added);
-                    chatViewModel.syncSendMessageTask(publicKey, msg, MessageType.TEXT.ordinal());
+                    chatViewModel.syncSendMessageTask(publicKey, msg, MessageType.TEXT.getType());
                     logger.debug("AddFriendsLocally, syncSendMessageTask::{}", msg);
                 } else {
                     result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));

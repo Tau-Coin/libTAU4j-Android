@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.core.model;
 import android.content.Context;
 
 import org.libTAU4j.Ed25519;
+import org.libTAU4j.Message;
 import org.libTAU4j.Pair;
 import org.libTAU4j.PortmapTransport;
 import org.libTAU4j.alerts.Alert;
@@ -131,7 +132,7 @@ class TauDaemonAlertHandler {
     private void onNewMessage(Alert alert, String userPk) {
         CommNewMsgAlert newMsgAlert = (CommNewMsgAlert) alert;
         logger.info(newMsgAlert.get_message());
-        byte[] message = newMsgAlert.get_new_message();
+        Message message = newMsgAlert.get_new_message();
         msgListenHandler.onNewMessage(message, userPk);
     }
 

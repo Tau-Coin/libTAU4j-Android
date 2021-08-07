@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
 
+import org.libTAU4j.Message;
 import org.libTAU4j.alerts.Alert;
 
 import java.math.BigInteger;
@@ -275,9 +276,9 @@ public class TauDaemonImpl extends TauDaemon {
      * 添加新消息
      */
     @Override
-    public boolean addNewMessage(byte[] msg) {
+    public boolean addNewMessage(String receiver, Message msg) {
         if (isRunning) {
-            boolean isAddSuccess = sessionManager.addNewMsg(msg);
+            boolean isAddSuccess = sessionManager.addNewMsg(receiver, msg);
             logger.debug("addNewMessage success::{}", isAddSuccess);
             return isAddSuccess;
         }
