@@ -18,12 +18,6 @@ public class Message {
                 receiver, logicMsgHash, BigInteger.valueOf(nonce), MessageType.TEXT.getType(), content);
     }
 
-    public static Message createTextMessage(String sender, String receiver,
-                                            String logicMsgHash, long nonce, byte[] content) {
-        return new Message(MessageVersion.VERSION1.getV(), BigInteger.ZERO, sender,
-                receiver, logicMsgHash, BigInteger.valueOf(nonce), MessageType.TEXT.getType(), content);
-    }
-
     public Message(Integer version, BigInteger timestamp, String sender, String receiver,
                    String logicMsgHash, BigInteger nonce, Integer type, byte[] content) {
         this.version = version;

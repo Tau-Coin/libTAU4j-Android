@@ -236,17 +236,17 @@ public class ChatViewModel extends AndroidViewModel {
                 for (int nonce = 0; nonce < contentSize; nonce++) {
                     byte[] content = contents.get(nonce);
                     long millisTime = DateUtil.getMillisTime();
+                    long timestamp = millisTime / 1000;
                     Message message;
                     byte[] encryptedContent = CryptoUtil.encrypt(content, key);
                     if (type == MessageType.TEXT.getType()) {
-                        message = Message.createTextMessage(senderPk,
+                        message = Message.createTextMessage(timestamp, senderPk,
                                 friendPk, logicMsgHash, nonce, encryptedContent);
                     } else {
                         throw new Exception("Unknown message type");
                     }
-                    Map map = BeanUtils.bean2map(message);
+                    Map<String, ?> map = BeanUtils.bean2map(message);
                     org.libTAU4j.Message tauMsg = new org.libTAU4j.Message(map);
-                    long timestamp = tauMsg.timestamp();
                     String hash = tauMsg.sha256().toHex();
                     logger.debug("sendMessageTask newMsgHash::{}, contentType::{}, " +
                                     "nonce::{}, rawLength::{}, encryptedLength::{}, " +
