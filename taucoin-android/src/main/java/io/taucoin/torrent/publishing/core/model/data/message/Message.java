@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 public class Message {
     private Integer version;                // 标识消息版本
-    private BigInteger timestamp;           // 消息时间（可省略，直接使用libTAU内部创建的时间）
+    private BigInteger time;                // 消息时间（可省略，直接使用libTAU内部创建的时间 key为time）
     private String sender;                  // 消息的发送者
     private String receiver;                // 消息的接收者
     private String logicHash;               // 用于确认区分逻辑消息，带时间戳（可能连发两次）
@@ -12,16 +12,16 @@ public class Message {
     private Integer type;                   // 可以标识消息类型
     private byte[] content;                 // 加密消息体
 
-    public static Message createTextMessage(long timestamp, String sender, String receiver,
+    public static Message createTextMessage(long time, String sender, String receiver,
                                             String logicMsgHash, long nonce, byte[] content) {
-        return new Message(MessageVersion.VERSION1.getV(), BigInteger.valueOf(timestamp), sender,
+        return new Message(MessageVersion.VERSION1.getV(), BigInteger.valueOf(time), sender,
                 receiver, logicMsgHash, BigInteger.valueOf(nonce), MessageType.TEXT.getType(), content);
     }
 
-    public Message(Integer version, BigInteger timestamp, String sender, String receiver,
+    public Message(Integer version, BigInteger time, String sender, String receiver,
                    String logicMsgHash, BigInteger nonce, Integer type, byte[] content) {
         this.version = version;
-        this.timestamp = timestamp;
+        this.time = time;
         this.sender = sender;
         this.receiver = receiver;
         this.logicHash = logicMsgHash;
@@ -38,12 +38,12 @@ public class Message {
         this.version = version;
     }
 
-    public BigInteger getTimestamp() {
-        return timestamp;
+    public BigInteger getTime() {
+        return time;
     }
 
-    public void setTimestamp(BigInteger timestamp) {
-        this.timestamp = timestamp;
+    public void setTime(BigInteger time) {
+        this.time = time;
     }
 
     public String getSender() {

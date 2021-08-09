@@ -60,7 +60,7 @@ class MsgAlertHandler {
             Message message = BeanUtils.map2bean(tauMsg.value(), Message.class);
             // 朋友默认为发送者
             String hash = tauMsg.sha256().toHex();
-            long sentTime = tauMsg.timestamp();
+            long sentTime = message.getTime().longValue();
             String senderPk = message.getSender();
             String receiverPk = message.getReceiver();
             String logicMsgHash = message.getLogicHash();
