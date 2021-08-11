@@ -8,7 +8,6 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 import io.reactivex.Observable;
-import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndUser;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 
@@ -93,7 +92,7 @@ public interface ChatDao {
      * @return List<Chat>
      */
     @Query(QUERY_MESSAGES_BY_FRIEND_PK)
-    List<ChatMsgAndUser> getMessages(String senderPk, String receiverPk, int startPosition, int loadSize);
+    List<ChatMsg> getMessages(String senderPk, String receiverPk, int startPosition, int loadSize);
 
     @Query(QUERY_MESSAGE_LIST)
     List<ChatMsg> getMessageList(String senderPk, String receiverPk, int startPosition, int loadSize);

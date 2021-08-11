@@ -81,16 +81,9 @@ public class HashTextView extends TextView {
         }
         disposable = Flowable.create((FlowableOnSubscribe<String>) emitter -> {
             try {
-                byte[] cryptoKey;
                 long startTime = System.currentTimeMillis();
-                if (StringUtil.isEquals(senderPk, MainApplication.getInstance().getPublicKey())) {
-                    cryptoKey = Utils.keyExchange(receiverPk, MainApplication.getInstance().getSeed());
-                } else {
-                    cryptoKey = Utils.keyExchange(senderPk, MainApplication.getInstance().getSeed());
-                }
                 long keyExchangeTime = System.currentTimeMillis() - startTime;
-                byte[] rawContentTemp = CryptoUtil.decrypt(content, cryptoKey);
-                String rawContentStr = Utils.textBytesToString(rawContentTemp);
+                String rawContentStr = Utils.textBytesToString(content);
                 long decryptTime = System.currentTimeMillis() - startTime;
                 String rawContentLog = rawContentStr.length() > 50 ?
                         rawContentStr.substring(0, 10) : rawContentStr;

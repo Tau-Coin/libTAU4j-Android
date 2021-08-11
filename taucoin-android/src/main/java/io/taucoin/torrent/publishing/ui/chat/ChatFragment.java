@@ -34,7 +34,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndUser;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
@@ -251,7 +250,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                 }));
 
         chatViewModel.observerChatMessages().observe(this, messages -> {
-            List<ChatMsgAndUser> currentList = new ArrayList<>(messages);
+            List<ChatMsg> currentList = new ArrayList<>(messages);
             if (currentPos == 0) {
                 adapter.submitList(currentList, handleUpdateAdapter);
             } else {

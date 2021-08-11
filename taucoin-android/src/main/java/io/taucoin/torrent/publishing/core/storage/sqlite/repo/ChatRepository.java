@@ -3,7 +3,6 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndUser;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
@@ -60,7 +59,7 @@ public interface ChatRepository {
 
     void submitDataSetChangedDirect(String usersPk);
 
-    List<ChatMsgAndUser> getMessages(String friendPk, int pos, int loadSize);
+    List<ChatMsg> getMessages(String friendPk, int pos, int loadSize);
 
     /**
      * 添加消息日志

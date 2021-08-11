@@ -582,5 +582,5 @@ public abstract class TauDaemon {
     /**
      * 添加新消息
      */
-    public abstract boolean addNewMessage(String receiver, Message msg);
+    public abstract boolean addNewMessage(Message msg);
 }

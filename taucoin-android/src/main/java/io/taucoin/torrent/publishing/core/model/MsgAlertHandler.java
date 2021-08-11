@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.core.model;
 import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 
+import org.libTAU4j.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
+import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
@@ -21,11 +23,9 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.DeviceRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
-import io.taucoin.torrent.publishing.core.utils.BeanUtils;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
-import io.taucoin.torrent.publishing.core.model.data.message.Message;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
 
@@ -52,18 +52,16 @@ class MsgAlertHandler {
      * 0、如果没和朋友建立Chat, 创建Chat
      * 1、更新朋友状态
      * 2、保存Chat的聊天信息
-     * @param tauMsg 消息
+     * @param message 消息
      * @param userPk byte[] 当前用户的公钥
      */
-    void onNewMessage(org.libTAU4j.Message tauMsg, String userPk) {
+    void onNewMessage(Message message, String userPk) {
         try {
-            Message message = BeanUtils.map2bean(tauMsg.value(), Message.class);
             // 朋友默认为发送者
-            String hash = tauMsg.sha256().toHex();
-            long sentTime = message.getTime().longValue();
-            String senderPk = message.getSender();
-            String receiverPk = message.getReceiver();
-            String logicMsgHash = message.getLogicHash();
+            String hash = message.msgId();
+            long sentTime = message.timestamp();
+            String senderPk = ByteUtil.toHexString(message.sender());
+            String receiverPk = ByteUtil.toHexString(message.receiver());
             long receivedTime = DateUtil.getTime();
 
             ChatMsg chatMsg = chatRepo.queryChatMsg(senderPk, hash);
@@ -83,13 +81,15 @@ class MsgAlertHandler {
                 } else {
                     friendPkStr = senderPk;
                 }
+                logger.error("payload.size::{}", message.payload().length);
+                MsgContent msgContent = new MsgContent(message.payload());
+                String logicMsgHash = msgContent.getLogicHash();
                 // 原始数据解密
                 byte[] cryptoKey = Utils.keyExchange(friendPkStr, user.seed);
                 // 保存消息数据
-                byte[] encryptedContent = CryptoUtil.decrypt(message.getContent(), cryptoKey);
-                chatMsg = new ChatMsg(hash, senderPk, receiverPk, encryptedContent,
-                        message.getType(), sentTime, message.getNonce().longValue(),
-                        logicMsgHash, 1);
+                byte[] rawContent = CryptoUtil.decrypt(msgContent.getContent(), cryptoKey);
+                chatMsg = new ChatMsg(hash, senderPk, receiverPk, rawContent,
+                        msgContent.getType(), sentTime, msgContent.getNonce(), logicMsgHash, 1);
                 chatRepo.addChatMsg(chatMsg);
 
                 // 标记消息未读, 更新上次交流的时间

@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.ui.chat;
 
 import android.app.Application;
 
+import org.libTAU4j.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -23,12 +23,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
-import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndUser;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
+import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -36,15 +35,14 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
-import io.taucoin.torrent.publishing.core.utils.BeanUtils;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.HashUtil;
 import io.taucoin.torrent.publishing.core.utils.MsgSplitUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.ui.constant.Page;
-import io.taucoin.torrent.publishing.core.model.data.message.Message;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
 
@@ -59,7 +57,7 @@ public class ChatViewModel extends AndroidViewModel {
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> chatResult = new MutableLiveData<>();
     private MutableLiveData<Result> resentResult = new MutableLiveData<>();
-    private MutableLiveData<List<ChatMsgAndUser>> chatMessages = new MutableLiveData<>();
+    private MutableLiveData<List<ChatMsg>> chatMessages = new MutableLiveData<>();
     private TauDaemon daemon;
     private Disposable chattingDisposable = null;
     public ChatViewModel(@NonNull Application application) {
@@ -96,7 +94,7 @@ public class ChatViewModel extends AndroidViewModel {
     /**
      * 观察查询的聊天信息
      */
-    LiveData<List<ChatMsgAndUser>> observerChatMessages() {
+    LiveData<List<ChatMsg>> observerChatMessages() {
         return chatMessages;
     }
 
@@ -212,18 +210,18 @@ public class ChatViewModel extends AndroidViewModel {
     /**
      * 同步给朋友发信息任务
      * @param friendPk 朋友公钥
-     * @param msgContent 消息
+     * @param text 消息
      * @param type 消息类型
      */
-    public Result syncSendMessageTask(String friendPk, String msgContent, int type) {
+    public Result syncSendMessageTask(String friendPk, String text, int type) {
         Result result = new Result();
         AppDatabase.getInstance(getApplication()).runInTransaction(() -> {
             try {
                 List<byte[]> contents;
                 String logicMsgHash;
                 if(type == MessageType.TEXT.getType()) {
-                    logicMsgHash = HashUtil.makeSha256HashWithTimeStamp(msgContent);
-                    contents = MsgSplitUtil.splitTextMsg(msgContent);
+                    logicMsgHash = HashUtil.makeSha256HashWithTimeStamp(text);
+                    contents = MsgSplitUtil.splitTextMsg(text);
                 } else {
                     throw new Exception("Unknown message type");
                 }
@@ -237,17 +235,17 @@ public class ChatViewModel extends AndroidViewModel {
                     byte[] content = contents.get(nonce);
                     long millisTime = DateUtil.getMillisTime();
                     long timestamp = millisTime / 1000;
-                    Message message;
                     byte[] encryptedContent = CryptoUtil.encrypt(content, key);
+                    MsgContent msgContent;
                     if (type == MessageType.TEXT.getType()) {
-                        message = Message.createTextMessage(timestamp, senderPk,
-                                friendPk, logicMsgHash, nonce, encryptedContent);
+                        msgContent = MsgContent.createTextContent(logicMsgHash, nonce, encryptedContent);
                     } else {
                         throw new Exception("Unknown message type");
                     }
-                    Map<String, ?> map = BeanUtils.bean2map(message);
-                    org.libTAU4j.Message tauMsg = new org.libTAU4j.Message(map);
-                    String hash = tauMsg.sha256().toHex();
+
+                    Message message = new Message(timestamp, ByteUtil.toByte(senderPk),
+                            ByteUtil.toByte(friendPk), msgContent.getEncoded());
+                    String hash = message.msgId();
                     logger.debug("sendMessageTask newMsgHash::{}, contentType::{}, " +
                                     "nonce::{}, rawLength::{}, encryptedLength::{}, " +
                                     "logicMsgHash::{}, millisTime::{}",
@@ -255,9 +253,9 @@ public class ChatViewModel extends AndroidViewModel {
                             null == encryptedContent ? 0 : encryptedContent.length,
                             logicMsgHash, DateUtil.format(millisTime, DateUtil.pattern9));
 
-                    boolean isSuccess = daemon.addNewMessage(friendPk, tauMsg);
+                    boolean isSuccess = daemon.addNewMessage(message);
                     // 组织Message的结构，并发送到DHT和数据入库
-                    ChatMsg chatMsg = new ChatMsg(hash, senderPk, friendPk, encryptedContent, type,
+                    ChatMsg chatMsg = new ChatMsg(hash, senderPk, friendPk, content, type,
                             timestamp, nonce, logicMsgHash, isSuccess ? 1 : 0);
                     messages[nonce] = chatMsg;
 
@@ -296,10 +294,14 @@ public class ChatViewModel extends AndroidViewModel {
             String receiver = chatMsg.receiverPk;
             String logicMsgHash = chatMsg.logicMsgHash;
             long nonce = chatMsg.nonce;
-            Message message = Message.createTextMessage(timestamp, sender, receiver, logicMsgHash,
-                    nonce, chatMsg.content);
-            org.libTAU4j.Message tauMsg = new org.libTAU4j.Message(BeanUtils.bean2map(message));
-            boolean isSuccess = daemon.addNewMessage(receiver, tauMsg);
+            User user = userRepo.getUserByPublicKey(sender);
+            byte[] key = Utils.keyExchange(receiver, user.seed);
+            byte[] encryptedContent = CryptoUtil.encrypt(chatMsg.content, key);
+            MsgContent msgContent = MsgContent.createTextContent(logicMsgHash,
+                    nonce, encryptedContent);
+            Message message = new Message(timestamp, ByteUtil.toByte(sender),
+                    ByteUtil.toByte(receiver), msgContent.getEncoded());
+            boolean isSuccess = daemon.addNewMessage(message);
             if (isSuccess) {
                 // 更新界面数据
                 msg.unsent = 1;
@@ -360,8 +362,8 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     void loadMessagesData(String friendPk, int pos) {
-        Disposable disposable = Observable.create((ObservableOnSubscribe<List<ChatMsgAndUser>>) emitter -> {
-            List<ChatMsgAndUser> messages = new ArrayList<>();
+        Disposable disposable = Observable.create((ObservableOnSubscribe<List<ChatMsg>>) emitter -> {
+            List<ChatMsg> messages = new ArrayList<>();
             try {
                 long startTime = System.currentTimeMillis();
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
@@ -370,21 +372,9 @@ public class ChatViewModel extends AndroidViewModel {
                 logger.trace("loadMessagesData pos::{}, pageSize::{}, messages.size::{}",
                         pos, pageSize, messages.size());
                 logger.trace("loadMessagesData getMessagesTime::{}", getMessagesTime - startTime);
-                byte[] friendCryptoKey = Utils.keyExchange(friendPk, MainApplication.getInstance().getSeed());
-                for (ChatMsgAndUser msg : messages) {
-                    byte[] encryptedContent = msg.content;
-                    try {
-                        msg.rawContent = CryptoUtil.decrypt(encryptedContent, friendCryptoKey);
-                        msg.content = null;
-                    } catch (Exception e) {
-                        logger.error("loadMessagesData decrypt error::", e);
-                    }
-                }
-                long decryptTime = System.currentTimeMillis();
-                logger.trace("loadMessagesData decryptTime Time::{}", decryptTime - getMessagesTime);
                 Collections.reverse(messages);
                 long endTime = System.currentTimeMillis();
-                logger.trace("loadMessagesData reverseTime Time::{}", endTime - decryptTime);
+                logger.trace("loadMessagesData reverseTime Time::{}", endTime - getMessagesTime);
             } catch (Exception e) {
                 logger.error("loadMessagesData error::", e);
             }

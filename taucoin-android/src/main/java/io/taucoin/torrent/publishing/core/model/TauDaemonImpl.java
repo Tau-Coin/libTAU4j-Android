@@ -276,9 +276,9 @@ public class TauDaemonImpl extends TauDaemon {
      * 添加新消息
      */
     @Override
-    public boolean addNewMessage(String receiver, Message msg) {
+    public boolean addNewMessage(Message msg) {
         if (isRunning) {
-            boolean isAddSuccess = sessionManager.addNewMsg(receiver, msg);
+            boolean isAddSuccess = sessionManager.addNewMsg(msg);
             logger.debug("addNewMessage success::{}", isAddSuccess);
             return isAddSuccess;
         }

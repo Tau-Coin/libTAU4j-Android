@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndUser;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -34,7 +33,7 @@ import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 /**
  * 聊天消息的Adapter
  */
-public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter.ViewHolder> {
+public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHolder> {
 
     enum ViewType {
         LEFT_TEXT,
@@ -115,7 +114,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ChatMsgAndUser previousChat = null;
+        ChatMsg previousChat = null;
         if (position > 0) {
             previousChat = getItem(position - 1);
         }
@@ -148,7 +147,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
             this.cryptoKey = cryptoKey;
         }
 
-        void bindTextRight(ItemTextRightBinding binding, ChatMsgAndUser msg, ChatMsgAndUser previousChat) {
+        void bindTextRight(ItemTextRightBinding binding, ChatMsg msg, ChatMsg previousChat) {
             if (null == binding || null == msg) {
                 return;
             }
@@ -156,7 +155,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
             bindText(binding.roundButton, binding.tvTime, binding.tvMsg, msg, previousChat);
         }
 
-        void bindText(ItemTextBinding binding, ChatMsgAndUser msg, ChatMsgAndUser previousChat) {
+        void bindText(ItemTextBinding binding, ChatMsg msg, ChatMsg previousChat) {
             if (null == binding || null == msg) {
                 return;
             }
@@ -164,7 +163,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
         }
 
         private void bindText(RoundButton roundButton, TextView tvTime, HashTextView tvMsg,
-                              ChatMsgAndUser msg, ChatMsgAndUser previousChat) {
+                              ChatMsg msg, ChatMsg previousChat) {
             if (null == msg) {
                 return;
             }
@@ -189,7 +188,8 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
                 tvTime.setText(time);
             }
             tvTime.setVisibility(isShowTime ? View.VISIBLE : View.GONE);
-            tvMsg.setTextContent(msg.content, msg.rawContent, msg.senderPk, msg.receiverPk);
+            String contentStr = Utils.textBytesToString(msg.content);
+            tvMsg.setText(contentStr);
         }
 
         private void showStatusView(ImageView ivStats, ProgressBar tvProgress, ImageView ivWarning, ChatMsg msg) {
@@ -213,7 +213,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
             });
         }
 
-        private boolean isShowTime(ChatMsgAndUser chat, ChatMsgAndUser previousChat) {
+        private boolean isShowTime(ChatMsg chat, ChatMsg previousChat) {
             if (previousChat != null) {
                 int interval = DateUtil.getSeconds(previousChat.timestamp, chat.timestamp);
                 return interval > 2 * 60;
@@ -221,7 +221,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
             return true;
         }
 
-        void bindPictureRight(ItemPictureRightBinding binding, ChatMsgAndUser msg, ChatMsgAndUser previousChat) {
+        void bindPictureRight(ItemPictureRightBinding binding, ChatMsg msg, ChatMsg previousChat) {
             if (null == binding || null == msg) {
                 return;
             }
@@ -229,7 +229,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
             bindPicture(binding.roundButton, binding.tvTime, binding.tvImage, msg, previousChat);
         }
 
-        void bindPicture(ItemPictureBinding binding, ChatMsgAndUser msg, ChatMsgAndUser previousChat) {
+        void bindPicture(ItemPictureBinding binding, ChatMsg msg, ChatMsg previousChat) {
             if(null == binding || null == msg){
                 return;
             }
@@ -237,7 +237,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
         }
 
         private void bindPicture(RoundButton roundButton, TextView tvTime, HashImageView tvImage,
-                                 ChatMsgAndUser msg, ChatMsgAndUser previousChat) {
+                                 ChatMsg msg, ChatMsg previousChat) {
             if (null == msg) {
                 return;
             }
@@ -271,16 +271,16 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndUser, ChatListAdapter
         void onUserClicked(ChatMsg msg);
     }
 
-    private static final DiffUtil.ItemCallback<ChatMsgAndUser> diffCallback = new DiffUtil.ItemCallback<ChatMsgAndUser>() {
+    private static final DiffUtil.ItemCallback<ChatMsg> diffCallback = new DiffUtil.ItemCallback<ChatMsg>() {
         @Override
-        public boolean areContentsTheSame(@NonNull ChatMsgAndUser oldItem, @NonNull ChatMsgAndUser newItem) {
+        public boolean areContentsTheSame(@NonNull ChatMsg oldItem, @NonNull ChatMsg newItem) {
             return oldItem.equals(newItem)
                     && StringUtil.isEquals(oldItem.logicMsgHash, newItem.logicMsgHash)
                     && oldItem.nonce == newItem.nonce && oldItem.unsent == newItem.unsent;
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull ChatMsgAndUser oldItem, @NonNull ChatMsgAndUser newItem) {
+        public boolean areItemsTheSame(@NonNull ChatMsg oldItem, @NonNull ChatMsg newItem) {
             return oldItem.equals(newItem);
         }
     };

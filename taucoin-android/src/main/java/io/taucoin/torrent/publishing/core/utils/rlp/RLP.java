@@ -899,7 +899,45 @@ public class RLP {
     }
 
     public static byte[] encodeString(String srcString) {
+        srcString = null == srcString ? "" : srcString;
         return encodeElement(srcString.getBytes());
+    }
+
+    public static byte[] encodeInteger(Integer srcInteger) {
+        if (srcInteger < 0) throw new RuntimeException("negative numbers are not allowed");
+
+        if (srcInteger == 0)
+            return encodeByte((byte) 0);
+        else
+            return encodeElement(asUnsignedByteArray(BigInteger.valueOf(srcInteger)));
+    }
+
+    public static byte[] encodeLong(Long srcLong) {
+        if (srcLong < 0) throw new RuntimeException("negative numbers are not allowed");
+
+        if (srcLong == 0)
+            return encodeByte((byte) 0);
+        else
+            return encodeElement(asUnsignedByteArray(BigInteger.valueOf(srcLong)));
+    }
+
+    public static long decodeLong(RLPList list, int index, long defaultVal) {
+        byte[] bytes = list.get(index).getRLPData();
+        return null == bytes ? defaultVal : new BigInteger(bytes).longValue();
+    }
+
+    public static Integer decodeInteger(RLPList list, int index, Integer defaultVal) {
+        byte[] bytes = list.get(index).getRLPData();
+        return null == bytes ? defaultVal : new BigInteger(bytes).intValue();
+    }
+
+    public static String decodeString(RLPList list, int index, String defaultVal) {
+        byte[] bytes = list.get(index).getRLPData();
+        return null == bytes ? defaultVal : new String(bytes);
+    }
+
+    public static byte[] decodeElement(RLPList list, int index) {
+        return list.get(index).getRLPData();
     }
 
     public static byte[] encodeBigInteger(BigInteger srcBigInteger) {

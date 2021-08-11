@@ -13,7 +13,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.torrent.publishing.MainApplication;
-import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndUser;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -125,7 +124,7 @@ public class ChatRepositoryImpl implements ChatRepository{
     }
 
     @Override
-    public List<ChatMsgAndUser> getMessages(String friendPk, int startPosition, int loadSize) {
+    public List<ChatMsg> getMessages(String friendPk, int startPosition, int loadSize) {
         String senderPk = MainApplication.getInstance().getPublicKey();
         return db.chatDao().getMessages(senderPk, friendPk, startPosition, loadSize);
     }
