@@ -11,7 +11,7 @@ public class MsgContent {
     private String logicHash;               // 用于确认区分逻辑消息，带时间戳（可能连发两次）
     private long nonce;                     // 局部nonce，用于标识切分消息的顺序
     private int type;                       // 可以标识消息类型
-    private byte[] content;                 // 加密消息体
+    private byte[] content;                 // 原始消息体
 
     public static MsgContent createTextContent(String logicMsgHash, long nonce, byte[] content) {
         return new MsgContent(MessageVersion.VERSION1.getV(), logicMsgHash, nonce, MessageType.TEXT.getType(), content);

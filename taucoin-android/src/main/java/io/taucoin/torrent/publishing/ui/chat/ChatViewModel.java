@@ -235,22 +235,21 @@ public class ChatViewModel extends AndroidViewModel {
                     byte[] content = contents.get(nonce);
                     long millisTime = DateUtil.getMillisTime();
                     long timestamp = millisTime / 1000;
-                    byte[] encryptedContent = CryptoUtil.encrypt(content, key);
                     MsgContent msgContent;
                     if (type == MessageType.TEXT.getType()) {
-                        msgContent = MsgContent.createTextContent(logicMsgHash, nonce, encryptedContent);
+                        msgContent = MsgContent.createTextContent(logicMsgHash, nonce, content);
                     } else {
                         throw new Exception("Unknown message type");
                     }
 
+                    byte[] encryptedEncoded = CryptoUtil.encrypt(msgContent.getEncoded(), key);
                     Message message = new Message(timestamp, ByteUtil.toByte(senderPk),
-                            ByteUtil.toByte(friendPk), msgContent.getEncoded());
+                            ByteUtil.toByte(friendPk), encryptedEncoded);
                     String hash = message.msgId();
                     logger.debug("sendMessageTask newMsgHash::{}, contentType::{}, " +
-                                    "nonce::{}, rawLength::{}, encryptedLength::{}, " +
+                                    "nonce::{}, rawLength::{}, encryptedEncoded::{}, " +
                                     "logicMsgHash::{}, millisTime::{}",
-                            hash, type, nonce, content.length,
-                            null == encryptedContent ? 0 : encryptedContent.length,
+                            hash, type, nonce, content.length, encryptedEncoded.length,
                             logicMsgHash, DateUtil.format(millisTime, DateUtil.pattern9));
 
                     boolean isSuccess = daemon.addNewMessage(message);
@@ -295,12 +294,12 @@ public class ChatViewModel extends AndroidViewModel {
             String logicMsgHash = chatMsg.logicMsgHash;
             long nonce = chatMsg.nonce;
             User user = userRepo.getUserByPublicKey(sender);
-            byte[] key = Utils.keyExchange(receiver, user.seed);
-            byte[] encryptedContent = CryptoUtil.encrypt(chatMsg.content, key);
             MsgContent msgContent = MsgContent.createTextContent(logicMsgHash,
-                    nonce, encryptedContent);
+                    nonce, chatMsg.content);
+            byte[] key = Utils.keyExchange(receiver, user.seed);
+            byte[] encryptedEncoded = CryptoUtil.encrypt(msgContent.getEncoded(), key);
             Message message = new Message(timestamp, ByteUtil.toByte(sender),
-                    ByteUtil.toByte(receiver), msgContent.getEncoded());
+                    ByteUtil.toByte(receiver), encryptedEncoded);
             boolean isSuccess = daemon.addNewMessage(message);
             if (isSuccess) {
                 // 更新界面数据

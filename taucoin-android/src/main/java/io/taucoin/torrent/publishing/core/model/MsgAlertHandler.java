@@ -82,14 +82,15 @@ class MsgAlertHandler {
                     friendPkStr = senderPk;
                 }
                 logger.error("payload.size::{}", message.payload().length);
-                MsgContent msgContent = new MsgContent(message.payload());
-                String logicMsgHash = msgContent.getLogicHash();
+                byte[] encryptedEncoded = message.payload();
                 // 原始数据解密
                 byte[] cryptoKey = Utils.keyExchange(friendPkStr, user.seed);
-                // 保存消息数据
-                byte[] rawContent = CryptoUtil.decrypt(msgContent.getContent(), cryptoKey);
-                chatMsg = new ChatMsg(hash, senderPk, receiverPk, rawContent,
-                        msgContent.getType(), sentTime, msgContent.getNonce(), logicMsgHash, 1);
+                byte[] encoded = CryptoUtil.decrypt(encryptedEncoded, cryptoKey);
+                MsgContent msgContent = new MsgContent(encoded);
+                String logicMsgHash = msgContent.getLogicHash();
+                byte[] content = msgContent.getContent();
+                chatMsg = new ChatMsg(hash, senderPk, receiverPk, content, msgContent.getType(),
+                        sentTime, msgContent.getNonce(), logicMsgHash, 1);
                 chatRepo.addChatMsg(chatMsg);
 
                 // 标记消息未读, 更新上次交流的时间
