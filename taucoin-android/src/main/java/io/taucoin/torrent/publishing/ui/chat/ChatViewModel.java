@@ -263,7 +263,6 @@ public class ChatViewModel extends AndroidViewModel {
                     boolean isConfirmed = isSuccess && StringUtil.isEquals(senderPk, friendPk);
                     ChatMsgStatus status = isConfirmed ? ChatMsgStatus.SYNC_CONFIRMED : ChatMsgStatus.BUILT;
                     // 确认接收的时间精确到秒
-                    millisTime = isConfirmed ? millisTime / 1000 : millisTime;
                     chatMsgLogs[nonce] = new ChatMsgLog(hash,
                     status.getStatus(), millisTime);
 
@@ -311,7 +310,7 @@ public class ChatViewModel extends AndroidViewModel {
                 // 如何是自己给自己发，直接确认接收
                 if (StringUtil.isEquals(chatMsg.senderPk, chatMsg.receiverPk)) {
                     ChatMsgLog  chatMsgLog = new ChatMsgLog(chatMsg.hash,
-                            ChatMsgStatus.SYNC_CONFIRMED.getStatus(), DateUtil.getTime());
+                            ChatMsgStatus.SYNC_CONFIRMED.getStatus(), DateUtil.getMillisTime());
                     chatRepo.addChatMsgLogs(chatMsgLog);
                 }
             }
