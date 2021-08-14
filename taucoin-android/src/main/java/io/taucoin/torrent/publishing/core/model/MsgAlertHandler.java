@@ -184,8 +184,9 @@ class MsgAlertHandler {
             if (isUpdate) {
                 friendRepo.updateFriend(friend);
             }
-            logger.info("onDiscoveryFriend friendPk::{}, lastSeenTime::{}", friendPk,
-                    DateUtil.formatTime(lastSeenTime, DateUtil.pattern6));
+
+            logger.info("onDiscoveryFriend friendPk::{}, lastSeenTime::{}, {}", friendPk,
+                    DateUtil.format(lastSeenTime, DateUtil.pattern9), lastSeenTime);
         }
     }
 
