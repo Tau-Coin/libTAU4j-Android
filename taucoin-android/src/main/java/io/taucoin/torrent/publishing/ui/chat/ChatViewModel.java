@@ -242,6 +242,7 @@ public class ChatViewModel extends AndroidViewModel {
                         throw new Exception("Unknown message type");
                     }
 
+                    // 加密填充模式为16的倍数896, 最大控制为895
                     byte[] encryptedEncoded = CryptoUtil.encrypt(msgContent.getEncoded(), key);
                     Message message = new Message(timestamp, ByteUtil.toByte(senderPk),
                             ByteUtil.toByte(friendPk), encryptedEncoded);

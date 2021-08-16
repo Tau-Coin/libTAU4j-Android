@@ -17,7 +17,7 @@ import io.taucoin.torrent.publishing.service.LibJpegManager;
  */
 public class MsgSplitUtil {
     private static final Logger logger = LoggerFactory.getLogger("MsgSplit");
-    private static final int BYTE_LIMIT = 847; // 消息拆分字节限制, 加密填充模式为16的倍数848
+    private static final int BYTE_LIMIT = 820;
 
     /**
      * 拆分文本消息
