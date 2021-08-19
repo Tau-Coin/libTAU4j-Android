@@ -154,11 +154,11 @@
     <string name="setting_share_journal">Share All Journal</string>
     <string name="setting_wifi_network_title">WiFi - likely free internet</string>
     <string name="setting_metered_network_title">Metered - likely paid internet</string>
-    <string name="setting_data_reset_time">Data Daily Reset Time</string>
+    <string name="setting_data_reset_time">Data Quota Daily Reset</string>
     <string name="setting_data_reset_time_value">%d am</string>
     <string name="setting_work_frequency">Working Frequency</string>
     <string name="setting_fore_mode">Foreground Mode</string>
-    <string name="setting_bg_mode">Background Mode</string>
+    <string name="setting_bg_mode">Run In Background</string>
     <string name="setting_survival_mode">Survival Mode</string>
     <string name="setting_running_time">Running time: %1$s</string>
     <string name="setting_doze_time">Doze time: %1$s</string>
