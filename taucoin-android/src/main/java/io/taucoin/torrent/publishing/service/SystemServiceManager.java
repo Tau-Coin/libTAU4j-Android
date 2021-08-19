@@ -8,6 +8,8 @@ import android.net.LinkAddress;
 import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 
 import org.slf4j.Logger;
@@ -16,6 +18,10 @@ import org.slf4j.LoggerFactory;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.taucoin.torrent.publishing.MainApplication;
@@ -109,8 +115,10 @@ public class SystemServiceManager {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         String networkAddress = null;
         if (networks != null && activeNetworkInfo != null) {
+            logger.debug("ActiveNetworkInfo ::{}", activeNetworkInfo.toString());
             for (Network network : networks) {
                 NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
+                logger.debug("NetworkInfo ::{}", networkInfo.toString());
                 if (networkInfo.toString().equals(activeNetworkInfo.toString())) {
                     LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
                     String name = linkProperties.getInterfaceName();
@@ -141,6 +149,63 @@ public class SystemServiceManager {
             }
         }
         return networkAddress;
+    }
+
+    /**
+     * 获取本机IPv4地址
+     *
+     * @return 本机IPv4地址；null：无网络连接
+     */
+    public String getIpAddress() {
+        // TODO: 测试，以后可删除
+        getNetworkAddress();
+        // 获取WiFi服务
+        String ipv4;
+        Context appContext = MainApplication.getInstance().getApplicationContext();
+        WifiManager wifiManager = (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
+        // 判断WiFi是否开启
+        logger.debug("getIpAddress isWifiEnabled::{}", wifiManager.isWifiEnabled());
+        if (wifiManager.isWifiEnabled()) {
+            // 已经开启了WiFi
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            int ipAddress = wifiInfo.getIpAddress();
+            ipv4 = intToIp(ipAddress);
+        } else {
+            // 未开启WiFi
+            ipv4 = getLocalIpAddress();
+        }
+        ipv4 += ":0";
+        logger.debug("getIpAddress ipv4::{}", ipv4);
+        return ipv4;
+    }
+
+    private String intToIp(int ipAddress) {
+        return (ipAddress & 0xFF) + "." +
+                ((ipAddress >> 8) & 0xFF) + "." +
+                ((ipAddress >> 16) & 0xFF) + "." +
+                (ipAddress >> 24 & 0xFF);
+    }
+
+    /**
+     * 获取本地电信的IP地址
+     */
+    private String getLocalIpAddress() {
+        try {
+            String ipv4;
+            ArrayList<NetworkInterface> list = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface ni: list) {
+                ArrayList<InetAddress> addresses = Collections.list(ni.getInetAddresses());
+                for (InetAddress address: addresses) {
+                    // 不是环回地址和链接本地地址
+                    if (!address.isLoopbackAddress() && !address.isLinkLocalAddress() && isIPv4(address)) {
+                        ipv4 = address.getHostAddress();
+                        return ipv4;
+                    }
+                }
+            }
+        } catch (SocketException ignore) {
+        }
+        return null;
     }
 
     private boolean isIPv6ULA(InetAddress address) {
