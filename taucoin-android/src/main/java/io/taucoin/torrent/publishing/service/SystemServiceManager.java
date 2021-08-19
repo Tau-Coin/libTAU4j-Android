@@ -161,12 +161,12 @@ public class SystemServiceManager {
         getNetworkAddress();
         // 获取WiFi服务
         String ipv4;
-        Context appContext = MainApplication.getInstance().getApplicationContext();
-        WifiManager wifiManager = (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
+        NetworkInfo wifiNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         // 判断WiFi是否开启
-        logger.debug("getIpAddress isWifiEnabled::{}", wifiManager.isWifiEnabled());
-        if (wifiManager.isWifiEnabled()) {
+        logger.debug("getIpAddress isWifiConnected::{}", wifiNetworkInfo.isConnected());
+        if (wifiNetworkInfo.isConnected()) {
             // 已经开启了WiFi
+            WifiManager wifiManager = (WifiManager) appContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             WifiInfo wifiInfo = wifiManager.getConnectionInfo();
             int ipAddress = wifiInfo.getIpAddress();
             ipv4 = intToIp(ipAddress);
