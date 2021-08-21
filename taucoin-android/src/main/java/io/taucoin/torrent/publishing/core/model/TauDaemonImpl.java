@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.libTAU4j.Message;
 import org.libTAU4j.alerts.Alert;
+import org.libTAU4j.alerts.AlertType;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -75,37 +76,79 @@ public class TauDaemonImpl extends TauDaemon {
     @Override
     void observeTauDaemonAlertListener() {
         // alertQueue 生产线程
+        Disposable logDisposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+            if (emitter.isDisposed()) {
+                return;
+            }
+            TauDaemonAlertListener listener = new TauDaemonAlertListener() {
+                @Override
+                public int[] types() {
+                    return new int[]{
+                        AlertType.PORTMAP_LOG.swig(),
+                        AlertType.DHT_BOOTSTRAP.swig(),
+                        AlertType.SES_START_OVER.swig(),
+                        AlertType.DHT_GET_PEERS.swig(),
+                        AlertType.EXTERNAL_IP.swig(),
+                        AlertType.LISTEN_SUCCEEDED.swig(),
+                        AlertType.STATE_UPDATE.swig(),
+                        AlertType.SES_STOP_OVER.swig(),
+                        AlertType.SESSION_STATS.swig(),
+                        AlertType.LISTEN_FAILED.swig(),
+                        AlertType.UDP_ERROR.swig(),
+                        AlertType.DHT_ERROR.swig(),
+                        AlertType.LOG.swig(),
+                        AlertType.DHT_STATS.swig(),
+                        AlertType.DHT_LOG.swig(),
+                        AlertType.COMM_LOG.swig(),
+                        AlertType.DHT_PKT.swig(),
+                        AlertType.SESSION_ERROR.swig(),
+                        AlertType.SESSION_STATS_HEADER.swig(),
+                        AlertType.ALERTS_DROPPED.swig()
+                    };
+                }
+                @Override
+                public void alert(Alert<?> alert) {
+                    if (!emitter.isDisposed() && alert != null) {
+                        tauDaemonAlertHandler.handleLogAlert(alert);
+                    }
+                }
+            };
+            if (!emitter.isDisposed()) {
+                registerAlertListener(listener);
+                emitter.setDisposable(Disposables.fromAction(() -> unregisterAlertListener(listener)));
+            }
+        }).subscribeOn(Schedulers.io())
+                .subscribe();
+        disposables.add(logDisposable);
+
+        // alertQueue 生产线程
         Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             if (emitter.isDisposed()) {
                 return;
             }
             TauDaemonAlertListener listener = new TauDaemonAlertListener() {
                 @Override
+                public int[] types() {
+                    return new int[]{
+                        AlertType.PORTMAP.swig(),
+                        AlertType.PORTMAP_ERROR.swig(),
+                        AlertType.COMM_NEW_DEVICE_ID.swig(),
+                        AlertType.COMM_FRIEND_INFO.swig(),
+                        AlertType.COMM_NEW_MSG.swig(),
+                        AlertType.COMM_CONFIRM_ROOT.swig(),
+                        AlertType.COMM_SYNC_MSG.swig(),
+                        AlertType.COMM_LAST_SEEN.swig()
+                    };
+                }
+
+                @Override
                 public void alert(Alert<?> alert) {
                     if (!emitter.isDisposed() && alert != null) {
-                        switch (alert.type()) {
-                            case PORTMAP:
-                            case PORTMAP_ERROR:
-                            case COMM_NEW_DEVICE_ID:
-                            case COMM_FRIEND_INFO:
-                            case COMM_NEW_MSG:
-                            case COMM_CONFIRM_ROOT:
-                            case COMM_SYNC_MSG:
-                            case COMM_LAST_SEEN:
-                                // 防止OOM，此处超过队列容量，直接丢弃
-                                if (alertQueue.size() <= ALERT_QUEUE_CAPACITY) {
-                                    alertQueue.offer(new AlertAndUser(alert, seed));
-                                } else {
-                                    logger.warn("Queue full, Alert data is discarded::{}", alert.message());
-                                }
-                                break;
-//                            case SES_STOP_OVER:
-//                                tauDaemonAlertHandler.handleLogAlert(alert);
-//                                sessionStopOver();
-//                                break;
-                            default:
-                                tauDaemonAlertHandler.handleLogAlert(alert);
-                                break;
+                        // 防止OOM，此处超过队列容量，直接丢弃
+                        if (alertQueue.size() <= ALERT_QUEUE_CAPACITY) {
+                            alertQueue.offer(new AlertAndUser(alert, seed));
+                        } else {
+                            logger.warn("Queue full, Alert data is discarded::{}", alert.message());
                         }
                     }
                 }
@@ -127,10 +170,14 @@ public class TauDaemonImpl extends TauDaemon {
                     emitter.onComplete();
                     break;
                 }
-                logger.trace("alertQueue size::{}", alertQueue.size());
                 try {
                     AlertAndUser alertAndUser = alertQueue.take();
+                    long startTime = System.currentTimeMillis();
                     tauDaemonAlertHandler.handleAlertAndUser(alertAndUser);
+                    long endTime = System.currentTimeMillis();
+                    String alertType = alertAndUser.getAlert().type().name();
+                    logger.trace("alertQueue size::{}, alertType::{}, time cost::{}ms",
+                            alertQueue.size(), alertType, endTime - startTime);
                 } catch (InterruptedException e) {
                     break;
                 } catch (Exception e) {

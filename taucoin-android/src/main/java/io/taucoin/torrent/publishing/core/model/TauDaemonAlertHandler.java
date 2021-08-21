@@ -77,13 +77,14 @@ class TauDaemonAlertHandler {
                 break;
             case COMM_CONFIRM_ROOT:
                 // 消息确认
-                onConfirmRoot(alert);
+                onConfirmRoot(alert, alertAndUser.getUserPk());
                 break;
             case COMM_SYNC_MSG:
                 // 消息同步
-                onSyncMessage(alert);
+                onSyncMessage(alert, alertAndUser.getUserPk());
                 break;
             default:
+                logger.info("Unknown alert");
                 break;
         }
     }
@@ -104,25 +105,27 @@ class TauDaemonAlertHandler {
     /**
      * 消息正在同步
      * @param alert libTAU上报
+     * @param userPk 当前用户公钥
      */
-    private void onSyncMessage(Alert alert) {
+    private void onSyncMessage(Alert alert, String userPk) {
         CommSyncMsgAlert syncMsgAlert = (CommSyncMsgAlert) alert;
         logger.info(syncMsgAlert.get_message());
         byte[] hash = syncMsgAlert.getSyncing_msg_hash();
         long timestamp = syncMsgAlert.get_timestamp();
-        msgListenHandler.onSyncMessage(hash, timestamp);
+        msgListenHandler.onSyncMessage(hash, timestamp, userPk);
     }
 
     /**
      * 消息确认（已接收）
      * @param alert libTAU上报
+     * @param userPk 当前用户公钥
      */
-    private void onConfirmRoot(Alert alert) {
+    private void onConfirmRoot(Alert alert, String userPk) {
         CommConfirmRootAlert confirmRootAlert = (CommConfirmRootAlert) alert;
         logger.info(confirmRootAlert.get_message());
         long timestamp = confirmRootAlert.get_timestamp();
         List<byte[]> rootList = confirmRootAlert.getConfirmation_roots();
-        msgListenHandler.onReadMessageRoot(rootList, BigInteger.valueOf(timestamp));
+        msgListenHandler.onReadMessageRoot(rootList, BigInteger.valueOf(timestamp), userPk);
     }
 
     /**

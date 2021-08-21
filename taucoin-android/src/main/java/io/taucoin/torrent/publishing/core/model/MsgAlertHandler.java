@@ -121,9 +121,15 @@ class MsgAlertHandler {
      * @param msgHash 当前同步的消息
      * @param timestamp 开始同步时间
      */
-    void onSyncMessage(byte[] msgHash, long timestamp) {
+    void onSyncMessage(byte[] msgHash, long timestamp, String userPk) {
         try {
             String hash = ByteUtil.toHexString(msgHash);
+            ChatMsg msg = chatRepo.queryChatMsg(hash);
+            String senderPk = msg != null ? msg.senderPk : null;
+            if (StringUtil.isNotEquals(senderPk, userPk)) {
+                logger.debug("onSyncMessage MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
+                return;
+            }
             ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
                     ChatMsgStatus.SYNCING.getStatus());
             logger.trace("onSyncMessage MessageHash::{}, exist::{}", hash, msgLog != null);
@@ -141,11 +147,17 @@ class MsgAlertHandler {
      * 消息已被接收
      * @param hashList 消息root
      */
-    void onReadMessageRoot(List<byte[]> hashList, BigInteger timestamp) {
+    void onReadMessageRoot(List<byte[]> hashList, BigInteger timestamp, String userPk) {
         try {
             logger.trace("onReadMessageRoot hashList.size::{}", hashList.size());
             for (byte[] root : hashList) {
                 String hash = ByteUtil.toHexString(root);
+                ChatMsg msg = chatRepo.queryChatMsg(hash);
+                String senderPk = msg != null ? msg.senderPk : null;
+                if (StringUtil.isNotEquals(senderPk, userPk)) {
+                    logger.debug("onReadMessageRoot MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
+                    break;
+                }
                 ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
                         ChatMsgStatus.SYNC_CONFIRMED.getStatus());
                 logger.trace("onReadMessageRoot MessageHash::{}, exist::{}", hash, msgLog != null);
@@ -176,8 +188,8 @@ class MsgAlertHandler {
                 friend.status = FriendStatus.CONNECTED.getStatus();
                 isUpdate = true;
             }
-            // 当前时间大于上次更新时间
-            if (lastSeenTime > friend.lastSeenTime) {
+            // 当前时间比上次更新时间大于1s
+            if (lastSeenTime - friend.lastSeenTime >= 1000) {
                 friend.lastSeenTime = lastSeenTime;
                 isUpdate = true;
             }
