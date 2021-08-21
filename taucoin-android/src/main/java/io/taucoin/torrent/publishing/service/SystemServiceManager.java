@@ -190,8 +190,8 @@ public class SystemServiceManager {
      * 获取本地电信的IP地址
      */
     private String getLocalIpAddress() {
+        String ipv4 = null;
         try {
-            String ipv4;
             ArrayList<NetworkInterface> list = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface ni: list) {
                 ArrayList<InetAddress> addresses = Collections.list(ni.getInetAddresses());
@@ -199,13 +199,13 @@ public class SystemServiceManager {
                     // 不是环回地址和链接本地地址
                     if (!address.isLoopbackAddress() && !address.isLinkLocalAddress() && isIPv4(address)) {
                         ipv4 = address.getHostAddress();
-                        return ipv4;
+                        logger.debug("getLocalIpAddress ipv4::{}", ipv4);
                     }
                 }
             }
         } catch (SocketException ignore) {
         }
-        return null;
+        return ipv4;
     }
 
     private boolean isIPv6ULA(InetAddress address) {
