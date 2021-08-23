@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -89,6 +90,9 @@ public class ChatViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
         disposables.clear();
+        if (chattingDisposable != null && !chattingDisposable.isDisposed()) {
+            chattingDisposable.dispose();
+        }
     }
 
     /**
@@ -340,14 +344,12 @@ public class ChatViewModel extends AndroidViewModel {
         if (StringUtil.isEmpty(friendPk)) {
             return;
         }
-        chattingDisposable = daemon.observeDaemonRunning()
-                .subscribeOn(Schedulers.io())
-                .subscribe(isRunning -> {
-                    if (isRunning) {
-                        daemon.setChattingFriend(friendPk);
-                        chattingDisposable.dispose();
-                    }
-                });
+        if (null == chattingDisposable) {
+            daemon.setChattingFriend(friendPk);
+        }
+        chattingDisposable = Observable.interval(1, TimeUnit.SECONDS)
+            .observeOn(Schedulers.io())
+            .subscribe(l -> daemon.setChattingFriend(friendPk));
     }
 
     /**
