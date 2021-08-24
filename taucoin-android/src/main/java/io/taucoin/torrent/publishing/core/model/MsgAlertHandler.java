@@ -156,7 +156,7 @@ class MsgAlertHandler {
                 String senderPk = msg != null ? msg.senderPk : null;
                 if (StringUtil.isNotEquals(senderPk, userPk)) {
                     logger.debug("onReadMessageRoot MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
-                    break;
+                    continue;
                 }
                 ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
                         ChatMsgStatus.SYNC_CONFIRMED.getStatus());
