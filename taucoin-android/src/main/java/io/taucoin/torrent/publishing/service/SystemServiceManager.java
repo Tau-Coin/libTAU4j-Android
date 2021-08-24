@@ -114,12 +114,13 @@ public class SystemServiceManager {
         Network[] networks = connectivityManager.getAllNetworks();
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         String networkAddress = null;
-        if (networks != null && activeNetworkInfo != null) {
+        if (networks != null && activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+            int activeType = activeNetworkInfo.getType();
             logger.debug("ActiveNetworkInfo ::{}", activeNetworkInfo.toString());
             for (Network network : networks) {
                 NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
                 logger.debug("NetworkInfo ::{}", networkInfo.toString());
-                if (networkInfo.toString().equals(activeNetworkInfo.toString())) {
+                if (activeType == networkInfo.getType() && networkInfo.isConnected()) {
                     LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
                     String name = linkProperties.getInterfaceName();
                     logger.debug("ActiveNetworkInfo InterfaceName::{}", name);
@@ -129,20 +130,48 @@ public class SystemServiceManager {
                             logger.debug("ActiveNetworkInfo Flags::{}, PrefixLength::{}, Scope::{}",
                                     linkAddress.getFlags(), linkAddress.getPrefixLength(), linkAddress.getScope());
                             InetAddress address = linkAddress.getAddress();
-                            if (isIPv4(address)) {
-                                String ipv4 = address.getHostAddress();
-                                networkAddress = ipv4 + ":0";
-                                logger.debug("ActiveNetworkInfo IPv4 HostAddress::{}", ipv4);
-                            } else {
-                                String ipv6 = address.getHostAddress();
-                                if (StringUtil.isEmpty(networkAddress)) {
-                                    // 需要加中括号，代表地址（地址可能用::被省略）
-                                    networkAddress = "[" + ipv6 + "]:0";
+                            if (address != null) {
+                                if (isIPv4(address)) {
+                                    String ipv4 = address.getHostAddress();
+                                    if (!address.isLoopbackAddress() && !address.isLinkLocalAddress()) {
+                                        networkAddress = ipv4 + ":0";
+                                    }
+                                    logger.debug("ActiveNetworkInfo IPv4 HostAddress::{}", ipv4);
+                                } else {
+                                    String ipv6 = address.getHostAddress();
+                                    if (StringUtil.isEmpty(networkAddress) && !address.isLoopbackAddress()
+                                            && !address.isLinkLocalAddress()) {
+                                        // 需要加中括号，代表地址（地址可能用::被省略）
+                                        networkAddress = "[" + ipv6 + "]:0";
+                                    }
+                                    logger.debug("ActiveNetworkInfo IPv6 HostAddress::{}, isIPv6ULA::{}",
+                                            ipv6, isIPv6ULA(address));
                                 }
-                                logger.debug("ActiveNetworkInfo IPv6 HostAddress::{}, isIPv6ULA::{}",
-                                        ipv6, isIPv6ULA(address));
                             }
                             logger.debug("ActiveNetworkInfo ****************************************");
+                        }
+                    }
+                } else {
+                    LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
+                    String name = linkProperties.getInterfaceName();
+                    logger.debug("UnActiveNetworkInfo InterfaceName::{}", name);
+                    List<LinkAddress> linkAddresses = linkProperties.getLinkAddresses();
+                    if (linkAddresses != null) {
+                        for (LinkAddress linkAddress : linkAddresses) {
+                            logger.debug("UnActiveNetworkInfo Flags::{}, PrefixLength::{}, Scope::{}",
+                                    linkAddress.getFlags(), linkAddress.getPrefixLength(), linkAddress.getScope());
+                            InetAddress address = linkAddress.getAddress();
+                            if (address != null) {
+                                if (isIPv4(address)) {
+                                    String ipv4 = address.getHostAddress();
+                                    logger.debug("UnActiveNetworkInfo IPv4 HostAddress::{}", ipv4);
+                                } else {
+                                    String ipv6 = address.getHostAddress();
+                                    logger.debug("UnActiveNetworkInfo IPv6 HostAddress::{}, isIPv6ULA::{}",
+                                            ipv6, isIPv6ULA(address));
+                                }
+                            }
+                            logger.debug("UnActiveNetworkInfo ****************************************");
                         }
                     }
                 }

@@ -456,7 +456,7 @@ public abstract class TauDaemon {
      * 获取网络接口
      */
     private static String getNetworkInterface() {
-        return SystemServiceManager.getInstance().getIpAddress();
+        return SystemServiceManager.getInstance().getNetworkAddress();
     }
 
 
