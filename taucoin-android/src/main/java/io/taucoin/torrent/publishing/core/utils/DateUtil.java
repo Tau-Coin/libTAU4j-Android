@@ -272,18 +272,17 @@ public class DateUtil {
      * @return 显示时期
      */
     public static String getWeekTime(long time) {
-        long timeSeconds = time * 1000;
-        Date  date1 = new Date(timeSeconds);
+        Date  date1 = new Date(time);
         Date  date2 = new Date();
         int days = differentDays(date1, date2);
         if(days == 0){
-            return formatTime(time, pattern0);
+            return format(time, pattern0);
         }else if(days > weeks.length){
-            return formatTime(time, pattern4);
+            return format(time, pattern4);
         }else{
             Calendar cal = Calendar.getInstance();
             cal.setTimeZone(TimeZone.getDefault());
-            cal.setTimeInMillis(timeSeconds);
+            cal.setTimeInMillis(time);
             int weekIndex = cal.get(Calendar.DAY_OF_WEEK) - 1;
             if(weekIndex < 0){
                 weekIndex = 0;
@@ -293,23 +292,22 @@ public class DateUtil {
     }
 
     public static String getWeekTimeWithHours(long time) {
-        long timeSeconds = time * 1000;
-        Date  date1 = new Date(timeSeconds);
+        Date  date1 = new Date(time);
         Date  date2 = new Date();
         int days = differentDays(date1, date2);
         if(days == 0){
-            return formatTime(time, pattern0);
+            return format(time, pattern0);
         }else if(days > weeks.length){
-            return formatTime(time, pattern5);
+            return format(time, pattern5);
         }else{
             Calendar cal = Calendar.getInstance();
             cal.setTimeZone(TimeZone.getDefault());
-            cal.setTimeInMillis(timeSeconds);
+            cal.setTimeInMillis(time);
             int weekIndex = cal.get(Calendar.DAY_OF_WEEK) - 1;
             if(weekIndex < 0){
                 weekIndex = 0;
             }
-            return weeks[weekIndex] + " " + formatTime(time, pattern0);
+            return weeks[weekIndex] + " " + format(time, pattern0);
         }
     }
 

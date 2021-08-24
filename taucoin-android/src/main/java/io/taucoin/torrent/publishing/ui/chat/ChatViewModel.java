@@ -238,7 +238,6 @@ public class ChatViewModel extends AndroidViewModel {
                 for (int nonce = 0; nonce < contentSize; nonce++) {
                     byte[] content = contents.get(nonce);
                     long millisTime = DateUtil.getMillisTime();
-                    long timestamp = millisTime / 1000;
                     MsgContent msgContent;
                     if (type == MessageType.TEXT.getType()) {
                         msgContent = MsgContent.createTextContent(logicMsgHash, nonce, content);
@@ -248,7 +247,7 @@ public class ChatViewModel extends AndroidViewModel {
 
                     // 加密填充模式为16的倍数896, 最大控制为895
                     byte[] encryptedEncoded = CryptoUtil.encrypt(msgContent.getEncoded(), key);
-                    Message message = new Message(timestamp, ByteUtil.toByte(senderPk),
+                    Message message = new Message(millisTime, ByteUtil.toByte(senderPk),
                             ByteUtil.toByte(friendPk), encryptedEncoded);
                     String hash = message.msgId();
                     logger.debug("sendMessageTask newMsgHash::{}, contentType::{}, " +
@@ -260,7 +259,7 @@ public class ChatViewModel extends AndroidViewModel {
                     boolean isSuccess = daemon.addNewMessage(message);
                     // 组织Message的结构，并发送到DHT和数据入库
                     ChatMsg chatMsg = new ChatMsg(hash, senderPk, friendPk, content, type,
-                            timestamp, nonce, logicMsgHash, isSuccess ? 1 : 0);
+                            millisTime, nonce, logicMsgHash, isSuccess ? 1 : 0);
                     messages[nonce] = chatMsg;
 
                     // 更新消息日志信息

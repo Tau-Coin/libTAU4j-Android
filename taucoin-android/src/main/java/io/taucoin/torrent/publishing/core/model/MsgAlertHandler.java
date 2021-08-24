@@ -62,14 +62,14 @@ class MsgAlertHandler {
             long sentTime = message.timestamp();
             String senderPk = ByteUtil.toHexString(message.sender());
             String receiverPk = ByteUtil.toHexString(message.receiver());
-            long receivedTime = DateUtil.getTime();
+            long receivedTime = DateUtil.getMillisTime();
 
             ChatMsg chatMsg = chatRepo.queryChatMsg(senderPk, hash);
             logger.debug("TAU messaging onNewMessage senderPk::{}, receiverPk::{}, hash::{}, " +
-                            "SentTime::{}, ReceivedTime::{}, DelayTime::{}s, exist::{}",
+                            "SentTime::{}, ReceivedTime::{}, DelayTime::{}ms, exist::{}",
                     senderPk, receiverPk, hash,
-                    DateUtil.formatTime(sentTime, DateUtil.pattern6),
-                    DateUtil.formatTime(receivedTime, DateUtil.pattern6),
+                    DateUtil.formatTime(sentTime, DateUtil.pattern9),
+                    DateUtil.formatTime(receivedTime, DateUtil.pattern9),
                     receivedTime - sentTime, chatMsg != null);
             // 上报的Message有可能重复, 如果本地已存在不处理
             if (null == chatMsg) {
