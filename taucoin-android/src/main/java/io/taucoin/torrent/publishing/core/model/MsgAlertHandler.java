@@ -68,8 +68,8 @@ class MsgAlertHandler {
             logger.debug("TAU messaging onNewMessage senderPk::{}, receiverPk::{}, hash::{}, " +
                             "SentTime::{}, ReceivedTime::{}, DelayTime::{}ms, exist::{}",
                     senderPk, receiverPk, hash,
-                    DateUtil.formatTime(sentTime, DateUtil.pattern9),
-                    DateUtil.formatTime(receivedTime, DateUtil.pattern9),
+                    DateUtil.format(sentTime, DateUtil.pattern9),
+                    DateUtil.format(receivedTime, DateUtil.pattern9),
                     receivedTime - sentTime, chatMsg != null);
             // 上报的Message有可能重复, 如果本地已存在不处理
             if (null == chatMsg) {

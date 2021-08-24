@@ -372,7 +372,7 @@ public class DateUtil {
     }
 
     public static int getSeconds(long time1, long time2){
-        return (int)(time2 - time1);
+        return (int)(time2 - time1) / 1000;
     }
 
     /**
