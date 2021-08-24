@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -55,7 +56,7 @@ import io.taucoin.torrent.publishing.ui.setting.TrafficTipsActivity;
 public abstract class TauDaemon {
     private static final String TAG = TauDaemon.class.getSimpleName();
     static final Logger logger = LoggerFactory.getLogger(TAG);
-    private static final int REOPEN_NETWORKS_THRESHOLD = 15; // 单位s
+    private static final int REOPEN_NETWORKS_THRESHOLD = 30; // 单位s
     static final int ALERT_QUEUE_CAPACITY = 10000; // Alert缓存队列
     private static volatile TauDaemon instance;
 
@@ -456,9 +457,14 @@ public abstract class TauDaemon {
      * 获取网络接口
      */
     private static String getNetworkInterface() {
-        return SystemServiceManager.getInstance().getNetworkAddress();
+        List<String> ipList = SystemServiceManager.getInstance().getNetworkAddress();
+        if (ipList != null && ipList.size() > 0) {
+            Random random = new Random();
+            int index = random.nextInt(ipList.size());
+            return ipList.get(index);
+        }
+        return null;
     }
-
 
     /**
      * 重新启动Sessions
@@ -467,6 +473,7 @@ public abstract class TauDaemon {
         if (!isRunning) {
             return;
         }
+        updateListenInterfaces();
         sessionManager.restart();
         TrafficUtil.resetTrafficTotalOld();
         logger.debug("restartSessions...");

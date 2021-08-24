@@ -8,8 +8,6 @@ import android.net.LinkAddress;
 import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 
 import org.slf4j.Logger;
@@ -18,14 +16,10 @@ import org.slf4j.LoggerFactory;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.taucoin.torrent.publishing.MainApplication;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
 
 /**
  * 系统服务管理
@@ -36,7 +30,7 @@ public class SystemServiceManager {
     private Context appContext;
     private static volatile SystemServiceManager instance;
     private SystemServiceManager(){
-        this.appContext = MainApplication.getInstance();;
+        this.appContext = MainApplication.getInstance();
         connectivityManager = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
@@ -108,133 +102,63 @@ public class SystemServiceManager {
 
     /**
      * 获取网络地址
-     * 如果有IPV4直接取IPv4，否则获取第一个IPv6
+     * 1、获取当前ActiveNetworkInfo的type，
+     * 2、遍历所有的Networks，满足type和第一步中的type相等 && isConnected()的从中间看是否有ipv4
      */
-    public String getNetworkAddress() {
+    public List<String> getNetworkAddress() {
         Network[] networks = connectivityManager.getAllNetworks();
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        String networkAddress = null;
+        List<String> ipv4List = new ArrayList<>();
+        List<String> ipv6List = new ArrayList<>();
         if (networks != null && activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
             int activeType = activeNetworkInfo.getType();
             logger.debug("ActiveNetworkInfo ::{}", activeNetworkInfo.toString());
             for (Network network : networks) {
                 NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
+                if (null == networkInfo) {
+                    continue;
+                }
                 logger.debug("NetworkInfo ::{}", networkInfo.toString());
-                if (activeType == networkInfo.getType() && networkInfo.isConnected()) {
-                    LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
+                boolean isActive = activeType == networkInfo.getType() && networkInfo.isConnected();
+                LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
+                if (linkProperties != null) {
                     String name = linkProperties.getInterfaceName();
-                    logger.debug("ActiveNetworkInfo InterfaceName::{}", name);
+                    logger.debug("Active::{}, NetworkInfo InterfaceName::{}", isActive, name);
                     List<LinkAddress> linkAddresses = linkProperties.getLinkAddresses();
                     if (linkAddresses != null) {
                         for (LinkAddress linkAddress : linkAddresses) {
-                            logger.debug("ActiveNetworkInfo Flags::{}, PrefixLength::{}, Scope::{}",
+                            logger.debug("NetworkInfo Flags::{}, PrefixLength::{}, Scope::{}",
                                     linkAddress.getFlags(), linkAddress.getPrefixLength(), linkAddress.getScope());
                             InetAddress address = linkAddress.getAddress();
                             if (address != null) {
                                 if (isIPv4(address)) {
                                     String ipv4 = address.getHostAddress();
-                                    if (!address.isLoopbackAddress() && !address.isLinkLocalAddress()) {
-                                        networkAddress = ipv4 + ":0";
+                                    if (isActive && !address.isLoopbackAddress() && !address.isLinkLocalAddress()) {
+                                        ipv4List.add(ipv4 + ":0");
                                     }
-                                    logger.debug("ActiveNetworkInfo IPv4 HostAddress::{}", ipv4);
+                                    logger.debug("NetworkInfo IPv4 HostAddress::{}", ipv4);
                                 } else {
                                     String ipv6 = address.getHostAddress();
-                                    if (StringUtil.isEmpty(networkAddress) && !address.isLoopbackAddress()
-                                            && !address.isLinkLocalAddress()) {
+                                    if (isActive && !address.isLoopbackAddress() && !address.isLinkLocalAddress()) {
                                         // 需要加中括号，代表地址（地址可能用::被省略）
-                                        networkAddress = "[" + ipv6 + "]:0";
+                                        ipv6List.add("[" + ipv6 + "]:0");
                                     }
-                                    logger.debug("ActiveNetworkInfo IPv6 HostAddress::{}, isIPv6ULA::{}",
+                                    logger.debug("NetworkInfo IPv6 HostAddress::{}, isIPv6ULA::{}",
                                             ipv6, isIPv6ULA(address));
                                 }
                             }
-                            logger.debug("ActiveNetworkInfo ****************************************");
-                        }
-                    }
-                } else {
-                    LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
-                    String name = linkProperties.getInterfaceName();
-                    logger.debug("UnActiveNetworkInfo InterfaceName::{}", name);
-                    List<LinkAddress> linkAddresses = linkProperties.getLinkAddresses();
-                    if (linkAddresses != null) {
-                        for (LinkAddress linkAddress : linkAddresses) {
-                            logger.debug("UnActiveNetworkInfo Flags::{}, PrefixLength::{}, Scope::{}",
-                                    linkAddress.getFlags(), linkAddress.getPrefixLength(), linkAddress.getScope());
-                            InetAddress address = linkAddress.getAddress();
-                            if (address != null) {
-                                if (isIPv4(address)) {
-                                    String ipv4 = address.getHostAddress();
-                                    logger.debug("UnActiveNetworkInfo IPv4 HostAddress::{}", ipv4);
-                                } else {
-                                    String ipv6 = address.getHostAddress();
-                                    logger.debug("UnActiveNetworkInfo IPv6 HostAddress::{}, isIPv6ULA::{}",
-                                            ipv6, isIPv6ULA(address));
-                                }
-                            }
-                            logger.debug("UnActiveNetworkInfo ****************************************");
+                            logger.debug("NetworkInfo ****************************************");
                         }
                     }
                 }
             }
         }
-        return networkAddress;
-    }
-
-    /**
-     * 获取本机IPv4地址
-     *
-     * @return 本机IPv4地址；null：无网络连接
-     */
-    public String getIpAddress() {
-        // TODO: 测试，以后可删除
-        getNetworkAddress();
-        // 获取WiFi服务
-        String ipv4;
-        NetworkInfo wifiNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        // 判断WiFi是否开启
-        logger.debug("getIpAddress isWifiConnected::{}", wifiNetworkInfo.isConnected());
-        if (wifiNetworkInfo.isConnected()) {
-            // 已经开启了WiFi
-            WifiManager wifiManager = (WifiManager) appContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-            int ipAddress = wifiInfo.getIpAddress();
-            ipv4 = intToIp(ipAddress);
+        logger.debug("getNetworkAddress IPv4 size::{}, IPv6 size::{}", ipv4List.size(), ipv6List.size());
+        if (ipv4List.size() > 0) {
+            return ipv4List;
         } else {
-            // 未开启WiFi
-            ipv4 = getLocalIpAddress();
+            return ipv6List;
         }
-        ipv4 += ":0";
-        logger.debug("getIpAddress ipv4::{}", ipv4);
-        return ipv4;
-    }
-
-    private String intToIp(int ipAddress) {
-        return (ipAddress & 0xFF) + "." +
-                ((ipAddress >> 8) & 0xFF) + "." +
-                ((ipAddress >> 16) & 0xFF) + "." +
-                (ipAddress >> 24 & 0xFF);
-    }
-
-    /**
-     * 获取本地电信的IP地址
-     */
-    private String getLocalIpAddress() {
-        String ipv4 = null;
-        try {
-            ArrayList<NetworkInterface> list = Collections.list(NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface ni: list) {
-                ArrayList<InetAddress> addresses = Collections.list(ni.getInetAddresses());
-                for (InetAddress address: addresses) {
-                    // 不是环回地址和链接本地地址
-                    if (!address.isLoopbackAddress() && !address.isLinkLocalAddress() && isIPv4(address)) {
-                        ipv4 = address.getHostAddress();
-                        logger.debug("getLocalIpAddress ipv4::{}", ipv4);
-                    }
-                }
-            }
-        } catch (SocketException ignore) {
-        }
-        return ipv4;
     }
 
     private boolean isIPv6ULA(InetAddress address) {
