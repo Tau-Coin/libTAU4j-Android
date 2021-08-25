@@ -26,7 +26,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
@@ -42,7 +41,6 @@ import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.receiver.ConnectionReceiver;
 import io.taucoin.torrent.publishing.service.SystemServiceManager;
@@ -56,8 +54,8 @@ import io.taucoin.torrent.publishing.ui.setting.TrafficTipsActivity;
 public abstract class TauDaemon {
     private static final String TAG = TauDaemon.class.getSimpleName();
     static final Logger logger = LoggerFactory.getLogger(TAG);
-    private static final int REOPEN_NETWORKS_THRESHOLD = 30; // 单位s
-    static final int ALERT_QUEUE_CAPACITY = 10000; // Alert缓存队列
+    private static final int UPDATE_INTERFACE_THRESHOLD = 30;   // 单位s
+    static final int ALERT_QUEUE_CAPACITY = 10000;              // Alert缓存队列
     private static volatile TauDaemon instance;
 
     private Context appContext;
@@ -75,7 +73,6 @@ public abstract class TauDaemon {
     volatile String seed;
     String deviceID;
     private long noRemainingDataTimes = 0; // 触发无剩余流量的次数
-    private int noNodesCount = 0; // 无节点计数, nodes查询频率为1s
 
     // libTAU上报的Alert缓存队列
     LinkedBlockingQueue<AlertAndUser> alertQueue = new LinkedBlockingQueue<>();
@@ -136,19 +133,7 @@ public abstract class TauDaemon {
                 .subscribe());
         disposables.add(tauInfoProvider.observeSessionStats()
             .subscribeOn(Schedulers.io())
-                .subscribe(nodes -> {
-                    if (nodes > 0) {
-                        noNodesCount = 0;
-                    } else {
-                        noNodesCount += 1;
-                        if (noNodesCount > REOPEN_NETWORKS_THRESHOLD) {
-                            logger.trace("No nodes more than {}s, updateListenInterfaces...",
-                                    REOPEN_NETWORKS_THRESHOLD);
-                            restartSessions();
-                            noNodesCount = 0;
-                        }
-                    }
-                }));
+                .subscribe(this::updateInterfacesTimer));
     }
 
     /**
@@ -291,6 +276,9 @@ public abstract class TauDaemon {
             return;
         isRunning = false;
         disposables.clear();
+        if (updateInterfacesTimer != null && !updateInterfacesTimer.isDisposed()) {
+            updateInterfacesTimer.dispose();
+        }
         sessionManager.stop();
 
         sessionStopOver();
@@ -363,17 +351,9 @@ public abstract class TauDaemon {
             logger.info("SettingsChanged, charging state::{}", settingsRepo.chargingState());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
             logger.info("isMeteredNetwork::{}", NetworkSetting.isMeteredNetwork());
-        } else if (key.equals(appContext.getString(R.string.pref_key_current_speed))) {
-            if (updateInterfacesTimer != null && !updateInterfacesTimer.isDisposed()
-                    && NetworkSetting.getCurrentSpeed() > 0) {
-                updateInterfacesTimer.dispose();
-                disposables.remove(updateInterfacesTimer);
-                logger.info("updateInterfacesTimer dispose");
-            }
         } else if (key.equals(appContext.getString(R.string.pref_key_foreground_running))) {
             boolean isForeground = settingsRepo.getBooleanValue(key);
             logger.info("foreground running::{}", isForeground);
-            updateInterfacesTimer();
         } else if (key.equals(appContext.getString(R.string.pref_key_nat_pmp_mapped))) {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
@@ -384,32 +364,24 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 定时任务：APP从后台到前台触发, 网速采样时间后，网速依然为0，更新网络监听接口
+     * APP启动30s无peer触发更新libTAU的ListenInterfaces
      */
-    private void updateInterfacesTimer() {
-        boolean isForeground = settingsRepo.getBooleanValue(appContext.getString(R.string.pref_key_foreground_running));
-        if (!isForeground) {
-            return;
-        }
-        if (updateInterfacesTimer != null && !updateInterfacesTimer.isDisposed()) {
-            return;
-        }
-        logger.info("updateInterfacesTimer start");
-        updateInterfacesTimer = Observable.timer(10, TimeUnit.SECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(time -> {
-                    // 当前有网络连接, 并且还有剩余可用流量，网速为0，重新启动Session
-                    boolean isHaveAvailableData = NetworkSetting.isHaveAvailableData();
-                    boolean isRestart = settingsRepo.internetState() && isHaveAvailableData
-                            && NetworkSetting.getCurrentSpeed() == 0;
-                    logger.info("updateInterfacesTimer isRestart::{}", isRestart);
-                    if (isRestart) {
+    private void updateInterfacesTimer(long nodes) {
+        if (nodes > 0) {
+            if (updateInterfacesTimer != null && !updateInterfacesTimer.isDisposed()) {
+                updateInterfacesTimer.dispose();
+            }
+        } else {
+            if (null == updateInterfacesTimer || updateInterfacesTimer.isDisposed()) {
+                updateInterfacesTimer = Observable.interval(UPDATE_INTERFACE_THRESHOLD, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe( l -> {
+                        logger.trace("No nodes more than {}s, updateListenInterfaces...",
+                                UPDATE_INTERFACE_THRESHOLD);
                         updateListenInterfaces();
-                    }
-
-                });
-        disposables.add(updateInterfacesTimer);
+                    });
+            }
+        }
     }
 
     /**
@@ -464,19 +436,6 @@ public abstract class TauDaemon {
             return ipList.get(index);
         }
         return null;
-    }
-
-    /**
-     * 重新启动Sessions
-     */
-    private void restartSessions() {
-        if (!isRunning) {
-            return;
-        }
-        updateListenInterfaces();
-//        sessionManager.restart();
-//        TrafficUtil.resetTrafficTotalOld();
-//        logger.debug("restartSessions...");
     }
 
     /**
