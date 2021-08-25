@@ -276,7 +276,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
         public boolean areContentsTheSame(@NonNull ChatMsg oldItem, @NonNull ChatMsg newItem) {
             return oldItem.equals(newItem)
                     && StringUtil.isEquals(oldItem.logicMsgHash, newItem.logicMsgHash)
-                    && oldItem.nonce == newItem.nonce && oldItem.unsent == newItem.unsent;
+                    && oldItem.unsent == newItem.unsent;
         }
 
         @Override

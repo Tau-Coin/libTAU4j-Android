@@ -90,7 +90,7 @@ class MsgAlertHandler {
                 String logicMsgHash = msgContent.getLogicHash();
                 byte[] content = msgContent.getContent();
                 chatMsg = new ChatMsg(hash, senderPk, receiverPk, content, msgContent.getType(),
-                        sentTime, msgContent.getNonce(), logicMsgHash, 1);
+                        sentTime, logicMsgHash, 1);
                 chatRepo.addChatMsg(chatMsg);
 
                 // 标记消息未读, 更新上次交流的时间

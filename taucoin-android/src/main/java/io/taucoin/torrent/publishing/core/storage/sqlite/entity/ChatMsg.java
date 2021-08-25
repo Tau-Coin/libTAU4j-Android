@@ -14,7 +14,7 @@ import androidx.room.Index;
 @Entity(tableName = "ChatMessages", primaryKeys = "hash",
         indices = {
 //        @Index(value = {"senderPk", "receiverPk"}),
-        @Index(value = {"timestamp", "logicMsgHash", "nonce"})})
+        @Index(value = {"timestamp", "logicMsgHash"})})
 public class ChatMsg implements Parcelable {
     @NonNull
     public String hash;                    // 消息的Hash
@@ -27,34 +27,30 @@ public class ChatMsg implements Parcelable {
     @NonNull
     public int contentType;                // 消息内容类型
     @NonNull
-    public long nonce;                     // 帮助消息排序
-    @NonNull
     public String logicMsgHash;            // 逻辑消息Hash, 包含时间戳保证唯一性
     @NonNull
     public int unsent;                     // 0: 未发送， 1: 已发送
     public byte[] content;                 // 消息内容
 
     public ChatMsg(@NonNull String hash, String senderPk, String receiverPk, int contentType,
-                   long timestamp, long nonce, String logicMsgHash){
+                   long timestamp, String logicMsgHash){
         this.hash = hash;
         this.senderPk = senderPk;
         this.receiverPk = receiverPk;
         this.contentType = contentType;
         this.timestamp = timestamp;
-        this.nonce = nonce;
         this.logicMsgHash = logicMsgHash;
     }
 
     @Ignore
     public ChatMsg(@NonNull String hash, String senderPk, String receiverPk, byte[] content,
-                   int contentType, long timestamp, long nonce, String logicMsgHash, int unsent){
+                   int contentType, long timestamp, String logicMsgHash, int unsent){
         this.hash = hash;
         this.senderPk = senderPk;
         this.receiverPk = receiverPk;
         this.content = content;
         this.contentType = contentType;
         this.timestamp = timestamp;
-        this.nonce = nonce;
         this.logicMsgHash = logicMsgHash;
         this.unsent = unsent;
     }
@@ -66,7 +62,6 @@ public class ChatMsg implements Parcelable {
         receiverPk = in.readString();
         contentType = in.readInt();
         timestamp = in.readLong();
-        nonce = in.readLong();
         logicMsgHash = in.readString();
         unsent = in.readInt();
         in.readByteArray(content);
@@ -80,7 +75,6 @@ public class ChatMsg implements Parcelable {
         dest.writeInt(contentType);
         dest.writeLong(timestamp);
         dest.writeByteArray(content);
-        dest.writeLong(nonce);
         dest.writeString(logicMsgHash);
         dest.writeInt(unsent);
     }

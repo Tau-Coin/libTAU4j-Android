@@ -20,30 +20,13 @@ public interface ChatDao {
     String QUERY_GET_CHAT_MSG_BY_HASH = "SELECT * FROM ChatMessages WHERE hash = :hash";
 
     String QUERY_MESSAGES_WHERE = " WHERE ((msg.senderPk = :senderPk AND msg.receiverPk = :receiverPk)" +
-            " OR (msg.senderPk = :receiverPk AND msg.receiverPk = :senderPk)) " +
-            " AND (msg.contentType = 0 OR (msg.contentType = 1 AND msg.nonce = 0))";
-
-    String QUERY_NUM_MESSAGES = "SELECT count(hash) FROM ChatMessages msg" +
-            QUERY_MESSAGES_WHERE;
+            " OR (msg.senderPk = :receiverPk AND msg.receiverPk = :senderPk))";
 
     String QUERY_MESSAGES_BY_FRIEND_PK = "SELECT msg.*" +
             " FROM ChatMessages msg" +
             QUERY_MESSAGES_WHERE +
-            " ORDER BY msg.timestamp DESC, msg.logicMsgHash COLLATE UNICODE DESC, msg.nonce DESC" +
+            " ORDER BY msg.timestamp DESC, msg.logicMsgHash COLLATE UNICODE DESC" +
             " LIMIT :loadSize OFFSET :startPosition ";
-
-    String QUERY_MESSAGE_LIST = "SELECT msg.*" +
-            " FROM ChatMessages msg" +
-            " WHERE ((msg.senderPk = :senderPk AND msg.receiverPk = :receiverPk)" +
-            " OR (msg.senderPk = :receiverPk AND msg.receiverPk = :senderPk)) " +
-            " ORDER BY msg.timestamp DESC, msg.logicMsgHash COLLATE UNICODE DESC, msg.nonce DESC" +
-            " LIMIT :loadSize OFFSET :startPosition";
-
-    String QUERY_UNSENT_MESSAGES = "SELECT msg.*" +
-            " FROM ChatMessages msg" +
-            " WHERE msg.senderPk in (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " AND msg.unsent = 0" +
-            " ORDER BY msg.timestamp, msg.logicMsgHash COLLATE UNICODE, msg.nonce";
 
     // 查询消息的所有日志
     String QUERY_CHAT_MSG_LOGS = "SELECT * FROM ChatMsgLogs WHERE hash = :hash" +
@@ -83,14 +66,6 @@ public interface ChatDao {
     ChatMsg queryChatMsg(String hash);
 
     /**
-     * 获取社区的消息
-     * @param receiverPk 朋友公钥
-     * @return 消息总数
-     */
-    @Query(QUERY_NUM_MESSAGES)
-    int getNumMessages(String senderPk, String receiverPk);
-
-    /**
      * 获取聊天的消息
      * @param receiverPk 朋友公钥
      * @param startPosition 数据开始位置
@@ -99,12 +74,6 @@ public interface ChatDao {
      */
     @Query(QUERY_MESSAGES_BY_FRIEND_PK)
     List<ChatMsg> getMessages(String senderPk, String receiverPk, int startPosition, int loadSize);
-
-    @Query(QUERY_MESSAGE_LIST)
-    List<ChatMsg> getMessageList(String senderPk, String receiverPk, int startPosition, int loadSize);
-
-    @Query(QUERY_UNSENT_MESSAGES)
-    List<ChatMsg> getUnsentMessages();
 
     /**
      * 添加消息日志

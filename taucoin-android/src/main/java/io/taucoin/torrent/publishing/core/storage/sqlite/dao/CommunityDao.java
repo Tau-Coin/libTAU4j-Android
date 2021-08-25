@@ -26,12 +26,12 @@ public interface CommunityDao {
             " SELECT timestamp, content, contentType, logicMsgHash, senderPk, receiverPk, receiverPk AS receiverPkTemp" +
             " FROM (SELECT rowid, * FROM ChatMessages" +
             " WHERE senderPk = " + QUERY_GET_CURRENT_USER_PK +
-            " ORDER BY timestamp DESC, logicMsgHash COLLATE UNICODE DESC, nonce DESC) GROUP BY receiverPk" +
+            " ORDER BY timestamp DESC, logicMsgHash COLLATE UNICODE DESC) GROUP BY receiverPk" +
             " UNION ALL" +
             " SELECT timestamp, content, contentType, logicMsgHash, senderPk, receiverPk, senderPk AS receiverPkTemp" +
             " FROM (SELECT rowid, * FROM ChatMessages" +
             " WHERE receiverPk = "+ QUERY_GET_CURRENT_USER_PK +
-            " ORDER BY timestamp DESC, logicMsgHash COLLATE UNICODE DESC, nonce DESC) GROUP BY senderPk)" +
+            " ORDER BY timestamp DESC, logicMsgHash COLLATE UNICODE DESC) GROUP BY senderPk)" +
 
             " ORDER BY timestamp DESC, logicMsgHash COLLATE UNICODE DESC)" +
             " GROUP BY receiverPkTemp)";
@@ -40,12 +40,12 @@ public interface CommunityDao {
             " SELECT timestamp, content, contentType, logicMsgHash, senderPk, receiverPk, receiverPk AS receiverPkTemp" +
             " FROM (SELECT rowid, * FROM ChatMessages" +
             " WHERE senderPk = " + QUERY_GET_CURRENT_USER_PK +
-            " ORDER BY timestamp, logicMsgHash COLLATE UNICODE, nonce) GROUP BY receiverPk" +
+            " ORDER BY timestamp, logicMsgHash COLLATE UNICODE) GROUP BY receiverPk" +
             " UNION ALL" +
             " SELECT timestamp, content, contentType, logicMsgHash, senderPk, receiverPk, senderPk AS receiverPkTemp" +
             " FROM (SELECT rowid, * FROM ChatMessages" +
             " WHERE receiverPk = "+ QUERY_GET_CURRENT_USER_PK +
-            " ORDER BY timestamp, logicMsgHash COLLATE UNICODE, nonce) GROUP BY senderPk)" +
+            " ORDER BY timestamp, logicMsgHash COLLATE UNICODE) GROUP BY senderPk)" +
 
             " ORDER BY timestamp, logicMsgHash COLLATE UNICODE)" +
             " GROUP BY receiverPkTemp)";

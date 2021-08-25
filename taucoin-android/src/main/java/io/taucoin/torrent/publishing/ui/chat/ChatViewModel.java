@@ -250,7 +250,7 @@ public class ChatViewModel extends AndroidViewModel {
                     myLastSendTime = currentTime;
                     MsgContent msgContent;
                     if (type == MessageType.TEXT.getType()) {
-                        msgContent = MsgContent.createTextContent(logicMsgHash, nonce, content);
+                        msgContent = MsgContent.createTextContent(logicMsgHash, content);
                     } else {
                         throw new Exception("Unknown message type");
                     }
@@ -269,7 +269,7 @@ public class ChatViewModel extends AndroidViewModel {
                     boolean isSuccess = daemon.addNewMessage(message);
                     // 组织Message的结构，并发送到DHT和数据入库
                     ChatMsg chatMsg = new ChatMsg(hash, senderPk, friendPk, content, type,
-                            currentTime, nonce, logicMsgHash, isSuccess ? 1 : 0);
+                            currentTime, logicMsgHash, isSuccess ? 1 : 0);
                     messages[nonce] = chatMsg;
 
                     // 更新消息日志信息
@@ -305,10 +305,8 @@ public class ChatViewModel extends AndroidViewModel {
             String sender = chatMsg.senderPk;
             String receiver = chatMsg.receiverPk;
             String logicMsgHash = chatMsg.logicMsgHash;
-            long nonce = chatMsg.nonce;
             User user = userRepo.getUserByPublicKey(sender);
-            MsgContent msgContent = MsgContent.createTextContent(logicMsgHash,
-                    nonce, chatMsg.content);
+            MsgContent msgContent = MsgContent.createTextContent(logicMsgHash, chatMsg.content);
             byte[] key = Utils.keyExchange(receiver, user.seed);
             byte[] encryptedEncoded = CryptoUtil.encrypt(msgContent.getEncoded(), key);
             Message message = new Message(timestamp, ByteUtil.toByte(sender),
