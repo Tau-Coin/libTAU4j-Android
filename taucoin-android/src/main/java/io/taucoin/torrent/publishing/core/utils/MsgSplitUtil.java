@@ -17,7 +17,7 @@ import io.taucoin.torrent.publishing.service.LibJpegManager;
  */
 public class MsgSplitUtil {
     private static final Logger logger = LoggerFactory.getLogger("MsgSplit");
-    private static final int BYTE_LIMIT = 820;
+    private static final int BYTE_LIMIT = 821;
 
     /**
      * 拆分文本消息
