@@ -142,7 +142,7 @@ public abstract class TauDaemon {
                     } else {
                         noNodesCount += 1;
                         if (noNodesCount > REOPEN_NETWORKS_THRESHOLD) {
-                            logger.trace("No nodes more than {}s, restartSessions...",
+                            logger.trace("No nodes more than {}s, updateListenInterfaces...",
                                     REOPEN_NETWORKS_THRESHOLD);
                             restartSessions();
                             noNodesCount = 0;
@@ -474,9 +474,9 @@ public abstract class TauDaemon {
             return;
         }
         updateListenInterfaces();
-        sessionManager.restart();
-        TrafficUtil.resetTrafficTotalOld();
-        logger.debug("restartSessions...");
+//        sessionManager.restart();
+//        TrafficUtil.resetTrafficTotalOld();
+//        logger.debug("restartSessions...");
     }
 
     /**
