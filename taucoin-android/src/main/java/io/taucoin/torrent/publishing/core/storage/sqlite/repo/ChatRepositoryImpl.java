@@ -158,4 +158,15 @@ public class ChatRepositoryImpl implements ChatRepository{
     public ChatMsgLog queryChatMsgLog(String hash, int status) {
         return db.chatDao().queryChatMsgLog(hash, status);
     }
+
+    /**
+     * 获取发送的最后一条消息的时间
+     * @param senderPk 发送者
+     * @param receiverPk 接收者
+     * @return 时间
+     */
+    @Override
+    public long getLastSendTime(String senderPk, String receiverPk) {
+        return db.chatDao().getLastSendTime(senderPk, receiverPk);
+    }
 }

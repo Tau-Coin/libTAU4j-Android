@@ -235,9 +235,19 @@ public class ChatViewModel extends AndroidViewModel {
                 ChatMsgLog[] chatMsgLogs = new ChatMsgLog[contents.size()];
                 int contentSize = contents.size();
                 byte[] key = Utils.keyExchange(friendPk, user.seed);
+                // 朋友的最后一条信息时间
+                long friendLastSendTime = chatRepo.getLastSendTime(friendPk, senderPk);
+                // 自己的最后一条信息的时间
+                long myLastSendTime = chatRepo.getLastSendTime(senderPk, friendPk);
                 for (int nonce = 0; nonce < contentSize; nonce++) {
                     byte[] content = contents.get(nonce);
-                    long millisTime = DateUtil.getMillisTime();
+                    long currentTime = DateUtil.getMillisTime();
+                    // 1、先取当前时间和朋友的最后一条信息时间加1的最大值（防止朋友的时钟比自己本地的快）
+                    currentTime = Math.max(currentTime, friendLastSendTime + 1);
+                    // 2、再取第一步的是时间和自己的最后一条信息的时间的最大值（防止本地历史时间已比第一步的时间还大）
+                    currentTime = Math.max(currentTime, myLastSendTime + 1);
+                    // 3、更新自己发送的最后一条的时间
+                    myLastSendTime = currentTime;
                     MsgContent msgContent;
                     if (type == MessageType.TEXT.getType()) {
                         msgContent = MsgContent.createTextContent(logicMsgHash, nonce, content);
@@ -247,19 +257,19 @@ public class ChatViewModel extends AndroidViewModel {
 
                     // 加密填充模式为16的倍数896, 最大控制为895
                     byte[] encryptedEncoded = CryptoUtil.encrypt(msgContent.getEncoded(), key);
-                    Message message = new Message(millisTime, ByteUtil.toByte(senderPk),
+                    Message message = new Message(currentTime, ByteUtil.toByte(senderPk),
                             ByteUtil.toByte(friendPk), encryptedEncoded);
                     String hash = message.msgId();
                     logger.debug("sendMessageTask newMsgHash::{}, contentType::{}, " +
                                     "nonce::{}, rawLength::{}, encryptedEncoded::{}, " +
                                     "logicMsgHash::{}, millisTime::{}",
                             hash, type, nonce, content.length, encryptedEncoded.length,
-                            logicMsgHash, DateUtil.format(millisTime, DateUtil.pattern9));
+                            logicMsgHash, DateUtil.format(currentTime, DateUtil.pattern9));
 
                     boolean isSuccess = daemon.addNewMessage(message);
                     // 组织Message的结构，并发送到DHT和数据入库
                     ChatMsg chatMsg = new ChatMsg(hash, senderPk, friendPk, content, type,
-                            millisTime, nonce, logicMsgHash, isSuccess ? 1 : 0);
+                            currentTime, nonce, logicMsgHash, isSuccess ? 1 : 0);
                     messages[nonce] = chatMsg;
 
                     // 更新消息日志信息
@@ -268,7 +278,7 @@ public class ChatViewModel extends AndroidViewModel {
                     ChatMsgStatus status = isConfirmed ? ChatMsgStatus.SYNC_CONFIRMED : ChatMsgStatus.BUILT;
                     // 确认接收的时间精确到秒
                     chatMsgLogs[nonce] = new ChatMsgLog(hash,
-                    status.getStatus(), millisTime);
+                    status.getStatus(), currentTime);
 
                 }
                 // 批量添加到数据库

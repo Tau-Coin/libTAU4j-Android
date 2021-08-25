@@ -52,6 +52,12 @@ public interface ChatDao {
     // 查询消息单独状态日志数据
     String QUERY_CHAT_MSG_LOG = "SELECT * FROM ChatMsgLogs WHERE hash = :hash AND status = :status";
 
+    // 获取发送的最后一条消息的时间
+    String QUERY_LAST_SEND_TIME = "SELECT timestamp FROM ChatMessages" +
+            " WHERE senderPk = :senderPk AND receiverPk = :receiverPk" +
+            " ORDER BY timestamp DESC" +
+            " LIMIT 1";
+
     /**
      * 添加聊天信息
      */
@@ -114,4 +120,10 @@ public interface ChatDao {
      */
     @Query(QUERY_CHAT_MSG_LOG)
     ChatMsgLog queryChatMsgLog(String hash, int status);
+
+    /**
+     * 获取发送的最后一条消息的时间
+     */
+    @Query(QUERY_LAST_SEND_TIME)
+    long getLastSendTime(String senderPk, String receiverPk);
 }

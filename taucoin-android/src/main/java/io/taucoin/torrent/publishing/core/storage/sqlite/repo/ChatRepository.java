@@ -81,4 +81,12 @@ public interface ChatRepository {
      * @return
      */
     ChatMsgLog queryChatMsgLog(String hash, int status);
+
+    /**
+     * 获取发送的最后一条消息的时间
+     * @param senderPk 发送者
+     * @param receiverPk 接收者
+     * @return 时间
+     */
+    long getLastSendTime(String senderPk, String receiverPk);
 }
