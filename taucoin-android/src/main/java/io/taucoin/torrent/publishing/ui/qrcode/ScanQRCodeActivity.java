@@ -22,7 +22,6 @@ import android.widget.TextView;
 import org.libTAU4j.Ed25519;
 import com.google.gson.Gson;
 import com.google.zxing.qrcode.QRCodeReader;
-import com.luck.picture.lib.config.PictureConfig;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +66,7 @@ import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 public class ScanQRCodeActivity extends BaseActivity implements View.OnClickListener, Camera.PreviewCallback {
 
     private static final Logger logger = LoggerFactory.getLogger("ScanQRCodeActivity");
+    private static final int CHOOSE_REQUEST = 0x100;
     private CompositeDisposable disposables = new CompositeDisposable();
     private Disposable disposable;
     private TextView tvNoQrCode;
@@ -445,7 +445,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
         try {
             Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
             photoPickerIntent.setType("image/*");
-            startActivityForResult(photoPickerIntent, PictureConfig.CHOOSE_REQUEST);
+            startActivityForResult(photoPickerIntent, CHOOSE_REQUEST);
         } catch (Exception e) {
             logger.error("startPhotoSelectActivity ", e);
         }
@@ -456,7 +456,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode){
-                case PictureConfig.CHOOSE_REQUEST:
+                case CHOOSE_REQUEST:
                     handleSelectedImage(data);
                     break;
                 default:

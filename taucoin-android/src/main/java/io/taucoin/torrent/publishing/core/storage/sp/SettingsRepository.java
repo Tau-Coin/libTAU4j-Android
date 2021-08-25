@@ -51,18 +51,6 @@ public interface SettingsRepository {
     int getInternetType();
 
     /**
-     * CPU WakeLock
-     * @return 是否持有
-     */
-    boolean wakeLock();
-
-    /**
-     * 设置CPU WakeLock
-     * @param val 是否持有
-     */
-    void wakeLock(boolean val);
-
-    /**
      * 获取社区发送的最后一次交易费
      */
     String lastTxFee(String chainID);

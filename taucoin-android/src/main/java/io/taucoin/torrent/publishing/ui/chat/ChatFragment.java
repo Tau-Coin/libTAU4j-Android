@@ -11,11 +11,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.luck.picture.lib.PictureSelector;
-import com.luck.picture.lib.config.PictureConfig;
-import com.luck.picture.lib.config.PictureMimeType;
-import com.luck.picture.lib.entity.LocalMedia;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +35,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
-import io.taucoin.torrent.publishing.core.utils.MediaUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
@@ -55,8 +49,6 @@ import io.taucoin.torrent.publishing.ui.qrcode.UserQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * 单个朋友聊天页面
@@ -151,11 +143,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
 
         binding.chatAdd.setVisibility(View.GONE);
         binding.chatAdd.setListener((title, icon) -> {
-            if (R.string.chat_album == title) {
-                MediaUtil.startOpenGallery(activity);
-            } else if (R.string.chat_take_picture == title) {
-                MediaUtil.startOpenCamera(activity);
-            } else if (R.string.common_debug_digit1 == title) {
+            if (R.string.common_debug_digit1 == title) {
                 chatViewModel.sendBatchDebugDigitMessage(friendPK, 100);
             } else if (R.string.common_debug_digit2 == title) {
                 chatViewModel.sendBatchDebugDigitMessage(friendPK, 1000);
@@ -380,33 +368,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                 }).create();
         msgLogsDialog.submitList(logs);
         msgLogsDialog.show();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            switch (requestCode){
-                case PictureConfig.CHOOSE_REQUEST:
-                case PictureConfig.REQUEST_CAMERA:
-                    List<LocalMedia> selectList = PictureSelector.obtainMultipleResult(data);
-                    if(selectList != null && selectList.size() == 1){
-                        LocalMedia localMedia = selectList.get(0);
-                        if(PictureMimeType.eqImage(localMedia.getMimeType())){
-                            String imagePath = localMedia.getPath();
-                            if (StringUtil.isNotEmpty(localMedia.getAndroidQToPath())) {
-                                imagePath = localMedia.getAndroidQToPath();
-                            }
-                            chatViewModel.sendMessage(friendPK, imagePath,
-                                    MessageType.PICTURE.getType());
-                            return;
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
     @Override

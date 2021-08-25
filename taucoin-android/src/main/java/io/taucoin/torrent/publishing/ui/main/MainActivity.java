@@ -11,8 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.luck.picture.lib.config.PictureConfig;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -669,12 +667,7 @@ public class MainActivity extends ScanTriggerActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CommunityFragment.REQUEST_CODE) {
             goBack();
-        } else if (requestCode == PictureConfig.CHOOSE_REQUEST ||
-                requestCode == PictureConfig.REQUEST_CAMERA){
-           if (!isEmptyView()) {
-               currentFragment.onActivityResult(requestCode, resultCode, data);
-           }
-        }else if (resultCode == RESULT_OK && requestCode == FontSizeActivity.REQUEST_CODE_FONT_SIZE) {
+        } else if (resultCode == RESULT_OK && requestCode == FontSizeActivity.REQUEST_CODE_FONT_SIZE) {
             refreshAllView();
         }
     }

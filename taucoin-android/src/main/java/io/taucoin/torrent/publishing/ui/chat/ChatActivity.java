@@ -18,7 +18,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
-import io.taucoin.torrent.publishing.core.utils.MediaUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityChatBinding;
@@ -92,11 +91,11 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener{
 
         binding.chatAdd.setVisibility(View.GONE);
         binding.chatAdd.setListener((title, icon) -> {
-            if (R.string.chat_album == title) {
-                MediaUtil.startOpenGallery(this);
-            } else if (R.string.chat_take_picture == title) {
-                MediaUtil.startOpenCamera(this);
-            }
+//            if (R.string.chat_album == title) {
+//                MediaUtil.startOpenGallery(this);
+//            } else if (R.string.chat_take_picture == title) {
+//                MediaUtil.startOpenCamera(this);
+//            }
         });
     }
 

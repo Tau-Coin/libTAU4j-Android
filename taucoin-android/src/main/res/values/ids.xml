@@ -13,4 +13,6 @@
     <item name="median_fee" type="id" />
 
     <item name="tvContent" type="id" />
+
+    <item name="camera_view" type="id" />
 </resources>
