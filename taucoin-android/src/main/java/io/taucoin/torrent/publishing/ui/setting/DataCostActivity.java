@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -79,28 +78,17 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         List<Integer> wifiList = Ints.asList(wifiLimits);
         adapterWiFi.submitList(wifiList);
 
-        if (!BuildConfig.DEBUG) {
-            View view = (View) binding.switchBackground.getParent();
-            view.setVisibility(View.GONE);
-        }
-        binding.switchBackground.setChecked(NetworkSetting.isEnableBackgroundMode());
-        binding.switchBackground.setOnCheckedChangeListener(this);
-
-
         handleSettingsChanged(getString(R.string.pref_key_is_metered_network));
         handleSettingsChanged(getString(R.string.pref_key_current_speed));
         handleSettingsChanged(getString(R.string.pref_key_main_loop_interval_list));
-        handleSettingsChanged(getString(R.string.pref_key_metered_foreground_running_time));
-        handleSettingsChanged(getString(R.string.pref_key_wifi_foreground_running_time));
+        handleSettingsChanged(getString(R.string.pref_key_foreground_running_time));
 
         // 先更新，再显示
         NetworkSetting.updateMeteredSpeedLimit();
-        handleSettingsChanged(getString(R.string.pref_key_metered_screen_time_average_speed));
-        handleSettingsChanged(getString(R.string.pref_key_metered_background_average_speed));
+        handleSettingsChanged(getString(R.string.pref_key_metered_average_speed));
         handleSettingsChanged(getString(R.string.pref_key_metered_available_data));
         NetworkSetting.updateWiFiSpeedLimit();
-        handleSettingsChanged(getString(R.string.pref_key_wifi_screen_time_average_speed));
-        handleSettingsChanged(getString(R.string.pref_key_wifi_background_average_speed));
+        handleSettingsChanged(getString(R.string.pref_key_wifi_average_speed));
         handleSettingsChanged(getString(R.string.pref_key_wifi_available_data));
     }
 
@@ -114,11 +102,9 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         if (type == DailyQuotaAdapter.TYPE_METERED) {
             NetworkSetting.setMeteredLimit(limit);
             NetworkSetting.updateMeteredSpeedLimit();
-            handleSettingsChanged(getString(R.string.pref_key_metered_foreground_running_time));
         } else if (type == DailyQuotaAdapter.TYPE_WIFI) {
             NetworkSetting.setWiFiLimit(limit);
             NetworkSetting.updateWiFiSpeedLimit();
-            handleSettingsChanged(getString(R.string.pref_key_wifi_foreground_running_time));
         }
     }
 
@@ -126,10 +112,8 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
     public void onStart() {
         super.onStart();
         // 处理从后台切换到前台的情况下，后台时间不更新的问题
-        handleSettingsChanged(getString(R.string.pref_key_wifi_background_running_time));
-        handleSettingsChanged(getString(R.string.pref_key_metered_background_running_time));
-        handleSettingsChanged(getString(R.string.pref_key_metered_doze_running_time));
-        handleSettingsChanged(getString(R.string.pref_key_wifi_doze_running_time));
+        handleSettingsChanged(getString(R.string.pref_key_background_running_time));
+        handleSettingsChanged(getString(R.string.pref_key_doze_running_time));
         disposables.add(settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -151,26 +135,16 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             boolean meteredNetwork = NetworkSetting.isMeteredNetwork();
             binding.tvMeteredCurrentSpeed.setText(internetState && meteredNetwork ? currentSpeedStr : noSpeedStr);
             binding.tvWifiCurrentSpeed.setText(internetState && !meteredNetwork ? currentSpeedStr : noSpeedStr);
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_metered_screen_time_average_speed))) {
-            long averageSpeed = NetworkSetting.getMeteredScreenTimeAverageSpeed();
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_metered_average_speed))) {
+            long averageSpeed = NetworkSetting.getMeteredAverageSpeed();
             String averageSpeedStr = Formatter.formatFileSize(this, averageSpeed).toUpperCase();
             averageSpeedStr = getString(R.string.setting_metered_network_limit_speed, averageSpeedStr);
-            binding.tvMeteredAverageSpeedScreenTime.setText(averageSpeedStr);
-        }  else if(StringUtil.isEquals(key, getString(R.string.pref_key_metered_background_average_speed))) {
-            long averageSpeed = NetworkSetting.getMeteredBackgroundAverageSpeed();
+            binding.tvMeteredAverageSpeed.setText(averageSpeedStr);
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_wifi_average_speed))) {
+            long averageSpeed = NetworkSetting.getWifiAverageSpeed();
             String averageSpeedStr = Formatter.formatFileSize(this, averageSpeed).toUpperCase();
             averageSpeedStr = getString(R.string.setting_metered_network_limit_speed, averageSpeedStr);
-            binding.tvMeteredAverageSpeedBackground.setText(averageSpeedStr);
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_wifi_screen_time_average_speed))) {
-            long averageSpeed = NetworkSetting.getWifiScreenTimeAverageSpeed();
-            String averageSpeedStr = Formatter.formatFileSize(this, averageSpeed).toUpperCase();
-            averageSpeedStr = getString(R.string.setting_metered_network_limit_speed, averageSpeedStr);
-            binding.tvWifiAverageSpeedScreenTime.setText(averageSpeedStr);
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_wifi_background_average_speed))) {
-            long averageSpeed = NetworkSetting.getWifiBackgroundAverageSpeed();
-            String averageSpeedStr = Formatter.formatFileSize(this, averageSpeed).toUpperCase();
-            averageSpeedStr = getString(R.string.setting_metered_network_limit_speed, averageSpeedStr);
-            binding.tvWifiAverageSpeedBackground.setText(averageSpeedStr);
+            binding.tvWifiAverageSpeed.setText(averageSpeedStr);
         } else if (key.equals(getString(R.string.pref_key_is_metered_network))) {
             boolean internetState = settingsRepo.internetState();
             boolean meteredNetwork = NetworkSetting.isMeteredNetwork();
@@ -201,50 +175,18 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_interval_list))) {
             double frequency = FrequencyUtil.getMainLoopFrequency();
             binding.tvWorkingFrequency.setText(FmtMicrometer.formatTwoDecimal(frequency));
-        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_metered_foreground_running_time))) {
-            int screenTime = NetworkSetting.getMeteredForegroundModeTime();
-            String model;
-            int limitHours = NetworkSetting.getScreenTimeLimitHours(true);
-            int screenTimeLimit = limitHours * 60 * 60;
-            if (screenTime < screenTimeLimit) {
-                String times = DateUtil.getFormatTime(screenTime);
-                model = getString(R.string.setting_work_frequency_in_screen_time,
-                        limitHours, times);
-            } else {
-                model = getString(R.string.setting_work_frequency_not_in_screen_time,
-                        limitHours, limitHours);
-            }
-            binding.tvMeteredScreenTime.setText(model);
-        }  else if (StringUtil.isEquals(key, getString(R.string.pref_key_wifi_foreground_running_time))) {
-            int screenTime = NetworkSetting.getWifiForegroundModeTime();
-            String model;
-            int limitHours = NetworkSetting.getScreenTimeLimitHours(false);
-            int screenTimeLimit = limitHours * 60 * 60;
-            if (screenTime < screenTimeLimit) {
-                String times = DateUtil.getFormatTime(screenTime);
-                model = getString(R.string.setting_work_frequency_in_screen_time,
-                        limitHours, times);
-            } else {
-                model = getString(R.string.setting_work_frequency_not_in_screen_time,
-                        limitHours, limitHours);
-            }
-            binding.tvWifiScreenTime.setText(model);
-        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_metered_background_running_time))) {
-            int backgroundTime = NetworkSetting.getMeteredBackgroundModeTime();
+        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_foreground_running_time))) {
+            int foregroundTime = NetworkSetting.getForegroundRunningTime();
+            String foregroundTimeStr = DateUtil.getFormatTime(foregroundTime);
+            binding.tvForeRunningTime.setText(foregroundTimeStr);
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_background_running_time))) {
+            int backgroundTime = NetworkSetting.getBackgroundRunningTime();
             String backgroundTimeStr = DateUtil.getFormatTime(backgroundTime);
-            binding.tvMeteredBackgroundTime.setText(getString(R.string.setting_running_time, backgroundTimeStr));
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_wifi_background_running_time))) {
-            int backgroundTime = NetworkSetting.getWifiBackgroundModeTime();
-            String backgroundTimeStr = DateUtil.getFormatTime(backgroundTime);
-            binding.tvWifiBackgroundTime.setText(getString(R.string.setting_running_time, backgroundTimeStr));
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_metered_doze_running_time))) {
-            int dozeTime = NetworkSetting.getMeteredDozeModeTime();
+            binding.tvBgRunningTime.setText(backgroundTimeStr);
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_doze_running_time))) {
+            int dozeTime = NetworkSetting.getDozeTime();
             String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
-            binding.tvMeteredDozeTime.setText(getString(R.string.setting_doze_time, dozeTimeStr));
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_wifi_doze_running_time))) {
-            int dozeTime = NetworkSetting.getWifiDozeModeTime();
-            String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
-            binding.tvWifiDozeTime.setText(getString(R.string.setting_doze_time, dozeTimeStr));
+            binding.tvDozeRunningTime.setText(dozeTimeStr);
         }
     }
 

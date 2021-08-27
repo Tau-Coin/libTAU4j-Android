@@ -76,7 +76,7 @@ class SessionSettings {
     private static String dhtBootstrapNodes() {
         StringBuilder sb = new StringBuilder();
         // sb.append("dht.libtorrent.org:25401").append(",");
-        sb.append("13.229.53.249:6881");
+        sb.append("13.229.53.249:6882");
         return sb.toString();
     }
 }

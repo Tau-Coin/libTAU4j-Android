@@ -5,6 +5,8 @@ import android.content.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
+
 import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -188,29 +190,21 @@ public class TauInfoProvider {
      */
     private void handlerCPUAndMemoryStatistics( Sampler.Statistics statistics) {
         long totalMemory = sampler.sampleMemory();
-        double cpuUsageRate = sampler.sampleCPU();
+        float cpuUsageRate = sampler.sampleCPU();
 
         if (cpuUsageRate < 0) {
             cpuUsageRate = 0;
         } else if (cpuUsageRate > 100) {
             cpuUsageRate = 100;
         }
-        String cpuInfo = String.valueOf(cpuUsageRate);
-        int pointIndex = cpuInfo.indexOf(".");
-        int length = cpuInfo.length();
-        if(pointIndex > 0 && length - pointIndex > 3){
-            cpuInfo = cpuInfo.substring(0, pointIndex + 3);
-        }
-        cpuInfo += "%";
-        statistics.cpuUsageRate = cpuInfo;
         statistics.cpuUsage = cpuUsageRate;
         statistics.totalMemory = totalMemory;
 
-        settingsRepo.setCpuUsage(statistics.cpuUsageRate);
+        settingsRepo.setCpuUsage(statistics.cpuUsage);
         settingsRepo.setMemoryUsage(statistics.totalMemory);
         Context context = MainApplication.getInstance();
-        logger.debug("cpuUsageRate::{}, cpuUsageRate::{}, maxMemory::{}", cpuUsageRate,
-                statistics.cpuUsageRate,
+        logger.debug("cpuUsageRate::{}%, maxMemory::{}",
+                String.format(Locale.CHINA, "%.2f", statistics.cpuUsage),
                 Formatter.formatFileSize(context, statistics.totalMemory));
     }
 }

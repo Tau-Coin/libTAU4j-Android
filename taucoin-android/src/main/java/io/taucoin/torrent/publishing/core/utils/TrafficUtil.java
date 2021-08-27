@@ -102,12 +102,9 @@ public class TrafficUtil {
             settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, 0);
             resetTrafficTotalOld();
             // 同时重置前台运行时间
-            NetworkSetting.updateMeteredForegroundModeTime(0);
-            NetworkSetting.updateWifiForegroundModeTime(0);
-            NetworkSetting.updateMeteredBackgroundModeTime(0);
-            NetworkSetting.updateWifiBackgroundModeTime(0);
-            NetworkSetting.updateMeteredDozeModeTime(0);
-            NetworkSetting.updateWifiDozeModeTime(0);
+            NetworkSetting.updateForegroundRunningTime(0);
+            NetworkSetting.updateBackgroundRunningTime(0);
+            NetworkSetting.updateDozeTime(0);
         }
     }
 

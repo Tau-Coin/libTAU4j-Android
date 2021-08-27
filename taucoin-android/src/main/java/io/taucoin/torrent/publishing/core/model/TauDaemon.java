@@ -142,10 +142,9 @@ public abstract class TauDaemon {
     private void initLocalParam() {
         switchPowerReceiver();
         switchConnectionReceiver();
-        settingsRepo.setUPnpMapped(false);
-        settingsRepo.setNATPMPMapped(false);
         // 初始化主循环频率
         FrequencyUtil.clearMainLoopIntervalList();
+        settingsRepo.initData();
     }
 
     /**

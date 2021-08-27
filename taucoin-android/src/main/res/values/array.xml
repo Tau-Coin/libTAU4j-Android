@@ -17,26 +17,11 @@
         <item>1024</item>
     </integer-array>
 
-    <integer-array name="metered_screen_time">
-        <item>2</item>
-        <item>2</item>
-        <item>6</item>
-        <item>12</item>
-        <item>20</item>
-    </integer-array>
-
     <integer-array name="wifi_limit">
         <item>100</item>
         <item>500</item>
         <item>1024</item>
         <item>10240</item>
-    </integer-array>
-
-    <integer-array name="wifi_screen_time">
-        <item>2</item>
-        <item>2</item>
-        <item>4</item>
-        <item>20</item>
     </integer-array>
 
     <string-array name="font_scale_size">

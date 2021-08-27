@@ -47,10 +47,10 @@ public class Sampler {
         activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
     }
 
-    public double sampleCPU() {
+    public float sampleCPU() {
         long cpuTime = 0;
         long appTime = 0;
-        double sampleValue = 0.0D;
+        float sampleValue = 0.0f;
         try {
             if (appStatFile == null) {
                 try {
@@ -86,8 +86,8 @@ public class Sampler {
                 lastAppCpuTime = appTime;
                 return sampleValue;
             }
-            sampleValue = ((double) (appTime - lastAppCpuTime) /
-                    (double) (cpuTime - lastCpuTime)) * 100D;
+            sampleValue = ((float) (appTime - lastAppCpuTime) /
+                    (float) (cpuTime - lastCpuTime)) * 100f;
             lastCpuTime = cpuTime;
             lastAppCpuTime = appTime;
         } catch (Exception e) {
@@ -135,16 +135,14 @@ public class Sampler {
     public static class Statistics implements Parcelable {
         public long totalMemory;
         public long storageSize;
-        public String cpuUsageRate;
-        public double cpuUsage;
+        public float cpuUsage;
 
         public Statistics() {
 
         }
         Statistics(Parcel in) {
             totalMemory = in.readLong();
-            cpuUsageRate = in.readString();
-            cpuUsage = in.readDouble();
+            cpuUsage = in.readFloat();
         }
 
         public final Creator<Statistics> CREATOR = new Creator<Statistics>() {
@@ -167,8 +165,7 @@ public class Sampler {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeLong(totalMemory);
-            dest.writeString(cpuUsageRate);
-            dest.writeDouble(cpuUsage);
+            dest.writeFloat(cpuUsage);
         }
     }
 

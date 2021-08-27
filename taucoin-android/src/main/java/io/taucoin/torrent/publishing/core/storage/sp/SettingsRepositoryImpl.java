@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposables;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 
@@ -24,11 +25,12 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
  */
 public class SettingsRepositoryImpl implements SettingsRepository {
     private static class Default {
-        static final boolean bootStart = true;
         static final boolean chargingState = false;
         static final boolean internetState = false;
         static final int internetType = -1;
         static final boolean isShowBanDialog = false;
+        static final long cpu_sample = 15;                   // cpu采样大小，单位s
+        static final long memory_sample = 15;                // Memory采样大小，单位s
     }
 
     private Context appContext;
@@ -282,24 +284,89 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public void setCpuUsage(String usage) {
-        pref.edit().putString(appContext.getString(R.string.pref_key_cpu_usage), usage)
+    public void setCpuUsage(float usage) {
+        pref.edit().putFloat(appContext.getString(R.string.pref_key_cpu_usage), usage)
                 .apply();
+        setCpuAverageUsage(usage);
     }
 
     @Override
-    public String getCpuUsage() {
-        return pref.getString(appContext.getString(R.string.pref_key_cpu_usage), "0%");
+    public float getCpuUsage() {
+        return pref.getFloat(appContext.getString(R.string.pref_key_cpu_usage), 0);
+    }
+
+    @Override
+    public void setCpuAverageUsage(float usage) {
+        String key = appContext.getString(R.string.pref_key_cpu_average_usage);
+        List<Float> list = getListData(key, Float.class);
+        if (list.size() >= Default.cpu_sample) {
+            list.remove(0);
+        }
+        list.add(usage);
+        setListData(key, list);
+    }
+
+    @Override
+    public float getAverageCpuUsage() {
+        String key = appContext.getString(R.string.pref_key_cpu_average_usage);
+        List<Float> list = getListData(key, Float.class);
+        float totalUsage = 0;
+        int listSize = list.size();
+        for (int i = listSize - 1; i >= 0; i--) {
+            totalUsage += list.get(i);
+        }
+        if (list.size() == 0) {
+            return 0;
+        }
+        return totalUsage / list.size();
     }
 
     @Override
     public void setMemoryUsage(long usage) {
         pref.edit().putLong(appContext.getString(R.string.pref_key_memory_usage), usage)
                 .apply();
+        setMemoryAverageUsage(usage);
     }
 
     @Override
     public long getMemoryUsage() {
         return pref.getLong(appContext.getString(R.string.pref_key_memory_usage), 0);
+    }
+
+    @Override
+    public void setMemoryAverageUsage(long usage) {
+        String key = appContext.getString(R.string.pref_key_memory_average_usage);
+        List<Long> list = getListData(key, Long.class);
+        if (list.size() >= Default.memory_sample) {
+            list.remove(0);
+        }
+        list.add(usage);
+        setListData(key, list);
+    }
+
+    @Override
+    public long getAverageMemoryUsage() {
+        String key = appContext.getString(R.string.pref_key_memory_average_usage);
+        List<Long> list = getListData(key, Long.class);
+        long totalUsage = 0;
+        int listSize = list.size();
+        for (int i = listSize - 1; i >= 0; i--) {
+            totalUsage += list.get(i);
+        }
+        if (list.size() == 0) {
+            return 0;
+        }
+        return totalUsage / list.size();
+    }
+
+    @Override
+    public void initData() {
+        Context context = MainApplication.getInstance();
+        setUPnpMapped(false);
+        setNATPMPMapped(false);
+        setListData(context.getString(R.string.pref_key_cpu_average_usage),
+                new ArrayList<>());
+        setListData(context.getString(R.string.pref_key_memory_average_usage),
+                new ArrayList<>());
     }
 }

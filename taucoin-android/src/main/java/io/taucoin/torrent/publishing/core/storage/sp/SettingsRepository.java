@@ -117,12 +117,23 @@ public interface SettingsRepository {
      * 设置CPU使用率
      * @param usage 使用率
      */
-    void setCpuUsage(String usage);
+    void setCpuUsage(float usage);
+
+    /**
+     * 设置CPU多次平均使用率
+     * @param usage 使用率
+     */
+    void setCpuAverageUsage(float usage);
 
     /**
      * 获取CPU使用率
      */
-    String getCpuUsage();
+    float getCpuUsage();
+
+    /**
+     * 获取CPU多次平均使用率
+     */
+    float getAverageCpuUsage();
 
     /**
      * 设置内存使用大小
@@ -134,6 +145,10 @@ public interface SettingsRepository {
      * 获取内使用大小
      */
     long getMemoryUsage();
+
+    void setMemoryAverageUsage(long usage);
+
+    long getAverageMemoryUsage();
 
     long getLongValue(String key);
 
@@ -165,4 +180,6 @@ public interface SettingsRepository {
     float getFloatValue(String key, float defValue);
 
     void setFloatValue(String key, float value);
+
+    void initData();
 }

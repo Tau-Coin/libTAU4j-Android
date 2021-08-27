@@ -321,7 +321,7 @@ public class MainActivity extends ScanTriggerActivity {
             binding.drawer.itemFrequency.setRightText(Html.fromHtml(tvFrequency));
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_cpu_usage))) {
             binding.drawer.itemCpuUsage.setRightText(getString(R.string.drawer_cpu_usage,
-                    settingsRepo.getCpuUsage()));
+                    settingsRepo.getCpuUsage()) + "%");
             updateDHTStats();
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_memory_usage))) {
             binding.drawer.itemMemSize.setRightText(getString(R.string.drawer_mem_data,
