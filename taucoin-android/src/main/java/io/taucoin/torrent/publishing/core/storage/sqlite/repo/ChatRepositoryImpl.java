@@ -5,31 +5,24 @@ import android.content.Context;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
 
 /**
  * FriendRepository接口实现
  */
 public class ChatRepositoryImpl implements ChatRepository{
 
-    private static final int minChangeTime = 500; // 最小改变时间，防止频繁刷新，单位：ms
     private Context appContext;
     private AppDatabase db;
     private PublishSubject<DataChanged> dataSetChangedPublish = PublishSubject.create();
-    private Disposable changeTimer;
-    private boolean isNeedRefresh = false;
     private ExecutorService sender = Executors.newSingleThreadExecutor();
 
     /**
@@ -51,6 +44,7 @@ public class ChatRepositoryImpl implements ChatRepository{
     @Override
     public void addChatMessages(ChatMsg... chats) {
         db.chatDao().addChats(chats);
+        submitDataSetChanged(chats[0]);
     }
 
     @Override
@@ -86,39 +80,14 @@ public class ChatRepositoryImpl implements ChatRepository{
 
     @Override
     public void submitDataSetChanged(ChatMsg chat) {
-        String usersPk = chat.senderPk + chat.receiverPk;
+        String usersPk = chat.senderPk + chat.receiverPk + chat.timestamp;
         submitDataSetChangedDirect(usersPk);
     }
 
-    private void createChangeTimer(String usersPk) {
-        changeTimer = Observable.timer(minChangeTime, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .subscribe(aLong -> {
-                    if (isNeedRefresh) {
-                        isNeedRefresh = false;
-                        changeTimer.dispose();
-                        submitDataSetChangedDirect(usersPk);
-                    }
-                });
-    }
-
-    @Override
-    public void submitDataSetChangedDirect(String usersPk) {
-        if (changeTimer != null && !changeTimer.isDisposed()) {
-            isNeedRefresh = true;
-            submitDataSetChangedDirect(false, usersPk);
-            return;
-        }
-        createChangeTimer(usersPk);
-        submitDataSetChangedDirect(true, usersPk);
-    }
-
-    private void submitDataSetChangedDirect(boolean refresh, String usersPk) {
-        String msg = usersPk + DateUtil.getDateTime();
+    private void submitDataSetChangedDirect(String usersPk) {
         sender.submit(() -> {
             DataChanged result = new DataChanged();
-            result.setRefresh(refresh);
-            result.setMsg(msg);
+            result.setMsg(usersPk);
             dataSetChangedPublish.onNext(result);
         });
     }

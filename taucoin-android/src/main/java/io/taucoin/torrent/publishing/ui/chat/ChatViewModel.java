@@ -289,7 +289,6 @@ public class ChatViewModel extends AndroidViewModel {
                 result.setFailMsg(e.getMessage());
             }
         });
-        chatRepo.submitDataSetChangedDirect(friendPk);
         return result;
     }
 

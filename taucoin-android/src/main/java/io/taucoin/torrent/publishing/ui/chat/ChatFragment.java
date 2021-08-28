@@ -159,6 +159,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         adapter = new ChatListAdapter(this, friendPK);
         adapter.setFriend(friend);
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+        layoutManager.setStackFromEnd(true);
         binding.msgList.setLayoutManager(layoutManager);
         binding.msgList.setItemAnimator(null);
         binding.msgList.setAdapter(adapter);
@@ -192,7 +193,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             int bottomPosition = adapter.getItemCount() - 1;
             // 滚动到底部
             logger.debug("handleUpdateAdapter scrollToPosition::{}", bottomPosition);
-            layoutManager.scrollToPositionWithOffset(bottomPosition, 0);
+            layoutManager.scrollToPositionWithOffset(bottomPosition, Integer.MIN_VALUE);
         }
     };
 
@@ -229,11 +230,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
 
                         binding.refreshLayout.setRefreshing(false);
                         binding.refreshLayout.setEnabled(false);
-
                         // 立即执行刷新
-                        if (result.isRefresh()) {
-                            loadData(0);
-                        }
+                        loadData(0);
                     }
                 }));
 
