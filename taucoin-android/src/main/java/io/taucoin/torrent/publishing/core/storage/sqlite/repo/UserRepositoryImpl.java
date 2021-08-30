@@ -166,7 +166,7 @@ public class UserRepositoryImpl implements UserRepository{
      * 观察不在黑名单的用户列表
      */
     @Override
-    public List<UserAndFriend> getUsers(boolean isAll, int order, String friendPk, int pos, int loadSize) {
+    public List<UserAndFriend> getUsers(boolean isAll, int order, @NonNull String friendPk) {
         List<UserAndFriend> list;
         if (isAll) {
             if (order == 0) {

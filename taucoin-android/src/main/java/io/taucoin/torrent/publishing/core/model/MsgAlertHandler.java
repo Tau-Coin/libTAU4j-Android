@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.List;
 
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
@@ -189,8 +190,13 @@ class MsgAlertHandler {
                 isUpdate = true;
             }
             // 当前时间比上次更新时间大于1s
-            if (lastSeenTime - friend.lastSeenTime >= 1000) {
+            if (lastSeenTime > friend.lastSeenTime) {
                 friend.lastSeenTime = lastSeenTime;
+                if (friend.onlineCount < Constants.MAX_ONLINE_COUNT) {
+                    friend.onlineCount += 1;
+                } else {
+                    friend.onlineCount = 0;
+                }
                 isUpdate = true;
             }
             if (isUpdate) {

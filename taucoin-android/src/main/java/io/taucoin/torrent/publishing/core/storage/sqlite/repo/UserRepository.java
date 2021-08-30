@@ -93,7 +93,7 @@ public interface UserRepository {
     /**
      * 观察不在黑名单的用户列表
      */
-    List<UserAndFriend> getUsers(boolean isAll, int order, String friendPk, int pos, int loadSize);
+    List<UserAndFriend> getUsers(boolean isAll, int order, @NonNull String friendPk);
 
     /**
      * 获取用户和朋友的信息

@@ -14,6 +14,7 @@ import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 
 /**
  * FriendRepository接口实现
@@ -80,14 +81,18 @@ public class ChatRepositoryImpl implements ChatRepository{
 
     @Override
     public void submitDataSetChanged(ChatMsg chat) {
-        String usersPk = chat.senderPk + chat.receiverPk + chat.timestamp;
-        submitDataSetChangedDirect(usersPk);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(chat.senderPk);
+        stringBuilder.append(chat.receiverPk);
+        stringBuilder.append(chat.receiverPk);
+        stringBuilder.append(DateUtil.getDateTime());
+        submitDataSetChangedDirect(stringBuilder);
     }
 
-    private void submitDataSetChangedDirect(String usersPk) {
+    private void submitDataSetChangedDirect(StringBuilder msg) {
         sender.submit(() -> {
             DataChanged result = new DataChanged();
-            result.setMsg(usersPk);
+            result.setMsg(msg.toString());
             dataSetChangedPublish.onNext(result);
         });
     }

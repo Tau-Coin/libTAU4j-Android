@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,13 +28,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -41,12 +41,14 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MsgRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -91,6 +93,7 @@ public class UserViewModel extends AndroidViewModel {
     private SettingsRepository settingsRepo;
     private TxRepository txRepo;
     private MsgRepository msgRepo;
+    private MemberRepository memRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<String> changeResult = new MutableLiveData<>();
     private MutableLiveData<Result> addFriendResult = new MutableLiveData<>();
@@ -100,10 +103,10 @@ public class UserViewModel extends AndroidViewModel {
     private MutableLiveData<QRContent> qrContent = new MutableLiveData<>();
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
     private MutableLiveData<Bitmap> qrBlurBitmap = new MutableLiveData<>();
+    private MutableLiveData<List<UserAndFriend>> userList = new MutableLiveData<>();
     private CommonDialog commonDialog;
     private CommonDialog editNameDialog;
     private TauDaemon daemon;
-    private UserSourceFactory sourceFactory;
     private ChatViewModel chatViewModel;
     public UserViewModel(@NonNull Application application) {
         super(application);
@@ -112,8 +115,8 @@ public class UserViewModel extends AndroidViewModel {
         txRepo = RepositoryHelper.getTxRepository(getApplication());
         msgRepo = RepositoryHelper.getMsgRepository(getApplication());
         friendRepo = RepositoryHelper.getFriendsRepository(getApplication());
+        memRepo = RepositoryHelper.getMemberRepository(getApplication());
         daemon = TauDaemon.getInstance(application);
-        sourceFactory = new UserSourceFactory();
         chatViewModel = new ChatViewModel(application);
     }
 
@@ -378,6 +381,10 @@ public class UserViewModel extends AndroidViewModel {
         return editNameResult;
     }
 
+    public MutableLiveData<List<UserAndFriend>> getUserList() {
+        return userList;
+    }
+
     /**
      * 获取在黑名单的用户列表
      */
@@ -482,13 +489,29 @@ public class UserViewModel extends AndroidViewModel {
      * @return DataSource
      * @param order 排序字段
      * @param isAll 是否查询所有用户
-     * @param friendPk 扫描朋友公钥
+     * @param scannedFriendPk 扫描的朋友公钥
      */
-    public LiveData<PagedList<UserAndFriend>> observerUsers(int order, boolean isAll, String friendPk) {
-        sourceFactory.setParameter(order, isAll, friendPk);
-        return new LivePagedListBuilder<>(sourceFactory, Page.getPageListConfig())
-                .setInitialLoadKey(Page.PAGE_SIZE)
-                .build();
+    public void loadUsersList(int order, boolean isAll, String scannedFriendPk) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<List<UserAndFriend>>) emitter -> {
+            List<UserAndFriend> users = new ArrayList<>();
+            try {
+                String friendPk = StringUtil.isEmpty(scannedFriendPk) ? "" : scannedFriendPk;
+                long startTime = System.currentTimeMillis();
+                users = userRepo.getUsers(isAll, order, friendPk);
+                long getUsersTime = System.currentTimeMillis();
+                logger.trace("loadUsersList getUsers::{}ms, users.size::{}",
+                        getUsersTime - startTime, users.size());
+            } catch (Exception e) {
+                logger.error("loadUsersList error::", e);
+            }
+            emitter.onNext(users);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(users -> {
+                    userList.postValue(users);
+                });
+        disposables.add(disposable);
     }
 
     /**
@@ -866,5 +889,18 @@ public class UserViewModel extends AndroidViewModel {
         if (commonDialog != null) {
             commonDialog.closeDialog();
         }
+    }
+
+    public Observable<String> observeUserDataSetChanged() {
+        return userRepo.observeDataSetChanged();
+    }
+
+    public Observable<String> observeMemberDataSetChanged() {
+
+        return memRepo.observeDataSetChanged();
+    }
+
+    public Observable<String> observeFriendDataSetChanged() {
+        return friendRepo.observeDataSetChanged();
     }
 }

@@ -185,6 +185,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         super.onStop();
         chatViewModel.stopVisitFriend();
         disposables.clear();
+        // 关闭键盘和加号视图窗口
+        binding.etMessage.clearFocus();
+        binding.chatAdd.setVisibility(View.GONE);
     }
 
     private final Runnable handleUpdateAdapter = () -> {

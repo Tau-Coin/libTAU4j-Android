@@ -240,6 +240,17 @@
                         app:leftImage="@mipmap/icon_memory"
                         app:rightText="@string/drawer_mem_data"/>
 
+                    <ImageView
+                        android:id="@+id/iv_close_drawer"
+                        android:layout_width="@dimen/widget_size_48"
+                        android:layout_height="@dimen/widget_size_48"
+                        android:layout_marginTop="@dimen/widget_size_5"
+                        android:layout_marginEnd="@dimen/widget_size_30"
+                        android:padding="@dimen/widget_size_8"
+                        android:layout_gravity="end"
+                        android:onClick="onClick"
+                        android:src="@mipmap/icon_close_drawer"/>
+
                 </LinearLayout>
             </ScrollView>
 

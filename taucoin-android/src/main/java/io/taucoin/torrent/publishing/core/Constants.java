@@ -30,4 +30,7 @@ public class Constants {
     public static final String ChainidDelimeter = "#";
     //default genesis power equal to power/year.
     public static final BigInteger DefaultGeneisisPower = new BigInteger("105120");
+
+    // 最大在线统计次数
+    public static final int MAX_ONLINE_COUNT = 99;
 }

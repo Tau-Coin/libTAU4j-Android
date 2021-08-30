@@ -10,8 +10,8 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
@@ -26,7 +26,7 @@ import io.taucoin.torrent.publishing.databinding.ItemFriendListBinding;
 /**
  * 显示的联系人列表的Adapter
  */
-public class FriendsListAdapter extends PagedListAdapter<UserAndFriend, FriendsListAdapter.ViewHolder> {
+public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAdapter.ViewHolder> {
     private ClickListener listener;
     private List<String> selectedList = new ArrayList<>();
     private int page;
@@ -123,7 +123,13 @@ public class FriendsListAdapter extends PagedListAdapter<UserAndFriend, FriendsL
                 showNameBuilder.append(" ")
                     .append(context.getString(R.string.contacts_added))
                     .setForegroundColor(context.getResources().getColor(R.color.color_blue))
-                        .setFontSize(12, true);
+                    .setFontSize(12, true);
+            } else {
+                showNameBuilder.append(" ")
+                    .append(String.valueOf(user.onlineCount))
+                    .setForegroundColor(context.getResources().getColor(R.color.color_blue))
+                    .setFontSize(12, true)
+                    .setSuperscript();
             }
             holder.binding.tvName.setText(showNameBuilder.create());
             if (type == FriendsActivity.PAGE_FRIENDS_LIST) {
@@ -216,6 +222,7 @@ public class FriendsListAdapter extends PagedListAdapter<UserAndFriend, FriendsL
         public boolean areContentsTheSame(@NonNull UserAndFriend oldItem, @NonNull UserAndFriend newItem) {
             return oldItem.equals(newItem) && oldOrder == order &&
                     oldItem.status == newItem.status &&
+                    oldItem.onlineCount == newItem.onlineCount &&
                     ((order == 0 && oldItem.lastSeenTime == newItem.lastSeenTime) ||
                             (order == 1 && oldItem.lastCommTime == newItem.lastCommTime));
         }

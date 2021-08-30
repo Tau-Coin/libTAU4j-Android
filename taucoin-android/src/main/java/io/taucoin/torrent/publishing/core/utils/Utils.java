@@ -590,7 +590,11 @@ public class Utils {
      * @return
      */
     public static String textBytesToString(byte[] msg) {
-        return new String(msg, StandardCharsets.UTF_8);
+        if (msg != null) {
+            return new String(msg, StandardCharsets.UTF_8);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -599,6 +603,10 @@ public class Utils {
      * @return
      */
     public static byte[] textStringToBytes(String msg) {
-        return msg.getBytes(StandardCharsets.UTF_8);
+        if (StringUtil.isNotEmpty(msg)) {
+            return msg.getBytes(StandardCharsets.UTF_8);
+        } else {
+            return null;
+        }
     }
 }

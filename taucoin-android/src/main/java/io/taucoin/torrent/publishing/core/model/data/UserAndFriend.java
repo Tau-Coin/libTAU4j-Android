@@ -17,6 +17,7 @@ public class UserAndFriend extends User {
     public long lastCommTime;
     public long lastSeenTime;
     public int status;
+    public int onlineCount;
 
     public UserAndFriend(@NonNull String publicKey) {
         super(publicKey);

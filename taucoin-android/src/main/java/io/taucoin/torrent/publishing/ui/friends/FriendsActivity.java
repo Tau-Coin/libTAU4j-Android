@@ -9,9 +9,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -21,7 +19,6 @@ import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainLinkUtil;
-import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
@@ -52,12 +49,10 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     private ChatViewModel chatViewModel;
     private FriendsListAdapter adapter;
     private CompositeDisposable disposables = new CompositeDisposable();
-    // 联系人列表资源
-    private LiveData<PagedList<UserAndFriend>> pagedListLiveData;
     private String chainID;
     // 代表不同的入口页面
     private int page;
-    private String friendPk; // 新扫描的朋友的公钥
+    private String scannedFriendPk; // 新扫描的朋友的公钥
     private long medianFee;
     private int order = 0; // 0:last seen, 1:last communication
 
@@ -82,6 +77,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         initParameter(intent);
         initView();
         subscribeUserList();
+        onRefresh();
     }
 
     /**
@@ -91,7 +87,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         if (intent != null) {
             chainID = intent.getStringExtra(IntentExtra.CHAIN_ID);
             page = intent.getIntExtra(IntentExtra.TYPE, PAGE_FRIENDS_LIST);
-            friendPk = intent.getStringExtra(IntentExtra.PUBLIC_KEY);
+            scannedFriendPk = intent.getStringExtra(IntentExtra.PUBLIC_KEY);
         }
     }
 
@@ -104,12 +100,15 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        adapter = new FriendsListAdapter(this, page, order, friendPk);
+        binding.refreshLayout.setRefreshing(false);
+        binding.refreshLayout.setEnabled(false);
+        adapter = new FriendsListAdapter(this, page, order, scannedFriendPk);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.recyclerList.setLayoutManager(layoutManager);
         binding.recyclerList.setItemAnimator(null);
         binding.recyclerList.setAdapter(adapter);
-    }
+        onRefresh();
+}
 
     /**
      * 获取交易费中位数
@@ -124,11 +123,19 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     }
 
     private void subscribeUserList() {
-        if (pagedListLiveData != null && !pagedListLiveData.hasObservers()) {
-            pagedListLiveData.removeObservers(this);
-        }
-        pagedListLiveData = userViewModel.observerUsers(order, page == PAGE_FRIENDS_LIST, friendPk);
-        pagedListLiveData.observe(this, list -> {
+        disposables.add(userViewModel.observeUserDataSetChanged()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> onRefresh()));
+        disposables.add(userViewModel.observeMemberDataSetChanged()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> onRefresh()));
+        disposables.add(userViewModel.observeFriendDataSetChanged()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> onRefresh()));
+        userViewModel.getUserList().observe(this, list -> {
             adapter.setOrder(order);
             adapter.submitList(list);
         });
@@ -138,16 +145,16 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     public void onStart() {
         super.onStart();
         subscribeUserList();
-        chatViewModel.startVisitFriend(friendPk);
+        chatViewModel.startVisitFriend(scannedFriendPk);
 
         userViewModel.getAddFriendResult().observe(this, result -> {
             if (result.isSuccess()) {
                 ToastUtils.showShortToast(result.getMsg());
             } else {
                 userViewModel.closeDialog();
-                chatViewModel.startVisitFriend(friendPk);
-                friendPk = result.getMsg();
-                adapter = new FriendsListAdapter(this, page, order, friendPk);
+                chatViewModel.startVisitFriend(scannedFriendPk);
+                scannedFriendPk = result.getMsg();
+                adapter = new FriendsListAdapter(this, page, order, scannedFriendPk);
                 binding.recyclerList.setAdapter(adapter);
                 subscribeUserList();
             }
@@ -193,12 +200,12 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
             order = 1;
             invalidateOptionsMenu();
             ToastUtils.showShortToast(R.string.menu_rank_a);
-            subscribeUserList();
+            onRefresh();
         } else if (item.getItemId() == R.id.menu_rank_a) {
             order = 0;
             invalidateOptionsMenu();
             ToastUtils.showShortToast(R.string.menu_rank_c);
-            subscribeUserList();
+            onRefresh();
         }
         return true;
     }
@@ -271,5 +278,11 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         } else if (v.getId() == R.id.ll_add_friend) {
             userViewModel.showAddFriendDialog(this);
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        // 立即执行刷新
+        userViewModel.loadUsersList(order, page == PAGE_FRIENDS_LIST, scannedFriendPk);
     }
 }

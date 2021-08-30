@@ -2,7 +2,6 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,7 +10,6 @@ import androidx.annotation.NonNull;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;

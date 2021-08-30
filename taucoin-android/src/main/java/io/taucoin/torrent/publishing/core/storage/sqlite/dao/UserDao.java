@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.dao;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -9,7 +10,6 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
-import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
@@ -34,7 +34,7 @@ public interface UserDao {
 
     // 查询所有用户数据的详细sql
     String QUERY_GET_USERS_NOT_IN_BAN_LIST = "SELECT u.*, f.lastCommTime AS lastCommTime," +
-            " f.lastSeenTime AS lastSeenTime, f.status" +
+            " f.lastSeenTime AS lastSeenTime, f.status, f.onlineCount" +
             " FROM Users u" +
             " LEFT JOIN Friends f ON u.publicKey = f.friendPK AND f.userPK = (" +
             UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
@@ -68,7 +68,7 @@ public interface UserDao {
     String QUERY_USER_BY_PUBLIC_KEY = "SELECT * FROM Users WHERE publicKey = :publicKey";
 
     String QUERY_FRIEND_INFO_BY_PUBLIC_KEY = "SELECT u.*, f.lastCommTime AS lastCommTime," +
-            " f.lastSeenTime AS lastSeenTime, f.status" +
+            " f.lastSeenTime AS lastSeenTime, f.status, f.onlineCount" +
             " FROM Users u" +
             " LEFT JOIN Friends f ON u.publicKey = f.friendPK and f.userPK = (" + QUERY_GET_CURRENT_USER_PK + ")" +
             " where u.publicKey = :publicKey";
@@ -165,19 +165,19 @@ public interface UserDao {
      */
     @Transaction
     @Query(QUERY_USERS_ORDER_BY_LAST_COMM_TIME)
-    List<UserAndFriend> queryUsersOrderByLastCommTime(String friendPK);
+    List<UserAndFriend> queryUsersOrderByLastCommTime(@NonNull String friendPK);
 
     @Transaction
     @Query(QUERY_USERS_ORDER_BY_LAST_SEEN_TIME)
-    List<UserAndFriend> queryUsersOrderByLastSeenTime(String friendPK);
+    List<UserAndFriend> queryUsersOrderByLastSeenTime(@NonNull String friendPK);
 
     @Transaction
     @Query(QUERY_USERS_STATUS_ORDER_BY_LAST_COMM_TIME)
-    List<UserAndFriend> queryUsersByStatusOrderByLastCommTime(String friendPK);
+    List<UserAndFriend> queryUsersByStatusOrderByLastCommTime(@NonNull String friendPK);
 
     @Transaction
     @Query(QUERY_USERS_STATUS_ORDER_BY_LAST_SEEN_TIME)
-    List<UserAndFriend> queryUsersByStatusOrderByLastSeenTime(String friendPK);
+    List<UserAndFriend> queryUsersByStatusOrderByLastSeenTime(@NonNull String friendPK);
 
     /**
      * 获取用户和朋友的信息

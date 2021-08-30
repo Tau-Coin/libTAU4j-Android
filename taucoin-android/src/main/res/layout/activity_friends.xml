@@ -19,7 +19,6 @@
             layout="@layout/toolbar" />
 
         <RelativeLayout
-            android:id="@+id/refresh_layout"
             android:background="@color/color_bg"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -89,17 +88,24 @@
                     android:textAppearance="@style/TextAppearanceBody1"/>
             </LinearLayout>
 
-            <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:layout_above="@+id/ll_total_pay"
-                android:background="@color/color_white"
-                android:id="@+id/recycler_list"
                 android:layout_below="@+id/ll_add_friend"
-                android:layout_width="match_parent"
+                android:id="@+id/refresh_layout"
                 android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:scrollbars="vertical"
-                android:focusable="true"
-                android:scrollbarStyle="outsideOverlay" />
+                android:layout_width="match_parent">
+
+                <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                    android:background="@color/color_white"
+                    android:id="@+id/recycler_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:focusable="true"
+                    android:scrollbarStyle="outsideOverlay" />
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
             <LinearLayout
                 android:visibility="gone"

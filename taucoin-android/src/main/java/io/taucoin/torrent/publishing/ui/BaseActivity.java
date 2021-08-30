@@ -6,13 +6,15 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.ui.constant.Constants;
 import io.taucoin.torrent.publishing.ui.customviews.ProgressManager;
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity implements
+        SwipeRefreshLayout.OnRefreshListener {
     private ProgressManager progressManager = null;
 
     private boolean isFullScreen = true;
@@ -98,5 +100,10 @@ public abstract class BaseActivity extends AppCompatActivity {
      * 刷新所有视图， 保证字体大小修改成功
      */
     protected void refreshAllView() {
+    }
+
+    @Override
+    public void onRefresh() {
+
     }
 }
