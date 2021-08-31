@@ -6,6 +6,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -73,6 +74,7 @@ public interface ChatDao {
      * @return List<Chat>
      */
     @Query(QUERY_MESSAGES_BY_FRIEND_PK)
+    @Transaction
     List<ChatMsg> getMessages(String senderPk, String receiverPk, int startPosition, int loadSize);
 
     /**
