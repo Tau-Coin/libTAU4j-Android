@@ -62,14 +62,19 @@ public class Sampler {
                 appStatFile.seek(0L);
             }
             if (procStatFile != null) {
-                String procStatString = procStatFile.readLine();
-                if (StringUtil.isNotEmpty(procStatString)) {
-                    String[] procStats = procStatString.split(" ");
-                    if (procStats.length > 8) {
-                        cpuTime = Long.parseLong(procStats[2]) + Long.parseLong(procStats[3])
-                                + Long.parseLong(procStats[4]) + Long.parseLong(procStats[5])
-                                + Long.parseLong(procStats[6]) + Long.parseLong(procStats[7])
-                                + Long.parseLong(procStats[8]);
+                procStatFile.seek(0L);
+                while (true) {
+                    String procStatString = procStatFile.readLine();
+                    logger.debug("loadTotalLine readLine::{}", procStatString);
+                    if (StringUtil.isNotEmpty(procStatString)) {
+                        String[] procStats = procStatString.split(" ");
+                        if (procStats.length > 8) {
+                            cpuTime = Long.parseLong(procStats[2]) + Long.parseLong(procStats[3])
+                                    + Long.parseLong(procStats[4]) + Long.parseLong(procStats[5])
+                                    + Long.parseLong(procStats[6]) + Long.parseLong(procStats[7])
+                                    + Long.parseLong(procStats[8]);
+                        }
+                        break;
                     }
                 }
             }
