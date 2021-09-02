@@ -69,7 +69,7 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
 
         handleSettingsChanged(getString(R.string.pref_key_internet_state));
         handleSettingsChanged(getString(R.string.pref_key_charging_state));
-        handleSettingsChanged(getString(R.string.pref_key_main_loop_interval_list));
+        handleSettingsChanged(getString(R.string.pref_key_main_loop_interval));
         handleSettingsChanged(getString(R.string.pref_key_upnp_mapped));
         handleSettingsChanged(getString(R.string.pref_key_nat_pmp_mapped));
 
@@ -120,7 +120,7 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_charging_state))) {
             boolean chargingState = settingsRepo.chargingState();
             binding.tvCharging.setText(chargingState ? R.string.common_on : R.string.common_off);
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_interval_list))) {
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_interval))) {
             long interval = FrequencyUtil.getMainLoopInterval();
             binding.tvMainLoop.setText(String.valueOf(interval));
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_upnp_mapped))) {

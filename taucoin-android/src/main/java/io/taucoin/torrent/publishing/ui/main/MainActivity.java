@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -188,7 +187,9 @@ public class MainActivity extends ScanTriggerActivity {
         binding.drawerLayout.addDrawerListener(toggle);
 
         updateDHTStats();
-        handleSettingsChanged(getString(R.string.pref_key_main_loop_interval_list));
+        handleSettingsChanged(getString(R.string.pref_key_main_loop_interval));
+        handleSettingsChanged(getString(R.string.pref_key_cpu_usage));
+        handleSettingsChanged(getString(R.string.pref_key_memory_usage));
 
         if (Utils.isTablet(this)) {
             updateViewChanged();
@@ -288,8 +289,11 @@ public class MainActivity extends ScanTriggerActivity {
         disposables.add(infoProvider.observeSessionStats()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(nodes -> binding.drawer.itemDhtNodes.setRightText(
-                        getString(R.string.drawer_dht_nodes, nodes))));
+                .subscribe(nodes -> {
+                        binding.drawer.itemDhtNodes.setRightText(
+                        getString(R.string.drawer_dht_nodes, nodes));
+                    }
+                ));
     }
 
     private void handleClipboardContent() {
@@ -314,11 +318,11 @@ public class MainActivity extends ScanTriggerActivity {
     }
 
     private void handleSettingsChanged(String key) {
-        if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_interval_list))) {
+        if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_interval))) {
             double frequency = FrequencyUtil.getMainLoopFrequency();
             String tvFrequency = getString(R.string.drawer_frequency);
             tvFrequency = String.format(tvFrequency, FmtMicrometer.formatTwoDecimal(frequency));
-            binding.drawer.itemFrequency.setRightText(Html.fromHtml(tvFrequency));
+            binding.drawer.itemFrequency.setRightText(tvFrequency);
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_cpu_usage))) {
             binding.drawer.itemCpuUsage.setRightText(getString(R.string.drawer_cpu_usage,
                     settingsRepo.getCpuUsage()) + "%");

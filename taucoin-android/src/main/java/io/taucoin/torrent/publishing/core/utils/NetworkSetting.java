@@ -19,7 +19,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
  * 网络流量设置相关工具类
  */
 public class NetworkSetting {
-    private static final Logger logger = LoggerFactory.getLogger("NetworkSetting");
+//    private static final Logger logger = LoggerFactory.getLogger("NetworkSetting");
     private static final int METERED_LIMITED;                                   // 单位MB
     private static final int WIFI_LIMITED;                                      // 单位MB
     private static final int SURVIVAL_SPEED_LIMIT = 10;                         // 单位B
@@ -91,18 +91,17 @@ public class NetworkSetting {
     /**
      * 更新网络速度
      */
-
     public synchronized static void updateNetworkSpeed(@NonNull SessionStatistics statistics) {
         Context context = MainApplication.getInstance();
         long currentSpeed = statistics.getDownloadRate() + statistics.getUploadRate();
         settingsRepo.setLongValue(context.getString(R.string.pref_key_current_speed), currentSpeed);
 
         // 更新Mode运行时间
-        updateModeRunningTime();
+        updateRunningTime();
         updateMeteredSpeedLimit();
         updateWiFiSpeedLimit();
-        logger.trace("updateSpeed, CurrentSpeed::{}/s",
-                Formatter.formatFileSize(context, currentSpeed).toUpperCase());
+//        logger.trace("updateSpeed, CurrentSpeed::{}/s",
+//                Formatter.formatFileSize(context, currentSpeed).toUpperCase());
     }
 
     /**
@@ -115,9 +114,9 @@ public class NetworkSetting {
     }
 
     /**
-     * 更新Mode运行时间
+     * 更新运行时间
      */
-    private static void updateModeRunningTime() {
+    private static void updateRunningTime() {
         long currentTime = DateUtil.getMillisTime();
         if (isForegroundRunning()) {
             int foregroundRunningTime = getForegroundRunningTime() + 1;
@@ -233,8 +232,8 @@ public class NetworkSetting {
         Context context = MainApplication.getInstance();
         long total = TrafficUtil.getTrafficUploadTotal() + TrafficUtil.getTrafficDownloadTotal();
         long usage = total - TrafficUtil.getMeteredTrafficTotal();
-        logger.trace("updateWiFiSpeedLimit total::{}, MeteredTotal::{}, wifiUsage::{}", total,
-                TrafficUtil.getMeteredTrafficTotal(), usage);
+//        logger.trace("updateWiFiSpeedLimit total::{}, MeteredTotal::{}, wifiUsage::{}", total,
+//                TrafficUtil.getMeteredTrafficTotal(), usage);
         long limit = getWiFiLimit();
         long averageSpeed = 0;
         long availableData = 0;
@@ -242,10 +241,10 @@ public class NetworkSetting {
         BigInteger bigUnit = new BigInteger("1024");
         BigInteger bigLimit = BigInteger.valueOf(limit).multiply(bigUnit).multiply(bigUnit);
         BigInteger bigUsage = BigInteger.valueOf(usage);
-        logger.trace("updateWiFiSpeedLimit bigLimit::{}, bigUsage::{}, compareTo::{}",
-                bigLimit.longValue(),
-                bigUsage.longValue(),
-                bigLimit.compareTo(bigUsage));
+//        logger.trace("updateWiFiSpeedLimit bigLimit::{}, bigUsage::{}, compareTo::{}",
+//                bigLimit.longValue(),
+//                bigUsage.longValue(),
+//                bigLimit.compareTo(bigUsage));
 
         // 今天剩余的秒数
         long today24HLastSeconds = DateUtil.getTomorrowLastSeconds(TrafficUtil.TRAFFIC_UPDATE_TIME);
@@ -350,13 +349,13 @@ public class NetworkSetting {
         int timeInterval = 0;
         if (!isHaveAvailableData()) {
             timeInterval = max.getInterval();
-            logger.trace("calculateMainLoopInterval timeInterval::{}, isHaveAvailableData::false",
-                    timeInterval);
+//            logger.trace("calculateMainLoopInterval timeInterval::{}, isHaveAvailableData::false",
+//                    timeInterval);
 
         } else if (getCurrentSpeed() < SURVIVAL_SPEED_LIMIT) {
             timeInterval = (min.getInterval() + max.getInterval()) / 2;
-            logger.trace("calculateMainLoopInterval timeInterval::{}, currentSpeed::{}",
-                    timeInterval, getCurrentSpeed());
+//            logger.trace("calculateMainLoopInterval timeInterval::{}, currentSpeed::{}",
+//                    timeInterval, getCurrentSpeed());
             FrequencyUtil.updateMainLoopInterval(timeInterval);
         } else {
             long averageSpeed;
@@ -374,10 +373,10 @@ public class NetworkSetting {
                 int lastTimeInterval = FrequencyUtil.getMainLoopAverageInterval();
                 timeInterval = Math.max(min.getInterval(), (int)(lastTimeInterval * rate));
                 timeInterval = Math.min(timeInterval, max.getInterval());
-                logger.debug("calculateMainLoopInterval currentSpeed::{}, averageSpeed::{}, " +
-                                "rate::{}, timeInterval::{}, lastTimeInterval::{}, mainLoopMax::{}",
-                        currentSpeed, averageSpeed, rate, timeInterval, lastTimeInterval,
-                        max.getInterval());
+//                logger.debug("calculateMainLoopInterval currentSpeed::{}, averageSpeed::{}, " +
+//                                "rate::{}, timeInterval::{}, lastTimeInterval::{}, mainLoopMax::{}",
+//                        currentSpeed, averageSpeed, rate, timeInterval, lastTimeInterval,
+//                        max.getInterval());
             }
         }
 
@@ -397,10 +396,10 @@ public class NetworkSetting {
             int increase = (int)(excessSize * (max.getInterval() - min.getInterval()) / maxLimit);
             timeInterval += increase;
             timeInterval = Math.min(max.getInterval(), timeInterval);
-            logger.debug("calculateTimeInterval timeInterval::{}, increase::{}, cpuUsage::{}%," +
-                            " memoryUsage::{}", timeInterval, increase,
-                    String.format(Locale.CHINA, "%.2f", cpuUsage),
-                    Formatter.formatFileSize(MainApplication.getInstance(), memoryUsage));
+//            logger.debug("calculateTimeInterval timeInterval::{}, increase::{}, cpuUsage::{}%," +
+//                            " memoryUsage::{}", timeInterval, increase,
+//                    String.format(Locale.CHINA, "%.2f", cpuUsage),
+//                    Formatter.formatFileSize(MainApplication.getInstance(), memoryUsage));
         }
 
         if (timeInterval > 0) {

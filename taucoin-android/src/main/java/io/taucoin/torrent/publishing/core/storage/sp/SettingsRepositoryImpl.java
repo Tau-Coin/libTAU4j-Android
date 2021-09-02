@@ -1,16 +1,9 @@
 package io.taucoin.torrent.publishing.core.storage.sp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
@@ -18,7 +11,6 @@ import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposables;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
 
 /**
  * SettingsRepository: 用户设置的接口的实现
@@ -35,10 +27,13 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     private Context appContext;
     private SharedPreferences pref;
+    private SharedPreferences.Editor edit;
 
+    @SuppressLint("applyPrefEdits")
     public SettingsRepositoryImpl(@NonNull Context appContext) {
         this.appContext = appContext;
         pref = PreferenceManager.getDefaultSharedPreferences(appContext);
+        edit = pref.edit();
     }
 
     /**
@@ -64,7 +59,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void chargingState(boolean val) {
-        pref.edit().putBoolean(appContext.getString(R.string.pref_key_charging_state),val)
+        edit.putBoolean(appContext.getString(R.string.pref_key_charging_state),val)
                 .apply();
     }
 
@@ -82,13 +77,13 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void internetState(boolean val) {
-        pref.edit().putBoolean(appContext.getString(R.string.pref_key_internet_state),val)
+        edit.putBoolean(appContext.getString(R.string.pref_key_internet_state),val)
                 .apply();
     }
 
     @Override
     public void setInternetType(int type) {
-        pref.edit().putInt(appContext.getString(R.string.pref_key_internet_type), type)
+        edit.putInt(appContext.getString(R.string.pref_key_internet_type), type)
                 .apply();
     }
 
@@ -107,14 +102,14 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void lastTxFee(String chainID, String fee){
         String key = appContext.getString(R.string.pref_key_last_tx_fee) + chainID;
-        pref.edit().putString(key, fee)
+        edit.putString(key, fee)
                 .apply();
     }
 
     @Override
     public void doNotShowBanDialog(boolean isShow) {
         String key = appContext.getString(R.string.pref_key_do_not_show_ban_dialog);
-        pref.edit().putBoolean(key, isShow)
+        edit.putBoolean(key, isShow)
                 .apply();
     }
 
@@ -127,7 +122,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setApkDownloadID(long downloadID) {
         String key = appContext.getString(R.string.pref_key_apk_download_id);
-        pref.edit().putLong(key, downloadID)
+        edit.putLong(key, downloadID)
                 .apply();
     }
 
@@ -145,7 +140,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setNeedPromptUser(boolean isNeed) {
-        pref.edit().putBoolean(appContext.getString(R.string.pref_key_need_prompt_user), isNeed)
+        edit.putBoolean(appContext.getString(R.string.pref_key_need_prompt_user), isNeed)
                 .apply();
     }
 
@@ -163,7 +158,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
      */
     @Override
     public void setUPnpMapped(boolean isMapped) {
-        pref.edit().putBoolean(appContext.getString(R.string.pref_key_upnp_mapped), isMapped)
+        edit.putBoolean(appContext.getString(R.string.pref_key_upnp_mapped), isMapped)
                 .apply();
     }
 
@@ -181,7 +176,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
      */
     @Override
     public void setNATPMPMapped(boolean isMapped) {
-        pref.edit().putBoolean(appContext.getString(R.string.pref_key_nat_pmp_mapped), isMapped)
+        edit.putBoolean(appContext.getString(R.string.pref_key_nat_pmp_mapped), isMapped)
                 .apply();
     }
 
@@ -197,7 +192,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setLongValue(String key, long value) {
-        pref.edit().putLong(key, value)
+        edit.putLong(key, value)
                 .apply();
     }
 
@@ -213,7 +208,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setIntValue(String key, int value) {
-        pref.edit().putInt(key, value)
+        edit.putInt(key, value)
                 .apply();
     }
 
@@ -229,36 +224,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setBooleanValue(String key, boolean value) {
-        pref.edit().putBoolean(key, value)
+        edit.putBoolean(key, value)
                 .apply();
-    }
-
-    @Override
-    public <T> void setListData(String key, List<T> list) {
-        try {
-            Gson gson = new Gson();
-            String jsonArray = gson.toJson(list);
-            pref.edit().putString(key, jsonArray)
-                    .apply();
-        } catch (Exception ignore) {
-        }
-    }
-
-    @Override
-    public <T> List<T> getListData(String key, Class<T> cls) {
-        List<T> list = new ArrayList<>();
-        String jsonStr = pref.getString(key, "");
-        if (StringUtil.isNotEmpty(jsonStr)) {
-            try {
-                Gson gson = new Gson();
-                JsonArray array = JsonParser.parseString(jsonStr).getAsJsonArray();
-                for (JsonElement elem : array) {
-                    list.add(gson.fromJson(elem, cls));
-                }
-            } catch (Exception ignore) {
-            }
-        }
-        return list;
     }
 
     @Override
@@ -268,7 +235,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setStringValue(String key, String value) {
-        pref.edit().putString(key, value)
+        edit.putString(key, value)
                 .apply();
     }
 
@@ -279,13 +246,13 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void setFloatValue(String key, float value) {
-        pref.edit().putFloat(key, value)
+        edit.putFloat(key, value)
                 .apply();
     }
 
     @Override
     public void setCpuUsage(float usage) {
-        pref.edit().putFloat(appContext.getString(R.string.pref_key_cpu_usage), usage)
+        edit.putFloat(appContext.getString(R.string.pref_key_cpu_usage), usage)
                 .apply();
         setCpuAverageUsage(usage);
     }
@@ -298,32 +265,20 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setCpuAverageUsage(float usage) {
         String key = appContext.getString(R.string.pref_key_cpu_average_usage);
-        List<Float> list = getListData(key, Float.class);
-        if (list.size() >= Default.cpu_sample) {
-            list.remove(0);
-        }
-        list.add(usage);
-        setListData(key, list);
+        float average = pref.getFloat(key, 0);
+        average = (average * Default.cpu_sample + usage) / (Default.cpu_sample + 1);
+        edit.putFloat(key, average);
     }
 
     @Override
     public float getAverageCpuUsage() {
         String key = appContext.getString(R.string.pref_key_cpu_average_usage);
-        List<Float> list = getListData(key, Float.class);
-        float totalUsage = 0;
-        int listSize = list.size();
-        for (int i = listSize - 1; i >= 0; i--) {
-            totalUsage += list.get(i);
-        }
-        if (list.size() == 0) {
-            return 0;
-        }
-        return totalUsage / list.size();
+        return pref.getFloat(key, 0);
     }
 
     @Override
     public void setMemoryUsage(long usage) {
-        pref.edit().putLong(appContext.getString(R.string.pref_key_memory_usage), usage)
+        edit.putLong(appContext.getString(R.string.pref_key_memory_usage), usage)
                 .apply();
         setMemoryAverageUsage(usage);
     }
@@ -336,27 +291,15 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void setMemoryAverageUsage(long usage) {
         String key = appContext.getString(R.string.pref_key_memory_average_usage);
-        List<Long> list = getListData(key, Long.class);
-        if (list.size() >= Default.memory_sample) {
-            list.remove(0);
-        }
-        list.add(usage);
-        setListData(key, list);
+        long average = pref.getLong(key, 0);
+        average = (average * Default.memory_sample + usage) / (Default.memory_sample + 1);
+        edit.putLong(key, average);
     }
 
     @Override
     public long getAverageMemoryUsage() {
         String key = appContext.getString(R.string.pref_key_memory_average_usage);
-        List<Long> list = getListData(key, Long.class);
-        long totalUsage = 0;
-        int listSize = list.size();
-        for (int i = listSize - 1; i >= 0; i--) {
-            totalUsage += list.get(i);
-        }
-        if (list.size() == 0) {
-            return 0;
-        }
-        return totalUsage / list.size();
+        return pref.getLong(key, 0);
     }
 
     @Override
@@ -364,9 +307,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         Context context = MainApplication.getInstance();
         setUPnpMapped(false);
         setNATPMPMapped(false);
-        setListData(context.getString(R.string.pref_key_cpu_average_usage),
-                new ArrayList<>());
-        setListData(context.getString(R.string.pref_key_memory_average_usage),
-                new ArrayList<>());
+        edit.putFloat(context.getString(R.string.pref_key_cpu_average_usage), 0);
+        edit.putLong(context.getString(R.string.pref_key_memory_average_usage), 0);
     }
 }

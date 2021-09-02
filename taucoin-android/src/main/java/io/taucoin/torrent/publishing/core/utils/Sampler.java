@@ -55,7 +55,7 @@ public class Sampler {
             if (appStatFile == null) {
                 try {
                     procStatFile = new RandomAccessFile("/proc/stat", "r");
-                } catch (Exception e) {
+                } catch (Exception ignore) {
                 }
                 appStatFile = new RandomAccessFile("/proc/" + Process.myPid() + "/stat", "r");
             } else {
@@ -106,26 +106,30 @@ public class Sampler {
         try {
             // 统计进程的内存信息 totalPss
             Debug.MemoryInfo dbm;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                dbm = new Debug.MemoryInfo();
-                Debug.getMemoryInfo(dbm);
-            } else {
+            // 太消耗CPU（5%）, 图形内存不能统计
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//                dbm = new Debug.MemoryInfo();
+//                Debug.getMemoryInfo(dbm);
+
+//            } else {
+                Context context = MainApplication.getInstance();
+                activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
                 Debug.MemoryInfo[] memInfo = activityManager.getProcessMemoryInfo(
                         new int[]{Process.myPid()});
                 dbm = memInfo[0];
-            }
+//            }
 
             // TotalPss = dalvikPss + nativePss + otherPss, in KB
             // getTotalPrivateDirty()就是获得自己进程所独占的内存 in KB
             final int totalPss = dbm.getTotalPss();
-            Context context = MainApplication.getInstance();
-            logger.trace("sampleMemory maxMemory::{}MB, dalvikPss::{}, nativePss::{}, " +
-                    "otherPss::{}, totalPss::{}",
-                    activityManager.getMemoryClass(),
-                    Formatter.formatFileSize(context, dbm.dalvikPss * 1024),
-                    Formatter.formatFileSize(context, dbm.nativePss * 1024),
-                    Formatter.formatFileSize(context, dbm.otherPss * 1024),
-                    Formatter.formatFileSize(context, dbm.getTotalPss() * 1024));
+//            Context context = MainApplication.getInstance();
+//            logger.trace("sampleMemory maxMemory::{}MB, dalvikPss::{}, nativePss::{}, " +
+//                    "otherPss::{}, totalPss::{}",
+//                    activityManager.getMemoryClass(),
+//                    Formatter.formatFileSize(context, dbm.dalvikPss * 1024),
+//                    Formatter.formatFileSize(context, dbm.nativePss * 1024),
+//                    Formatter.formatFileSize(context, dbm.otherPss * 1024),
+//                    Formatter.formatFileSize(context, dbm.getTotalPss() * 1024));
 
             if (totalPss >= 0) {
                 // Mem in Byte

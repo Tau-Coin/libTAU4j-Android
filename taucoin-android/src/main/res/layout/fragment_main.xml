@@ -21,8 +21,7 @@
                 android:visibility="visible"
                 android:id="@+id/ll_warning"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="@dimen/widget_size_44"
+                android:layout_height="@dimen/widget_size_44"
                 android:background="@color/color_red_bg"
                 android:paddingStart="@dimen/widget_size_10"
                 android:paddingEnd="@dimen/widget_size_10"
@@ -38,9 +37,10 @@
                 <TextView
                     android:id="@+id/tv_warning"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:text="@string/main_connecting"
+                    android:maxLines="1"
+                    android:singleLine="true"
                     android:textColor="@color/gray_dark"
                     android:layout_marginStart="@dimen/widget_size_10"
                     android:textAppearance="@style/TextAppearanceBody1"/>

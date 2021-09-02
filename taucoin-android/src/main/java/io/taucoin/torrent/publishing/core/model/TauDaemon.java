@@ -41,6 +41,7 @@ import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.receiver.ConnectionReceiver;
 import io.taucoin.torrent.publishing.service.SystemServiceManager;
@@ -142,6 +143,7 @@ public abstract class TauDaemon {
     private void initLocalParam() {
         switchPowerReceiver();
         switchConnectionReceiver();
+        TrafficUtil.resetTrafficTotalOld();
         // 初始化主循环频率
         FrequencyUtil.clearMainLoopIntervalList();
         settingsRepo.initData();
@@ -357,7 +359,7 @@ public abstract class TauDaemon {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
             logger.info("SettingsChanged, UPnP mapped::{}", settingsRepo.isUPnpMapped());
-        } else if (key.equals(appContext.getString(R.string.pref_key_main_loop_interval_list))) {
+        } else if (key.equals(appContext.getString(R.string.pref_key_main_loop_interval))) {
             setMainLoopInterval(FrequencyUtil.getMainLoopInterval());
         }
     }

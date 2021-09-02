@@ -1,11 +1,10 @@
 package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
+import android.os.Build;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
@@ -17,12 +16,10 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Statistic;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.StatisticRepository;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
-import io.taucoin.torrent.publishing.core.utils.Formatter;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.Sampler;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
 import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
-import io.taucoin.torrent.publishing.service.SystemServiceManager;
 import io.taucoin.torrent.publishing.ui.constant.Constants;
 
 /**
@@ -32,6 +29,8 @@ public class TauInfoProvider {
     private static final String TAG = TauInfoProvider.class.getSimpleName();
     private static final Logger logger = LoggerFactory.getLogger(TAG);
     private static final int STATISTICS_PERIOD = 1000;
+    private static final int MEM_STATISTICS_PERIOD = 5 * 60 * 1000;             // 单位为ms
+    private static final int CPU_STATISTICS_PERIOD = 4 * 1000;             // 单位为ms
 
     private static volatile TauInfoProvider INSTANCE;
     private TauDaemon daemon;
@@ -81,9 +80,13 @@ public class TauInfoProvider {
     private Flowable<Long> makeSessionStatsFlowable() {
         return Flowable.create((emitter) -> {
             try {
+                long oldNodes = -1;
                 while (!emitter.isCancelled()) {
                     long sessionNodes = daemon.getSessionNodes();
-                    emitter.onNext(sessionNodes);
+                    if (oldNodes == -1 || oldNodes != sessionNodes) {
+                        oldNodes = sessionNodes;
+                        emitter.onNext(sessionNodes);
+                    }
                     if (!emitter.isCancelled()) {
                         Thread.sleep(STATISTICS_PERIOD);
                     }
@@ -121,17 +124,37 @@ public class TauInfoProvider {
                 SessionStatistics sessionStatistics = new SessionStatistics();
                 Statistic statistic = new Statistic();
                 int seconds = 0;
+                long lastMemQueryTime = DateUtil.getMillisTime();
+                long lastCPUQueryTime = DateUtil.getMillisTime();
                 while (!emitter.isCancelled()) {
-                    long startTimestamp = DateUtil.getMillisTime();
                     handlerTrafficStatistics(sessionStatistics);
                     long trafficTotal = sessionStatistics.getTotalDownload() + sessionStatistics.getTotalUpload();
                     trafficSize = trafficTotal - oldTrafficTotal;
                     trafficSize = Math.max(trafficSize, 0);
                     oldTrafficTotal = trafficTotal;
 
-                    handlerCPUAndMemoryStatistics(samplerStatistics);
+                    long currentTime = DateUtil.getMillisTime();
+                    // 内存采样：AndroidQ开始限制采样频率5分钟
+                    if (currentTime - lastMemQueryTime >= MEM_STATISTICS_PERIOD ||
+                            Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                        lastMemQueryTime = currentTime;
+                        samplerStatistics.totalMemory = sampler.sampleMemory();
+                        settingsRepo.setMemoryUsage(samplerStatistics.totalMemory);
+                    }
+                    // CPU采样
+                    if (currentTime - lastCPUQueryTime >= CPU_STATISTICS_PERIOD) {
+                        lastCPUQueryTime = currentTime;
+                        float cpuUsageRate = sampler.sampleCPU();
+                        if (cpuUsageRate < 0) {
+                            cpuUsageRate = 0;
+                        } else if (cpuUsageRate > 100) {
+                            cpuUsageRate = 100;
+                        }
+                        samplerStatistics.cpuUsage = cpuUsageRate;
+                        settingsRepo.setCpuUsage(samplerStatistics.cpuUsage);
+                    }
 
-                    statistic.timestamp = startTimestamp / 1000;
+                    statistic.timestamp = DateUtil.getTime();
                     statistic.dataSize = trafficSize;
                     statistic.memorySize = samplerStatistics.totalMemory;
                     statistic.cpuUsageRate = samplerStatistics.cpuUsage;
@@ -142,13 +165,7 @@ public class TauInfoProvider {
                         seconds = 0;
                     }
                     seconds ++;
-                    // 处理代码执行时间
-                    long endTimestamp = DateUtil.getMillisTime();
-                    long consumeTime = endTimestamp - startTimestamp;
-                    long sleepTime = STATISTICS_PERIOD - consumeTime;
-                    if (sleepTime > 0) {
-                        Thread.sleep(STATISTICS_PERIOD);
-                    }
+                    Thread.sleep(STATISTICS_PERIOD);
                 }
             } catch (InterruptedException ignore) {
             } catch (Exception e) {
@@ -161,11 +178,6 @@ public class TauInfoProvider {
      * 统计流量使用信息
      */
     private void handlerTrafficStatistics(SessionStatistics statistics) {
-        logger.debug("ConnectionReceiver isHaveNetwork::{}, isNetworkMetered::{}",
-                SystemServiceManager.getInstance().isHaveNetwork(),
-                SystemServiceManager.getInstance().isNetworkMetered());
-
-        Context context = MainApplication.getInstance();
         daemon.getSessionStatistics(statistics);
         // 保存流量统计
         TrafficUtil.saveTrafficTotal(statistics);
@@ -175,36 +187,14 @@ public class TauInfoProvider {
         NetworkSetting.calculateMainLoopInterval();
         // 根据当前的流量包的使用，判断是否给用户更换流量包的提示
         daemon.handleNoRemainingDataTips();
-        logger.debug("Network statistical:: totalDownload::{}({}), totalUpload::{}({})" +
-                        ", downloadRate::{}/s, uploadRate::{}/s",
-                Formatter.formatFileSize(context, statistics.getTotalDownload()),
-                statistics.getTotalDownload(),
-                Formatter.formatFileSize(context, statistics.getTotalUpload()),
-                statistics.getTotalUpload(),
-                Formatter.formatFileSize(context, statistics.getDownloadRate()),
-                Formatter.formatFileSize(context, statistics.getUploadRate()));
-    }
-
-    /**
-     * 统计CPU和Memory使用信息
-     */
-    private void handlerCPUAndMemoryStatistics( Sampler.Statistics statistics) {
-        long totalMemory = sampler.sampleMemory();
-        float cpuUsageRate = sampler.sampleCPU();
-
-        if (cpuUsageRate < 0) {
-            cpuUsageRate = 0;
-        } else if (cpuUsageRate > 100) {
-            cpuUsageRate = 100;
-        }
-        statistics.cpuUsage = cpuUsageRate;
-        statistics.totalMemory = totalMemory;
-
-        settingsRepo.setCpuUsage(statistics.cpuUsage);
-        settingsRepo.setMemoryUsage(statistics.totalMemory);
-        Context context = MainApplication.getInstance();
-        logger.debug("cpuUsageRate::{}%, maxMemory::{}",
-                String.format(Locale.CHINA, "%.2f", statistics.cpuUsage),
-                Formatter.formatFileSize(context, statistics.totalMemory));
+//        Context context = MainApplication.getInstance();
+//        logger.debug("Network statistical:: totalDownload::{}({}), totalUpload::{}({})" +
+//                        ", downloadRate::{}/s, uploadRate::{}/s",
+//                Formatter.formatFileSize(context, statistics.getTotalDownload()),
+//                statistics.getTotalDownload(),
+//                Formatter.formatFileSize(context, statistics.getTotalUpload()),
+//                statistics.getTotalUpload(),
+//                Formatter.formatFileSize(context, statistics.getDownloadRate()),
+//                Formatter.formatFileSize(context, statistics.getUploadRate()));
     }
 }

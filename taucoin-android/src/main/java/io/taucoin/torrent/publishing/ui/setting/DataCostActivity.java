@@ -80,7 +80,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
 
         handleSettingsChanged(getString(R.string.pref_key_is_metered_network));
         handleSettingsChanged(getString(R.string.pref_key_current_speed));
-        handleSettingsChanged(getString(R.string.pref_key_main_loop_interval_list));
+        handleSettingsChanged(getString(R.string.pref_key_main_loop_interval));
         handleSettingsChanged(getString(R.string.pref_key_foreground_running_time));
 
         // 先更新，再显示
@@ -172,7 +172,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             adapterMetered.updateSelectLimit(NetworkSetting.getMeteredLimit());
         } else if (key.equals(getString(R.string.pref_key_wifi_limit))) {
             adapterWiFi.updateSelectLimit(NetworkSetting.getWiFiLimit());
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_interval_list))) {
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_interval))) {
             double frequency = FrequencyUtil.getMainLoopFrequency();
             binding.tvWorkingFrequency.setText(FmtMicrometer.formatTwoDecimal(frequency));
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_foreground_running_time))) {

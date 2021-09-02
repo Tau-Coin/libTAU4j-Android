@@ -1,7 +1,5 @@
 package io.taucoin.torrent.publishing.core.storage.sp;
 
-import java.util.List;
-
 import io.reactivex.Flowable;
 
 /**
@@ -168,10 +166,6 @@ public interface SettingsRepository {
     boolean getBooleanValue(String key, boolean defValue);
 
     void setBooleanValue(String key, boolean value);
-
-    <T> void setListData(String key, List<T> list);
-
-    <T> List<T> getListData(String key, Class<T> cls);
 
     String getStringValue(String key, String defValue);
 
