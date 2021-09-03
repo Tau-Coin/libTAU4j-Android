@@ -28,9 +28,9 @@ import io.taucoin.torrent.publishing.ui.constant.Constants;
 public class TauInfoProvider {
     private static final String TAG = TauInfoProvider.class.getSimpleName();
     private static final Logger logger = LoggerFactory.getLogger(TAG);
-    private static final int STATISTICS_PERIOD = 1000;
+    private static final int STATISTICS_PERIOD = 2000;
     private static final int MEM_STATISTICS_PERIOD = 5 * 60 * 1000;             // 单位为ms
-    private static final int CPU_STATISTICS_PERIOD = 4 * 1000;             // 单位为ms
+    private static final int CPU_STATISTICS_PERIOD = 4 * 1000;                  // 单位为ms
 
     private static volatile TauInfoProvider INSTANCE;
     private TauDaemon daemon;
@@ -135,8 +135,8 @@ public class TauInfoProvider {
 
                     long currentTime = DateUtil.getMillisTime();
                     // 内存采样：AndroidQ开始限制采样频率5分钟
-                    if (currentTime - lastMemQueryTime >= MEM_STATISTICS_PERIOD ||
-                            Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P ||
+                            currentTime - lastMemQueryTime >= MEM_STATISTICS_PERIOD) {
                         lastMemQueryTime = currentTime;
                         samplerStatistics.totalMemory = sampler.sampleMemory();
                         settingsRepo.setMemoryUsage(samplerStatistics.totalMemory);
