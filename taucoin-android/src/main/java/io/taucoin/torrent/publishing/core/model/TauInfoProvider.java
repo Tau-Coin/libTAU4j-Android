@@ -80,6 +80,7 @@ public class TauInfoProvider {
     private Flowable<Long> makeSessionStatsFlowable() {
         return Flowable.create((emitter) -> {
             try {
+                Thread.currentThread().setName("SessionNodes");
                 long oldNodes = -1;
                 while (!emitter.isCancelled()) {
                     long sessionNodes = daemon.getSessionNodes();
@@ -113,6 +114,7 @@ public class TauInfoProvider {
     private Flowable<Void> makeAppStatisticsFlowable() {
         return Flowable.create((emitter) -> {
             try {
+                Thread.currentThread().setName("AppStatistics");
                 Sampler.Statistics samplerStatistics = new Sampler.Statistics();
                 if (!emitter.isCancelled()) {
                     emitter.setDisposable(Disposables.fromAction(() -> {

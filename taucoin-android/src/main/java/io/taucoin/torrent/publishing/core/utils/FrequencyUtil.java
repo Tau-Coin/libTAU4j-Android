@@ -5,9 +5,6 @@ import android.content.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
@@ -40,7 +37,12 @@ public class FrequencyUtil {
     static void updateMainLoopInterval(int interval) {
         Context context = MainApplication.getInstance();
         int average = getMainLoopAverageInterval();
-        average = (average * internal_sample + interval) / (internal_sample + 1);
+        if (average > 0 ) {
+            average = (average * internal_sample + interval) / (internal_sample + 1);
+        } else {
+            average = interval;
+        }
+
         settingsRepo.setIntValue(context.getString(R.string.pref_key_main_loop_average_interval), average);
         settingsRepo.setIntValue(context.getString(R.string.pref_key_main_loop_interval), interval);
     }

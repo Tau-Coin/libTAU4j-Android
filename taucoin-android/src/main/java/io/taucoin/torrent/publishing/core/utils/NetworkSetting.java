@@ -91,7 +91,7 @@ public class NetworkSetting {
     /**
      * 更新网络速度
      */
-    public synchronized static void updateNetworkSpeed(@NonNull SessionStatistics statistics) {
+    public static void updateNetworkSpeed(@NonNull SessionStatistics statistics) {
         Context context = MainApplication.getInstance();
         long currentSpeed = statistics.getDownloadRate() + statistics.getUploadRate();
         settingsRepo.setLongValue(context.getString(R.string.pref_key_current_speed), currentSpeed);

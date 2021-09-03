@@ -266,7 +266,12 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public void setCpuAverageUsage(float usage) {
         String key = appContext.getString(R.string.pref_key_cpu_average_usage);
         float average = pref.getFloat(key, 0);
-        average = (average * Default.cpu_sample + usage) / (Default.cpu_sample + 1);
+        if (average > 0) {
+            average = (average * Default.cpu_sample + usage) / (Default.cpu_sample + 1);
+        } else {
+            average = usage;
+        }
+
         edit.putFloat(key, average);
     }
 
@@ -292,7 +297,12 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public void setMemoryAverageUsage(long usage) {
         String key = appContext.getString(R.string.pref_key_memory_average_usage);
         long average = pref.getLong(key, 0);
-        average = (average * Default.memory_sample + usage) / (Default.memory_sample + 1);
+        if (average > 0) {
+            average = (average * Default.memory_sample + usage) / (Default.memory_sample + 1);
+        } else {
+            average = usage;
+        }
+
         edit.putLong(key, average);
     }
 

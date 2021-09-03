@@ -76,56 +76,57 @@ public class TauDaemonImpl extends TauDaemon {
     @Override
     void observeTauDaemonAlertListener() {
         // alertQueue 生产线程
-        Disposable logDisposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
-            if (emitter.isDisposed()) {
-                return;
-            }
-            TauDaemonAlertListener listener = new TauDaemonAlertListener() {
-                @Override
-                public int[] types() {
-                    return new int[]{
-                        AlertType.PORTMAP_LOG.swig(),
-                        AlertType.DHT_BOOTSTRAP.swig(),
-                        AlertType.SES_START_OVER.swig(),
-                        AlertType.DHT_GET_PEERS.swig(),
-                        AlertType.EXTERNAL_IP.swig(),
-                        AlertType.LISTEN_SUCCEEDED.swig(),
-                        AlertType.STATE_UPDATE.swig(),
-                        AlertType.SES_STOP_OVER.swig(),
-                        AlertType.SESSION_STATS.swig(),
-                        AlertType.LISTEN_FAILED.swig(),
-                        AlertType.UDP_ERROR.swig(),
-                        AlertType.DHT_ERROR.swig(),
-                        AlertType.LOG.swig(),
-                        AlertType.DHT_STATS.swig(),
-                        AlertType.DHT_LOG.swig(),
-                        AlertType.COMM_LOG.swig(),
-                        AlertType.DHT_PKT.swig(),
-                        AlertType.SESSION_ERROR.swig(),
-                        AlertType.SESSION_STATS_HEADER.swig(),
-                        AlertType.ALERTS_DROPPED.swig()
-                    };
-                }
-                @Override
-                public void alert(Alert<?> alert) {
-                    if (!emitter.isDisposed() && alert != null) {
-                        tauDaemonAlertHandler.handleLogAlert(alert);
-                    }
-                }
-            };
-            if (!emitter.isDisposed()) {
-                registerAlertListener(listener);
-                emitter.setDisposable(Disposables.fromAction(() -> unregisterAlertListener(listener)));
-            }
-        }).subscribeOn(Schedulers.io())
-                .subscribe();
-        disposables.add(logDisposable);
+//        Disposable logDisposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+//            if (emitter.isDisposed()) {
+//                return;
+//            }
+//            TauDaemonAlertListener listener = new TauDaemonAlertListener() {
+//                @Override
+//                public int[] types() {
+//                    return new int[]{
+//                        AlertType.PORTMAP_LOG.swig(),
+//                        AlertType.DHT_BOOTSTRAP.swig(),
+//                        AlertType.SES_START_OVER.swig(),
+//                        AlertType.DHT_GET_PEERS.swig(),
+//                        AlertType.EXTERNAL_IP.swig(),
+//                        AlertType.LISTEN_SUCCEEDED.swig(),
+//                        AlertType.STATE_UPDATE.swig(),
+//                        AlertType.SES_STOP_OVER.swig(),
+//                        AlertType.SESSION_STATS.swig(),
+//                        AlertType.LISTEN_FAILED.swig(),
+//                        AlertType.UDP_ERROR.swig(),
+//                        AlertType.DHT_ERROR.swig(),
+//                        AlertType.LOG.swig(),
+//                        AlertType.DHT_STATS.swig(),
+//                        AlertType.DHT_LOG.swig(),
+//                        AlertType.COMM_LOG.swig(),
+//                        AlertType.DHT_PKT.swig(),
+//                        AlertType.SESSION_ERROR.swig(),
+//                        AlertType.SESSION_STATS_HEADER.swig(),
+//                        AlertType.ALERTS_DROPPED.swig()
+//                    };
+//                }
+//                @Override
+//                public void alert(Alert<?> alert) {
+//                    if (!emitter.isDisposed() && alert != null) {
+//                        tauDaemonAlertHandler.handleLogAlert(alert);
+//                    }
+//                }
+//            };
+//            if (!emitter.isDisposed()) {
+//                registerAlertListener(listener);
+//                emitter.setDisposable(Disposables.fromAction(() -> unregisterAlertListener(listener)));
+//            }
+//        }).subscribeOn(Schedulers.io())
+//                .subscribe();
+//        disposables.add(logDisposable);
 
         // alertQueue 生产线程
         Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             if (emitter.isDisposed()) {
                 return;
             }
+            Thread.currentThread().setName("alertQueue");
             TauDaemonAlertListener listener = new TauDaemonAlertListener() {
                 @Override
                 public int[] types() {
@@ -162,6 +163,7 @@ public class TauDaemonImpl extends TauDaemon {
 
         // alertQueue 消费线程
         Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+            Thread.currentThread().setName("alertConsumer");
             this.alertConsumerEmitter = emitter;
             while (!emitter.isDisposed()) {
                 // 如果Session已停止结束，队列为空，生产者和消费者线程都结束
