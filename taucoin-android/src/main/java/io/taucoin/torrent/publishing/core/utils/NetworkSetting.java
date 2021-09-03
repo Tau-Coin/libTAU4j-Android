@@ -393,9 +393,11 @@ public class NetworkSetting {
                 maxLimit = MAX_MEMORY_LIMIT - 60 * 1024 * 1024;
             }
             // 计算出来需要增加的大小
-            int increase = (int)(excessSize * (max.getInterval() - min.getInterval()) / maxLimit);
-            timeInterval += increase;
-            timeInterval = Math.min(max.getInterval(), timeInterval);
+            if (excessSize > 0) {
+                int increase = (int)(excessSize * (max.getInterval() - min.getInterval()) / maxLimit);
+                timeInterval += increase;
+                timeInterval = Math.min(max.getInterval(), timeInterval);
+            }
 //            logger.debug("calculateTimeInterval timeInterval::{}, increase::{}, cpuUsage::{}%," +
 //                            " memoryUsage::{}", timeInterval, increase,
 //                    String.format(Locale.CHINA, "%.2f", cpuUsage),
