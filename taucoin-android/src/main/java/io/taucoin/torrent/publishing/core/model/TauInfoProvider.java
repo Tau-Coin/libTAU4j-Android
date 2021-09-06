@@ -29,7 +29,7 @@ public class TauInfoProvider {
     private static final String TAG = TauInfoProvider.class.getSimpleName();
     private static final Logger logger = LoggerFactory.getLogger(TAG);
     private static final int STATISTICS_PERIOD = 2000;
-    private static final int MEM_STATISTICS_PERIOD = 5 * 60 * 1000;             // 单位为ms
+    private static final int MEM_STATISTICS_PERIOD = 60 * 1000;                 // 单位为ms
     private static final int CPU_STATISTICS_PERIOD = 4 * 1000;                  // 单位为ms
 
     private static volatile TauInfoProvider INSTANCE;
@@ -137,7 +137,8 @@ public class TauInfoProvider {
 
                     long currentTime = DateUtil.getMillisTime();
                     // 内存采样：AndroidQ开始限制采样频率5分钟
-                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P ||
+                    if (samplerStatistics.totalMemory == 0 ||
+                            Build.VERSION.SDK_INT <= Build.VERSION_CODES.P ||
                             currentTime - lastMemQueryTime >= MEM_STATISTICS_PERIOD) {
                         lastMemQueryTime = currentTime;
                         samplerStatistics.totalMemory = sampler.sampleMemory();
