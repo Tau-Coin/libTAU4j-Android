@@ -113,6 +113,12 @@ public class RaeSeekBar extends AppCompatSeekBar {
                 mTickMarkTitlePaint.setTextSize(mTextSize[i % mTickMarkTitles.length]); // 设置刻度文字大小
                 // 画文本
                 canvas.drawText(title, thumbPos, mTextSize[mTextSize.length - 1], mTickMarkTitlePaint);
+
+                // 画选择圆点
+                if (getProgress() == i) {
+                    mTickMarkTitlePaint.setColor(ContextCompat.getColor(getContext(), R.color.color_yellow));
+                    canvas.drawCircle(thumbPos, h2, getResources().getDimension(R.dimen.widget_size_9), mTickMarkTitlePaint);
+                }
             }
         } catch (Exception e) {
             LoggerFactory.getLogger("SeekBar").error("test=", e);

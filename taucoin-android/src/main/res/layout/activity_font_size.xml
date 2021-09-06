@@ -97,11 +97,8 @@
                         android:id="@+id/seek_bar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
-                        android:layout_margin="@dimen/widget_size_20"
-                        android:progressDrawable="@android:color/transparent"
-                        android:theme="@style/Widget.AppCompat.SeekBar"
-                        android:thumb="@drawable/seek_bar_thumb_font_setting" />
+                        android:padding="@dimen/widget_size_20"
+                        android:progressDrawable="@android:color/transparent" />
 
                 </FrameLayout>
 
