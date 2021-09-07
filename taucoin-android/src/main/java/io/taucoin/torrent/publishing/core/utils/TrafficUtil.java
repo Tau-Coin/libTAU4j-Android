@@ -70,10 +70,8 @@ public class TrafficUtil {
         resetTrafficInfo();
         String trafficValueOld = TRAFFIC_VALUE_OLD + trafficType;
         long oldTraffic = settingsRepo.getLongValue(trafficValueOld, -1);
-        if (oldTraffic >= 0 && byteSize > oldTraffic) {
+        if (oldTraffic >= 0 && byteSize >= oldTraffic) {
             byteSize = byteSize - oldTraffic;
-        } else {
-            byteSize = 0;
         }
         return byteSize;
     }
