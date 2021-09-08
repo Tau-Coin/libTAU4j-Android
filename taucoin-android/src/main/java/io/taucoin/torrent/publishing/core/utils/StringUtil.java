@@ -174,6 +174,14 @@ public class StringUtil {
         }
     }
 
+    public static Float getFloatString(String data) {
+        try{
+            return Float.parseFloat(data);
+        }catch (Exception e){
+            return 0F;
+        }
+    }
+
     public static String getString(int data) {
         try{
             return String.valueOf(data);

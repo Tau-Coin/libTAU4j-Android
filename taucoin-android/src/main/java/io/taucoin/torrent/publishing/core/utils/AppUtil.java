@@ -11,6 +11,7 @@ import android.os.Build;
 import android.provider.Settings;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
 
 import io.taucoin.torrent.publishing.BuildConfig;
@@ -163,5 +164,18 @@ public class AppUtil {
         int myPid = android.os.Process.myPid();
         android.os.Process.killProcess(myPid);
         System.exit(0);
+    }
+
+    public static int getPid(Process p) {
+        int pid = -1;
+        try {
+            Field f = p.getClass().getDeclaredField("pid");
+            f.setAccessible(true);
+            pid = f.getInt(p);
+            f.setAccessible(false);
+        } catch (Throwable e) {
+            pid = -1;
+        }
+        return pid;
     }
 }

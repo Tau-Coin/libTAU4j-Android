@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.IPackageStatsObserver;
 import android.content.pm.PackageStats;
-import android.os.Build;
 import android.os.Debug;
 import android.os.IBinder;
 import android.os.IInterface;
@@ -45,6 +44,15 @@ public class Sampler {
     private Sampler () {
         Context context = MainApplication.getInstance();
         activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    }
+
+    public boolean isAccessibleFromFile() {
+        try {
+            RandomAccessFile procStatFile = new RandomAccessFile("/proc/stat", "r");
+            return procStatFile.readBoolean();
+        } catch (Exception ignore) {
+        }
+        return false;
     }
 
     public float sampleCPU() {

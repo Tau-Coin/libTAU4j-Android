@@ -6,6 +6,10 @@ import android.os.Build;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -19,8 +23,11 @@ import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.Sampler;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.ui.constant.Constants;
+
+import static java.lang.Runtime.getRuntime;
 
 /**
  * Provides runtime information about Tau, which isn't saved to the database.
@@ -100,6 +107,75 @@ public class TauInfoProvider {
     }
 
     /**
+     * 创建APP CPU统计的工作流
+     * @return Flowable
+     */
+    Flowable<Double> observeCPUStatistics() {
+        return Flowable.create((emitter) -> {
+            if (sampler.isAccessibleFromFile()) {
+                emitter.onComplete();
+                return;
+            }
+            String line;
+            String cmd = "top";
+            Process process;
+            try {
+                process = getRuntime().exec(new String[]{"sh", "-c", cmd});
+                emitter.setDisposable(Disposables.fromAction(() -> {
+                    if (process != null) {
+                        process.destroy();
+                        logger.debug("CpuStatistics: shell destroy");
+                    }
+                }));
+                getRuntime().addShutdownHook(new Thread(){
+                    @Override
+                    public void run() {
+                        if (process != null) {
+                            process.destroy();
+                            logger.debug("CpuStatistics process shutdown");
+                        }
+                    }
+                });
+                int processors = getRuntime().availableProcessors();
+                BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                int currentPid = android.os.Process.myPid();
+//                int shellPid = AppUtil.getPid(process);
+//                logger.debug("CpuStatistics currentPid::{}, shellPid::{}", currentPid, shellPid);
+                while ((line = br.readLine()) != null) {
+                    line = line.trim();
+                    String[] resp = line.split(" ");
+                    if (resp.length > 0) {
+                        int pid = StringUtil.getIntString(resp[0]);
+                        if (currentPid == pid) {
+                            int count = 0;
+                            for (String value : resp) {
+                                if (StringUtil.isNotEmpty(value) ) {
+                                    count ++;
+                                    if (count == 9) {
+                                        float cpuUsageRate = StringUtil.getFloatString(value);
+                                        cpuUsageRate = cpuUsageRate / processors;
+                                        cpuUsageRate = Math.max(0, cpuUsageRate);
+                                        cpuUsageRate = Math.min(100, cpuUsageRate);
+                                        settingsRepo.setCpuUsage(cpuUsageRate);
+//                                        logger.debug("CpuStatistics cpuUsage::{}%, " +
+//                                                        "processors::{}, cpuUsage/processors::{}%",
+//                                                value, processors, cpuUsageRate);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                process.waitFor();
+            } catch (IOException | InterruptedException ignore) {
+            } catch (Exception e) {
+                logger.error("CpuStatistics:", e);
+            }
+        }, BackpressureStrategy.LATEST);
+    }
+
+    /**
      * 观察APP统计
      * @return
      */
@@ -128,6 +204,7 @@ public class TauInfoProvider {
                 int seconds = 0;
                 long lastMemQueryTime = DateUtil.getMillisTime();
                 long lastCPUQueryTime = DateUtil.getMillisTime();
+                int processors = getRuntime().availableProcessors();
                 while (!emitter.isCancelled()) {
                     handlerTrafficStatistics(sessionStatistics);
                     long trafficTotal = sessionStatistics.getTotalDownload() + sessionStatistics.getTotalUpload();
@@ -145,16 +222,16 @@ public class TauInfoProvider {
                         settingsRepo.setMemoryUsage(samplerStatistics.totalMemory);
                     }
                     // CPU采样
-                    if (currentTime - lastCPUQueryTime >= CPU_STATISTICS_PERIOD) {
+                    if (sampler.isAccessibleFromFile() && currentTime - lastCPUQueryTime >= CPU_STATISTICS_PERIOD) {
                         lastCPUQueryTime = currentTime;
                         float cpuUsageRate = sampler.sampleCPU();
-                        if (cpuUsageRate < 0) {
-                            cpuUsageRate = 0;
-                        } else if (cpuUsageRate > 100) {
-                            cpuUsageRate = 100;
-                        }
+                        cpuUsageRate = cpuUsageRate / processors;
+                        cpuUsageRate = Math.max(0, cpuUsageRate);
+                        cpuUsageRate = Math.min(100, cpuUsageRate);
                         samplerStatistics.cpuUsage = cpuUsageRate;
                         settingsRepo.setCpuUsage(samplerStatistics.cpuUsage);
+                    } else {
+                        samplerStatistics.cpuUsage = settingsRepo.getCpuUsage();
                     }
 
                     statistic.timestamp = DateUtil.getTime();
