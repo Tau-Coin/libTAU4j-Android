@@ -90,7 +90,6 @@ public class TauDaemonImpl extends TauDaemon {
                         AlertType.DHT_GET_PEERS.swig(),
                         AlertType.EXTERNAL_IP.swig(),
                         AlertType.LISTEN_SUCCEEDED.swig(),
-                        AlertType.STATE_UPDATE.swig(),
                         AlertType.SES_STOP_OVER.swig(),
                         AlertType.SESSION_STATS.swig(),
                         AlertType.LISTEN_FAILED.swig(),
