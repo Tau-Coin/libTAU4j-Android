@@ -137,6 +137,13 @@ public class TauService extends Service {
                 .subscribe(this::stopServiceWaitAlertDisposed));
     }
 
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        logger.info("onTaskRemoved");
+        shutdown();
+    }
+
     /**
      * 等待Alert被处理完停止服务
      */
