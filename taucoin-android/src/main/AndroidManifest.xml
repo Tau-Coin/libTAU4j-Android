@@ -109,6 +109,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.setting.WorkingConditionActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.user.SeedActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 

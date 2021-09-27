@@ -58,6 +58,7 @@
     <string name="drawer_peers">Friends</string>
     <string name="drawer_setting">Settings</string>
     <string name="drawer_data_cost">Data Cost</string>
+    <string name="drawer_working_condition">Working Condition</string>
     <string name="drawer_share">Share</string>
     <string name="drawer_frequency">Working Frequency/%1$s</string>
     <string name="drawer_dht_nodes">Peers/%1$d</string>
@@ -152,6 +153,8 @@
     <string name="setting_cpu_statistics">24h CPU Statistics</string>
     <string name="setting_journal_path">Journal storage path</string>
     <string name="setting_share_journal">Share All Journal</string>
+    <string name="setting_wifi">WiFi</string>
+    <string name="setting_metered">Metered</string>
     <string name="setting_wifi_network_title">WiFi - likely free internet</string>
     <string name="setting_metered_network_title">Metered - likely paid internet</string>
     <string name="setting_data_reset_time">Data Quota Daily Reset</string>
@@ -176,6 +179,12 @@
     <string name="setting_master_node">Master node</string>
     <string name="setting_charging">Charging</string>
     <string name="setting_internet">Internet</string>
+    <string name="setting_network_type">Network Type</string>
+    <string name="setting_network_interfaces">Network Interfaces</string>
+    <string name="setting_processors">Processors</string>
+    <string name="setting_dht_invoke">DHT Invoke</string>
+    <string name="setting_cpu">CPU/Processors</string>
+    <string name="setting_memory">Memory</string>
     <string name="setting_upnp">UPnP</string>
     <string name="setting_nat_pmp">NAT-PMP</string>
     <string name="setting_main_loop_interval">Main Loop Interval(ms)</string>

@@ -24,7 +24,7 @@ public class NetworkSetting {
     private static final int WIFI_LIMITED;                                      // 单位MB
     private static final int SURVIVAL_SPEED_LIMIT = 10;                         // 单位B
     private static final float MAX_CPU_LIMIT = 5;                               // 单位%
-    private static final int MAX_MEMORY_LIMIT = 150 * 1024 *1024;               // 单位B
+    public static final int HEAP_SIZE_LIMIT = 50 * 1024 * 1024;                 // 单位为B
 
     private static SettingsRepository settingsRepo;
     private static long lastStatisticsTime = 0;
@@ -85,7 +85,7 @@ public class NetworkSetting {
     public static boolean isMeteredNetwork() {
         Context context = MainApplication.getInstance();
         return settingsRepo.getBooleanValue(context.getString(R.string.pref_key_is_metered_network),
-                false);
+                true);
     }
 
     /**
@@ -383,14 +383,14 @@ public class NetworkSetting {
         // 根据系统资源(cpu, memory)的使用
         float cpuUsage = settingsRepo.getAverageCpuUsage();
         long memoryUsage = settingsRepo.getAverageMemoryUsage();
-        if (cpuUsage > MAX_CPU_LIMIT || memoryUsage > MAX_MEMORY_LIMIT) {
+        long maxMemoryLimit = settingsRepo.getMaxMemoryLimit();
+        if (cpuUsage > MAX_CPU_LIMIT || memoryUsage > maxMemoryLimit) {
             // 超出部分大小
             float excessSize = cpuUsage - MAX_CPU_LIMIT;
             float maxLimit = MAX_CPU_LIMIT;
             if (excessSize <= 0) {
-                excessSize = memoryUsage - MAX_MEMORY_LIMIT;
-                // 减去初始大约60MB
-                maxLimit = MAX_MEMORY_LIMIT - 60 * 1024 * 1024;
+                excessSize = memoryUsage - maxMemoryLimit;
+                maxLimit = HEAP_SIZE_LIMIT;
             }
             // 计算出来需要增加的大小
             if (excessSize > 0) {

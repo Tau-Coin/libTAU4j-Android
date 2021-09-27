@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.SparseArray;
 
 import org.libTAU4j.Message;
 import org.libTAU4j.SessionHandle;
@@ -432,14 +433,38 @@ public abstract class TauDaemon {
     /**
      * 获取网络接口
      */
-    private static String getNetworkInterface() {
-        List<String> ipList = SystemServiceManager.getInstance().getNetworkAddress();
-        if (ipList != null && ipList.size() > 0) {
+    private String getNetworkInterface() {
+        SparseArray<List<String>> ipList = SystemServiceManager.getInstance().getNetworkAddress();
+        List<String>  ipv4List = ipList.get(4);
+        List<String>  ipv6List = ipList.get(6);
+        StringBuilder networkInterfaces = new StringBuilder();
+        // 本地保存展示
+        StringBuilder localInterfaces = new StringBuilder();
+        if (ipv4List != null && ipv4List.size() > 0) {
             Random random = new Random();
-            int index = random.nextInt(ipList.size());
-            return ipList.get(index);
+            int index = random.nextInt(ipv4List.size());
+            networkInterfaces.append(ipv4List.get(index));
+            networkInterfaces.append(":0");
+
+            localInterfaces.append(ipv4List.get(index));
         }
-        return null;
+        boolean isMeteredNetwork = NetworkSetting.isMeteredNetwork();
+        if (!isMeteredNetwork && ipv6List != null && ipv6List.size() > 0) {
+            Random random = new Random();
+            int index = random.nextInt(ipv6List.size());
+            if (StringUtil.isNotEmpty(networkInterfaces)) {
+                networkInterfaces.append(",");
+
+                localInterfaces.append("\n");
+            }
+            networkInterfaces.append("[");
+            networkInterfaces.append(ipv6List.get(index));
+            networkInterfaces.append("]:0");
+
+            localInterfaces.append(ipv6List.get(index));
+        }
+        settingsRepo.setStringValue(appContext.getString(R.string.pref_key_network_interfaces), localInterfaces.toString());
+        return networkInterfaces.toString();
     }
 
     /**

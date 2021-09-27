@@ -272,7 +272,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
             average = usage;
         }
 
-        edit.putFloat(key, average);
+        edit.putFloat(key, average).apply();
     }
 
     @Override
@@ -294,6 +294,17 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
+    public void setMaxMemoryLimit(long maxLimit) {
+        edit.putLong(appContext.getString(R.string.pref_key_memory_max_limit), maxLimit)
+                .apply();
+    }
+
+    @Override
+    public long getMaxMemoryLimit() {
+        return pref.getLong(appContext.getString(R.string.pref_key_memory_max_limit), 0);
+    }
+
+    @Override
     public void setMemoryAverageUsage(long usage) {
         String key = appContext.getString(R.string.pref_key_memory_average_usage);
         long average = pref.getLong(key, 0);
@@ -303,7 +314,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
             average = usage;
         }
 
-        edit.putLong(key, average);
+        edit.putLong(key, average).apply();
     }
 
     @Override
@@ -317,7 +328,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         Context context = MainApplication.getInstance();
         setUPnpMapped(false);
         setNATPMPMapped(false);
-        edit.putFloat(context.getString(R.string.pref_key_cpu_average_usage), 0);
-        edit.putLong(context.getString(R.string.pref_key_memory_average_usage), 0);
+        edit.putFloat(context.getString(R.string.pref_key_cpu_average_usage), 0).apply();
+        edit.putLong(context.getString(R.string.pref_key_memory_average_usage), 0).apply();
+        edit.putString(context.getString(R.string.pref_key_network_interfaces), "").apply();
     }
 }

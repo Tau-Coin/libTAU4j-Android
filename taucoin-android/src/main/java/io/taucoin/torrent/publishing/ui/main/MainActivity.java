@@ -73,6 +73,7 @@ import io.taucoin.torrent.publishing.ui.qrcode.KeyQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.setting.DataCostActivity;
 import io.taucoin.torrent.publishing.ui.setting.FontSizeActivity;
 import io.taucoin.torrent.publishing.ui.setting.SettingActivity;
+import io.taucoin.torrent.publishing.ui.setting.WorkingConditionActivity;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.UserQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
@@ -185,11 +186,6 @@ public class MainActivity extends ScanTriggerActivity {
         toggle.setDrawerArrowDrawable(drawable);
 
         binding.drawerLayout.addDrawerListener(toggle);
-
-        updateDHTStats();
-        handleSettingsChanged(getString(R.string.pref_key_main_loop_interval));
-        handleSettingsChanged(getString(R.string.pref_key_cpu_usage));
-        handleSettingsChanged(getString(R.string.pref_key_memory_usage));
 
         if (Utils.isTablet(this)) {
             updateViewChanged();
@@ -310,6 +306,11 @@ public class MainActivity extends ScanTriggerActivity {
      * 订阅配置文件改变
      */
     private void subscribeSettingsChanged() {
+        updateDHTStats();
+        handleSettingsChanged(getString(R.string.pref_key_main_loop_interval));
+        handleSettingsChanged(getString(R.string.pref_key_cpu_usage));
+        handleSettingsChanged(getString(R.string.pref_key_memory_usage));
+
         Disposable disposable = settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -399,6 +400,9 @@ public class MainActivity extends ScanTriggerActivity {
                 break;
             case R.id.item_data_cost:
                 ActivityUtil.startActivity(this, DataCostActivity.class);
+                break;
+            case R.id.item_working_condition:
+                ActivityUtil.startActivity(this, WorkingConditionActivity.class);
                 break;
         }
         if (binding != null) {

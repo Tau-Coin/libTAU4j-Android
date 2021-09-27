@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Debug;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,7 +219,13 @@ public class TauInfoProvider {
                             Build.VERSION.SDK_INT <= Build.VERSION_CODES.P ||
                             currentTime - lastMemQueryTime >= MEM_STATISTICS_PERIOD) {
                         lastMemQueryTime = currentTime;
-                        samplerStatistics.totalMemory = sampler.sampleMemory();
+                        Debug.MemoryInfo memoryInfo = sampler.sampleMemory();
+                        if (memoryInfo != null && memoryInfo.getTotalPss() > 0) {
+                            samplerStatistics.totalMemory = memoryInfo.getTotalPss() * 1024;
+                            // 设置最大内存限制
+                            long maxMemoryLimit = memoryInfo.otherPss * 1024 + NetworkSetting.HEAP_SIZE_LIMIT;
+                            settingsRepo.setMaxMemoryLimit(maxMemoryLimit);
+                        }
                         settingsRepo.setMemoryUsage(samplerStatistics.totalMemory);
                     }
                     // CPU采样

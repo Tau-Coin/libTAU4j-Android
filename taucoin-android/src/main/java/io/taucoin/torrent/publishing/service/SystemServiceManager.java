@@ -9,6 +9,7 @@ import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
+import android.util.SparseArray;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,12 @@ public class SystemServiceManager {
     private SystemServiceManager(){
         this.appContext = MainApplication.getInstance();
         connectivityManager = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        connectivityManager.addDefaultNetworkActiveListener(new ConnectivityManager.OnNetworkActiveListener() {
+            @Override
+            public void onNetworkActive() {
+                logger.debug("!!!!!!!!onNetworkActive************");
+            }
+        });
     }
 
     public static SystemServiceManager getInstance() {
@@ -105,7 +112,7 @@ public class SystemServiceManager {
      * 1、获取当前ActiveNetworkInfo的type，
      * 2、遍历所有的Networks，满足type和第一步中的type相等 && isConnected()的从中间看是否有ipv4
      */
-    public List<String> getNetworkAddress() {
+    public SparseArray<List<String>> getNetworkAddress() {
         Network[] networks = connectivityManager.getAllNetworks();
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         List<String> ipv4List = new ArrayList<>();
@@ -134,14 +141,14 @@ public class SystemServiceManager {
                                 if (isIPv4(address)) {
                                     String ipv4 = address.getHostAddress();
                                     if (isActive && !address.isLoopbackAddress() && !address.isLinkLocalAddress()) {
-                                        ipv4List.add(ipv4 + ":0");
+                                        ipv4List.add(ipv4);
                                     }
                                     logger.debug("NetworkInfo IPv4 HostAddress::{}", ipv4);
                                 } else {
                                     String ipv6 = address.getHostAddress();
                                     if (isActive && !address.isLoopbackAddress() && !address.isLinkLocalAddress()) {
                                         // 需要加中括号，代表地址（地址可能用::被省略）
-                                        ipv6List.add("[" + ipv6 + "]:0");
+                                        ipv6List.add(ipv6);
                                     }
                                     logger.debug("NetworkInfo IPv6 HostAddress::{}, isIPv6ULA::{}",
                                             ipv6, isIPv6ULA(address));
@@ -154,11 +161,10 @@ public class SystemServiceManager {
             }
         }
         logger.debug("getNetworkAddress IPv4 size::{}, IPv6 size::{}", ipv4List.size(), ipv6List.size());
-        if (ipv4List.size() > 0) {
-            return ipv4List;
-        } else {
-            return ipv6List;
-        }
+        SparseArray<List<String>> ipList = new SparseArray<>();
+        ipList.append(4, ipv4List);
+        ipList.append(6, ipv6List);
+        return ipList;
     }
 
     private boolean isIPv6ULA(InetAddress address) {

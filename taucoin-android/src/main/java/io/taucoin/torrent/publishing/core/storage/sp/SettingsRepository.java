@@ -140,6 +140,17 @@ public interface SettingsRepository {
     void setMemoryUsage(long usage);
 
     /**
+     * 设置最大内存边界值
+     * @param maxLimit 最大内存边界值
+     */
+    void setMaxMemoryLimit(long maxLimit);
+
+    /**
+     * 获取最大内存边界值
+     */
+    long getMaxMemoryLimit();
+
+    /**
      * 获取内使用大小
      */
     long getMemoryUsage();

@@ -16,7 +16,6 @@
                 android:layout_height="wrap_content"
                 android:minHeight="@dimen/widget_size_100"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
                 android:paddingStart="@dimen/widget_size_15"
                 android:paddingEnd="@dimen/widget_size_15"
                 android:paddingTop="@dimen/widget_size_5"
@@ -30,6 +29,7 @@
                     android:textAllCaps="true"
                     android:textColor="@color/color_white"
                     android:textStyle="bold"
+                    android:layout_centerVertical="true"
                     android:gravity="center_vertical|center"
                     android:textAppearance="@style/TextAppearanceHeadline6"
                     app:btnStrokeColor="@color/primary_light"
@@ -38,75 +38,93 @@
                     app:btnCornerRadius="@dimen/widget_size_35"
                     app:btnPressedRatio="1.5" />
 
-                <TextView
-                    android:layout_toEndOf="@+id/round_button"
-                    android:id="@+id/tv_note_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_15"
-                    android:layout_marginTop="@dimen/widget_size_0"
-                    android:includeFontPadding="false"
-                    android:onClick="onClick"
-                    android:singleLine="true"
-                    android:textStyle="bold"
-                    android:ellipsize="end"
-                    android:textAppearance="@style/TextAppearanceBody1" />
-
-                <TextView
-                    android:layout_toEndOf="@+id/round_button"
-                    android:layout_below="@+id/tv_note_name"
-                    android:id="@+id/tv_public_key_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:layout_marginStart="@dimen/widget_size_15"
-                    android:layout_marginTop="@dimen/widget_size_5"
-                    android:onClick="onClick"
-                    android:text="@string/tx_public_key_hint"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    android:textColor="@color/gray_dark"
-                    android:textAppearance="@style/TextAppearanceBody3" />
-
                 <LinearLayout
+                    android:id="@+id/ll_user_info"
                     android:layout_toEndOf="@+id/round_button"
-                    android:layout_below="@+id/tv_public_key_title"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_toStartOf="@+id/iv_user_qr_code"
+                    android:layout_centerVertical="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tv_public_key"
-                        android:layout_width="0dp"
+                        android:id="@+id/tv_note_name"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/widget_size_15"
+                        android:layout_marginTop="@dimen/widget_size_0"
+                        android:includeFontPadding="false"
+                        android:onClick="onClick"
+                        android:singleLine="true"
+                        android:textStyle="bold"
+                        android:ellipsize="end"
+                        android:textAppearance="@style/TextAppearanceBody1" />
+
+                    <TextView
+                        android:id="@+id/tv_public_key_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:includeFontPadding="false"
                         android:layout_marginStart="@dimen/widget_size_15"
-                        android:layout_marginTop="@dimen/widget_size_2"
-                        android:singleLine="true"
-                        android:ellipsize="middle"
+                        android:layout_marginTop="@dimen/widget_size_5"
                         android:onClick="onClick"
+                        android:text="@string/tx_public_key_hint"
+                        android:singleLine="true"
+                        android:ellipsize="end"
                         android:textColor="@color/gray_dark"
                         android:textAppearance="@style/TextAppearanceBody3" />
 
-                    <ImageView
-                        android:id="@+id/iv_public_key_copy"
-                        android:layout_width="@dimen/widget_size_12"
-                        android:layout_height="@dimen/widget_size_12"
-                        android:onClick="onClick"
-                        android:layout_marginTop="@dimen/widget_size_2"
-                        android:contentDescription="@null"
-                        android:layout_marginStart="@dimen/widget_size_5"
-                        android:src="@mipmap/icon_copy_text"/>
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tv_public_key"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:includeFontPadding="false"
+                            android:layout_marginStart="@dimen/widget_size_15"
+                            android:layout_marginTop="@dimen/widget_size_2"
+                            android:singleLine="true"
+                            android:ellipsize="middle"
+                            android:onClick="onClick"
+                            android:textColor="@color/gray_dark"
+                            android:textAppearance="@style/TextAppearanceBody3" />
+
+                        <ImageView
+                            android:id="@+id/iv_public_key_copy"
+                            android:layout_width="@dimen/widget_size_12"
+                            android:layout_height="@dimen/widget_size_12"
+                            android:onClick="onClick"
+                            android:layout_marginTop="@dimen/widget_size_2"
+                            android:contentDescription="@null"
+                            android:layout_marginStart="@dimen/widget_size_5"
+                            android:src="@mipmap/icon_copy_text"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
                 <ImageView
-                    android:id="@+id/iv_user_qr_code"
-                    android:layout_below="@+id/tv_note_name"
+                    android:id="@+id/iv_close_drawer"
                     android:layout_width="@dimen/widget_size_22"
                     android:layout_height="@dimen/widget_size_22"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="@dimen/widget_size_7"
+                    android:onClick="onClick"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_close_drawer"/>
+
+                <ImageView
+                    android:id="@+id/iv_user_qr_code"
+                    android:layout_below="@+id/iv_close_drawer"
+                    android:layout_width="@dimen/widget_size_22"
+                    android:layout_height="@dimen/widget_size_22"
+                    android:layout_marginTop="@dimen/widget_size_25"
                     android:onClick="onClick"
                     android:layout_alignParentEnd="true"
                     android:contentDescription="@null"
@@ -154,6 +172,17 @@
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_dashboard"
                         app:rightText="@string/drawer_data_cost"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                        android:id="@+id/item_working_condition"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:layout_marginBottom="@dimen/widget_size_5"
+                        android:gravity="center_vertical"
+                        android:onClick="onClick"
+                        app:leftImage="@mipmap/icon_working_condition"
+                        app:rightText="@string/drawer_working_condition"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_setting"
@@ -239,17 +268,6 @@
                         android:gravity="center_vertical"
                         app:leftImage="@mipmap/icon_memory"
                         app:rightText="@string/drawer_mem_data"/>
-
-                    <ImageView
-                        android:id="@+id/iv_close_drawer"
-                        android:layout_width="@dimen/widget_size_48"
-                        android:layout_height="@dimen/widget_size_48"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        android:layout_marginEnd="@dimen/widget_size_30"
-                        android:padding="@dimen/widget_size_8"
-                        android:layout_gravity="end"
-                        android:onClick="onClick"
-                        android:src="@mipmap/icon_close_drawer"/>
 
                 </LinearLayout>
             </ScrollView>
