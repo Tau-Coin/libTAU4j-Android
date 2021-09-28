@@ -436,7 +436,7 @@ public abstract class TauDaemon {
     private String getNetworkInterface() {
         SparseArray<List<String>> ipList = SystemServiceManager.getInstance().getNetworkAddress();
         List<String>  ipv4List = ipList.get(4);
-        List<String>  ipv6List = ipList.get(6);
+//        List<String>  ipv6List = ipList.get(6);
         StringBuilder networkInterfaces = new StringBuilder();
         // 本地保存展示
         StringBuilder localInterfaces = new StringBuilder();
@@ -447,23 +447,25 @@ public abstract class TauDaemon {
             networkInterfaces.append(":0");
 
             localInterfaces.append(ipv4List.get(index));
+        } else {
+            localInterfaces.append("0.0.0.0");
         }
-        boolean isMeteredNetwork = NetworkSetting.isMeteredNetwork();
-        if (!isMeteredNetwork && ipv6List != null && ipv6List.size() > 0) {
-            Random random = new Random();
-            int index = random.nextInt(ipv6List.size());
-            if (StringUtil.isNotEmpty(networkInterfaces)) {
-                networkInterfaces.append(",");
-
-                localInterfaces.append("\n");
-            }
-            networkInterfaces.append("[");
-            networkInterfaces.append(ipv6List.get(index));
-            networkInterfaces.append("]:0");
-
-            localInterfaces.append(ipv6List.get(index));
-        }
-        settingsRepo.setStringValue(appContext.getString(R.string.pref_key_network_interfaces), localInterfaces.toString());
+//        boolean isMeteredNetwork = NetworkSetting.isMeteredNetwork();
+//        if (!isMeteredNetwork && ipv6List != null && ipv6List.size() > 0) {
+//            Random random = new Random();
+//            int index = random.nextInt(ipv6List.size());
+//            if (StringUtil.isNotEmpty(networkInterfaces)) {
+//                networkInterfaces.append(",");
+//
+//                localInterfaces.append("\n");
+//            }
+//            networkInterfaces.append("[");
+//            networkInterfaces.append(ipv6List.get(index));
+//            networkInterfaces.append("]:0");
+//
+//            localInterfaces.append(ipv6List.get(index));
+//        }
+        settingsRepo.setNetworkInterfaces(localInterfaces.toString());
         return networkInterfaces.toString();
     }
 

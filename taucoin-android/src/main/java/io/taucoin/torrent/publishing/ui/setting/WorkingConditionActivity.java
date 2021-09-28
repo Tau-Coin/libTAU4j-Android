@@ -84,6 +84,9 @@ public class WorkingConditionActivity extends BaseActivity {
             binding.tvDataLimit.setText(wifiLimitStr);
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_network_interfaces))) {
             String networkInterfaces = settingsRepo.getStringValue(key, "");
+            if (StringUtil.isEquals(networkInterfaces, "0.0.0.0")) {
+                networkInterfaces = "";
+            }
             binding.tvNetworkInterfaces.setText(networkInterfaces);
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_invoke))) {
             int invoke = settingsRepo.getIntValue(key, 0);

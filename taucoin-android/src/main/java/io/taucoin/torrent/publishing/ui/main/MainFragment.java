@@ -22,9 +22,12 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauInfoProvider;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
+import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityCreateActivity;
@@ -41,6 +44,7 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     private FragmentMainBinding binding;
     private MainViewModel viewModel;
     private TauInfoProvider infoProvider;
+    private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
 
     @Nullable
@@ -59,6 +63,7 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         ViewModelProvider provider = new ViewModelProvider(activity);
         viewModel = provider.get(MainViewModel.class);
         infoProvider = TauInfoProvider.getInstance(MainApplication.getInstance());
+        settingsRepo = RepositoryHelper.getSettingsRepository(MainApplication.getInstance());
         initView();
     }
 
@@ -90,18 +95,38 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         disposables.add(infoProvider.observeSessionStats()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(nodes -> {
-                    binding.llWarning.setVisibility(View.VISIBLE);
-                    if (nodes <= 0) {
-                        binding.tvWarning.setText(getString(R.string.main_connecting));
-                    } else if (!NetworkSetting.isHaveAvailableData()) {
-                        binding.tvWarning.setText(getString(R.string.main_data_used_up));
-                    } else if (DeviceUtils.isSpaceInsufficient()) {
-                        binding.tvWarning.setText(getString(R.string.main_insufficient_device_space));
-                    } else {
-                        binding.llWarning.setVisibility(View.GONE);
-                    }
-                }));
+                .subscribe(this::handleWarningView));
+
+        disposables.add(settingsRepo.observeSettingsChanged()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleSettingsChanged));
+    }
+
+    private void handleWarningView(long nodes) {
+        binding.llWarning.setVisibility(View.VISIBLE);
+        if (nodes <= 0) {
+            binding.tvWarning.setText(getString(R.string.main_connecting));
+        } else if (!NetworkSetting.isHaveAvailableData()) {
+            binding.tvWarning.setText(getString(R.string.main_data_used_up));
+        } else if (DeviceUtils.isSpaceInsufficient()) {
+            binding.tvWarning.setText(getString(R.string.main_insufficient_device_space));
+        } else {
+            binding.llWarning.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 用户设置参数变化
+     * @param key
+     */
+    private void handleSettingsChanged(String key) {
+        if (StringUtil.isEquals(key, getString(R.string.pref_key_network_interfaces))) {
+            String networkInterfaces = settingsRepo.getStringValue(key, "");
+            if (StringUtil.isEquals(networkInterfaces, "0.0.0.0")) {
+                binding.tvWarning.setText(getString(R.string.main_no_ipv4));
+            }
+        }
     }
 
     private void showCommunityList(List<CommunityAndFriend> communities) {

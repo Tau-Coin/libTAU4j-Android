@@ -323,13 +323,29 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         return pref.getLong(key, 0);
     }
 
+    /**
+     * 获取网络接口
+     */
+    @Override
+    public String getNetworkInterfaces() {
+        String key = appContext.getString(R.string.pref_key_network_interfaces);
+        return pref.getString(key, "");
+    }
+
+    /**
+     * 设置网络接口
+     */
+    @Override
+    public void setNetworkInterfaces(String interfaces) {
+        edit.putString(appContext.getString(R.string.pref_key_network_interfaces), interfaces).apply();
+    }
+
     @Override
     public void initData() {
-        Context context = MainApplication.getInstance();
         setUPnpMapped(false);
         setNATPMPMapped(false);
-        edit.putFloat(context.getString(R.string.pref_key_cpu_average_usage), 0).apply();
-        edit.putLong(context.getString(R.string.pref_key_memory_average_usage), 0).apply();
-        edit.putString(context.getString(R.string.pref_key_network_interfaces), "").apply();
+        setNetworkInterfaces("");
+        edit.putFloat(appContext.getString(R.string.pref_key_cpu_average_usage), 0).apply();
+        edit.putLong(appContext.getString(R.string.pref_key_memory_average_usage), 0).apply();
     }
 }

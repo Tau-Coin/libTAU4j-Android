@@ -159,6 +159,16 @@ public interface SettingsRepository {
 
     long getAverageMemoryUsage();
 
+    /**
+     * 获取网络接口
+     */
+    String getNetworkInterfaces();
+
+    /**
+     * 设置网络接口
+     */
+    void setNetworkInterfaces(String interfaces);
+
     long getLongValue(String key);
 
     long getLongValue(String key, long defValue);
