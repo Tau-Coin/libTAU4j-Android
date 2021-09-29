@@ -15,7 +15,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
  */
 public class FrequencyUtil {
     private static final Logger logger = LoggerFactory.getLogger("FrequencyUtil");
-    private static final int internal_sample = 50;            // 主循环采样大小，单位s
+    private static final int internal_sample = 5;            // 主循环采样大小，单位s
 
     private static SettingsRepository settingsRepo;
     static {
