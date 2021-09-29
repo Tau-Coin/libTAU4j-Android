@@ -183,7 +183,7 @@
     <string name="setting_network_type">Network Type</string>
     <string name="setting_network_interfaces">Network Interfaces</string>
     <string name="setting_processors">Processors</string>
-    <string name="setting_dht_invoke">DHT Invoke</string>
+    <string name="setting_dht_invoke">DHT Invoked Requests</string>
     <string name="setting_cpu">CPU/Processors</string>
     <string name="setting_memory">Memory</string>
     <string name="setting_upnp">UPnP</string>

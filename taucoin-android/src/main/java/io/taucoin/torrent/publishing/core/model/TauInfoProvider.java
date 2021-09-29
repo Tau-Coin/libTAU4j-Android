@@ -16,6 +16,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposables;
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Statistic;
@@ -90,12 +91,20 @@ public class TauInfoProvider {
             try {
                 Thread.currentThread().setName("SessionNodes");
                 long oldNodes = -1;
+                long oldInvokedRequests = -1;
+                String key = MainApplication.getInstance().getString(R.string.pref_key_dht_invoked_requests);
                 while (!emitter.isCancelled()) {
                     long sessionNodes = daemon.getSessionNodes();
                     if (oldNodes == -1 || oldNodes != sessionNodes) {
                         oldNodes = sessionNodes;
                         emitter.onNext(sessionNodes);
                     }
+                    long invokedRequests = daemon.getInvokedRequests();
+                    if (oldInvokedRequests == -1 || oldInvokedRequests != invokedRequests) {
+                        oldInvokedRequests = invokedRequests;
+                        settingsRepo.setLongValue(key, invokedRequests);
+                    }
+
                     if (!emitter.isCancelled()) {
                         Thread.sleep(STATISTICS_PERIOD);
                     }

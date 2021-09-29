@@ -507,6 +507,16 @@ public abstract class TauDaemon {
     }
 
     /**
+     * 统计Sessions的nodes数
+     */
+    long getInvokedRequests() {
+        if (!isRunning) {
+            return 0;
+        }
+        return sessionManager.invokedRequests();
+    }
+
+    /**
      * 获取Sessions的流量统计
      */
     void getSessionStatistics(@NonNull SessionStatistics statistics) {

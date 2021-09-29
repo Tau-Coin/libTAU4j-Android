@@ -55,7 +55,7 @@ public class WorkingConditionActivity extends BaseActivity {
         handleSettingsChanged(getString(R.string.pref_key_charging_state));
         handleSettingsChanged(getString(R.string.pref_key_is_metered_network));
         handleSettingsChanged(getString(R.string.pref_key_network_interfaces));
-        handleSettingsChanged(getString(R.string.pref_key_dht_invoke));
+        handleSettingsChanged(getString(R.string.pref_key_dht_invoked_requests));
         handleSettingsChanged(getString(R.string.pref_key_cpu_usage));
         handleSettingsChanged(getString(R.string.pref_key_memory_usage));
 
@@ -88,8 +88,8 @@ public class WorkingConditionActivity extends BaseActivity {
                 networkInterfaces = "";
             }
             binding.tvNetworkInterfaces.setText(networkInterfaces);
-        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_invoke))) {
-            int invoke = settingsRepo.getIntValue(key, 0);
+        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_invoked_requests))) {
+            long invoke = settingsRepo.getLongValue(key, 0);
             binding.tvDhtInvoke.setText(String.valueOf(invoke));
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_cpu_usage))) {
             float cpuUsage = settingsRepo.getCpuUsage();
