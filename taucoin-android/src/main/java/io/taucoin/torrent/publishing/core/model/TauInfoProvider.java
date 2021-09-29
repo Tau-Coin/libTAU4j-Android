@@ -153,6 +153,7 @@ public class TauInfoProvider {
 //                logger.debug("CpuStatistics currentPid::{}, shellPid::{}", currentPid, shellPid);
                 while ((line = br.readLine()) != null) {
                     line = line.trim();
+                    logger.debug("CpuStatistics line::{}", line);
                     String[] resp = line.split(" ");
                     if (resp.length > 0) {
                         int pid = StringUtil.getIntString(resp[0]);
@@ -167,9 +168,9 @@ public class TauInfoProvider {
                                         cpuUsageRate = Math.max(0, cpuUsageRate);
                                         cpuUsageRate = Math.min(100, cpuUsageRate);
                                         settingsRepo.setCpuUsage(cpuUsageRate);
-//                                        logger.debug("CpuStatistics cpuUsage::{}%, " +
-//                                                        "processors::{}, cpuUsage/processors::{}%",
-//                                                value, processors, cpuUsageRate);
+                                        logger.debug("CpuStatistics cpuUsage::{}%, " +
+                                                        "processors::{}, cpuUsage/processors::{}%",
+                                                value, processors, cpuUsageRate);
                                         break;
                                     }
                                 }
@@ -246,6 +247,7 @@ public class TauInfoProvider {
                         cpuUsageRate = Math.min(100, cpuUsageRate);
                         samplerStatistics.cpuUsage = cpuUsageRate;
                         settingsRepo.setCpuUsage(samplerStatistics.cpuUsage);
+                        logger.debug("setCpuUsage::{}", samplerStatistics.cpuUsage);
                     } else {
                         samplerStatistics.cpuUsage = settingsRepo.getCpuUsage();
                     }
