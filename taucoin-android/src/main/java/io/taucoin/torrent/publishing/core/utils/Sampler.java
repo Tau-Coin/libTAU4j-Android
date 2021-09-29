@@ -73,7 +73,7 @@ public class Sampler {
                 procStatFile.seek(0L);
                 while (true) {
                     String procStatString = procStatFile.readLine();
-                    logger.debug("loadTotalLine readLine::{}", procStatString);
+                    logger.debug("loadTotalLine procStatString::{}", procStatString);
                     if (StringUtil.isNotEmpty(procStatString)) {
                         String[] procStats = procStatString.split(" ");
                         if (procStats.length > 8) {
@@ -91,20 +91,30 @@ public class Sampler {
                 cpuTime = date.getTime();
             }
 
-            String appStatString = appStatFile.readLine();
-            String[] appStats = appStatString.split(" ");
-            appTime = Long.parseLong(appStats[13]) + Long.parseLong(appStats[14]);
+            while (true) {
+                String appStatString = appStatFile.readLine();
+                logger.debug("loadTotalLine appStatString::{}", appStatString);
+                if (StringUtil.isNotEmpty(appStatString)) {
+                    String[] appStats = appStatString.split(" ");
+                    appTime = Long.parseLong(appStats[13]) + Long.parseLong(appStats[14]);
+                    break;
+                }
+            }
             if (lastCpuTime == null || lastAppCpuTime == null) {
                 lastCpuTime = cpuTime;
                 lastAppCpuTime = appTime;
+                logger.debug("sampleValue0::{}", sampleValue);
                 return sampleValue;
             }
             sampleValue = ((float) (appTime - lastAppCpuTime) /
                     (float) (cpuTime - lastCpuTime)) * 100f;
+            logger.debug("sampleValue::{}, cpuTime::{}({}, {}), appTime::{}({}, {})",
+                    sampleValue, (cpuTime - lastCpuTime), lastCpuTime, cpuTime, (appTime - lastAppCpuTime)
+                    , lastAppCpuTime, appTime);
             lastCpuTime = cpuTime;
             lastAppCpuTime = appTime;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("sampleValue error::{}", e.getMessage());
         }
         return sampleValue;
     }

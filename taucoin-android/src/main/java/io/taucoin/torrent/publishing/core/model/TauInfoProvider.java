@@ -242,12 +242,13 @@ public class TauInfoProvider {
                     if (sampler.isAccessibleFromFile() && currentTime - lastCPUQueryTime >= CPU_STATISTICS_PERIOD) {
                         lastCPUQueryTime = currentTime;
                         float cpuUsageRate = sampler.sampleCPU();
+                        logger.debug("cpuUsageRate::{}, processors::{}", cpuUsageRate, processors);
                         cpuUsageRate = cpuUsageRate / processors;
                         cpuUsageRate = Math.max(0, cpuUsageRate);
                         cpuUsageRate = Math.min(100, cpuUsageRate);
                         samplerStatistics.cpuUsage = cpuUsageRate;
                         settingsRepo.setCpuUsage(samplerStatistics.cpuUsage);
-                        logger.debug("setCpuUsage::{}", samplerStatistics.cpuUsage);
+                        logger.debug("cpuUsageRate setCpuUsage::{}", samplerStatistics.cpuUsage);
                     } else {
                         samplerStatistics.cpuUsage = settingsRepo.getCpuUsage();
                     }
