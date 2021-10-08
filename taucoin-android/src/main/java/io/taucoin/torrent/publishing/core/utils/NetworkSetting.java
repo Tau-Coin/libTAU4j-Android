@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.Interval;
+import io.taucoin.torrent.publishing.core.model.TauInfoProvider;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 
@@ -125,7 +126,8 @@ public class NetworkSetting {
             int backgroundRunningTime = getBackgroundRunningTime() + 1;
             updateBackgroundRunningTime(backgroundRunningTime);
 
-            int dozeTime = (int) ((currentTime - lastStatisticsTime) / 1000 - 1);
+            // 去除流量统计时间间隔
+            int dozeTime = (int) ((currentTime - lastStatisticsTime - TauInfoProvider.STATISTICS_PERIOD) / 1000);
             if (lastStatisticsTime > 0 && dozeTime > 0 && !isForegroundRunning()) {
                 dozeTime += getDozeTime();
                 updateDozeTime(dozeTime);

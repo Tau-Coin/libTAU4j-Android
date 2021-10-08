@@ -73,7 +73,6 @@ public class Sampler {
                 procStatFile.seek(0L);
                 while (true) {
                     String procStatString = procStatFile.readLine();
-                    logger.debug("loadTotalLine procStatString::{}", procStatString);
                     if (StringUtil.isNotEmpty(procStatString)) {
                         String[] procStats = procStatString.split(" ");
                         if (procStats.length > 8) {
@@ -93,7 +92,6 @@ public class Sampler {
 
             while (true) {
                 String appStatString = appStatFile.readLine();
-                logger.debug("loadTotalLine appStatString::{}", appStatString);
                 if (StringUtil.isNotEmpty(appStatString)) {
                     String[] appStats = appStatString.split(" ");
                     appTime = Long.parseLong(appStats[13]) + Long.parseLong(appStats[14]);
@@ -103,7 +101,6 @@ public class Sampler {
             if (lastCpuTime == null || lastAppCpuTime == null) {
                 lastCpuTime = cpuTime;
                 lastAppCpuTime = appTime;
-                logger.debug("sampleValue0::{}", sampleValue);
                 return sampleValue;
             }
             sampleValue = ((float) (appTime - lastAppCpuTime) /

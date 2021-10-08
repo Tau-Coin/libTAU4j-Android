@@ -37,7 +37,7 @@ import static java.lang.Runtime.getRuntime;
 public class TauInfoProvider {
     private static final String TAG = TauInfoProvider.class.getSimpleName();
     private static final Logger logger = LoggerFactory.getLogger(TAG);
-    private static final int STATISTICS_PERIOD = 2000;
+    public static final int STATISTICS_PERIOD = 2000;
     private static final int MEM_STATISTICS_PERIOD = 60 * 1000;                 // 单位为ms
     private static final int CPU_STATISTICS_PERIOD = 4 * 1000;                  // 单位为ms
 
@@ -100,6 +100,7 @@ public class TauInfoProvider {
                         emitter.onNext(sessionNodes);
                     }
                     long invokedRequests = daemon.getInvokedRequests();
+                    logger.debug("invokedRequests::{}", invokedRequests);
                     if (oldInvokedRequests == -1 || oldInvokedRequests != invokedRequests) {
                         oldInvokedRequests = invokedRequests;
                         settingsRepo.setLongValue(key, invokedRequests);
@@ -242,13 +243,11 @@ public class TauInfoProvider {
                     if (sampler.isAccessibleFromFile() && currentTime - lastCPUQueryTime >= CPU_STATISTICS_PERIOD) {
                         lastCPUQueryTime = currentTime;
                         float cpuUsageRate = sampler.sampleCPU();
-                        logger.debug("cpuUsageRate::{}, processors::{}", cpuUsageRate, processors);
                         cpuUsageRate = cpuUsageRate / processors;
                         cpuUsageRate = Math.max(0, cpuUsageRate);
                         cpuUsageRate = Math.min(100, cpuUsageRate);
                         samplerStatistics.cpuUsage = cpuUsageRate;
                         settingsRepo.setCpuUsage(samplerStatistics.cpuUsage);
-                        logger.debug("cpuUsageRate setCpuUsage::{}", samplerStatistics.cpuUsage);
                     } else {
                         samplerStatistics.cpuUsage = settingsRepo.getCpuUsage();
                     }
