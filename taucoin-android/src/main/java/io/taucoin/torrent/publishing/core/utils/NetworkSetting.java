@@ -20,7 +20,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
  * 网络流量设置相关工具类
  */
 public class NetworkSetting {
-//    private static final Logger logger = LoggerFactory.getLogger("NetworkSetting");
+    private static final Logger logger = LoggerFactory.getLogger("NetworkSetting");
     private static final int METERED_LIMITED;                                   // 单位MB
     private static final int WIFI_LIMITED;                                      // 单位MB
     private static final int SURVIVAL_SPEED_LIMIT = 10;                         // 单位B
@@ -358,7 +358,7 @@ public class NetworkSetting {
             timeInterval = (min.getInterval() + max.getInterval()) / 2;
 //            logger.trace("calculateMainLoopInterval timeInterval::{}, currentSpeed::{}",
 //                    timeInterval, getCurrentSpeed());
-            FrequencyUtil.updateMainLoopInterval(timeInterval);
+//            FrequencyUtil.updateMainLoopInterval(timeInterval);
         } else {
             long averageSpeed;
             if (isMeteredNetwork()) {
@@ -408,6 +408,7 @@ public class NetworkSetting {
 
         if (timeInterval > 0) {
             FrequencyUtil.updateMainLoopInterval(timeInterval);
+            logger.debug("updateMainLoopInterval timeInterval::{}ms", timeInterval);
         }
     }
 }

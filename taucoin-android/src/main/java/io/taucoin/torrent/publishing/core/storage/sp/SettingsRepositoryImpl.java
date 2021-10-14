@@ -347,5 +347,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         setNetworkInterfaces("");
         edit.putFloat(appContext.getString(R.string.pref_key_cpu_average_usage), 0).apply();
         edit.putLong(appContext.getString(R.string.pref_key_memory_average_usage), 0).apply();
+        // 初始化主循环频率
+        edit.putInt(appContext.getString(R.string.pref_key_main_loop_interval), 0).apply();
+        edit.putInt(appContext.getString(R.string.pref_key_main_loop_average_interval), 0).apply();
     }
 }

@@ -148,8 +148,6 @@ public abstract class TauDaemon {
         switchPowerReceiver();
         switchConnectionReceiver();
         TrafficUtil.resetTrafficTotalOld();
-        // 初始化主循环频率
-        FrequencyUtil.clearMainLoopIntervalList();
         settingsRepo.initData();
     }
 
