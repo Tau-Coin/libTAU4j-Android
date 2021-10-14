@@ -122,6 +122,8 @@ public abstract class TauDaemon {
                     logger.debug("Tau start successfully");
                     isRunning = true;
                     handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
+                    // 防止第一次更新时，链端未启动成功，后面无法触发
+                    handleSettingsChanged(appContext.getString(R.string.pref_key_main_loop_interval));
                     // 把自己当作朋友添加进libTAU
                     addYourselfAsFriend();
                 }
