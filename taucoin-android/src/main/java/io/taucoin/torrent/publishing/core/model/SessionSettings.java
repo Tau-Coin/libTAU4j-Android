@@ -63,6 +63,16 @@ class SessionSettings {
             return this;
         }
 
+        /**
+         * set dht read only
+         * @param readOnly read only
+         */
+        SessionParamsBuilder setReadOnly(boolean readOnly) {
+            logger.debug("setReadOnly::{}", readOnly);
+            sp.set_bool(settings_pack.bool_types.dht_read_only.swigValue(), readOnly);
+            return this;
+        }
+
         SessionParams build() {
             session_params params = new session_params(sp);
             return new SessionParams(params);

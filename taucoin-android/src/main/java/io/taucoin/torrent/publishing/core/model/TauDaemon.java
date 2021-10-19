@@ -261,6 +261,7 @@ public abstract class TauDaemon {
                 .setNetworkInterface(networkAddress)
                 .setDeviceID(deviceID)
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
+                .setReadOnly(true)
                 .build();
         sessionManager.start(sessionParams);
     }
