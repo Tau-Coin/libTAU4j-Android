@@ -17,7 +17,11 @@ import org.slf4j.LoggerFactory;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import io.taucoin.torrent.publishing.MainApplication;
@@ -33,12 +37,6 @@ public class SystemServiceManager {
     private SystemServiceManager(){
         this.appContext = MainApplication.getInstance();
         connectivityManager = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        connectivityManager.addDefaultNetworkActiveListener(new ConnectivityManager.OnNetworkActiveListener() {
-            @Override
-            public void onNetworkActive() {
-                logger.debug("!!!!!!!!onNetworkActive************");
-            }
-        });
     }
 
     public static SystemServiceManager getInstance() {
@@ -108,6 +106,52 @@ public class SystemServiceManager {
     }
 
     /**
+     * 通过NetworkInterface.getNetworkInterfaces()获取解析整个设备的网络地址
+     * @param ipv4List List<String>
+     * @param ipv6List List<String>
+     */
+    private void parseAllNetworks(List<String> ipv4List, List<String> ipv6List) {
+        try {
+            boolean isAddIPAddress = ipv4List.isEmpty();
+            // 防止统计重复
+            if (isAddIPAddress) {
+                ipv6List.clear();
+            }
+            Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
+            int count = 0;
+            while (en.hasMoreElements()) {
+                count += 1;
+                NetworkInterface intf = en.nextElement();
+                logger.debug("testAllNetworks count::{}, Networks::{}", count, intf.toString());
+
+                List<InterfaceAddress> interfaceAddresses = intf.getInterfaceAddresses();
+                StringBuilder address = new StringBuilder();
+                for (InterfaceAddress ia : interfaceAddresses) {
+                    InetAddress inetAddress = ia.getAddress();
+                    if (inetAddress != null && !inetAddress.isLoopbackAddress() && !inetAddress.isLinkLocalAddress()) {
+                        String ipAddress = inetAddress.getHostAddress();
+                        address.append(", ").append(ipAddress);
+
+                        if (isAddIPAddress) {
+                            if (isIPv4(inetAddress)) {
+                                ipv4List.add(ipAddress);
+                            } else {
+                                ipv6List.add(ipAddress);
+                            }
+                        }
+                    }
+                }
+                logger.debug("testAllNetworks count::{}, Networks::{}, address::{}",
+                        count, intf.toString(), address.toString());
+            }
+            logger.debug("testAllNetworks IPv4 size::{}, IPv6 size::{}, isAddIPAddress::{}",
+                    ipv4List.size(), ipv6List.size(), isAddIPAddress);
+        } catch (SocketException e) {
+            logger.debug("testAllNetworks error::", e);
+        }
+    }
+
+    /**
      * 获取网络地址
      * 1、获取当前ActiveNetworkInfo的type，
      * 2、遍历所有的Networks，满足type和第一步中的type相等 && isConnected()的从中间看是否有ipv4
@@ -119,8 +163,11 @@ public class SystemServiceManager {
         List<String> ipv6List = new ArrayList<>();
         if (networks != null && activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
             int activeType = activeNetworkInfo.getType();
-            logger.debug("ActiveNetworkInfo ::{}", activeNetworkInfo.toString());
+            logger.debug("ActiveNetworkInfo::{}, AllNetworks::{}", activeNetworkInfo.toString(),
+                    networks.length);
             for (Network network : networks) {
+                logger.debug("ActiveNetworkInfo::{}, ActiveType::{}, AllNetworks::{}", activeNetworkInfo.toString(),
+                        activeType, networks.length);
                 NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
                 if (null == networkInfo) {
                     continue;
@@ -160,7 +207,8 @@ public class SystemServiceManager {
                 }
             }
         }
-        logger.debug("getNetworkAddress IPv4 size::{}, IPv6 size::{}", ipv4List.size(), ipv6List.size());
+        logger.debug("NetworkInfo IPv4 size::{}, IPv6 size::{}", ipv4List.size(), ipv6List.size());
+        parseAllNetworks(ipv4List, ipv6List);
         SparseArray<List<String>> ipList = new SparseArray<>();
         ipList.append(4, ipv4List);
         ipList.append(6, ipv6List);
