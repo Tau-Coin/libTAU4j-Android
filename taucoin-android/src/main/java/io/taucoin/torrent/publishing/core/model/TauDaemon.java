@@ -2,7 +2,6 @@ package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.SparseArray;
 
 import org.libTAU4j.Message;
 import org.libTAU4j.SessionHandle;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -246,11 +244,6 @@ public abstract class TauDaemon {
      * Only calls from TauService
      */
     public void doStart(String seed) {
-        String networkAddress = getNetworkInterface();
-        if (StringUtil.isEmpty(networkAddress)) {
-            logger.info("Failed to get network address");
-            return;
-        }
         logger.info("doStart");
         if (isRunning)
             return;
@@ -258,7 +251,6 @@ public abstract class TauDaemon {
         // 设置SessionManager启动参数
         SessionParams sessionParams = SessionSettings.getSessionParamsBuilder()
                 .setAccountSeed(seed)
-                .setNetworkInterface(networkAddress)
                 .setDeviceID(deviceID)
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
                 .setReadOnly(true)
@@ -423,51 +415,11 @@ public abstract class TauDaemon {
                 doStart(seed);
             }
         } else {
-            String networkInterface = getNetworkInterface();
-            if (StringUtil.isNotEmpty(networkInterface) && sessionManager.swig() != null) {
-                new SessionHandle(sessionManager.swig()).updateListenInterfaces(networkInterface);
+            if (sessionManager.swig() != null) {
+                new SessionHandle(sessionManager.swig()).updateListenInterfaces("");
             }
-            logger.debug("updateListenInterfaces::{}", networkInterface);
+            logger.debug("updateListenInterfaces...");
         }
-    }
-
-    /**
-     * 获取网络接口
-     */
-    private String getNetworkInterface() {
-        SparseArray<List<String>> ipList = SystemServiceManager.getInstance().getNetworkAddress();
-        List<String>  ipv4List = ipList.get(4);
-//        List<String>  ipv6List = ipList.get(6);
-        StringBuilder networkInterfaces = new StringBuilder();
-        // 本地保存展示
-        StringBuilder localInterfaces = new StringBuilder();
-        if (ipv4List != null && ipv4List.size() > 0) {
-            Random random = new Random();
-            int index = random.nextInt(ipv4List.size());
-            networkInterfaces.append(ipv4List.get(index));
-            networkInterfaces.append(":0");
-
-            localInterfaces.append(ipv4List.get(index));
-        } else {
-            localInterfaces.append("0.0.0.0");
-        }
-//        boolean isMeteredNetwork = NetworkSetting.isMeteredNetwork();
-//        if (!isMeteredNetwork && ipv6List != null && ipv6List.size() > 0) {
-//            Random random = new Random();
-//            int index = random.nextInt(ipv6List.size());
-//            if (StringUtil.isNotEmpty(networkInterfaces)) {
-//                networkInterfaces.append(",");
-//
-//                localInterfaces.append("\n");
-//            }
-//            networkInterfaces.append("[");
-//            networkInterfaces.append(ipv6List.get(index));
-//            networkInterfaces.append("]:0");
-//
-//            localInterfaces.append(ipv6List.get(index));
-//        }
-        settingsRepo.setNetworkInterfaces(localInterfaces.toString());
-        return networkInterfaces.toString();
     }
 
     /**
