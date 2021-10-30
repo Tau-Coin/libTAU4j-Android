@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.libTAU4j.Message;
-import org.libTAU4j.SessionHandle;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.alerts.Alert;
@@ -415,10 +414,10 @@ public abstract class TauDaemon {
                 doStart(seed);
             }
         } else {
-            if (sessionManager.swig() != null) {
-                new SessionHandle(sessionManager.swig()).updateListenInterfaces("");
-            }
-            logger.debug("updateListenInterfaces...");
+            List<String> list = SystemServiceManager.getInstance().getNetworkAddress().get(4);
+            sessionManager.reopenNetworkSockets();
+            logger.debug("updateListenInterfaces list.size::{}, IP::{}", list.size(),
+                    list.size() > 0 ? list.get(0) : "");
         }
     }
 
