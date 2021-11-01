@@ -375,10 +375,9 @@ public class NetworkSetting {
                 int lastTimeInterval = FrequencyUtil.getMainLoopAverageInterval();
                 timeInterval = Math.max(min.getInterval(), (int)(lastTimeInterval * rate));
                 timeInterval = Math.min(timeInterval, max.getInterval());
-//                logger.debug("calculateMainLoopInterval currentSpeed::{}, averageSpeed::{}, " +
-//                                "rate::{}, timeInterval::{}, lastTimeInterval::{}, mainLoopMax::{}",
-//                        currentSpeed, averageSpeed, rate, timeInterval, lastTimeInterval,
-//                        max.getInterval());
+                logger.debug("calculateMainLoopInterval currentSpeed::{}, averageSpeed::{}, " +
+                                "rate::{}, timeInterval::{}, lastTimeInterval::{}",
+                        currentSpeed, averageSpeed, rate, timeInterval, lastTimeInterval);
             }
         }
 
