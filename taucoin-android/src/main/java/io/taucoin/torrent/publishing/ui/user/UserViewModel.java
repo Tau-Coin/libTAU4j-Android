@@ -41,7 +41,6 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
-import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
@@ -74,7 +73,6 @@ import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.constant.Constants;
 import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
 import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
-import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
@@ -531,53 +529,9 @@ public class UserViewModel extends AndroidViewModel {
      */
     public void addFriend(String publicKey, String nickname) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
-            logger.debug("AddFriendsLocally, publicKey::{}, nickname::{}", publicKey, nickname);
-            Result result = new Result();
-            User user = userRepo.getUserByPublicKey(publicKey);
-            if(null == user){
-                logger.debug("AddFriendsLocally, new user");
-                user = new User(publicKey);
-                if (StringUtil.isNotEmpty(nickname)) {
-                    user.nickname = nickname;
-                    user.updateTime = DateUtil.getTime();
-                }
-                userRepo.addUser(user);
-            } else {
-                logger.debug("AddFriendsLocally, user exist");
-                if (StringUtil.isEmpty(user.nickname) && StringUtil.isNotEmpty(nickname)) {
-                    user.nickname = nickname;
-                    user.updateTime = DateUtil.getTime();
-                    userRepo.updateUser(user);
-                }
-            }
-            String userPK = MainApplication.getInstance().getPublicKey();
-            Friend friend = friendRepo.queryFriend(userPK, publicKey);
+            Result result = addFriendTask(publicKey, nickname);
 
-            // 更新libTAU朋友信息
-            boolean isSuccess = daemon.updateFriendInfo(user);
-            logger.debug("AddFriendsLocally, libTAU updateFriendInfo success::{}", isSuccess);
-            boolean isExist = true;
-            if (null == friend) {
-                // 添加朋友
-                int status = isSuccess ? FriendStatus.ADDED.getStatus() : FriendStatus.DISCOVERED.getStatus();
-                friend = new Friend(userPK, publicKey, status);
-                friendRepo.addFriend(friend);
-                if (isSuccess) {
-                    isExist = false;
-                    result.setMsg(publicKey);
-                    // 发送默认消息
-                    String msg = getApplication().getString(R.string.contacts_have_added);
-                    chatViewModel.syncSendMessageTask(publicKey, msg, MessageType.TEXT.getType());
-                    logger.debug("AddFriendsLocally, syncSendMessageTask::{}", msg);
-                } else {
-                    result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));
-                    logger.debug("AddFriendsLocally, {}", result.getMsg());
-                }
-            } else {
-                result.setMsg(getApplication().getString(R.string.contacts_friend_already_exists));
-                logger.debug("AddFriendsLocally, {}", result.getMsg());
-            }
-            result.setSuccess(isExist);
+            result.setSuccess(result.isExist());
             emitter.onNext(result);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
@@ -585,6 +539,57 @@ public class UserViewModel extends AndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(isExist -> addFriendResult.postValue(isExist));
         disposables.add(disposable);
+    }
+
+    private Result addFriendTask(String publicKey, String nickname) {
+        logger.debug("AddFriendsLocally, publicKey::{}, nickname::{}", publicKey, nickname);
+        Result result = new Result();
+        User user = userRepo.getUserByPublicKey(publicKey);
+        if(null == user){
+            logger.debug("AddFriendsLocally, new user");
+            user = new User(publicKey);
+            if (StringUtil.isNotEmpty(nickname)) {
+                user.nickname = nickname;
+                user.updateTime = DateUtil.getTime();
+            }
+            userRepo.addUser(user);
+        } else {
+            logger.debug("AddFriendsLocally, user exist");
+            if (StringUtil.isEmpty(user.nickname) && StringUtil.isNotEmpty(nickname)) {
+                user.nickname = nickname;
+                user.updateTime = DateUtil.getTime();
+                userRepo.updateUser(user);
+            }
+        }
+        String userPK = MainApplication.getInstance().getPublicKey();
+        Friend friend = friendRepo.queryFriend(userPK, publicKey);
+
+        // 更新libTAU朋友信息
+        boolean isSuccess = daemon.updateFriendInfo(user);
+        logger.debug("AddFriendsLocally, libTAU updateFriendInfo success::{}", isSuccess);
+        boolean isExist = true;
+        if (null == friend) {
+            // 添加朋友
+            int status = isSuccess ? FriendStatus.ADDED.getStatus() : FriendStatus.DISCOVERED.getStatus();
+            friend = new Friend(userPK, publicKey, status);
+            friendRepo.addFriend(friend);
+            if (isSuccess) {
+                isExist = false;
+                result.setMsg(publicKey);
+                // 发送默认消息
+                String msg = getApplication().getString(R.string.contacts_have_added);
+                chatViewModel.syncSendMessageTask(publicKey, msg, MessageType.TEXT.getType());
+                logger.debug("AddFriendsLocally, syncSendMessageTask::{}", msg);
+            } else {
+                result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));
+                logger.debug("AddFriendsLocally, {}", result.getMsg());
+            }
+        } else {
+            result.setMsg(getApplication().getString(R.string.contacts_friend_already_exists));
+            logger.debug("AddFriendsLocally, {}", result.getMsg());
+        }
+        result.setExist(isExist);
+        return result;
     }
 
     /**
@@ -902,5 +907,24 @@ public class UserViewModel extends AndroidViewModel {
 
     public Observable<String> observeFriendDataSetChanged() {
         return friendRepo.observeDataSetChanged();
+    }
+
+    public void batchAddFriends(String name, int num) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            if (num > 0) {
+                for (int i = 0; i < num; i++) {
+                    String friendName = name + (i + 1);
+                    byte[] seedBytes = Ed25519.createSeed();
+                    Pair<byte[], byte[]> keypair = Ed25519.createKeypair(seedBytes);
+                    String friendPk = ByteUtil.toHexString(keypair.first);
+                    addFriend(friendPk, friendName);
+                }
+            }
+            ToastUtils.showShortToast(R.string.contacts_add_successfully);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe();
+        disposables.add(disposable);
     }
 }

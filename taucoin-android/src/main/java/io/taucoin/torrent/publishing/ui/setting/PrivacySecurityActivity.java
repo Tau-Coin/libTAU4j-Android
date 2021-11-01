@@ -7,8 +7,10 @@ import android.view.View;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityPrivacySecurityBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
@@ -41,6 +43,7 @@ public class PrivacySecurityActivity extends BaseActivity implements View.OnClic
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(R.string.setting_privacy_security);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        binding.llTest.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
     }
     @Override
     public void onStart() {
@@ -72,6 +75,11 @@ public class PrivacySecurityActivity extends BaseActivity implements View.OnClic
                 break;
             case R.id.ll_devices:
                 ActivityUtil.startActivity(this, DevicesActivity.class);
+                break;
+            case R.id.tv_batch_add_friends:
+                String name = StringUtil.getText(binding.tvFriendsName);
+                int num = StringUtil.getIntText(binding.tvFriendsNum);
+                viewModel.batchAddFriends(name, num);
                 break;
         }
     }
