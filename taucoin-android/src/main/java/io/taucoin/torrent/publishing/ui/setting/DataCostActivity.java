@@ -78,6 +78,10 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         List<Integer> wifiList = Ints.asList(wifiLimits);
         adapterWiFi.submitList(wifiList);
 
+        refreshAllData();
+    }
+
+    private void refreshAllData() {
         handleSettingsChanged(getString(R.string.pref_key_is_metered_network));
         handleSettingsChanged(getString(R.string.pref_key_current_speed));
         handleSettingsChanged(getString(R.string.pref_key_main_loop_interval));
@@ -112,6 +116,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
     public void onStart() {
         super.onStart();
         // 处理从后台切换到前台的情况下，后台时间不更新的问题
+        refreshAllData();
         handleSettingsChanged(getString(R.string.pref_key_background_running_time));
         handleSettingsChanged(getString(R.string.pref_key_doze_running_time));
         disposables.add(settingsRepo.observeSettingsChanged()
