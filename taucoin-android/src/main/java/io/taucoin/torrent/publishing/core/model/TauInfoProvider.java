@@ -22,6 +22,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Statistic;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.StatisticRepository;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.Formatter;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.Sampler;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
@@ -235,6 +236,12 @@ public class TauInfoProvider {
                             samplerStatistics.totalMemory = memoryInfo.getTotalPss() * 1024;
                             // 设置最大内存限制
                             long maxMemoryLimit = memoryInfo.otherPss * 1024 + NetworkSetting.HEAP_SIZE_LIMIT;
+                            logger.debug("NetworkSetting totalPss::{}, dalvikPss::{}, nativePss::{}," +
+                                            " otherPss::{}",
+                                    Formatter.formatFileSize(MainApplication.getInstance(), memoryInfo.getTotalPss() * 1024),
+                                    Formatter.formatFileSize(MainApplication.getInstance(), memoryInfo.dalvikPss * 1024),
+                                    Formatter.formatFileSize(MainApplication.getInstance(), memoryInfo.nativePss * 1024),
+                                    Formatter.formatFileSize(MainApplication.getInstance(), memoryInfo.otherPss * 1024));
                             settingsRepo.setMaxMemoryLimit(maxMemoryLimit);
                         }
                         settingsRepo.setMemoryUsage(samplerStatistics.totalMemory);

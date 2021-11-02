@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposables;
-import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 
 /**
@@ -21,8 +20,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         static final boolean internetState = false;
         static final int internetType = -1;
         static final boolean isShowBanDialog = false;
-        static final long cpu_sample = 15;                   // cpu采样大小，单位s
-        static final long memory_sample = 15;                // Memory采样大小，单位s
+        static final long cpu_sample = 5;                   // cpu采样大小，单位s
+        static final long memory_sample = 5;                // Memory采样大小，单位s
     }
 
     private Context appContext;

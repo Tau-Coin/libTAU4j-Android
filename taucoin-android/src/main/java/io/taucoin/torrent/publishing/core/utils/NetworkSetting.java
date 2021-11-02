@@ -385,6 +385,7 @@ public class NetworkSetting {
         float cpuUsage = settingsRepo.getAverageCpuUsage();
         long memoryUsage = settingsRepo.getAverageMemoryUsage();
         long maxMemoryLimit = settingsRepo.getMaxMemoryLimit();
+        int increase = 0;
         if (cpuUsage > MAX_CPU_LIMIT || memoryUsage > maxMemoryLimit) {
             // 超出部分大小
             float excessSize = cpuUsage - MAX_CPU_LIMIT;
@@ -395,15 +396,16 @@ public class NetworkSetting {
             }
             // 计算出来需要增加的大小
             if (excessSize > 0) {
-                int increase = (int)(excessSize * (max.getInterval() - min.getInterval()) / maxLimit);
+                increase = (int)(excessSize * (max.getInterval() - min.getInterval()) / maxLimit);
                 timeInterval += increase;
                 timeInterval = Math.min(max.getInterval(), timeInterval);
             }
-//            logger.debug("calculateTimeInterval timeInterval::{}, increase::{}, cpuUsage::{}%," +
-//                            " memoryUsage::{}", timeInterval, increase,
-//                    String.format(Locale.CHINA, "%.2f", cpuUsage),
-//                    Formatter.formatFileSize(MainApplication.getInstance(), memoryUsage));
         }
+        logger.debug("calculateTimeInterval timeInterval::{}, increase::{}, cpuUsage::{}%," +
+                        " memoryUsage::{}, maxMemoryLimit::{}", timeInterval, increase,
+                String.format(Locale.CHINA, "%.2f", cpuUsage),
+                Formatter.formatFileSize(MainApplication.getInstance(), memoryUsage),
+                Formatter.formatFileSize(MainApplication.getInstance(), maxMemoryLimit));
 
         if (timeInterval > 0) {
             FrequencyUtil.updateMainLoopInterval(timeInterval);
