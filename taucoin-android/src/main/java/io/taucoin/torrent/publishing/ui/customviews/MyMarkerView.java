@@ -5,6 +5,7 @@ import android.content.Context;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.components.MarkerView;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
@@ -25,7 +26,8 @@ import io.taucoin.torrent.publishing.core.utils.LargeValueFormatter;
 public class MyMarkerView extends MarkerView {
 
     private TextView tvContent;
-    private LargeValueFormatter formatter;
+    private LargeValueFormatter leftFormatter;
+    private LargeValueFormatter rightFormatter;
     private List<String> xValues;
 
     public MyMarkerView(Context context, int layoutResource) {
@@ -39,7 +41,12 @@ public class MyMarkerView extends MarkerView {
             CandleEntry ce = (CandleEntry) e;
             tvContent.setText(Utils.formatNumber(ce.getHigh(), 2, false));
         } else {
-            String value = getValueFormatter().getFormattedValue(e.getY());
+            String value;
+            if (highlight.getAxis().equals(YAxis.AxisDependency.RIGHT)) {
+                value = getRightFormatter().getFormattedValue(e.getY());
+            } else {
+                value = getLeftFormatter().getFormattedValue(e.getY());
+            }
             if (xValues != null && e.getX() < xValues.size()) {
                 value =xValues.get((int) e.getX()) + ", " + value;
             }
@@ -60,14 +67,25 @@ public class MyMarkerView extends MarkerView {
         this.xValues = xValues;
     }
 
-    private LargeValueFormatter getValueFormatter() {
-        if (null == formatter) {
-            formatter = new LargeValueFormatter();
+    private LargeValueFormatter getLeftFormatter() {
+        if (null == leftFormatter) {
+            leftFormatter = new LargeValueFormatter();
         }
-        return formatter;
+        return leftFormatter;
     }
 
-    public void setValueFormatter(LargeValueFormatter formatter) {
-        this.formatter = formatter;
+    private LargeValueFormatter getRightFormatter() {
+        if (null == rightFormatter) {
+            rightFormatter = new LargeValueFormatter();
+        }
+        return rightFormatter;
+    }
+
+    public void setLeftValueFormatter(LargeValueFormatter formatter) {
+        this.leftFormatter = formatter;
+    }
+
+    public void setRightValueFormatter(LargeValueFormatter formatter) {
+        this.rightFormatter = formatter;
     }
 }

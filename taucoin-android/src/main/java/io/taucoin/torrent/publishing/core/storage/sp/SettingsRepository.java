@@ -140,24 +140,24 @@ public interface SettingsRepository {
     void setMemoryUsage(long usage);
 
     /**
-     * 设置最大内存边界值
-     * @param maxLimit 最大内存边界值
+     * 设置当前堆内存大小
+     * @param heapSize 堆内存大小
      */
-    void setMaxMemoryLimit(long maxLimit);
+    void setCurrentHeapSize(long heapSize);
 
     /**
-     * 获取最大内存边界值
+     * 获取当前堆内存大小
      */
-    long getMaxMemoryLimit();
+    long getCurrentHeapSize();
 
     /**
      * 获取内使用大小
      */
     long getMemoryUsage();
 
-    void setMemoryAverageUsage(long usage);
+    void setAverageHeapSize(long heapSize);
 
-    long getAverageMemoryUsage();
+    long getAverageHeapSize();
 
     /**
      * 获取网络接口

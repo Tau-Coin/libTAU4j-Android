@@ -226,7 +226,7 @@ public class CpuStatisticsActivity extends BaseActivity {
         //自定义的MarkerView对象
         MyMarkerView mv = new MyMarkerView(this, R.layout.custom_marker_view);
         mv.setChartView(binding.lineChart);
-        mv.setValueFormatter(yAxisFormatter);
+        mv.setLeftValueFormatter(yAxisFormatter);
         mv.setXValues(xValues);
         binding.lineChart.setMarker(mv);
 

@@ -58,6 +58,7 @@ public class WorkingConditionActivity extends BaseActivity {
         handleSettingsChanged(getString(R.string.pref_key_dht_invoked_requests));
         handleSettingsChanged(getString(R.string.pref_key_cpu_usage));
         handleSettingsChanged(getString(R.string.pref_key_memory_usage));
+        handleSettingsChanged(getString(R.string.pref_key_current_heap_size));
 
         disposables.add(settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.newThread())
@@ -99,6 +100,10 @@ public class WorkingConditionActivity extends BaseActivity {
             long memoryUsage = settingsRepo.getMemoryUsage();
             String memoryUsageStr = Formatter.formatFileSize(this, memoryUsage);
             binding.tvMemory.setText(memoryUsageStr);
+        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_current_heap_size))) {
+            long heapSize = settingsRepo.getCurrentHeapSize();
+            String heapSizeStr = Formatter.formatFileSize(this, heapSize);
+            binding.tvHeapSize.setText(heapSizeStr);
         }
     }
 

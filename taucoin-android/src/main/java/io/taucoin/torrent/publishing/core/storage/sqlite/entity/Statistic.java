@@ -16,6 +16,7 @@ public class Statistic implements Parcelable {
     public int isMetered;         // 区分流量类型  0: 非计费, 1: 计费
     public long memorySize;       // 内存大小
     public double cpuUsageRate;   // CPU使用率
+    public double workingFrequency;  // 主循环工作频率
 
     public Statistic(){
     }

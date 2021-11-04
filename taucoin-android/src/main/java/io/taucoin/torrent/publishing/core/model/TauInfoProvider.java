@@ -23,6 +23,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Statistic;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.StatisticRepository;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.Formatter;
+import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.Sampler;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
@@ -219,12 +220,6 @@ public class TauInfoProvider {
                 long lastCPUQueryTime = DateUtil.getMillisTime();
                 int processors = getRuntime().availableProcessors();
                 while (!emitter.isCancelled()) {
-                    handlerTrafficStatistics(sessionStatistics);
-                    long trafficTotal = sessionStatistics.getTotalDownload() + sessionStatistics.getTotalUpload();
-                    trafficSize = trafficTotal - oldTrafficTotal;
-                    trafficSize = Math.max(trafficSize, 0);
-                    oldTrafficTotal = trafficTotal;
-
                     long currentTime = DateUtil.getMillisTime();
                     // 内存采样：AndroidQ开始限制采样频率5分钟
                     if (samplerStatistics.totalMemory == 0 ||
@@ -235,14 +230,16 @@ public class TauInfoProvider {
                         if (memoryInfo != null && memoryInfo.getTotalPss() > 0) {
                             samplerStatistics.totalMemory = memoryInfo.getTotalPss() * 1024;
                             // 设置最大内存限制
-                            long maxMemoryLimit = memoryInfo.otherPss * 1024 + NetworkSetting.HEAP_SIZE_LIMIT;
-                            logger.debug("NetworkSetting totalPss::{}, dalvikPss::{}, nativePss::{}," +
+                            long heapSize = (memoryInfo.dalvikPss + memoryInfo.nativePss) * 1024;
+                            long totalPss = memoryInfo.dalvikPss + memoryInfo.nativePss + memoryInfo.otherPss;
+                            logger.debug("NetworkSetting totalPss::{}, totalPssNotSwapped::{}, dalvikPss::{}, nativePss::{}," +
                                             " otherPss::{}",
                                     Formatter.formatFileSize(MainApplication.getInstance(), memoryInfo.getTotalPss() * 1024),
+                                    Formatter.formatFileSize(MainApplication.getInstance(), totalPss * 1024),
                                     Formatter.formatFileSize(MainApplication.getInstance(), memoryInfo.dalvikPss * 1024),
                                     Formatter.formatFileSize(MainApplication.getInstance(), memoryInfo.nativePss * 1024),
                                     Formatter.formatFileSize(MainApplication.getInstance(), memoryInfo.otherPss * 1024));
-                            settingsRepo.setMaxMemoryLimit(maxMemoryLimit);
+                            settingsRepo.setCurrentHeapSize(heapSize);
                         }
                         settingsRepo.setMemoryUsage(samplerStatistics.totalMemory);
                     }
@@ -259,7 +256,15 @@ public class TauInfoProvider {
                         samplerStatistics.cpuUsage = settingsRepo.getCpuUsage();
                     }
 
+                    // 流量统计
+                    handlerTrafficStatistics(sessionStatistics);
+                    long trafficTotal = sessionStatistics.getTotalDownload() + sessionStatistics.getTotalUpload();
+                    trafficSize = trafficTotal - oldTrafficTotal;
+                    trafficSize = Math.max(trafficSize, 0);
+                    oldTrafficTotal = trafficTotal;
+
                     statistic.timestamp = DateUtil.getTime();
+                    statistic.workingFrequency = FrequencyUtil.getMainLoopFrequency();
                     statistic.dataSize = trafficSize;
                     statistic.memorySize = samplerStatistics.totalMemory;
                     statistic.cpuUsageRate = samplerStatistics.cpuUsage;

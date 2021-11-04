@@ -10,6 +10,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposables;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 
 /**
  * SettingsRepository: 用户设置的接口的实现
@@ -20,8 +21,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         static final boolean internetState = false;
         static final int internetType = -1;
         static final boolean isShowBanDialog = false;
-        static final long cpu_sample = 5;                   // cpu采样大小，单位s
-        static final long memory_sample = 5;                // Memory采样大小，单位s
+        static final long cpu_sample = 5;                   // cpu采样大小
+        static final long heap_sample = 5;                  // Heap采样大小
     }
 
     private Context appContext;
@@ -265,10 +266,12 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public void setCpuAverageUsage(float usage) {
         String key = appContext.getString(R.string.pref_key_cpu_average_usage);
         float average = pref.getFloat(key, 0);
-        if (average > 0) {
-            average = (average * Default.cpu_sample + usage) / (Default.cpu_sample + 1);
-        } else {
+        // 上次CPU使用率平均值大于最大限制值，并且当前CPU使用率小于最大限制值，直接用当前CPU使用率
+        if ((average > NetworkSetting.MAX_CPU_LIMIT && usage <= NetworkSetting.MAX_CPU_LIMIT)
+                || average <= 0 ) {
             average = usage;
+        } else {
+            average = (average * Default.cpu_sample + usage) / (Default.cpu_sample + 1);
         }
 
         edit.putFloat(key, average).apply();
@@ -284,7 +287,6 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public void setMemoryUsage(long usage) {
         edit.putLong(appContext.getString(R.string.pref_key_memory_usage), usage)
                 .apply();
-        setMemoryAverageUsage(usage);
     }
 
     @Override
@@ -293,32 +295,34 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public void setMaxMemoryLimit(long maxLimit) {
-        edit.putLong(appContext.getString(R.string.pref_key_memory_max_limit), maxLimit)
+    public void setCurrentHeapSize(long heapSize) {
+        edit.putLong(appContext.getString(R.string.pref_key_current_heap_size), heapSize)
                 .apply();
+        setAverageHeapSize(heapSize);
     }
 
     @Override
-    public long getMaxMemoryLimit() {
-        return pref.getLong(appContext.getString(R.string.pref_key_memory_max_limit), 0);
+    public long getCurrentHeapSize() {
+        return pref.getLong(appContext.getString(R.string.pref_key_current_heap_size), 0);
     }
 
     @Override
-    public void setMemoryAverageUsage(long usage) {
-        String key = appContext.getString(R.string.pref_key_memory_average_usage);
+    public void setAverageHeapSize(long heapSize) {
+        String key = appContext.getString(R.string.pref_key_average_heap_size);
         long average = pref.getLong(key, 0);
-        if (average > 0) {
-            average = (average * Default.memory_sample + usage) / (Default.memory_sample + 1);
+        // 上次堆大小平均值大于最大限制值，并且当前堆大小小于最大限制值，直接用当前堆大小
+        if ((average > NetworkSetting.HEAP_SIZE_LIMIT && heapSize <= NetworkSetting.HEAP_SIZE_LIMIT)
+            || average <= 0 ) {
+            average = heapSize;
         } else {
-            average = usage;
+            average = (average * Default.heap_sample + heapSize) / (Default.heap_sample + 1);
         }
-
         edit.putLong(key, average).apply();
     }
 
     @Override
-    public long getAverageMemoryUsage() {
-        String key = appContext.getString(R.string.pref_key_memory_average_usage);
+    public long getAverageHeapSize() {
+        String key = appContext.getString(R.string.pref_key_average_heap_size);
         return pref.getLong(key, 0);
     }
 
@@ -344,8 +348,10 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         setUPnpMapped(false);
         setNATPMPMapped(false);
         setNetworkInterfaces("");
+        edit.putFloat(appContext.getString(R.string.pref_key_cpu_usage), 0).apply();
         edit.putFloat(appContext.getString(R.string.pref_key_cpu_average_usage), 0).apply();
-        edit.putLong(appContext.getString(R.string.pref_key_memory_average_usage), 0).apply();
+        edit.putLong(appContext.getString(R.string.pref_key_average_heap_size), 0).apply();
+        edit.putLong(appContext.getString(R.string.pref_key_current_heap_size), 0).apply();
         // 初始化主循环频率
         edit.putInt(appContext.getString(R.string.pref_key_main_loop_interval), 0).apply();
         edit.putInt(appContext.getString(R.string.pref_key_main_loop_average_interval), 0).apply();

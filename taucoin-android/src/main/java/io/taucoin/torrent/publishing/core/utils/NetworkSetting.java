@@ -24,7 +24,7 @@ public class NetworkSetting {
     private static final int METERED_LIMITED;                                   // 单位MB
     private static final int WIFI_LIMITED;                                      // 单位MB
     private static final int SURVIVAL_SPEED_LIMIT = 10;                         // 单位B
-    private static final float MAX_CPU_LIMIT = 5;                               // 单位%
+    public static final float MAX_CPU_LIMIT = 15;                               // 单位%
     public static final int HEAP_SIZE_LIMIT = 50 * 1024 * 1024;                 // 单位为B
 
     private static SettingsRepository settingsRepo;
@@ -381,35 +381,37 @@ public class NetworkSetting {
             }
         }
 
-        // 根据系统资源(cpu, memory)的使用
-        float cpuUsage = settingsRepo.getAverageCpuUsage();
-        long memoryUsage = settingsRepo.getAverageMemoryUsage();
-        long maxMemoryLimit = settingsRepo.getMaxMemoryLimit();
-        int increase = 0;
-        if (cpuUsage > MAX_CPU_LIMIT || memoryUsage > maxMemoryLimit) {
-            // 超出部分大小
-            float excessSize = cpuUsage - MAX_CPU_LIMIT;
-            float maxLimit = MAX_CPU_LIMIT;
-            if (excessSize <= 0) {
-                excessSize = memoryUsage - maxMemoryLimit;
-                maxLimit = HEAP_SIZE_LIMIT;
+        boolean isForegroundRunning = isForegroundRunning();
+        if (!isForegroundRunning) {
+            // 根据系统资源(cpu, memory)的使用
+            float cpuUsage = settingsRepo.getAverageCpuUsage();
+            long heapSize = settingsRepo.getAverageHeapSize();
+            int increase = 0;
+            if (cpuUsage > MAX_CPU_LIMIT || heapSize > HEAP_SIZE_LIMIT) {
+                // 超出部分大小
+                float excessSize = cpuUsage - MAX_CPU_LIMIT;
+                float maxLimit = MAX_CPU_LIMIT;
+                if (excessSize <= 0) {
+                    excessSize = heapSize - HEAP_SIZE_LIMIT;
+                    maxLimit = HEAP_SIZE_LIMIT;
+                }
+                // 计算出来需要增加的大小
+                if (excessSize > 0) {
+                    increase = (int)(excessSize * (max.getInterval() - min.getInterval()) / maxLimit);
+                    timeInterval += increase;
+                    timeInterval = Math.min(max.getInterval(), timeInterval);
+                }
             }
-            // 计算出来需要增加的大小
-            if (excessSize > 0) {
-                increase = (int)(excessSize * (max.getInterval() - min.getInterval()) / maxLimit);
-                timeInterval += increase;
-                timeInterval = Math.min(max.getInterval(), timeInterval);
-            }
+            logger.debug("calculateTimeInterval timeInterval::{}, increase::{}, cpuUsage::{}%," +
+                            " heapSize::{}", timeInterval, increase,
+                    String.format(Locale.CHINA, "%.2f", cpuUsage),
+                    Formatter.formatFileSize(MainApplication.getInstance(), heapSize));
         }
-        logger.debug("calculateTimeInterval timeInterval::{}, increase::{}, cpuUsage::{}%," +
-                        " memoryUsage::{}, maxMemoryLimit::{}", timeInterval, increase,
-                String.format(Locale.CHINA, "%.2f", cpuUsage),
-                Formatter.formatFileSize(MainApplication.getInstance(), memoryUsage),
-                Formatter.formatFileSize(MainApplication.getInstance(), maxMemoryLimit));
 
         if (timeInterval > 0) {
             FrequencyUtil.updateMainLoopInterval(timeInterval);
-            logger.debug("updateMainLoopInterval timeInterval::{}ms", timeInterval);
+            logger.debug("updateMainLoopInterval isForegroundRunning::{}, timeInterval::{}ms",
+                    isForegroundRunning, timeInterval);
         }
     }
 }

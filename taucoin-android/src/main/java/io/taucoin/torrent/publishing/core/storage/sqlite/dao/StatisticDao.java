@@ -44,7 +44,7 @@ public interface StatisticDao {
 
     // 查询内存统计数据
     String QUERY_MEMORY_STATISTICS = "SELECT round(timestamp/(:seconds), 0) AS timeKey, max(timestamp) AS timestamp," +
-            " avg(memorySize) AS memoryAvg" +
+            " avg(memorySize) AS memoryAvg, avg(workingFrequency) AS workingFreqAvg" +
             " FROM  Statistics WHERE" +
             QUERY_WHERE_24HOURS +
             " GROUP BY timeKey" +

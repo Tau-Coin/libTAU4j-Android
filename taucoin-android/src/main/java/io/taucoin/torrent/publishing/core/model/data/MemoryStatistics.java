@@ -4,6 +4,7 @@ public class MemoryStatistics {
     private long timeKey;
     private long timestamp;
     private long memoryAvg;
+    private double workingFreqAvg;
 
     public long getTimeKey() {
         return timeKey;
@@ -27,5 +28,13 @@ public class MemoryStatistics {
 
     public void setMemoryAvg(long memoryAvg) {
         this.memoryAvg = memoryAvg;
+    }
+
+    public double getWorkingFreqAvg() {
+        return workingFreqAvg;
+    }
+
+    public void setWorkingFreqAvg(double workingFreqAvg) {
+        this.workingFreqAvg = workingFreqAvg;
     }
 }

@@ -139,7 +139,8 @@ public class MemoryStatisticsActivity extends BaseActivity {
 
         // 组织数据
         List<String> xValues = new ArrayList<>();
-        List<Entry> yValues = new ArrayList<>();
+        List<Entry> yLeftValues = new ArrayList<>();
+        List<Entry> yRightValues = new ArrayList<>();
 
         // 统计数据较少时，补充数据
         long initSupplySize = 7;
@@ -157,7 +158,8 @@ public class MemoryStatisticsActivity extends BaseActivity {
         for (long j = initSupplySize; j > 0; j--) {
             long timestamp = firstTimestamp - j * Constants.STATISTICS_DISPLAY_PERIOD;
             xValues.add(DateUtil.formatTime(timestamp, DateUtil.pattern0));
-            yValues.add(new Entry(yValues.size(), 0));
+            yLeftValues.add(new Entry(yLeftValues.size(), 0));
+            yRightValues.add(new Entry(yRightValues.size(), 0));
         }
 
         for (int i = 0; i < statistics.size(); i++) {
@@ -170,12 +172,15 @@ public class MemoryStatisticsActivity extends BaseActivity {
                     for (long j = 1; j < supplySize; j++) {
                         long timestamp = lastStatistic.getTimestamp() + j * Constants.STATISTICS_DISPLAY_PERIOD;
                         xValues.add(DateUtil.formatTime(timestamp, DateUtil.pattern0));
-                        yValues.add(new Entry(yValues.size(), 0));
+                        yLeftValues.add(new Entry(yLeftValues.size(), 0));
+                        yRightValues.add(new Entry(yRightValues.size(), 0));
                     }
                 }
             }
             xValues.add(DateUtil.formatTime(statistic.getTimestamp(), DateUtil.pattern0));
-            yValues.add(new Entry(yValues.size(), statistic.getMemoryAvg()));
+            yLeftValues.add(new Entry(yLeftValues.size(), statistic.getMemoryAvg()));
+            float workingFreqAvg = Float.parseFloat(String.valueOf(statistic.getWorkingFreqAvg()));
+            yRightValues.add(new Entry(yRightValues.size(), workingFreqAvg));
         }
 
         // X轴
@@ -194,20 +199,34 @@ public class MemoryStatisticsActivity extends BaseActivity {
 //        //显示的时候是按照多大的比率缩放显示,1f表示不放大缩小
 //        binding.lineChart.zoom(ratio,1f,0,0);
 
-        // Y轴
-        LargeValueFormatter yAxisFormatter = new LargeValueFormatter();
+        // 左边Y轴
+        LargeValueFormatter yAxisLeftFormatter = new LargeValueFormatter();
         YAxis leftAxis = binding.lineChart.getAxisLeft();
 
         leftAxis.setLabelCount(8, false);
-        leftAxis.setValueFormatter(yAxisFormatter);
+        leftAxis.setValueFormatter(yAxisLeftFormatter);
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         leftAxis.setSpaceTop(15f);
         leftAxis.setAxisMinimum(0);
-        binding.lineChart.getAxisRight().setEnabled(false);
+        leftAxis.setTextColor(getResources().getColor(R.color.colorPrimary));
+//        binding.lineChart.getAxisRight().setEnabled(false);
+
+        // 右边Y轴
+        LargeValueFormatter yAxisRightFormatter = new LargeValueFormatter();
+        yAxisRightFormatter.setSuffix(new String[]{"", "", "", "", ""});
+        YAxis rightAxis = binding.lineChart.getAxisRight();
+
+        rightAxis.setLabelCount(8, false);
+        rightAxis.setValueFormatter(yAxisRightFormatter);
+        rightAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        rightAxis.setSpaceTop(15f);
+        rightAxis.setAxisMinimum(0);
+        rightAxis.setTextColor(getResources().getColor(R.color.color_red));
+//        binding.lineChart.getAxisRight().setEnabled(false);
 
         //这里，每重新new一个LineDataSet，相当于重新画一组折线
         //每一个LineDataSet相当于一组折线。比如:这里有两个LineDataSet：setComp1，setComp2。
-        LineDataSet setComp = new LineDataSet(yValues, getString(R.string.setting_memory_statistics));
+        LineDataSet setComp = new LineDataSet(yLeftValues, getString(R.string.setting_memory_statistics));
         setComp.setAxisDependency(YAxis.AxisDependency.LEFT);
         setComp.setColor(getResources().getColor(R.color.colorPrimary));
         setComp.setDrawFilled(true);
@@ -216,15 +235,26 @@ public class MemoryStatisticsActivity extends BaseActivity {
         setComp.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
         setComp.setLineWidth(1f);// 设置线宽
 
+        LineDataSet setComp1 = new LineDataSet(yRightValues, getString(R.string.setting_working_frequency));
+        setComp1.setAxisDependency(YAxis.AxisDependency.RIGHT);
+        setComp1.setColor(getResources().getColor(R.color.color_red));
+        setComp1.setDrawFilled(true);
+        setComp1.setDrawValues(false);
+        setComp1.setDrawCircles(false);
+        setComp1.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+        setComp1.setLineWidth(1f);// 设置线宽
+
         List<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(setComp);
+        dataSets.add(setComp1);
 
         LineData lineData = new LineData(dataSets);
 
         //自定义的MarkerView对象
         MyMarkerView mv = new MyMarkerView(this, R.layout.custom_marker_view);
         mv.setChartView(binding.lineChart);
-        mv.setValueFormatter(yAxisFormatter);
+        mv.setLeftValueFormatter(yAxisLeftFormatter);
+        mv.setRightValueFormatter(yAxisRightFormatter);
         mv.setXValues(xValues);
         binding.lineChart.setMarker(mv);
 

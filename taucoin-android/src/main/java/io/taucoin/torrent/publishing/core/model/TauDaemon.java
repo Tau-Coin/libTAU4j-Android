@@ -243,6 +243,7 @@ public abstract class TauDaemon {
      * Only calls from TauService
      */
     public void doStart(String seed) {
+        getLocalNetworkAddress();
         logger.info("doStart");
         if (isRunning)
             return;
@@ -414,11 +415,17 @@ public abstract class TauDaemon {
                 doStart(seed);
             }
         } else {
-            List<String> list = SystemServiceManager.getInstance().getNetworkAddress().get(4);
+            getLocalNetworkAddress();
             sessionManager.reopenNetworkSockets();
-            logger.debug("updateListenInterfaces list.size::{}, IP::{}", list.size(),
-                    list.size() > 0 ? list.get(0) : "");
+            logger.debug("updateListenInterfaces...");
         }
+    }
+
+    private void getLocalNetworkAddress() {
+        List<String> list = SystemServiceManager.getInstance().getNetworkAddress().get(4);
+        String IPv4 = list.size() > 0 ? list.get(0) : "";
+        settingsRepo.setStringValue(appContext.getString(R.string.pref_key_network_interfaces), IPv4);
+        logger.debug("updateListenInterfaces list.size::{}, IP::{}", list.size(), IPv4);
     }
 
     /**
