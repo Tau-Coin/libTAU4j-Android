@@ -211,8 +211,6 @@ public class TauInfoProvider {
 
                     }));
                 }
-                long trafficSize;
-                long oldTrafficTotal = 0;
                 SessionStatistics sessionStatistics = new SessionStatistics();
                 Statistic statistic = new Statistic();
                 int seconds = 0;
@@ -258,14 +256,10 @@ public class TauInfoProvider {
 
                     // 流量统计
                     handlerTrafficStatistics(sessionStatistics);
-                    long trafficTotal = sessionStatistics.getTotalDownload() + sessionStatistics.getTotalUpload();
-                    trafficSize = trafficTotal - oldTrafficTotal;
-                    trafficSize = Math.max(trafficSize, 0);
-                    oldTrafficTotal = trafficTotal;
 
                     statistic.timestamp = DateUtil.getTime();
                     statistic.workingFrequency = FrequencyUtil.getMainLoopFrequency();
-                    statistic.dataSize = trafficSize;
+                    statistic.dataSize = sessionStatistics.getDownloadRate() + sessionStatistics.getUploadRate();
                     statistic.memorySize = samplerStatistics.totalMemory;
                     statistic.cpuUsageRate = samplerStatistics.cpuUsage;
                     statistic.isMetered = NetworkSetting.isMeteredNetwork() ? 1 : 0;
