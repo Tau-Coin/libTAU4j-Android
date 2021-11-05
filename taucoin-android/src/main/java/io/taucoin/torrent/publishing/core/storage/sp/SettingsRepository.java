@@ -118,20 +118,9 @@ public interface SettingsRepository {
     void setCpuUsage(float usage);
 
     /**
-     * 设置CPU多次平均使用率
-     * @param usage 使用率
-     */
-    void setCpuAverageUsage(float usage);
-
-    /**
      * 获取CPU使用率
      */
     float getCpuUsage();
-
-    /**
-     * 获取CPU多次平均使用率
-     */
-    float getAverageCpuUsage();
 
     /**
      * 设置内存使用大小

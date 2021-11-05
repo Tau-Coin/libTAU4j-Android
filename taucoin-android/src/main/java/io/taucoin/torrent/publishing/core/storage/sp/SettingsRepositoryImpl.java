@@ -21,7 +21,6 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         static final boolean internetState = false;
         static final int internetType = -1;
         static final boolean isShowBanDialog = false;
-        static final long cpu_sample = 5;                   // cpu采样大小
         static final long heap_sample = 5;                  // Heap采样大小
     }
 
@@ -254,33 +253,11 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public void setCpuUsage(float usage) {
         edit.putFloat(appContext.getString(R.string.pref_key_cpu_usage), usage)
                 .apply();
-        setCpuAverageUsage(usage);
     }
 
     @Override
     public float getCpuUsage() {
         return pref.getFloat(appContext.getString(R.string.pref_key_cpu_usage), 0);
-    }
-
-    @Override
-    public void setCpuAverageUsage(float usage) {
-        String key = appContext.getString(R.string.pref_key_cpu_average_usage);
-        float average = pref.getFloat(key, 0);
-        // 上次CPU使用率平均值大于最大限制值，并且当前CPU使用率小于最大限制值，直接用当前CPU使用率
-        if ((average > NetworkSetting.MAX_CPU_LIMIT && usage <= NetworkSetting.MAX_CPU_LIMIT)
-                || average <= 0 ) {
-            average = usage;
-        } else {
-            average = (average * Default.cpu_sample + usage) / (Default.cpu_sample + 1);
-        }
-
-        edit.putFloat(key, average).apply();
-    }
-
-    @Override
-    public float getAverageCpuUsage() {
-        String key = appContext.getString(R.string.pref_key_cpu_average_usage);
-        return pref.getFloat(key, 0);
     }
 
     @Override
@@ -349,7 +326,6 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         setNATPMPMapped(false);
         setNetworkInterfaces("");
         edit.putFloat(appContext.getString(R.string.pref_key_cpu_usage), 0).apply();
-        edit.putFloat(appContext.getString(R.string.pref_key_cpu_average_usage), 0).apply();
         edit.putLong(appContext.getString(R.string.pref_key_average_heap_size), 0).apply();
         edit.putLong(appContext.getString(R.string.pref_key_current_heap_size), 0).apply();
         // 初始化主循环频率

@@ -34,7 +34,6 @@
     <string name="pref_key_nat_pmp_mapped" translatable="false">pref_key_nat_pmp_mapped</string>
 
     <string name="pref_key_cpu_usage" translatable="false">pref_key_cpu_usage</string>
-    <string name="pref_key_cpu_average_usage" translatable="false">pref_key_cpu_average_usage</string>
     <string name="pref_key_memory_usage" translatable="false">pref_key_memory_usage</string>
     <string name="pref_key_average_heap_size" translatable="false">pref_key_average_heap_size</string>
     <string name="pref_key_current_heap_size" translatable="false">pref_key_current_heap_size</string>

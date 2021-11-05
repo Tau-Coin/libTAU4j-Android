@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.MainApplication;
@@ -24,7 +23,6 @@ public class NetworkSetting {
     private static final int METERED_LIMITED;                                   // 单位MB
     private static final int WIFI_LIMITED;                                      // 单位MB
     private static final int SURVIVAL_SPEED_LIMIT = 10;                         // 单位B
-    public static final float MAX_CPU_LIMIT = 15;                               // 单位%
     public static final int HEAP_SIZE_LIMIT = 50 * 1024 * 1024;                 // 单位为B
 
     private static SettingsRepository settingsRepo;
@@ -383,28 +381,21 @@ public class NetworkSetting {
 
         boolean isForegroundRunning = isForegroundRunning();
         if (!isForegroundRunning) {
-            // 根据系统资源(cpu, memory)的使用
-            float cpuUsage = settingsRepo.getAverageCpuUsage();
+            // 根据系统资源(memory)的使用
             long heapSize = settingsRepo.getAverageHeapSize();
             int increase = 0;
-            if (cpuUsage > MAX_CPU_LIMIT || heapSize > HEAP_SIZE_LIMIT) {
+            if (heapSize > HEAP_SIZE_LIMIT) {
                 // 超出部分大小
-                float excessSize = cpuUsage - MAX_CPU_LIMIT;
-                float maxLimit = MAX_CPU_LIMIT;
-                if (excessSize <= 0) {
-                    excessSize = heapSize - HEAP_SIZE_LIMIT;
-                    maxLimit = HEAP_SIZE_LIMIT;
-                }
+                float excessSize = heapSize - HEAP_SIZE_LIMIT;
                 // 计算出来需要增加的大小
                 if (excessSize > 0) {
-                    increase = (int)(excessSize * (max.getInterval() - min.getInterval()) / maxLimit);
+                    increase = (int)(excessSize * (max.getInterval() - min.getInterval()) / HEAP_SIZE_LIMIT);
                     timeInterval += increase;
                     timeInterval = Math.min(max.getInterval(), timeInterval);
                 }
             }
-            logger.debug("calculateTimeInterval timeInterval::{}, increase::{}, cpuUsage::{}%," +
-                            " heapSize::{}", timeInterval, increase,
-                    String.format(Locale.CHINA, "%.2f", cpuUsage),
+            logger.debug("calculateTimeInterval timeInterval::{}, increase::{}, heapSize::{}",
+                    timeInterval, increase,
                     Formatter.formatFileSize(MainApplication.getInstance(), heapSize));
         }
 
