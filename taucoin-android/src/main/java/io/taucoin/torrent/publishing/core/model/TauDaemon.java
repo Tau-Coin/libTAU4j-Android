@@ -254,6 +254,7 @@ public abstract class TauDaemon {
                 .setDeviceID(deviceID)
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
                 .setReadOnly(true)
+                .setDhtBootstrapInterval(1800)
                 .build();
         sessionManager.start(sessionParams);
     }

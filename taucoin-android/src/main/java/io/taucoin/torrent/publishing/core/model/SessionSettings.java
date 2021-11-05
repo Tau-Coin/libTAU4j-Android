@@ -73,6 +73,16 @@ class SessionSettings {
             return this;
         }
 
+        /**
+         * set dht bootstrap interval
+         * @param interval 时间间隔
+         */
+        SessionParamsBuilder setDhtBootstrapInterval(int interval) {
+            logger.debug("setDhtBootstrapInterval::{}", interval);
+            sp.set_int(settings_pack.int_types.dht_bootstrap_interval.swigValue(), interval);
+            return this;
+        }
+
         SessionParams build() {
             session_params params = new session_params(sp);
             return new SessionParams(params);
