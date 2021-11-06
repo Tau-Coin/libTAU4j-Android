@@ -301,7 +301,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         if (isShow) {
             KeyboardUtils.hideSoftInput(activity);
         }
-        disposables.add(Observable.timer(100, TimeUnit.MILLISECONDS)
+        disposables.add(Observable.timer(10, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(aLong -> {

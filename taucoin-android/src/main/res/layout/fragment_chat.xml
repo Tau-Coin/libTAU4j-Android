@@ -147,6 +147,7 @@
             android:background="@color/color_chat_pop"
             android:id="@+id/chat_add"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_260" />
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_135"/>
     </LinearLayout>
 </layout>
