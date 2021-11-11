@@ -20,7 +20,7 @@ public class TrafficUtil {
     private static final String TRAFFIC_VALUE_OLD = "pref_key_traffic_old_";
     private static final String TRAFFIC_VALUE = "pref_key_traffic_";
     private static final String TRAFFIC_TIME = "pref_key_traffic_time";
-    public static final int TRAFFIC_UPDATE_TIME = 4; // 流量统计更新时间为每天凌晨4点
+    public static final int TRAFFIC_UPDATE_TIME = 20; // 流量统计更新时间为20点
 
     private static SettingsRepository settingsRepo;
     static {
