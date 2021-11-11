@@ -24,19 +24,16 @@ import io.taucoin.torrent.publishing.core.model.TauInfoProvider;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
-import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
-import io.taucoin.torrent.publishing.ui.community.CommunityCreateActivity;
-import io.taucoin.torrent.publishing.ui.friends.ExchangeActivity;
 
 /**
  * 群组列表页面
  */
-public class MainFragment extends BaseFragment implements MainListAdapter.ClickListener, View.OnClickListener {
+public class MainFragment extends BaseFragment implements MainListAdapter.ClickListener {
 
     private MainActivity activity;
 
@@ -52,7 +49,6 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false);
-        binding.setListener(this);
         return binding.getRoot();
     }
 
@@ -83,7 +79,6 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         binding.groupList.setLayoutManager(layoutManager);
         binding.groupList.setItemAnimator(animator);
-        binding.groupList.setEmptyView(binding.emptyViewGroupList);
         binding.groupList.setAdapter(adapter);
     }
 
@@ -160,20 +155,5 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     @Override
     public void onItemClicked(@NonNull CommunityAndFriend item) {
         activity.updateMainRightFragment(item);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.tv_add_friends:
-                ActivityUtil.startActivity(this, ExchangeActivity.class);
-                break;
-            case R.id.tv_create_communities:
-                ActivityUtil.startActivity(this, CommunityCreateActivity.class);
-                break;
-//            case R.id.tv_frequency:
-//                viewModel.showWorkFrequencyDialog(activity);
-//                break;
-        }
     }
 }

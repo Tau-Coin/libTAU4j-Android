@@ -160,7 +160,7 @@
     <string name="setting_wifi_network_title">WiFi - likely free internet</string>
     <string name="setting_metered_network_title">Metered - likely paid internet</string>
     <string name="setting_data_reset_time">Data Quota Daily Reset</string>
-    <string name="setting_data_reset_time_value">%d am</string>
+    <string name="setting_data_reset_time_value">%d pm</string>
     <string name="setting_work_frequency">Working Frequency</string>
     <string name="setting_fore_running_time">Foreground Time</string>
     <string name="setting_bg_running_time">Background Time</string>
@@ -190,7 +190,6 @@
     <string name="setting_heap_size">Heap Size</string>
     <string name="setting_upnp">UPnP</string>
     <string name="setting_nat_pmp">NAT-PMP</string>
-    <string name="setting_main_loop_interval">Main Loop Interval(ms)</string>
     <string name="setting_gossip_interval">Gossip Interval(s)</string>
     <string name="setting_daily_traffic_limit_used_up">Data limit used, proceed to use more data?</string>
     <string name="setting_metered_limit_select_tips">Using telecom data may incur additional fees.\n

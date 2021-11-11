@@ -17,10 +17,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
-import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
@@ -37,7 +34,6 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
     private static final Logger logger = LoggerFactory.getLogger("SettingActivity");
     private ActivitySettingBinding binding;
     private UserViewModel viewModel;
-    private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
@@ -47,7 +43,6 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
         viewModel = provider.get(UserViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_setting);
         binding.setListener(this);
-        settingsRepo = RepositoryHelper.getSettingsRepository(getApplicationContext());
         initView();
     }
 
@@ -66,18 +61,6 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(R.string.setting_title);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
-
-        handleSettingsChanged(getString(R.string.pref_key_internet_state));
-        handleSettingsChanged(getString(R.string.pref_key_charging_state));
-        handleSettingsChanged(getString(R.string.pref_key_main_loop_interval));
-        handleSettingsChanged(getString(R.string.pref_key_upnp_mapped));
-        handleSettingsChanged(getString(R.string.pref_key_nat_pmp_mapped));
-
-        Disposable disposable = settingsRepo.observeSettingsChanged()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleSettingsChanged);
-        disposables.add(disposable);
 
         viewModel.getChangeResult().observe(this, result -> {
             if (StringUtil.isNotEmpty(result)) {
@@ -111,25 +94,6 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
         binding.tvPublicKey.setText(UsersUtil.getMidHideName(user.publicKey));
         String userName = UsersUtil.getCurrentUserName(user);
         binding.tvUsername.setText(userName);
-    }
-
-    private void handleSettingsChanged(String key) {
-        if (StringUtil.isEquals(key, getString(R.string.pref_key_internet_state))) {
-            boolean internetState = settingsRepo.internetState();
-            binding.tvInternet.setText(internetState ? R.string.common_on : R.string.common_off);
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_charging_state))) {
-            boolean chargingState = settingsRepo.chargingState();
-            binding.tvCharging.setText(chargingState ? R.string.common_on : R.string.common_off);
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_interval))) {
-            long interval = FrequencyUtil.getMainLoopInterval();
-            binding.tvMainLoop.setText(String.valueOf(interval));
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_upnp_mapped))) {
-            boolean isMapped = settingsRepo.isUPnpMapped();
-            binding.tvUpnp.setText(isMapped ? R.string.common_on : R.string.common_off);
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_nat_pmp_mapped))) {
-            boolean isMapped = settingsRepo.isNATPMPMapped();
-            binding.tvNatPmp.setText(isMapped ? R.string.common_on : R.string.common_off);
-        }
     }
 
     @Override
