@@ -2,6 +2,9 @@ package io.taucoin.torrent.publishing.core.utils;
 
 import android.content.Context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Date;
 
 import androidx.annotation.NonNull;
@@ -13,6 +16,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
  * 流量统计工具类
  */
 public class TrafficUtil {
+    private static final Logger logger = LoggerFactory.getLogger("TrafficUtil");
     private static final String TRAFFIC_DOWN = "download";
     private static final String TRAFFIC_UP = "upload";
     private static final String TRAFFIC_METERED = "metered";
@@ -20,7 +24,7 @@ public class TrafficUtil {
     private static final String TRAFFIC_VALUE_OLD = "pref_key_traffic_old_";
     private static final String TRAFFIC_VALUE = "pref_key_traffic_";
     private static final String TRAFFIC_TIME = "pref_key_traffic_time";
-    public static final int TRAFFIC_UPDATE_TIME = 20; // 流量统计更新时间为20点
+    public static final int TRAFFIC_RESET_TIME = 20; // 流量统计重置时间为20点
 
     private static SettingsRepository settingsRepo;
     static {
@@ -91,19 +95,42 @@ public class TrafficUtil {
     private synchronized static void resetTrafficInfo() {
         long currentTrafficTime = new Date().getTime();
         long oldTrafficTime = settingsRepo.getLongValue(TRAFFIC_TIME);
-        // 如果旧的流量记录时间为0，或者当前记录时间比旧的流量记录大于一天同时为凌晨4点更新流量统计
-        if (oldTrafficTime == 0 || (DateUtil.compareDay(oldTrafficTime, currentTrafficTime) > 0 &&
-                DateUtil.getHourOfDay() >= TRAFFIC_UPDATE_TIME)) {
-            settingsRepo.setLongValue(TRAFFIC_TIME, currentTrafficTime);
-            settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN, 0);
-            settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_UP, 0);
-            settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, 0);
-            resetTrafficTotalOld();
-            // 同时重置前台运行时间
-            NetworkSetting.updateForegroundRunningTime(0);
-            NetworkSetting.updateBackgroundRunningTime(0);
-            NetworkSetting.updateDozeTime(0);
+        if (oldTrafficTime == 0) {
+            // 第一次直接数据重置
+            resetTrafficInfo(oldTrafficTime, currentTrafficTime);
+        } else {
+            // 当前时间与前一次重置时间相隔天数
+            int days = DateUtil.compareDay(oldTrafficTime, currentTrafficTime);
+            if (days >= 2) {
+                // 相隔天数大于等于2天数据重置
+                resetTrafficInfo(oldTrafficTime, currentTrafficTime);
+            } else if (days == 1 && DateUtil.getHourOfDay() >= TRAFFIC_RESET_TIME) {
+                // 相隔天数等于1天，并且当前时间点大于等于重置时间点
+                resetTrafficInfo(oldTrafficTime, currentTrafficTime);
+            } else if (days == 0 && DateUtil.getHourOfDay() >= TRAFFIC_RESET_TIME
+                    && DateUtil.getHourOfDay(oldTrafficTime) < TRAFFIC_RESET_TIME) {
+                // 相隔天数等于0天（同一天），当前时间点大于等于重置时间点，并且前一次重置时间点小于重置时间点
+                resetTrafficInfo(oldTrafficTime, currentTrafficTime);
+            }
         }
+    }
+
+    /**
+     * 重置本地流量统计信息
+     */
+    private static void resetTrafficInfo(long oldTrafficTime, long currentTrafficTime) {
+        logger.debug("resetTrafficInfo oldTrafficTime::{}, currentTrafficTime::{}",
+                DateUtil.format(oldTrafficTime, DateUtil.pattern6),
+                DateUtil.format(currentTrafficTime, DateUtil.pattern6));
+        settingsRepo.setLongValue(TRAFFIC_TIME, currentTrafficTime);
+        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN, 0);
+        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_UP, 0);
+        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, 0);
+        resetTrafficTotalOld();
+        // 同时重置前台运行时间
+        NetworkSetting.updateForegroundRunningTime(0);
+        NetworkSetting.updateBackgroundRunningTime(0);
+        NetworkSetting.updateDozeTime(0);
     }
 
     /**

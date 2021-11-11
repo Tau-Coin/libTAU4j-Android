@@ -211,8 +211,11 @@ public class NetworkSetting {
         BigInteger bigLimit = BigInteger.valueOf(limit).multiply(bigUnit).multiply(bigUnit);
         BigInteger bigUsage = BigInteger.valueOf(usage);
 
+        logger.trace("updateSpeedLimit meteredLimit::{}, meteredUsage::{}, compareTo::{}",
+                bigLimit.longValue(), bigUsage, bigLimit.compareTo(bigUsage));
+
         // 今天剩余的秒数
-        long today24HLastSeconds = DateUtil.getTomorrowLastSeconds(TrafficUtil.TRAFFIC_UPDATE_TIME);;
+        long today24HLastSeconds = DateUtil.getTomorrowLastSeconds(TrafficUtil.TRAFFIC_RESET_TIME);;
 
         if (bigLimit.compareTo(bigUsage) > 0) {
             availableData = bigLimit.subtract(bigUsage).longValue();
@@ -232,8 +235,6 @@ public class NetworkSetting {
         Context context = MainApplication.getInstance();
         long total = TrafficUtil.getTrafficUploadTotal() + TrafficUtil.getTrafficDownloadTotal();
         long usage = total - TrafficUtil.getMeteredTrafficTotal();
-//        logger.trace("updateWiFiSpeedLimit total::{}, MeteredTotal::{}, wifiUsage::{}", total,
-//                TrafficUtil.getMeteredTrafficTotal(), usage);
         long limit = getWiFiLimit();
         long averageSpeed = 0;
         long availableData = 0;
@@ -241,13 +242,11 @@ public class NetworkSetting {
         BigInteger bigUnit = new BigInteger("1024");
         BigInteger bigLimit = BigInteger.valueOf(limit).multiply(bigUnit).multiply(bigUnit);
         BigInteger bigUsage = BigInteger.valueOf(usage);
-//        logger.trace("updateWiFiSpeedLimit bigLimit::{}, bigUsage::{}, compareTo::{}",
-//                bigLimit.longValue(),
-//                bigUsage.longValue(),
-//                bigLimit.compareTo(bigUsage));
+        logger.trace("updateSpeedLimit wifiLimit::{}, total::{}, wifiUsage::{}, compareTo::{}",
+                bigLimit.longValue(), total, bigUsage, bigLimit.compareTo(bigUsage));
 
         // 今天剩余的秒数
-        long today24HLastSeconds = DateUtil.getTomorrowLastSeconds(TrafficUtil.TRAFFIC_UPDATE_TIME);
+        long today24HLastSeconds = DateUtil.getTomorrowLastSeconds(TrafficUtil.TRAFFIC_RESET_TIME);
 
         if (bigLimit.compareTo(bigUsage) > 0) {
             availableData = bigLimit.subtract(bigUsage).longValue();

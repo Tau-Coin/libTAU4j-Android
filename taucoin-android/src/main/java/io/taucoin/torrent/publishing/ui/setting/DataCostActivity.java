@@ -55,7 +55,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         binding.toolbarInclude.toolbar.setTitle(R.string.drawer_data_cost);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        String resetTime = getString(R.string.setting_data_reset_time_value, TrafficUtil.TRAFFIC_UPDATE_TIME);
+        String resetTime = getString(R.string.setting_data_reset_time_value, TrafficUtil.TRAFFIC_RESET_TIME);
         binding.tvResetTime.setText(resetTime);
 
         LinearLayoutManager layoutManagerMetered = new LinearLayoutManager(this);

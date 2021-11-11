@@ -406,6 +406,24 @@ public class DateUtil {
     }
 
     /**
+     * 获取时间的小时
+     * @return 小时
+     */
+    public static int getHourOfDay(long time) {
+        try {
+            Date date = new Date(time);
+            format.applyPattern(pattern6);
+            format.format(date);
+
+            Calendar newTime = Calendar.getInstance();
+            newTime.setTime(date);
+            return newTime.get(Calendar.HOUR_OF_DAY);
+        } catch(Exception ignore) {
+        }
+        return 0;
+    }
+
+    /**
      * 格式化时间显示
      * @param timeSeconds 秒数
      * @return 显示小时、分钟、秒
