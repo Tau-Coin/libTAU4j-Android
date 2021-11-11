@@ -348,7 +348,7 @@ public class NetworkSetting {
         Interval max = Interval.MAIN_LOOP_MAX;
         int timeInterval = 0;
         if (!isHaveAvailableData()) {
-            timeInterval = max.getInterval();
+            timeInterval = Interval.MAIN_LOOP_NO_DATA.getInterval();
 //            logger.trace("calculateMainLoopInterval timeInterval::{}, isHaveAvailableData::false",
 //                    timeInterval);
 
