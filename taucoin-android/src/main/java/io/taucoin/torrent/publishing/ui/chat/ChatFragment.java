@@ -102,6 +102,25 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         }
     }
 
+    private TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            boolean isEmpty = StringUtil.isEmpty(s);
+            binding.tvSend.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+            binding.ivAdd.setVisibility(!isEmpty ? View.GONE : View.VISIBLE);
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
+
     /**
      * 初始化布局
      */
@@ -113,24 +132,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             KeyboardUtils.hideSoftInput(activity);
             activity.goBack();
         });
-        binding.etMessage.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                boolean isEmpty = StringUtil.isEmpty(s);
-                binding.tvSend.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
-                binding.ivAdd.setVisibility(!isEmpty ? View.GONE : View.VISIBLE);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+        binding.etMessage.addTextChangedListener(textWatcher);
         binding.etMessage.setOnFocusChangeListener((v, hasFocus) -> {
             showOrHideChatAddView(false);
             handler.postDelayed(handleUpdateAdapter, 200);
@@ -188,6 +190,12 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         // 关闭键盘和加号视图窗口
         binding.etMessage.clearFocus();
         binding.chatAdd.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        binding.etMessage.removeTextChangedListener(textWatcher);
     }
 
     private final Runnable handleUpdateAdapter = () -> {

@@ -357,6 +357,12 @@ public class MainActivity extends ScanTriggerActivity {
         if(linkDialog != null){
             linkDialog.closeDialog();
         }
+        if (currentFragment != null) {
+            FragmentManager fm = getSupportFragmentManager();
+            if (!fm.isDestroyed()) {
+                fm.beginTransaction().remove(currentFragment).commit();
+            }
+        }
     }
 
     /**
