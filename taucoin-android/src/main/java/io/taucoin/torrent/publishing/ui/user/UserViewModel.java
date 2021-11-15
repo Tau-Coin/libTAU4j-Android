@@ -126,7 +126,7 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     @Override
-    protected void onCleared() {
+    public void onCleared() {
         super.onCleared();
         disposables.clear();
         if(commonDialog != null){

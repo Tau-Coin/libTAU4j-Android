@@ -27,7 +27,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
@@ -35,20 +34,13 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
-import io.taucoin.torrent.publishing.core.model.TauInfoProvider;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
-import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
-import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainLinkUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
-import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.Formatter;
-import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.RootUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
-import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
@@ -88,11 +80,9 @@ public class MainActivity extends ScanTriggerActivity {
 
     private UserViewModel userViewModel;
     private MainViewModel mainViewModel;
-    private TauInfoProvider infoProvider;
     private CommunityViewModel communityViewModel;
     private DownloadViewModel downloadViewModel;
     private NotificationViewModel notificationViewModel;
-    private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
     private Subject<Integer> mBackClick = PublishSubject.create();
     private CommonDialog seedDialog;
@@ -110,8 +100,6 @@ public class MainActivity extends ScanTriggerActivity {
         communityViewModel = provider.get(CommunityViewModel.class);
         notificationViewModel = provider.get(NotificationViewModel.class);
         downloadViewModel = provider.get(DownloadViewModel.class);
-        infoProvider = TauInfoProvider.getInstance(getApplicationContext());
-        settingsRepo = RepositoryHelper.getSettingsRepository(getApplicationContext());
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_drawer);
         initLayout();
         checkCurrentUser();
@@ -214,22 +202,6 @@ public class MainActivity extends ScanTriggerActivity {
     }
 
     /**
-     * 更新DHT的状态
-     */
-    private void updateDHTStats() {
-        long downloadTotal = TrafficUtil.getTrafficDownloadTotal();
-        long uploadTotal = TrafficUtil.getTrafficUploadTotal();
-        String downloadTotalStr = Formatter.formatFileSize(this, downloadTotal).toUpperCase();
-        String uploadTotalStr = Formatter.formatFileSize(this, uploadTotal).toUpperCase();
-        logger.info("downloadTotalStr::{}, uploadTotalStr::{}",
-                downloadTotalStr, uploadTotalStr);
-        binding.drawer.itemDownloadData.setRightText(getString(R.string.drawer_daily_data,
-                downloadTotalStr));
-        binding.drawer.itemUploadData.setRightText(getString(R.string.drawer_daily_data,
-                uploadTotalStr));
-    }
-
-    /**
      * 订阅是否需要启动TauDaemon
      */
     private void subscribeNeedStartDaemon(){
@@ -275,21 +247,8 @@ public class MainActivity extends ScanTriggerActivity {
     public void onStart() {
         super.onStart();
         subscribeCurrentUser();
-        subscribeSessionStats();
         subscribeNeedStartDaemon();
-        subscribeSettingsChanged();
 //        downloadViewModel.checkAppVersion(this);
-    }
-
-    private void subscribeSessionStats() {
-        disposables.add(infoProvider.observeSessionStats()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(nodes -> {
-                        binding.drawer.itemDhtNodes.setRightText(
-                        getString(R.string.drawer_dht_nodes, nodes));
-                    }
-                ));
     }
 
     private void handleClipboardContent() {
@@ -299,39 +258,6 @@ public class MainActivity extends ScanTriggerActivity {
             if(isShowLinkDialog){
                 CopyManager.clearClipboardContent();
             }
-        }
-    }
-
-    /**
-     * 订阅配置文件改变
-     */
-    private void subscribeSettingsChanged() {
-        updateDHTStats();
-        handleSettingsChanged(getString(R.string.pref_key_main_loop_interval));
-        handleSettingsChanged(getString(R.string.pref_key_cpu_usage));
-        handleSettingsChanged(getString(R.string.pref_key_memory_usage));
-
-        Disposable disposable = settingsRepo.observeSettingsChanged()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleSettingsChanged);
-        disposables.add(disposable);
-    }
-
-    private void handleSettingsChanged(String key) {
-        if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_interval))) {
-            double frequency = FrequencyUtil.getMainLoopFrequency();
-            String tvFrequency = getString(R.string.drawer_frequency);
-            tvFrequency = String.format(tvFrequency, FmtMicrometer.formatTwoDecimal(frequency));
-            binding.drawer.itemFrequency.setRightText(tvFrequency);
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_cpu_usage))) {
-            binding.drawer.itemCpuUsage.setRightText(getString(R.string.drawer_cpu_usage,
-                    settingsRepo.getCpuUsage()) + "%");
-            updateDHTStats();
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_memory_usage))) {
-            binding.drawer.itemMemSize.setRightText(getString(R.string.drawer_mem_data,
-                    Formatter.formatFileSize(this, settingsRepo.getMemoryUsage())));
-            updateDHTStats();
         }
     }
 

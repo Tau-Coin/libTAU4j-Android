@@ -61,14 +61,7 @@
     <string name="drawer_data_cost">Data Cost</string>
     <string name="drawer_working_condition">Working Condition</string>
     <string name="drawer_share">Share</string>
-    <string name="drawer_frequency">Working Frequency/%1$s</string>
-    <string name="drawer_dht_nodes">Peers/%1$d</string>
-    <string name="drawer_daily_data">%1$s</string>
-    <string name="drawer_cpu_usage">CPU/%.2f</string>
-    <string name="drawer_mem_data">Memory/%1$s</string>
     <string name="drawer_export_seed">Export Key</string>
-    <string name="drawer_wifi">Wifi</string>
-    <string name="drawer_telecom">Tele\ncom</string>
 
     <!-- Strings used for menu -->
     <string name="menu_share">Share</string>
@@ -185,6 +178,9 @@
     <string name="setting_network_interfaces">Network Interfaces</string>
     <string name="setting_processors">Processors</string>
     <string name="setting_dht_invoke">DHT Invoked Requests</string>
+    <string name="setting_peers">Peers</string>
+    <string name="setting_download">Total Download</string>
+    <string name="setting_upload">Total Upload</string>
     <string name="setting_cpu">CPU/Processors</string>
     <string name="setting_memory">Memory</string>
     <string name="setting_heap_size">Heap Size</string>

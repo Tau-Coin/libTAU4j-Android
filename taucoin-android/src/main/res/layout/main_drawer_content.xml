@@ -208,67 +208,6 @@
                         app:rightText="@string/drawer_share"/>
 
                     <include layout="@layout/view_line"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_frequency"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        app:leftImage="@mipmap/icon_frequency"
-                        app:rightText="@string/drawer_frequency"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_dht_nodes"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        app:leftImage="@mipmap/icon_dht_node"
-                        app:rightText="@string/drawer_dht_nodes"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_download_data"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        app:leftImage="@mipmap/icon_download"
-                        app:rightText="@string/drawer_daily_data"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_upload_data"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        android:gravity="center_vertical"
-                        app:leftImage="@mipmap/icon_upload"
-                        app:rightText="@string/drawer_daily_data"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_cpu_usage"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        android:gravity="center_vertical"
-                        app:leftImage="@mipmap/icon_cpu"
-                        app:rightText="@string/drawer_cpu_usage"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_mem_size"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        android:gravity="center_vertical"
-                        app:leftImage="@mipmap/icon_memory"
-                        app:rightText="@string/drawer_mem_data"/>
-
                 </LinearLayout>
             </ScrollView>
 

@@ -1,6 +1,7 @@
 package io.taucoin.torrent.publishing.core.utils;
 
 import android.content.Context;
+import android.os.SystemClock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,18 +118,20 @@ public class NetworkSetting {
      */
     private static void updateRunningTime() {
         long currentTime = DateUtil.getMillisTime();
-        if (isForegroundRunning()) {
-            int foregroundRunningTime = getForegroundRunningTime() + 1;
-            updateForegroundRunningTime(foregroundRunningTime);
-        } else {
-            int backgroundRunningTime = getBackgroundRunningTime() + 1;
-            updateBackgroundRunningTime(backgroundRunningTime);
+        if (lastStatisticsTime > 0) {
+            int seconds = (int)(currentTime - lastStatisticsTime) / 1000;
+            if (isForegroundRunning()) {
+                int foregroundRunningTime = getForegroundRunningTime() + seconds;
+                updateForegroundRunningTime(foregroundRunningTime);
+            } else {
+                int backgroundRunningTime = getBackgroundRunningTime() + seconds;
+                updateBackgroundRunningTime(backgroundRunningTime);
 
-            // 去除流量统计时间间隔
-            int dozeTime = (int) ((currentTime - lastStatisticsTime - TauInfoProvider.STATISTICS_PERIOD) / 1000);
-            if (lastStatisticsTime > 0 && dozeTime > 0 && !isForegroundRunning()) {
-                dozeTime += getDozeTime();
-                updateDozeTime(dozeTime);
+                // 去除流量统计时间间隔
+                if (seconds > TauInfoProvider.STATISTICS_PERIOD / 1000) {
+                    int dozeTime = getDozeTime() + seconds;
+                    updateDozeTime(dozeTime);
+                }
             }
         }
         lastStatisticsTime = currentTime;

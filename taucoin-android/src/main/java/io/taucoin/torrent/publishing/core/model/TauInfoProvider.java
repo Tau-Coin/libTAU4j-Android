@@ -102,7 +102,7 @@ public class TauInfoProvider {
                         emitter.onNext(sessionNodes);
                     }
                     long invokedRequests = daemon.getInvokedRequests();
-                    logger.debug("invokedRequests::{}", invokedRequests);
+                    logger.debug("invokedRequests::{}, sessionNodes::{}", invokedRequests, sessionNodes);
                     if (oldInvokedRequests == -1 || oldInvokedRequests != invokedRequests) {
                         oldInvokedRequests = invokedRequests;
                         settingsRepo.setLongValue(key, invokedRequests);

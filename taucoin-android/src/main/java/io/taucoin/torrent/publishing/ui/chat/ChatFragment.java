@@ -196,6 +196,17 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     public void onDestroy() {
         super.onDestroy();
         binding.etMessage.removeTextChangedListener(textWatcher);
+        if (msgLogsDialog != null) {
+            msgLogsDialog.closeDialog();
+        }
+        if (logsDisposable != null && !logsDisposable.isDisposed()) {
+            logsDisposable.dispose();
+        }
+        handler.removeCallbacks(handlePullAdapter);
+        handler.removeCallbacks(handleUpdateAdapter);
+
+        chatViewModel.onCleared();
+        userViewModel.onCleared();
     }
 
     private final Runnable handleUpdateAdapter = () -> {

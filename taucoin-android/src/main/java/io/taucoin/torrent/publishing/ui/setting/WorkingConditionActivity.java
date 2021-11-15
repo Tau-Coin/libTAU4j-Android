@@ -1,6 +1,7 @@
 package io.taucoin.torrent.publishing.ui.setting;
 
 import android.os.Bundle;
+import android.view.View;
 
 import java.util.Locale;
 
@@ -9,23 +10,27 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.TauInfoProvider;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
+import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.Formatter;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityWorkingConditionBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 
 /**
  * 工况页面
  */
-public class WorkingConditionActivity extends BaseActivity {
+public class WorkingConditionActivity extends BaseActivity implements View.OnClickListener {
 
     private ActivityWorkingConditionBinding binding;
     private SettingsRepository settingsRepo;
+    private TauInfoProvider infoProvider;
     private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
@@ -33,6 +38,8 @@ public class WorkingConditionActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         settingsRepo = RepositoryHelper.getSettingsRepository(getApplicationContext());
         binding = DataBindingUtil.setContentView(this, R.layout.activity_working_condition);
+        infoProvider = TauInfoProvider.getInstance(getApplicationContext());
+        binding.setListener(this);
         initView();
     }
 
@@ -62,11 +69,19 @@ public class WorkingConditionActivity extends BaseActivity {
         handleSettingsChanged(getString(R.string.pref_key_cpu_usage));
         handleSettingsChanged(getString(R.string.pref_key_memory_usage));
         handleSettingsChanged(getString(R.string.pref_key_current_heap_size));
+        handleSettingsChanged(TrafficUtil.getDownKey());
+        handleSettingsChanged(TrafficUtil.getUpKey());
 
         disposables.add(settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleSettingsChanged));
+
+        disposables.add(infoProvider.observeSessionStats()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(nodes -> binding.tvPeers.setText(String.valueOf(nodes))
+                ));
     }
 
     /**
@@ -119,6 +134,21 @@ public class WorkingConditionActivity extends BaseActivity {
             long heapSize = settingsRepo.getCurrentHeapSize();
             String heapSizeStr = Formatter.formatFileSize(this, heapSize);
             binding.tvHeapSize.setText(heapSizeStr);
+        } else if (StringUtil.isEquals(key, TrafficUtil.getDownKey())) {
+            long downloadTotal = TrafficUtil.getTrafficDownloadTotal();
+            String downloadTotalStr = Formatter.formatFileSize(this, downloadTotal).toUpperCase();
+            binding.tvDownload.setText(downloadTotalStr);
+        } else if (StringUtil.isEquals(key, TrafficUtil.getUpKey())) {
+            long uploadTotal = TrafficUtil.getTrafficUploadTotal();
+            String uploadTotalStr = Formatter.formatFileSize(this, uploadTotal).toUpperCase();
+            binding.tvUpload.setText(uploadTotalStr);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.ll_journal) {
+            ActivityUtil.startActivity(this, JournalActivity.class);
         }
     }
 

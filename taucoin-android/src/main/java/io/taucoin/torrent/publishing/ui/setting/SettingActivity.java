@@ -117,9 +117,6 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
             case R.id.item_privacy_security:
                 ActivityUtil.startActivity(this, PrivacySecurityActivity.class);
                 break;
-            case R.id.item_journal:
-                ActivityUtil.startActivity(this, JournalActivity.class);
-                break;
             case R.id.item_font_size:
                 ActivityUtil.startActivityForResult(this, FontSizeActivity.class,
                         FontSizeActivity.REQUEST_CODE_FONT_SIZE);
