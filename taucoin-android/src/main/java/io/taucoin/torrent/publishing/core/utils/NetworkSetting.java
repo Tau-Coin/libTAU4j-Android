@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.Interval;
-import io.taucoin.torrent.publishing.core.model.TauInfoProvider;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 
@@ -27,7 +26,8 @@ public class NetworkSetting {
     public static final int HEAP_SIZE_LIMIT = 50 * 1024 * 1024;                 // 单位为B
 
     private static SettingsRepository settingsRepo;
-    private static long lastStatisticsTime = 0;
+    private static long lastElapsedRealTime = 0;
+    private static long lastUptime = 0;
     static {
         Context context = MainApplication.getInstance();
         settingsRepo = RepositoryHelper.getSettingsRepository(context);
@@ -117,24 +117,32 @@ public class NetworkSetting {
      * 更新运行时间
      */
     private static void updateRunningTime() {
-        long currentTime = DateUtil.getMillisTime();
-        if (lastStatisticsTime > 0) {
-            int seconds = (int)(currentTime - lastStatisticsTime) / 1000;
-            if (isForegroundRunning()) {
-                int foregroundRunningTime = getForegroundRunningTime() + seconds;
-                updateForegroundRunningTime(foregroundRunningTime);
-            } else {
-                int backgroundRunningTime = getBackgroundRunningTime() + seconds;
-                updateBackgroundRunningTime(backgroundRunningTime);
-
-                // 去除流量统计时间间隔
-                if (seconds > TauInfoProvider.STATISTICS_PERIOD / 1000) {
-                    int dozeTime = getDozeTime() + seconds;
-                    updateDozeTime(dozeTime);
+        long currentElapsedRealTime = SystemClock.elapsedRealtime();
+        long currentUptime = SystemClock.uptimeMillis();
+        if (lastElapsedRealTime > 0 && lastUptime > 0) {
+            int realSeconds = (int)(currentElapsedRealTime - lastElapsedRealTime) / 1000;
+            if (realSeconds > 0) {
+                if (isForegroundRunning()) {
+                    int foregroundRunningTime = getForegroundRunningTime() + realSeconds;
+                    logger.debug("updateRunningTime foregroundRunningTime::{}s", foregroundRunningTime);
+                    updateForegroundRunningTime(foregroundRunningTime);
+                } else {
+                    int backgroundRunningTime = getBackgroundRunningTime() + realSeconds;
+                    logger.debug("updateRunningTime backgroundRunningTime::{}s", backgroundRunningTime);
+                    updateBackgroundRunningTime(backgroundRunningTime);
                 }
             }
+            // 计算Doze Time
+            int upSeconds = (int)(currentUptime - lastUptime) / 1000;
+            int dozeSeconds = realSeconds - upSeconds;
+            if (dozeSeconds > 0) {
+                int dozeTime = getDozeTime() + dozeSeconds;
+                updateDozeTime(dozeTime);
+                logger.debug("updateRunningTime dozeTime::{}s", dozeSeconds);
+            }
         }
-        lastStatisticsTime = currentTime;
+        lastElapsedRealTime = currentElapsedRealTime;
+        lastUptime = currentUptime;
     }
 
     /**

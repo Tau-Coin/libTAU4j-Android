@@ -24,7 +24,7 @@ public class TrafficUtil {
     private static final String TRAFFIC_VALUE_OLD = "pref_key_traffic_old_";
     private static final String TRAFFIC_VALUE = "pref_key_traffic_";
     private static final String TRAFFIC_TIME = "pref_key_traffic_time";
-    public static final int TRAFFIC_RESET_TIME = 20; // 流量统计重置时间为20点
+    public static  int TRAFFIC_RESET_TIME = 20; // 流量统计重置时间为20点
 
     private static SettingsRepository settingsRepo;
     static {
@@ -60,7 +60,8 @@ public class TrafficUtil {
         long incrementalSize = calculateIncrementalSize(trafficType, byteSize);
         settingsRepo.setLongValue(trafficValueOld, byteSize);
         String trafficValue = TRAFFIC_VALUE + trafficType;
-        long trafficTotal = incrementalSize + settingsRepo.getLongValue(trafficValue);
+        long trafficTotal = settingsRepo.getLongValue(trafficValue);
+        trafficTotal += incrementalSize;
         settingsRepo.setLongValue(trafficValue, trafficTotal);
     }
 
@@ -74,8 +75,11 @@ public class TrafficUtil {
         resetTrafficInfo();
         String trafficValueOld = TRAFFIC_VALUE_OLD + trafficType;
         long oldTraffic = settingsRepo.getLongValue(trafficValueOld, -1);
+        // 重置流量数据时oldTraffic == -1， 第一次流量统计为0
         if (oldTraffic >= 0 && byteSize >= oldTraffic) {
             byteSize = byteSize - oldTraffic;
+        } else {
+            byteSize = 0;
         }
         return byteSize;
     }
@@ -131,6 +135,15 @@ public class TrafficUtil {
         NetworkSetting.updateForegroundRunningTime(0);
         NetworkSetting.updateBackgroundRunningTime(0);
         NetworkSetting.updateDozeTime(0);
+
+        logger.debug("resetTrafficInfo TRAFFIC_DOWN::{}, TRAFFIC_UP::{}, TRAFFIC_METERED::{}, " +
+                        "TRAFFIC_DOWN_OLD::{}, TRAFFIC_UP_OLD::{}, TRAFFIC_METERED_OLD::{}",
+                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN),
+                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_UP),
+                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_METERED),
+                settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_DOWN),
+                settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_UP),
+                settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_METERED));
     }
 
     /**
