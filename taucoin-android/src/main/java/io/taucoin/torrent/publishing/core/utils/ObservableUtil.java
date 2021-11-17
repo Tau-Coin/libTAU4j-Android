@@ -8,8 +8,10 @@ public class ObservableUtil {
         return Observable.create(emitter -> {
             while (true) {
                 try {
-                    Thread.sleep(millis);
-                    emitter.onNext(System.currentTimeMillis());
+                    if (!emitter.isDisposed()) {
+                        Thread.sleep(millis);
+                        emitter.onNext(System.currentTimeMillis());
+                    }
                 } catch (Exception e) {
                     break;
                 }

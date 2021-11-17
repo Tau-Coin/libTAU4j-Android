@@ -355,7 +355,7 @@ public class ChatViewModel extends AndroidViewModel {
             daemon.setChattingFriend(friendPk);
         }
         chattingDisposable = ObservableUtil.intervalSeconds(1)
-            .observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
             .subscribe(l -> daemon.setChattingFriend(friendPk));
     }
 
