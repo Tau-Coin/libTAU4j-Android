@@ -40,6 +40,7 @@ import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.HashUtil;
 import io.taucoin.torrent.publishing.core.utils.MsgSplitUtil;
+import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
@@ -353,7 +354,7 @@ public class ChatViewModel extends AndroidViewModel {
         if (null == chattingDisposable) {
             daemon.setChattingFriend(friendPk);
         }
-        chattingDisposable = Observable.interval(1, TimeUnit.SECONDS)
+        chattingDisposable = ObservableUtil.intervalSeconds(1)
             .observeOn(Schedulers.io())
             .subscribe(l -> daemon.setChattingFriend(friendPk));
     }

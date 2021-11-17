@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
@@ -37,6 +36,7 @@ import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
+import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
@@ -372,7 +372,7 @@ public abstract class TauDaemon {
             }
         } else {
             if (null == updateInterfacesTimer || updateInterfacesTimer.isDisposed()) {
-                updateInterfacesTimer = Observable.interval(UPDATE_INTERFACE_THRESHOLD, TimeUnit.SECONDS)
+                updateInterfacesTimer = ObservableUtil.intervalSeconds(UPDATE_INTERFACE_THRESHOLD)
                     .subscribeOn(Schedulers.io())
                     .subscribe( l -> {
                         logger.trace("No nodes more than {}s, updateListenInterfaces...",

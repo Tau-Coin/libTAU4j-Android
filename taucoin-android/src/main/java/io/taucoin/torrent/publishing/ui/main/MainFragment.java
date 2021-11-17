@@ -20,7 +20,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.TauInfoProvider;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
@@ -40,7 +39,6 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     private MainListAdapter adapter;
     private FragmentMainBinding binding;
     private MainViewModel viewModel;
-    private TauInfoProvider infoProvider;
     private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
 
@@ -58,7 +56,6 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         activity = (MainActivity) getActivity();
         ViewModelProvider provider = new ViewModelProvider(activity);
         viewModel = provider.get(MainViewModel.class);
-        infoProvider = TauInfoProvider.getInstance(MainApplication.getInstance());
         settingsRepo = RepositoryHelper.getSettingsRepository(MainApplication.getInstance());
         initView();
     }
@@ -87,11 +84,8 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::showCommunityList));
 
-        disposables.add(infoProvider.observeSessionStats()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleWarningView));
-
+        handleSettingsChanged(getString(R.string.pref_key_network_interfaces));
+        handleSettingsChanged(getString(R.string.pref_key_dht_nodes));
         disposables.add(settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -121,6 +115,9 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
             if (StringUtil.isEquals(networkInterfaces, "0.0.0.0")) {
                 binding.tvWarning.setText(getString(R.string.main_no_ipv4));
             }
+        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
+            long nodes = settingsRepo.getLongValue(key, 0L);
+            handleWarningView(nodes);
         }
     }
 

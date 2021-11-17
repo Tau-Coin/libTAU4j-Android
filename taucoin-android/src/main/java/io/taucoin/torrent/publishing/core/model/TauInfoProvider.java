@@ -94,18 +94,19 @@ public class TauInfoProvider {
                 Thread.currentThread().setName("SessionNodes");
                 long oldNodes = -1;
                 long oldInvokedRequests = -1;
-                String key = MainApplication.getInstance().getString(R.string.pref_key_dht_invoked_requests);
+                String invokedKey = MainApplication.getInstance().getString(R.string.pref_key_dht_invoked_requests);
+                String nodesKey = MainApplication.getInstance().getString(R.string.pref_key_dht_nodes);
                 while (!emitter.isCancelled()) {
                     long sessionNodes = daemon.getSessionNodes();
                     if (oldNodes == -1 || oldNodes != sessionNodes) {
                         oldNodes = sessionNodes;
-                        emitter.onNext(sessionNodes);
+                        settingsRepo.setLongValue(nodesKey, sessionNodes);
                     }
                     long invokedRequests = daemon.getInvokedRequests();
                     logger.debug("invokedRequests::{}, sessionNodes::{}", invokedRequests, sessionNodes);
                     if (oldInvokedRequests == -1 || oldInvokedRequests != invokedRequests) {
                         oldInvokedRequests = invokedRequests;
-                        settingsRepo.setLongValue(key, invokedRequests);
+                        settingsRepo.setLongValue(invokedKey, invokedRequests);
                     }
 
                     if (!emitter.isCancelled()) {

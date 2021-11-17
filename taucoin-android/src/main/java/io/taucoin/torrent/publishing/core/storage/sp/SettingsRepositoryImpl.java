@@ -331,5 +331,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         // 初始化主循环频率
         edit.putInt(appContext.getString(R.string.pref_key_main_loop_interval), 0).apply();
         edit.putInt(appContext.getString(R.string.pref_key_main_loop_average_interval), 0).apply();
+
+        edit.putLong(appContext.getString(R.string.pref_key_dht_invoked_requests), 0).apply();
+        edit.putLong(appContext.getString(R.string.pref_key_dht_nodes), 0).apply();
     }
 }
