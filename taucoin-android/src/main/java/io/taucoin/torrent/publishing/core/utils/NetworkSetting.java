@@ -24,6 +24,7 @@ public class NetworkSetting {
     private static final int WIFI_LIMITED;                                      // 单位MB
     private static final int SURVIVAL_SPEED_LIMIT = 10;                         // 单位B
     public static final int HEAP_SIZE_LIMIT = 50 * 1024 * 1024;                 // 单位为B
+    private static final int FOREGROUND_TARGET_SPEED_TIMES = 3;                 // 前台网速提升倍数
 
     private static SettingsRepository settingsRepo;
     private static long lastElapsedRealTime = 0;
@@ -232,6 +233,9 @@ public class NetworkSetting {
             availableData = bigLimit.subtract(bigUsage).longValue();
             if (today24HLastSeconds > 0) {
                 averageSpeed = availableData / today24HLastSeconds;
+                if (isForegroundRunning()) {
+                    averageSpeed = averageSpeed * FOREGROUND_TARGET_SPEED_TIMES;
+                }
             }
         }
         settingsRepo.setLongValue(context.getString(R.string.pref_key_metered_available_data), availableData);
@@ -263,6 +267,9 @@ public class NetworkSetting {
             availableData = bigLimit.subtract(bigUsage).longValue();
             if (today24HLastSeconds > 0) {
                 averageSpeed = availableData / today24HLastSeconds;
+                if (isForegroundRunning()) {
+                    averageSpeed = averageSpeed * FOREGROUND_TARGET_SPEED_TIMES;
+                }
             }
         }
         settingsRepo.setLongValue(context.getString(R.string.pref_key_wifi_available_data), availableData);
@@ -354,19 +361,19 @@ public class NetworkSetting {
      * @return 返回计算的时间间隔
      */
     public static void calculateMainLoopInterval() {
-        Interval min = Interval.MAIN_LOOP_MIN;
+        Interval min;
         Interval max = Interval.MAIN_LOOP_MAX;
+        boolean isForegroundRunning = isForegroundRunning();
+        if (isForegroundRunning) {
+            min = Interval.FORE_MAIN_LOOP_MIN;
+        } else {
+            min = Interval.BACK_MAIN_LOOP_MIN;
+        }
         int timeInterval = 0;
         if (!isHaveAvailableData()) {
             timeInterval = Interval.MAIN_LOOP_NO_DATA.getInterval();
-//            logger.trace("calculateMainLoopInterval timeInterval::{}, isHaveAvailableData::false",
-//                    timeInterval);
-
         } else if (getCurrentSpeed() < SURVIVAL_SPEED_LIMIT) {
             timeInterval = (min.getInterval() + max.getInterval()) / 2;
-//            logger.trace("calculateMainLoopInterval timeInterval::{}, currentSpeed::{}",
-//                    timeInterval, getCurrentSpeed());
-//            FrequencyUtil.updateMainLoopInterval(timeInterval);
         } else {
             long averageSpeed;
             if (isMeteredNetwork()) {
@@ -388,8 +395,6 @@ public class NetworkSetting {
                         currentSpeed, averageSpeed, rate, timeInterval, lastTimeInterval);
             }
         }
-
-        boolean isForegroundRunning = isForegroundRunning();
         if (!isForegroundRunning) {
             // 根据系统资源(memory)的使用
             long heapSize = settingsRepo.getAverageHeapSize();

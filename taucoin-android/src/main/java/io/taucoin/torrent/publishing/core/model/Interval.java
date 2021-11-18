@@ -5,7 +5,8 @@ package io.taucoin.torrent.publishing.core.model;
  */
 public enum Interval {
     // 单位ms
-    MAIN_LOOP_MIN(50),                     // libTAU主循环最小时间间隔
+    BACK_MAIN_LOOP_MIN(200),               // libTAU后台主循环最小时间间隔
+    FORE_MAIN_LOOP_MIN(100),               // libTAU前台主循环最小时间间隔
     MAIN_LOOP_MAX(5000),                   // libTAU主循环最大时间间隔
     MAIN_LOOP_NO_DATA(60000),              // 没有可用流量数据，libTAU主循环时间间隔
 
