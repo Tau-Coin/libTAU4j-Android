@@ -423,10 +423,7 @@ public abstract class TauDaemon {
     }
 
     private void getLocalNetworkAddress() {
-        List<String> list = SystemServiceManager.getInstance().getNetworkAddress().get(4);
-        String IPv4 = list.size() > 0 ? list.get(0) : "";
-        settingsRepo.setStringValue(appContext.getString(R.string.pref_key_network_interfaces), IPv4);
-        logger.debug("updateListenInterfaces list.size::{}, IP::{}", list.size(), IPv4);
+       SystemServiceManager.getInstance().getNetworkAddress();
     }
 
     /**

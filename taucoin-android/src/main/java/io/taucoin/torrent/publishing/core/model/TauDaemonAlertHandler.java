@@ -13,6 +13,7 @@ import org.libTAU4j.alerts.CommLastSeenAlert;
 import org.libTAU4j.alerts.CommNewDeviceIdAlert;
 import org.libTAU4j.alerts.CommNewMsgAlert;
 import org.libTAU4j.alerts.CommSyncMsgAlert;
+import org.libTAU4j.alerts.ListenSucceededAlert;
 import org.libTAU4j.alerts.PortmapAlert;
 import org.libTAU4j.alerts.PortmapErrorAlert;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.FriendInfo;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -38,8 +40,10 @@ class TauDaemonAlertHandler {
     private static final Logger logger = LoggerFactory.getLogger("libTAU");
     private MsgAlertHandler msgListenHandler;
     private SettingsRepository settingsRepo;
+    private Context appContext;
 
     TauDaemonAlertHandler(Context appContext, TauDaemon daemon){
+        this.appContext = appContext;
         this.msgListenHandler = new MsgAlertHandler(appContext, daemon);
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
     }
@@ -58,6 +62,10 @@ class TauDaemonAlertHandler {
             case PORTMAP_ERROR:
                 // 端口映射出错
                 onPortUnmapped(alert);
+                break;
+            case LISTEN_SUCCEEDED:
+                // 端口监听成功
+                onListenSucceeded(alert);
                 break;
             case COMM_LAST_SEEN:
                 // 多设备新的DeviceID
@@ -211,6 +219,18 @@ class TauDaemonAlertHandler {
             logger.info("Nat-PMP mapped::{}", false);
             settingsRepo.setNATPMPMapped(false);
         }
+    }
+
+    /**
+     * 端口监听成功
+     * @param alert libTAU上报
+     */
+    private void onListenSucceeded(Alert alert) {
+        ListenSucceededAlert a = (ListenSucceededAlert) alert;
+        String interfaces = a.address().toString() + ":" + a.port();
+        logger.info("onListenSucceeded IP::{}", interfaces);
+        settingsRepo.setStringValue(appContext.getString(R.string.pref_key_network_interfaces),
+                interfaces);
     }
 
     /**
