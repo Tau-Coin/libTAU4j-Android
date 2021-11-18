@@ -153,17 +153,30 @@ public class FixMemLeak {
                         }
                     }
 
-                    // 解决三星手机分屏内存，MainActivity销毁，(InputMethodManager.mCurrentInputConnection)内存泄漏的问题
-                    Object imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (imm != null) {
-                        Field sInstance = imm.getClass().getDeclaredField("sInstance");
-                        sInstance.setAccessible(true);
-                        Object sInstanceObj = sInstance.get(imm);
-                        Field mCurrentInputConnection = HookUtils.getDeclaredField(sInstanceObj.getClass(),
-                                "mCurrentInputConnection");
-                        if (mCurrentInputConnection != null) {
-                            HookUtils.fieldSetValue(mCurrentInputConnection, sInstanceObj, null);
-                        }
+                    fixSamSungInputConnectionLeak(activity);
+                }
+            }
+        } catch (Exception ignore) {
+        }
+    }
+
+    /**
+     * 解决三星手机分屏内存时MainActivity销毁，或者正常Fragment销毁
+     * (InputMethodManager.mCurrentInputConnection)内存泄漏的问题
+     * @param activity
+     */
+    public static void fixSamSungInputConnectionLeak(Activity activity) {
+        try {
+            if (Build.MANUFACTURER.equals("samsung") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                Object imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    Field sInstance = imm.getClass().getDeclaredField("sInstance");
+                    sInstance.setAccessible(true);
+                    Object sInstanceObj = sInstance.get(imm);
+                    Field mCurrentInputConnection = HookUtils.getDeclaredField(sInstanceObj.getClass(),
+                            "mCurrentInputConnection");
+                    if (mCurrentInputConnection != null) {
+                        HookUtils.fieldSetValue(mCurrentInputConnection, sInstanceObj, null);
                     }
                 }
             }

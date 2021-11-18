@@ -45,5 +45,6 @@ public abstract class BaseFragment extends Fragment implements
         super.onDestroy();
         getViewModelStore().clear();
         FixMemLeak.fixOPPOLeak(this);
+        FixMemLeak.fixSamSungInputConnectionLeak(baseActivity);
     }
 }
