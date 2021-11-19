@@ -38,38 +38,74 @@ public class NetworkSetting {
 
     /**
      * 获取计费网络流量限制值
+     * 先优先使用无流量时，提升的流量包，重置流量时恢复到用户收到设置的流量包
      * @return long
      */
     public static int getMeteredLimit() {
         Context context = MainApplication.getInstance();
-        return settingsRepo.getIntValue(context.getString(R.string.pref_key_metered_limit), METERED_LIMITED);
+        int limit = settingsRepo.getIntValue(context.getString(R.string.pref_key_metered_prompt_limit), 0);
+        if (limit <= 0) {
+            limit = settingsRepo.getIntValue(context.getString(R.string.pref_key_metered_limit), METERED_LIMITED);
+        }
+        return limit;
     }
 
     /**
      * 设置计费网络流量限制值
      * @param limited
      */
-    public static void setMeteredLimit(int limited) {
+    public static void setMeteredLimit(int limited, boolean isClearPrompt) {
         Context context = MainApplication.getInstance();
-        settingsRepo.setIntValue(context.getString(R.string.pref_key_metered_limit), limited);
+        if (isClearPrompt) {
+            clearMeteredPromptLimit();
+            settingsRepo.setIntValue(context.getString(R.string.pref_key_metered_limit), limited);
+        } else {
+            settingsRepo.setIntValue(context.getString(R.string.pref_key_metered_prompt_limit), limited);
+        }
+    }
+
+    /**
+     * 清除计费提升的流量包
+     */
+    static void clearMeteredPromptLimit() {
+        Context context = MainApplication.getInstance();
+        settingsRepo.setIntValue(context.getString(R.string.pref_key_metered_prompt_limit), 0);
+    }
+
+    /**
+     * 清除Wifi提升的流量包
+     */
+    static void clearWifiPromptLimit() {
+        Context context = MainApplication.getInstance();
+        settingsRepo.setIntValue(context.getString(R.string.pref_key_wifi_prompt_limit), 0);
     }
 
     /**
      * 获取WiFi网络流量限制值
+     * 先优先使用无流量时，提升的流量包，重置流量时恢复到用户收到设置的流量包
      * @return long
      */
     public static int getWiFiLimit() {
         Context context = MainApplication.getInstance();
-        return settingsRepo.getIntValue(context.getString(R.string.pref_key_wifi_limit), WIFI_LIMITED);
+        int limit = settingsRepo.getIntValue(context.getString(R.string.pref_key_wifi_prompt_limit), 0);
+        if (limit <= 0) {
+            limit = settingsRepo.getIntValue(context.getString(R.string.pref_key_wifi_limit), WIFI_LIMITED);
+        }
+        return limit;
     }
 
     /**
      * 设置WiFi网络流量限制值
      * @param limited
      */
-    public static void setWiFiLimit(int limited) {
+    public static void setWiFiLimit(int limited, boolean isClearPrompt) {
         Context context = MainApplication.getInstance();
-        settingsRepo.setIntValue(context.getString(R.string.pref_key_wifi_limit), limited);
+        if (isClearPrompt) {
+            clearWifiPromptLimit();
+            settingsRepo.setIntValue(context.getString(R.string.pref_key_wifi_limit), limited);
+        } else {
+            settingsRepo.setIntValue(context.getString(R.string.pref_key_wifi_prompt_limit), limited);
+        }
     }
 
     /**

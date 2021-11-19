@@ -104,10 +104,10 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
     @Override
     public void onCheckedChanged(int type, int limit) {
         if (type == DailyQuotaAdapter.TYPE_METERED) {
-            NetworkSetting.setMeteredLimit(limit);
+            NetworkSetting.setMeteredLimit(limit, true);
             NetworkSetting.updateMeteredSpeedLimit();
         } else if (type == DailyQuotaAdapter.TYPE_WIFI) {
-            NetworkSetting.setWiFiLimit(limit);
+            NetworkSetting.setWiFiLimit(limit, true);
             NetworkSetting.updateWiFiSpeedLimit();
         }
     }
@@ -173,10 +173,14 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             long availableData = NetworkSetting.getWiFiAvailableData();
             String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();
             binding.tvWifiAvailableData.setText(availableDataStr);
-        } else if (key.equals(getString(R.string.pref_key_metered_limit))) {
+        } else if (key.equals(getString(R.string.pref_key_metered_limit)) ||
+                key.equals(getString(R.string.pref_key_metered_prompt_limit))) {
             adapterMetered.updateSelectLimit(NetworkSetting.getMeteredLimit());
-        } else if (key.equals(getString(R.string.pref_key_wifi_limit))) {
+            NetworkSetting.updateMeteredSpeedLimit();
+        } else if (key.equals(getString(R.string.pref_key_wifi_limit)) ||
+                key.equals(getString(R.string.pref_key_wifi_prompt_limit))) {
             adapterWiFi.updateSelectLimit(NetworkSetting.getWiFiLimit());
+            NetworkSetting.updateWiFiSpeedLimit();
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_interval))) {
             double frequency = FrequencyUtil.getMainLoopFrequency();
             binding.tvWorkingFrequency.setText(FmtMicrometer.formatTwoDecimal(frequency));

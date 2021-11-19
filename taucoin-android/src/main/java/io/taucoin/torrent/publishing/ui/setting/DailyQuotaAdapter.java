@@ -72,6 +72,7 @@ public class DailyQuotaAdapter extends ListAdapter<Integer, DailyQuotaAdapter.Vi
             } else {
                 limitStr = context.getString(R.string.setting_daily_quota_unit_m, limit);
             }
+            holder.binding.radioButton.setOnCheckedChangeListener(null);
             holder.binding.radioButton.setText(limitStr);
             holder.binding.radioButton.setChecked(adapter.selectLimit == limit);
             holder.binding.radioButton.setOnCheckedChangeListener((buttonView, isChecked) -> {

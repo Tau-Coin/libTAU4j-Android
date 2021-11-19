@@ -135,6 +135,8 @@ public class TrafficUtil {
         NetworkSetting.updateForegroundRunningTime(0);
         NetworkSetting.updateBackgroundRunningTime(0);
         NetworkSetting.updateDozeTime(0);
+        NetworkSetting.clearWifiPromptLimit();
+        NetworkSetting.clearMeteredPromptLimit();
 
         logger.debug("resetTrafficInfo TRAFFIC_DOWN::{}, TRAFFIC_UP::{}, TRAFFIC_METERED::{}, " +
                         "TRAFFIC_DOWN_OLD::{}, TRAFFIC_UP_OLD::{}, TRAFFIC_METERED_OLD::{}",

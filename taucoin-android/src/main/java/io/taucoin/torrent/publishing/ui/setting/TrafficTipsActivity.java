@@ -74,7 +74,7 @@ public class TrafficTipsActivity extends BaseActivity {
                 int[] meteredLimits = getResources().getIntArray(R.array.metered_limit);
                 for (int i = 0; i < meteredLimits.length; i++) {
                     if (meteredLimit == meteredLimits[i] && i < meteredLimits.length - 1) {
-                        NetworkSetting.setMeteredLimit(meteredLimits[i + 1]);
+                        NetworkSetting.setMeteredLimit(meteredLimits[i + 1], false);
                         NetworkSetting.updateMeteredSpeedLimit();
                         updateDailyDataLimit = true;
                         break;
@@ -85,7 +85,7 @@ public class TrafficTipsActivity extends BaseActivity {
                 int[] wifiLimits = getResources().getIntArray(R.array.wifi_limit);
                 for (int i = 0; i < wifiLimits.length; i++) {
                     if (wifiLimit == wifiLimits[i] && i < wifiLimits.length - 1) {
-                        NetworkSetting.setWiFiLimit(wifiLimits[i + 1]);
+                        NetworkSetting.setWiFiLimit(wifiLimits[i + 1], false);
                         NetworkSetting.updateWiFiSpeedLimit();
                         updateDailyDataLimit = true;
                         break;
