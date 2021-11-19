@@ -27,6 +27,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.MemoryStatistics;
+import io.taucoin.torrent.publishing.core.model.data.PeersAndInvoked;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.StatisticRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -38,11 +39,11 @@ import io.taucoin.torrent.publishing.ui.constant.Constants;
 import io.taucoin.torrent.publishing.ui.customviews.MyMarkerView;
 
 /**
- * 内存统计页面页面
+ * Peers和Invoked requests统计
  */
-public class MemoryStatisticsActivity extends BaseActivity {
+public class PeersAndInvokedActivity extends BaseActivity {
 
-    private static final Logger logger = LoggerFactory.getLogger("MemoryStatisticsActivity");
+    private static final Logger logger = LoggerFactory.getLogger("PeersAndInvokedActivity");
     private ActivityDataStatisticsBinding binding;
     private CompositeDisposable disposables = new CompositeDisposable();
     private StatisticRepository repository;
@@ -61,7 +62,7 @@ public class MemoryStatisticsActivity extends BaseActivity {
      */
     private void initView() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.setting_memory_statistics);
+        binding.toolbarInclude.toolbar.setTitle(R.string.setting_peers_invoked);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         binding.lineChart.post(() -> {
@@ -85,7 +86,7 @@ public class MemoryStatisticsActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Disposable subscribe = repository.getMemoryStatistics()
+        Disposable subscribe = repository.getPeersAndInvoked()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(statistics -> {
@@ -112,7 +113,7 @@ public class MemoryStatisticsActivity extends BaseActivity {
         binding.lineChart.clear();
     }
 
-    private void initLineChart(List<MemoryStatistics> statistics) {
+    private void initLineChart(List<PeersAndInvoked> statistics) {
         binding.lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
@@ -147,7 +148,7 @@ public class MemoryStatisticsActivity extends BaseActivity {
         if (statistics.size() > initSupplySize) {
             initSupplySize = 2;
         }
-        MemoryStatistics statistic;
+        PeersAndInvoked statistic;
         long firstTimestamp;
         if (statistics.size() > 0) {
             statistic = statistics.get(0);
@@ -166,7 +167,7 @@ public class MemoryStatisticsActivity extends BaseActivity {
             statistic = statistics.get(i);
             logger.debug("statistics.timestamp::{}", DateUtil.formatTime(statistic.getTimestamp(), DateUtil.pattern0));
             if (i > 0) {
-                MemoryStatistics lastStatistic = statistics.get(i - 1);
+                PeersAndInvoked lastStatistic = statistics.get(i - 1);
                 long supplySize = statistic.getTimeKey() - lastStatistic.getTimeKey();
                 if (supplySize > 1) {
                     for (long j = 1; j < supplySize; j++) {
@@ -178,9 +179,8 @@ public class MemoryStatisticsActivity extends BaseActivity {
                 }
             }
             xValues.add(DateUtil.formatTime(statistic.getTimestamp(), DateUtil.pattern0));
-            yLeftValues.add(new Entry(yLeftValues.size(), statistic.getMemoryAvg()));
-            float workingFreqAvg = Float.parseFloat(String.valueOf(statistic.getWorkingFreqAvg()));
-            yRightValues.add(new Entry(yRightValues.size(), workingFreqAvg));
+            yLeftValues.add(new Entry(yLeftValues.size(), statistic.getPeers()));
+            yRightValues.add(new Entry(yRightValues.size(), statistic.getInvokedRequests()));
         }
 
         // X轴
@@ -201,6 +201,7 @@ public class MemoryStatisticsActivity extends BaseActivity {
 
         // 左边Y轴
         LargeValueFormatter yAxisLeftFormatter = new LargeValueFormatter();
+        yAxisLeftFormatter.setSuffix(new String[]{" ", "K", "M", "B", "T"});
         YAxis leftAxis = binding.lineChart.getAxisLeft();
 
         leftAxis.setLabelCount(8, false);
@@ -209,7 +210,6 @@ public class MemoryStatisticsActivity extends BaseActivity {
         leftAxis.setSpaceTop(15f);
         leftAxis.setAxisMinimum(0);
         leftAxis.setTextColor(getResources().getColor(R.color.colorPrimary));
-//        binding.lineChart.getAxisRight().setEnabled(false);
 
         // 右边Y轴
         LargeValueFormatter yAxisRightFormatter = new LargeValueFormatter();
@@ -226,7 +226,7 @@ public class MemoryStatisticsActivity extends BaseActivity {
 
         //这里，每重新new一个LineDataSet，相当于重新画一组折线
         //每一个LineDataSet相当于一组折线。比如:这里有两个LineDataSet：setComp1，setComp2。
-        LineDataSet setComp = new LineDataSet(yLeftValues, getString(R.string.setting_memory_statistics));
+        LineDataSet setComp = new LineDataSet(yLeftValues, getString(R.string.setting_peers_statistics));
         setComp.setAxisDependency(YAxis.AxisDependency.LEFT);
         setComp.setColor(getResources().getColor(R.color.colorPrimary));
         setComp.setDrawFilled(true);
@@ -235,7 +235,7 @@ public class MemoryStatisticsActivity extends BaseActivity {
         setComp.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
         setComp.setLineWidth(1f);// 设置线宽
 
-        LineDataSet setComp1 = new LineDataSet(yRightValues, getString(R.string.setting_working_frequency));
+        LineDataSet setComp1 = new LineDataSet(yRightValues, getString(R.string.setting_invoked_requests));
         setComp1.setAxisDependency(YAxis.AxisDependency.RIGHT);
         setComp1.setColor(getResources().getColor(R.color.color_red));
         setComp1.setDrawFilled(true);

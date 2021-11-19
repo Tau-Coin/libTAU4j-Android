@@ -10,6 +10,7 @@ import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.CpuStatistics;
 import io.taucoin.torrent.publishing.core.model.data.DataStatistics;
 import io.taucoin.torrent.publishing.core.model.data.MemoryStatistics;
+import io.taucoin.torrent.publishing.core.model.data.PeersAndInvoked;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Statistic;
 
 /**
@@ -44,12 +45,18 @@ public interface StatisticDao {
 
     // 查询内存统计数据
     String QUERY_MEMORY_STATISTICS = "SELECT round(timestamp/(:seconds), 0) AS timeKey, max(timestamp) AS timestamp," +
-            " avg(memorySize) AS memoryAvg, avg(workingFrequency) AS workingFreqAvg" +
+            " avg(memorySize) AS memoryAvg, round(avg(workingFrequency)) AS workingFreqAvg" +
             " FROM  Statistics WHERE" +
             QUERY_WHERE_24HOURS +
             " GROUP BY timeKey" +
             " ORDER BY timeKey";
 
+    String QUERY_PEERS_AND_INVOKED = "SELECT round(timestamp/(:seconds), 0) AS timeKey, max(timestamp) AS timestamp," +
+            " round(avg(nodes)) AS peers, round(avg(invokedRequests)) AS invokedRequests" +
+            " FROM  Statistics WHERE" +
+            QUERY_WHERE_24HOURS +
+            " GROUP BY timeKey" +
+            " ORDER BY timeKey";
 
     // 查询CPU统计数据
     String QUERY_CPU_STATISTICS = "SELECT round(timestamp/(:seconds), 0) AS timeKey, max(timestamp) AS timestamp," +
@@ -77,6 +84,9 @@ public interface StatisticDao {
 
     @Query(QUERY_MEMORY_STATISTICS)
     Single<List<MemoryStatistics>> getMemoryStatistics(int seconds);
+
+    @Query(QUERY_PEERS_AND_INVOKED)
+    Single<List<PeersAndInvoked>> getPeersAndInvoked(int seconds);
 
     @Query(QUERY_CPU_STATISTICS)
     Single<List<CpuStatistics>> getCpuStatistics(int seconds);

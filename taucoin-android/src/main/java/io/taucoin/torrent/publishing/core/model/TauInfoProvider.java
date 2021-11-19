@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.core.model;
 import android.content.Context;
 import android.os.Build;
 import android.os.Debug;
+import android.os.SystemClock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,50 +75,6 @@ public class TauInfoProvider {
         this.sampler = Sampler.getInstance();
         settingsRepo = RepositoryHelper.getSettingsRepository(MainApplication.getInstance());
         statisticRepo = RepositoryHelper.getStatisticRepository(MainApplication.getInstance());
-    }
-
-    /**
-     * 观察torrent SessionStats的工作流
-     * @return Flowable
-     */
-    public Flowable<Long> observeSessionStats() {
-        return makeSessionStatsFlowable();
-    }
-
-    /**
-     * 创建torrent SessionStats的工作流
-     * @return Flowable
-     */
-    private Flowable<Long> makeSessionStatsFlowable() {
-        return Flowable.create((emitter) -> {
-            try {
-                Thread.currentThread().setName("SessionNodes");
-                long oldNodes = -1;
-                long oldInvokedRequests = -1;
-                String invokedKey = MainApplication.getInstance().getString(R.string.pref_key_dht_invoked_requests);
-                String nodesKey = MainApplication.getInstance().getString(R.string.pref_key_dht_nodes);
-                while (!emitter.isCancelled()) {
-                    long sessionNodes = daemon.getSessionNodes();
-                    if (oldNodes == -1 || oldNodes != sessionNodes) {
-                        oldNodes = sessionNodes;
-                        settingsRepo.setLongValue(nodesKey, sessionNodes);
-                    }
-                    long invokedRequests = daemon.getInvokedRequests();
-                    logger.debug("invokedRequests::{}, sessionNodes::{}", invokedRequests, sessionNodes);
-                    if (oldInvokedRequests == -1 || oldInvokedRequests != invokedRequests) {
-                        oldInvokedRequests = invokedRequests;
-                        settingsRepo.setLongValue(invokedKey, invokedRequests);
-                    }
-
-                    if (!emitter.isCancelled()) {
-                        Thread.sleep(STATISTICS_PERIOD);
-                    }
-                }
-            } catch (InterruptedException ignore) {
-            } catch (Exception e) {
-                logger.error("makeSessionStatsFlowable is error", e);
-            }
-        }, BackpressureStrategy.LATEST);
     }
 
     /**
@@ -218,6 +175,14 @@ public class TauInfoProvider {
                 long lastMemQueryTime = DateUtil.getMillisTime();
                 long lastCPUQueryTime = DateUtil.getMillisTime();
                 int processors = getRuntime().availableProcessors();
+
+                // nodes和invoked统计
+                long oldNodes = -1;
+                long oldInvokedRequests = -1;
+                long oldInvokedTime = 0;
+                String invokedKey = MainApplication.getInstance().getString(R.string.pref_key_dht_invoked_requests);
+                String nodesKey = MainApplication.getInstance().getString(R.string.pref_key_dht_nodes);
+
                 while (!emitter.isCancelled()) {
                     long currentTime = DateUtil.getMillisTime();
                     // 内存采样：AndroidQ开始限制采样频率5分钟
@@ -258,12 +223,41 @@ public class TauInfoProvider {
                     // 流量统计
                     handlerTrafficStatistics(sessionStatistics);
 
+                    // nodes和invoked统计
+                    long sessionNodes = daemon.getSessionNodes();
+                    if (oldNodes == -1 || oldNodes != sessionNodes) {
+                        oldNodes = sessionNodes;
+                        settingsRepo.setLongValue(nodesKey, sessionNodes);
+                    }
+                    long invokedRequests = daemon.getInvokedRequests();
+                    long requestsPerSecond = 0;
+                    long timeSeconds = 0;
+                    if (oldInvokedRequests == -1 || oldInvokedRequests != invokedRequests) {
+                        long currentInvokedTime = SystemClock.uptimeMillis();
+                        timeSeconds = (currentInvokedTime - oldInvokedTime) / 1000;
+                        if (oldInvokedTime <= 0 || invokedRequests < oldInvokedRequests) {
+                            requestsPerSecond = invokedRequests;
+                        } else {
+                            requestsPerSecond = invokedRequests - oldInvokedRequests;
+                            if (requestsPerSecond > 0) {
+                                requestsPerSecond = requestsPerSecond / timeSeconds;
+                            }
+                        }
+                        settingsRepo.setLongValue(invokedKey, requestsPerSecond);
+                        oldInvokedRequests = invokedRequests;
+                        oldInvokedTime = currentInvokedTime;
+                    }
+                    logger.debug("invokedRequests::{}, seconds::{}, requestsPerSecond::{}, sessionNodes::{}",
+                            invokedRequests, timeSeconds, requestsPerSecond, sessionNodes);
+
                     statistic.timestamp = DateUtil.getTime();
                     statistic.workingFrequency = FrequencyUtil.getMainLoopFrequency();
                     statistic.dataSize = sessionStatistics.getDownloadRate() + sessionStatistics.getUploadRate();
                     statistic.memorySize = samplerStatistics.totalMemory;
                     statistic.cpuUsageRate = samplerStatistics.cpuUsage;
                     statistic.isMetered = NetworkSetting.isMeteredNetwork() ? 1 : 0;
+                    statistic.nodes = sessionNodes;
+                    statistic.invokedRequests = requestsPerSecond;
                     statisticRepo.addStatistic(statistic);
                     if (seconds > Constants.STATISTICS_CLEANING_PERIOD) {
                         statisticRepo.deleteOldStatistics();

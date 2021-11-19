@@ -6,6 +6,7 @@ import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.CpuStatistics;
 import io.taucoin.torrent.publishing.core.model.data.DataStatistics;
 import io.taucoin.torrent.publishing.core.model.data.MemoryStatistics;
+import io.taucoin.torrent.publishing.core.model.data.PeersAndInvoked;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Statistic;
 
 /**
@@ -28,6 +29,11 @@ public interface StatisticRepository {
      * 获取内存数据统计信息
      */
     Single<List<MemoryStatistics>> getMemoryStatistics();
+
+    /**
+     * 获取Peers和invoked request数据统计信息
+     */
+    Single<List<PeersAndInvoked>> getPeersAndInvoked();
 
     /**
      * 获取CPU数据统计信息

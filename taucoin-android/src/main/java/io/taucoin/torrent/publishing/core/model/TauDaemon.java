@@ -135,9 +135,6 @@ public abstract class TauDaemon {
         disposables.add(tauInfoProvider.observeCPUStatistics()
                 .subscribeOn(Schedulers.io())
                 .subscribe());
-        disposables.add(tauInfoProvider.observeSessionStats()
-                        .subscribeOn(Schedulers.io())
-                .subscribe(this::updateInterfacesTimer));
     }
 
     /**

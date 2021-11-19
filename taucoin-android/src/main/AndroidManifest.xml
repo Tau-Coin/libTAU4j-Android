@@ -267,6 +267,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.setting.PeersAndInvokedActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.setting.FontSizeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 

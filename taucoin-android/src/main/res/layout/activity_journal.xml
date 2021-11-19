@@ -108,6 +108,36 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ll_peers_invoked"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_44"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:paddingStart="@dimen/widget_size_20"
+            android:paddingEnd="@dimen/widget_size_20"
+            android:onClick="@{listener::onClick}"
+            android:gravity="center_vertical"
+            android:background="@color/color_white">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/setting_peers_invoked"
+                android:textAppearance="@style/TextAppearanceBody1" />
+
+            <ImageView
+                android:layout_width="@dimen/widget_size_16"
+                android:layout_height="@dimen/widget_size_16"
+                android:src="@mipmap/icon_arrow"
+                android:contentDescription="@null"
+                android:textColor="@color/primary_light" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

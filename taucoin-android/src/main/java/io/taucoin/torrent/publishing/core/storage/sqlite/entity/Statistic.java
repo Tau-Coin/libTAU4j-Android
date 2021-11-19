@@ -17,6 +17,8 @@ public class Statistic implements Parcelable {
     public long memorySize;       // 内存大小
     public double cpuUsageRate;   // CPU使用率
     public double workingFrequency;  // 主循环工作频率
+    public long nodes;               // 当前node个数
+    public long invokedRequests;     // 当前DHT invoked requests个数
 
     public Statistic(){
     }
@@ -35,6 +37,8 @@ public class Statistic implements Parcelable {
         memorySize = in.readLong();
         cpuUsageRate = in.readDouble();
         isMetered = in.readInt();
+        nodes = in.readLong();
+        invokedRequests = in.readLong();
     }
 
     @Override
@@ -44,6 +48,8 @@ public class Statistic implements Parcelable {
         dest.writeLong(memorySize);
         dest.writeDouble(cpuUsageRate);
         dest.writeInt(isMetered);
+        dest.writeLong(nodes);
+        dest.writeLong(invokedRequests);
     }
 
     @Override
