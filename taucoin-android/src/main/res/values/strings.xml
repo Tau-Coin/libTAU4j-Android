@@ -180,7 +180,7 @@
     <string name="setting_network_type">Network Type</string>
     <string name="setting_network_interfaces">Network Interfaces</string>
     <string name="setting_processors">Processors</string>
-    <string name="setting_dht_invoke">Invoked Requests/Seconds</string>
+    <string name="setting_dht_invoke">DHT Invoked Requests</string>
     <string name="setting_peers">Peers</string>
     <string name="setting_download">Total Download</string>
     <string name="setting_upload">Total Upload</string>

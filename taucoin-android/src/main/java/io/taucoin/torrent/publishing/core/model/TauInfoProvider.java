@@ -230,25 +230,22 @@ public class TauInfoProvider {
                         settingsRepo.setLongValue(nodesKey, sessionNodes);
                     }
                     long invokedRequests = daemon.getInvokedRequests();
-                    long requestsPerSecond = 0;
+                    long requests = 0;
                     long timeSeconds = 0;
                     if (oldInvokedRequests == -1 || oldInvokedRequests != invokedRequests) {
                         long currentInvokedTime = SystemClock.uptimeMillis();
                         timeSeconds = (currentInvokedTime - oldInvokedTime) / 1000;
-                        if (oldInvokedTime <= 0 || invokedRequests < oldInvokedRequests) {
-                            requestsPerSecond = invokedRequests;
+                        if (invokedRequests < oldInvokedRequests) {
+                            requests = invokedRequests;
                         } else {
-                            requestsPerSecond = invokedRequests - oldInvokedRequests;
-                            if (requestsPerSecond > 0) {
-                                requestsPerSecond = requestsPerSecond / timeSeconds;
-                            }
+                            requests = invokedRequests - oldInvokedRequests;
                         }
-                        settingsRepo.setLongValue(invokedKey, requestsPerSecond);
+                        settingsRepo.setLongValue(invokedKey, requests);
                         oldInvokedRequests = invokedRequests;
                         oldInvokedTime = currentInvokedTime;
                     }
-                    logger.debug("invokedRequests::{}, seconds::{}, requestsPerSecond::{}, sessionNodes::{}",
-                            invokedRequests, timeSeconds, requestsPerSecond, sessionNodes);
+                    logger.debug("invokedRequests::{}, seconds::{}, requests::{}, sessionNodes::{}",
+                            invokedRequests, timeSeconds, requests, sessionNodes);
 
                     statistic.timestamp = DateUtil.getTime();
                     statistic.workingFrequency = FrequencyUtil.getMainLoopFrequency();
@@ -257,7 +254,7 @@ public class TauInfoProvider {
                     statistic.cpuUsageRate = samplerStatistics.cpuUsage;
                     statistic.isMetered = NetworkSetting.isMeteredNetwork() ? 1 : 0;
                     statistic.nodes = sessionNodes;
-                    statistic.invokedRequests = requestsPerSecond;
+                    statistic.invokedRequests = requests;
                     statisticRepo.addStatistic(statistic);
                     if (seconds > Constants.STATISTICS_CLEANING_PERIOD) {
                         statisticRepo.deleteOldStatistics();
