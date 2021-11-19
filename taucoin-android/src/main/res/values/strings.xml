@@ -236,6 +236,7 @@
     <string name="copy_successfully">Copy successfully</string>
     <string name="copy_link_successfully">Copy link successfully</string>
     <string name="blacklist_successfully">Blacklist successfully</string>
+    <string name="blacklist_failed">Blacklist failed</string>
     <string name="favourite_successfully">Added favourite successfully</string>
     <string name="share_link_successfully">Share successfully</string>
 

@@ -523,6 +523,12 @@ public abstract class TauDaemon {
     public abstract boolean updateFriendInfo(User friend);
 
     /**
+     * 删除朋友
+     * @param friendPk 朋友公钥
+     */
+    public abstract boolean deleteFriend(String friendPk);
+
+    /**
      * 设置正在聊天的朋友
      * @param friendPk 朋友公钥
      */

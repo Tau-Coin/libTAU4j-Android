@@ -97,6 +97,7 @@ public class UserViewModel extends AndroidViewModel {
     private MutableLiveData<Result> addFriendResult = new MutableLiveData<>();
     private MutableLiveData<Boolean> editNameResult = new MutableLiveData<>();
     private MutableLiveData<List<User>> blackList = new MutableLiveData<>();
+    private MutableLiveData<Result> editBlacklistResult = new MutableLiveData<>();
     private MutableLiveData<UserAndFriend> userDetail = new MutableLiveData<>();
     private MutableLiveData<QRContent> qrContent = new MutableLiveData<>();
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
@@ -368,6 +369,13 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     /**
+     * 获取修改黑名单的结果
+     */
+    public MutableLiveData<Result> getEditBlacklistResult() {
+        return editBlacklistResult;
+    }
+
+    /**
      * 获取用户黑名单的被观察者
      * @return 被观察者
      */
@@ -404,14 +412,27 @@ public class UserViewModel extends AndroidViewModel {
      * @param blacklist 是否加入黑名单
      */
     public void setUserBlacklist(String publicKey, boolean blacklist) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
-            userRepo.setUserBlacklist(publicKey, blacklist);
-            emitter.onNext(true);
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
+            Result result = new Result();
+            boolean isSuccess;
+            if (blacklist) {
+                isSuccess = daemon.deleteFriend(publicKey);
+            } else {
+                User friend = userRepo.getFriend(publicKey);
+                isSuccess = daemon.updateFriendInfo(friend);
+            }
+            if (isSuccess) {
+                userRepo.setUserBlacklist(publicKey, blacklist);
+            }
+            result.setMsg(DateUtil.getDateTime());
+            result.setSuccess(isSuccess);
+            emitter.onNext(result);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isSuccess -> {
+                .subscribe(result -> {
+                    editBlacklistResult.postValue(result);
                     submitDataSetChanged();
                 });
         disposables.add(disposable);

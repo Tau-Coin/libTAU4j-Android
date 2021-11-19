@@ -251,6 +251,20 @@ public class TauDaemonImpl extends TauDaemon {
     }
 
     /**
+     * 删除朋友
+     * @param friendPk 朋友公钥
+     */
+    @Override
+    public boolean deleteFriend(String friendPk) {
+        boolean isSuccess = false;
+        if (isRunning) {
+            isSuccess = sessionManager.deleteFriend(friendPk);
+        }
+        logger.debug("deleteFriend friendPk::{}, isSuccess::{}", friendPk, isSuccess);
+        return isSuccess;
+    }
+
+    /**
      * 更新朋友信息
      * @param friendPk 朋友公钥
      * @param friendInfo 朋友信息

@@ -134,6 +134,15 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 openChatActivity(state.getMsg());
             }
         });
+
+        userViewModel.getEditBlacklistResult().observe(this, result -> {
+            if (result.isSuccess()) {
+                ToastUtils.showShortToast(R.string.blacklist_successfully);
+                onBackPressed();
+            } else {
+                ToastUtils.showShortToast(R.string.blacklist_failed);
+            }
+        });
     }
 
     private void showUserInfo(UserAndFriend userInfo) {
@@ -220,8 +229,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.tv_ban:
                 userViewModel.setUserBlacklist(publicKey, true);
-                ToastUtils.showShortToast(R.string.blacklist_successfully);
-                onBackPressed();
                 break;
         }
     }
