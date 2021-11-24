@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemUserCommunityBinding;
@@ -23,7 +24,7 @@ import io.taucoin.torrent.publishing.ui.Selectable;
  * 用户加入社区的列表的Adapter
  */
 public class UserCommunityListAdapter extends ListAdapter<Member, UserCommunityListAdapter.ViewHolder>
-    implements Selectable<Member> {
+        implements Selectable<Member> {
     private List<Member> dataList = new ArrayList<>();
     private ClickListener clickListener;
 
@@ -90,7 +91,7 @@ public class UserCommunityListAdapter extends ListAdapter<Member, UserCommunityL
             if(null == holder || null == member){
                 return;
             }
-            String communityName = Utils.getCommunityName(member.chainID);
+            String communityName = ChainIDUtil.getName(member.chainID);
             communityName = context.getString(R.string.user_community_name, communityName);
             holder.binding.tvName.setText(communityName);
 

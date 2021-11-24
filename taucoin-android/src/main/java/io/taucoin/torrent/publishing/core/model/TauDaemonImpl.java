@@ -2,13 +2,21 @@ package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
 
+import org.libTAU4j.Account;
+import org.libTAU4j.Block;
+import org.libTAU4j.ChainURL;
 import org.libTAU4j.Message;
+import org.libTAU4j.Transaction;
+import org.libTAU4j.Vectors;
 import org.libTAU4j.alerts.Alert;
 import org.libTAU4j.alerts.AlertType;
+import org.libTAU4j.swig.byte_vector;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
@@ -23,6 +31,7 @@ import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
@@ -102,7 +111,8 @@ public class TauDaemonImpl extends TauDaemon {
                         AlertType.DHT_PKT.swig(),
                         AlertType.SESSION_ERROR.swig(),
                         AlertType.SESSION_STATS_HEADER.swig(),
-                        AlertType.ALERTS_DROPPED.swig()
+                        AlertType.ALERTS_DROPPED.swig(),
+                        AlertType.BLOCK_CHAIN_LOG.swig(),
                     };
                 }
                 @Override
@@ -138,7 +148,13 @@ public class TauDaemonImpl extends TauDaemon {
                         AlertType.COMM_NEW_MSG.swig(),
                         AlertType.COMM_CONFIRM_ROOT.swig(),
                         AlertType.COMM_SYNC_MSG.swig(),
-                        AlertType.COMM_LAST_SEEN.swig()
+                        AlertType.COMM_LAST_SEEN.swig(),
+                        AlertType.BLOCK_CHAIN_TIP_BLOCK.swig(),
+                        AlertType.BLOCK_CHAIN_TAIL_BLOCK.swig(),
+                        AlertType.BLOCK_CHAIN_ROLLBACK_BLOCK.swig(),
+                        AlertType.BLOCK_CHAIN_NEW_TX.swig(),
+                        AlertType.BLOCK_CHAIN_FORK_POINT.swig(),
+                        AlertType.BLOCK_CHAIN_TOP_THREE_VOTES.swig(),
                     };
                 }
 
@@ -346,5 +362,127 @@ public class TauDaemonImpl extends TauDaemon {
             return isAddSuccess;
         }
         return false;
+    }
+
+    /**
+     * 创建新的社区
+     * @param chainID chainID
+     * @param accounts 创世区块的账户信息
+     * @return boolean 是否创建成功
+     */
+    @Override
+    public boolean createNewCommunity(byte[] chainID, Map<String, Account> accounts) {
+        if (isRunning) {
+            boolean isAddSuccess = sessionManager.createNewCommunity(chainID, accounts);
+            logger.debug("createNewCommunity success::{}", isAddSuccess);
+            return isAddSuccess;
+        }
+        return false;
+    }
+
+    /**
+     * 创建新的社区链ID
+     * @param communityName 社区名称
+     * @return chainID
+     */
+    @Override
+    public String createNewChainID(String communityName) {
+        String newChainID = null;
+        if (isRunning) {
+            byte[] chainID = sessionManager.createChainID(communityName);
+            logger.debug("createNewChainID Byte length::{}", chainID.length);
+            newChainID = ChainIDUtil.decode(chainID);
+            logger.debug("createNewChainID String length::{}", newChainID.length());
+        }
+        logger.debug("createNewChainID isRunning::{}, chainID::{}", isRunning, newChainID);
+        return newChainID;
+    }
+
+    /**
+     * 获取账户信息
+     * @param chainID 社区ID
+     * @param publicKey 用户公钥
+     * @return Account 账户信息
+     */
+    @Override
+    public Account getAccountInfo(byte[] chainID, String publicKey) {
+        Account account = null;
+        if (isRunning) {
+            account = sessionManager.getAccountInfo(chainID, publicKey);
+            logger.debug("getAccountInfo balance::{}, power::{}, nonce::{}", account.getBalance(),
+                    account.getEffectivePower(), account.getNonce());
+        }
+        return account;
+    }
+
+    /**
+     * 提交交易到交易池
+     * @param tx 交易对象
+     */
+    @Override
+    public boolean submitTransaction(Transaction tx) {
+        if (isRunning) {
+            logger.debug("submitTransaction txID::{}, nonce::{}", tx.getTxID().to_hex(), tx.getNonce());
+            return sessionManager.submitTransaction(tx);
+        }
+        return false;
+    }
+
+    /**
+     * 跟随链
+     * @param chainID 链ID
+     * @param peers 链上peers
+     */
+    @Override
+    public boolean followChain(String chainID, Set<String> peers) {
+        boolean success = false;
+        if (isRunning) {
+            success = sessionManager.followChain(ChainIDUtil.encode(chainID), peers);
+        }
+        logger.debug("followChain chainID::{}, peers size::{}, success::{}", chainID,
+                peers.size(), success);
+        return success;
+    }
+
+    /**
+     * 取消跟随链
+     * @param chainID 链ID
+     */
+    @Override
+    public boolean unfollowChain(String chainID) {
+        boolean success = false;
+        if (isRunning) {
+            success = sessionManager.unfollowChain(ChainIDUtil.encode(chainID));
+        }
+        logger.debug("unfollowChain chainID::{}, success::{}", chainID, success);
+        return false;
+    }
+
+    /**
+     * 获取tip前三名区块号和哈希
+     * @param chainID 链ID
+     * @param topNum 获取数目
+     */
+    @Override
+    public List<Block> getTopTipBlock(String chainID, int topNum) {
+        if (isRunning) {
+            logger.debug("getTopTipBlock chainID::{}, topNum::{}", chainID, topNum);
+            return sessionManager.getTopTipBlock(ChainIDUtil.encode(chainID), topNum);
+        }
+        return null;
+    }
+
+    /**
+     * 获取交易打包的最小交易费
+     * @param chainID 链ID
+     */
+    @Override
+    public long getMedianTxFree(String chainID) {
+        long medianTxFee = 0;
+        if (isRunning) {
+            medianTxFee = sessionManager.getMedianTxFee(ChainIDUtil.encode(chainID));
+        }
+        logger.debug("getMedianTxFree chainID::{}, medianTxFee::{}", chainID, medianTxFee);
+        return medianTxFee;
     }
 }

@@ -60,6 +60,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         binding.setListener(this);
         initParam();
         initView();
+        initData();
     }
 
     /**
@@ -109,9 +110,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    private void initData() {
         userViewModel.getUserDetail().observe(this, this::showUserInfo);
 
         userViewModel.getAddFriendResult().observe(this, result -> {
@@ -203,12 +202,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 .setCanceledOnTouchOutside(false)
                 .create();
         shareQRDialog.show();
-    }
-
-
-    @Override
-    protected void onStop() {
-        super.onStop();
     }
 
     @Override

@@ -10,40 +10,22 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/widget_size_10"
-        android:layout_marginTop="@dimen/widget_size_10"
-        android:gravity="bottom">
-
-        <include android:id="@+id/left_view"
-            layout="@layout/msg_left_view"/>
+        android:layout_marginTop="@dimen/widget_size_10">
 
         <LinearLayout
             android:id="@+id/middle_view"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@mipmap/icon_chat_bg"
+            android:layout_marginStart="@dimen/widget_size_10"
+            android:layout_marginEnd="@dimen/widget_size_10"
+            android:background="@drawable/red_rect_round_bg_big_radius"
             android:minHeight="@dimen/widget_size_50"
-            android:layout_marginEnd="@dimen/widget_size_60"
             android:layout_marginBottom="@dimen/widget_size_3"
-            android:paddingStart="@dimen/widget_size_20"
+            android:paddingStart="@dimen/widget_size_10"
             android:paddingEnd="@dimen/widget_size_10"
             android:paddingTop="@dimen/widget_size_5"
             android:paddingBottom="@dimen/widget_size_5"
             android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_result"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/widget_size_5"
-                android:textAppearance="@style/TextAppearanceBody3" />
-
-            <TextView
-                android:id="@+id/tv_amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/widget_size_2"
-                android:textAppearance="@style/TextAppearanceHeadline5" />
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -54,12 +36,12 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/tx_to"
+                    android:text="@string/tx_amount"
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody3" />
 
                 <TextView
-                    android:id="@+id/tv_receiver"
+                    android:id="@+id/tv_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearanceBody3" />
@@ -67,7 +49,6 @@
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_marginTop="@dimen/widget_size_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -84,9 +65,49 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearanceBody3" />
             </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tx_from"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody3" />
+
+                <TextView
+                    android:id="@+id/tv_sender"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_blue"
+                    android:textAppearance="@style/TextAppearanceBody3" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tx_to"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody3" />
+
+                <TextView
+                    android:id="@+id/tv_receiver"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_blue"
+                    android:textAppearance="@style/TextAppearanceBody3" />
+            </LinearLayout>
+
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_marginTop="@dimen/widget_size_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -101,13 +122,30 @@
                     android:id="@+id/tv_hash"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/color_yellow"
                     android:textAppearance="@style/TextAppearanceBody3" />
             </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_marginTop="@dimen/widget_size_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tx_block_number"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody3" />
+
+                <TextView
+                    android:id="@+id/tv_block_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearanceBody3" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -130,7 +168,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:layout_marginTop="@dimen/widget_size_5"
                 android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody3" />
 

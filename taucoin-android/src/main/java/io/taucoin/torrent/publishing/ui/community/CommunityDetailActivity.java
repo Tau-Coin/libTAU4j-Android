@@ -4,8 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,25 +16,23 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.ViewModelProvider;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
+import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityMembersBinding;
-import io.taucoin.torrent.publishing.databinding.ViewDialogBinding;
+import io.taucoin.torrent.publishing.databinding.BlacklistDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.CommunityQRCodeActivity;
-
 /**
- * 群组成员页面
+ * 社区详情页面
  */
-public class MembersActivity extends BaseActivity {
+public class CommunityDetailActivity extends BaseActivity {
 
     private ActivityMembersBinding binding;
     private CommunityViewModel communityViewModel;
@@ -43,7 +40,8 @@ public class MembersActivity extends BaseActivity {
     private String chainID;
     private List<Fragment> fragmentList = new ArrayList<>();
     private int[] titles = new int[]{R.string.community_on_chain, R.string.community_queue};
-    private CommonDialog banDialog;
+    private CommonDialog blacklistDialog;
+    private boolean isReadOnly;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +60,7 @@ public class MembersActivity extends BaseActivity {
     private void initParameter() {
         if(getIntent() != null){
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
+            isReadOnly = getIntent().getBooleanExtra(IntentExtra.READ_ONLY, true);
         }
     }
 
@@ -70,14 +69,17 @@ public class MembersActivity extends BaseActivity {
      */
     private void initLayout() {
         if(StringUtil.isNotEmpty(chainID)){
-            String communityName = UsersUtil.getCommunityName(chainID);
+            String communityName = ChainIDUtil.getName(chainID);
             binding.toolbarInclude.tvGroupName.setText(Html.fromHtml(communityName));
-            binding.toolbarInclude.tvUsersStats.setText(getString(R.string.community_users_stats, 0, 0));
+            binding.toolbarInclude.tvUsersStats.setVisibility(View.GONE);
         }
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
+        if (isReadOnly) {
+            binding.itemAddMember.setVisibility(View.GONE);
+        }
         // 添加OnChain页面
         Fragment chainTab = new MemberFragment();
         Bundle chainBundle = new Bundle();
@@ -102,79 +104,81 @@ public class MembersActivity extends BaseActivity {
     }
 
     /**
-     *  创建右上角Menu
+     * 左侧抽屉布局点击事件
      */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_member, menu);
-        return true;
-    }
-    /**
-     * 右上角Menu选项选择事件
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(StringUtil.isEmpty(chainID)){
-            return false;
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.item_chain_status:
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, ChainStatusActivity.class);
+                break;
+            case R.id.item_add_member:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_ADD_MEMBERS);
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, FriendsActivity.class);
+                break;
+            case R.id.item_qr_code:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, CommunityQRCodeActivity.class);
+                break;
+            case R.id.item_blacklist:
+                showBanCommunityTipsDialog(chainID);
+                break;
         }
-        if (item.getItemId() == R.id.member_add) {
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_ADD_MEMBERS);
-            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            ActivityUtil.startActivity(intent, this, FriendsActivity.class);
-        } else if (item.getItemId() == R.id.member_ban) {
-            showBanCommunityTipsDialog(chainID);
-        } else if (item.getItemId() == R.id.community_qr_code) {
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            ActivityUtil.startActivity(intent, this, CommunityQRCodeActivity.class);
-        }
-        return true;
     }
-
     /**
      * 显示禁止社区的提示对话框
      * @param chainID
      */
     private void showBanCommunityTipsDialog(String chainID) {
-        ViewDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
-                R.layout.view_dialog, null, false);
-        dialogBinding.tvMsg.setText(R.string.community_ban_community);
-        dialogBinding.tvMsg.setTextColor(getResources().getColor(R.color.color_black));
-        banDialog = new CommonDialog.Builder(this)
+        BlacklistDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
+                R.layout.blacklist_dialog, null, false);
+        String blacklistTip = getString(R.string.community_blacklist_tip, ChainIDUtil.getName(chainID));
+        dialogBinding.tvMsg.setText(Html.fromHtml(blacklistTip));
+        blacklistDialog = new CommonDialog.Builder(this)
                 .setContentView(dialogBinding.getRoot())
+                .enableWarpWidth(true)
                 .setCanceledOnTouchOutside(false)
-                .setHorizontal()
-                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
-                    dialog.dismiss();
-                    communityViewModel.setCommunityBlacklist(chainID, true);
-                })
-                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .create();
-        banDialog.show();
+        blacklistDialog.show();
+        dialogBinding.tvSubmit.setOnClickListener(v -> {
+            blacklistDialog.closeDialog();
+            communityViewModel.setCommunityBlacklist(chainID, true);
+        });
+        dialogBinding.ivClose.setOnClickListener(v -> {
+            blacklistDialog.closeDialog();
+        });
     }
 
     @Override
     public void onStart() {
         super.onStart();
         communityViewModel.getSetBlacklistState().observe(this, isSuccess -> {
-            if(isSuccess){
+            if (isSuccess) {
+                ToastUtils.showShortToast(R.string.blacklist_successfully);
                 this.setResult(RESULT_OK);
                 this.finish();
+            } else {
+                ToastUtils.showShortToast(R.string.blacklist_failed);
             }
         });
-        disposables.add(communityViewModel.getMembersStatistics(chainID)
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(statistics ->
-                binding.toolbarInclude.tvUsersStats.setText(getString(R.string.community_users_stats,
-                        statistics.getMembers(), statistics.getOnline()))));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         disposables.clear();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (blacklistDialog != null) {
+            blacklistDialog.closeDialog();
+        }
     }
 
     public class MyAdapter extends FragmentPagerAdapter {

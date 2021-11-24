@@ -43,4 +43,6 @@
     <string name="pref_key_network_interfaces" translatable="false">pref_key_network_interfaces</string>
     <string name="pref_key_dht_invoked_requests" translatable="false">pref_key_dht_invoked_requests</string>
     <string name="pref_key_dht_nodes" translatable="false">pref_key_dht_nodes</string>
+
+    <string name="pref_key_community_filters_selected" translatable="false">pref_key_community_filters_selected</string>
 </resources>

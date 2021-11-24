@@ -23,7 +23,7 @@
             android:id="@+id/joined_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="@{@dimen/fab_size + @dimen/fab_margin}"
+            android:paddingBottom="@dimen/widget_size_10"
             android:clipToPadding="false"
             android:scrollbars="vertical"
             android:focusable="true"

@@ -61,7 +61,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         progressManager.showProgressDialog(this, isCanCancel);
     }
 
-    public void closeProgressDialog(){
+    public void closeProgressDialog() {
         if(progressManager != null){
             progressManager.closeProgressDialog();
         }

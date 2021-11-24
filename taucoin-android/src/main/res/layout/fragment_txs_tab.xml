@@ -12,15 +12,29 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
-            android:id="@+id/tx_list"
-            android:layout_width="match_parent"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/refresh_layout"
             android:layout_height="match_parent"
-            android:paddingBottom="@{@dimen/fab_size + @dimen/fab_margin}"
-            android:clipToPadding="false"
-            android:scrollbars="vertical"
-            android:focusable="true"
-            android:scrollbarStyle="outsideOverlay" />
+            android:layout_width="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                    android:id="@+id/tx_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@{@dimen/fab_size + @dimen/fab_margin}"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:focusable="true"
+                    android:scrollbarStyle="outsideOverlay" />
+
+            </LinearLayout>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <io.taucoin.torrent.publishing.ui.customviews.ThemedSpeedDialView
             android:id="@+id/fab_button"

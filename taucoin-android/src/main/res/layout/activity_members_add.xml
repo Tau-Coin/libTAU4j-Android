@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:layout_marginStart="@dimen/widget_size_20"
+                android:layout_marginEnd="@dimen/widget_size_20">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/rb_unified"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/community_unified_airdrop"
+                        android:checked="true"
+                        style="@style/TextAppearanceBody2"/>
+
+                    <EditText
+                        android:id="@+id/et_airdrop_coins"
+                        android:layout_width="@dimen/widget_size_80"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:hint="@string/community_custom_coins_tips"
+                        android:gravity="center"
+                        android:inputType="numberDecimal|number"
+                        android:autofillHints="@string/community_custom_coins_tips"
+                        android:textAppearance="@style/TextAppearanceBody2"/>
+
+                </LinearLayout>
+
+                <RadioButton
+                    android:id="@+id/rb_custom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/widget_size_5"
+                    android:text="@string/community_custom_coins"
+                    style="@style/TextAppearanceBody2"/>
+
+                <include layout="@layout/view_line"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_5">
+
+                    <TextView
+                        android:id="@+id/tv_selected_friends"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/community_selected_friends"
+                        android:textColor="@color/gray_dark"
+                        style="@style/TextAppearanceBody2" />
+
+                    <TextView
+                        android:id="@+id/tv_airdrop_coins"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/community_total_coins"
+                        android:textColor="@color/gray_dark"
+                        style="@style/TextAppearanceBody2" />
+
+                </LinearLayout>
+
+                <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                    android:background="@color/color_white"
+                    android:id="@+id/recycler_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:focusable="true"
+                    android:scrollbarStyle="outsideOverlay" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</layout>

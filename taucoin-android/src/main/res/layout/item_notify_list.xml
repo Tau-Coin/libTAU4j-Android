@@ -8,37 +8,24 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/widget_size_78"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/widget_size_5"
+        android:paddingBottom="@dimen/widget_size_5"
         android:paddingStart="@dimen/widget_size_20"
         android:paddingEnd="@dimen/widget_size_20">
 
         <CheckBox
-            android:visibility="gone"
             android:id="@+id/cb_select"
             android:layout_centerVertical="true"
             android:layout_width="@dimen/widget_size_37"
             android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/tv_user_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/cb_select"
-            android:includeFontPadding="false"
-            android:layout_marginTop="@dimen/widget_size_5"
-            android:textColor="@color/gray_dark"
-            android:singleLine="true"
-            android:ellipsize="middle"
-            android:textAppearance="@style/TextAppearanceBody2" />
-
         <io.taucoin.torrent.publishing.ui.customviews.RoundButton
             android:layout_toEndOf="@+id/cb_select"
-            android:layout_below="@+id/tv_user_name"
             android:id="@+id/left_view"
-            android:layout_width="@dimen/widget_size_40"
-            android:layout_height="@dimen/widget_size_40"
+            android:layout_width="@dimen/widget_size_44"
+            android:layout_height="@dimen/widget_size_44"
             android:layout_marginEnd="@dimen/widget_size_7"
-            android:layout_marginTop="@dimen/widget_size_5"
             android:layout_centerVertical="true"
             android:gravity="center"
             android:textAllCaps="true"
@@ -50,31 +37,58 @@
             app:btnSolidColor="@color/primary_light"
             app:btnPressedRatio="1.5" />
 
-        <TextView
-            android:layout_below="@+id/tv_user_name"
-            android:id="@+id/tv_community_name"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/widget_size_40"
+        <LinearLayout
             android:layout_toEndOf="@+id/left_view"
-            android:layout_toStartOf="@+id/btn_join"
-            android:includeFontPadding="false"
-            android:gravity="center_vertical"
-            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_toStartOf="@+id/tv_coin"
             android:layout_centerVertical="true"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:textColor="@color/gray_dark"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:textAppearance="@style/TextAppearanceBody2" />
+
+            <TextView
+                android:id="@+id/tv_community_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:gravity="center_vertical"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:textAppearance="@style/TextAppearanceBody1" />
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:textColor="@color/gray_dark"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:textAppearance="@style/TextAppearanceBody3" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_coin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginStart="@dimen/widget_size_10"
+            android:layout_centerVertical="true"
+            android:text="123 coin"
             android:singleLine="true"
             android:ellipsize="middle"
-            android:textAppearance="@style/TextAppearanceHeadline6" />
-
-        <Button
-            android:id="@+id/btn_join"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/widget_size_50"
-            android:text="@string/notifications_join"
-            android:textAllCaps="false"
-            android:layout_marginEnd="@dimen/widget_size_10"
-            android:layout_marginStart="@dimen/widget_size_20"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:textAppearance="@style/TextAppearanceBody1"/>
+            android:textAppearance="@style/TextAppearanceBody2" />
     </RelativeLayout>
 </layout>

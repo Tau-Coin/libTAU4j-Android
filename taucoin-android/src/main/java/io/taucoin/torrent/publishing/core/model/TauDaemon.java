@@ -3,15 +3,20 @@ package io.taucoin.torrent.publishing.core.model;
 import android.content.Context;
 import android.content.Intent;
 
+import org.libTAU4j.Account;
+import org.libTAU4j.Block;
 import org.libTAU4j.Message;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
+import org.libTAU4j.Transaction;
 import org.libTAU4j.alerts.Alert;
 import org.libTAU4j.alerts.AlertType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -356,6 +361,9 @@ public abstract class TauDaemon {
             logger.info("SettingsChanged, UPnP mapped::{}", settingsRepo.isUPnpMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_main_loop_interval))) {
             setMainLoopInterval(FrequencyUtil.getMainLoopInterval());
+        } else if (key.equals(appContext.getString(R.string.pref_key_dht_nodes))) {
+            long nodes = settingsRepo.getLongValue(key, 0);
+            updateInterfacesTimer(nodes);
         }
     }
 
@@ -550,4 +558,56 @@ public abstract class TauDaemon {
      * 添加新消息
      */
     public abstract boolean addNewMessage(Message msg);
+
+    /**
+     * 创建新的社区
+     */
+    public abstract boolean createNewCommunity(byte[] chainID, Map<String, Account> accounts);
+
+    /**
+     * 创建新的社区链ID
+     * @param communityName 社区名称
+     * @return chainID
+     */
+    public abstract String createNewChainID(String communityName);
+
+    /**
+     * 获取账户信息
+     * @param chainID 社区ID
+     * @param publicKey 用户公钥
+     * @return Account 账户信息
+     */
+    public abstract Account getAccountInfo(byte[] chainID, String publicKey);
+
+    /**
+     * 提交交易到交易池
+     * @param tx 交易对象
+     */
+    public abstract boolean submitTransaction(Transaction tx);
+
+    /**
+     * 跟随链
+     * @param chainID 链ID
+     * @param peers 链上peers
+     */
+    public abstract boolean followChain(String chainID, Set<String> peers);
+
+    /**
+     * 取消跟随链
+     * @param chainID 链ID
+     */
+    public abstract boolean unfollowChain(String chainID);
+
+    /**
+     * 获取tip前三名区块号和哈希
+     * @param chainID 链ID
+     * @param topNum 获取数目
+     */
+    public abstract List<Block> getTopTipBlock(String chainID, int topNum);
+
+    /**
+     * 获取交易打包的最小交易费
+     * @param chainID 链ID
+     */
+    public abstract long getMedianTxFree(String chainID);
 }

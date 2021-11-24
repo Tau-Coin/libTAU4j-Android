@@ -236,8 +236,8 @@ public class CommonDialog extends Dialog {
                     lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
                     dialogWindow.setAttributes(lp);
                 }
-            }else {
-                layout.setMinimumWidth((int) (display.getWidth() * 0.85));
+            } else {
+                layout.setMinimumWidth((int) (display.getWidth() * 0.8));
             }
         }
 

@@ -1,5 +1,6 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,19 +11,23 @@ import android.view.ViewGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
+import io.taucoin.torrent.publishing.ui.community.CommunityTabs;
+import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.setting.FavoriteViewModel;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
-import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
@@ -46,6 +51,7 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         View.OnClickListener {
 
     private static final Logger logger = LoggerFactory.getLogger("TxsTabFragment");
+    public static final int TX_REQUEST_CODE = 0x1002;
     private BaseActivity activity;
     private FragmentTxsTabBinding binding;
     private TxViewModel txViewModel;
@@ -56,8 +62,9 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     private CommonDialog operationsDialog;
 
     private String chainID;
-    private int txType;
-    private boolean isReadOnly = true;
+    private int currentTab;
+    private boolean isReadOnly;
+    private int currentPos = 0;
 
     @Nullable
     @Override
@@ -88,10 +95,11 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     private void initParameter() {
         if(getArguments() != null){
             chainID = getArguments().getString(IntentExtra.CHAIN_ID);
-            txType = getArguments().getInt(IntentExtra.TYPE, -1);
-            if(txType == -1){
+            currentTab = getArguments().getInt(IntentExtra.TYPE, -1);
+            if(currentTab == -1){
                 binding.fabButton.setVisibility(View.GONE);
             }
+            isReadOnly = getArguments().getBoolean(IntentExtra.READ_ONLY, false);
         }
     }
 
@@ -99,25 +107,35 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
      * 初始化视图
      */
     private void initView() {
-        adapter = new TxListAdapter(this, chainID);
-        DefaultItemAnimator animator = new DefaultItemAnimator() {
-            @Override
-            public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
-                return true;
-            }
-        };
-        LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
-        binding.txList.setLayoutManager(layoutManager);
+        binding.refreshLayout.setOnRefreshListener(this);
 
-        binding.txList.setItemAnimator(animator);
+        adapter = new TxListAdapter(this, chainID);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+        layoutManager.setStackFromEnd(true);
+        binding.txList.setLayoutManager(layoutManager);
+        binding.txList.setItemAnimator(null);
         binding.txList.setAdapter(adapter);
+
+        loadData(0);
     }
 
     private final Runnable handleUpdateAdapter = () -> {
-        if (binding.txList.getLayoutManager() != null) {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
+        if (layoutManager != null) {
             int bottomPosition = adapter.getItemCount() - 1;
+            // 滚动到底部
             logger.debug("handleUpdateAdapter scrollToPosition::{}", bottomPosition);
-            binding.txList.getLayoutManager().scrollToPosition(bottomPosition);
+            layoutManager.scrollToPositionWithOffset(bottomPosition, Integer.MIN_VALUE);
+        }
+    };
+
+    private final Runnable handlePullAdapter = () -> {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
+        if (layoutManager != null) {
+            int bottomPosition = adapter.getItemCount() - 1;
+            int position = bottomPosition - currentPos;
+            layoutManager.scrollToPositionWithOffset(position, 0);
         }
     };
 
@@ -125,17 +143,23 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
      * 初始化右下角悬浮按钮组件
      */
     private void initFabSpeedDial() {
+        if (currentTab == CommunityTabs.OFF_CHAIN_MSG.getIndex()) {
+            binding.fabButton.setVisibility(View.GONE);
+            return;
+        }
         // 自定义点击事件
         binding.fabButton.getMainFab().setOnClickListener(v ->{
-            if(isReadOnly){
+            if (isReadOnly) {
                 return;
             }
             Intent intent = new Intent();
             intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            if(txType == TypesConfig.TxType.WCoinsType.ordinal()){
-                ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
-            }else{
-                ActivityUtil.startActivity(intent, this, MessageActivity.class);
+            if (currentTab == CommunityTabs.WRING_TX.getIndex()) {
+                ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
+                        TX_REQUEST_CODE);
+            } else {
+                ActivityUtil.startActivityForResult(intent, activity, MessageActivity.class,
+                        TX_REQUEST_CODE);
             }
         });
     }
@@ -150,10 +174,32 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     @Override
     public void onStart() {
         super.onStart();
-        txViewModel.observerCommunityTxs(chainID, txType).observe(this, replyAndAllTxs -> {
-            adapter.submitList(replyAndAllTxs, handleUpdateAdapter);
-            logger.debug("adapter.size::{}, newSize::{}", adapter.getItemCount(), replyAndAllTxs.size());
+        txViewModel.observerChainTxs().observe(this, txs -> {
+            List<UserAndTx> currentList = new ArrayList<>(txs);
+            if (currentPos == 0) {
+                adapter.submitList(currentList, handleUpdateAdapter);
+            } else {
+                currentList.addAll(adapter.getCurrentList());
+                adapter.submitList(currentList, handlePullAdapter);
+            }
+            binding.refreshLayout.setRefreshing(false);
+            binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
+
+            logger.debug("txs.size::{}", txs.size());
         });
+
+        disposables.add(txViewModel.observeDataSetChanged()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                    // 跟当前用户有关系的才触发刷新
+                    if (result != null && StringUtil.isNotEmpty(result.getMsg())) {
+                        binding.refreshLayout.setRefreshing(false);
+                        binding.refreshLayout.setEnabled(false);
+                        // 立即执行刷新
+                        loadData(0);
+                    }
+                }));
     }
 
     @Override
@@ -270,5 +316,23 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         this.isReadOnly = isReadOnly;
         int color = isReadOnly ? R.color.gray_light : R.color.primary;
         binding.fabButton.setMainFabClosedBackgroundColor(getResources().getColor(color));
+    }
+
+    @Override
+    public void onRefresh() {
+        loadData(adapter.getItemCount());
+    }
+
+    private void loadData(int pos) {
+        currentPos = pos;
+        txViewModel.loadTxsData(currentTab, chainID, pos);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == TX_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            loadData(0);
+        }
     }
 }

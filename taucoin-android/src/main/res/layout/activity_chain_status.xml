@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_white"
+        android:fitsSystemWindows="true">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_chain_length"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    app:lineLeftText="@string/chain_length"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_difficulty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    app:lineLeftText="@string/chain_difficulty" />
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_total_peers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    app:lineLeftText="@string/chain_total_peers" />
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_peers_blocks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    app:lineLeftText="@string/chain_peers_blocks" />
+
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_total_coins"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    app:lineLeftText="@string/chain_total_coins" />
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_top_peers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:onClick="onClick"
+                    app:lineLeftText="@string/chain_top_peers"
+                    app:lineRightImage="@mipmap/icon_arrow"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_top_consensus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:onClick="onClick"
+                    app:lineLeftText="@string/chain_top_consensus"
+                    app:lineRightImage="@mipmap/icon_arrow"/>
+
+                <LinearLayout
+                    android:id="@+id/ll_fork_point"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/chain_current_fork"
+                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:layout_marginBottom="@dimen/widget_size_10"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/item_fork_block_num"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        app:lineHeight="@dimen/widget_size_0"
+                        app:lineVisibility="false"
+                        app:lineLeftTextColor="@color/gray_dark"
+                        app:lineLeftText="@string/chain_block_number"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/item_fork_block_hash"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        app:lineHeight="@dimen/widget_size_0"
+                        app:lineLeftTextColor="@color/gray_dark"
+                        app:lineLeftText="@string/chain_block_hash"
+                        app:lineVisibility="false"/>
+
+                    <include
+                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/widget_size_1"
+                        layout="@layout/view_line"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</layout>

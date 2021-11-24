@@ -2,7 +2,6 @@ package io.taucoin.torrent.publishing.ui.friends;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,19 +17,15 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainLinkUtil;
-import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ActivityFriendsBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
+import io.taucoin.torrent.publishing.ui.community.MembersAddActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.qrcode.UserQRCodeActivity;
-import io.taucoin.torrent.publishing.ui.transaction.TxViewModel;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
@@ -45,7 +40,6 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     private ActivityFriendsBinding binding;
     private UserViewModel userViewModel;
     private CommunityViewModel communityViewModel;
-    private TxViewModel txViewModel;
     private ChatViewModel chatViewModel;
     private FriendsListAdapter adapter;
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -53,7 +47,6 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     // 代表不同的入口页面
     private int page;
     private String scannedFriendPk; // 新扫描的朋友的公钥
-    private long medianFee;
     private int order = 0; // 0:last seen, 1:last communication
 
     @Override
@@ -63,12 +56,10 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         binding.setListener(this);
         ViewModelProvider provider = new ViewModelProvider(this);
         userViewModel = provider.get(UserViewModel.class);
-        txViewModel = provider.get(TxViewModel.class);
         chatViewModel = provider.get(ChatViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
         initParameter(getIntent());
         initView();
-        getMedianFee();
     }
 
     @Override
@@ -113,14 +104,14 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     /**
      * 获取交易费中位数
      */
-    private void getMedianFee() {
-        if(StringUtil.isNotEmpty(chainID) && page == PAGE_ADD_MEMBERS){
-            disposables.add(txViewModel.observeMedianFee(chainID)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(fees -> medianFee = Utils.getMedianData(fees)));
-        }
-    }
+//    private void getMedianFee() {
+//        if(StringUtil.isNotEmpty(chainID) && page == PAGE_ADD_MEMBERS){
+//            disposables.add(txViewModel.observeMedianFee(chainID)
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(fees -> medianFee = Utils.getMedianData(fees)));
+//        }
+//    }
 
     private void subscribeUserList() {
         disposables.add(userViewModel.observeUserDataSetChanged()
@@ -194,8 +185,10 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_done) {
-            showProgressDialog();
-            txViewModel.airdropToFriends(chainID, adapter.getSelectedList(), medianFee);
+            Intent intent = new Intent();
+            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+            intent.putParcelableArrayListExtra(IntentExtra.BEAN, adapter.getSelectedList());
+            ActivityUtil.startActivity(intent, this, MembersAddActivity.class);
         } else if (item.getItemId() == R.id.menu_rank_c) {
             order = 1;
             invalidateOptionsMenu();
@@ -210,22 +203,21 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         return true;
     }
 
-    @Override
-    public void onSelectClicked() {
-        int total = adapter.getSelectedList().size();
-        binding.llTotalPay.setVisibility(total > 0 ? View.VISIBLE : View.GONE);
-        if(total > 0){
-            long airdropCoin = Constants.AIRDROP_COIN.longValue();
-            long totalPay = (airdropCoin + medianFee) * total;
-            long totalFee = medianFee * total;
-            String totalPayStr = FmtMicrometer.fmtBalance(totalPay);
-            String totalFeeStr = FmtMicrometer.fmtFeeValue(totalFee);
-            String coinName = UsersUtil.getCoinName(chainID);
-            String totalPayHtml = getString(R.string.contacts_total_pay, total,
-                    totalPayStr, coinName, totalFeeStr);
-            binding.tvTotalPay.setText(Html.fromHtml(totalPayHtml));
-        }
-    }
+//    @Override
+//    public void onSelectClicked() {
+//        int total = adapter.getSelectedList().size();
+//        if(total > 0){
+//            long airdropCoin = Constants.AIRDROP_COIN.longValue();
+//            long totalPay = (airdropCoin + medianFee) * total;
+//            long totalFee = medianFee * total;
+//            String totalPayStr = FmtMicrometer.fmtBalance(totalPay);
+//            String totalFeeStr = FmtMicrometer.fmtFeeValue(totalFee);
+//            String coinName = UsersUtil.getCoinName(chainID);
+//            String totalPayHtml = getString(R.string.contacts_total_pay, total,
+//                    totalPayStr, coinName, totalFeeStr);
+//            binding.tvTotalPay.setText(Html.fromHtml(totalPayHtml));
+//        }
+//    }
 
     @Override
     public void onItemClicked(@NonNull UserAndFriend user) {
@@ -265,9 +257,8 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         disposables.add(communityViewModel.getCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
-                    String communityInviteLink = ChainLinkUtil.encode(chainID, list);
-                    ActivityUtil.shareText(this, getString(R.string.contacts_share_link_via),
-                            communityInviteLink);
+                    String chainUrl = ChainUrlUtil.encode(chainID, list);
+                    ActivityUtil.shareText(this, getString(R.string.contacts_share_link_via), chainUrl);
                 }));
     }
 

@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.ui.notify;
 
 import android.app.Application;
 
+import org.libTAU4j.ChainURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,8 @@ import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Notification;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.NotificationRepository;
-import io.taucoin.torrent.publishing.core.utils.ChainLinkUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 
@@ -101,9 +103,9 @@ public class NotificationViewModel extends AndroidViewModel {
      */
     public void addNotification(String inviteLink, String friendPk){
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
-            ChainLinkUtil.ChainLink decode = ChainLinkUtil.decode(inviteLink);
-            if(decode.isValid()){
-                String chainID = decode.getDn();
+            ChainURL decode = ChainUrlUtil.decode(inviteLink);
+            if (decode != null) {
+                String chainID = ChainIDUtil.decode(decode.getChainID());
                 Notification notification = notifyRepo.queryNotification(friendPk, chainID);
                 if(null == notification){
                     notification = new Notification(friendPk, inviteLink,

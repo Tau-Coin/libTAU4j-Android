@@ -9,26 +9,35 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
-import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemNoteBinding;
+import io.taucoin.torrent.publishing.databinding.ItemNoteRightBinding;
 import io.taucoin.torrent.publishing.databinding.ItemWiringTxBinding;
 import io.taucoin.torrent.publishing.databinding.MsgLeftViewBinding;
-import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 
 /**
  * 消息/交易列表显示的Adapter
  */
-public class TxListAdapter extends PagedListAdapter<UserAndTx, TxListAdapter.ViewHolder> {
+public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHolder> {
+
+    enum ViewType {
+        WIRING_TX,
+        LEFT_NOTE,
+        RIGHT_NOTE
+    }
+
     private ClickListener listener;
     private String chainID;
 
@@ -43,16 +52,15 @@ public class TxListAdapter extends PagedListAdapter<UserAndTx, TxListAdapter.Vie
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ViewDataBinding binding;
-        if(viewType == TypesConfig.TxType.WCoinsType.ordinal()){
+        if (viewType == ViewType.WIRING_TX.ordinal()) {
             binding = DataBindingUtil.inflate(inflater,
-                    R.layout.item_wiring_tx,
-                    parent,
-                    false);
-        }else {
+                    R.layout.item_wiring_tx, parent, false);
+        } else if (viewType == ViewType.RIGHT_NOTE.ordinal()) {
             binding = DataBindingUtil.inflate(inflater,
-                    R.layout.item_note,
-                    parent,
-                    false);
+                    R.layout.item_note_right, parent, false);
+        } else {
+            binding = DataBindingUtil.inflate(inflater,
+                    R.layout.item_note, parent, false);
         }
         return new ViewHolder(binding, listener, chainID);
     }
@@ -65,8 +73,18 @@ public class TxListAdapter extends PagedListAdapter<UserAndTx, TxListAdapter.Vie
     @Override
     public int getItemViewType(int position) {
         UserAndTx tx = getItem(position);
+        String userPk = MainApplication.getInstance().getPublicKey();
         if(tx != null){
-            return (int) tx.txType;
+            if (tx.txType == TxType.WRING_TX.getType()) {
+                return ViewType.WIRING_TX.ordinal();
+            } else if (tx.txType == TxType.CHAIN_NOTE.getType()) {
+                if (StringUtil.isEquals(userPk, tx.senderPk)) {
+                    return ViewType.RIGHT_NOTE.ordinal();
+                } else {
+                    return ViewType.LEFT_NOTE.ordinal();
+                }
+            }
+            return tx.txType;
         }
         return -1;
     }
@@ -95,43 +113,46 @@ public class TxListAdapter extends PagedListAdapter<UserAndTx, TxListAdapter.Vie
             SpannableStringBuilder memo = Utils.getSpannableStringUrl(tx.memo);
             String firstLettersName = StringUtil.getFirstLettersOfName(showName);
             String userName = UsersUtil.getUserName(tx.sender, tx.senderPk);
-            if(binding instanceof ItemWiringTxBinding){
+            if (binding instanceof ItemWiringTxBinding) {
                 ItemWiringTxBinding txBinding = (ItemWiringTxBinding) holder.binding;
-                txBinding.leftView.roundButton.setBgColor(bgColor);
-                txBinding.leftView.tvName.setText(firstLettersName);
-                txBinding.leftView.tvEditName.setText(userName);
-                txBinding.leftView.tvBalance.setText(UsersUtil.getShowBalance(tx.senderBalance));
-                if(tx.txStatus == 1){
-                    txBinding.tvResult.setText(R.string.tx_result_successfully);
-                    txBinding.tvResult.setTextColor(context.getResources().getColor(R.color.color_black));
-                    txBinding.tvAmount.setTextColor(context.getResources().getColor(R.color.color_black));
-                }else{
-                    txBinding.tvResult.setText(R.string.tx_result_processing);
-                    txBinding.tvResult.setTextColor(context.getResources().getColor(R.color.color_blue));
-                    txBinding.tvAmount.setTextColor(context.getResources().getColor(R.color.color_blue));
-                }
-                String amount = FmtMicrometer.fmtBalance(tx.amount) + " " + UsersUtil.getCoinName(chainID);
+                txBinding.tvBlockNumber.setVisibility(tx.txStatus == 1 ? View.VISIBLE : View.GONE);
+                String amount = FmtMicrometer.fmtBalance(tx.amount) + " " +
+                        ChainIDUtil.getCoinName(chainID);
                 txBinding.tvAmount.setText(amount);
+                txBinding.tvSender.setText(tx.senderPk);
                 txBinding.tvReceiver.setText(tx.receiverPk);
                 txBinding.tvFee.setText(FmtMicrometer.fmtFeeValue(tx.fee));
                 txBinding.tvHash.setText(tx.txID);
                 txBinding.tvMemo.setText(memo);
                 txBinding.tvTime.setText(time);
+                boolean isMine = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
+                txBinding.middleView.setBackgroundResource(isMine ? R.drawable.red_rect_round_bg_big_radius :
+                        R.drawable.white_rect_round_bg_big_radius);
+                setOnLongClickListener(txBinding.middleView, tx, tx.memo);
+//                setLeftViewClickListener(txBinding.leftView, tx);
+            } else if (binding instanceof ItemNoteRightBinding) {
+                ItemNoteRightBinding noteBinding = (ItemNoteRightBinding) holder.binding;
+                noteBinding.leftView.roundButton.setBgColor(bgColor);
+                noteBinding.leftView.tvName.setText(firstLettersName);
+                noteBinding.leftView.tvEditName.setText(userName);
+                noteBinding.leftView.tvBalance.setText(UsersUtil.getShowBalance(tx.senderBalance));
+
+                noteBinding.tvMsg.setText(memo);
+                noteBinding.tvTime.setText(time);
 
                 if(StringUtil.isEquals(tx.senderPk,
                         MainApplication.getInstance().getPublicKey())){
-                    txBinding.leftView.tvBlacklist.setVisibility(View.GONE);
+                    noteBinding.leftView.tvBlacklist.setVisibility(View.GONE);
                 }
-                setOnLongClickListener(txBinding.middleView, tx, tx.memo);
-                setLeftViewClickListener(txBinding.leftView, tx);
-            }else{
+                setOnLongClickListener(noteBinding.middleView, tx, tx.memo);
+                setLeftViewClickListener(noteBinding.leftView, tx);
+            } else {
                 ItemNoteBinding noteBinding = (ItemNoteBinding) holder.binding;
                 noteBinding.leftView.roundButton.setBgColor(bgColor);
                 noteBinding.leftView.tvName.setText(firstLettersName);
                 noteBinding.leftView.tvEditName.setText(userName);
                 noteBinding.leftView.tvBalance.setText(UsersUtil.getShowBalance(tx.senderBalance));
 
-                noteBinding.tvName.setText(showName);
                 noteBinding.tvMsg.setText(memo);
                 noteBinding.tvTime.setText(time);
 

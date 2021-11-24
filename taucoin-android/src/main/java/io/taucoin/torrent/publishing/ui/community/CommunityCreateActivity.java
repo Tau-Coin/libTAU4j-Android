@@ -9,16 +9,14 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.nio.charset.StandardCharsets;
-
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import io.taucoin.torrent.publishing.core.model.data.GenesisConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.EditTextInhibitInput;
+import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -30,6 +28,7 @@ import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
+import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
 /**
  * 群组/社区创建页面
@@ -38,7 +37,7 @@ public class CommunityCreateActivity extends BaseActivity {
     private ActivityCommunityCreateBinding binding;
     private CommunityViewModel viewModel;
     private CommonDialog successDialog;
-    private GenesisConfig cf;
+    private String chainID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,49 +60,49 @@ public class CommunityCreateActivity extends BaseActivity {
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         binding.tvPublicKey.setText(MainApplication.getInstance().getPublicKey());
+        String totalCoin = getString(R.string.community_total_coins,
+                FmtMicrometer.fmtBalance(Constants.TOTAL_COIN.longValue()));
+        binding.tvTotalCoin.setText(totalCoin);
         // 社区名字禁止输入#特殊符号
         binding.etCommunityName.setFilters(new InputFilter[]{new EditTextInhibitInput(EditTextInhibitInput.WELL_REGEX)});
-        binding.etCommunityName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String communityName = s.toString();
-                String chainID;
-                if (StringUtil.isEmpty(communityName)) {
-                    cf = null;
-                    chainID = null;
-                } else {
-                    Community community = buildCommunity();
-                    cf = viewModel.createGenesisConfig(community);
-                    chainID = new String(cf.getChainID(), StandardCharsets.UTF_8);
-                }
-
-                String firstLetters = StringUtil.getFirstLettersOfName(s.toString());
-                binding.roundButton.setText(firstLetters);
-                int defaultColor = getResources().getColor(R.color.primary_light);
-                int bgColor = StringUtil.isEmpty(chainID) ? defaultColor : Utils.getGroupColor(chainID);
-                binding.roundButton.setBgColor(bgColor);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+        binding.etCommunityName.addTextChangedListener(mTextWatcher);
     }
+
+    private TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            String communityName = s.toString();
+            if (StringUtil.isEmpty(communityName)) {
+                chainID = null;
+            } else {
+                chainID = viewModel.createNewChainID(communityName.trim());
+            }
+            String firstLetters = StringUtil.getFirstLettersOfName(s.toString());
+            binding.roundButton.setText(firstLetters);
+            int defaultColor = getResources().getColor(R.color.primary_light);
+            int bgColor = StringUtil.isEmpty(chainID) ? defaultColor : Utils.getGroupColor(chainID);
+            binding.roundButton.setBgColor(bgColor);
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
 
     /**
      * 观察添加社区的状态
      */
     private void observeAddCommunityState() {
         viewModel.getAddCommunityState().observe(this, state -> {
-            if(state.isSuccess()){
+            if (state.isSuccess()) {
                 showSuccessDialog(state.getMsg());
-            }else{
+            } else {
                 ToastUtils.showShortToast(state.getMsg());
             }
         });
@@ -119,7 +118,8 @@ public class CommunityCreateActivity extends BaseActivity {
         binding.tvMsg.setTextColor(getResources().getColor(R.color.color_black));
         successDialog = new CommonDialog.Builder(this)
                 .setContentView(binding.getRoot())
-                .setButtonWidth(R.dimen.widget_size_240)
+                .setHorizontal()
+                .setCanceledOnTouchOutside(false)
                 .setPositiveButton(R.string.community_added_members, (dialog, which) -> {
                     dialog.cancel();
                     onBackPressed();
@@ -127,11 +127,15 @@ public class CommunityCreateActivity extends BaseActivity {
                     intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_ADD_MEMBERS);
                     intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                     ActivityUtil.startActivity(intent, this, FriendsActivity.class);
+                }).setNegativeButton(R.string.common_later, (dialog, which) -> {
+                    dialog.cancel();
+                    // 进入社区页面
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra(IntentExtra.TYPE, 0);
+                    ActivityUtil.startActivity(intent, this, MainActivity.class);
                 }).create();
-        successDialog.setOnCancelListener(dialog -> {
-            dialog.dismiss();
-            onBackPressed();
-        });
         successDialog.show();
 
     }
@@ -153,27 +157,28 @@ public class CommunityCreateActivity extends BaseActivity {
         // 添加新社区处理事件
         if (item.getItemId() == R.id.menu_done) {
             Community community = buildCommunity();
+            community.chainID = chainID;
             if(viewModel.validateCommunity(community)){
-                viewModel.addCommunity(community, cf);
+                viewModel.addCommunity(community);
             }
         }
         return true;
     }
 
-    private Community buildCommunity(){
+    private Community buildCommunity() {
         String communityName = ViewUtils.getText(binding.etCommunityName);
         String publicKey = ViewUtils.getText(binding.tvPublicKey);
-        return new Community(communityName, publicKey,
-                Constants.TOTAL_COIN.longValue(), Constants.BLOCK_IN_AVG);
+        return new Community(chainID, communityName);
     }
-
-
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(successDialog != null){
+        if (successDialog != null) {
             successDialog.closeDialog();
+        }
+        if (mTextWatcher != null) {
+            binding.etCommunityName.removeTextChangedListener(mTextWatcher);
         }
     }
 }

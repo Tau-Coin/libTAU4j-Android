@@ -14,14 +14,14 @@
 
     <TextView
         android:id="@+id/tv_badge"
-        android:layout_width="@dimen/widget_size_16"
-        android:layout_height="@dimen/widget_size_16"
+        android:layout_width="@dimen/widget_size_14"
+        android:layout_height="@dimen/widget_size_14"
         android:layout_alignParentEnd="true"
         android:background="@drawable/circle_red"
         android:gravity="center|center_vertical"
-        android:layout_marginTop="@dimen/widget_size_12"
-        android:layout_marginEnd="@dimen/widget_size_12"
+        android:layout_marginTop="@dimen/widget_size_8"
+        android:layout_marginEnd="@dimen/widget_size_8"
         android:includeFontPadding="false"
-        android:textAppearance="@style/TextAppearanceBody3"
+        android:textAppearance="@style/TextAppearanceBody4"
         android:textColor="@android:color/white" />
 </RelativeLayout>

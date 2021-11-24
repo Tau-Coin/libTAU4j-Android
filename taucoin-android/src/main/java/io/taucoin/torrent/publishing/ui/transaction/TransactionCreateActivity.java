@@ -2,6 +2,8 @@ package io.taucoin.torrent.publishing.ui.transaction;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,11 +12,11 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
-import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -22,7 +24,6 @@ import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityTransactionCreateBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
@@ -70,19 +71,23 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        if(StringUtil.isNotEmpty(chainID)){
-            String fee = "0";
-            binding.tvFee.setTag(R.id.median_fee, fee);
-            String lastTxFee = txViewModel.getLastTxFee(chainID);
-            if(StringUtil.isNotEmpty(lastTxFee)){
-                fee = FmtMicrometer.fmtFeeValue(lastTxFee);
-            }
-            showFeeView(binding.tvFee, fee);
+        binding.etAmount.setFilters(new InputFilter[]{new MoneyValueFilter()});
+
+        if (StringUtil.isNotEmpty(chainID)) {
+            long txFee = txViewModel.getTxFee(chainID);
+            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
+            binding.tvFee.setTag(R.id.median_fee, txFee);
+
+            String medianFree = getString(R.string.tx_median_fee, txFeeStr,
+                    ChainIDUtil.getCoinName(chainID));
+            binding.tvFee.setText(Html.fromHtml(medianFree));
+            binding.tvFee.setTag(txFeeStr);
         }
     }
 
     private void showFeeView(TextView tvFee, String fee) {
-        tvFee.setText(getString(R.string.tx_median_fee, fee, UsersUtil.getCoinName(chainID)));
+        String medianFree = getString(R.string.tx_median_fee, fee, ChainIDUtil.getCoinName(chainID));
+        tvFee.setText(Html.fromHtml(medianFree));
         tvFee.setTag(fee);
     }
 
@@ -93,21 +98,26 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
             if(StringUtil.isNotEmpty(result)){
                 ToastUtils.showShortToast(result);
             }else {
+                setResult(RESULT_OK);
                 onBackPressed();
             }
         });
-        if(StringUtil.isNotEmpty(chainID)){
-            disposables.add(txViewModel.observeMedianFee(chainID)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(fees -> {
-                        String medianFee = FmtMicrometer.fmtFeeValue(Utils.getMedianData(fees));
-                        binding.tvFee.setTag(R.id.median_fee, medianFee);
-                        if(StringUtil.isEmpty(txViewModel.getLastTxFee(chainID))){
-                            showFeeView(binding.tvFee, medianFee);
-                        }
-                    }));
-        }
+//        if(StringUtil.isNotEmpty(chainID)){
+//            disposables.add(txViewModel.observeMedianFee(chainID)
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(fees -> {
+//                        long medianFee = txViewModel.getMedianFee(chainID);
+//                        if (medianFee <= 0) {
+//                            medianFee = Utils.getMedianData(fees);
+//                        }
+//                        String medianFeeStr = FmtMicrometer.fmtFeeValue(medianFee);
+//                        binding.tvFee.setTag(R.id.median_fee, medianFeeStr);
+//                        if(StringUtil.isEmpty(txViewModel.getLastTxFee(chainID))){
+//                            showFeeView(binding.tvFee, medianFeeStr);
+//                        }
+//                    }));
+//        }
     }
 
     @Override
@@ -145,7 +155,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
      * @return Tx
      */
     private Tx buildTx() {
-        long txType = TypesConfig.TxType.WCoinsType.ordinal();
+        int txType = TxType.WRING_TX.getType();
         String receiverPk = ViewUtils.getText(binding.etPublicKey);
         String amount = ViewUtils.getText(binding.etAmount);
         String fee = ViewUtils.getStringTag(binding.tvFee);

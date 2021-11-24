@@ -1,6 +1,7 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,9 +12,10 @@ import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
@@ -60,48 +62,33 @@ public class MessageActivity extends BaseActivity implements View.OnClickListene
      */
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.community_message);
+        binding.toolbarInclude.toolbar.setTitle(R.string.community_chain_note_title);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        if(StringUtil.isNotEmpty(chainID)){
-            String fee = "0";
-            binding.tvFee.setTag(R.id.median_fee, fee);
-            String lastTxFee = txViewModel.getLastTxFee(chainID);
-            if(StringUtil.isNotEmpty(lastTxFee)){
-                fee = FmtMicrometer.fmtFeeValue(lastTxFee);
-            }
-            showFeeView(binding.tvFee, fee);
-        }
-    }
+        if (StringUtil.isNotEmpty(chainID)) {
+            long txFee = txViewModel.getTxFee(chainID);
+            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
+            binding.tvFee.setTag(R.id.median_fee, txFee);
 
-    private void showFeeView(TextView tvFee, String fee) {
-        tvFee.setText(getString(R.string.tx_median_fee, fee, UsersUtil.getCoinName(chainID)));
-        tvFee.setTag(fee);
+            String medianFree = getString(R.string.tx_median_fee, txFeeStr,
+                    ChainIDUtil.getCoinName(chainID));
+            binding.tvFee.setText(Html.fromHtml(medianFree));
+            binding.tvFee.setTag(txFeeStr);
+        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
         txViewModel.getAddState().observe(this, result -> {
-            if(StringUtil.isNotEmpty(result)){
+            if (StringUtil.isNotEmpty(result)) {
                 ToastUtils.showShortToast(result);
-            }else {
+            } else {
+                setResult(RESULT_OK);
                 onBackPressed();
             }
         });
-        if(StringUtil.isNotEmpty(chainID)){
-            disposables.add(txViewModel.observeMedianFee(chainID)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(fees -> {
-                        String medianFee = FmtMicrometer.fmtFeeValue(Utils.getMedianData(fees));
-                        binding.tvFee.setTag(R.id.median_fee, medianFee);
-                        if(StringUtil.isEmpty(txViewModel.getLastTxFee(chainID))){
-                            showFeeView(binding.tvFee, medianFee);
-                        }
-                    }));
-        }
     }
 
     @Override
@@ -126,7 +113,7 @@ public class MessageActivity extends BaseActivity implements View.OnClickListene
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_done) {
             Tx tx = buildTx();
-            if(txViewModel.validateTx(tx)){
+            if (txViewModel.validateTx(tx)) {
                 txViewModel.addTransaction(tx);
             }
         }
@@ -138,7 +125,7 @@ public class MessageActivity extends BaseActivity implements View.OnClickListene
      * @return Tx
      */
     private Tx buildTx() {
-        long txType = TypesConfig.TxType.FNoteType.ordinal();
+        int txType = TxType.CHAIN_NOTE.getType();
         String fee = ViewUtils.getStringTag(binding.tvFee);
         String memo = ViewUtils.getText(binding.etInput);
         return new Tx(chainID, FmtMicrometer.fmtTxLongValue(fee), txType, memo);

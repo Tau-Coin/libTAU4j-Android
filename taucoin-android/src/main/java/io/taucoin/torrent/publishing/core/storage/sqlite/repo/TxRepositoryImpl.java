@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
+import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
@@ -22,7 +23,7 @@ public class TxRepositoryImpl implements TxRepository{
 
     private Context appContext;
     private AppDatabase db;
-    private PublishSubject<String> dataSetChangedPublish = PublishSubject.create();
+    private PublishSubject<DataChanged> dataSetChangedPublish = PublishSubject.create();
     private ExecutorService sender = Executors.newSingleThreadExecutor();
 
     /**
@@ -41,7 +42,7 @@ public class TxRepositoryImpl implements TxRepository{
     @Override
     public long addTransaction(Tx transaction){
         long result = db.txDao().addTransaction(transaction);
-        submitDataSetChanged();
+        submitDataSetChanged(transaction);
         return result;
     }
 
@@ -51,7 +52,7 @@ public class TxRepositoryImpl implements TxRepository{
     @Override
     public int updateTransaction(Tx transaction){
         int result = db.txDao().updateTransaction(transaction);
-        submitDataSetChanged();
+        submitDataSetChanged(transaction);
         return result;
     }
 
@@ -73,10 +74,10 @@ public class TxRepositoryImpl implements TxRepository{
      * @param chainID 社区链ID
      */
     @Override
-    public int queryNumCommunityTxs(String chainID, long txType){
-        if(txType == -1){
+    public int queryNumCommunityTxs(String chainID, int txType){
+        if (txType == -1) {
             return db.txDao().queryNumCommunityTxsNotOnChain(chainID, 0);
-        }else{
+        } else {
             return db.txDao().queryNumCommunityTxsOnChain(chainID, txType, 1);
         }
     }
@@ -86,7 +87,7 @@ public class TxRepositoryImpl implements TxRepository{
      * @param chainID 社区链ID
      */
     @Override
-    public List<UserAndTx> queryCommunityTxs(String chainID, long txType, int startPos, int loadSize){
+    public List<UserAndTx> queryCommunityTxs(String chainID, int txType, int startPos, int loadSize){
         if(txType == -1){
             return db.txDao().queryCommunityTxsNotOnChain(chainID, 0, startPos, loadSize);
         }else{
@@ -157,13 +158,31 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public Observable<String> observeDataSetChanged() {
+    public Observable<DataChanged> observeDataSetChanged() {
         return dataSetChangedPublish;
     }
 
     @Override
     public void submitDataSetChanged() {
-        String dateTime = DateUtil.getDateTime();
-        sender.submit(() -> dataSetChangedPublish.onNext(dateTime));
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(DateUtil.getDateTime());
+        submitDataSetChangedDirect(stringBuilder);
+    }
+
+    @Override
+    public void submitDataSetChanged(Tx tx) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(tx.senderPk);
+        stringBuilder.append(tx.receiverPk);
+        stringBuilder.append(DateUtil.getDateTime());
+        submitDataSetChangedDirect(stringBuilder);
+    }
+
+    private void submitDataSetChangedDirect(StringBuilder msg) {
+        sender.submit(() -> {
+            DataChanged result = new DataChanged();
+            result.setMsg(msg.toString());
+            dataSetChangedPublish.onNext(result);
+        });
     }
 }

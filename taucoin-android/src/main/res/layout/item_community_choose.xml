@@ -1,65 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
     </data>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/widget_size_60"
-        android:background="@color/color_white"
-        android:paddingStart="@dimen/widget_size_7"
-        android:paddingEnd="0dp">
-
-        <io.taucoin.torrent.publishing.ui.customviews.RoundButton
-            android:id="@+id/left_view"
-            android:layout_width="@dimen/widget_size_50"
-            android:layout_height="@dimen/widget_size_50"
-            android:layout_marginEnd="@dimen/widget_size_7"
-            android:layout_marginStart="@dimen/widget_size_7"
-            android:layout_centerVertical="true"
-            android:gravity="center"
-            android:textAllCaps="true"
-            android:textColor="@color/color_white"
-            android:textStyle="bold"
-            app:btnStrokeColor="@color/primary_light"
-            app:btnStrokeWidth="0dp"
-            app:btnCornerRadius="@dimen/widget_size_25"
-            app:btnSolidColor="@color/primary_light"
-            app:btnPressedRatio="1.5" />
+        android:layout_height="wrap_content"
+        android:background="@color/color_white">
 
         <TextView
-            android:layout_toEndOf="@+id/left_view"
             android:id="@+id/tv_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:textStyle="bold"
+            android:minHeight="@dimen/widget_size_50"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:gravity="center_vertical"
             android:singleLine="true"
             android:ellipsize="end"
             android:textAppearance="@style/TextAppearanceBody1" />
 
-
-<!--        <TextView-->
-<!--            android:layout_toEndOf="@+id/tv_name"-->
-<!--            android:id="@+id/tv_public_key"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_centerVertical="true"-->
-<!--            android:layout_marginEnd="@dimen/widget_size_7"-->
-<!--            android:textColor="@color/gray_dark"-->
-<!--            android:singleLine="true"-->
-<!--            android:ellipsize="end"-->
-<!--            android:textAppearance="@style/TextAppearanceBody2" />-->
-
-<!--        <include-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="@dimen/widget_size_1"-->
-<!--            android:layout_toEndOf="@+id/left_view"-->
-<!--            android:layout_centerVertical="true"-->
-<!--            android:layout_alignParentBottom="true"-->
-<!--            layout="@layout/view_line"/>-->
-    </RelativeLayout>
+        <include layout="@layout/view_line" />
+    </LinearLayout>
 </layout>

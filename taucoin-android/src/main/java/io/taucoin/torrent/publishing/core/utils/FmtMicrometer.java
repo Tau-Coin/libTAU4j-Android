@@ -26,7 +26,7 @@ import io.taucoin.torrent.publishing.core.Constants;
 
 public class FmtMicrometer {
     private static String mDecimal = Constants.COIN.toString(10);
-    private static int mScale = mDecimal.length() -1;
+    public static int mScale = Constants.COIN_DECIMAL;
 
     public static String fmtBalance(long balance) {
         DecimalFormat df = getDecimalFormatInstance();
@@ -63,7 +63,7 @@ public class FmtMicrometer {
         return new BigInteger("0").toString();
     }
 
-    static String fmtValue(double value) {
+    public static String fmtValue(double value) {
         DecimalFormat df = getDecimalFormatInstance();
         df.applyPattern("###,##0.########");
         df.setRoundingMode(RoundingMode.FLOOR);

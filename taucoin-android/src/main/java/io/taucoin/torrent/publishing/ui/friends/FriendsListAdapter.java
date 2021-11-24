@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.SpanUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -28,7 +29,7 @@ import io.taucoin.torrent.publishing.databinding.ItemFriendListBinding;
  */
 public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAdapter.ViewHolder> {
     private ClickListener listener;
-    private List<String> selectedList = new ArrayList<>();
+    private ArrayList<UserAndFriend> selectedList = new ArrayList<>();
     private int page;
     private int order;
     private String friendPk;
@@ -63,7 +64,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
         holder.bind(holder, getItem(position), order);
     }
 
-    List<String> getSelectedList() {
+    ArrayList<UserAndFriend> getSelectedList() {
         return selectedList;
     }
 
@@ -72,11 +73,11 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
         private ClickListener listener;
         private Context context;
         private int type;
-        private List<String> selectedList;
+        private List<UserAndFriend> selectedList;
         private String friendPk;
 
         ViewHolder(ItemFriendListBinding binding, ClickListener listener, int type,
-                   List<String> selectedList, String friendPk) {
+                   List<UserAndFriend> selectedList, String friendPk) {
             super(binding.getRoot());
             this.binding = binding;
             this.context = binding.getRoot().getContext();
@@ -98,44 +99,50 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
                     ? View.VISIBLE : View.GONE);
             if(type == FriendsActivity.PAGE_ADD_MEMBERS){
                 holder.binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    selectedList.remove(user.publicKey);
+                    selectedList.remove(user);
                     if(isChecked){
-                        selectedList.add(user.publicKey);
-                    }
-                    if(listener != null){
-                        listener.onSelectClicked();
+                        selectedList.add(user);
                     }
                 });
                 holder.binding.cbSelect.setChecked(selectedList.contains(user.publicKey));
             }
-            String showName = UsersUtil.getShowNameWithYourself(user, user.publicKey);
-            SpanUtils showNameBuilder = new SpanUtils()
-                    .append(showName);
-            int stateProgress = 100;
-            if (user.isDiscovered()) {
-                stateProgress = 0;
-                showNameBuilder.append(" ")
-                    .append(context.getString(R.string.contacts_discovered))
-                    .setForegroundColor(context.getResources().getColor(R.color.color_blue))
-                    .setFontSize(12, true);
-            } else if (user.isAdded()) {
-                stateProgress = 50;
-                showNameBuilder.append(" ")
-                    .append(context.getString(R.string.contacts_added))
-                    .setForegroundColor(context.getResources().getColor(R.color.color_blue))
-                    .setFontSize(12, true);
-            } else {
-                showNameBuilder.append(" ")
-                    .append(String.valueOf(user.onlineCount))
-                    .setForegroundColor(context.getResources().getColor(R.color.color_blue))
-                    .setFontSize(12, true)
-                    .setSuperscript();
-            }
-            holder.binding.tvName.setText(showNameBuilder.create());
+            SpanUtils showNameBuilder = new SpanUtils();
+            String showName;
             if (type == FriendsActivity.PAGE_FRIENDS_LIST) {
+                showName = UsersUtil.getShowNameWithYourself(user, user.publicKey);
+                showNameBuilder.append(showName);
+                int stateProgress = 100;
+                if (user.isDiscovered()) {
+                    stateProgress = 0;
+                    showNameBuilder.append(" ")
+                            .append(context.getString(R.string.contacts_discovered))
+                            .setForegroundColor(context.getResources().getColor(R.color.color_blue))
+                            .setFontSize(12, true);
+                } else if (user.isAdded()) {
+                    stateProgress = 50;
+                    showNameBuilder.append(" ")
+                            .append(context.getString(R.string.contacts_added))
+                            .setForegroundColor(context.getResources().getColor(R.color.color_blue))
+                            .setFontSize(12, true);
+                } else {
+                    showNameBuilder.append(" ")
+                            .append(String.valueOf(user.onlineCount))
+                            .setForegroundColor(context.getResources().getColor(R.color.color_blue))
+                            .setFontSize(12, true)
+                            .setSuperscript();
+                }
+
                 holder.binding.stateProgress.setVisibility(View.VISIBLE);
                 holder.binding.stateProgress.setProgress(stateProgress);
+            } else {
+                showName = UsersUtil.getShowName(user, user.publicKey);
+                showNameBuilder.append(showName);
+                showNameBuilder.append(context.getString(R.string.common_parentheses,
+                        UsersUtil.getLastPublicKey(user.publicKey)))
+                        .setForegroundColor(context.getResources().getColor(R.color.gray_dark))
+                        .setFontSize(14, true);
             }
+            holder.binding.tvName.setText(showNameBuilder.create());
             String firstLetters = StringUtil.getFirstLettersOfName(showName);
             holder.binding.leftView.setText(firstLetters);
 
@@ -162,7 +169,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
                     if(communities.length() == 0){
                         communities.append(context.getResources().getString(R.string.contacts_community_from));
                     }
-                    String communityName = Utils.getCommunityName(member.chainID);
+                    String communityName = ChainIDUtil.getName(member.chainID);
                     String community = context.getResources().getString(R.string.contacts_community_more, communityName);
                     if(i == 0){
                         community = community.substring(1);
@@ -201,7 +208,6 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
 
     public interface ClickListener {
         void onItemClicked(UserAndFriend item);
-        void onSelectClicked();
         void onShareClicked(UserAndFriend item);
         void onProcessClicked(UserAndFriend item);
     }

@@ -5,15 +5,47 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
+        android:background="@color/color_white"
         android:orientation="vertical">
 
         <include
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_margin="@dimen/widget_size_20">
+
+            <TextView
+                android:id="@+id/tv_ignore"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center"
+                android:text="@string/common_ignore"
+                android:textColor="@color/color_white"
+                android:background="@drawable/red_rect_round_bg"
+                android:layout_marginEnd="@dimen/widget_size_10"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+            <TextView
+                android:id="@+id/tv_accept"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center"
+                android:text="@string/common_accept"
+                android:textColor="@color/color_white"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:background="@drawable/blue_rect_round_bg"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+        </LinearLayout>
+
         <RelativeLayout
             android:id="@+id/refresh_layout"
-            android:background="@color/color_bg"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -23,7 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingTop="@dimen/widget_size_10"
-                android:paddingBottom="@{@dimen/fab_size + @dimen/fab_margin}"
+                android:paddingBottom="@dimen/widget_size_10"
                 android:clipToPadding="false"
                 android:scrollbars="vertical"
                 android:focusable="true"

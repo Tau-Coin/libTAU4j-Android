@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 
@@ -26,13 +27,13 @@ public interface TxRepository {
      * 根据chainID查询社区交易数
      * @param chainID 社区链ID
      */
-    int queryNumCommunityTxs(String chainID, long txType);
+    int queryNumCommunityTxs(String chainID, int txType);
 
     /**
      * 根据chainID查询社区交易
      * @param chainID 社区链ID
      */
-    List<UserAndTx> queryCommunityTxs(String chainID, long txType, int startPos, int loadSize);
+    List<UserAndTx> queryCommunityTxs(String chainID, int txType, int startPos, int loadSize);
 
     /**
      * 获取社区里用户未上链并且未过期的交易数
@@ -41,6 +42,7 @@ public interface TxRepository {
      * @param expireTime 过期时间时长
      * @return int
      */
+    @Deprecated
     int getPendingTxsNotExpired(String chainID, String publicKey, long expireTime);
     /**
      * 获取社区里用户未上链并且未过期的交易数
@@ -49,6 +51,7 @@ public interface TxRepository {
      * @param expireTime 过期时间时长
      * @return int
      */
+    @Deprecated
     Tx getEarliestExpireTx(String chainID, String senderPk, long expireTime);
 
     /**
@@ -78,7 +81,12 @@ public interface TxRepository {
     /**
      * 观察社区的交易的变化
      */
-    Observable<String> observeDataSetChanged();
+    Observable<DataChanged> observeDataSetChanged();
+
+    /**
+     * 提交数据变化
+     */
+    void submitDataSetChanged(Tx tx);
 
     /**
      * 提交数据变化

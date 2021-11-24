@@ -2,11 +2,20 @@ package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
 
+import org.libTAU4j.Block;
 import org.libTAU4j.Ed25519;
 import org.libTAU4j.Message;
 import org.libTAU4j.Pair;
 import org.libTAU4j.PortmapTransport;
+import org.libTAU4j.Transaction;
+import org.libTAU4j.Vote;
 import org.libTAU4j.alerts.Alert;
+import org.libTAU4j.alerts.BlockChainForkPointBlockAlert;
+import org.libTAU4j.alerts.BlockChainNewTailBlockAlert;
+import org.libTAU4j.alerts.BlockChainNewTipBlockAlert;
+import org.libTAU4j.alerts.BlockChainNewTransactionAlert;
+import org.libTAU4j.alerts.BlockChainRollbackBlockAlert;
+import org.libTAU4j.alerts.BlockChainTopThreeVotesAlert;
 import org.libTAU4j.alerts.CommConfirmRootAlert;
 import org.libTAU4j.alerts.CommFriendInfoAlert;
 import org.libTAU4j.alerts.CommLastSeenAlert;
@@ -39,12 +48,14 @@ class TauDaemonAlertHandler {
 
     private static final Logger logger = LoggerFactory.getLogger("libTAU");
     private MsgAlertHandler msgListenHandler;
+    private TauListenHandler tauListenHandler;
     private SettingsRepository settingsRepo;
     private Context appContext;
 
     TauDaemonAlertHandler(Context appContext, TauDaemon daemon){
         this.appContext = appContext;
         this.msgListenHandler = new MsgAlertHandler(appContext, daemon);
+        this.tauListenHandler = new TauListenHandler(appContext, daemon);
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
     }
 
@@ -90,6 +101,24 @@ class TauDaemonAlertHandler {
             case COMM_SYNC_MSG:
                 // 消息同步
                 onSyncMessage(alert, alertAndUser.getUserPk());
+                break;
+            case BLOCK_CHAIN_TIP_BLOCK:
+                onNewBlock(alert, alertAndUser.getUserPk());
+                break;
+            case BLOCK_CHAIN_TAIL_BLOCK:
+                onSyncBlock(alert, alertAndUser.getUserPk());
+                break;
+            case BLOCK_CHAIN_ROLLBACK_BLOCK:
+                onRollbackBlock(alert, alertAndUser.getUserPk());
+                break;
+            case BLOCK_CHAIN_NEW_TX:
+                onNewTransaction(alert);
+                break;
+            case BLOCK_CHAIN_FORK_POINT:
+                onNewForkPoint(alert);
+                break;
+            case BLOCK_CHAIN_TOP_THREE_VOTES:
+                onNewTopVotes(alert);
                 break;
             default:
                 logger.info("Unknown alert");
@@ -239,5 +268,75 @@ class TauDaemonAlertHandler {
      */
     void handleLogAlert(Alert<?> alert) {
         logger.info(alert.message());
+    }
+
+    /**
+     * libTAU上报新的区块
+     * @param alert libTAU上报
+     * @param userPk 当前用户公钥
+     */
+    private void onNewBlock(Alert alert, String userPk) {
+        BlockChainNewTipBlockAlert a = (BlockChainNewTipBlockAlert) alert;
+        logger.info(a.get_message());
+        Block block = a.get_new_block();
+        tauListenHandler.handleNewBlock(block, userPk);
+    }
+
+    /**
+     * libTAU上报向前同步的区块
+     * @param alert libTAU上报
+     * @param userPk 当前用户公钥
+     */
+    private void onSyncBlock(Alert alert, String userPk) {
+        BlockChainNewTailBlockAlert a = (BlockChainNewTailBlockAlert) alert;
+        logger.info(a.get_message());
+        Block block = a.get_new_block();
+        tauListenHandler.handleSyncBlock(block, userPk);
+    }
+
+    /**
+     * libTAU上报链的区块回滚
+     * @param alert libTAU上报
+     * @param userPk 当前用户公钥
+     */
+    private void onRollbackBlock(Alert alert, String userPk) {
+        BlockChainRollbackBlockAlert a = (BlockChainRollbackBlockAlert) alert;
+        logger.info(a.get_message());
+        Block block = a.get_new_block();
+        tauListenHandler.handleRollbackBlock(block, userPk);
+    }
+
+    /**
+     * libTAU上报接收到新的交易（未上链）
+     * @param alert libTAU上报
+     */
+    private void onNewTransaction(Alert alert) {
+        BlockChainNewTransactionAlert a = (BlockChainNewTransactionAlert) alert;
+        logger.info(a.get_message());
+        Transaction tx = a.get_new_transaction();
+        tauListenHandler.handleNewTransaction(tx);
+    }
+
+    /**
+     * libTAU上报分叉点
+     * @param alert libTAU上报
+     */
+    private void onNewForkPoint(Alert alert) {
+        BlockChainForkPointBlockAlert a = (BlockChainForkPointBlockAlert) alert;
+        logger.info(a.get_message());
+        Block block = a.get_new_block();
+        tauListenHandler.handleNewForkPoint(block);
+    }
+
+    /**
+     * libTAU上报节点投票
+     * @param alert libTAU上报
+     */
+    private void onNewTopVotes(Alert alert) {
+        BlockChainTopThreeVotesAlert a = (BlockChainTopThreeVotesAlert) alert;
+        logger.info(a.get_message());
+        List<Vote> votes = a.get_votes();
+        byte[] chainID = a.get_chain_id();
+        tauListenHandler.handleNewTopVotes(chainID, votes);
     }
 }

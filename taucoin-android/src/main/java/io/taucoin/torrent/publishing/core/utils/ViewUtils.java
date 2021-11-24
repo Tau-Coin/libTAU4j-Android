@@ -16,6 +16,7 @@
 package io.taucoin.torrent.publishing.core.utils;
 
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class ViewUtils {
@@ -48,5 +49,21 @@ public class ViewUtils {
         }catch (Exception ignore){
         }
         return 0L;
+    }
+
+    public static double getDoubleText(TextView view) {
+        String text = getText(view);
+        try {
+            return Double.parseDouble(text);
+        }catch (Exception ignore){
+        }
+        return 0d;
+    }
+
+    public static void updateViewWeight(View view, float weight) {
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)
+                view.getLayoutParams();
+        layoutParams.weight = weight;
+        view.setLayoutParams(layoutParams);
     }
 }

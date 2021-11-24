@@ -2,15 +2,26 @@ package io.taucoin.torrent.publishing.ui.community;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import org.libTAU4j.Account;
+import org.libTAU4j.Block;
+import org.libTAU4j.ChainURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -28,29 +39,33 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.core.model.data.GenesisConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.data.DrawBean;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
-import io.taucoin.torrent.publishing.core.utils.ChainLinkUtil;
+import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
+import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.ui.constant.Page;
-import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
  * Community模块的ViewModel
@@ -63,7 +78,6 @@ public class CommunityViewModel extends AndroidViewModel {
     private FriendRepository friendRepo;
     private UserRepository userRepo;
     private TauDaemon daemon;
-    private Disposable observeDaemonRunning;
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> addCommunityState = new MutableLiveData<>();
     private MutableLiveData<Boolean> setBlacklistState = new MutableLiveData<>();
@@ -134,19 +148,27 @@ public class CommunityViewModel extends AndroidViewModel {
     /**
      * 添加新的社区到数据库
      * @param chainID
-     * @param chainLink
+     * @param chainUrl
      */
-    public void addCommunity(String chainID, String chainLink){
+    public void addCommunity(String chainID, String chainUrl){
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             Result result = new Result();
-            String communityName = UsersUtil.getCommunityName(chainID);
-            if(StringUtil.isNotEmpty(communityName)){
-                Community community = new Community(chainID, communityName);
-                communityRepo.addCommunity(community);
+            String communityName = ChainIDUtil.getName(chainID);
+            if (StringUtil.isNotEmpty(communityName)) {
                 // 链端follow community
-//                daemon.followCommunity(chainLink);
+                ChainURL url = ChainUrlUtil.decode(chainUrl);
+                boolean success = false;
+                if (url != null) {
+                    Set<String> peers = url.getPeers();
+                    success = daemon.followChain(chainID, peers);
+                }
+                if (success) {
+                    Community community = new Community(chainID, communityName);
+                    communityRepo.addCommunity(community);
+                }
+                result.setSuccess(success);
                 result.setMsg(chainID);
-            }else{
+            } else {
                 result.setSuccess(false);
             }
             emitter.onNext(result);
@@ -160,37 +182,14 @@ public class CommunityViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    GenesisConfig createGenesisConfig(@NonNull Community community){
-        byte[] publicKey = ByteUtil.toByte(community.publicKey);
-        BigInteger totalCoin = BigInteger.valueOf(community.totalCoin);
-        ArrayList<?> list = new ArrayList<>();
-        return new GenesisConfig(community.communityName, list);
-    }
-
     /**
      * 添加新的社区到数据库
      * @param community 社区数据
      */
-    void addCommunity(@NonNull Community community, GenesisConfig cf){
-        if (observeDaemonRunning != null && !observeDaemonRunning.isDisposed()) {
-            return;
-        }
-        observeDaemonRunning = daemon.observeDaemonRunning()
-            .subscribeOn(Schedulers.io())
-            .subscribe((isRunning) -> {
-                if (isRunning) {
-                    newCommunity(community, cf);
-                    if (observeDaemonRunning != null) {
-                        observeDaemonRunning.dispose();
-                    }
-                }
-            });
-    }
-
-    private void newCommunity(@NonNull Community community, GenesisConfig cf){
+    void addCommunity(@NonNull Community community) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             // TauController:创建Community社区
-            Result result = createCommunity(community, cf);
+            Result result = createCommunity(community);
             emitter.onNext(result);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
@@ -200,22 +199,36 @@ public class CommunityViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private Result createCommunity(Community community, GenesisConfig cf) {
+    private Result createCommunity(Community community) {
         Result result = new Result();
         try {
-            if (null == cf) {
-                cf = createGenesisConfig(community);
+            // chainID为空，再次尝试创建一次
+            if (StringUtil.isEmpty(community.chainID)) {
+                community.chainID = createNewChainID(community.communityName);
             }
-//            daemon.createNewCommunity(cf);
-
-            community.chainID = new String(cf.getChainID(), StandardCharsets.UTF_8);
+            if (StringUtil.isEmpty(community.chainID)) {
+                result.setFailMsg(getApplication().getString(R.string.community_creation_failed));
+                return result;
+            }
+            result.setMsg(community.chainID);
+            Map<String, Account> accounts = new HashMap<>();
+            byte[] chainID = ChainIDUtil.encode(community.chainID);
+            boolean isCreateSuccess = daemon.createNewCommunity(chainID, accounts);
+            if (!isCreateSuccess) {
+                result.setFailMsg(getApplication().getString(R.string.community_creation_failed));
+                return result;
+            }
             communityRepo.addCommunity(community);
             logger.debug("Add community to database: communityName={}, chainID={}",
                     community.communityName, community.chainID);
             // 把社区创建者添加为社区成员
-            Member member = new Member(community.chainID, community.publicKey,
-                    community.totalCoin, Constants.DefaultGeneisisPower.longValue());
-            memberRepo.addMember(member);
+            User currentUser = userRepo.getCurrentUser();
+            Account account = daemon.getAccountInfo(chainID, currentUser.publicKey);
+            if (account != null) {
+                Member member = new Member(community.chainID, currentUser.publicKey,
+                        account.getBalance(), account.getEffectivePower());
+                memberRepo.addMember(member);
+            }
         }catch (Exception e){
             result.setFailMsg(e.getMessage());
         }
@@ -226,9 +239,6 @@ public class CommunityViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
         disposables.clear();
-        if (observeDaemonRunning != null && !observeDaemonRunning.isDisposed()) {
-            observeDaemonRunning.dispose();
-        }
     }
 
     /**
@@ -238,8 +248,13 @@ public class CommunityViewModel extends AndroidViewModel {
      */
     boolean validateCommunity(@NonNull Community community) {
         String communityName = community.communityName;
-        if(StringUtil.isEmpty(communityName)){
+        if (StringUtil.isEmpty(communityName)) {
             ToastUtils.showLongToast(R.string.error_community_name_empty);
+            return false;
+        }
+        byte[] nameBytes = Utils.textStringToBytes(communityName);
+        if (nameBytes != null && nameBytes.length > Constants.MAX_COMMUNITY_NAME_LENGTH) {
+            ToastUtils.showLongToast(R.string.error_community_name_too_long);
             return false;
         }
         return true;
@@ -251,32 +266,28 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param blacklist 是否加入黑名单
      */
     public void setCommunityBlacklist(String chainID, boolean blacklist) {
-        if (observeDaemonRunning != null && !observeDaemonRunning.isDisposed()) {
-            return;
-        }
-        observeDaemonRunning = daemon.observeDaemonRunning()
-                .subscribeOn(Schedulers.io())
-                .subscribe((isRunning) -> {
-                    if (isRunning) {
-                        setCommunityBlacklistTask(chainID, blacklist);
-                        if (observeDaemonRunning != null) {
-                            observeDaemonRunning.dispose();
-                        }
-                    }
-                });
+        setCommunityBlacklistTask(chainID, blacklist);
     }
 
     private void setCommunityBlacklistTask(String chainID, boolean blacklist) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
             communityRepo.setCommunityBlacklist(chainID, blacklist);
+            boolean success;
             if (blacklist) {
-//                daemon.unfollowCommunity(chainID);
+                success = daemon.unfollowChain(chainID);
             } else {
                 List<String> list = queryCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT);
-                String communityInviteLink = ChainLinkUtil.encode(chainID, list);
-//                daemon.followCommunity(communityInviteLink);
+                Set<String> peers = new HashSet<>(list);
+                success = daemon.followChain(chainID, peers);
             }
-            emitter.onNext(true);
+            if (success) {
+                Community community = communityRepo.getCommunityByChainID(chainID);
+                if (community != null) {
+                    community.isBanned = blacklist;
+                    communityRepo.updateCommunity(community);
+                }
+            }
+            emitter.onNext(success);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
                 .subscribeOn(Schedulers.io())
@@ -288,7 +299,7 @@ public class CommunityViewModel extends AndroidViewModel {
     /**
      * 获取在黑名单的社区列表
      */
-    public void getCommunitiesInBlacklist(){
+    public void getCommunitiesInBlacklist() {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<List<Community>>) emitter -> {
             List<Community> list = communityRepo.getCommunitiesInBlacklist();
             emitter.onNext(list);
@@ -302,11 +313,10 @@ public class CommunityViewModel extends AndroidViewModel {
 
     /**
      * 获取用户加入的社区列表
-     * @param chainID
      */
-    void getJoinedCommunityList(String chainID) {
+    void getJoinedCommunityList() {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<List<Community>>) emitter -> {
-            List<Community> list = communityRepo.getJoinedCommunityList(chainID);
+            List<Community> list = communityRepo.getJoinedCommunityList();
             emitter.onNext(list);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
@@ -358,7 +368,7 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param onChain
      * @return DataSource.Factory
      */
-    public DataSource.Factory<Integer, MemberAndUser> queryCommunityMembers(String chainID, boolean onChain) {
+    public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID, boolean onChain) {
         return memberRepo.queryCommunityMembers(chainID, onChain);
     }
 
@@ -400,7 +410,7 @@ public class CommunityViewModel extends AndroidViewModel {
         return communityRepo.observerCommunityByChainID(chainID);
     }
 
-    LiveData<PagedList<MemberAndUser>> observerCommunityMembers(String chainID, boolean onChain) {
+    LiveData<PagedList<MemberAndFriend>> observerCommunityMembers(String chainID, boolean onChain) {
         return new LivePagedListBuilder<>(queryCommunityMembers(chainID, onChain),
                 Page.getPageListConfig()).build();
     }
@@ -425,29 +435,33 @@ public class CommunityViewModel extends AndroidViewModel {
     public void generateQRCode(Context context, String QRContent, String chainID, String showName) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Bitmap>) emitter -> {
             try {
-//                String qrName = UsersUtil.getQRCodeName(showName);
-//                int bgColor = Utils.getGroupColor(chainID);
-//                Bitmap logoBitmap = BitmapUtil.createLogoBitmap(bgColor, qrName);
-//
-//                int heightPix = DimensionsUtil.dip2px(context, 480);
-//                Bitmap bitmap = BitmapUtil.createQRCode(QRContent, heightPix, logoBitmap,
-//                        context.getResources().getColor(R.color.color_transparent));
-//                logger.debug("shareQRCode bitmap::{}", bitmap);
-//
-//                // 二维码背景样式
-//                Bitmap bgBitmap = BitmapFactory.decodeResource(context.getResources(),
-//                        R.mipmap.icon_community_qr_bg);
-//                bgBitmap.getWidth();
-//                DrawBean bean = new DrawBean();
-//                bean.setSize(DimensionsUtil.dip2px(context, 210));
-//                bean.setX(DimensionsUtil.dip2px(context, 60));
-//                bean.setY(DimensionsUtil.dip2px(context, 60));
-//                // 二维码背景
-//                Bitmap qrbgBitmap = BitmapUtil.createBitmap(bitmap.getWidth(),
-//                        bgBitmap.getHeight(), Color.BLACK);
-//                Bitmap lastBitmap = BitmapUtil.drawStyleQRcode(bgBitmap,
-//                        qrbgBitmap, bitmap, bean);
-//                emitter.onNext(lastBitmap);
+                String qrName = UsersUtil.getQRCodeName(showName);
+                int bgColor = Utils.getGroupColor(chainID);
+                Bitmap logoBitmap = BitmapUtil.createLogoBitmap(bgColor, qrName);
+
+                Resources resources = context.getApplicationContext().getResources();
+                int heightPix = resources.getDimensionPixelSize(R.dimen.widget_size_480);
+                int widthPix = heightPix;
+                //Generate the QR Code.
+                HashMap<EncodeHintType, Object> hints = new HashMap<>();
+                hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+                hints.put(EncodeHintType.MARGIN, 0);
+                hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+                QRCodeWriter writer = new QRCodeWriter();
+                Bitmap bitmap = writer.encode(QRContent, BarcodeFormat.QR_CODE, widthPix, heightPix,
+                        hints, logoBitmap, context);
+
+                // 二维码背景样式
+                Bitmap bgBitmap = BitmapFactory.decodeResource(context.getResources(),
+                        R.mipmap.icon_community_qr_bg);
+                bgBitmap.getWidth();
+                DrawBean bean = new DrawBean();
+                bean.setSize(resources.getDimensionPixelSize(R.dimen.widget_size_210));
+                bean.setX(resources.getDimensionPixelSize(R.dimen.widget_size_60));
+                bean.setY(resources.getDimensionPixelSize(R.dimen.widget_size_60));
+                Bitmap lastBitmap = BitmapUtil.drawStyleQRcode(bgBitmap,
+                        null, bitmap, bean);
+                emitter.onNext(lastBitmap);
             } catch (Exception e) {
                 logger.error("generateTAUIDQRCode error ", e);
             }
@@ -457,5 +471,24 @@ public class CommunityViewModel extends AndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> qrBitmap.postValue(result));
         disposables.add(disposable);
+    }
+
+    /**
+     * 创建新的社区链ID
+     * @param communityName 社区名称
+     * @return chainID
+     */
+    String createNewChainID(String communityName) {
+        return daemon.createNewChainID(communityName);
+    }
+
+    /**
+     * 获取tip block列表
+     * @param chainID 社区ID
+     * @param topNum 返回的数目
+     * @return List<Block>
+     */
+    public List<Block> getTopTipBlock(String chainID, int topNum) {
+        return daemon.getTopTipBlock(chainID, topNum);
     }
 }

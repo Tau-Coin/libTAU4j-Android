@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
@@ -11,113 +12,165 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background_grey"
+        android:background="@color/color_white"
         android:fitsSystemWindows="true">
 
         <include
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_60"
-            android:paddingStart="@dimen/widget_size_20"
-            android:paddingEnd="@dimen/widget_size_20"
-            android:paddingTop="@dimen/widget_size_10"
-            android:background="@color/color_white"
-            android:onClick="@{listener::onClick}"
-            android:gravity="center_vertical">
+            android:layout_height="wrap_content"
+            android:fillViewport="true">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/community_sync_rate"
-                android:textAppearance="@style/TextAppearanceBody1" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tv_sync_rate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearanceBody1" />
+                <RelativeLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_10"
+                    android:minHeight="@dimen/widget_size_44">
 
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/tv_community_name_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="0dp"
+                        android:lineSpacingMultiplier="0.7"
+                        android:includeFontPadding="false"
+                        android:layout_centerVertical="true"
+                        android:text="@string/community_name"
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_50"
-            android:paddingStart="@dimen/widget_size_20"
-            android:paddingEnd="@dimen/widget_size_10"
-            android:background="@color/color_white"
-            android:onClick="@{listener::onClick}"
-            android:gravity="center_vertical">
+                    <TextView
+                        android:layout_toEndOf="@+id/tv_community_name_title"
+                        android:layout_toStartOf="@+id/iv_arrow"
+                        android:id="@+id/tv_community_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/widget_size_10"
+                        android:paddingEnd="@dimen/widget_size_10"
+                        android:gravity="end"
+                        android:onClick="@{listener::onClick}"
+                        android:singleLine="true"
+                        android:ellipsize="middle"
+                        android:includeFontPadding="false"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/color_blue_light"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/community_miners_online"
-                android:textAppearance="@style/TextAppearanceBody1" />
+                    <ImageView
+                        android:id="@+id/iv_arrow"
+                        android:layout_width="@dimen/widget_size_16"
+                        android:layout_height="@dimen/widget_size_16"
+                        android:layout_centerVertical="true"
+                        android:onClick="@{listener::onClick}"
+                        android:src="@mipmap/icon_arrow"
+                        android:layout_alignParentEnd="true"/>
+                </RelativeLayout>
 
-            <TextView
-                android:id="@+id/tv_miners_online"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearanceBody1" />
+                <include layout="@layout/view_line" />
 
-        </LinearLayout>
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_mining_income"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:gravity="center_vertical"
+                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftText="@string/community_mining_income"
+                    app:lineVisibility="false"/>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_50"
-            android:paddingStart="@dimen/widget_size_20"
-            android:paddingEnd="@dimen/widget_size_10"
-            android:background="@color/color_white"
-            android:onClick="@{listener::onClick}"
-            android:gravity="center_vertical">
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_mining_power"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:gravity="center_vertical"
+                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftText="@string/community_mining_power"
+                    app:lineVisibility="false"/>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/community_total_blocks"
-                android:textAppearance="@style/TextAppearanceBody1" />
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_last_block"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:gravity="center_vertical"
+                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftText="@string/community_last_block"
+                    app:lineVisibility="false"/>
 
-            <TextView
-                android:id="@+id/tv_total_blocks"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearanceBody1" />
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_difficulty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:gravity="center_vertical"
+                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftText="@string/chain_difficulty"
+                    app:lineVisibility="false"/>
 
-        </LinearLayout>
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_perishable_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:gravity="center_vertical"
+                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftText="@string/community_perishable_date"
+                    app:lineRightTextColor="@color/color_blue_light"
+                    app:lineVisibility="false"/>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_60"
-            android:paddingStart="@dimen/widget_size_20"
-            android:paddingEnd="@dimen/widget_size_10"
-            android:paddingBottom="@dimen/widget_size_10"
-            android:background="@color/color_white"
-            android:onClick="@{listener::onClick}"
-            android:gravity="center_vertical">
+                <RelativeLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_10"
+                    android:minHeight="@dimen/widget_size_44">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/community_mining_power"
-                android:textAppearance="@style/TextAppearanceBody1" />
+                    <TextView
+                        android:id="@+id/tv_auto_renewal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="0dp"
+                        android:lineSpacingMultiplier="0.7"
+                        android:includeFontPadding="false"
+                        android:layout_centerVertical="true"
+                        android:text="@string/community_auto_renewal"
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
 
-            <TextView
-                android:id="@+id/tv_mining_power"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearanceBody1" />
+                    <ImageView
+                        android:layout_toEndOf="@+id/tv_auto_renewal"
+                        android:id="@+id/iv_auto_renewal"
+                        android:layout_width="@dimen/widget_size_26"
+                        android:layout_height="@dimen/widget_size_26"
+                        android:padding="@dimen/widget_size_7"
+                        android:layout_centerVertical="true"
+                        android:onClick="@{listener::onClick}"
+                        android:src="@mipmap/icon_help"
+                        android:contentDescription="@null"/>
 
-        </LinearLayout>
+                    <Switch
+                        android:id="@+id/item_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"/>
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
     </LinearLayout>
 </layout>

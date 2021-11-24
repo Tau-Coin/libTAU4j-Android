@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.FavoriteAndUser;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -21,7 +22,7 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemFavoriteBinding;
 import io.taucoin.torrent.publishing.databinding.ItemFavoriteWiringBinding;
-import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 
 /**
  * 收藏列表显示的Adapter
@@ -38,7 +39,7 @@ public class FavoriteListAdapter extends PagedListAdapter<FavoriteAndUser,
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ViewDataBinding binding;
-        if(viewType == TypesConfig.TxType.WCoinsType.ordinal()){
+        if(viewType == TxType.WRING_TX.getType()){
             binding = DataBindingUtil.inflate(inflater,
                     R.layout.item_favorite_wiring,
                     parent,
@@ -85,14 +86,14 @@ public class FavoriteListAdapter extends PagedListAdapter<FavoriteAndUser,
             SpannableStringBuilder memo = Utils.getSpannableStringUrl(favorite.memo);
             String userName = UsersUtil.getUserName(favorite.sender, favorite.senderPk);
             String firstLettersName = StringUtil.getFirstLettersOfName(userName);
-            String communityName = UsersUtil.getCommunityName(favorite.chainID);
+            String communityName = ChainIDUtil.getName(favorite.chainID);
             if(binding instanceof ItemFavoriteWiringBinding){
                 ItemFavoriteWiringBinding txBinding = (ItemFavoriteWiringBinding) holder.binding;
                 txBinding.roundButton.setBgColor(bgColor);
                 txBinding.roundButton.setText(firstLettersName);
                 txBinding.tvUserName.setText(userName);
                 txBinding.tvCommunityName.setText(communityName);
-                String amount = FmtMicrometer.fmtBalance(favorite.amount) + " " + UsersUtil.getCoinName(favorite.chainID);
+                String amount = FmtMicrometer.fmtBalance(favorite.amount) + " " + ChainIDUtil.getCoinName(favorite.chainID);
                 txBinding.tvAmount.setText(amount);
                 txBinding.tvReceiver.setText(favorite.receiverPk);
                 txBinding.tvFee.setText(FmtMicrometer.fmtFeeValue(favorite.fee));

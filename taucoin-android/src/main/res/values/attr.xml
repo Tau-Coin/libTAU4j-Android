@@ -287,6 +287,17 @@
         <attr name="rightTextColor" format="color" />
     </declare-styleable>
 
+    <declare-styleable name="LeftRightLineView">
+        <attr name="lineLeftImage" format="reference" />
+        <attr name="lineLeftText" format="string" />
+        <attr name="lineLeftTextColor" format="color" />
+        <attr name="lineRightImage" format="reference" />
+        <attr name="lineRightText" format="string" />
+        <attr name="lineRightTextColor" format="color" />
+        <attr name="lineVisibility" format="boolean" />
+        <attr name="lineHeight" format="dimension" />
+    </declare-styleable>
+
     <declare-styleable name="NumberProgressBar">
         <attr name="progress_current" format="integer"/>
         <attr name="progress_max" format="integer"/>

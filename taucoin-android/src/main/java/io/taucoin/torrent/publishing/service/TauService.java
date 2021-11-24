@@ -128,13 +128,14 @@ public class TauService extends Service {
      */
     private void shutdown() {
         logger.info("shutdown");
-        disposables.add(Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            daemon.doStop();
-            emitter.onNext(true);
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::stopServiceWaitAlertDisposed));
+//        disposables.add(Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+//            daemon.doStop();
+//            emitter.onNext(true);
+//            emitter.onComplete();
+//        }).subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(this::stopServiceWaitAlertDisposed));
+        stopService();
     }
 
     @Override

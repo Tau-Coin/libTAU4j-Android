@@ -1,7 +1,15 @@
 package io.taucoin.torrent.publishing.ui.qrcode;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+
+import org.libTAU4j.ChainURL;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -11,13 +19,14 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainLinkUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityCommunityQrCodeBinding;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
  * 社区QR Code页面
@@ -27,6 +36,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     private CompositeDisposable disposables = new CompositeDisposable();
     private ActivityCommunityQrCodeBinding binding;
     private CommunityViewModel communityViewModel;
+    private UserViewModel userViewModel;
     private String chainID;
 
     @Override
@@ -38,6 +48,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
         binding.qrCode.setListener(this);
         ViewModelProvider provider = new ViewModelProvider(this);
         communityViewModel = provider.get(CommunityViewModel.class);
+        userViewModel = provider.get(UserViewModel.class);
         initView();
     }
 
@@ -45,17 +56,18 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
      * 初始化布局
      */
     private void initView() {
-        if(getIntent() != null){
+        if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
         }
-        if(StringUtil.isEmpty(chainID)){
+        if (StringUtil.isEmpty(chainID)) {
             return;
         }
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(R.string.community_qr_code);
+        setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        String showName = UsersUtil.getCommunityName(chainID);
+        String showName = ChainIDUtil.getName(chainID);
         binding.qrCode.tvName.setText(showName);
         binding.qrCode.tvQrCode.setVisibility(View.GONE);
         binding.qrCode.ivCopy.setVisibility(View.GONE);
@@ -64,14 +76,35 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
         disposables.add(communityViewModel.getCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
-                    String communityInviteLink = ChainLinkUtil.encode(chainID, list);
-                    communityViewModel.generateQRCode(this, communityInviteLink,
-                            chainID, showName);
+                    if (StringUtil.isNotEmpty(chainID)) {
+                        String chainUrl = ChainUrlUtil.encode(chainID, list);
+                        communityViewModel.generateQRCode(this, chainUrl, this.chainID, showName);
+                    }
                 }));
 
         communityViewModel.getQRBitmap().observe(this, bitmap -> {
             binding.qrCode.ivQrCode.setImageBitmap(bitmap);
         });
+    }
+
+    /**
+     *  创建右上角Menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_qr_code, menu);
+        return true;
+    }
+
+    /**
+     * 右上角Menu选项选择事件
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_share) {
+            userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 240);
+        }
+        return true;
     }
 
     @Override

@@ -499,14 +499,6 @@ public class Utils {
         return null;
     }
 
-    public static String getCommunityName(String chainID) {
-        String[] splits = chainID.split(Constants.ChainidDelimeter);
-        if(splits.length > 0){
-            return splits[0];
-        }
-        return "";
-    }
-
     /**
      * byte[]转化为UTF_8 String
      * @param bytes byte[]

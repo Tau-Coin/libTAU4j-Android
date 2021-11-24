@@ -3,16 +3,22 @@ package io.taucoin.torrent.publishing.ui.notify;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.NotificationAndUser;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityNotificationsBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
@@ -20,7 +26,7 @@ import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 /**
  * 通知页面
  */
-public class NotificationActivity extends BaseActivity implements NotificationAdapter.ClickListener {
+public class NotificationActivity extends BaseActivity implements View.OnClickListener {
     private ActivityNotificationsBinding binding;
     private CommunityViewModel communityViewModel;
     private NotificationViewModel notifyViewModel;
@@ -47,7 +53,7 @@ public class NotificationActivity extends BaseActivity implements NotificationAd
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        adapter = new NotificationAdapter(this, isEdit);
+        adapter = new NotificationAdapter();
         /*
          * A RecyclerView by default creates another copy of the ViewHolder in order to
          * fade the views into each other. This causes the problem because the old ViewHolder gets
@@ -65,10 +71,18 @@ public class NotificationActivity extends BaseActivity implements NotificationAd
         binding.recyclerList.setEmptyView(binding.emptyViewList);
         binding.recyclerList.setAdapter(adapter);
 
-        notifyViewModel.observerNotifications().observe(this, list -> {
-            adapter.submitList(list);
-            notifyViewModel.readAllNotifications();
-        });
+//        notifyViewModel.observerNotifications().observe(this, list -> {
+//            adapter.submitList(list);
+//            notifyViewModel.readAllNotifications();
+//        });
+
+        List<NotificationAndUser> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            NotificationAndUser nu = new NotificationAndUser("123123123123123123123123123123123123",
+                    "", "TEST#123123123123123123123123123123123123", DateUtil.getMillisTime());
+            list.add(nu);
+        }
+        adapter.submitList(list);
     }
 
     @Override
@@ -87,49 +101,13 @@ public class NotificationActivity extends BaseActivity implements NotificationAd
         disposables.clear();
     }
 
-    /**
-     * 创建右上角Menu
-     */
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_notification, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem menuDone = menu.findItem(R.id.menu_done);
-        MenuItem menuEdit = menu.findItem(R.id.menu_edit);
-        MenuItem menuDelete = menu.findItem(R.id.menu_delete);
-        menuDone.setVisible(isEdit);
-        menuDelete.setVisible(isEdit);
-        menuEdit.setVisible(!isEdit);
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    /**
-     * 右上角Menu选项选择事件
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_done) {
-            isEdit = false;
-            invalidateOptionsMenu();
-            adapter.setEdit(isEdit);
-        } else if (item.getItemId() == R.id.menu_edit) {
-            isEdit = true;
-            invalidateOptionsMenu();
-            adapter.setEdit(isEdit);
-        } else if (item.getItemId() == R.id.menu_delete) {
-            if(adapter.getSelectedList().size() > 0){
-                notifyViewModel.deleteNotifications(adapter.getSelectedList());
-            }
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.tv_ignore:
+                break;
+            case R.id.tv_accept:
+                break;
         }
-        return true;
-    }
-
-    @Override
-    public void onJoinClicked(NotificationAndUser notify) {
-        communityViewModel.addCommunity(notify.chainID, notify.chainLink);
     }
 }

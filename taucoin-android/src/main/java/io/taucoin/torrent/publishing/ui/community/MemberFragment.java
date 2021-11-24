@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -22,9 +21,9 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
-import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainLinkUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMemberBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
@@ -80,16 +79,10 @@ public class MemberFragment extends BaseFragment implements MemberListAdapter.Cl
      */
     private void initView() {
         adapter = new MemberListAdapter(this);
-        DefaultItemAnimator animator = new DefaultItemAnimator() {
-            @Override
-            public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
-                return true;
-            }
-        };
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+        layoutManager.setOrientation(RecyclerView.VERTICAL);
         binding.recyclerView.setLayoutManager(layoutManager);
-
-        binding.recyclerView.setItemAnimator(animator);
+        binding.recyclerView.setItemAnimator(null);
         binding.recyclerView.setAdapter(adapter);
 
         communityViewModel.observerCommunityMembers(chainID, onChain).observe(activity, members -> {
@@ -117,14 +110,14 @@ public class MemberFragment extends BaseFragment implements MemberListAdapter.Cl
     }
 
     @Override
-    public void onItemClicked(MemberAndUser member) {
+    public void onItemClicked(MemberAndFriend member) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.PUBLIC_KEY, member.publicKey);
         ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
     }
 
     @Override
-    public void onShareClicked(MemberAndUser member) {
+    public void onShareClicked(MemberAndFriend member) {
         showShareDialog();
     }
 
@@ -136,9 +129,8 @@ public class MemberFragment extends BaseFragment implements MemberListAdapter.Cl
         disposables.add(communityViewModel.getCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
-                    String communityInviteLink = ChainLinkUtil.encode(chainID, list);
-                    ActivityUtil.shareText(activity, getString(R.string.contacts_share_link_via),
-                            communityInviteLink);
+                    String chainUrl =  ChainUrlUtil.encode(chainID, list);
+                    ActivityUtil.shareText(activity, getString(R.string.contacts_share_link_via), chainUrl);
                 }));
     }
 }

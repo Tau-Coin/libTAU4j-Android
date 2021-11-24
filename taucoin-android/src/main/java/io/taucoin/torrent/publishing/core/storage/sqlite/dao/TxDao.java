@@ -31,6 +31,7 @@ public interface TxDao {
             " FROM Txs AS tx" +
             " LEFT JOIN Members AS mem ON tx.senderPk = mem.publicKey AND tx.chainID = mem.chainID" +
             QUERY_GET_TXS_BY_CHAIN_WHERE +
+            " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
     // SQL:查询社区里的交易数(未上链，不区分交易类型)
@@ -43,6 +44,7 @@ public interface TxDao {
             " LEFT JOIN Members AS mem ON tx.senderPk = mem.publicKey AND tx.chainID = mem.chainID" +
             QUERY_GET_TXS_BY_CHAIN_WHERE +
             " AND tx.txType = :txType" +
+            " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
 
@@ -72,7 +74,7 @@ public interface TxDao {
     String QUERY_TX_MEDIAN_FEE = "SELECT fee FROM Txs " +
             " WHERE chainID = :chainID and " +
             " senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
-            " ORDER BY fee";
+            " ORDER BY fee limit 10";
     /**
      * 添加新的交易
      */
@@ -91,11 +93,11 @@ public interface TxDao {
      */
     @Transaction
     @Query(QUERY_GET_TXS_BY_CHAIN_ID_AND_TYPE_ON_CHAIN)
-    List<UserAndTx> queryCommunityTxsOnChain(String chainID, long txType, int txStatus,
+    List<UserAndTx> queryCommunityTxsOnChain(String chainID, int txType, int txStatus,
                                              int startPosition, int loadSize);
 
     @Query(QUERY_GET_TXS_NUM_BY_CHAIN_ID_ON_CHAIN)
-    int queryNumCommunityTxsOnChain(String chainID, long txType, int txStatus);
+    int queryNumCommunityTxsOnChain(String chainID, int txType, int txStatus);
 
     @Transaction
     @Query(QUERY_GET_TXS_BY_CHAIN_ID_NOT_ON_CHAIN)

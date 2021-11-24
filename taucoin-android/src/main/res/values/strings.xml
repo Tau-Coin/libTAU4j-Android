@@ -11,8 +11,10 @@
     <string name="common_install_browser">Please install mobile browser first!</string>
     <string name="common_parentheses">(%1$s)</string>
     <string name="common_proceed">Proceed</string>
+    <string name="common_turn_off">Turn Off</string>
     <string name="common_back">Back</string>
     <string name="common_slant">(%1$d/%2$d)</string>
+    <string name="common_confirm">Confirm</string>
     <string name="common_submit">Submit</string>
     <string name="common_percent">%1$d%%</string>
     <string name="common_on">ON</string>
@@ -26,6 +28,8 @@
     <string name="common_default">Default</string>
     <string name="common_share">Share</string>
     <string name="common_later">Later</string>
+    <string name="common_ignore">Ignore</string>
+    <string name="common_accept">Accept</string>
     <string name="common_debug_digit1">1-100</string>
     <string name="common_debug_digit2">1-1000</string>
     <string name="common_debug_str1">100*10KB</string>
@@ -40,7 +44,7 @@
     <string name="main_empty_create_communities">Create Coin Community</string>
     <string name="main_exit">Click again to exit the application!</string>
     <string name="main_balance_power">Balance %1$s, Power %2$s</string>
-    <string name="main_read_only">READ\nONLY</string>
+    <string name="main_read_only">Read\nOnly</string>
     <string name="main_open_link">Open the link?</string>
 
     <string name="main_publish_video">Publish Video</string>
@@ -57,6 +61,7 @@
     <!-- Strings used for main drawer content -->
     <string name="drawer_new_community">New Community</string>
     <string name="drawer_peers">Friends</string>
+    <string name="drawer_mining">Mining</string>
     <string name="drawer_setting">Settings</string>
     <string name="drawer_data_cost">Data Cost</string>
     <string name="drawer_working_condition">Working Condition</string>
@@ -77,23 +82,34 @@
     <string name="menu_community_info">Community Info</string>
 
     <string name="community_settings">Settings</string>
-    <string name="community_blacklist">Ban</string>
-    <string name="community_mining_info">Mining Info</string>
+    <string name="community_chain_status">Chain Status</string>
+    <string name="community_blacklist">Blacklist</string>
+    <string name="community_mining_info">Mining</string>
     <string name="community_sync_rate">Sync Rate</string>
     <string name="community_miners_online">Miners Online</string>
     <string name="community_total_blocks">Total Blocks</string>
     <string name="community_mining_power">Mining Power</string>
+    <string name="community_last_block">Last Block</string>
+    <string name="community_perishable_date">Perishable Date</string>
+    <string name="community_auto_renewal">Auto-Renewal</string>
+    <string name="community_auto_renewal_turn_off_tip">Turn off Auto-renewal?</string>
     <string name="community_info">Info</string>
     <string name="community_invite_link">Invite Link</string>
-    <string name="community_add_member">Add Member via Wiring</string>
     <string name="community_qr_code">Community QR Code</string>
-    <string name="community_ban_community">Do you want to ban this community?</string>
+    <string name="community_blacklist_tip" formatted="false"><Data><![CDATA[No message from <font color="#477df9">%1$s</font> until
+    remove from the blacklist<br/><font color="#727272">(setting>blacklist)</font>]]></Data></string>
 
     <string name="community_input_hint">Message</string>
     <string name="community_users_stats">%1$d members, %2$d online</string>
     <string name="common_loading">loading&#8230;</string>
 
-    <string name="community_community_name">e.g.Paris(required)</string>F
+    <string name="community_community_name">Community Name(required)</string>
+    <string name="community_name">Community Name</string>
+    <string name="community_total_coins">Total coins: %s</string>
+    <string name="community_unified_airdrop">Unified airdrop coins per account</string>
+    <string name="community_custom_coins">Custom airdrop coins</string>
+    <string name="community_custom_coins_tips">Coins</string>
+    <string name="community_selected_friends">Selected friends: %d</string>
     <string name="community_coin_name">Coin Name(optional)</string>
     <string name="community_announce">Announce on TAU</string>
     <string name="community_total_coin">Total Coins</string>
@@ -102,26 +118,62 @@
     <string name="community_intro">Introduction(optional)</string>
     <string name="community_more_settings">More Settings</string>
     <string name="community_bootstrap_node">DHT Bootstrap Node</string>
-    <string name="community_message">Message</string>
-    <string name="community_comment">Comment</string>
     <string name="community_transaction">Transaction</string>
     <string name="community_nickname">Community Nickname</string>
-    <string name="community_choose_community">Choose Community</string>
+    <string name="community_choose_community">Mining Pool</string>
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>
     <string name="community_mining_income">Mining Income</string>
-    <string name="community_state">Total Blocks %1$s, Sync Blocks %2$s</string>
-    <string name="community_chain_note">Chain Content</string>
-    <string name="community_instant_chat">Chat</string>
-    <string name="community_wired">Transaction</string>
+    <string name="community_filter_all">All</string>
+    <string name="community_chain_note">Onchain Note Transaction</string>
+    <string name="community_off_chain_msg">Offchain Message</string>
+    <string name="community_wired">Wiring Transaction</string>
+    <string name="community_tip_blocks">Tip Blocks</string>
     <string name="community_queue">Queue</string>
     <string name="community_on_chain">Onchain</string>
+    <string name="community_chain_note_title">Onchain Note Transaction</string>
+    <string name="community_filter_by">Filter by</string>
+    <string name="community_creation_failed">Community creation failed, please try again later!</string>
+
+    <string name="chain_length">Chain Length</string>
+    <string name="chain_difficulty">Difficulty</string>
+    <string name="chain_total_peers">Total Peers</string>
+    <string name="chain_peers_blocks">Peers &#038; Blocks</string>
+    <string name="chain_total_coins">Total Coins</string>
+    <string name="chain_top_peers">Top 10 peers</string>
+    <string name="chain_top_consensus">Top 3 consensus</string>
+    <string name="chain_current_fork">Current Fork</string>
+    <string name="chain_block_number">Block Number</string>
+    <string name="chain_block_hash">Hash</string>
+    <string name="chain_top_tab_coin">Coin</string>
+    <string name="chain_top_tab_power">Power</string>
+    <string name="chain_top_tab_consensus">Consensus</string>
+    <string name="chain_top_tab_tip">Tip</string>
+    <string name="chain_top_tab_rank">Rank</string>
+    <string name="chain_top_tab_peer">Peer</string>
 
     <string name="error_community_name_empty">Community name cannot be empty!</string>
+    <string name="error_community_name_too_long">Community name is too long!</string>
     <string name="error_coin_name_empty">Coin name cannot be empty!</string>
     <string name="error_telegram_id_illegal">Telegram ID is illegal!</string>
     <string name="community_added_successfully">Create Community Successful!</string>
-    <string name="community_added_members">+ Add Members Now</string>
+    <string name="community_added_failed">Failed to add community!</string>
+    <string name="community_added_members">Add Members</string>
+    <string name="community_custom_airdrop_tips">Custom airdrop coins to friends</string>
+    <string name="community_airdrop_peers">Peers/%1$d</string>
+    <string name="community_airdrop_coins">Coins/%1$s</string>
+    <string name="community_airdrop_free">Free/%1$s</string>
+    <string name="community_auto_renewal_help_title">What is Auto-Renewal?</string>
+    <string name="community_auto_renewal_help_content">Auto Renewal keeps account available on chain
+        when remaining balance covers the transaction fee.</string>
+
+    <string name="community_tip_block">Tip Block</string>
+    <string name="community_tip_block_txs">Transactions:</string>
+    <string name="community_tip_block_timestamp">Timestamp:</string>
+    <string name="community_tip_block_miner">Mined by:</string>
+    <string name="community_tip_block_reward">Block Reward:</string>
+    <string name="community_tip_block_difficulty">Difficulty:</string>
+    <string name="community_tip_block_size">Size:</string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_key_explain">Secret key is your private ID to be kept confidential, public key is your open ID for friends.</string>
@@ -246,12 +298,13 @@
     <!-- Strings used for transactions -->
     <string name="tx_send">Send</string>
     <string name="tx_public_key_hint">My Public Key</string>
+    <string name="tx_address_hint">Address</string>
     <string name="tx_amount_hint">Amount</string>
-    <string name="tx_memo_hint">Memo</string>
-    <string name="tx_median_fee">Transaction median fee/%1$s %2$s</string>
+    <string name="tx_memo_hint">Memo(optional)</string>
+    <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction median fee: <font color="#477df9">%1$s</font> %2$s]]></Data></string>
     <string name="tx_new_name">Nick Name(required)</string>
     <string name="tx_personal_profile">Personal profile(Optional)</string>
-    <string name="tx_message">Comment(required)</string>
+    <string name="tx_message">Comments(required)</string>
     <string name="tx_contact_id">%1$s(Optional)</string>
     <string name="tx_bootstrap_node">Bootstrap node(required)</string>
     <string name="tx_comment">Comment(required)</string>
@@ -269,20 +322,25 @@
     <string name="tx_fee_tips">*More transaction fees more opportunities be packaged miners.</string>
     <string name="tx_error_invalid_pk">Invalid receiver\'s Public Key!</string>
     <string name="tx_error_invalid_amount">Invalid Transaction amount</string>
+    <string name="tx_error_invalid_free">Invalid Transaction free</string>
     <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Balance</string>
     <string name="tx_error_no_enough_coins_for_fee">Insufficient Balance :\nTransaction Fee > Balance</string>
     <string name="tx_error_no_enough_coins_for_airdrop">Insufficient Balance</string>
     <string name="tx_error_invalid_name">Invalid Name</string>
     <string name="tx_error_invalid_message">Invalid Message</string>
     <string name="tx_error_invalid_comment">Invalid Comment</string>
+    <string name="tx_error_send_failed">Transaction sending failed, please try again later!</string>
 
     <string name="tx_result_successfully">Successfully</string>
     <string name="tx_result_processing">In processing,expected to confirm</string>
     <string name="tx_result_failed">Failed</string>
-    <string name="tx_to">To/</string>
-    <string name="tx_fee">Fee/</string>
-    <string name="tx_hash">Hash/</string>
-    <string name="tx_memo">Memo/</string>
+    <string name="tx_amount">Amount:</string>
+    <string name="tx_from">From:</string>
+    <string name="tx_to">To:</string>
+    <string name="tx_fee">Fee:</string>
+    <string name="tx_hash">Hash:</string>
+    <string name="tx_memo">Memo:</string>
+    <string name="tx_block_number">Blocknumber:</string>
     <string name="tx_memo_airdrop">Airdrop coins</string>
 
     <!-- Strings used for notifier -->
@@ -318,8 +376,6 @@
     <string name="contacts_friend_add_failed">Failed to add friend, please try again!</string>
     <string name="contacts_error_invalid_qr">Invalid QR code, please copy/paste key text instead.</string>
     <string name="contacts_airdrop_successfully">You have send %1$s coins to your friends!</string>
-    <string name="contacts_total_pay" formatted="false"><Data><![CDATA[Invite&nbsp;<font color="#f19322">%1$d</font>&nbsp;friends,&nbsp;total
-    &nbsp;<font color="#f19322">%2$s</font>&nbsp;%3$s&nbsp;(including %4$s fee).]]></Data></string>
 
     <!-- Strings used for QRCode -->
     <string name="qr_code_title">My Public Key QR Code</string>

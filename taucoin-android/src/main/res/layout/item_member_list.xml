@@ -50,18 +50,17 @@
                 android:includeFontPadding="false"
                 android:singleLine="true"
                 android:ellipsize="middle"
-                android:text="123123"
                 android:textAppearance="@style/TextAppearanceHeadline6" />
 
             <TextView
-                android:visibility="gone"
+                android:visibility="visible"
                 android:id="@+id/tv_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:text="123123"
+                android:layout_marginTop="@dimen/widget_size_5"
                 android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody2" />
 
@@ -72,7 +71,6 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:includeFontPadding="false"
-                android:text="123123"
                 android:ellipsize="end"
                 android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody2" />
@@ -92,6 +90,7 @@
             android:contentDescription="@null"/>
 
         <include
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_1"
             android:layout_toEndOf="@+id/left_view"

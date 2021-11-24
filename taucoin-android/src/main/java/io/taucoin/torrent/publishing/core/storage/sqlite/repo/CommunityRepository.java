@@ -48,9 +48,8 @@ public interface CommunityRepository {
 
     /**
      * 获取用户加入的社区列表
-     * @param chainID 社区chainID
      */
-    List<Community> getJoinedCommunityList(String chainID);
+    List<Community> getJoinedCommunityList();
 
     /**
      * 根据chainID查询社区

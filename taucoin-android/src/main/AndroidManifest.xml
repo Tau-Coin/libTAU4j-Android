@@ -63,11 +63,6 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name=".ui.community.CommunityActivity"
-            android:launchMode="singleTop"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
-
-        <activity
             android:name=".ui.community.CommunityCreateActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
@@ -80,7 +75,23 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name=".ui.community.MembersActivity"
+            android:name=".ui.community.CommunityDetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.community.MembersAddActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.community.ChainStatusActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.community.ChainTopActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.community.FilterChooseActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity

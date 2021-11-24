@@ -3,9 +3,7 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.dao;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
-import androidx.paging.PagedList;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -15,6 +13,7 @@ import androidx.room.Update;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
@@ -27,8 +26,16 @@ public interface MemberDao {
     String WHERE_ON_CHAIN = " (balance > 0 OR power > 0) ";
     String QUERY_GET_MEMBER_BY_CHAIN_ID_PK = "SELECT * FROM Members WHERE chainID = :chainID AND publicKey = :publicKey";
     String QUERY_GET_MEMBERS_BY_CHAIN_ID = "SELECT * FROM Members WHERE chainID = :chainID";
-    String QUERY_GET_MEMBERS_ON_CHAIN = "SELECT * FROM Members WHERE chainID = :chainID AND " + WHERE_ON_CHAIN;
-    String QUERY_GET_MEMBERS_NOT_ON_CHAIN = "SELECT * FROM Members WHERE chainID = :chainID AND balance <= 0 AND power <= 0";
+    String QUERY_GET_MEMBERS_ON_CHAIN = "SELECT m.*, f.lastSeenTime" +
+            " FROM Members m LEFT JOIN Friends f" +
+            " ON m.publicKey = f.friendPK AND f.userPK = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " WHERE chainID = :chainID AND " + WHERE_ON_CHAIN;
+
+    String QUERY_GET_MEMBERS_NOT_ON_CHAIN = "SELECT m.*, f.lastSeenTime" +
+            " FROM Members m LEFT JOIN Friends f" +
+            " ON m.publicKey = f.friendPK AND f.userPK = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " WHERE chainID = :chainID AND balance <= 0 AND power <= 0";
+
     String QUERY_COMMUNITY_NUM_IN_COMMON = "SELECT chainID FROM " +
             " (Select count(*) AS num, chainID FROM Members" +
             " where (publicKey =:currentUserPk OR publicKey =:memberPk) AND " + WHERE_ON_CHAIN +
@@ -42,9 +49,9 @@ public interface MemberDao {
             " (SELECT COUNT(*) AS members FROM Members WHERE chainID =:chainID and " + WHERE_ON_CHAIN + ") a," +
             " (SELECT COUNT(*) AS online FROM Members WHERE chainID =:chainID and " + WHERE_ON_CHAIN +
             " and publicKey IN" +
-            " (SELECT publicKey FROM Users WHERE " +
-//            "lastUpdateTime > strftime('%s', 'now','-" + Constants.ONLINE_HOURS + "') OR " +
-            "isCurrentUser = 1)) b";
+            " (SELECT friendPK FROM Friends WHERE userPK = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND (lastSeenTime > strftime('%s', 'now','-" + Constants.ONLINE_HOURS + "') OR" +
+            " friendPK = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" + "))) b";
 
     String QUERY_DELETE_COMMUNITY_MEMBERS = "DELETE FROM Members where chainID =:chainID";
     /**
@@ -79,7 +86,7 @@ public interface MemberDao {
      */
     @Query(QUERY_GET_MEMBERS_ON_CHAIN)
     @Transaction
-    DataSource.Factory<Integer, MemberAndUser> queryCommunityMembersOnChain(String chainID);
+    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembersOnChain(String chainID);
 
     /**
      * 查询社区未上链的成员
@@ -88,7 +95,7 @@ public interface MemberDao {
      */
     @Query(QUERY_GET_MEMBERS_NOT_ON_CHAIN)
     @Transaction
-    DataSource.Factory<Integer, MemberAndUser> queryCommunityMembersNotOnChain(String chainID);
+    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembersNotOnChain(String chainID);
 
     /**
      * 获取和社区成员共在的社区数

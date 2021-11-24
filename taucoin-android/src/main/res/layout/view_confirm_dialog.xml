@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/widget_size_20"
+        android:background="@color/color_white"
+        android:gravity="center_horizontal"
+        android:paddingStart="@dimen/widget_size_10"
+        android:paddingEnd="@dimen/widget_size_10"
+        android:orientation="vertical">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/TextAppearanceBody2"
+                    android:textColor="@color/gray_dark"
+                    android:text="@string/community_custom_airdrop_tips"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                    android:background="@color/color_white"
+                    android:id="@+id/recycler_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:layout_marginBottom="@dimen/widget_size_10"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:focusable="true"
+                    android:scrollbarStyle="outsideOverlay" />
+
+                <include layout="@layout/view_line"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_5">
+
+                    <TextView
+                        android:id="@+id/tv_airdrop_peers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/community_airdrop_peers"
+                        style="@style/TextAppearanceBody2" />
+
+                    <TextView
+                        android:layout_toEndOf="@+id/tv_airdrop_peers"
+                        android:id="@+id/tv_airdrop_coins"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:gravity="end"
+                        android:text="@string/community_airdrop_coins"
+                        style="@style/TextAppearanceBody2" />
+
+                    <TextView
+                        android:layout_below="@+id/tv_airdrop_coins"
+                        android:layout_toEndOf="@+id/tv_airdrop_peers"
+                        android:id="@+id/tv_airdrop_free"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:gravity="end"
+                        android:text="@string/community_airdrop_free"
+                        style="@style/TextAppearanceBody2" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+</layout>

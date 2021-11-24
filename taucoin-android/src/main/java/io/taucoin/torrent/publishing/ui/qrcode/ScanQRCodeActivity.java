@@ -19,6 +19,7 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import org.libTAU4j.ChainURL;
 import org.libTAU4j.Ed25519;
 import com.google.gson.Gson;
 import com.google.zxing.qrcode.QRCodeReader;
@@ -45,7 +46,8 @@ import io.taucoin.torrent.publishing.core.camera.MyHandler;
 import io.taucoin.torrent.publishing.core.camera.Size;
 import io.taucoin.torrent.publishing.core.camera.Utilities;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainLinkUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -266,9 +268,9 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
     private void handleScanResult(String scanResult) {
         try {
             if (StringUtil.isNotEmpty(scanResult)) {
-                ChainLinkUtil.ChainLink decode = ChainLinkUtil.decode(scanResult);
-                if (decode.isValid()) {
-                    String chainID = decode.getDn();
+                ChainURL decode = ChainUrlUtil.decode(scanResult);
+                if (decode != null) {
+                    String chainID = ChainIDUtil.decode(decode.getChainID());
                     openChainLink(chainID, scanResult);
                     return;
                 }
@@ -360,8 +362,10 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
 
     private void subscribeAddCommunity(){
         communityViewModel.getAddCommunityState().observe(this, result -> {
-            if(result.isSuccess()){
+            if (result.isSuccess()) {
                 openCommunityActivity(result.getMsg());
+            } else {
+                ToastUtils.showShortToast(R.string.community_added_failed);
             }
         });
 
@@ -402,6 +406,8 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
     private void openCommunityActivity(String chainID) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(IntentExtra.TYPE, 0);
         ActivityUtil.startActivity(intent, this, MainActivity.class);
         onBackPressed();
     }

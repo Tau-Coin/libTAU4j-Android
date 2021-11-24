@@ -11,6 +11,7 @@ import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -21,8 +22,7 @@ import io.taucoin.torrent.publishing.databinding.ItemMemberListBinding;
 /**
  * 显示的联系人列表的Adapter
  */
-public class MemberListAdapter extends PagedListAdapter<MemberAndUser,
-        MemberListAdapter.ViewHolder> {
+public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberListAdapter.ViewHolder> {
     private ClickListener listener;
 
     MemberListAdapter(ClickListener listener) {
@@ -59,32 +59,36 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndUser,
             this.listener = listener;
         }
 
-        void bind(ViewHolder holder, MemberAndUser member) {
-            if(null == holder || null == member){
+        void bind(ViewHolder holder, MemberAndFriend member) {
+            if (null == holder || null == member) {
                 return;
             }
             String showName = UsersUtil.getDefaultName(member.publicKey);
-            if(member.user != null){
+            if (member.user != null) {
                 showName = UsersUtil.getShowName(member.user);
             }
             holder.binding.tvName.setText(showName);
             String firstLetters = StringUtil.getFirstLettersOfName(showName);
             holder.binding.leftView.setText(firstLetters);
 
-            String time = "";
-//            if(member.user != null && member.user.lastUpdateTime > 0){
-//                time = DateUtil.formatTime(member.user.lastUpdateTime, DateUtil.pattern5);
-//                time = context.getResources().getString(R.string.contacts_last_seen, time);
-//            }
-            holder.binding.tvTime.setText(time);
+            if (member.lastSeenTime > 0) {
+                String time = DateUtil.formatTime(member.lastSeenTime, DateUtil.pattern6);
+                time = context.getResources().getString(R.string.contacts_last_seen, time);
+                holder.binding.tvTime.setText(time);
+                holder.binding.tvTime.setVisibility(View.VISIBLE);
+            } else {
+                holder.binding.tvTime.setVisibility(View.GONE);
+            }
+
             holder.binding.tvCommunities.setVisibility(View.GONE);
-            holder.binding.ivShare.setVisibility(View.VISIBLE);
+            holder.binding.ivShare.setVisibility(View.GONE);
+            holder.binding.ivShare.setVisibility(View.GONE);
 
             int bgColor = Utils.getGroupColor(member.publicKey);
             holder.binding.leftView.setBgColor(bgColor);
 
-            holder.binding.ivShare.setOnClickListener(v ->{
-                if(listener != null){
+            holder.binding.ivShare.setOnClickListener(v -> {
+                if (listener != null) {
                     listener.onShareClicked(member);
                 }
             });
@@ -98,18 +102,18 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndUser,
     }
 
     public interface ClickListener {
-        void onItemClicked(MemberAndUser item);
-        void onShareClicked(MemberAndUser item);
+        void onItemClicked(MemberAndFriend item);
+        void onShareClicked(MemberAndFriend item);
     }
 
-    private static final DiffUtil.ItemCallback<MemberAndUser> diffCallback = new DiffUtil.ItemCallback<MemberAndUser>() {
+    private static final DiffUtil.ItemCallback<MemberAndFriend> diffCallback = new DiffUtil.ItemCallback<MemberAndFriend>() {
         @Override
-        public boolean areContentsTheSame(@NonNull MemberAndUser oldItem, @NonNull MemberAndUser newItem) {
+        public boolean areContentsTheSame(@NonNull MemberAndFriend oldItem, @NonNull MemberAndFriend newItem) {
             return oldItem.equals(newItem);
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull MemberAndUser oldItem, @NonNull MemberAndUser newItem) {
+        public boolean areItemsTheSame(@NonNull MemberAndFriend oldItem, @NonNull MemberAndFriend newItem) {
             return oldItem.equals(newItem);
         }
     };

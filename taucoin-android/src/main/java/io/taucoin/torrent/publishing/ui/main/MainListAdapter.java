@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -93,7 +94,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 }else{
                     binding.tvMsgLastTime.setText(null);
                 }
-                String communityName = UsersUtil.getCommunityName(bean.ID);
+                String communityName = ChainIDUtil.getName(bean.ID);
                 binding.tvGroupName.setText(communityName);
                 String firstLetters = StringUtil.getFirstLettersOfName(communityName);
                 binding.leftView.setText(firstLetters);
@@ -107,7 +108,6 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
 
                 int bgColor = Utils.getGroupColor(bean.ID);
                 binding.leftView.setBgColor(bgColor);
-                binding.readOnly.setBgColor(bgColor);
                 boolean isReadOnly = bean.balance <= 0 && bean.power <= 0;
                 binding.readOnly.setVisibility(isReadOnly ? View.VISIBLE : View.INVISIBLE);
             } else if (holder.binding instanceof ItemChatListBinding) {

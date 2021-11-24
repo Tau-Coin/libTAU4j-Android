@@ -46,10 +46,20 @@ public class UsersUtil {
      * @return 隐藏后的名字
      */
     public static String getMidHideName(String name) {
-        if(StringUtil.isNotEmpty(name) && name.length() > 11){
+        return getMidHideName(name, 8);
+    }
+
+    /**
+     * 获取中间隐藏的名字
+     * @param name 隐藏前的名字
+     * @param lastNum 隐藏小数点后的位数
+     * @return 隐藏后的名字
+     */
+    public static String getMidHideName(String name, int lastNum) {
+        if(StringUtil.isNotEmpty(name) && name.length() > lastNum + 3){
             String midHideName = name.substring(0, 3);
             midHideName += "***";
-            midHideName += name.substring(name.length() - 8);
+            midHideName += name.substring(name.length() - lastNum);
             return midHideName;
         }
         return name;
@@ -118,32 +128,6 @@ public class UsersUtil {
     }
 
     /**
-     * 获取显示coin name
-     * @param chainID 当前社区ID
-     * @return 显示名字
-     */
-    public static String getCoinName(String chainID) {
-        String communityName = getCommunityName(chainID);
-        String firstLetters = StringUtil.getFirstLettersOfName(communityName);
-        return firstLetters + "coin";
-    }
-
-    /**
-     * 获取社区名
-     * @param chainID 链的chainID
-     * @return 社区名
-     */
-    public static String getCommunityName(@NonNull String chainID) {
-       if(StringUtil.isNotEmpty(chainID)){
-           String[] splits = chainID.split(Constants.ChainidDelimeter);
-           if(splits.length > 1){
-               return splits[0];
-           }
-       }
-       return "";
-    }
-
-    /**
      * 获取balance的显示
      * @param balance 余额
      * @return 余额显示
@@ -169,5 +153,18 @@ public class UsersUtil {
             return name.substring(0, QR_NAME_LENGTH);
         }
         return name;
+    }
+
+    /**
+     * 获取公钥后六为
+     * @param publicKey
+     * @return
+     */
+    public static String getLastPublicKey(String publicKey) {
+        if (StringUtil.isNotEmpty(publicKey) && publicKey.length() > 6) {
+            int length = publicKey.length();
+            return publicKey.substring(length - 6, length);
+        }
+        return publicKey;
     }
 }

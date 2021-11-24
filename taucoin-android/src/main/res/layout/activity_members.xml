@@ -20,32 +20,84 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar_group_left" />
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_height="@dimen/widget_size_40"
-            android:layout_width="wrap_content"
-            android:layout_marginStart="@dimen/widget_size_10"
-            android:layout_marginEnd="@dimen/widget_size_10"
-            app:tabMinWidth="@dimen/widget_size_65"
-            app:tabMode="scrollable"
-            app:tabTextAppearance="@style/TabLayout"
-            app:tabIndicatorHeight="@dimen/widget_size_3"
-            app:tabIndicatorColor="@color/primary"
-            app:tabSelectedTextColor="@color/primary"
-            app:tabTextColor="@color/gray_dark"
-            app:tabBackground="@color/color_transparent"
-            app:tabRippleColor="@color/color_transparent"/>
-
-        <View
-            android:id="@+id/tab_layout_line"
+        <ScrollView
+            android:fillViewport="true"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_1"
-            android:background="@color/divider"/>
+            android:layout_height="match_parent">
 
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_chain_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:gravity="center_vertical"
+                    android:onClick="onClick"
+                    app:lineLeftText="@string/community_chain_status"
+                    app:lineRightImage="@mipmap/icon_arrow"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_add_member"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:gravity="center_vertical"
+                    android:onClick="onClick"
+                    app:lineLeftText="@string/community_added_members"
+                    app:lineRightImage="@mipmap/icon_arrow"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_qr_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:gravity="center_vertical"
+                    android:onClick="onClick"
+                    app:lineLeftText="@string/community_qr_code"
+                    app:lineRightImage="@mipmap/icon_arrow"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_blacklist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:gravity="center_vertical"
+                    android:onClick="onClick"
+                    app:lineLeftTextColor="@color/color_red"
+                    app:lineLeftText="@string/community_blacklist" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tab_layout"
+                    android:layout_height="@dimen/widget_size_40"
+                    android:layout_width="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:layout_marginEnd="@dimen/widget_size_10"
+                    app:tabMinWidth="@dimen/widget_size_65"
+                    app:tabMode="scrollable"
+                    app:tabTextAppearance="@style/TabLayout"
+                    app:tabIndicatorHeight="@dimen/widget_size_3"
+                    app:tabIndicatorColor="@color/primary"
+                    app:tabSelectedTextColor="@color/primary"
+                    app:tabTextColor="@color/gray_dark"
+                    app:tabBackground="@color/color_transparent"
+                    app:tabRippleColor="@color/color_transparent"/>
+
+                <View
+                    android:id="@+id/tab_layout_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_1"
+                    android:background="@color/divider"/>
+
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/view_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 </layout>

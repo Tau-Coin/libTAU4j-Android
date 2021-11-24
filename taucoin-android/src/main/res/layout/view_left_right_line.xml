@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:background="@color/color_white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/rl_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_44"
+            android:paddingStart="@dimen/widget_size_20"
+            android:paddingEnd="@dimen/widget_size_10">
+
+            <ImageView
+                android:id="@+id/iv_left"
+                android:layout_width="@dimen/widget_size_22"
+                android:layout_height="@dimen/widget_size_22"
+                android:layout_centerVertical="true"
+                android:src="@mipmap/icon_working_condition"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_toEndOf="@+id/iv_left"
+                android:id="@+id/tv_left1"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_5"
+                android:lineSpacingExtra="0dp"
+                android:lineSpacingMultiplier="0.7"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+            <TextView
+                android:layout_toEndOf="@+id/iv_left"
+                android:id="@+id/tv_left2"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="0dp"
+                android:lineSpacingMultiplier="0.7"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+            <TextView
+                android:id="@+id/tv_right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:includeFontPadding="false"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:gravity="end"
+                android:layout_marginEnd="@dimen/widget_size_10"
+                android:textAppearance="@style/TextAppearanceBody1"
+                android:layout_toEndOf="@+id/tv_left2"/>
+
+            <ImageView
+                android:id="@+id/iv_right"
+                android:layout_width="@dimen/widget_size_16"
+                android:layout_height="@dimen/widget_size_16"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:src="@mipmap/icon_arrow"
+                android:contentDescription="@null" />
+        </RelativeLayout>
+
+        <include
+            android:id="@+id/line_view"
+            layout="@layout/view_line"/>
+    </LinearLayout>
+</layout>

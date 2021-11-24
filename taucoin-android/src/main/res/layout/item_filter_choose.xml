@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/widget_size_50"
+        android:background="@color/color_white">
+
+        <CheckBox
+            android:id="@+id/cb_select"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_5"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+        <include layout="@layout/view_line" />
+    </LinearLayout>
+</layout>

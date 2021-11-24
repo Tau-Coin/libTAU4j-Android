@@ -6,51 +6,50 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.PagerAdapter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
-import io.taucoin.torrent.publishing.ui.chat.ChatsTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
+import io.taucoin.torrent.publishing.ui.transaction.TipBlocksTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
-import io.taucoin.torrent.publishing.core.model.data.message.TypesConfig;
 
 /**
  * 单个群组页面
  */
 public class CommunityFragment extends BaseFragment implements View.OnClickListener {
 
-    public static final int REQUEST_CODE = 100;
+    public static final int MEMBERS_REQUEST_CODE = 0x100;
+    public static final int FILTER_REQUEST_CODE = 0x101;
     private MainActivity activity;
     private FragmentCommunityBinding binding;
-    private MyAdapter fragmentAdapter;
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private SettingsRepository settingsRepo;
+    private CommunityTabFragment currentTabFragment = null;
+    private TextView selectedView = null;
     private String chainID;
-    private List<CommunityTabFragment> fragmentList = new ArrayList<>();
-    private int[] titles = new int[]{R.string.community_instant_chat, R.string.community_chain_note,
-            R.string.community_wired, R.string.community_queue};
-
+    private boolean isReadOnly = true;
 
     @Nullable
     @Override
@@ -64,6 +63,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         activity = (MainActivity) getActivity();
+        settingsRepo = RepositoryHelper.getSettingsRepository(activity.getApplicationContext());
         ViewModelProvider provider = new ViewModelProvider(this);
         communityViewModel = provider.get(CommunityViewModel.class);
         binding.setListener(this);
@@ -72,23 +72,11 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         initLayout();
     }
 
-//    @Override
-//    protected void onNewIntent(Intent intent) {
-//        super.onNewIntent(intent);
-//        if (0 != (Intent.FLAG_ACTIVITY_CLEAR_TOP & intent.getFlags())) {
-//            finish();
-//            String chainID = intent.getStringExtra(IntentExtra.CHAIN_ID);
-//            intent = new Intent();
-//            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-//            ActivityUtil.startActivity(intent, this, CommunityFragment.class);
-//        }
-//    }
-
     /**
      * 初始化参数
      */
     private void initParameter() {
-        if(getArguments() != null){
+        if (getArguments() != null) {
             chainID = getArguments().getString(IntentExtra.ID);
         }
     }
@@ -97,59 +85,120 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
      * 初始化布局
      */
     private void initLayout() {
-        if(StringUtil.isNotEmpty(chainID)){
-            String communityName = UsersUtil.getCommunityName(chainID);
+
+        if (StringUtil.isNotEmpty(chainID)) {
+            String communityName = ChainIDUtil.getName(chainID);
             binding.toolbarInclude.tvTitle.setText(Html.fromHtml(communityName));
             binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats, 0, 0));
         }
         binding.toolbarInclude.ivBack.setOnClickListener(v -> activity.goBack());
         binding.toolbarInclude.tvSubtitle.setVisibility(View.VISIBLE);
         binding.toolbarInclude.ivAction.setVisibility(View.VISIBLE);
+        binding.toolbarInclude.ivAction.setImageResource(R.mipmap.icon_community_detail);
         binding.toolbarInclude.ivAction.setOnClickListener(v -> {
-            if(StringUtil.isEmpty(chainID)){
+            if(StringUtil.isEmpty(chainID)) {
                 return;
             }
             Intent intent = new Intent();
             intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            ActivityUtil.startActivityForResult(intent, activity,
-                    MembersActivity.class, REQUEST_CODE);
+            intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
+            ActivityUtil.startActivityForResult(intent, activity, CommunityDetailActivity.class, MEMBERS_REQUEST_CODE);
         });
-        // 初始化Tab页
-        // 添加Chat页面
-        CommunityTabFragment chatTab = new ChatsTabFragment();
-        Bundle chatBundle = new Bundle();
-        chatBundle.putString(IntentExtra.CHAIN_ID, chainID);
-        chatTab.setArguments(chatBundle);
-        fragmentList.add(chatTab);
 
-        // 添加Chain Note页面
-        CommunityTabFragment chainNoteTab = new TxsTabFragment();
-        Bundle noteBundle = new Bundle();
-        noteBundle.putString(IntentExtra.CHAIN_ID, chainID);
-        noteBundle.putInt(IntentExtra.TYPE, TypesConfig.TxType.FNoteType.ordinal());
-        chainNoteTab.setArguments(noteBundle);
-        fragmentList.add(chainNoteTab);
+        refreshFilterView();
+    }
 
-        // 添加Wired页面
-        CommunityTabFragment wiringTab = new TxsTabFragment();
-        Bundle wiringBundle = new Bundle();
-        wiringBundle.putString(IntentExtra.CHAIN_ID, chainID);
-        wiringBundle.putInt(IntentExtra.TYPE, TypesConfig.TxType.WCoinsType.ordinal());
-        wiringTab.setArguments(wiringBundle);
-        fragmentList.add(wiringTab);
+    private void refreshFilterView() {
+        Set<String> set = settingsRepo.getFiltersSelected();
+        String selectedTab = null;
+        if (null == set) {
+            set = CommunityTabs.getIndexSet();
+        }
+        if (set.size() > 0) {
+            if (selectedView != null && set.contains(StringUtil.getTag(selectedView))) {
+                selectedTab = StringUtil.getTag(selectedView);
+            } else {
+                selectedTab = set.iterator().next();
+            }
+        }
+        if (set.size() <= 0) {
+            replaceOrRemoveFragment(true);
+        }
+        ViewGroup viewGroup = binding.llFilter;
+        int count = viewGroup.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View view = viewGroup.getChildAt(i);
+            if (set.contains(StringUtil.getTag(view))) {
+                view.setVisibility(View.VISIBLE);
+            } else {
+                view.setVisibility(View.GONE);
+            }
+            if (StringUtil.isEquals(StringUtil.getTag(view), selectedTab)) {
+                onClick(view);
+            }
+        }
+    }
 
-        // 添加Queue页面
-        CommunityTabFragment queueTab = new TxsTabFragment();
-        Bundle queueBundle = new Bundle();
-        queueBundle.putString(IntentExtra.CHAIN_ID, chainID);
-        queueTab.setArguments(queueBundle);
-        fragmentList.add(queueTab);
+    /**
+     * 加载Tab视图
+     */
+    private void loadTabView(String tab) {
+        switch (tab) {
+            case "0":
+                currentTabFragment = new TxsTabFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString(IntentExtra.CHAIN_ID, chainID);
+                bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
+                bundle.putInt(IntentExtra.TYPE, CommunityTabs.ON_CHAIN_NOTE.getIndex());
+                currentTabFragment.setArguments(bundle);
+                break;
+            case "1":
+                // 添加Chain Note页面
+                currentTabFragment = new TxsTabFragment();
+                bundle = new Bundle();
+                bundle.putString(IntentExtra.CHAIN_ID, chainID);
+                bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
+                bundle.putInt(IntentExtra.TYPE, CommunityTabs.OFF_CHAIN_MSG.getIndex());
+                currentTabFragment.setArguments(bundle);
+                break;
+            case "2":
+                currentTabFragment = new TxsTabFragment();
+                bundle = new Bundle();
+                bundle.putString(IntentExtra.CHAIN_ID, chainID);
+                bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
+                bundle.putInt(IntentExtra.TYPE, CommunityTabs.WRING_TX.getIndex());
+                currentTabFragment.setArguments(bundle);
+                break;
+            case "3":
+                currentTabFragment = new TipBlocksTabFragment();
+                bundle = new Bundle();
+                bundle.putString(IntentExtra.CHAIN_ID, chainID);
+                currentTabFragment.setArguments(bundle);
+                break;
+        }
+        replaceOrRemoveFragment(false);
+    }
 
-        FragmentManager fragmentManager = activity.getSupportFragmentManager();
-        fragmentAdapter = new MyAdapter(fragmentManager);
-        binding.viewPager.setAdapter(fragmentAdapter);
-        binding.tabLayout.setupWithViewPager(binding.viewPager);
-        binding.viewPager.setOffscreenPageLimit(fragmentList.size());
+    private void replaceOrRemoveFragment(boolean isRemove) {
+        if (currentTabFragment != null && activity != null) {
+            FragmentManager fm = activity.getSupportFragmentManager();
+            if (fm.isDestroyed()) {
+                return;
+            }
+            FragmentTransaction transaction = fm.beginTransaction();
+            if (!isRemove) {
+                // Replace whatever is in the fragment container view with this fragment,
+                // and add the transaction to the back stack
+                transaction.replace(R.id.tab_fragment, currentTabFragment);
+                // 执行此方法后，fragment的onDestroy()方法和ViewModel的onCleared()方法都不执行
+                // transaction.addToBackStack(null);
+                transaction.commitAllowingStateLoss();
+            } else {
+                transaction.remove(currentTabFragment);
+                transaction.commitAllowingStateLoss();
+                currentTabFragment = null;
+            }
+        }
     }
 
     @Override
@@ -165,16 +214,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
-    public void onDestroyView() {
-        try{
-            // 清除子ViewPager中的Fragment,防止一直在内存里
-            // 需要与FragmentStatePagerAdapter结合使用
-            fragmentList.clear();
-            fragmentAdapter.notifyDataSetChanged();
-        }catch(Exception ignore) {
-        } finally {
-            super.onDestroyView();
-        }
+    public void onDestroy() {
+        super.onDestroy();
+        replaceOrRemoveFragment(true);
     }
 
     /**
@@ -194,26 +236,14 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                             statistics.getMembers(), statistics.getOnline())))
         );
 
-        disposables.add(communityViewModel.observerCommunityByChainID(chainID)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(community -> {
-                    long totalBlocks = community.totalBlocks + 1;
-                    long syncBlocks = totalBlocks - community.syncBlock;
-                    String communityState = getString(R.string.community_state,
-                            FmtMicrometer.fmtLong(totalBlocks),
-                            FmtMicrometer.fmtLong(syncBlocks));
-                    binding.tvCommunityState.setText(communityState);
-                }));
-
         disposables.add(communityViewModel.observerCurrentMember(chainID)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
                     boolean isReadOnly = member.balance <= 0 && member.power <= 0;
-                    for (int i = 0; i < fragmentList.size() - 1; i++) {
-                        CommunityTabFragment fragment = fragmentList.get(i);
-                        fragment.handleReadOnly(isReadOnly);
+                    if (currentTabFragment != null) {
+                        currentTabFragment.handleReadOnly(isReadOnly);
+                        this.isReadOnly = isReadOnly;
                     }
                 }));
 
@@ -221,36 +251,39 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.iv_community_state_close) {
-            binding.llCommunityState.setVisibility(View.GONE);
+        switch (v.getId()) {
+            case R.id.iv_filter:
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivityForResult(intent, activity,
+                        FilterChooseActivity.class, FILTER_REQUEST_CODE);
+                break;
+            case R.id.tv_chain_note:
+            case R.id.tv_off_chain:
+            case R.id.tv_wring:
+            case R.id.tv_tip_blocks:
+                if (this.selectedView != null) {
+                    this.selectedView.setBackgroundResource(R.drawable.community_tab_background_default);
+                    this.selectedView.setTextColor(getResources().getColor(R.color.color_white));
+                }
+                TextView selectedView = (TextView) v;
+                selectedView.setBackgroundResource(R.drawable.community_tab_background_selected);
+                selectedView.setTextColor(getResources().getColor(R.color.color_blue_dark));
+                this.selectedView = selectedView;
+                loadTabView(StringUtil.getTag(selectedView));
+                break;
         }
     }
 
-    public class MyAdapter extends FragmentStatePagerAdapter {
-        MyAdapter(FragmentManager fm) {
-            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-        }
-
-        @Override
-        public int getCount() {
-            return fragmentList.size();
-        }
-
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            return fragmentList.get(position);
-        }
-
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return getResources().getText(titles[position]);
-        }
-
-        @Override
-        public int getItemPosition(@NonNull Object object) {
-            return PagerAdapter.POSITION_NONE;
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CommunityFragment.FILTER_REQUEST_CODE) {
+            refreshFilterView();
+        } else {
+            if (currentTabFragment != null) {
+                currentTabFragment.onActivityResult(requestCode, resultCode, data);
+            }
         }
     }
 }

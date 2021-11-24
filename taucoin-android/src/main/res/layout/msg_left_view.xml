@@ -9,9 +9,7 @@
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:gravity="center_horizontal"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/widget_size_15"
-        android:layout_marginEnd="@dimen/widget_size_5">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/tv_edit_name"

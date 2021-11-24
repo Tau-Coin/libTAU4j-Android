@@ -12,6 +12,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
@@ -84,7 +85,7 @@ public class MemberRepositoryImpl implements MemberRepository{
      * @return DataSource.Factory
      */
     @Override
-    public DataSource.Factory<Integer, MemberAndUser> queryCommunityMembers(String chainID, boolean onChain){
+    public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID, boolean onChain){
         if(onChain){
             return db.memberDao().queryCommunityMembersOnChain(chainID);
         }else{

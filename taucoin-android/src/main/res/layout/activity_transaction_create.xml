@@ -30,7 +30,7 @@
                 android:layout_marginStart="@dimen/widget_size_20"
                 android:layout_marginEnd="0dp"
                 android:layout_marginTop="@dimen/widget_size_10"
-                android:hint="@string/tx_public_key_hint"
+                android:hint="@string/tx_address_hint"
                 android:inputType="textMultiLine"
                 android:textAppearance="@style/TextAppearanceBody1"
                 android:autofillHints="@string/tx_public_key_hint" />

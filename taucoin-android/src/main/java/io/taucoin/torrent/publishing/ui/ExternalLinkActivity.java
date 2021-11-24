@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import io.taucoin.torrent.publishing.core.utils.ChainLinkUtil;
+import org.libTAU4j.ChainURL;
+
+import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
@@ -21,10 +23,10 @@ public class ExternalLinkActivity extends BaseActivity {
 
         Intent intent = getIntent();
         Uri uri = intent.getData();
-        if(null != uri){
+        if (null != uri) {
             String chainLink = uri.toString();
-            ChainLinkUtil.ChainLink decode = ChainLinkUtil.decode(chainLink);
-            if(decode.isValid()){
+            ChainURL decode = ChainUrlUtil.decode(chainLink);
+            if (decode != null) {
                 Intent mainIntent = new Intent(this.getApplicationContext(), MainActivity.class);
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 mainIntent.setAction(ACTION_CHAIN_LINK_CLICK);

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import java.util.Set;
+
 import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -93,23 +95,21 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public String lastTxFee(String chainID){
+    public long lastTxFee(String chainID){
         String key = appContext.getString(R.string.pref_key_last_tx_fee) + chainID;
-        return pref.getString(key, "");
+        return pref.getLong(key, 0);
     }
 
     @Override
-    public void lastTxFee(String chainID, String fee){
+    public void lastTxFee(String chainID, long fee){
         String key = appContext.getString(R.string.pref_key_last_tx_fee) + chainID;
-        edit.putString(key, fee)
-                .apply();
+        edit.putLong(key, fee).apply();
     }
 
     @Override
     public void doNotShowBanDialog(boolean isShow) {
         String key = appContext.getString(R.string.pref_key_do_not_show_ban_dialog);
-        edit.putBoolean(key, isShow)
-                .apply();
+        edit.putBoolean(key, isShow).apply();
     }
 
     @Override
@@ -334,5 +334,17 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
         edit.putLong(appContext.getString(R.string.pref_key_dht_invoked_requests), 0).apply();
         edit.putLong(appContext.getString(R.string.pref_key_dht_nodes), 0).apply();
+    }
+
+    @Override
+    public Set<String> getFiltersSelected() {
+        String key = appContext.getString(R.string.pref_key_community_filters_selected);
+        return pref.getStringSet(key, null);
+    }
+
+    @Override
+    public void setFiltersSelected(Set<String> filters) {
+        edit.putStringSet(appContext.getString(R.string.pref_key_community_filters_selected),
+                filters).apply();
     }
 }

@@ -38,11 +38,8 @@ public class CommunityChooseActivity extends BaseActivity {
      * 初始化参数
      */
     private void initParameter() {
-        if(getIntent() != null){
+        if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            if(StringUtil.isNotEmpty(chainID)){
-                communityViewModel.getJoinedCommunityList(chainID);
-            }
         }
     }
 
@@ -55,14 +52,14 @@ public class CommunityChooseActivity extends BaseActivity {
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        adapter = new ChooseListAdapter();
+        adapter = new ChooseListAdapter(chainID);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.joinedList.setLayoutManager(layoutManager);
         binding.joinedList.setOnItemClickListener((view, adapterPosition) -> {
             // 选择社区退出返回数据
-            Community community = adapter.getItemKey(adapterPosition);
+            Community community = adapter.getCurrentList().get(adapterPosition);
             Intent intent = new Intent();
-            intent.putExtra(IntentExtra.BEAN, community);
+            intent.putExtra(IntentExtra.CHAIN_ID, community.chainID);
             CommunityChooseActivity.this.setResult(RESULT_OK, intent);
             CommunityChooseActivity.this.finish();
         });
@@ -73,11 +70,11 @@ public class CommunityChooseActivity extends BaseActivity {
      * 观察加入的社区列表
      */
     private void observeJoinedList() {
-        communityViewModel.getJoinedList()
-                .observe(this, communities -> {
-                    if(adapter != null){
-                        adapter.setCommunityList(communities);
-                    }
-                });
+        communityViewModel.getJoinedCommunityList();
+        communityViewModel.getJoinedList().observe(this, communities -> {
+            if(adapter != null){
+                adapter.submitList(communities);
+            }
+        });
     }
 }

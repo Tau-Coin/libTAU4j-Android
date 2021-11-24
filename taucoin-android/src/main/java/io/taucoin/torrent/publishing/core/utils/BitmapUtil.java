@@ -311,7 +311,7 @@ public class BitmapUtil {
 
         Bitmap bitmap = Bitmap.createBitmap(bgBitmap.getWidth(), bgBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.drawColor(Color.WHITE);
+        canvas.drawColor(Color.RED);
 
         //绘制背景
         Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());

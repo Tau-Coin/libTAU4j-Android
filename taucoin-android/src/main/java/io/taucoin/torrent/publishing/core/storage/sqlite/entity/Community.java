@@ -22,11 +22,8 @@ public class Community implements Parcelable {
     public long totalBlocks;                // 社区总区块数（不上链）
     public long syncBlock;                  // 已同步到区块数（不上链）
     public boolean isBanned = false;        // 社区是否被用户拉入黑名单（不上链）
-    @Ignore
-    public long totalCoin;                  // 社区总的币量（不上链，不入数据库）
-    @Ignore
-    public int blockInAvg;                  // 社区创建者的公钥平均出块时间（不上链，不入数据库）
-    public String publicKey;                // 社区创建者的公钥
+    public String forkPoint;                // 社区分叉点区块号
+    public String topConsensus;             // 社区前3个投票共识点
 
     public Community(@NonNull String chainID, @NonNull String communityName){
         this.communityName = communityName;
@@ -36,14 +33,6 @@ public class Community implements Parcelable {
     @Ignore
     public Community(@NonNull String communityName){
         this.communityName = communityName;
-    }
-
-    @Ignore
-    public Community(@NonNull String communityName, String publicKey, long totalCoin, int blockInAvg){
-        this.communityName = communityName;
-        this.publicKey = publicKey;
-        this.totalCoin = totalCoin;
-        this.blockInAvg = blockInAvg;
     }
 
     @Ignore
@@ -57,10 +46,8 @@ public class Community implements Parcelable {
         totalBlocks = in.readLong();
         syncBlock = in.readLong();
         isBanned = in.readByte() != 0;
-
-        totalCoin = in.readLong();
-        blockInAvg = in.readInt();
-        publicKey = in.readString();
+        forkPoint = in.readString();
+        topConsensus = in.readString();
     }
 
     @Override
@@ -70,9 +57,8 @@ public class Community implements Parcelable {
         dest.writeLong(totalBlocks);
         dest.writeLong(syncBlock);
         dest.writeByte((byte) (isBanned ? 1 : 0));
-        dest.writeLong(totalCoin);
-        dest.writeInt(blockInAvg);
-        dest.writeString(publicKey);
+        dest.writeString(forkPoint);
+        dest.writeString(topConsensus);
     }
 
     @Override

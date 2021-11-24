@@ -8,7 +8,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/widget_size_65"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/widget_size_65"
         android:layout_marginStart="@dimen/widget_size_7">
 
         <io.taucoin.torrent.publishing.ui.customviews.RoundButton
@@ -89,28 +90,29 @@
                 android:singleLine="true"
                 android:includeFontPadding="false"
                 android:ellipsize="end"
+                android:text="12:12"
                 android:gravity="center_horizontal"
                 android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody3" />
 
-            <io.taucoin.torrent.publishing.ui.customviews.RoundButton
+            <TextView
                 android:id="@+id/read_only"
-                android:layout_width="@dimen/widget_size_32"
-                android:layout_height="@dimen/widget_size_24"
-                android:layout_marginTop="@dimen/widget_size_10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/widget_size_5"
+                android:paddingEnd="@dimen/widget_size_5"
+                android:paddingTop="@dimen/widget_size_3"
+                android:paddingBottom="@dimen/widget_size_3"
+                android:layout_marginTop="@dimen/widget_size_5"
                 android:gravity="center"
-                android:textAllCaps="true"
+                android:textAllCaps="false"
                 android:text="@string/main_read_only"
                 android:textColor="@color/color_white"
                 android:includeFontPadding="false"
-                android:textAppearance="@style/TextAppearanceBody4"
-                android:lineSpacingMultiplier="0.75"
+                android:lineSpacingMultiplier="1"
                 android:lineSpacingExtra="0dp"
-                app:btnStrokeColor="@color/primary_light"
-                app:btnStrokeWidth="0dp"
-                app:btnCornerRadius="@dimen/widget_size_5"
-                app:btnSolidColor="@color/primary_light"
-                app:btnPressedRatio="1.5" />
+                android:background="@drawable/grey_rect_round_bg_no_border"
+                android:textAppearance="@style/TextAppearanceBody4"/>
 
         </LinearLayout>
 
@@ -118,7 +120,6 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_1"
             android:layout_toEndOf="@+id/left_view"
-            android:layout_centerVertical="true"
             android:layout_alignParentBottom="true"
             layout="@layout/view_line"/>
     </RelativeLayout>

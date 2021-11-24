@@ -8,8 +8,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 
+import org.libTAU4j.ChainURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -36,7 +37,8 @@ import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainLinkUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.RootUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -56,9 +58,12 @@ import io.taucoin.torrent.publishing.ui.community.CommunityFragment;
 import io.taucoin.torrent.publishing.ui.ExternalLinkActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityCreateActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
+import io.taucoin.torrent.publishing.ui.community.MiningInfoActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.customviews.BadgeActionProvider;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.download.DownloadViewModel;
+import io.taucoin.torrent.publishing.ui.notify.NotificationActivity;
 import io.taucoin.torrent.publishing.ui.notify.NotificationViewModel;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.KeyQRCodeActivity;
@@ -66,6 +71,7 @@ import io.taucoin.torrent.publishing.ui.setting.DataCostActivity;
 import io.taucoin.torrent.publishing.ui.setting.FontSizeActivity;
 import io.taucoin.torrent.publishing.ui.setting.SettingActivity;
 import io.taucoin.torrent.publishing.ui.setting.WorkingConditionActivity;
+import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.UserQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
@@ -89,6 +95,7 @@ public class MainActivity extends ScanTriggerActivity {
     private CommonDialog linkDialog;
     private User user;
     private Fragment currentFragment;
+    private BadgeActionProvider badgeProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,9 +129,10 @@ public class MainActivity extends ScanTriggerActivity {
             logger.info("MainActivity::chain link clicked");
             if (intent.hasExtra(IntentExtra.CHAIN_LINK)) {
                 String chainLink = intent.getStringExtra(IntentExtra.CHAIN_LINK);
-                ChainLinkUtil.ChainLink decode = ChainLinkUtil.decode(chainLink);
-                if(decode.isValid()){
-                    openExternalLink(decode.getDn(), chainLink);
+                ChainURL decode = ChainUrlUtil.decode(chainLink);
+                if (decode != null) {
+                    String chainID = ChainIDUtil.decode(decode.getChainID());
+                    openExternalLink(chainID, chainLink);
                 }
             }
         } else if (0 != (Intent.FLAG_ACTIVITY_CLEAR_TOP & intent.getFlags())) {
@@ -178,7 +186,7 @@ public class MainActivity extends ScanTriggerActivity {
         if (Utils.isTablet(this)) {
             updateViewChanged();
         } else {
-            updateViewWeight(binding.mainRightFragment, 0);
+            ViewUtils.updateViewWeight(binding.mainRightFragment, 0);
         }
     }
 
@@ -323,6 +331,9 @@ public class MainActivity extends ScanTriggerActivity {
             case R.id.item_contacts:
                 ActivityUtil.startActivity(this, FriendsActivity.class);
                 break;
+            case R.id.item_mining:
+                ActivityUtil.startActivity(this, MiningInfoActivity.class);
+                break;
             case R.id.item_setting:
                 ActivityUtil.startActivityForResult(this, SettingActivity.class,
                         FontSizeActivity.REQUEST_CODE_FONT_SIZE);
@@ -374,15 +385,15 @@ public class MainActivity extends ScanTriggerActivity {
     }
 
     /**
-     * 显示打开外部chain link的对话框（来自剪切板或外部链接）
+     * 显示打开外部chain url的对话框（来自剪切板或外部链接）
      */
-    private boolean showOpenExternalLinkDialog(String chainLink) {
-        ChainLinkUtil.ChainLink decode = ChainLinkUtil.decode(chainLink);
-        if(decode.isValid()){
-            String chainID = decode.getDn();
+    private boolean showOpenExternalLinkDialog(String chainUrl) {
+        ChainURL decode = ChainUrlUtil.decode(chainUrl);
+        if (decode != null) {
+            String chainID = ChainIDUtil.decode(decode.getChainID());
             ExternalLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
                     R.layout.external_link_dialog, null, false);
-            dialogBinding.tvName.setText(UsersUtil.getCommunityName(chainID));
+            dialogBinding.tvName.setText(ChainIDUtil.getName(chainID));
             dialogBinding.ivClose.setOnClickListener(v -> {
                 if(linkDialog != null){
                     linkDialog.closeDialog();
@@ -392,7 +403,7 @@ public class MainActivity extends ScanTriggerActivity {
                 if(linkDialog != null){
                     linkDialog.closeDialog();
                 }
-                openExternalLink(chainID, chainLink);
+                openExternalLink(chainID, chainUrl);
             });
             linkDialog = new CommonDialog.Builder(this)
                     .setContentView(dialogBinding.getRoot())
@@ -418,14 +429,14 @@ public class MainActivity extends ScanTriggerActivity {
         if (Utils.isTablet(this)) {
             if (Utils.isLandscape()) {
                 float leftWeight = calculateLeftWeight();
-                updateViewWeight(binding.rlMainLeft, leftWeight);
-                updateViewWeight(binding.mainRightFragment, 10 - leftWeight);
+                ViewUtils.updateViewWeight(binding.rlMainLeft, leftWeight);
+                ViewUtils.updateViewWeight(binding.mainRightFragment, 10 - leftWeight);
             } else {
                 if (isEmptyView()) {
                     nextAndBackChange(true);
                 } else {
-                    updateViewWeight(binding.rlMainLeft, 0F);
-                    updateViewWeight(binding.mainRightFragment, 1.0F);
+                    ViewUtils.updateViewWeight(binding.rlMainLeft, 0F);
+                    ViewUtils.updateViewWeight(binding.mainRightFragment, 1.0F);
                 }
             }
         } else {
@@ -450,16 +461,9 @@ public class MainActivity extends ScanTriggerActivity {
         return defaultLeftWeight;
     }
 
-    private void updateViewWeight(View view, float weight) {
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)
-                view.getLayoutParams();
-        layoutParams.weight = weight;
-        view.setLayoutParams(layoutParams);
-    }
-
     private void nextAndBackChange(boolean isBack) {
-       updateViewWeight(binding.rlMainLeft, isBack ? 1F : 0F);
-       updateViewWeight(binding.mainRightFragment, isBack ? 0F : 1F);
+       ViewUtils.updateViewWeight(binding.rlMainLeft, isBack ? 1F : 0F);
+        ViewUtils.updateViewWeight(binding.mainRightFragment, isBack ? 0F : 1F);
     }
 
     public void goBack() {
@@ -551,6 +555,12 @@ public class MainActivity extends ScanTriggerActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem menuAlert = menu.findItem(R.id.menu_alert);
+        menuAlert.setVisible(false);
+//        badgeProvider = (BadgeActionProvider) MenuItemCompat.getActionProvider(menuAlert);
+//        badgeProvider.setOnClickListener(0, v -> {
+//            ActivityUtil.startActivity(this, NotificationActivity.class);
+//        });
         return true;
     }
 
@@ -563,6 +573,13 @@ public class MainActivity extends ScanTriggerActivity {
             openScanQRActivity(user);
         }
         return true;
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+//        badgeProvider.setVisibility(true);
+//        badgeProvider.setBadge(10);
     }
 
     @Override
@@ -605,8 +622,13 @@ public class MainActivity extends ScanTriggerActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CommunityFragment.REQUEST_CODE) {
+        if (requestCode == CommunityFragment.MEMBERS_REQUEST_CODE && resultCode == RESULT_OK) {
             goBack();
+        } else if (requestCode == CommunityFragment.FILTER_REQUEST_CODE ||
+                requestCode == TxsTabFragment.TX_REQUEST_CODE) {
+            if (currentFragment != null) {
+                currentFragment.onActivityResult(requestCode, resultCode, data);
+            }
         } else if (resultCode == RESULT_OK && requestCode == FontSizeActivity.REQUEST_CODE_FONT_SIZE) {
             refreshAllView();
         }

@@ -1,5 +1,7 @@
 package io.taucoin.torrent.publishing.core.storage.sp;
 
+import java.util.Set;
+
 import io.reactivex.Flowable;
 
 /**
@@ -51,12 +53,12 @@ public interface SettingsRepository {
     /**
      * 获取社区发送的最后一次交易费
      */
-    String lastTxFee(String chainID);
+    long lastTxFee(String chainID);
 
     /**
      * 设置社区发送的最后一次交易费
      */
-    void lastTxFee(String chainID, String fee);
+    void lastTxFee(String chainID, long fee);
 
     /**
      * 设置不显示ban对话框
@@ -186,4 +188,14 @@ public interface SettingsRepository {
     void setFloatValue(String key, float value);
 
     void initData();
+
+    /**
+     * 获取社区选择过滤
+     */
+    Set<String> getFiltersSelected();
+
+    /**
+     * 设置社区选择过滤
+     */
+    void setFiltersSelected(Set<String> filters);
 }

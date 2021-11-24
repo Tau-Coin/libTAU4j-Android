@@ -8,10 +8,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/widget_size_20"
         android:background="@color/color_white"
         android:gravity="center_horizontal"
         android:orientation="vertical">
+
+        <ImageView
+            android:visibility="invisible"
+            android:id="@+id/iv_close"
+            android:layout_width="@dimen/widget_size_18"
+            android:layout_height="@dimen/widget_size_18"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:contentDescription="@null"
+            android:layout_gravity="end"
+            android:src="@mipmap/icon_close" />
 
         <io.taucoin.torrent.publishing.ui.customviews.MultilineTextView
             android:id="@+id/tv_msg"

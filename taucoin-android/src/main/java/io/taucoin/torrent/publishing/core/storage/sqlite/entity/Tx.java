@@ -23,14 +23,14 @@ public class Tx implements Parcelable {
     public long fee;                        // 交易费
     public long timestamp;                  // 交易时间戳
     public long nonce;                      // 交易nonce
-    public long txType;                     // 交易类型，同MsgType中枚举类型
+    public int txType;                      // 交易类型，同MsgType中枚举类型
     public String memo;                     // 交易的备注、描述、bootstraps、评论等
     public int txStatus;                    // 交易的状态 0：未上链（在交易池中）；1：上链成功 (不上链)
 
-    public String receiverPk;               // 交易接收者的公钥 只针对MsgType.Wiring类型
-    public long amount;                     // 交易金额 只针对MsgType.Wiring类型
+    public String receiverPk;               // 交易接收者的公钥 只针对TxType.Wiring类型
+    public long amount;                     // 交易金额 只针对TxType.Wiring类型
 
-    public Tx(@NonNull String chainID, String receiverPk, long amount, long fee, long txType, String memo){
+    public Tx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo){
         this.chainID = chainID;
         this.receiverPk = receiverPk;
         this.amount = amount;
@@ -40,7 +40,7 @@ public class Tx implements Parcelable {
     }
 
     @Ignore
-    public Tx(@NonNull String chainID, long fee, long txType, String memo){
+    public Tx(@NonNull String chainID, long fee, int txType, String memo){
         this.chainID = chainID;
         this.fee = fee;
         this.txType = txType;
@@ -48,11 +48,10 @@ public class Tx implements Parcelable {
     }
 
     @Ignore
-    public Tx( @NonNull String txID, @NonNull String chainID, long fee, long txType){
+    public Tx( @NonNull String txID, @NonNull String chainID, long fee){
         this.txID = txID;
         this.chainID = chainID;
         this.fee = fee;
-        this.txType = txType;
     }
 
     @Ignore
@@ -66,7 +65,7 @@ public class Tx implements Parcelable {
         memo = in.readString();
         timestamp = in.readLong();
         nonce = in.readLong();
-        txType = in.readLong();
+        txType = in.readInt();
         txStatus = in.readInt();
     }
 
@@ -81,7 +80,7 @@ public class Tx implements Parcelable {
         dest.writeString(memo);
         dest.writeLong(timestamp);
         dest.writeLong(nonce);
-        dest.writeLong(txType);
+        dest.writeInt(txType);
         dest.writeInt(txStatus);
     }
 

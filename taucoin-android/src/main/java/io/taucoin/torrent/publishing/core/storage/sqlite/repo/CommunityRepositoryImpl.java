@@ -91,9 +91,8 @@ public class CommunityRepositoryImpl implements CommunityRepository{
 
     /**
      * 获取用户加入的社区列表
-     * @param chainID
      */
-    public List<Community> getJoinedCommunityList(String chainID){
+    public List<Community> getJoinedCommunityList(){
         return db.communityDao().getJoinedCommunityList();
     }
 

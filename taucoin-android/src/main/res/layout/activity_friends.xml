@@ -89,7 +89,6 @@
             </LinearLayout>
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                android:layout_above="@+id/ll_total_pay"
                 android:layout_below="@+id/ll_add_friend"
                 android:id="@+id/refresh_layout"
                 android:layout_height="match_parent"
@@ -106,30 +105,6 @@
                     android:scrollbarStyle="outsideOverlay" />
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/ll_total_pay"
-                android:layout_alignParentBottom="true"
-                android:orientation="vertical"
-                android:background="@color/color_pay_bg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <include layout="@layout/view_line"/>
-
-                <TextView
-                    android:id="@+id/tv_total_pay"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    android:layout_gravity="center_vertical"
-                    android:textAppearance="@style/TextAppearanceBody2"
-                    android:layout_marginEnd="@dimen/widget_size_10"
-                    android:layout_marginStart="@dimen/widget_size_10"/>
-
-            </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
 </layout>
