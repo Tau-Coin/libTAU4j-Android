@@ -135,7 +135,6 @@
     <string name="community_filter_by">Filter by</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
 
-    <string name="chain_length">Chain Length</string>
     <string name="chain_difficulty">Difficulty</string>
     <string name="chain_total_peers">Total Peers</string>
     <string name="chain_peers_blocks">Peers &#038; Blocks</string>

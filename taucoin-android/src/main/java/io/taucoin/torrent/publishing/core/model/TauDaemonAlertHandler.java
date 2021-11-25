@@ -103,13 +103,13 @@ class TauDaemonAlertHandler {
                 onSyncMessage(alert, alertAndUser.getUserPk());
                 break;
             case BLOCK_CHAIN_TIP_BLOCK:
-                onNewBlock(alert, alertAndUser.getUserPk());
+                onNewBlock(alert);
                 break;
             case BLOCK_CHAIN_TAIL_BLOCK:
-                onSyncBlock(alert, alertAndUser.getUserPk());
+                onSyncBlock(alert);
                 break;
             case BLOCK_CHAIN_ROLLBACK_BLOCK:
-                onRollbackBlock(alert, alertAndUser.getUserPk());
+                onRollbackBlock(alert);
                 break;
             case BLOCK_CHAIN_NEW_TX:
                 onNewTransaction(alert);
@@ -273,37 +273,34 @@ class TauDaemonAlertHandler {
     /**
      * libTAU上报新的区块
      * @param alert libTAU上报
-     * @param userPk 当前用户公钥
      */
-    private void onNewBlock(Alert alert, String userPk) {
+    private void onNewBlock(Alert alert) {
         BlockChainNewTipBlockAlert a = (BlockChainNewTipBlockAlert) alert;
         logger.info(a.get_message());
         Block block = a.get_new_block();
-        tauListenHandler.handleNewBlock(block, userPk);
+        tauListenHandler.handleNewBlock(block);
     }
 
     /**
      * libTAU上报向前同步的区块
      * @param alert libTAU上报
-     * @param userPk 当前用户公钥
      */
-    private void onSyncBlock(Alert alert, String userPk) {
+    private void onSyncBlock(Alert alert) {
         BlockChainNewTailBlockAlert a = (BlockChainNewTailBlockAlert) alert;
         logger.info(a.get_message());
         Block block = a.get_new_block();
-        tauListenHandler.handleSyncBlock(block, userPk);
+        tauListenHandler.handleSyncBlock(block);
     }
 
     /**
      * libTAU上报链的区块回滚
      * @param alert libTAU上报
-     * @param userPk 当前用户公钥
      */
-    private void onRollbackBlock(Alert alert, String userPk) {
+    private void onRollbackBlock(Alert alert) {
         BlockChainRollbackBlockAlert a = (BlockChainRollbackBlockAlert) alert;
         logger.info(a.get_message());
         Block block = a.get_new_block();
-        tauListenHandler.handleRollbackBlock(block, userPk);
+        tauListenHandler.handleRollbackBlock(block);
     }
 
     /**

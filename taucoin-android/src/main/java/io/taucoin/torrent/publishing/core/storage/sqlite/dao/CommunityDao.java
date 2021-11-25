@@ -107,8 +107,17 @@ public interface CommunityDao {
     String QUERY_JOINED_COMMUNITY = "SELECT * FROM Communities";
     String QUERY_CLEAR_COMMUNITY_STATE = "UPDATE Communities SET totalBlocks = 0, syncBlock = 0" +
             " WHERE chainID = :chainID";
+
     String QUERY_CURRENT_MEMBER = "SELECT * FROM Members" +
             " WHERE chainID = :chainID AND publicKey = :publicKey";
+
+    String QUERY_CHAIN_TOP_COIN_MEMBERS = "SELECT * FROM Members" +
+            " WHERE chainID = :chainID" +
+            " ORDER BY balance DESC LIMIT :topNum";
+
+    String QUERY_CHAIN_TOP_POWER_MEMBERS = "SELECT * FROM Members" +
+            " WHERE chainID = :chainID"  +
+            " ORDER BY power DESC LIMIT :topNum";
 
     /**
      * 添加新的社区
@@ -175,4 +184,16 @@ public interface CommunityDao {
 
     @Query(QUERY_CURRENT_MEMBER)
     Observable<Member> observerCurrentMember(String chainID, String publicKey);
+
+    /**
+     * 观察链上币量前topNum的成员
+     */
+    @Query(QUERY_CHAIN_TOP_COIN_MEMBERS)
+    Observable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum);
+
+    /**
+     * 观察链上Power前topNum的成员
+     */
+    @Query(QUERY_CHAIN_TOP_POWER_MEMBERS)
+    Observable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum);
 }

@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
@@ -44,6 +46,7 @@ public class RepositoryHelper {
     private static ChatRepositoryImpl chatRepo;
     private static DeviceRepositoryImpl deviceRepo;
     private static StatisticRepositoryImpl statisticRepo;
+    private static BlockRepositoryImpl blockRepository;
 
     /**
      * 获取CommunityRepository单例
@@ -197,5 +200,18 @@ public class RepositoryHelper {
                     AppDatabase.getInstance(appContext));
 
         return statisticRepo;
+    }
+
+    /**
+     * 获取BlockRepository单例
+     * @param appContext 上下文
+     * @return BlockRepository
+     */
+    public synchronized static BlockRepository getBlockRepository(@NonNull Context appContext) {
+        if (blockRepository == null)
+            blockRepository = new BlockRepositoryImpl(appContext,
+                    AppDatabase.getInstance(appContext));
+
+        return blockRepository;
     }
 }

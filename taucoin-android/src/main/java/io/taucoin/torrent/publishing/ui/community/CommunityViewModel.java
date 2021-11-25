@@ -31,6 +31,7 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -43,6 +44,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.DrawBean;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
@@ -51,6 +53,7 @@ import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
@@ -75,6 +78,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private static final Logger logger = LoggerFactory.getLogger("CommunityViewModel");
     private CommunityRepository communityRepo;
     private MemberRepository memberRepo;
+    private BlockRepository blockRepo;
     private FriendRepository friendRepo;
     private UserRepository userRepo;
     private TauDaemon daemon;
@@ -92,6 +96,7 @@ public class CommunityViewModel extends AndroidViewModel {
         memberRepo = RepositoryHelper.getMemberRepository(getApplication());
         userRepo = RepositoryHelper.getUserRepository(getApplication());
         friendRepo = RepositoryHelper.getFriendsRepository(getApplication());
+        blockRepo = RepositoryHelper.getBlockRepository(getApplication());
         daemon = TauDaemon.getInstance(getApplication());
     }
 
@@ -226,10 +231,10 @@ public class CommunityViewModel extends AndroidViewModel {
             Account account = daemon.getAccountInfo(chainID, currentUser.publicKey);
             if (account != null) {
                 Member member = new Member(community.chainID, currentUser.publicKey,
-                        account.getBalance(), account.getEffectivePower());
+                        account.getBalance(), account.getEffectivePower(), account.getBlockNumber());
                 memberRepo.addMember(member);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             result.setFailMsg(e.getMessage());
         }
         return result;
@@ -490,5 +495,34 @@ public class CommunityViewModel extends AndroidViewModel {
      */
     public List<Block> getTopTipBlock(String chainID, int topNum) {
         return daemon.getTopTipBlock(chainID, topNum);
+    }
+
+    /**
+     * 观察链上币量前topNum的成员
+     * @param chainID 链ID
+     * @param topNum 查询数目
+     * @return Observable<List<Member>>
+     */
+    Observable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum) {
+        return communityRepo.observeChainTopCoinMembers(chainID, topNum);
+    }
+
+    /**
+     * 观察链上Power前topNum的成员
+     * @param chainID 链ID
+     * @param topNum 查询数目
+     * @return Observable<List<Member>>
+     */
+    Observable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum) {
+        return communityRepo.observeChainTopPowerMembers(chainID, topNum);
+    }
+
+    /**
+     * 观察链上状态信息
+     * @param chainID 链ID
+     * @return Flowable<ChainStatus>
+     */
+    public Flowable<ChainStatus> observerChainStatus(String chainID) {
+        return blockRepo.observerChainStatus(chainID);
     }
 }

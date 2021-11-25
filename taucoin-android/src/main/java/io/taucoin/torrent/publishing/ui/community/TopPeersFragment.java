@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -20,9 +19,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMemberBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
@@ -33,18 +35,16 @@ import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 /**
  * 社区排名页面
  */
-public class ChainTopFragment extends BaseFragment implements ChainTopAdapter.ClickListener {
+public class TopPeersFragment extends BaseFragment implements TopPeersAdapter.ClickListener {
 
     static final int TOP_COIN = 0x01;
     static final int TOP_POWER = 0x02;
-    static final int TOP_CONSENSUS = 0x03;
-    static final int TOP_TIP = 0x04;
-    private static final Logger logger = LoggerFactory.getLogger("ChainTopFragment");
+    private static final Logger logger = LoggerFactory.getLogger("TopPeersFragment");
     private BaseActivity activity;
     private FragmentMemberBinding binding;
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
-    private ChainTopAdapter adapter;
+    private TopPeersAdapter adapter;
 
     private String chainID;
     private int type;
@@ -83,7 +83,7 @@ public class ChainTopFragment extends BaseFragment implements ChainTopAdapter.Cl
      */
     private void initView() {
         logger.debug("chainID::{}, type::{}", chainID, type);
-        adapter = new ChainTopAdapter(this, type);
+        adapter = new TopPeersAdapter(this, type);
         DefaultItemAnimator animator = new DefaultItemAnimator() {
             @Override
             public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
@@ -95,17 +95,6 @@ public class ChainTopFragment extends BaseFragment implements ChainTopAdapter.Cl
 
         binding.recyclerView.setItemAnimator(animator);
         binding.recyclerView.setAdapter(adapter);
-
-        List<MemberAndUser> list = new ArrayList<>();
-        int size = (type == TOP_COIN || type == TOP_POWER) ? 10 : 3;
-        for (int i = 0; i < size; i++) {
-            MemberAndUser user = new MemberAndUser("83024767468b8bf8db868f336596c63561265d553833e5c0bf3e4767659b826b",
-                    "83024767468b8bf8db868f336596c63561265d553833e5c0bf3e4767659b826b" + i);
-            user.balance = 100000000;
-            user.power = 10000;
-            list.add(user);
-        }
-        adapter.submitList(list);
     }
 
     @Override
@@ -118,6 +107,15 @@ public class ChainTopFragment extends BaseFragment implements ChainTopAdapter.Cl
     @Override
     public void onStart() {
         super.onStart();
+        Observable<List<Member>> observable;
+        if (type == TOP_COIN) {
+            observable = communityViewModel.observeChainTopCoinMembers(chainID, 10);
+        } else {
+            observable = communityViewModel.observeChainTopPowerMembers(chainID, 10);
+        }
+        disposables.add(observable.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(list -> adapter.submitList(list)));
     }
 
     @Override

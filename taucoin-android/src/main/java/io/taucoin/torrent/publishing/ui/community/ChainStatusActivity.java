@@ -16,10 +16,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityChainStatusBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
@@ -43,6 +45,8 @@ public class ChainStatusActivity extends BaseActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chain_status);
         initParameter();
         initLayout();
+        loadCommunityData(null);
+        loadChainStatusData(new ChainStatus());
     }
 
     /**
@@ -65,26 +69,32 @@ public class ChainStatusActivity extends BaseActivity {
     }
 
     /**
+     * 加载链状态数据
+     */
+    private void loadChainStatusData(ChainStatus status) {
+        if (null == status) {
+            return;
+        }
+        binding.itemLastBlock.setRightText(FmtMicrometer.fmtLong(status.blockNumber));
+        binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
+        binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
+        binding.itemPeersBlocks.setRightText(FmtMicrometer.fmtLong(status.peerBlocks));
+        binding.itemTotalCoins.setRightText(FmtMicrometer.fmtBalance(status.totalCoin));
+    }
+
+    /**
      * 加载社区数据
      */
     private void loadCommunityData(Community community) {
-        if (null == community) {
-            return;
-        }
-        binding.itemChainLength.setRightText(String.valueOf(community.totalBlocks));
-//        binding.itemDifficulty.setRightText(String.valueOf(community.totalBlocks));
-        ForkPoint point = new Gson().fromJson(community.forkPoint, ForkPoint.class);
-        if (point != null) {
-            binding.itemForkBlockHash.setRightText(point.getHash());
-            binding.itemForkBlockNum.setRightText(String.valueOf(point.getNumber()));
+        ForkPoint point = null;
+        if (community != null) {
+            point = new Gson().fromJson(community.forkPoint, ForkPoint.class);
+            if (point != null) {
+                binding.itemForkBlockHash.setRightText(point.getHash());
+                binding.itemForkBlockNum.setRightText(String.valueOf(point.getNumber()));
+            }
         }
         binding.llForkPoint.setVisibility(point != null ? View.VISIBLE : View.GONE);
-
-//        Type type = new TypeToken<List<ConsensusInfo>>(){}.getType();
-//        List<ConsensusInfo> list = new Gson().fromJson(community.topConsensus, type);
-//        if (list != null && list.size() > 0) {
-//            for ()
-//        }
     }
 
     /**
@@ -111,10 +121,15 @@ public class ChainStatusActivity extends BaseActivity {
     public void onStart() {
         super.onStart();
         if (StringUtil.isNotEmpty(chainID)) {
-            disposables.add(communityViewModel.observerCommunityByChainID(chainID)
+            disposables.add(communityViewModel.observerChainStatus(chainID)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::loadCommunityData));
+                .subscribe(this::loadChainStatusData));
+
+            disposables.add(communityViewModel.observerCommunityByChainID(chainID)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::loadCommunityData));
         }
     }
 

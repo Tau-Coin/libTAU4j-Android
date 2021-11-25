@@ -217,24 +217,14 @@ public class TxViewModel extends AndroidViewModel {
         long txType = tx.txType;
         Member member = memberRepo.getMemberByChainIDAndPk(tx.chainID, tx.senderPk);
         if (null == member) {
-//            Account account = daemon.getAccountInfo(Utils.textStringToBytes(tx.chainID), tx.senderPk);
             member = new Member(tx.chainID, tx.senderPk);
-//            if (account != null) {
-//                member.balance = account.getBalance();
-//                member.power = account.getEffectivePower();
-//            }
             memberRepo.addMember(member);
             logger.info("addMemberInfoToLocal, senderPk::{}", tx.senderPk);
         }
         if (txType == TxType.WRING_TX.getType() && StringUtil.isNotEquals(tx.senderPk, tx.receiverPk)) {
             Member receiverMember = memberRepo.getMemberByChainIDAndPk(tx.chainID, tx.receiverPk);
             if (null == receiverMember) {
-//                Account account = daemon.getAccountInfo(Utils.textStringToBytes(tx.chainID), tx.receiverPk);
                 receiverMember = new Member(tx.chainID, tx.receiverPk);
-//                if (account != null) {
-//                    receiverMember.balance = account.getBalance();
-//                    receiverMember.power = account.getEffectivePower();
-//                }
                 memberRepo.addMember(receiverMember);
                 logger.info("addMemberInfoToLocal, receiverPk::{}", tx.receiverPk);
             }

@@ -20,7 +20,9 @@ import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
@@ -42,6 +44,7 @@ class TauListenHandler {
     private MemberRepository memberRepo;
     private TxRepository txRepo;
     private CommunityRepository communityRepo;
+    private BlockRepository blockRepository;
     private TauDaemon daemon;
 
     TauListenHandler(Context appContext, TauDaemon daemon) {
@@ -50,42 +53,34 @@ class TauListenHandler {
         memberRepo = RepositoryHelper.getMemberRepository(appContext);
         txRepo = RepositoryHelper.getTxRepository(appContext);
         communityRepo = RepositoryHelper.getCommunityRepository(appContext);
+        blockRepository = RepositoryHelper.getBlockRepository(appContext);
     }
 
     /**
-     * 保存社区：查询本地是否有此社区，没有则添加到本地
-     * @param block 链上区块
+     * 处理上报新的区块
+     * @param block Block
      */
-    private void saveCommunityInfo(String chainID, Block block, boolean isSync) {
-        Community community = communityRepo.getCommunityByChainID(chainID);
+    void handleNewBlock(Block block) {
+        logger.debug("handleNewBlock");
+        handleBlockData(block, false, false);
+    }
 
-        if (null == community) {
-            community = new Community();
-            community.chainID = chainID;
-            community.communityName = ChainIDUtil.getName(community.chainID);
-            community.totalBlocks = block.getBlockNumber();
-            community.syncBlock = block.getBlockNumber();
-            communityRepo.addCommunity(community);
-            logger.info("SaveCommunity to local, communityName::{}, chainID::{}, " +
-                            "totalBlocks::{}, syncBlock::{}", community.communityName,
-                    community.chainID, community.totalBlocks + 1, community.syncBlock);
-        } else {
-            if (isSync) {
-                community.syncBlock = block.getBlockNumber();
-                if(community.totalBlocks < community.syncBlock){
-                    community.totalBlocks = community.syncBlock;
-                }
-            } else {
-                community.totalBlocks = block.getBlockNumber();
-                if(community.totalBlocks < community.syncBlock){
-                    community.syncBlock = community.totalBlocks;
-                }
-            }
-            communityRepo.addCommunity(community);
-            logger.info("Update Community Info, communityName::{}, chainID::{}, " +
-                            "totalBlocks::{}, syncBlock::{}", community.communityName,
-                    community.chainID, community.totalBlocks + 1, community.syncBlock);
-        }
+    /**
+     * 处理上报被回滚的区块
+     * @param block Block
+     */
+    void handleRollbackBlock(Block block) {
+        logger.debug("handleRollBack");
+        handleBlockData(block, true, false);
+    }
+
+    /**
+     * 处理上报向前同步的区块
+     * @param block Block
+     */
+    void handleSyncBlock(Block block) {
+        logger.debug("handleSyncBlock");
+        handleBlockData(block, false, true);
     }
 
     /**
@@ -101,70 +96,107 @@ class TauListenHandler {
     private void handleBlockData(Block block, boolean isRollback, boolean isSync) {
         String chainID = ChainIDUtil.decode(block.getChainID());
         logger.debug("handleBlockData:: chainID::{}，blockNum::{}, blockHash::{}", chainID,
-                block.getBlockNumber(), ByteUtil.toHexString(block.getGenerationSignature()));
+                block.getBlockNumber(), block.Hash());
         // 更新社区信息
-        saveCommunityInfo(chainID, block, isSync);
-        Transaction txMsg = block.getTx();
+        saveCommunityInfo(block, isSync);
+        // 更新区块信息
+        saveBlockInfo(block, isRollback);
         // 更新矿工的信息
         saveUserInfo(block.getMiner());
         // 添加发送者为社区成员
         addMemberInfo(block.getChainID(), block.getMiner(), isSync);
-        if (txMsg != null) {
-            String txID = txMsg.getTxID().to_hex();
-            Tx tx = txRepo.getTxByTxID(txID);
-            logger.debug("handleBlockData txID::{}, exist::{}, payload::{}", txID, tx != null,
-                    txMsg.getPayload());
-            // 本地不存在此交易
-            if (null == tx) {
-                handleTransactionData(txMsg, isRollback, isSync);
+        // 处理交易信息
+        handleTransactionData(block.getTx(), isRollback, isSync);
+    }
+
+    /**
+     * 保存社区：查询本地是否有此社区，没有则添加到本地
+     * @param block 链上区块
+     */
+    private void saveCommunityInfo(Block block, boolean isSync) {
+        String chainID = ChainIDUtil.decode(block.getChainID());
+        Community community = communityRepo.getCommunityByChainID(chainID);
+
+        if (null == community) {
+            community = new Community();
+            community.chainID = chainID;
+            community.communityName = ChainIDUtil.getName(community.chainID);
+            community.totalBlocks = block.getBlockNumber();
+            community.syncBlock = block.getBlockNumber();
+            communityRepo.addCommunity(community);
+            logger.info("SaveCommunity to local, communityName::{}, chainID::{}, " +
+                            "totalBlocks::{}, syncBlock::{}", community.communityName,
+                    community.chainID, community.totalBlocks, community.syncBlock);
+        } else {
+            if (isSync) {
+                community.syncBlock = block.getBlockNumber();
+                if(community.totalBlocks < community.syncBlock){
+                    community.totalBlocks = community.syncBlock;
+                }
             } else {
-                tx.txStatus = isRollback ? 0 : 1;
-                txRepo.updateTransaction(tx);
-                handleMemberInfo(txMsg);
+                community.totalBlocks = block.getBlockNumber();
+                if(community.totalBlocks < community.syncBlock){
+                    community.syncBlock = community.totalBlocks;
+                }
             }
+            communityRepo.addCommunity(community);
+            logger.info("Update Community Info, communityName::{}, chainID::{}, " +
+                            "totalBlocks::{}, syncBlock::{}", community.communityName,
+                    community.chainID, community.totalBlocks, community.syncBlock);
         }
     }
 
     /**
-     * 处理上报新的区块
-     * @param block Block
-     * @param userPk 当前用户公钥
+     * 保存区块信息，供UI上统计使用
+     * @param block 链上区块
+     * @param isRollback 是否是回滚
      */
-    void handleNewBlock(Block block, String userPk) {
-        logger.debug("handleNewBlock");
-        handleBlockData(block, false, false);
-    }
-
-    /**
-     * 处理上报被回滚的区块
-     * @param block Block
-     * @param userPk 当前用户公钥
-     */
-    void handleRollbackBlock(Block block, String userPk) {
-        logger.debug("handleRollBack");
-        handleBlockData(block, true, false);
-    }
-
-    /**
-     * 处理上报向前同步的区块
-     * @param block Block
-     * @param userPk 当前用户公钥
-     */
-    void handleSyncBlock(Block block, String userPk) {
-        logger.debug("handleSyncBlock");
-        handleBlockData(block, false, true);
+    private void saveBlockInfo(Block block, boolean isRollback) {
+        String chainID = ChainIDUtil.decode(block.getChainID());
+        String blockHash = block.Hash();
+        BlockInfo blockInfo = blockRepository.getBlock(chainID, blockHash);
+        int status = isRollback ? 0 : 1;
+        if (null == blockInfo) {
+            long blockNumber = block.getBlockNumber();
+            String miner = ByteUtil.toHexString(block.getMiner());
+            long difficulty = block.getCumulativeDifficulty().longValue();
+            Transaction transaction = block.getTx();
+            long rewards = null == transaction ? 0L : transaction.getFee();
+            blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty, status);
+            blockRepository.addBlock(blockInfo);
+            logger.info("Save Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}",
+                    chainID, blockHash, blockNumber, rewards);
+        } else {
+            blockInfo.status = status;
+            blockRepository.updateBlock(blockInfo);
+            logger.info("Update Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}",
+                    chainID, blockInfo.blockHash, blockInfo.blockNumber, blockInfo.rewards);
+        }
     }
 
     /**
      * 处理Block数据：解析Block数据，更新用户、社区成员、交易数据
      * @param txMsg Transaction
      */
-    private void handleTransactionData(@NonNull Transaction txMsg, boolean isRollback, boolean isSync) {
+    private void handleTransactionData(Transaction txMsg, boolean isRollback, boolean isSync) {
+        if (null == txMsg) {
+            return;
+        }
         String txID = txMsg.getTxID().to_hex();
+        Tx tx = txRepo.getTxByTxID(txID);
+        logger.debug("handleBlockData txID::{}, exist::{}, payload::{}", txID, tx != null,
+                txMsg.getPayload());
+        // 本地存在此交易, 更新交易状态值
+        if (tx != null) {
+            tx.txStatus = isRollback ? 0 : 1;
+            txRepo.updateTransaction(tx);
+            handleMemberInfo(txMsg);
+            return;
+        }
         String chainID = ChainIDUtil.decode(txMsg.getChainID());
         long fee = txMsg.getFee();
         byte[] payload = txMsg.getPayload();
-        Tx tx = new Tx(txID, chainID, fee);
+        tx = new Tx(txID, chainID, fee);
         if (null == payload || payload.length == 0) {
             logger.info("transaction payload empty");
             return;
@@ -258,13 +290,15 @@ class TauListenHandler {
         Account account = daemon.getAccountInfo(chainID, publicKey);
         long balance = 0;
         long power = 0;
+        long blockNumber = 0;
         if (account != null) {
             balance = account.getBalance();
             power = account.getEffectivePower();
+            blockNumber = account.getBlockNumber();
         }
 
         if (null == member) {
-            member = new Member(chainIDStr, publicKey, balance, power);
+            member = new Member(chainIDStr, publicKey, balance, power, blockNumber);
             memberRepo.addMember(member);
             logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}, power::{}",
                     chainIDStr, publicKey, balance, power);

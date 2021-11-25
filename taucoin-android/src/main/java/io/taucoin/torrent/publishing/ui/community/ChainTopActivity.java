@@ -27,7 +27,7 @@ public class ChainTopActivity extends BaseActivity {
     public static final int TOP_CONSENSUS = 0x02;
     private ActivityChainTopBinding binding;
     private List<Fragment> fragmentList = new ArrayList<>();
-    private int[] titles = new int[]{R.string.community_on_chain, R.string.community_queue};
+    private int[] titles = null;
     private String chainID;
     private int type;
 
@@ -70,19 +70,31 @@ public class ChainTopActivity extends BaseActivity {
         ViewUtils.updateViewWeight(binding.tvCol2, isTopPeers ? 3 : 3);
         ViewUtils.updateViewWeight(binding.tvCol3, isTopPeers ? 2 : 4);
 
+        Fragment tab1;
         // 添加Tab1页面
-        Fragment tab1 = new ChainTopFragment();
+        if (isTopPeers) {
+            tab1 = new TopPeersFragment();
+        } else {
+            tab1 = new TopConsensusFragment();
+        }
         Bundle chainBundle = new Bundle();
         chainBundle.putString(IntentExtra.CHAIN_ID, chainID);
-        chainBundle.putInt(IntentExtra.TYPE, isTopPeers ? ChainTopFragment.TOP_COIN : ChainTopFragment.TOP_CONSENSUS);
+        chainBundle.putInt(IntentExtra.TYPE, isTopPeers ? TopPeersFragment.TOP_COIN :
+                TopConsensusFragment.TOP_CONSENSUS);
         tab1.setArguments(chainBundle);
         fragmentList.add(tab1);
 
+        Fragment tab2;
         // 添加Tab2页面
-        Fragment tab2 = new ChainTopFragment();
+        if (isTopPeers) {
+            tab2 = new TopPeersFragment();
+        } else {
+            tab2 = new TopConsensusFragment();
+        }
         Bundle queueBundle = new Bundle();
         queueBundle.putString(IntentExtra.CHAIN_ID, chainID);
-        queueBundle.putInt(IntentExtra.TYPE, isTopPeers ? ChainTopFragment.TOP_POWER : ChainTopFragment.TOP_TIP);
+        queueBundle.putInt(IntentExtra.TYPE, isTopPeers ? TopPeersFragment.TOP_POWER :
+                TopConsensusFragment.TOP_TIP);
         tab2.setArguments(queueBundle);
         fragmentList.add(tab2);
 

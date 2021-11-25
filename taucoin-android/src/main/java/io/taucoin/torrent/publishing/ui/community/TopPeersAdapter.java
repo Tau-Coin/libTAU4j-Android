@@ -1,35 +1,28 @@
 package io.taucoin.torrent.publishing.ui.community;
 
-import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ItemChainTopBinding;
-import io.taucoin.torrent.publishing.databinding.ItemMemberListBinding;
 
 /**
  * 社区排名的Adapter
  */
-public class ChainTopAdapter extends ListAdapter<MemberAndUser,
-        ChainTopAdapter.ViewHolder> {
+public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHolder> {
     private ClickListener listener;
     private int type;
 
-    ChainTopAdapter(ClickListener listener, int type) {
+    TopPeersAdapter(ClickListener listener, int type) {
         super(diffCallback);
         this.listener = listener;
         this.type = type;
@@ -64,31 +57,27 @@ public class ChainTopAdapter extends ListAdapter<MemberAndUser,
             this.type = type;
         }
 
-        void bind(ViewHolder holder, MemberAndUser member, int pos) {
+        void bind(ViewHolder holder, Member member, int pos) {
             if(null == holder || null == member){
                 return;
             }
             holder.binding.tvCol1.setText(String.valueOf(pos + 1));
-            if (type == ChainTopFragment.TOP_COIN) {
+            if (type == TopPeersFragment.TOP_COIN) {
                 String midHideName = UsersUtil.getMidHideName(member.publicKey, 6);
                 holder.binding.tvCol2.setText(midHideName);
                 holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_blue));
                 holder.binding.tvCol3.setText(FmtMicrometer.fmtBalance(member.balance));
-            } else if (type == ChainTopFragment.TOP_POWER) {
+            } else if (type == TopPeersFragment.TOP_POWER) {
                 String midHideName = UsersUtil.getMidHideName(member.publicKey, 6);
                 holder.binding.tvCol2.setText(midHideName);
                 holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_blue));
                 holder.binding.tvCol3.setText(String.valueOf(member.power));
-            } else {
-                holder.binding.tvCol2.setText(String.valueOf(member.power));
-                holder.binding.tvCol3.setText(member.chainID);
             }
 
-            boolean isTopPeers = type == ChainTopFragment.TOP_COIN || type == ChainTopFragment.TOP_POWER;
-            ViewUtils.updateViewWeight(binding.tvCol2, isTopPeers ? 3 : 3);
-            ViewUtils.updateViewWeight(binding.tvCol3, isTopPeers ? 2 : 4);
+            ViewUtils.updateViewWeight(binding.tvCol2, 3);
+            ViewUtils.updateViewWeight(binding.tvCol3, 2);
 
-            if (type == ChainTopFragment.TOP_COIN || type == ChainTopFragment.TOP_POWER) {
+            if (type == TopPeersFragment.TOP_COIN || type == TopPeersFragment.TOP_POWER) {
                 holder.binding.tvCol2.setOnClickListener(v -> {
                     if(listener != null){
                         listener.onItemClicked(member.publicKey);
@@ -102,14 +91,14 @@ public class ChainTopAdapter extends ListAdapter<MemberAndUser,
         void onItemClicked(String publicKey);
     }
 
-    private static final DiffUtil.ItemCallback<MemberAndUser> diffCallback = new DiffUtil.ItemCallback<MemberAndUser>() {
+    private static final DiffUtil.ItemCallback<Member> diffCallback = new DiffUtil.ItemCallback<Member>() {
         @Override
-        public boolean areContentsTheSame(@NonNull MemberAndUser oldItem, @NonNull MemberAndUser newItem) {
+        public boolean areContentsTheSame(@NonNull Member oldItem, @NonNull Member newItem) {
             return oldItem.equals(newItem);
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull MemberAndUser oldItem, @NonNull MemberAndUser newItem) {
+        public boolean areItemsTheSame(@NonNull Member oldItem, @NonNull Member newItem) {
             return oldItem.equals(newItem);
         }
     };

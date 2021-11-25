@@ -118,4 +118,26 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     public Observable<Member> observerCurrentMember(String chainID, String publicKey) {
         return db.communityDao().observerCurrentMember(chainID, publicKey);
     }
+
+    /**
+     * 观察链上币量前topNum的成员
+     * @param chainID 链ID
+     * @param topNum 查询数目
+     * @return Observable<List<Member>>
+     */
+    @Override
+    public Observable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum) {
+        return db.communityDao().observeChainTopCoinMembers(chainID, topNum);
+    }
+
+    /**
+     * 观察链上Power前topNum的成员
+     * @param chainID 链ID
+     * @param topNum 查询数目
+     * @return Observable<List<Member>>
+     */
+    @Override
+    public Observable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum) {
+        return db.communityDao().observeChainTopPowerMembers(chainID, topNum);
+    }
 }

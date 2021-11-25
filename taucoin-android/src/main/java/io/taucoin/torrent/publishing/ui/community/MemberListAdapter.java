@@ -72,7 +72,7 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberL
             holder.binding.leftView.setText(firstLetters);
 
             if (member.lastSeenTime > 0) {
-                String time = DateUtil.formatTime(member.lastSeenTime, DateUtil.pattern6);
+                String time = DateUtil.format(member.lastSeenTime, DateUtil.pattern6);
                 time = context.getResources().getString(R.string.contacts_last_seen, time);
                 holder.binding.tvTime.setText(time);
                 holder.binding.tvTime.setVisibility(View.VISIBLE);

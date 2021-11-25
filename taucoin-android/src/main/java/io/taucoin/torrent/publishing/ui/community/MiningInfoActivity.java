@@ -7,14 +7,25 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.google.gson.Gson;
+
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
+import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityMiningInfoBinding;
@@ -30,6 +41,7 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
     private static final int CHOOSE_REQUEST_CODE = 0x01;
     private ActivityMiningInfoBinding binding;
     private CommunityViewModel viewModel;
+    private CompositeDisposable disposables = new CompositeDisposable();
     private CommonDialog helpDialog;
     private CommonDialog closeDialog;
     private String chainID;
@@ -42,6 +54,7 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
         binding = DataBindingUtil.setContentView(this, R.layout.activity_mining_info);
         binding.setListener(this);
         initLayout();
+        loadMemberData(null);
         observeJoinedList();
     }
 
@@ -85,11 +98,49 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
     private void loadMiningInfo() {
         String communityName = ChainIDUtil.getName(chainID);
         binding.tvCommunityName.setText(communityName);
-        binding.itemMiningIncome.setRightText(FmtMicrometer.fmtBalance(0));
-        binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(0));
-        binding.itemLastBlock.setRightText(FmtMicrometer.fmtLong(0));
-        binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(0));
-        binding.itemPerishableDate.setRightText(DateUtil.format(DateUtil.getMillisTime(), DateUtil.pattern6));
+
+        if (StringUtil.isNotEmpty(chainID)) {
+            loadChainStatusData(new ChainStatus());
+            disposables.add(viewModel.observerChainStatus(chainID)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::loadChainStatusData));
+
+            loadMemberData(null);
+            disposables.add(viewModel.observerCurrentMember(chainID)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::loadMemberData));
+        }
+    }
+
+    /**
+     * 加载链状态数据
+     */
+    private void loadChainStatusData(ChainStatus status) {
+        if (null == status) {
+            return;
+        }
+        binding.itemMiningIncome.setRightText(FmtMicrometer.fmtBalance(status.totalRewards));
+        binding.itemLastBlock.setRightText(FmtMicrometer.fmtLong(status.blockNumber));
+        binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
+    }
+
+    /**
+     * 加载社区当前登陆用户数据
+     */
+    private void loadMemberData(Member member) {
+        long perishableDate = 0;
+        long power = 0;
+        if (member != null) {
+            power = member.power;
+            perishableDate = Constants.BLOCKS_NOT_PERISHABLE * Constants.BLOCK_IN_AVG +
+                    DateUtil.getTime();
+        }
+        binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
+        binding.itemPerishableDate.setRightText(DateUtil.formatTime(perishableDate, DateUtil.pattern6));
+        binding.itemPerishableDate.setVisibility(perishableDate > 0 ? View.VISIBLE : View.GONE);
+        binding.rlAutoRenewal.setVisibility(perishableDate > 0 ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -159,6 +210,18 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
 
         closeDialog = builder.create();
         closeDialog.show();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        disposables.clear();
     }
 
     @Override

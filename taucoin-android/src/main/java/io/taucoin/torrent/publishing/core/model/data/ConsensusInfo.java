@@ -1,13 +1,15 @@
 package io.taucoin.torrent.publishing.core.model.data;
 
+import androidx.annotation.Nullable;
+
 /**
  * 共识点信息
  */
-public class ConsensusInfo {
+public class ConsensusInfo implements Comparable<ConsensusInfo> {
 
     private String hash;
     private long number;
-    private long votes;
+    private Long votes;
 
     public ConsensusInfo(String hash, long number, long votes) {
         this.hash = hash;
@@ -31,11 +33,30 @@ public class ConsensusInfo {
         this.number = number;
     }
 
-    public long getVotes() {
+    public Long getVotes() {
         return votes;
     }
 
-    public void setVotes(long votes) {
+    public void setVotes(Long votes) {
         this.votes = votes;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+        return o instanceof ConsensusInfo && (o == this || (
+                number == (((ConsensusInfo)o).number) &&
+                        votes == (((ConsensusInfo)o).votes)));
+    }
+
+    @Override
+    public int compareTo(ConsensusInfo o) {
+
+        if (this.getVotes() > o.getVotes()) {
+            return -1;
+        } else if (this.getVotes().equals(o.getVotes())) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 }
