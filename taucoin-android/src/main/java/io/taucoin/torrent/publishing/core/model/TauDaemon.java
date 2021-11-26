@@ -6,7 +6,6 @@ import android.content.Intent;
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
 import org.libTAU4j.Message;
-import org.libTAU4j.SessionHandle;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.Transaction;
@@ -423,10 +422,7 @@ public abstract class TauDaemon {
             }
         } else {
             String ipv4 = getLocalNetworkAddress();
-            sessionManager.swig();
-            if (sessionManager.swig() != null) {
-                new SessionHandle(sessionManager.swig()).updateListenInterfaces(ipv4);
-            }
+            sessionManager.updateListenInterfaces(ipv4);
             logger.debug("updateListenInterfaces ipv4::{}", ipv4);
         }
     }

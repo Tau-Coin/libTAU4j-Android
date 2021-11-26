@@ -168,8 +168,9 @@ public class TxViewModel extends AndroidViewModel {
                 receiverPk = senderPk;
             }
             TxContent txContent = new TxContent(tx.txType, Utils.textStringToBytes(tx.memo));
+            long nonce = account.getNonce() + 1;
             Transaction transaction = new Transaction(chainID, 0, timestamp, senderPk, receiverPk,
-                    account.getNonce(), tx.amount, tx.fee, txContent.getEncoded());
+                    nonce, tx.amount, tx.fee, txContent.getEncoded());
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
             boolean isSubmitSuccess = daemon.submitTransaction(transaction);
             if (!isSubmitSuccess) {
