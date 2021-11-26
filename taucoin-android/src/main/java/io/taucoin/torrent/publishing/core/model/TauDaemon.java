@@ -6,6 +6,7 @@ import android.content.Intent;
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
 import org.libTAU4j.Message;
+import org.libTAU4j.SessionHandle;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.Transaction;
@@ -245,7 +246,6 @@ public abstract class TauDaemon {
      * Only calls from TauService
      */
     public void doStart(String seed) {
-        getLocalNetworkAddress();
         logger.info("doStart");
         if (isRunning)
             return;
@@ -257,6 +257,7 @@ public abstract class TauDaemon {
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
                 .setReadOnly(true)
                 .setDhtBootstrapInterval(1800)
+                .setNetworkInterface(getLocalNetworkAddress())
                 .build();
         sessionManager.start(sessionParams);
     }
@@ -421,14 +422,22 @@ public abstract class TauDaemon {
                 doStart(seed);
             }
         } else {
-            getLocalNetworkAddress();
-            sessionManager.reopenNetworkSockets();
-            logger.debug("updateListenInterfaces...");
+            String ipv4 = getLocalNetworkAddress();
+            sessionManager.swig();
+            if (sessionManager.swig() != null) {
+                new SessionHandle(sessionManager.swig()).updateListenInterfaces(ipv4);
+            }
+            logger.debug("updateListenInterfaces ipv4::{}", ipv4);
         }
     }
 
-    private void getLocalNetworkAddress() {
-       SystemServiceManager.getInstance().getNetworkAddress();
+    private String getLocalNetworkAddress() {
+        SystemServiceManager.getInstance().getNetworkAddress();
+        String ipv4 = SystemServiceManager.getInstance().getActiveNetworkAddress();
+        if (StringUtil.isNotEmpty(ipv4)) {
+            ipv4 += ":0";
+        }
+        return ipv4;
     }
 
     /**

@@ -25,6 +25,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 
 /**
  * 系统服务管理
@@ -163,11 +164,9 @@ public class SystemServiceManager {
         List<String> ipv6List = new ArrayList<>();
         if (networks != null && activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
             int activeType = activeNetworkInfo.getType();
-            logger.debug("ActiveNetworkInfo::{}, AllNetworks::{}", activeNetworkInfo.toString(),
-                    networks.length);
+            logger.debug("ActiveNetworkInfo::{}, ActiveType::{}, AllNetworks::{}", activeNetworkInfo.toString(),
+                    activeType, networks.length);
             for (Network network : networks) {
-                logger.debug("ActiveNetworkInfo::{}, ActiveType::{}, AllNetworks::{}", activeNetworkInfo.toString(),
-                        activeType, networks.length);
                 NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
                 if (null == networkInfo) {
                     continue;
@@ -213,6 +212,42 @@ public class SystemServiceManager {
         ipList.append(4, ipv4List);
         ipList.append(6, ipv6List);
         return ipList;
+    }
+
+    /**
+     * 获取当前ActiveNetworkInfo的IPv4
+     */
+    public String getActiveNetworkAddress() {
+        String ipv4 = "";
+        Network[] networks = connectivityManager.getAllNetworks();
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networks != null && activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+            for (Network network : networks) {
+                NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
+                if (null == networkInfo) {
+                    continue;
+                }
+                if (StringUtil.isEquals(networkInfo.toString(), activeNetworkInfo.toString())) {
+                    LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
+                    if (linkProperties != null) {
+                        List<LinkAddress> linkAddresses = linkProperties.getLinkAddresses();
+                        if (linkAddresses != null) {
+                            for (LinkAddress linkAddress : linkAddresses) {
+                                InetAddress address = linkAddress.getAddress();
+                                if (address != null) {
+                                    if (isIPv4(address) && !address.isLoopbackAddress() && !address.isLinkLocalAddress()) {
+                                        ipv4 = address.getHostAddress();
+                                        logger.debug("ActiveNetworkAddress IPv4::{}", ipv4);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return ipv4;
     }
 
     private boolean isIPv6ULA(InetAddress address) {
