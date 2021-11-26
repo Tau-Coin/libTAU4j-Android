@@ -121,28 +121,28 @@ class TauListenHandler {
             community = new Community();
             community.chainID = chainID;
             community.communityName = ChainIDUtil.getName(community.chainID);
-            community.totalBlocks = block.getBlockNumber();
-            community.syncBlock = block.getBlockNumber();
+            community.headBlock = block.getBlockNumber();
+            community.tailBlock = block.getBlockNumber();
             communityRepo.addCommunity(community);
             logger.info("SaveCommunity to local, communityName::{}, chainID::{}, " +
-                            "totalBlocks::{}, syncBlock::{}", community.communityName,
-                    community.chainID, community.totalBlocks, community.syncBlock);
+                            "headBlock::{}, tailBlock::{}", community.communityName,
+                    community.chainID, community.headBlock, community.tailBlock);
         } else {
             if (isSync) {
-                community.syncBlock = block.getBlockNumber();
-                if(community.totalBlocks < community.syncBlock){
-                    community.totalBlocks = community.syncBlock;
+                community.tailBlock = block.getBlockNumber();
+                if(community.headBlock < community.tailBlock){
+                    community.headBlock = community.tailBlock;
                 }
             } else {
-                community.totalBlocks = block.getBlockNumber();
-                if(community.totalBlocks < community.syncBlock){
-                    community.syncBlock = community.totalBlocks;
+                community.headBlock = block.getBlockNumber();
+                if(community.headBlock < community.tailBlock){
+                    community.tailBlock = community.headBlock;
                 }
             }
             communityRepo.addCommunity(community);
             logger.info("Update Community Info, communityName::{}, chainID::{}, " +
-                            "totalBlocks::{}, syncBlock::{}", community.communityName,
-                    community.chainID, community.totalBlocks, community.syncBlock);
+                            "headBlock::{}, tailBlock::{}", community.communityName,
+                    community.chainID, community.headBlock, community.tailBlock);
         }
     }
 

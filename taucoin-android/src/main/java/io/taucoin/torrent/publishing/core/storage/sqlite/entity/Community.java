@@ -19,9 +19,9 @@ public class Community implements Parcelable {
     @NonNull
     public String communityName;            // 社区名字
 
-    public long totalBlocks;                // 社区总区块数（不上链）
-    public long syncBlock;                  // 已同步到区块数（不上链）
-    public boolean isBanned = false;        // 社区是否被用户拉入黑名单（不上链）
+    public long headBlock;                  // 头部区块号
+    public long tailBlock;                  // 尾部区块号
+    public boolean isBanned = false;        // 社区是否被用户拉入黑名单
     public String forkPoint;                // 社区分叉点区块号
     public String topConsensus;             // 社区前3个投票共识点
 
@@ -43,8 +43,8 @@ public class Community implements Parcelable {
     protected Community(Parcel in) {
         chainID = in.readString();
         communityName = in.readString();
-        totalBlocks = in.readLong();
-        syncBlock = in.readLong();
+        headBlock = in.readLong();
+        tailBlock = in.readLong();
         isBanned = in.readByte() != 0;
         forkPoint = in.readString();
         topConsensus = in.readString();
@@ -54,8 +54,8 @@ public class Community implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(chainID);
         dest.writeString(communityName);
-        dest.writeLong(totalBlocks);
-        dest.writeLong(syncBlock);
+        dest.writeLong(headBlock);
+        dest.writeLong(tailBlock);
         dest.writeByte((byte) (isBanned ? 1 : 0));
         dest.writeString(forkPoint);
         dest.writeString(topConsensus);

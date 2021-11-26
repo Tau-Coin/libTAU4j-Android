@@ -108,7 +108,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
 
                 int bgColor = Utils.getGroupColor(bean.ID);
                 binding.leftView.setBgColor(bgColor);
-                boolean isReadOnly = bean.balance <= 0 && bean.power <= 0;
+                boolean isReadOnly = bean.isReadOnly();
                 binding.readOnly.setVisibility(isReadOnly ? View.VISIBLE : View.INVISIBLE);
             } else if (holder.binding instanceof ItemChatListBinding) {
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;

@@ -12,6 +12,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 
@@ -50,7 +51,7 @@ public interface CommunityDao {
             " ORDER BY timestamp, logicMsgHash COLLATE UNICODE)" +
             " GROUP BY receiverPkTemp)";
 
-    String QUERY_COMMUNITIES = "SELECT a.chainID AS ID, b.balance AS balance, b.power AS power," +
+    String QUERY_COMMUNITIES = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.power, b.blockNumber," +
             " 0 AS type, 0 AS msgType, '' AS senderPk, '' AS receiverPk, " +
             " 0 AS msgUnread, '' AS msg," +
             " (case when (d.timestamp IS NULL OR c.timestamp >= d.timestamp) then c.memo else d.content end)" +
@@ -69,7 +70,7 @@ public interface CommunityDao {
             " ORDER BY timestamp) GROUP BY chainID) AS d" +
             " ON a.chainID = d.chainID";
 
-    String QUERY_FRIENDS_ASC = "SELECT f.friendPK AS ID, 0 AS balance, 0 AS power," +
+    String QUERY_FRIENDS_ASC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS balance, 0 AS power, 0 AS blockNumber," +
             " 1 AS type, cm.contentType AS msgType," +
             " cm.senderPk AS senderPk, cm.receiverPk AS receiverPk," +
             " f.msgUnread AS msgUnread," +
@@ -81,7 +82,7 @@ public interface CommunityDao {
             " WHERE f.userPk = " + QUERY_GET_CURRENT_USER_PK +
             " AND f.friendPK NOT IN " + QUERY_GET_BANNED_USER_PK;
 
-    String QUERY_FRIENDS_DESC = "SELECT f.friendPK AS ID, 0 AS balance, 0 AS power," +
+    String QUERY_FRIENDS_DESC = "SELECT f.friendPK AS ID,0 AS headBlock, 0 AS balance, 0 AS power, 0 AS blockNumber," +
             " 1 AS type, cm.contentType AS msgType," +
             " cm.senderPk AS senderPk, cm.receiverPk AS receiverPk," +
             " f.msgUnread AS msgUnread," +
@@ -105,7 +106,7 @@ public interface CommunityDao {
     String QUERY_GET_COMMUNITY_BY_CHAIN_ID = "SELECT * FROM Communities WHERE chainID = :chainID";
     String QUERY_ADD_COMMUNITY_BLACKLIST = "Update Communities set isBanned =:isBanned WHERE chainID = :chainID";
     String QUERY_JOINED_COMMUNITY = "SELECT * FROM Communities";
-    String QUERY_CLEAR_COMMUNITY_STATE = "UPDATE Communities SET totalBlocks = 0, syncBlock = 0" +
+    String QUERY_CLEAR_COMMUNITY_STATE = "UPDATE Communities SET headBlock = 0, tailBlock = 0" +
             " WHERE chainID = :chainID";
 
     String QUERY_CURRENT_MEMBER = "SELECT * FROM Members" +
@@ -183,7 +184,8 @@ public interface CommunityDao {
     void clearCommunityState(String chainID);
 
     @Query(QUERY_CURRENT_MEMBER)
-    Observable<Member> observerCurrentMember(String chainID, String publicKey);
+    @Transaction
+    Observable<MemberAndCommunity> observerCurrentMember(String chainID, String publicKey);
 
     /**
      * 观察链上币量前topNum的成员

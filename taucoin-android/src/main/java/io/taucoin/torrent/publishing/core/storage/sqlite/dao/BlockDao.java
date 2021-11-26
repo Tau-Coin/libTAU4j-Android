@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 import io.reactivex.Flowable;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 
@@ -18,16 +19,20 @@ public interface BlockDao {
     String QUERY_BLOCK = "SELECT * FROM Blocks " +
             " WHERE chainID = :chainID and blockHash= :blockHash";
 
-    String QUERY_CHAIN_STATUS_DESC = "SELECT a.* , b.peerBlocks, b.totalRewards, c.totalPeers, c.totalCoin FROM" +
+    String QUERY_CHAIN_STATUS = "SELECT a.* , b.peerBlocks, b.totalRewards, c.totalPeers, c.totalCoin FROM" +
             " (SELECT blockNumber, difficulty FROM Blocks " +
             " WHERE chainID = :chainID AND status = 1 ORDER BY blockNumber DESC" +
             " LIMIT 1) AS a," +
-            " (SELECT count(*) peerBlocks, SUM(rewards) AS totalRewards FROM Blocks" +
-            " WHERE chainID = :chainID" +
+            " (SELECT count(*) peerBlocks, SUM(rewards) AS totalRewards FROM Blocks bb" +
+            " LEFT JOIN Communities c ON bb.chainID = c.chainID" +
+            " WHERE bb.chainID = :chainID" +
             " AND miner =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " AND status = 1) AS b," +
-            " (SELECT count(*) totalPeers, SUM(balance) AS totalCoin FROM Members" +
-            " WHERE chainID = :chainID AND balance > 0 AND power > 0) AS c";
+            " AND status = 1" +
+            " AND (c.headBlock - bb.blockNumber < "+ Constants.BLOCKS_NOT_PERISHABLE +")" +
+            ") AS b," +
+            " (SELECT count(*) totalPeers, SUM(balance) AS totalCoin FROM Members mm" +
+            " LEFT JOIN Communities c ON mm.chainID = c.chainID" +
+            " WHERE mm.chainID = :chainID AND "+ MemberDao.WHERE_ON_CHAIN +") AS c";
 
     /**
      * 添加用户设备信息
@@ -47,6 +52,6 @@ public interface BlockDao {
     /**
      * 观察链上状态信息
      */
-    @Query(QUERY_CHAIN_STATUS_DESC)
+    @Query(QUERY_CHAIN_STATUS)
     Flowable<ChainStatus> observerChainStatus(String chainID);
 }

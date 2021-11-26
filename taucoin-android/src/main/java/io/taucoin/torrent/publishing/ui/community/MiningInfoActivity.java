@@ -19,6 +19,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -129,18 +130,20 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
     /**
      * 加载社区当前登陆用户数据
      */
-    private void loadMemberData(Member member) {
+    private void loadMemberData(MemberAndCommunity member) {
         long perishableDate = 0;
         long power = 0;
+        boolean isReadOnly = true;
         if (member != null) {
+            isReadOnly = member.isReadOnly();
             power = member.power;
             perishableDate = Constants.BLOCKS_NOT_PERISHABLE * Constants.BLOCK_IN_AVG +
                     DateUtil.getTime();
         }
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
-        binding.itemPerishableDate.setRightText(DateUtil.formatTime(perishableDate, DateUtil.pattern6));
-        binding.itemPerishableDate.setVisibility(perishableDate > 0 ? View.VISIBLE : View.GONE);
-        binding.rlAutoRenewal.setVisibility(perishableDate > 0 ? View.VISIBLE : View.GONE);
+        binding.itemPerishableDate.setRightText(DateUtil.formatTime(perishableDate, DateUtil.pattern4));
+        binding.itemPerishableDate.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);
+        binding.rlAutoRenewal.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);
     }
 
     @Override

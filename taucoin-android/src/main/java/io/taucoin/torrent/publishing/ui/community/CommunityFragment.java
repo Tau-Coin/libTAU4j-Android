@@ -240,7 +240,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
-                    boolean isReadOnly = member.balance <= 0 && member.power <= 0;
+                    boolean isReadOnly = member.isReadOnly();
                     if (currentTabFragment != null) {
                         currentTabFragment.handleReadOnly(isReadOnly);
                         this.isReadOnly = isReadOnly;

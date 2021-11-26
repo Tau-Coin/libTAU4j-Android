@@ -1,7 +1,7 @@
 package io.taucoin.torrent.publishing.core.model.data;
 
 import androidx.room.Relation;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 
 /**
@@ -11,6 +11,8 @@ public class CommunityAndFriend {
     // 社区相关数据
     public long balance;                    // 成员在此社区的balance
     public long power;                      // 成员在此社区的power
+    public long blockNumber;                // 成员状态改变的区块号
+    public long headBlock;                  // 社区最新的区块号
 
     // 朋友相关数据
     public String senderPk;                 // ChatMsg中的消息发送者
@@ -37,5 +39,17 @@ public class CommunityAndFriend {
     @Override
     public boolean equals(Object o) {
         return o instanceof CommunityAndFriend && (o == this || ID.equals(((CommunityAndFriend)o).ID));
+    }
+
+    /**
+     * 判断社区成员是否是read only
+     * 判断条件：
+     * 1、区块余额和power都小于等于0
+     * 2、最新区块和成员状态时的区块相差Constants.BLOCKS_NOT_PERISHABLE
+     * @return read only
+     */
+    public boolean isReadOnly() {
+        return (balance <= 0 && power <= 0) ||
+                (headBlock - blockNumber >= Constants.BLOCKS_NOT_PERISHABLE);
     }
 }
