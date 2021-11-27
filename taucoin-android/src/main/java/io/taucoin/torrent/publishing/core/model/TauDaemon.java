@@ -430,9 +430,10 @@ public abstract class TauDaemon {
     private String getLocalNetworkAddress() {
         SystemServiceManager.getInstance().getNetworkAddress();
         String ipv4 = SystemServiceManager.getInstance().getActiveNetworkAddress();
-        if (StringUtil.isNotEmpty(ipv4)) {
-            ipv4 += ":0";
+        if (StringUtil.isEmpty(ipv4)) {
+            ipv4 = "0.0.0.0";
         }
+        ipv4 += ":6881";
         return ipv4;
     }
 
@@ -615,4 +616,9 @@ public abstract class TauDaemon {
      * @param chainID 链ID
      */
     public abstract long getMedianTxFree(String chainID);
+
+    /**
+     * 获取Session Time
+     */
+    public abstract long getSessionTime();
 }

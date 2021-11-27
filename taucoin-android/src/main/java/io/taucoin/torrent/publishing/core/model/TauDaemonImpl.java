@@ -4,13 +4,10 @@ import android.content.Context;
 
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
-import org.libTAU4j.ChainURL;
 import org.libTAU4j.Message;
 import org.libTAU4j.Transaction;
-import org.libTAU4j.Vectors;
 import org.libTAU4j.alerts.Alert;
 import org.libTAU4j.alerts.AlertType;
-import org.libTAU4j.swig.byte_vector;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -32,6 +29,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
@@ -484,5 +482,23 @@ public class TauDaemonImpl extends TauDaemon {
         }
         logger.debug("getMedianTxFree chainID::{}, medianTxFee::{}", chainID, medianTxFee);
         return medianTxFee;
+    }
+
+    /**
+     * 获取Session Time
+     */
+    @Override
+    public long getSessionTime() {
+        long time = 0;
+        if (isRunning) {
+            time = sessionManager.getSessionTime();
+        }
+        boolean isLocalTime = time <= 0;
+        if (isLocalTime) {
+            time = DateUtil.getMillisTime();
+        }
+        logger.debug("SessionTime::{}({}), isLocalTime::{}", DateUtil.format(time, DateUtil.pattern9),
+                time, isLocalTime);
+        return time;
     }
 }
