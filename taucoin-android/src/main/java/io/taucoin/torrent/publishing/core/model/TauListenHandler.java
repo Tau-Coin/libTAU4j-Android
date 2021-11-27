@@ -184,7 +184,7 @@ class TauListenHandler {
         }
         String txID = txMsg.getTxID().to_hex();
         Tx tx = txRepo.getTxByTxID(txID);
-        logger.debug("handleBlockData txID::{}, exist::{}, payload::{}", txID, tx != null,
+        logger.debug("handleTransactionData txID::{}, exist::{}, payload::{}", txID, tx != null,
                 txMsg.getPayload());
         // 本地存在此交易, 更新交易状态值
         if (tx != null) {
@@ -198,7 +198,7 @@ class TauListenHandler {
         byte[] payload = txMsg.getPayload();
         tx = new Tx(txID, chainID, fee);
         if (null == payload || payload.length == 0) {
-            logger.info("transaction payload empty");
+            logger.info("handleTransactionData payload empty");
             return;
         }
         TxContent txContent = new TxContent(txMsg.getPayload());
@@ -345,7 +345,7 @@ class TauListenHandler {
      * @param votes 投票结果
      */
     void handleNewTopVotes(byte[] chainID, List<Vote> votes) {
-        logger.info("handleNewForkPoint");
+        logger.info("handleNewTopVotes");
         String chainIDStr = ChainIDUtil.decode(chainID);
         Community community = communityRepo.getCommunityByChainID(chainIDStr);
         if (community != null) {
@@ -359,7 +359,7 @@ class TauListenHandler {
             }
             community.topConsensus = new Gson().toJson(list);
             communityRepo.updateCommunity(community);
-            logger.info("handleNewForkPoint chainID::{}, topConsensus::{}", chainIDStr,
+            logger.info("handleNewTopVotes chainID::{}, topConsensus::{}", chainIDStr,
                     community.topConsensus);
         }
     }

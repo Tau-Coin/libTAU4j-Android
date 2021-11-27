@@ -242,7 +242,7 @@ public class ChatViewModel extends AndroidViewModel {
                 long myLastSendTime = chatRepo.getLastSendTime(senderPk, friendPk);
                 for (int nonce = 0; nonce < contentSize; nonce++) {
                     byte[] content = contents.get(nonce);
-                    long currentTime = DateUtil.getMillisTime();
+                    long currentTime = daemon.getSessionTime();
                     // 1、先取当前时间和朋友的最后一条信息时间加1的最大值（防止朋友的时钟比自己本地的快）
                     currentTime = Math.max(currentTime, friendLastSendTime + 1);
                     // 2、再取第一步的是时间和自己的最后一条信息的时间的最大值（防止本地历史时间已比第一步的时间还大）
@@ -322,7 +322,7 @@ public class ChatViewModel extends AndroidViewModel {
                 // 如何是自己给自己发，直接确认接收
                 if (StringUtil.isEquals(chatMsg.senderPk, chatMsg.receiverPk)) {
                     ChatMsgLog  chatMsgLog = new ChatMsgLog(chatMsg.hash,
-                            ChatMsgStatus.SYNC_CONFIRMED.getStatus(), DateUtil.getMillisTime());
+                            ChatMsgStatus.SYNC_CONFIRMED.getStatus(), daemon.getSessionTime());
                     chatRepo.addChatMsgLogs(chatMsgLog);
                 }
             }

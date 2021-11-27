@@ -209,13 +209,13 @@ public class UserViewModel extends AndroidViewModel {
                     userRepo.setCurrentUser(currentUser.publicKey, false);
                 }
                 // 1、更新本地数据库数据
-                if(null == user){
+                if (null == user) {
                     user = new User(publicKey, seed, name, true);
                     userRepo.addUser(user);
-                }else{
+                } else {
                     if(StringUtil.isNotEmpty(name)){
                         user.nickname = name;
-                        user.updateTime = DateUtil.getTime();
+                        user.updateTime = daemon.getSessionTime() / 1000;
                     }
                     user.seed = seed;
                     user.isCurrentUser = true;
@@ -473,7 +473,7 @@ public class UserViewModel extends AndroidViewModel {
             if (user != null) {
                 if (StringUtil.isNotEmpty(name)) {
                     user.nickname = name;
-                    user.updateTime = DateUtil.getTime();
+                    user.updateTime = daemon.getSessionTime() / 1000;
                 }
                 String currentUserPk = userRepo.getCurrentUser().publicKey;
                 userRepo.updateUser(user);
@@ -571,14 +571,14 @@ public class UserViewModel extends AndroidViewModel {
             user = new User(publicKey);
             if (StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
-                user.updateTime = DateUtil.getTime();
+                user.updateTime = daemon.getSessionTime() / 1000;
             }
             userRepo.addUser(user);
         } else {
             logger.debug("AddFriendsLocally, user exist");
             if (StringUtil.isEmpty(user.nickname) && StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
-                user.updateTime = DateUtil.getTime();
+                user.updateTime = daemon.getSessionTime() / 1000;
                 userRepo.updateUser(user);
             }
         }

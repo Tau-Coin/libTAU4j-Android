@@ -63,7 +63,7 @@ class MsgAlertHandler {
             long sentTime = message.timestamp();
             String senderPk = ByteUtil.toHexString(message.sender());
             String receiverPk = ByteUtil.toHexString(message.receiver());
-            long receivedTime = DateUtil.getMillisTime();
+            long receivedTime = daemon.getSessionTime();
 
             ChatMsg chatMsg = chatRepo.queryChatMsg(senderPk, hash);
             logger.debug("TAU messaging onNewMessage senderPk::{}, receiverPk::{}, hash::{}, " +

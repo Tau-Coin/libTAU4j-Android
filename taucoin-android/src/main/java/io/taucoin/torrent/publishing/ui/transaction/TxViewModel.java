@@ -159,7 +159,7 @@ public class TxViewModel extends AndroidViewModel {
                 result = getApplication().getString(R.string.tx_error_send_failed);
                 return result;
             }
-            long timestamp = DateUtil.getMillisTime();
+            long timestamp = daemon.getSessionTime();
             byte[] receiverPk;
             if (tx.txType == TxType.WRING_TX.getType()) {
                 receiverPk = ByteUtil.toByte(tx.receiverPk);
