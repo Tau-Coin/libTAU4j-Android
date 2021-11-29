@@ -6,6 +6,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import org.libTAU4j.ChainURL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -33,6 +35,7 @@ import io.taucoin.torrent.publishing.ui.user.UserViewModel;
  */
 public class CommunityQRCodeActivity extends ScanTriggerActivity implements View.OnClickListener {
 
+    private static final Logger logger = LoggerFactory.getLogger("QRCode");
     private CompositeDisposable disposables = new CompositeDisposable();
     private ActivityCommunityQrCodeBinding binding;
     private CommunityViewModel communityViewModel;
@@ -78,6 +81,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
                     if (StringUtil.isNotEmpty(chainID)) {
                         String chainUrl = ChainUrlUtil.encode(chainID, list);
+                        logger.debug("chainUrl::{}", chainUrl);
                         communityViewModel.generateQRCode(this, chainUrl, this.chainID, showName);
                     }
                 }));

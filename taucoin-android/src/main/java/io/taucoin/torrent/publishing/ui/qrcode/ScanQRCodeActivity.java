@@ -67,7 +67,7 @@ import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
  */
 public class ScanQRCodeActivity extends BaseActivity implements View.OnClickListener, Camera.PreviewCallback {
 
-    private static final Logger logger = LoggerFactory.getLogger("ScanQRCodeActivity");
+    private static final Logger logger = LoggerFactory.getLogger("QRCode");
     private static final int CHOOSE_REQUEST = 0x100;
     private CompositeDisposable disposables = new CompositeDisposable();
     private Disposable disposable;
@@ -268,6 +268,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
     private void handleScanResult(String scanResult) {
         try {
             if (StringUtil.isNotEmpty(scanResult)) {
+                logger.debug("scanResult::{}", scanResult);
                 ChainURL decode = ChainUrlUtil.decode(scanResult);
                 if (decode != null) {
                     String chainID = ChainIDUtil.decode(decode.getChainID());
@@ -298,7 +299,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
                 }
             }
         } catch (Exception e){
-            logger.error("handleScanResult ", e);
+            logger.error("handleScanResult::{}", e);
         }
         if (cameraView != null && cameraView.getCameraSession() != null) {
             cameraView.getCameraSession().resume();
