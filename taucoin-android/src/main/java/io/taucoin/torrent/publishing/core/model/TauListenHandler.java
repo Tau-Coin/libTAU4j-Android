@@ -104,9 +104,9 @@ class TauListenHandler {
         // 更新矿工的信息
         saveUserInfo(block.getMiner());
         // 添加发送者为社区成员
-        addMemberInfo(block.getChainID(), block.getMiner(), isSync);
+        addMemberInfo(block.getChainID(), block.getMiner());
         // 处理交易信息
-        handleTransactionData(block.getBlockNumber(), block.getTx(), isRollback, isSync);
+        handleTransactionData(block.getBlockNumber(), block.getTx(), isRollback);
     }
 
     /**
@@ -184,10 +184,8 @@ class TauListenHandler {
      * @param blockNumber 区块号
      * @param txMsg Transaction
      * @param isRollback 是否是回滚
-     * @param isSync 是否是同步
      */
-    private void handleTransactionData(long blockNumber, Transaction txMsg, boolean isRollback,
-                                       boolean isSync) {
+    private void handleTransactionData(long blockNumber, Transaction txMsg, boolean isRollback) {
         if (null == txMsg) {
             return;
         }
@@ -195,43 +193,59 @@ class TauListenHandler {
         Tx tx = txRepo.getTxByTxID(txID);
         logger.debug("handleTransactionData txID::{}, exist::{}, payload::{}", txID, tx != null,
                 txMsg.getPayload());
+        // 处理用户信息
+        handleUserInfo(txMsg);
+        // 处理社区成员信息
+        handleMemberInfo(txMsg);
+
         // 本地存在此交易, 更新交易状态值
         if (tx != null) {
             tx.txStatus = isRollback ? 0 : 1;
             tx.blockNumber = blockNumber;
             txRepo.updateTransaction(tx);
-            handleMemberInfo(txMsg);
-            return;
+        } else {
+            byte[] payload = txMsg.getPayload();
+            if (null == payload || payload.length == 0) {
+                logger.info("handleTransactionData payload empty");
+                return;
+            }
+            String chainID = ChainIDUtil.decode(txMsg.getChainID());
+            long fee = txMsg.getFee();
+            tx = new Tx(txID, chainID, fee);
+            TxContent txContent = new TxContent(txMsg.getPayload());
+            tx.txType = txContent.getType();
+            tx.memo = Utils.textBytesToString(txContent.getContent());
+            tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
+            tx.txStatus = isRollback ? 0 : 1;
+            tx.blockNumber = blockNumber;
+            if (tx.txType == TxType.WRING_TX.getType()) {
+                // 添加交易
+                tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
+                tx.amount = txMsg.getAmount();
+            }
+            txRepo.addTransaction(tx);
+            logger.info("Add transaction to local, txID::{}, txType::{}", txID, tx.txType);
         }
-        String chainID = ChainIDUtil.decode(txMsg.getChainID());
-        long fee = txMsg.getFee();
+    }
+
+    /**
+     * 处理用户成员信息
+     * @param txMsg 交易
+     */
+    private void handleUserInfo(@NonNull Transaction txMsg) {
         byte[] payload = txMsg.getPayload();
-        tx = new Tx(txID, chainID, fee);
         if (null == payload || payload.length == 0) {
-            logger.info("handleTransactionData payload empty");
+            logger.info("handleUserInfo transaction payload empty");
             return;
         }
         TxContent txContent = new TxContent(txMsg.getPayload());
-        tx.txType = txContent.getType();
-        tx.memo = Utils.textBytesToString(txContent.getContent());
-        tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
-        tx.txStatus = isRollback ? 0 : 1;
-        tx.blockNumber = blockNumber;
-        // 保存发送者信息
-        saveUserInfo(txMsg.getSender());
-        // 添加发送者为社区成员
-        addMemberInfo(txMsg.getChainID(), txMsg.getSender(), isSync);
-        if (tx.txType == TxType.WRING_TX.getType()) {
-            // 保存接受者信息
+        int txType = txContent.getType();
+        if (txType == TxType.CHAIN_NOTE.getType()) {
+            saveUserInfo(txMsg.getSender());
+        } else if (txType == TxType.WRING_TX.getType()) {
+            saveUserInfo(txMsg.getSender());
             saveUserInfo(txMsg.getReceiver());
-            // 添加接受者为社区成员
-            addMemberInfo(txMsg.getChainID(), txMsg.getReceiver(), isSync);
-            // 添加交易
-            tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
-            tx.amount = txMsg.getAmount();
         }
-        txRepo.addTransaction(tx);
-        logger.info("Add transaction to local, txID::{}, txType::{}", txID, tx.txType);
     }
 
     /**
@@ -241,16 +255,16 @@ class TauListenHandler {
     private void handleMemberInfo(@NonNull Transaction txMsg) {
         byte[] payload = txMsg.getPayload();
         if (null == payload || payload.length == 0) {
-            logger.info("transaction payload empty");
+            logger.info("handleMemberInfo transaction payload empty");
             return;
         }
         TxContent txContent = new TxContent(txMsg.getPayload());
         int txType = txContent.getType();
         if (txType == TxType.CHAIN_NOTE.getType()) {
-            addMemberInfo(txMsg.getChainID(), txMsg.getSender(), false);
+            addMemberInfo(txMsg.getChainID(), txMsg.getSender());
         } else if (txType == TxType.WRING_TX.getType()) {
-            addMemberInfo(txMsg.getChainID(), txMsg.getSender(), false);
-            addMemberInfo(txMsg.getChainID(), txMsg.getReceiver(), false);
+            addMemberInfo(txMsg.getChainID(), txMsg.getSender());
+            addMemberInfo(txMsg.getChainID(), txMsg.getReceiver());
         }
     }
 
@@ -286,8 +300,8 @@ class TauListenHandler {
      * @param publicKey 公钥
      * @param chainID chainID
      */
-    private void addMemberInfo(byte[] chainID, byte[] publicKey, boolean isSync) {
-        addMemberInfo(chainID, ByteUtil.toHexString(publicKey), isSync);
+    private void addMemberInfo(byte[] chainID, byte[] publicKey) {
+        addMemberInfo(chainID, ByteUtil.toHexString(publicKey));
     }
 
     /**
@@ -295,7 +309,7 @@ class TauListenHandler {
      * @param publicKey 公钥
      * @param chainID chainID
      */
-    private void addMemberInfo(byte[] chainID, String publicKey, boolean isSync) {
+    private void addMemberInfo(byte[] chainID, String publicKey) {
         String chainIDStr = ChainIDUtil.decode(chainID);
         Member member = memberRepo.getMemberByChainIDAndPk(chainIDStr, publicKey);
         Account account = daemon.getAccountInfo(chainID, publicKey);
@@ -314,13 +328,12 @@ class TauListenHandler {
             logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}, power::{}",
                     chainIDStr, publicKey, balance, power);
         } else {
-            if(!isSync){
-                member.balance = balance;
-                member.power = power;
-                memberRepo.updateMember(member);
-                logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
-                        "balance::{}, power::{}", chainIDStr, publicKey, member.balance, member.power);
-            }
+            member.balance = balance;
+            member.power = power;
+            member.blockNumber = blockNumber;
+            memberRepo.updateMember(member);
+            logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
+                    "balance::{}, power::{}", chainIDStr, publicKey, member.balance, member.power);
         }
     }
 
@@ -344,7 +357,7 @@ class TauListenHandler {
      */
     void handleNewTransaction(Transaction tx) {
         logger.info("handleNewTransaction");
-        handleTransactionData(0, tx, true, false);
+        handleTransactionData(0, tx, true);
     }
 
     /**
