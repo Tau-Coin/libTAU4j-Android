@@ -20,7 +20,7 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar_group_left" />
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:fillViewport="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -70,34 +70,28 @@
                     app:lineLeftTextColor="@color/color_red"
                     app:lineLeftText="@string/community_blacklist" />
 
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tab_layout"
-                    android:layout_height="@dimen/widget_size_40"
-                    android:layout_width="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_10"
-                    android:layout_marginEnd="@dimen/widget_size_10"
-                    app:tabMinWidth="@dimen/widget_size_65"
-                    app:tabMode="scrollable"
-                    app:tabTextAppearance="@style/TabLayout"
-                    app:tabIndicatorHeight="@dimen/widget_size_3"
-                    app:tabIndicatorColor="@color/primary"
-                    app:tabSelectedTextColor="@color/primary"
-                    app:tabTextColor="@color/gray_dark"
-                    app:tabBackground="@color/color_transparent"
-                    app:tabRippleColor="@color/color_transparent"/>
-
-                <View
-                    android:id="@+id/tab_layout_line"
+                <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/widget_size_1"
-                    android:background="@color/divider"/>
+                    android:layout_height="wrap_content"
+                    android:text="@string/community_members"
+                    android:gravity="center_vertical"
+                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingEnd="@dimen/widget_size_20"
+                    android:paddingTop="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_8"
+                    android:textColor="@color/gray_light"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
 
-                <androidx.viewpager.widget.ViewPager
-                    android:id="@+id/view_pager"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:focusable="true"
+                    android:scrollbarStyle="outsideOverlay" />
 
             </LinearLayout>
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
     </LinearLayout>
 </layout>

@@ -123,7 +123,7 @@
                     android:paddingStart="@dimen/widget_size_2"
                     android:paddingEnd="@dimen/widget_size_2"
                     android:textColor="@color/color_white"
-                    android:text="@string/community_tip_block"
+                    android:text="@string/community_head_blocks"
                     android:tag="3"
                     android:includeFontPadding="false"
                     app:autoSizeTextType="uniform"

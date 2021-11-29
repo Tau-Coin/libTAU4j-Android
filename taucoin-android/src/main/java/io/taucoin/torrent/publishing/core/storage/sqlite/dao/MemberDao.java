@@ -25,22 +25,16 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 public interface MemberDao {
     String WHERE_NOT_PERISHABLE = " (headBlock - blockNumber < "+ Constants.BLOCKS_NOT_PERISHABLE +")";
     String WHERE_ON_CHAIN = " ((balance > 0 OR power > 0) AND" + WHERE_NOT_PERISHABLE + ")";
-    String WHERE_OFF_CHAIN = " ((balance <= 0 AND power <= 0)" +
-            " OR (headBlock - blockNumber >= " + Constants.BLOCKS_NOT_PERISHABLE +"))";
 
     String QUERY_GET_MEMBER_BY_CHAIN_ID_PK = "SELECT * FROM Members WHERE chainID = :chainID AND publicKey = :publicKey";
     String QUERY_GET_MEMBERS_BY_CHAIN_ID = "SELECT * FROM Members WHERE chainID = :chainID";
+
     String QUERY_GET_MEMBERS_ON_CHAIN = "SELECT m.*, f.lastSeenTime, c.headBlock" +
             " FROM Members m LEFT JOIN Friends f" +
             " ON m.publicKey = f.friendPK AND f.userPK = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.chainID = :chainID AND " + WHERE_ON_CHAIN;
-
-    String QUERY_GET_MEMBERS_NOT_ON_CHAIN = "SELECT m.*, f.lastSeenTime, c.headBlock" +
-            " FROM Members m LEFT JOIN Friends f" +
-            " ON m.publicKey = f.friendPK AND f.userPK = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.chainID = :chainID AND " + WHERE_OFF_CHAIN;
+            " WHERE m.chainID = :chainID AND " + WHERE_ON_CHAIN +
+            " ORDER BY f.lastSeenTime DESC";
 
     String QUERY_COMMUNITY_NUM_IN_COMMON = "SELECT chainID FROM " +
             " (Select count(*) AS num, m.chainID FROM Members m" +
@@ -100,15 +94,6 @@ public interface MemberDao {
     @Query(QUERY_GET_MEMBERS_ON_CHAIN)
     @Transaction
     DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembersOnChain(String chainID);
-
-    /**
-     * 查询社区未上链的成员
-     * @param chainID 社区链ID
-     * @return DataSource.Factory
-     */
-    @Query(QUERY_GET_MEMBERS_NOT_ON_CHAIN)
-    @Transaction
-    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembersNotOnChain(String chainID);
 
     /**
      * 获取和社区成员共在的社区数

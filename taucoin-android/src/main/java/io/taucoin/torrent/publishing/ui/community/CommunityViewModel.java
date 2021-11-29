@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.Html;
+import android.view.LayoutInflater;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -24,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -31,7 +35,6 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -52,6 +55,7 @@ import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.model.data.Result;
+import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
@@ -69,7 +73,9 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
+import io.taucoin.torrent.publishing.databinding.BlacklistDialogBinding;
 import io.taucoin.torrent.publishing.ui.constant.Page;
+import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 
 /**
  * Community模块的ViewModel
@@ -82,6 +88,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private BlockRepository blockRepo;
     private FriendRepository friendRepo;
     private UserRepository userRepo;
+    private SettingsRepository settingsRepo;
     private TauDaemon daemon;
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> addCommunityState = new MutableLiveData<>();
@@ -98,6 +105,7 @@ public class CommunityViewModel extends AndroidViewModel {
         userRepo = RepositoryHelper.getUserRepository(getApplication());
         friendRepo = RepositoryHelper.getFriendsRepository(getApplication());
         blockRepo = RepositoryHelper.getBlockRepository(getApplication());
+        settingsRepo = RepositoryHelper.getSettingsRepository(getApplication());
         daemon = TauDaemon.getInstance(getApplication());
     }
 
@@ -164,13 +172,20 @@ public class CommunityViewModel extends AndroidViewModel {
                 // 链端follow community
                 ChainURL url = ChainUrlUtil.decode(chainUrl);
                 boolean success = false;
+                Set<String> peers = null;
                 if (url != null) {
-                    Set<String> peers = url.getPeers();
+                    peers = url.getPeers();
                     success = daemon.followChain(chainID, peers);
                 }
                 if (success) {
                     Community community = new Community(chainID, communityName);
                     communityRepo.addCommunity(community);
+                    if (peers != null) {
+                        for (String peer : peers) {
+                            addUserInfoToLocal(peer);
+                            addMemberInfoToLocal(chainID, peer);
+                        }
+                    }
                 }
                 result.setSuccess(success);
                 result.setMsg(chainID);
@@ -186,6 +201,33 @@ public class CommunityViewModel extends AndroidViewModel {
                     addCommunityState.postValue(state);
                 });
         disposables.add(disposable);
+    }
+
+    /**
+     * 添加用户信息到本地
+     * @param publicKey 用户公钥
+     */
+    private void addUserInfoToLocal(String publicKey) {
+        User receiverUser = userRepo.getUserByPublicKey(publicKey);
+        if (null == receiverUser) {
+            receiverUser = new User(publicKey);
+            userRepo.addUser(receiverUser);
+            logger.info("addUserInfoToLocal, publicKey::{}", publicKey);
+        }
+    }
+
+    /**
+     * 添加社区成员信息
+     * @param chainID 链ID
+     * @param publicKey 用户公钥
+     */
+    private void addMemberInfoToLocal(String chainID, String publicKey) {
+        Member member = memberRepo.getMemberByChainIDAndPk(chainID, publicKey);
+        if (null == member) {
+            member = new Member(chainID, publicKey);
+            memberRepo.addMember(member);
+            logger.info("addMemberInfoToLocal, publicKey::{}", publicKey);
+        }
     }
 
     /**
@@ -267,6 +309,38 @@ public class CommunityViewModel extends AndroidViewModel {
     }
 
     /**
+     * 显示拉黑社区提示对话框
+     * @param chainID 社区chainID
+     */
+    CommonDialog showBanCommunityTipsDialog(FragmentActivity activity, String chainID) {
+        String key = activity.getString(R.string.pref_key_show_blacklist_dialog);
+        boolean isShowDialog = settingsRepo.getBooleanValue(key, true);
+        if (!isShowDialog) {
+            setCommunityBlacklist(chainID, true);
+            return null;
+        }
+        BlacklistDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
+                R.layout.blacklist_dialog, null, false);
+        String blacklistTip = activity.getString(R.string.community_blacklist_tip, ChainIDUtil.getName(chainID));
+        dialogBinding.tvMsg.setText(Html.fromHtml(blacklistTip));
+        CommonDialog blacklistDialog = new CommonDialog.Builder(activity)
+                .setContentView(dialogBinding.getRoot())
+                .enableWarpWidth(true)
+                .setCanceledOnTouchOutside(false)
+                .create();
+        blacklistDialog.show();
+        dialogBinding.tvSubmit.setOnClickListener(v -> {
+            blacklistDialog.closeDialog();
+            settingsRepo.setBooleanValue(key, !dialogBinding.cbDoNotShow.isChecked());
+            setCommunityBlacklist(chainID, true);
+        });
+        dialogBinding.ivClose.setOnClickListener(v -> {
+            blacklistDialog.closeDialog();
+        });
+        return blacklistDialog;
+    }
+
+    /**
      * 设置社区黑名单
      * @param chainID 社区chainID
      * @param blacklist 是否加入黑名单
@@ -277,7 +351,6 @@ public class CommunityViewModel extends AndroidViewModel {
 
     private void setCommunityBlacklistTask(String chainID, boolean blacklist) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
-            communityRepo.setCommunityBlacklist(chainID, blacklist);
             boolean success;
             if (blacklist) {
                 success = daemon.unfollowChain(chainID);
@@ -371,11 +444,10 @@ public class CommunityViewModel extends AndroidViewModel {
     /**
      * 查询社区成员
      * @param chainID
-     * @param onChain
      * @return DataSource.Factory
      */
-    public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID, boolean onChain) {
-        return memberRepo.queryCommunityMembers(chainID, onChain);
+    public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID) {
+        return memberRepo.queryCommunityMembers(chainID);
     }
 
     /**
@@ -416,8 +488,8 @@ public class CommunityViewModel extends AndroidViewModel {
         return communityRepo.observerCommunityByChainID(chainID);
     }
 
-    LiveData<PagedList<MemberAndFriend>> observerCommunityMembers(String chainID, boolean onChain) {
-        return new LivePagedListBuilder<>(queryCommunityMembers(chainID, onChain),
+    LiveData<PagedList<MemberAndFriend>> observerCommunityMembers(String chainID) {
+        return new LivePagedListBuilder<>(queryCommunityMembers(chainID),
                 Page.getPageListConfig()).build();
     }
 

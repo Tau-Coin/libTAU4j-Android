@@ -13,7 +13,7 @@ public enum CommunityTabs {
     ON_CHAIN_NOTE(0, R.string.community_chain_note),
     OFF_CHAIN_MSG(1, R.string.community_chain_note),
     WRING_TX(2, R.string.community_wired),
-    TIP_BLOCKS(3, R.string.community_queue);
+    TIP_BLOCKS(3, R.string.community_head_blocks);
 
     private int index;
     private int name;

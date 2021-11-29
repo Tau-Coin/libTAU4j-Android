@@ -81,16 +81,11 @@ public class MemberRepositoryImpl implements MemberRepository{
     /**
      * 查询社区成员
      * @param chainID 社区链ID
-     * @param onChain 是否上链
      * @return DataSource.Factory
      */
     @Override
-    public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID, boolean onChain){
-        if(onChain){
-            return db.memberDao().queryCommunityMembersOnChain(chainID);
-        }else{
-            return db.memberDao().queryCommunityMembersNotOnChain(chainID);
-        }
+    public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID){
+        return db.memberDao().queryCommunityMembersOnChain(chainID);
     }
 
     /**

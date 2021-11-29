@@ -85,7 +85,7 @@ public class MemberFragment extends BaseFragment implements MemberListAdapter.Cl
         binding.recyclerView.setItemAnimator(null);
         binding.recyclerView.setAdapter(adapter);
 
-        communityViewModel.observerCommunityMembers(chainID, onChain).observe(activity, members -> {
+        communityViewModel.observerCommunityMembers(chainID).observe(activity, members -> {
             adapter.submitList(members);
             logger.debug("adapter.size::{}, newSize::{}", adapter.getItemCount(), members.size());
         });

@@ -84,6 +84,7 @@
     <string name="community_settings">Settings</string>
     <string name="community_chain_status">Chain Status</string>
     <string name="community_blacklist">Blacklist</string>
+    <string name="community_members">Members</string>
     <string name="community_mining_info">Mining</string>
     <string name="community_sync_rate">Sync Rate</string>
     <string name="community_miners_online">Miners Online</string>
@@ -127,10 +128,9 @@
     <string name="community_filter_all">All</string>
     <string name="community_chain_note">Onchain Note Transaction</string>
     <string name="community_off_chain_msg">Offchain Message</string>
+    <string name="community_member_off_chain">Offchain</string>
     <string name="community_wired">Wiring Transaction</string>
-    <string name="community_tip_blocks">Tip Blocks</string>
-    <string name="community_queue">Queue</string>
-    <string name="community_on_chain">Onchain</string>
+    <string name="community_head_blocks">Head Blocks</string>
     <string name="community_chain_note_title">Onchain Note Transaction</string>
     <string name="community_filter_by">Filter by</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
@@ -166,7 +166,9 @@
     <string name="community_auto_renewal_help_content">Auto Renewal keeps account available on chain
         when remaining balance covers the transaction fee.</string>
 
-    <string name="community_tip_block">Tip Block</string>
+    <string name="community_head_block">Head Block</string>
+    <string name="community_tail_block">Tail Block</string>
+    <string name="community_consensus_block">Consensus Block</string>
     <string name="community_tip_block_txs">Transactions:</string>
     <string name="community_tip_block_timestamp">Timestamp:</string>
     <string name="community_tip_block_miner">Mined by:</string>

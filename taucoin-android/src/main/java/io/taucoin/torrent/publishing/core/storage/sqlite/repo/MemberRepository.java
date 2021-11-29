@@ -43,7 +43,7 @@ public interface MemberRepository {
 
     Flowable<List<MemberAndUser>> observeCommunityMembers(String chainID);
 
-    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID, boolean onChain);
+    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID);
 
     /**
      * 获取和社区成员共在的社区数

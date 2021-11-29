@@ -126,6 +126,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/ll_block_number"
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">

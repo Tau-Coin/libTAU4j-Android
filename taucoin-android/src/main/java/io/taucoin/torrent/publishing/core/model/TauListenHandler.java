@@ -106,7 +106,7 @@ class TauListenHandler {
         // 添加发送者为社区成员
         addMemberInfo(block.getChainID(), block.getMiner(), isSync);
         // 处理交易信息
-        handleTransactionData(block.getTx(), isRollback, isSync);
+        handleTransactionData(block.getBlockNumber(), block.getTx(), isRollback, isSync);
     }
 
     /**
@@ -161,7 +161,12 @@ class TauListenHandler {
             String miner = ByteUtil.toHexString(block.getMiner());
             long difficulty = block.getCumulativeDifficulty().longValue();
             Transaction transaction = block.getTx();
-            long rewards = null == transaction ? 0L : transaction.getFee();
+            long rewards;
+            if (block.getBlockNumber() <= 0) {
+                rewards = block.getMinerBalance();
+            } else {
+                rewards = null == transaction ? 0L : transaction.getFee();
+            }
             blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty, status);
             blockRepository.addBlock(blockInfo);
             logger.info("Save Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}",
@@ -176,9 +181,13 @@ class TauListenHandler {
 
     /**
      * 处理Block数据：解析Block数据，更新用户、社区成员、交易数据
+     * @param blockNumber 区块号
      * @param txMsg Transaction
+     * @param isRollback 是否是回滚
+     * @param isSync 是否是同步
      */
-    private void handleTransactionData(Transaction txMsg, boolean isRollback, boolean isSync) {
+    private void handleTransactionData(long blockNumber, Transaction txMsg, boolean isRollback,
+                                       boolean isSync) {
         if (null == txMsg) {
             return;
         }
@@ -189,6 +198,7 @@ class TauListenHandler {
         // 本地存在此交易, 更新交易状态值
         if (tx != null) {
             tx.txStatus = isRollback ? 0 : 1;
+            tx.blockNumber = blockNumber;
             txRepo.updateTransaction(tx);
             handleMemberInfo(txMsg);
             return;
@@ -206,6 +216,7 @@ class TauListenHandler {
         tx.memo = Utils.textBytesToString(txContent.getContent());
         tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
         tx.txStatus = isRollback ? 0 : 1;
+        tx.blockNumber = blockNumber;
         // 保存发送者信息
         saveUserInfo(txMsg.getSender());
         // 添加发送者为社区成员
@@ -314,12 +325,26 @@ class TauListenHandler {
     }
 
     /**
+     * libTAU上报当前共识点区块
+     * @param block 共识点区块
+     */
+    void handleNewConsensusBlock(Block block) {
+        String chainID = ChainIDUtil.decode(block.getChainID());
+        Community community = communityRepo.getCommunityByChainID(chainID);
+        if (community != null) {
+            community.consensusBlock = block.getBlockNumber();
+            logger.info("handleNewConsensusBlock, chainID::{}, blockNumber::{}, blockHash::{}",
+                    chainID, block.getBlockNumber(), block.Hash());
+        }
+    }
+
+    /**
      * 处理libTAU上报接收到新的交易（未上链在交易池中）
      * @param tx 交易
      */
     void handleNewTransaction(Transaction tx) {
         logger.info("handleNewTransaction");
-        handleTransactionData(tx, true, false);
+        handleTransactionData(0, tx, true, false);
     }
 
     /**

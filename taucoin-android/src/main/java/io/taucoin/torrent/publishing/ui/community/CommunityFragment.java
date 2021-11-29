@@ -25,13 +25,12 @@ import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
-import io.taucoin.torrent.publishing.ui.transaction.TipBlocksTabFragment;
+import io.taucoin.torrent.publishing.ui.transaction.HeadBlockTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
 
 /**
@@ -145,6 +144,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private void loadTabView(String tab) {
         switch (tab) {
             case "0":
+                // Onchain note transaction
                 currentTabFragment = new TxsTabFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString(IntentExtra.CHAIN_ID, chainID);
@@ -153,7 +153,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 currentTabFragment.setArguments(bundle);
                 break;
             case "1":
-                // 添加Chain Note页面
+                // offchian message
                 currentTabFragment = new TxsTabFragment();
                 bundle = new Bundle();
                 bundle.putString(IntentExtra.CHAIN_ID, chainID);
@@ -162,6 +162,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 currentTabFragment.setArguments(bundle);
                 break;
             case "2":
+                // Wiring transaction
                 currentTabFragment = new TxsTabFragment();
                 bundle = new Bundle();
                 bundle.putString(IntentExtra.CHAIN_ID, chainID);
@@ -170,7 +171,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 currentTabFragment.setArguments(bundle);
                 break;
             case "3":
-                currentTabFragment = new TipBlocksTabFragment();
+                // head block
+                currentTabFragment = new HeadBlockTabFragment();
                 bundle = new Bundle();
                 bundle.putString(IntentExtra.CHAIN_ID, chainID);
                 currentTabFragment.setArguments(bundle);

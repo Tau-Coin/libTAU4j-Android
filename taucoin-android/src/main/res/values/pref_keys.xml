@@ -45,4 +45,6 @@
     <string name="pref_key_dht_nodes" translatable="false">pref_key_dht_nodes</string>
 
     <string name="pref_key_community_filters_selected" translatable="false">pref_key_community_filters_selected</string>
+
+    <string name="pref_key_show_blacklist_dialog" translatable="false">pref_key_show_blacklist_dialog</string>
 </resources>

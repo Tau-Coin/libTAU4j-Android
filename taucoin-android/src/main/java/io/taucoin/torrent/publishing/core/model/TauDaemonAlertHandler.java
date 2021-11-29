@@ -11,8 +11,9 @@ import org.libTAU4j.Transaction;
 import org.libTAU4j.Vote;
 import org.libTAU4j.alerts.Alert;
 import org.libTAU4j.alerts.BlockChainForkPointBlockAlert;
+import org.libTAU4j.alerts.BlockChainNewConsensusPointBlockAlert;
+import org.libTAU4j.alerts.BlockChainNewHeadBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewTailBlockAlert;
-import org.libTAU4j.alerts.BlockChainNewTipBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewTransactionAlert;
 import org.libTAU4j.alerts.BlockChainRollbackBlockAlert;
 import org.libTAU4j.alerts.BlockChainTopThreeVotesAlert;
@@ -102,11 +103,14 @@ class TauDaemonAlertHandler {
                 // 消息同步
                 onSyncMessage(alert, alertAndUser.getUserPk());
                 break;
-            case BLOCK_CHAIN_TIP_BLOCK:
+            case BLOCK_CHAIN_HEAD_BLOCK:
                 onNewBlock(alert);
                 break;
             case BLOCK_CHAIN_TAIL_BLOCK:
                 onSyncBlock(alert);
+                break;
+            case BLOCK_CHAIN_CONSENSUS_POINT_BLOCK:
+                onNewConsensusBlock(alert);
                 break;
             case BLOCK_CHAIN_ROLLBACK_BLOCK:
                 onRollbackBlock(alert);
@@ -275,7 +279,7 @@ class TauDaemonAlertHandler {
      * @param alert libTAU上报
      */
     private void onNewBlock(Alert alert) {
-        BlockChainNewTipBlockAlert a = (BlockChainNewTipBlockAlert) alert;
+        BlockChainNewHeadBlockAlert a = (BlockChainNewHeadBlockAlert) alert;
         logger.info(a.get_message());
         Block block = a.get_new_block();
         tauListenHandler.handleNewBlock(block);
@@ -301,6 +305,17 @@ class TauDaemonAlertHandler {
         logger.info(a.get_message());
         Block block = a.get_new_block();
         tauListenHandler.handleRollbackBlock(block);
+    }
+
+    /**
+     * libTAU上报当前共识点区块
+     * @param alert libTAU上报
+     */
+    private void onNewConsensusBlock(Alert alert) {
+        BlockChainNewConsensusPointBlockAlert a = (BlockChainNewConsensusPointBlockAlert) alert;
+        logger.info(a.get_message());
+        Block block = a.get_new_block();
+        tauListenHandler.handleNewConsensusBlock(block);
     }
 
     /**

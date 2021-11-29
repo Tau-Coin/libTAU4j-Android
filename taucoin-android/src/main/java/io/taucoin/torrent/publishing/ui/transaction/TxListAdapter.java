@@ -115,7 +115,6 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
             String userName = UsersUtil.getUserName(tx.sender, tx.senderPk);
             if (binding instanceof ItemWiringTxBinding) {
                 ItemWiringTxBinding txBinding = (ItemWiringTxBinding) holder.binding;
-                txBinding.tvBlockNumber.setVisibility(tx.txStatus == 1 ? View.VISIBLE : View.GONE);
                 String amount = FmtMicrometer.fmtBalance(tx.amount) + " " +
                         ChainIDUtil.getCoinName(chainID);
                 txBinding.tvAmount.setText(amount);
@@ -125,6 +124,8 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
                 txBinding.tvHash.setText(tx.txID);
                 txBinding.tvMemo.setText(memo);
                 txBinding.tvTime.setText(time);
+                txBinding.llBlockNumber.setVisibility(tx.txStatus == 1 ? View.VISIBLE : View.GONE);
+                txBinding.tvBlockNumber.setText(FmtMicrometer.fmtLong(tx.blockNumber));
                 boolean isMine = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
                 txBinding.middleView.setBackgroundResource(isMine ? R.drawable.red_rect_round_bg_big_radius :
                         R.drawable.white_rect_round_bg_big_radius);
@@ -156,8 +157,8 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
                 noteBinding.tvMsg.setText(memo);
                 noteBinding.tvTime.setText(time);
 
-                if(StringUtil.isEquals(tx.senderPk,
-                        MainApplication.getInstance().getPublicKey())){
+                if (StringUtil.isEquals(tx.senderPk,
+                        MainApplication.getInstance().getPublicKey())) {
                     noteBinding.leftView.tvBlacklist.setVisibility(View.GONE);
                 }
                 setOnLongClickListener(noteBinding.middleView, tx, tx.memo);
@@ -167,7 +168,7 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
 
         private void setLeftViewClickListener(MsgLeftViewBinding binding, UserAndTx tx) {
             binding.roundButton.setOnClickListener(view ->{
-                if(listener != null){
+                if (listener != null) {
                     listener.onUserClicked(tx.senderPk);
                 }
             });

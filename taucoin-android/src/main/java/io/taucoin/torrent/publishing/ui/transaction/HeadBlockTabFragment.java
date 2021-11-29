@@ -8,8 +8,6 @@ import android.view.ViewGroup;
 
 import org.libTAU4j.Block;
 import org.libTAU4j.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -20,8 +18,8 @@ import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -32,12 +30,11 @@ import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
- * Tip区块页面
+ * 头区块页面
  */
-public class TipBlocksTabFragment extends CommunityTabFragment {
+public class HeadBlockTabFragment extends CommunityTabFragment {
 
     private BaseActivity activity;
     private FragmentTipBlocksTabBinding binding;
@@ -76,11 +73,11 @@ public class TipBlocksTabFragment extends CommunityTabFragment {
     /**
      * 加载Tip区块信息
      */
-    private void loadData() {
+    private void loadData(Community community) {
         List<Block> tipBlocks = communityViewModel.getTopTipBlock(chainID, 1);
         if (tipBlocks != null && tipBlocks.size() == 1) {
             Block block = tipBlocks.get(0);
-            binding.tvTipBlock.setText(String.valueOf(block.getBlockNumber()));
+            binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(block.getBlockNumber()));
             Transaction tx = block.getTx();
             byte[] payload = tx.getPayload();
 
@@ -94,6 +91,10 @@ public class TipBlocksTabFragment extends CommunityTabFragment {
             String difficulty = FmtMicrometer.fmtDecimal(block.getCumulativeDifficulty().longValue());
             binding.tvDifficulty.setText(difficulty);
             binding.tvSize.setText(Formatter.formatFileSize(activity, block.Size()));
+        }
+        if (community != null) {
+            binding.tvTailBlock.setText(FmtMicrometer.fmtLong(community.tailBlock));
+            binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(community.consensusBlock));
         }
     }
 
@@ -110,9 +111,7 @@ public class TipBlocksTabFragment extends CommunityTabFragment {
         disposables.add(communityViewModel.observerCommunityByChainID(chainID)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(community -> {
-                loadData();
-            }));
+            .subscribe(community -> loadData(community)));
     }
 
     @Override

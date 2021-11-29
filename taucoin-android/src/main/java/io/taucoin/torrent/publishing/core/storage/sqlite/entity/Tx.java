@@ -26,6 +26,7 @@ public class Tx implements Parcelable {
     public int txType;                      // 交易类型，同MsgType中枚举类型
     public String memo;                     // 交易的备注、描述、bootstraps、评论等
     public int txStatus;                    // 交易的状态 0：未上链（在交易池中）；1：上链成功 (不上链)
+    public long blockNumber;                // 交易所属的区块号
 
     public String receiverPk;               // 交易接收者的公钥 只针对TxType.Wiring类型
     public long amount;                     // 交易金额 只针对TxType.Wiring类型
@@ -67,6 +68,7 @@ public class Tx implements Parcelable {
         nonce = in.readLong();
         txType = in.readInt();
         txStatus = in.readInt();
+        blockNumber = in.readLong();
     }
 
     @Override
@@ -82,6 +84,7 @@ public class Tx implements Parcelable {
         dest.writeLong(nonce);
         dest.writeInt(txType);
         dest.writeInt(txStatus);
+        dest.writeLong(blockNumber);
     }
 
     @Override
