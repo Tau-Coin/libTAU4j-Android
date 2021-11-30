@@ -219,6 +219,10 @@ public class MembersAddFragment extends BaseFragment implements CompoundButton.O
      * 显示添加新社区成功后的对话框
      */
     void showConfirmDialog() {
+        if (getSelectedMap().size() == 0) {
+            ToastUtils.showShortToast(R.string.community_added_members_empty);
+            return;
+        }
         ViewConfirmDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.view_confirm_dialog, null, false);
         MembersConfirmAdapter adapter = new MembersConfirmAdapter(getSelectedMap());

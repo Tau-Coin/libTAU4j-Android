@@ -318,14 +318,16 @@ public class CommunityViewModel extends AndroidViewModel {
             return false;
         }
         BigInteger totalCoins = BigInteger.ZERO;
-        Collection<String> values = selectedMap.values();
-        for (String value : values) {
-            long coin = FmtMicrometer.fmtTxLongValue(value);
-            totalCoins = totalCoins.add(BigInteger.valueOf(coin));
-        }
-        if (totalCoins.compareTo(Constants.TOTAL_COIN) > 0) {
-            ToastUtils.showLongToast(R.string.error_airdrop_coins_too_greater);
-            return false;
+        if (selectedMap != null) {
+            Collection<String> values = selectedMap.values();
+            for (String value : values) {
+                long coin = FmtMicrometer.fmtTxLongValue(value);
+                totalCoins = totalCoins.add(BigInteger.valueOf(coin));
+            }
+            if (totalCoins.compareTo(Constants.TOTAL_COIN) > 0) {
+                ToastUtils.showLongToast(R.string.error_airdrop_coins_too_greater);
+                return false;
+            }
         }
         return true;
     }

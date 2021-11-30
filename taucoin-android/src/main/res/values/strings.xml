@@ -159,6 +159,7 @@
     <string name="community_added_successfully">Create Community Successful!</string>
     <string name="community_added_failed">Failed to add community!</string>
     <string name="community_added_members">Add Members</string>
+    <string name="community_added_members_empty">Please add or select friends first!</string>
     <string name="community_custom_airdrop_tips">Custom airdrop coins to friends</string>
     <string name="community_airdrop_peers">Peers/%1$d</string>
     <string name="community_airdrop_coins">Coins/%1$s</string>
