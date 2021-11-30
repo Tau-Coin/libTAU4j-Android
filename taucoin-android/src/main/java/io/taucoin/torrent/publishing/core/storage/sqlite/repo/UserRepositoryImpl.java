@@ -119,6 +119,7 @@ public class UserRepositoryImpl implements UserRepository{
     @Override
     public void setUserBlacklist(String publicKey, boolean blacklist){
         db.userDao().setUserBlacklist(publicKey, blacklist ? 1 : 0);
+        submitDataSetChanged();
     }
 
     /**

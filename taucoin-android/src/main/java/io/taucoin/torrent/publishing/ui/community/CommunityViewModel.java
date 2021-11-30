@@ -19,6 +19,8 @@ import org.libTAU4j.ChainURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -66,6 +68,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
+import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
@@ -233,11 +236,12 @@ public class CommunityViewModel extends AndroidViewModel {
     /**
      * 添加新的社区到数据库
      * @param community 社区数据
+     * @param selectedMap 创建社区的初始成员
      */
-    void addCommunity(@NonNull Community community) {
+    void addCommunity(@NonNull Community community, Map<String, String> selectedMap) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             // TauController:创建Community社区
-            Result result = createCommunity(community);
+            Result result = createCommunity(community, selectedMap);
             emitter.onNext(result);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
@@ -247,7 +251,7 @@ public class CommunityViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private Result createCommunity(Community community) {
+    private Result createCommunity(Community community, Map<String, String> selectedMap) {
         Result result = new Result();
         try {
             // chainID为空，再次尝试创建一次
@@ -260,6 +264,14 @@ public class CommunityViewModel extends AndroidViewModel {
             }
             result.setMsg(community.chainID);
             Map<String, Account> accounts = new HashMap<>();
+            if (selectedMap != null) {
+                Collection<String> keys = selectedMap.keySet();
+                for (String key : keys) {
+                    long balance = FmtMicrometer.fmtTxLongValue(selectedMap.get(key));
+                    Account account = new Account(balance, 0, 1, 0);
+                    accounts.put(key, account);
+                }
+            }
             byte[] chainID = ChainIDUtil.encode(community.chainID);
             boolean isCreateSuccess = daemon.createNewCommunity(chainID, accounts);
             if (!isCreateSuccess) {
@@ -294,7 +306,7 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param community view数据对象
      * @return 是否验证通过
      */
-    boolean validateCommunity(@NonNull Community community) {
+    boolean validateCommunity(@NonNull Community community, Map<String, String> selectedMap) {
         String communityName = community.communityName;
         if (StringUtil.isEmpty(communityName)) {
             ToastUtils.showLongToast(R.string.error_community_name_empty);
@@ -303,6 +315,16 @@ public class CommunityViewModel extends AndroidViewModel {
         byte[] nameBytes = Utils.textStringToBytes(communityName);
         if (nameBytes != null && nameBytes.length > Constants.MAX_COMMUNITY_NAME_LENGTH) {
             ToastUtils.showLongToast(R.string.error_community_name_too_long);
+            return false;
+        }
+        BigInteger totalCoins = BigInteger.ZERO;
+        Collection<String> values = selectedMap.values();
+        for (String value : values) {
+            long coin = FmtMicrometer.fmtTxLongValue(value);
+            totalCoins = totalCoins.add(BigInteger.valueOf(coin));
+        }
+        if (totalCoins.compareTo(Constants.TOTAL_COIN) > 0) {
+            ToastUtils.showLongToast(R.string.error_airdrop_coins_too_greater);
             return false;
         }
         return true;
@@ -568,6 +590,16 @@ public class CommunityViewModel extends AndroidViewModel {
      */
     public List<Block> getTopTipBlock(String chainID, int topNum) {
         return daemon.getTopTipBlock(chainID, topNum);
+    }
+
+    /**
+     * 获取区块
+     * @param chainID 社区ID
+     * @param blockNumber 区块号
+     * @return Block
+     */
+    public Block getBlockByNumber(String chainID, long blockNumber) {
+        return daemon.getBlockByNumber(chainID, blockNumber);
     }
 
     /**

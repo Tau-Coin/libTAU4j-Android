@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -337,13 +337,23 @@ public class TxViewModel extends AndroidViewModel {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             Result result = new Result();
             try {
-//                String senderPk = MainApplication.getInstance().getPublicKey();
-//                long balance = daemon.getUserBalance(chainID, senderPk);
-//                long airdropCoin = Constants.AIRDROP_COIN.longValue();
-//                long totalPay = (airdropCoin + medianFee) * friendPks.size();
-//                if(totalPay > balance){
-//                    result = application.getString(R.string.tx_error_no_enough_coins_for_airdrop);
-//                }else{
+                Collection<String> values = friendPks.values();
+                long totalPay = 0L;
+                long txFee = FmtMicrometer.fmtTxLongValue(fee);
+                for (String value : values) {
+                    totalPay += FmtMicrometer.fmtTxLongValue(value);
+                }
+                totalPay += friendPks.size() * txFee;
+
+                String senderPk = MainApplication.getInstance().getPublicKey();
+                Account account = daemon.getAccountInfo(ChainIDUtil.encode(chainID), senderPk);
+                long balance = 0L;
+                if (account != null) {
+                    balance = account.getBalance();
+                }
+                if (totalPay > balance) {
+                    result.setFailMsg(application.getString(R.string.tx_error_no_enough_coins_for_airdrop));
+                } else {
                     Set<String> friends = friendPks.keySet();
                     for (String friend : friends) {
                         String amount = friendPks.get(friend);
@@ -357,7 +367,7 @@ public class TxViewModel extends AndroidViewModel {
                             break;
                         }
                     }
-//                }
+                }
             } catch (Exception e){
                 result.setFailMsg(e.getMessage());
             }

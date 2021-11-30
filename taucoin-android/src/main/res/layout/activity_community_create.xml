@@ -2,6 +2,12 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -75,6 +81,25 @@
                         android:textAppearance="@style/TextAppearanceBody2" />
 
                 </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/tv_add_members"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:layout_marginTop="@dimen/widget_size_20"
+                    android:text="@string/community_added_members"
+                    android:textColor="@color/color_white"
+                    android:gravity="center_vertical|center"
+                    android:onClick="@{listener::onClick}"
+                    android:background="@drawable/primary_rect_round_bg"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/members_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>

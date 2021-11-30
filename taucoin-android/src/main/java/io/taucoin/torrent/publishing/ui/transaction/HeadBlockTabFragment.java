@@ -26,6 +26,7 @@ import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.Formatter;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentTipBlocksTabBinding;
+import io.taucoin.torrent.publishing.databinding.ItemBlockLayoutBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
@@ -71,31 +72,46 @@ public class HeadBlockTabFragment extends CommunityTabFragment {
     }
 
     /**
-     * 加载Tip区块信息
+     * 加载社区信息
      */
-    private void loadData(Community community) {
-        List<Block> tipBlocks = communityViewModel.getTopTipBlock(chainID, 1);
-        if (tipBlocks != null && tipBlocks.size() == 1) {
-            Block block = tipBlocks.get(0);
-            binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(block.getBlockNumber()));
-            Transaction tx = block.getTx();
-            byte[] payload = tx.getPayload();
+    private void loadCommunityData(Community community) {
+        if (null == community) {
+            return;
+        }
+        binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(community.headBlock));
+        Block headBlock = communityViewModel.getBlockByNumber(chainID, community.headBlock);
+        loadBlockDetailData(binding.headBlock, headBlock);
+        binding.tvTailBlock.setText(FmtMicrometer.fmtLong(community.tailBlock));
+        Block tailBlock = communityViewModel.getBlockByNumber(chainID, community.tailBlock);
+        loadBlockDetailData(binding.tailBlock, tailBlock);
+        binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(community.consensusBlock));
+        Block consensusBlock = communityViewModel.getBlockByNumber(chainID, community.consensusBlock);
+        loadBlockDetailData(binding.consensusBlock, consensusBlock);
+    }
 
-            boolean isHaveTx = payload != null && payload.length > 0;
-            binding.tvTxs.setText(isHaveTx ? "1" : "0");
-            binding.tvTimestamp.setText(DateUtil.formatTime(block.getTimestamp(), DateUtil.pattern6));
-            binding.tvMiner.setText(ByteUtil.toHexString(block.getMiner()));
-            String blockReward = FmtMicrometer.fmtFeeValue(tx.getFee());
-            blockReward += " " + ChainIDUtil.getCoinName(chainID);
-            binding.tvReward.setText(blockReward);
-            String difficulty = FmtMicrometer.fmtDecimal(block.getCumulativeDifficulty().longValue());
-            binding.tvDifficulty.setText(difficulty);
-            binding.tvSize.setText(Formatter.formatFileSize(activity, block.Size()));
+    /**
+     * 加载区块详细信息
+     */
+    private void loadBlockDetailData(ItemBlockLayoutBinding binding, Block block) {
+        if (null == block) {
+            return;
         }
-        if (community != null) {
-            binding.tvTailBlock.setText(FmtMicrometer.fmtLong(community.tailBlock));
-            binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(community.consensusBlock));
+        Transaction tx = block.getTx();
+        byte[] payload = tx.getPayload();
+
+        boolean isHaveTx = payload != null && payload.length > 0;
+        binding.tvTxs.setText(isHaveTx ? "1" : "0");
+        binding.tvTimestamp.setText(DateUtil.formatTime(block.getTimestamp(), DateUtil.pattern6));
+        binding.tvMiner.setText(ByteUtil.toHexString(block.getMiner()));
+        String blockReward = FmtMicrometer.fmtBalance(tx.getFee());
+        if (block.getBlockNumber() <= 0) {
+            blockReward = FmtMicrometer.fmtBalance(block.getMinerBalance());
         }
+        blockReward += " " + ChainIDUtil.getCoinName(chainID);
+        binding.tvReward.setText(blockReward);
+        String difficulty = FmtMicrometer.fmtDecimal(block.getCumulativeDifficulty().longValue());
+        binding.tvDifficulty.setText(difficulty);
+        binding.tvSize.setText(Formatter.formatFileSize(activity, block.Size()));
     }
 
     @Override
@@ -111,7 +127,7 @@ public class HeadBlockTabFragment extends CommunityTabFragment {
         disposables.add(communityViewModel.observerCommunityByChainID(chainID)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(community -> loadData(community)));
+            .subscribe(this::loadCommunityData));
     }
 
     @Override

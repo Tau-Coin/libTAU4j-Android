@@ -502,4 +502,30 @@ public class TauDaemonImpl extends TauDaemon {
                 time, isLocalTime);
         return time;
     }
+
+    /**
+     * 通过区块号查询区块
+     * @param chainID 链ID
+     * @param blockNumber 区块号
+     */
+    @Override
+    public Block getBlockByNumber(String chainID, long blockNumber) {
+        if (isRunning) {
+            return sessionManager.getBlockByNumber(ChainIDUtil.encode(chainID), blockNumber);
+        }
+        return null;
+    }
+
+    /**
+     * 通过区块hash查询区块
+     * @param chainID 链ID
+     * @param hash 区块hash
+     */
+    @Override
+    public Block getBlockByHash(String chainID, String hash) {
+        if (isRunning) {
+            return sessionManager.getBlockByHash(ChainIDUtil.encode(chainID), hash);
+        }
+        return null;
+    }
 }

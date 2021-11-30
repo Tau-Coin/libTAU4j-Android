@@ -621,4 +621,18 @@ public abstract class TauDaemon {
      * 获取Session Time
      */
     public abstract long getSessionTime();
+
+    /**
+     * 通过区块号查询区块
+     * @param chainID 链ID
+     * @param blockNumber 区块号
+     */
+    public abstract Block getBlockByNumber(String chainID, long blockNumber);
+
+    /**
+     * 通过区块hash查询区块
+     * @param chainID 链ID
+     * @param hash 区块hash
+     */
+    public abstract Block getBlockByHash(String chainID, String hash);
 }

@@ -154,6 +154,7 @@
     <string name="error_community_name_empty">Community name cannot be empty!</string>
     <string name="error_community_name_too_long">Community name is too long!</string>
     <string name="error_coin_name_empty">Coin name cannot be empty!</string>
+    <string name="error_airdrop_coins_too_greater">Airdrop coins cannot be greater than total coins!</string>
     <string name="error_telegram_id_illegal">Telegram ID is illegal!</string>
     <string name="community_added_successfully">Create Community Successful!</string>
     <string name="community_added_failed">Failed to add community!</string>

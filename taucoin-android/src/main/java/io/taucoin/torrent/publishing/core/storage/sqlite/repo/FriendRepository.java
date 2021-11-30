@@ -1,6 +1,5 @@
 package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Flowable;

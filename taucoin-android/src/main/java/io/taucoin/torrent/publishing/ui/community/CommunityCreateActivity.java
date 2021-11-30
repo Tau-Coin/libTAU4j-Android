@@ -5,15 +5,22 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
+import java.util.ArrayList;
+import java.util.Map;
+
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.EditTextInhibitInput;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -23,21 +30,20 @@ import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityCommunityCreateBinding;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
-import io.taucoin.torrent.publishing.databinding.ViewDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
 /**
  * 群组/社区创建页面
  */
-public class CommunityCreateActivity extends BaseActivity {
+public class CommunityCreateActivity extends BaseActivity implements View.OnClickListener {
+    private static int ADD_MEMBERS_CODE = 0x01;
     private ActivityCommunityCreateBinding binding;
     private CommunityViewModel viewModel;
-    private CommonDialog successDialog;
     private String chainID;
+    private MembersAddFragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +52,7 @@ public class CommunityCreateActivity extends BaseActivity {
         viewModel = provider.get(CommunityViewModel.class);
         viewModel.observeNeedStartDaemon();
         binding = DataBindingUtil.setContentView(this, R.layout.activity_community_create);
+        binding.setListener(this);
         initLayout();
         observeAddCommunityState();
     }
@@ -101,43 +108,16 @@ public class CommunityCreateActivity extends BaseActivity {
     private void observeAddCommunityState() {
         viewModel.getAddCommunityState().observe(this, state -> {
             if (state.isSuccess()) {
-                showSuccessDialog(state.getMsg());
+                // 进入社区页面
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, state.getMsg());
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra(IntentExtra.TYPE, 0);
+                ActivityUtil.startActivity(intent, this, MainActivity.class);
             } else {
                 ToastUtils.showShortToast(state.getMsg());
             }
         });
-    }
-
-    /**
-     * 显示添加新社区成功后的对话框
-     */
-    private void showSuccessDialog(String chainID) {
-        ViewDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(this),
-                R.layout.view_dialog, null, false);
-        binding.tvMsg.setText(R.string.community_added_successfully);
-        binding.tvMsg.setTextColor(getResources().getColor(R.color.color_black));
-        successDialog = new CommonDialog.Builder(this)
-                .setContentView(binding.getRoot())
-                .setHorizontal()
-                .setCanceledOnTouchOutside(false)
-                .setPositiveButton(R.string.community_added_members, (dialog, which) -> {
-                    dialog.cancel();
-                    onBackPressed();
-                    Intent intent = new Intent();
-                    intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_ADD_MEMBERS);
-                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                    ActivityUtil.startActivity(intent, this, FriendsActivity.class);
-                }).setNegativeButton(R.string.common_later, (dialog, which) -> {
-                    dialog.cancel();
-                    // 进入社区页面
-                    Intent intent = new Intent();
-                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra(IntentExtra.TYPE, 0);
-                    ActivityUtil.startActivity(intent, this, MainActivity.class);
-                }).create();
-        successDialog.show();
-
     }
 
     /**
@@ -158,8 +138,13 @@ public class CommunityCreateActivity extends BaseActivity {
         if (item.getItemId() == R.id.menu_done) {
             Community community = buildCommunity();
             community.chainID = chainID;
-            if(viewModel.validateCommunity(community)){
-                viewModel.addCommunity(community);
+
+            Map<String, String> selectedMap = null;
+            if (currentFragment != null) {
+                selectedMap = currentFragment.getSelectedMap();
+            }
+            if (viewModel.validateCommunity(community, selectedMap)) {
+                viewModel.addCommunity(community, selectedMap);
             }
         }
         return true;
@@ -167,18 +152,56 @@ public class CommunityCreateActivity extends BaseActivity {
 
     private Community buildCommunity() {
         String communityName = ViewUtils.getText(binding.etCommunityName);
-        String publicKey = ViewUtils.getText(binding.tvPublicKey);
         return new Community(chainID, communityName);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (successDialog != null) {
-            successDialog.closeDialog();
-        }
         if (mTextWatcher != null) {
             binding.etCommunityName.removeTextChangedListener(mTextWatcher);
+        }
+        currentFragment = null;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.tv_add_members) {
+            Intent intent = new Intent();
+            intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_CREATION_ADD_MEMBERS);
+            ActivityUtil.startActivityForResult(intent, this, FriendsActivity.class,
+                    ADD_MEMBERS_CODE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == ADD_MEMBERS_CODE && data != null) {
+            loadFragment(data.getParcelableArrayListExtra(IntentExtra.BEAN));
+        }
+    }
+
+    private void loadFragment(ArrayList<User> friends) {
+        if (null == currentFragment) {
+            FragmentManager fm = getSupportFragmentManager();
+            if (fm.isDestroyed()) {
+                return;
+            }
+            currentFragment = new MembersAddFragment();
+            Bundle bundle = new Bundle();
+            bundle.putLong(IntentExtra.AIRDROP_COIN, Constants.CREATION_AIRDROP_COIN.longValue());
+            bundle.putParcelableArrayList(IntentExtra.BEAN, friends);
+            currentFragment.setArguments(bundle);
+            FragmentTransaction transaction = fm.beginTransaction();
+            // Replace whatever is in the fragment container view with this fragment,
+            // and add the transaction to the back stack
+            transaction.replace(R.id.members_fragment, currentFragment);
+            // 执行此方法后，fragment的onDestroy()方法和ViewModel的onCleared()方法都不执行
+            // transaction.addToBackStack(null);
+            transaction.commitAllowingStateLoss();
+        } else {
+            currentFragment.updateData(friends);
         }
     }
 }

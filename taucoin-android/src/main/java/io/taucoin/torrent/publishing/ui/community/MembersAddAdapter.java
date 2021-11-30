@@ -36,11 +36,13 @@ import io.taucoin.torrent.publishing.databinding.ItemAddMembersBinding;
 public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewHolder> {
     private ClickListener listener;
     private boolean isUnified;
+    private long airdropCoin;
     private Map<String, String> selectedMap = new HashMap<>();
 
-    MembersAddAdapter(boolean isUnified) {
+    MembersAddAdapter(boolean isUnified, long airdropCoin) {
         super(diffCallback);
         this.isUnified = isUnified;
+        this.airdropCoin = airdropCoin;
     }
 
     void submitFriendList(@NonNull List<User> list) {
@@ -48,7 +50,7 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
         for (User user : list) {
             String key = user.publicKey;
             String value = getInputCoins(this.selectedMap, key,
-                    FmtMicrometer.fmtFormat(Constants.AIRDROP_COIN.toString()));
+                    FmtMicrometer.fmtFormat(String.valueOf(airdropCoin)));
             selectedMap.put(key, value);
         }
         this.selectedMap.clear();
@@ -97,7 +99,6 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
 
     List<User> getSelectedList() {
         List<User> list = new ArrayList<>();
-        Set<String> keys = selectedMap.keySet();
         for (User user : getCurrentList()) {
             if (selectedMap.containsKey(user.publicKey)) {
                 list.add(user);

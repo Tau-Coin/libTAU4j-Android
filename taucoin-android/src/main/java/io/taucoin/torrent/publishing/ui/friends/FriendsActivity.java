@@ -37,6 +37,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     public static final int PAGE_FRIENDS_LIST = 0;
     public static final int PAGE_SELECT_CONTACT = 1;
     public static final int PAGE_ADD_MEMBERS = 2;
+    public static final int PAGE_CREATION_ADD_MEMBERS = 4;
     private ActivityFriendsBinding binding;
     private UserViewModel userViewModel;
     private CommunityViewModel communityViewModel;
@@ -60,6 +61,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         communityViewModel = provider.get(CommunityViewModel.class);
         initParameter(getIntent());
         initView();
+        onRefresh();
     }
 
     @Override
@@ -98,20 +100,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         binding.recyclerList.setLayoutManager(layoutManager);
         binding.recyclerList.setItemAnimator(null);
         binding.recyclerList.setAdapter(adapter);
-        onRefresh();
-}
-
-    /**
-     * 获取交易费中位数
-     */
-//    private void getMedianFee() {
-//        if(StringUtil.isNotEmpty(chainID) && page == PAGE_ADD_MEMBERS){
-//            disposables.add(txViewModel.observeMedianFee(chainID)
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(fees -> medianFee = Utils.getMedianData(fees)));
-//        }
-//    }
+    }
 
     private void subscribeUserList() {
         disposables.add(userViewModel.observeUserDataSetChanged()
@@ -135,6 +124,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     @Override
     public void onStart() {
         super.onStart();
+        onRefresh();
         subscribeUserList();
         chatViewModel.startVisitFriend(scannedFriendPk);
 
@@ -173,7 +163,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         MenuItem menuItem = menu.findItem(R.id.menu_done);
         MenuItem menuRankC = menu.findItem(R.id.menu_rank_c);
         MenuItem menuRankA = menu.findItem(R.id.menu_rank_a);
-        menuItem.setVisible(page == PAGE_ADD_MEMBERS);
+        menuItem.setVisible(page == PAGE_ADD_MEMBERS || page == PAGE_CREATION_ADD_MEMBERS);
         menuRankC.setVisible(page == PAGE_FRIENDS_LIST && order == 0);
         menuRankA.setVisible(page == PAGE_FRIENDS_LIST && order != 0);
         return super.onPrepareOptionsMenu(menu);
@@ -186,9 +176,14 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_done) {
             Intent intent = new Intent();
-            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
             intent.putParcelableArrayListExtra(IntentExtra.BEAN, adapter.getSelectedList());
-            ActivityUtil.startActivity(intent, this, MembersAddActivity.class);
+            if (page == PAGE_CREATION_ADD_MEMBERS) {
+                setResult(RESULT_OK, intent);
+                this.finish();
+            } else {
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, MembersAddActivity.class);
+            }
         } else if (item.getItemId() == R.id.menu_rank_c) {
             order = 1;
             invalidateOptionsMenu();
@@ -202,22 +197,6 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         }
         return true;
     }
-
-//    @Override
-//    public void onSelectClicked() {
-//        int total = adapter.getSelectedList().size();
-//        if(total > 0){
-//            long airdropCoin = Constants.AIRDROP_COIN.longValue();
-//            long totalPay = (airdropCoin + medianFee) * total;
-//            long totalFee = medianFee * total;
-//            String totalPayStr = FmtMicrometer.fmtBalance(totalPay);
-//            String totalFeeStr = FmtMicrometer.fmtFeeValue(totalFee);
-//            String coinName = UsersUtil.getCoinName(chainID);
-//            String totalPayHtml = getString(R.string.contacts_total_pay, total,
-//                    totalPayStr, coinName, totalFeeStr);
-//            binding.tvTotalPay.setText(Html.fromHtml(totalPayHtml));
-//        }
-//    }
 
     @Override
     public void onItemClicked(@NonNull UserAndFriend user) {

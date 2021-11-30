@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -29,7 +31,7 @@ import io.taucoin.torrent.publishing.databinding.ItemFriendListBinding;
  */
 public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAdapter.ViewHolder> {
     private ClickListener listener;
-    private ArrayList<UserAndFriend> selectedList = new ArrayList<>();
+    private Map<String, UserAndFriend> selectedList = new HashMap<>();
     private int page;
     private int order;
     private String friendPk;
@@ -65,7 +67,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
     }
 
     ArrayList<UserAndFriend> getSelectedList() {
-        return selectedList;
+        return new ArrayList<>(selectedList.values());
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -73,17 +75,17 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
         private ClickListener listener;
         private Context context;
         private int type;
-        private List<UserAndFriend> selectedList;
+        private Map<String, UserAndFriend> selectedMap;
         private String friendPk;
 
         ViewHolder(ItemFriendListBinding binding, ClickListener listener, int type,
-                   List<UserAndFriend> selectedList, String friendPk) {
+                   Map<String, UserAndFriend> selectedMap, String friendPk) {
             super(binding.getRoot());
             this.binding = binding;
             this.context = binding.getRoot().getContext();
             this.listener = listener;
             this.type = type;
-            this.selectedList = selectedList;
+            this.selectedMap = selectedMap;
             this.friendPk = friendPk;
         }
 
@@ -91,20 +93,19 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
             if(null == holder || null == user){
                 return;
             }
-            holder.binding.cbSelect.setVisibility(type == FriendsActivity.PAGE_ADD_MEMBERS
-                    ? View.VISIBLE : View.GONE);
-            holder.binding.ivShare.setVisibility(type == FriendsActivity.PAGE_ADD_MEMBERS
-                    ? View.VISIBLE : View.GONE);
-            holder.binding.ivShare.setVisibility(type == FriendsActivity.PAGE_ADD_MEMBERS
-                    ? View.VISIBLE : View.GONE);
-            if(type == FriendsActivity.PAGE_ADD_MEMBERS){
+            boolean isShowSelect = type == FriendsActivity.PAGE_ADD_MEMBERS ||
+                    type == FriendsActivity.PAGE_CREATION_ADD_MEMBERS;
+            holder.binding.cbSelect.setVisibility(isShowSelect ? View.VISIBLE : View.GONE);
+            holder.binding.ivShare.setVisibility(View.GONE);
+            if (isShowSelect) {
                 holder.binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    selectedList.remove(user);
                     if(isChecked){
-                        selectedList.add(user);
+                        selectedMap.put(user.publicKey, user);
+                    } else {
+                        selectedMap.remove(user.publicKey);
                     }
                 });
-                holder.binding.cbSelect.setChecked(selectedList.contains(user.publicKey));
+                holder.binding.cbSelect.setChecked(selectedMap.containsKey(user.publicKey));
             }
             SpanUtils showNameBuilder = new SpanUtils();
             String showName;
