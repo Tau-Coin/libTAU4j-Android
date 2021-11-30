@@ -253,6 +253,6 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     @Override
     public void onRefresh() {
         // 立即执行刷新
-        userViewModel.loadUsersList(order, page == PAGE_FRIENDS_LIST, scannedFriendPk);
+        userViewModel.loadUsersList(order, true, scannedFriendPk);
     }
 }
