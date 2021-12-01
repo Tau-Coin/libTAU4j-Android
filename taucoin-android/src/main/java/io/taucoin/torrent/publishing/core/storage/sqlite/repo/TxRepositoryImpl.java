@@ -56,19 +56,6 @@ public class TxRepositoryImpl implements TxRepository{
         return result;
     }
 
-//    /**
-//     * 根据chainID获取社区的交易的被被观察者
-//     * @param chainID 社区链id
-//     */
-//    @Override
-//    public DataSource.Factory<Integer, UserAndTx> queryCommunityTxs(String chainID, long txType, int txStatus){
-//        if(txType == -1){
-//            return db.txDao().queryCommunityTxsNotOnChain(chainID);
-//        }else{
-//            return db.txDao().queryCommunityTxsOnChain(chainID, txType);
-//        }
-//    }
-
     /**
      * 根据chainID查询社区交易
      * @param chainID 社区链ID

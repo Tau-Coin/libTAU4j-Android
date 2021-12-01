@@ -712,7 +712,7 @@ public class UserViewModel extends AndroidViewModel {
      * 显示Ban User的对话框
      */
     public void showBanDialog(BaseActivity activity, String publicKey, String showName) {
-        if(settingsRepo.doNotShowBanDialog()){
+        if (settingsRepo.doNotShowBanDialog()) {
             setUserBlacklist(publicKey, true);
             return;
         }
@@ -724,15 +724,12 @@ public class UserViewModel extends AndroidViewModel {
                 commonDialog.closeDialog();
             }
         });
-        binding.tvDoNotShow.setOnClickListener(v -> {
-            if (commonDialog != null) {
-                commonDialog.closeDialog();
-            }
-            settingsRepo.doNotShowBanDialog(true);
-        });
         binding.tvSubmit.setOnClickListener(v -> {
             if (commonDialog != null) {
                 commonDialog.closeDialog();
+                if (binding.cbDoNotShow.isChecked()) {
+                    settingsRepo.doNotShowBanDialog(true);
+                }
             }
             setUserBlacklist(publicKey, true);
         });

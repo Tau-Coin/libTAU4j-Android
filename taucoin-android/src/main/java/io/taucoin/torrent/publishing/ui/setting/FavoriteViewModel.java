@@ -68,7 +68,7 @@ public class FavoriteViewModel extends AndroidViewModel {
                 if(tx != null){
                     favorite = new Favorite(tx.txID, tx.chainID, tx.senderPk, tx.receiverPk,
                             tx.amount, tx.fee, tx.txType, tx.memo);
-                    favorite.timestamp = DateUtil.getTime();
+                    favorite.timestamp = DateUtil.getMillisTime();
                     favoriteRepo.addFavorite(favorite);
                     logger.info("AddTxFavorite txID::{}, txType::{}, chainID::{}, memo::{}", tx.txID,
                             tx.txType, tx.chainID, tx.memo);

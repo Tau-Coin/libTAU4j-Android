@@ -63,14 +63,14 @@
                 android:textAppearance="@style/TextAppearanceBody1"
                 android:background="@drawable/primary_rect_round_bg" />
 
-            <TextView
-                android:id="@+id/tv_do_not_show"
+            <CheckBox
+                android:id="@+id/cb_do_not_show"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/widget_size_30"
-                android:textColor="@color/gray_dark"
+                android:layout_marginTop="@dimen/widget_size_0"
                 android:text="@string/common_do_not_show"
+                android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody2"/>
 
         </LinearLayout>

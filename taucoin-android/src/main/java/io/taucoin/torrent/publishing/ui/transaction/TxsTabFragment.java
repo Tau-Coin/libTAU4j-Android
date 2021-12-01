@@ -200,6 +200,14 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
                         loadData(0);
                     }
                 }));
+
+        userViewModel.getEditBlacklistResult().observe(this, result -> {
+            if (result.isSuccess()) {
+                ToastUtils.showShortToast(R.string.ban_successfully);
+            } else {
+                ToastUtils.showShortToast(R.string.ban_failed);
+            }
+        });
     }
 
     @Override

@@ -355,7 +355,9 @@ public class CommunityViewModel extends AndroidViewModel {
         blacklistDialog.show();
         dialogBinding.tvSubmit.setOnClickListener(v -> {
             blacklistDialog.closeDialog();
-            settingsRepo.setBooleanValue(key, !dialogBinding.cbDoNotShow.isChecked());
+            if (dialogBinding.cbDoNotShow.isChecked()) {
+                settingsRepo.setBooleanValue(key, true);
+            }
             setCommunityBlacklist(chainID, true);
         });
         dialogBinding.ivClose.setOnClickListener(v -> {
