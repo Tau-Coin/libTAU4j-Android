@@ -122,6 +122,7 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
                 txBinding.tvReceiver.setText(tx.receiverPk);
                 txBinding.tvFee.setText(FmtMicrometer.fmtFeeValue(tx.fee));
                 txBinding.tvHash.setText(tx.txID);
+                txBinding.tvNonce.setText(FmtMicrometer.fmtLong(tx.nonce));
                 txBinding.tvMemo.setText(memo);
                 txBinding.tvTime.setText(time);
                 txBinding.llBlockNumber.setVisibility(tx.txStatus == 1 ? View.VISIBLE : View.GONE);
