@@ -52,16 +52,16 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ViewDataBinding binding;
-        if (viewType == ViewType.WIRING_TX.ordinal()) {
+//        if (viewType == ViewType.WIRING_TX.ordinal()) {
             binding = DataBindingUtil.inflate(inflater,
                     R.layout.item_wiring_tx, parent, false);
-        } else if (viewType == ViewType.RIGHT_NOTE.ordinal()) {
-            binding = DataBindingUtil.inflate(inflater,
-                    R.layout.item_note_right, parent, false);
-        } else {
-            binding = DataBindingUtil.inflate(inflater,
-                    R.layout.item_note, parent, false);
-        }
+//        } else if (viewType == ViewType.RIGHT_NOTE.ordinal()) {
+//            binding = DataBindingUtil.inflate(inflater,
+//                    R.layout.item_note_right, parent, false);
+//        } else {
+//            binding = DataBindingUtil.inflate(inflater,
+//                    R.layout.item_note, parent, false);
+//        }
         return new ViewHolder(binding, listener, chainID);
     }
 
