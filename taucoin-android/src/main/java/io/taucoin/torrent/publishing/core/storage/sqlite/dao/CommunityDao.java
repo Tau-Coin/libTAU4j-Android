@@ -51,7 +51,7 @@ public interface CommunityDao {
             " ORDER BY timestamp, logicMsgHash COLLATE UNICODE)" +
             " GROUP BY receiverPkTemp)";
 
-    String QUERY_COMMUNITIES = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.power, b.blockNumber," +
+    String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.power, b.blockNumber," +
             " 0 AS type, 0 AS msgType, '' AS senderPk, '' AS receiverPk, " +
             " 0 AS msgUnread, '' AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
@@ -60,6 +60,17 @@ public interface CommunityDao {
             " LEFT JOIN (SELECT timestamp, memo, chainID FROM (SELECT timestamp, memo, chainID FROM Txs" +
             " WHERE senderPk NOT IN " + QUERY_GET_BANNED_USER_PK +
             " ORDER BY timestamp) GROUP BY chainID) AS c" +
+            " ON a.chainID = c.chainID";
+
+    String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.power, b.blockNumber," +
+            " 0 AS type, 0 AS msgType, '' AS senderPk, '' AS receiverPk, " +
+            " 0 AS msgUnread, '' AS msg, c.memo, c.timestamp" +
+            " FROM Communities AS a" +
+            " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
+            " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
+            " LEFT JOIN (SELECT timestamp, memo, chainID FROM (SELECT timestamp, memo, chainID FROM Txs" +
+            " WHERE senderPk NOT IN " + QUERY_GET_BANNED_USER_PK +
+            " ORDER BY timestamp DESC) GROUP BY chainID) AS c" +
             " ON a.chainID = c.chainID";
 
     String QUERY_FRIENDS_ASC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS balance, 0 AS power, 0 AS blockNumber," +
@@ -87,11 +98,11 @@ public interface CommunityDao {
             " AND f.friendPK NOT IN " + QUERY_GET_BANNED_USER_PK;
 
     String QUERY_COMMUNITIES_AND_FRIENDS_DESC = "SELECT * FROM (" + QUERY_FRIENDS_DESC +
-            " UNION ALL " + QUERY_COMMUNITIES + ")" +
+            " UNION ALL " + QUERY_COMMUNITIES_DESC + ")" +
             " ORDER BY timestamp DESC";
 
     String QUERY_COMMUNITIES_AND_FRIENDS_ASC = "SELECT * FROM (" + QUERY_FRIENDS_ASC +
-            " UNION ALL " + QUERY_COMMUNITIES + ")" +
+            " UNION ALL " + QUERY_COMMUNITIES_ASC + ")" +
             " ORDER BY timestamp DESC";
 
     String QUERY_GET_COMMUNITIES_IN_BLACKLIST = "SELECT * FROM Communities where isBanned = 1";
