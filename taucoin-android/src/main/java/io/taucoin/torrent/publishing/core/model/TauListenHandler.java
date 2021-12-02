@@ -191,8 +191,8 @@ class TauListenHandler {
         }
         String txID = txMsg.getTxID().to_hex();
         Tx tx = txRepo.getTxByTxID(txID);
-        logger.debug("handleTransactionData txID::{}, exist::{}, payload::{}", txID, tx != null,
-                txMsg.getPayload());
+        logger.debug("handleTransactionData txID::{}, timestamp::{}, exist::{}, payload::{}", txID,
+                txMsg.getTimestamp(), tx != null, txMsg.getPayload());
         // 处理用户信息
         handleUserInfo(txMsg);
         // 处理社区成员信息
