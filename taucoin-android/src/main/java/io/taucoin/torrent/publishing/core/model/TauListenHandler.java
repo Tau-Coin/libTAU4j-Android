@@ -103,7 +103,7 @@ class TauListenHandler {
         saveBlockInfo(block, isRollback);
         // 更新矿工的信息
         saveUserInfo(block.getMiner());
-        // 添加发送者为社区成员
+        // 添加矿工为社区成员
         addMemberInfo(block.getChainID(), block.getMiner());
         // 处理交易信息
         handleTransactionData(block.getBlockNumber(), block.getTx(), isRollback);
@@ -191,8 +191,8 @@ class TauListenHandler {
         }
         String txID = txMsg.getTxID().to_hex();
         Tx tx = txRepo.getTxByTxID(txID);
-        logger.debug("handleTransactionData txID::{}, timestamp::{}, exist::{}, payload::{}", txID,
-                txMsg.getTimestamp(), tx != null, txMsg.getPayload());
+        logger.debug("handleTransactionData txID::{}, timestamp::{}, nonce::{}, exist::{}, payload::{}", txID,
+                txMsg.getTimestamp(), txMsg.getNonce(), tx != null, txMsg.getPayload());
         // 处理用户信息
         handleUserInfo(txMsg);
         // 处理社区成员信息
