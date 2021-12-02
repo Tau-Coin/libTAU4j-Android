@@ -105,7 +105,7 @@ class TauListenHandler {
         // 添加矿工为社区成员
         addMemberInfo(block.getChainID(), block.getMiner());
         // 处理交易信息
-        handleTransactionData(block.getBlockNumber(), block.getTx(), isRollback);
+        handleTransactionData(block, !isRollback);
     }
 
     /**
@@ -178,55 +178,74 @@ class TauListenHandler {
         }
     }
 
+    private boolean isTransactionEmpty(Transaction txMsg) {
+        if (null == txMsg) {
+            return true;
+        }
+        return null == txMsg.getPayload() || txMsg.getPayload().length == 0;
+    }
+
     /**
      * 处理Block数据：解析Block数据，更新用户、社区成员、交易数据
-     * @param blockNumber 区块号
-     * @param txMsg Transaction
-     * @param isRollback 是否是回滚
+     * @param block 区块
+     * @param onChain 是否是上链
      */
-    private void handleTransactionData(long blockNumber, Transaction txMsg, boolean isRollback) {
-        if (null == txMsg) {
+    private void handleTransactionData(Block block, boolean onChain) {
+        if (null == block || null == block.getTx()) {
+            return;
+        }
+        Transaction txMsg = block.getTx();
+        String txID = txMsg.getTxID().to_hex();
+        Tx tx = txRepo.getTxByTxID(txID);
+        boolean isEmpty = isTransactionEmpty(txMsg);
+        logger.debug("handleTransactionData txID::{}, timestamp::{}, nonce::{}, exist::{}, transaction empty::{}", txID,
+                txMsg.getTimestamp(), txMsg.getNonce(), tx != null, isEmpty);
+        if (!isEmpty) {
+            // 本地存在此交易, 更新交易状态值
+            if (tx != null) {
+                tx.txStatus = onChain ? 1 : 0;
+                tx.blockNumber = block.getBlockNumber();
+                txRepo.updateTransaction(tx);
+            } else {
+                handleTransactionData(block.getBlockNumber(), txMsg, onChain);
+            }
+            // 处理用户信息
+            handleUserInfo(txMsg);
+            // 处理社区成员信息
+            handleMemberInfo(txMsg);
+        }
+    }
+
+    /**
+     * 直接添加新的交易
+     * @param blockNumber 区块号
+     * @param txMsg 交易
+     * @param onChain 是否上链
+     */
+    private void handleTransactionData(long blockNumber, Transaction txMsg, boolean onChain) {
+        if (isTransactionEmpty(txMsg)) {
+            logger.info("handleTransactionData transaction empty");
             return;
         }
         String txID = txMsg.getTxID().to_hex();
-        Tx tx = txRepo.getTxByTxID(txID);
-        logger.debug("handleTransactionData txID::{}, timestamp::{}, nonce::{}, exist::{}, payload::{}", txID,
-                txMsg.getTimestamp(), txMsg.getNonce(), tx != null, txMsg.getPayload());
-        // 处理用户信息
-        handleUserInfo(txMsg);
-        // 处理社区成员信息
-        handleMemberInfo(txMsg);
-
-        // 本地存在此交易, 更新交易状态值
-        if (tx != null) {
-            tx.txStatus = isRollback ? 0 : 1;
-            tx.blockNumber = blockNumber;
-            txRepo.updateTransaction(tx);
-        } else {
-            byte[] payload = txMsg.getPayload();
-            if (null == payload || payload.length == 0) {
-                logger.info("handleTransactionData payload empty");
-                return;
-            }
-            String chainID = ChainIDUtil.decode(txMsg.getChainID());
-            long fee = txMsg.getFee();
-            tx = new Tx(txID, chainID, fee);
-            TxContent txContent = new TxContent(txMsg.getPayload());
-            tx.txType = txContent.getType();
-            tx.memo = Utils.textBytesToString(txContent.getContent());
-            tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
-            tx.txStatus = isRollback ? 0 : 1;
-            tx.blockNumber = blockNumber;
-            tx.timestamp = txMsg.getTimestamp();
-            tx.nonce = txMsg.getNonce();
-            if (tx.txType == TxType.WRING_TX.getType()) {
-                // 添加交易
-                tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
-                tx.amount = txMsg.getAmount();
-            }
-            txRepo.addTransaction(tx);
-            logger.info("Add transaction to local, txID::{}, txType::{}", txID, tx.txType);
+        String chainID = ChainIDUtil.decode(txMsg.getChainID());
+        long fee = txMsg.getFee();
+        Tx tx = new Tx(txID, chainID, fee);
+        TxContent txContent = new TxContent(txMsg.getPayload());
+        tx.txType = txContent.getType();
+        tx.memo = Utils.textBytesToString(txContent.getContent());
+        tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
+        tx.txStatus = onChain ? 1 : 0;
+        tx.blockNumber = blockNumber;
+        tx.timestamp = txMsg.getTimestamp();
+        tx.nonce = txMsg.getNonce();
+        if (tx.txType == TxType.WRING_TX.getType()) {
+            // 添加交易
+            tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
+            tx.amount = txMsg.getAmount();
         }
+        txRepo.addTransaction(tx);
+        logger.info("Add transaction to local, txID::{}, txType::{}", txID, tx.txType);
     }
 
     /**
@@ -234,9 +253,8 @@ class TauListenHandler {
      * @param txMsg 交易
      */
     private void handleUserInfo(@NonNull Transaction txMsg) {
-        byte[] payload = txMsg.getPayload();
-        if (null == payload || payload.length == 0) {
-            logger.info("handleUserInfo transaction payload empty");
+        if (isTransactionEmpty(txMsg)) {
+            logger.info("handleUserInfo transaction empty");
             return;
         }
         TxContent txContent = new TxContent(txMsg.getPayload());
@@ -254,9 +272,8 @@ class TauListenHandler {
      * @param txMsg 交易
      */
     private void handleMemberInfo(@NonNull Transaction txMsg) {
-        byte[] payload = txMsg.getPayload();
-        if (null == payload || payload.length == 0) {
-            logger.info("handleMemberInfo transaction payload empty");
+        if (isTransactionEmpty(txMsg)) {
+            logger.info("handleMemberInfo transaction empty");
             return;
         }
         TxContent txContent = new TxContent(txMsg.getPayload());
@@ -344,11 +361,20 @@ class TauListenHandler {
 
     /**
      * 处理libTAU上报接收到新的交易（未上链在交易池中）
-     * @param tx 交易
+     * @param txMsg 交易
      */
-    void handleNewTransaction(Transaction tx) {
+    void handleNewTransaction(Transaction txMsg) {
         logger.info("handleNewTransaction");
-        handleTransactionData(0, tx, true);
+        if (null == txMsg) {
+            return;
+        }
+        String txID = txMsg.getTxID().to_hex();
+        Tx tx = txRepo.getTxByTxID(txID);
+        logger.debug("handleNewTransaction txID::{}, timestamp::{}, nonce::{}, exist::{}, transaction empty::{}",
+                txID, txMsg.getTimestamp(), txMsg.getNonce(), tx != null, isTransactionEmpty(txMsg));
+        if (null == tx) {
+            handleTransactionData(0, txMsg, false);
+        }
     }
 
     /**
