@@ -5,13 +5,10 @@ import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
@@ -19,8 +16,6 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityMessageBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
@@ -29,7 +24,7 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 /**
  * Chain note页面
  */
-public class MessageActivity extends BaseActivity implements View.OnClickListener {
+public class NoteCreateActivity extends BaseActivity implements View.OnClickListener {
 
     private ActivityMessageBinding binding;
     private TxViewModel txViewModel;

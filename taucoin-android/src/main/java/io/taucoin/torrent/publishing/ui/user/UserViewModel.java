@@ -48,7 +48,6 @@ import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MsgRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
@@ -90,7 +89,6 @@ public class UserViewModel extends AndroidViewModel {
     private FriendRepository friendRepo;
     private SettingsRepository settingsRepo;
     private TxRepository txRepo;
-    private MsgRepository msgRepo;
     private MemberRepository memRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<String> changeResult = new MutableLiveData<>();
@@ -112,7 +110,6 @@ public class UserViewModel extends AndroidViewModel {
         userRepo = RepositoryHelper.getUserRepository(getApplication());
         settingsRepo = RepositoryHelper.getSettingsRepository(getApplication());
         txRepo = RepositoryHelper.getTxRepository(getApplication());
-        msgRepo = RepositoryHelper.getMsgRepository(getApplication());
         friendRepo = RepositoryHelper.getFriendsRepository(getApplication());
         memRepo = RepositoryHelper.getMemberRepository(getApplication());
         daemon = TauDaemon.getInstance(application);
@@ -499,7 +496,6 @@ public class UserViewModel extends AndroidViewModel {
      * 在社区页面，刷新数据
      */
     private void submitDataSetChanged(){
-        msgRepo.submitDataSetChanged();
         txRepo.submitDataSetChanged();
     }
 

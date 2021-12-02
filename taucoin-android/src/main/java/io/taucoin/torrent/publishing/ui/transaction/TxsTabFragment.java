@@ -158,7 +158,7 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
                 ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
                         TX_REQUEST_CODE);
             } else {
-                ActivityUtil.startActivityForResult(intent, activity, MessageActivity.class,
+                ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
                         TX_REQUEST_CODE);
             }
         });

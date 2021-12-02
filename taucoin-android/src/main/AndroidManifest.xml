@@ -132,7 +132,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name=".ui.transaction.MessageActivity"
+            android:name=".ui.transaction.NoteCreateActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <service
@@ -243,11 +243,6 @@
             android:name=".ui.download.UpgradeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/transparent"/>
-
-        <activity
-            android:name=".ui.chat.ChatActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden"
-            android:configChanges="orientation|keyboardHidden|screenSize" />
 
         <!-- 禁用默认提供程序 -->
         <provider

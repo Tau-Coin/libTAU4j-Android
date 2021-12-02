@@ -15,11 +15,9 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Favorite;
  */
 @Dao
 public interface FavoriteDao {
-    String QUERY_REPLY_USERS = " (SELECT u.nickname, f.senderPk, f.ID FROM Users u" +
-            " LEFT JOIN Favorites f ON u.publicKey = f.senderPk) ";
-    String QUERY_GET_FAVORITES_AND_REPLY = "SELECT f.*, ur.nickname AS replyName FROM Favorites f" +
-            " LEFT JOIN " + QUERY_REPLY_USERS + " AS ur ON f.replyID = ur.ID" +
-            " WHERE isReply = 0 ORDER BY timestamp DESC";
+
+    String QUERY_GET_FAVORITES_AND_REPLY = "SELECT f.* FROM Favorites f" +
+            " ORDER BY timestamp DESC";
 
     String QUERY_DEL_FAVORITE_BY_ID = "DELETE FROM Favorites WHERE ID = :ID";
     String QUERY_FAVORITE_BY_ID = "SELECT * FROM Favorites WHERE ID = :ID";

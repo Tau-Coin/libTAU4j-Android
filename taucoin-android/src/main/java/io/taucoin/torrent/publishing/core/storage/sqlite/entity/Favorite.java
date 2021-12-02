@@ -27,8 +27,6 @@ public class Favorite implements Parcelable {
 
     public String receiverPk;               // 交易接收者的公钥 只针对MsgType.Wiring类型
     public long amount;                     // 交易金额 只针对MsgType.Wiring类型
-    public String replyID;                  // 被回复的Chat消息ID
-    public int isReply;                     // 来源是否是被回复的Chat消息 0:不是回复，UI显示， 1：是，UI不显示
 
     public Favorite(@NonNull String ID, @NonNull String chainID, @NonNull String senderPk,
                     String receiverPk, long amount, long fee, long type, String memo){
@@ -44,25 +42,12 @@ public class Favorite implements Parcelable {
 
     @Ignore
     public Favorite(@NonNull String ID, @NonNull String chainID, @NonNull String senderPk, long type,
-                    String memo, String replyID){
+                    String memo){
         this.ID = ID;
         this.chainID = chainID;
         this.senderPk = senderPk;
         this.type = type;
         this.memo = memo;
-        this.replyID = replyID;
-    }
-
-    @Ignore
-    public Favorite(@NonNull String ID, @NonNull String chainID, @NonNull String senderPk, long type,
-                    String memo, String replyID, int isReply){
-        this.ID = ID;
-        this.chainID = chainID;
-        this.senderPk = senderPk;
-        this.type = type;
-        this.memo = memo;
-        this.replyID = replyID;
-        this.isReply = isReply;
     }
 
     @Ignore
@@ -76,8 +61,6 @@ public class Favorite implements Parcelable {
         memo = in.readString();
         timestamp = in.readLong();
         type = in.readLong();
-        replyID = in.readString();
-        isReply = in.readInt();
     }
 
     @Override
@@ -91,8 +74,6 @@ public class Favorite implements Parcelable {
         dest.writeString(memo);
         dest.writeLong(timestamp);
         dest.writeLong(type);
-        dest.writeString(replyID);
-        dest.writeInt(isReply);
     }
 
     @Override

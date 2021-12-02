@@ -23,14 +23,11 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.core.model.data.FavoriteAndUser;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FavoriteRepository;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MsgRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Favorite;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Message;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 
 /**
@@ -40,13 +37,11 @@ public class FavoriteViewModel extends AndroidViewModel {
 
     private static final Logger logger = LoggerFactory.getLogger("FavoriteViewModel");
     private TxRepository txRepo;
-    private MsgRepository msgRepo;
     private FavoriteRepository favoriteRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
     public FavoriteViewModel(@NonNull Application application) {
         super(application);
         txRepo = RepositoryHelper.getTxRepository(getApplication());
-        msgRepo = RepositoryHelper.getMsgRepository(getApplication());
         favoriteRepo = RepositoryHelper.getFavoriteRepository(getApplication());
     }
 
@@ -73,53 +68,6 @@ public class FavoriteViewModel extends AndroidViewModel {
                     logger.info("AddTxFavorite txID::{}, txType::{}, chainID::{}, memo::{}", tx.txID,
                             tx.txType, tx.chainID, tx.memo);
                 }
-            }
-            emitter.onComplete();
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
-        disposables.add(disposable);
-    }
-
-    /**
-     * 添加Chat消息收藏
-     * @param msgID Chat消息ID
-     */
-    public void addMsgFavorite(String msgID){
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<List<UserAndTx>>) emitter -> {
-            Favorite favorite = favoriteRepo.queryFavoriteByID(msgID);
-            if(null == favorite){
-                Message msg = msgRepo.getMessageByID(msgID);
-                if(msg != null){
-                    favorite = new Favorite(msg.msgID, msg.chainID, msg.senderPk,
-                            -1, msg.content, msg.replyID);
-                    favorite.timestamp = DateUtil.getTime();
-                    favoriteRepo.addFavorite(favorite);
-                    logger.info("AddMsgFavorite msgID::{}, chainID::{}, memo::{}", msg.msgID,
-                            msg.chainID, msg.content);
-                    if(StringUtil.isNotEmpty(msg.replyID)){
-                        Favorite favoriteReply = favoriteRepo.queryFavoriteByID(msg.replyID);
-                        if(null == favoriteReply){
-                            Message replyMsg = msgRepo.getMessageByID(msg.replyID);
-                            favoriteReply = new Favorite(replyMsg.msgID, replyMsg.chainID, replyMsg.senderPk,
-                                    -1, replyMsg.content, replyMsg.replyID, 1);
-                            favoriteReply.timestamp = DateUtil.getTime();
-                            favoriteRepo.addFavorite(favoriteReply);
-
-                            logger.info("AddMsgFavorite's reply msgID::{}, chainID::{}, memo::{}", msg.msgID,
-                                    msg.chainID, msg.content);
-                        }
-                    }
-                }
-            }else{
-                // 更新为0，UI会显示
-                favorite.isReply = 0;
-                favorite.timestamp = DateUtil.getTime();
-                favoriteRepo.updateFavorite(favorite);
-
-                logger.info("AddMsgFavorite update msgID::{}, chainID::{}, memo::{}", favorite.ID,
-                        favorite.chainID, favorite.memo);
             }
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)

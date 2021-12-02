@@ -53,22 +53,14 @@ public interface CommunityDao {
 
     String QUERY_COMMUNITIES = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.power, b.blockNumber," +
             " 0 AS type, 0 AS msgType, '' AS senderPk, '' AS receiverPk, " +
-            " 0 AS msgUnread, '' AS msg," +
-            " (case when (d.timestamp IS NULL OR c.timestamp >= d.timestamp) then c.memo else d.content end)" +
-            " AS memo," +
-            " (case when (d.timestamp IS NULL OR c.timestamp >= d.timestamp) then c.timestamp else d.timestamp end)" +
-            " AS timestamp" +
+            " 0 AS msgUnread, '' AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
             " LEFT JOIN (SELECT timestamp, memo, chainID FROM (SELECT timestamp, memo, chainID FROM Txs" +
             " WHERE senderPk NOT IN " + QUERY_GET_BANNED_USER_PK +
             " ORDER BY timestamp) GROUP BY chainID) AS c" +
-            " ON a.chainID = c.chainID" +
-            " LEFT JOIN (SELECT timestamp, content, chainID FROM (SELECT timestamp, content, chainID FROM Messages " +
-            " WHERE senderPk NOT IN " + QUERY_GET_BANNED_USER_PK +
-            " ORDER BY timestamp) GROUP BY chainID) AS d" +
-            " ON a.chainID = d.chainID";
+            " ON a.chainID = c.chainID";
 
     String QUERY_FRIENDS_ASC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS balance, 0 AS power, 0 AS blockNumber," +
             " 1 AS type, cm.contentType AS msgType," +

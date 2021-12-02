@@ -109,15 +109,7 @@ public class FavoriteListAdapter extends PagedListAdapter<FavoriteAndUser,
                 favoriteBinding.tvCommunityName.setText(communityName);
                 favoriteBinding.tvMsg.setText(memo);
                 favoriteBinding.tvTime.setText(time);
-
-                if(favorite.reply != null){
-                    favoriteBinding.llReply.setVisibility(View.VISIBLE);
-                    String replyName = UsersUtil.getShowName(favorite.reply.senderPk, favorite.replyName);
-                    favoriteBinding.tvReplyName.setText(replyName);
-                    favoriteBinding.tvReplyMsg.setText(favorite.reply.memo);
-                }else{
-                    favoriteBinding.llReply.setVisibility(View.GONE);
-                }
+                favoriteBinding.llReply.setVisibility(View.GONE);
             }
         }
     }

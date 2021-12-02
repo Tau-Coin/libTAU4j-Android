@@ -14,12 +14,7 @@ public class FavoriteAndUser extends Favorite {
             entityColumn = "publicKey")
     public User sender;
 
-    @Relation(parentColumn = "replyID",
-            entityColumn = "ID")
-    public Favorite reply;
-    public String replyName;
-
-    public FavoriteAndUser(@NonNull String ID, @NonNull String chainID, @NonNull String senderPk, long type, String memo, String replyID) {
-        super(ID, chainID, senderPk, type, memo, replyID);
+    public FavoriteAndUser(@NonNull String ID, @NonNull String chainID, @NonNull String senderPk, long type, String memo) {
+        super(ID, chainID, senderPk, type, memo);
     }
 }
