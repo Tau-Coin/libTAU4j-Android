@@ -48,17 +48,9 @@ public interface MemberDao {
             " WHERE m.chainID = :chainID AND " + WHERE_ON_CHAIN +
             " ORDER BY m.power limit :limit";
 
-    String QUERY_MEMBERS_STATISTICS = "SELECT a.members, b.online FROM" +
-            " (SELECT COUNT(*) AS members FROM Members m" +
+    String QUERY_MEMBERS_STATISTICS = "SELECT COUNT(*) AS members FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.chainID =:chainID and " + WHERE_ON_CHAIN + ") a," +
-            " (SELECT COUNT(*) AS online FROM Members m" +
-            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.chainID =:chainID and " + WHERE_ON_CHAIN +
-            " and m.publicKey IN" +
-            " (SELECT friendPK FROM Friends WHERE userPK = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " AND (lastSeenTime > strftime('%s', 'now','-" + Constants.ONLINE_HOURS + "') OR" +
-            " friendPK = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" + "))) b";
+            " WHERE m.chainID =:chainID and " + WHERE_ON_CHAIN;
 
     String QUERY_DELETE_COMMUNITY_MEMBERS = "DELETE FROM Members where chainID =:chainID";
     /**

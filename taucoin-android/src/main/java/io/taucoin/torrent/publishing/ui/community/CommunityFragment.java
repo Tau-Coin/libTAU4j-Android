@@ -88,7 +88,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         if (StringUtil.isNotEmpty(chainID)) {
             String communityName = ChainIDUtil.getName(chainID);
             binding.toolbarInclude.tvTitle.setText(Html.fromHtml(communityName));
-            binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats, 0, 0));
+            binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats, 0));
         }
         binding.toolbarInclude.ivBack.setOnClickListener(v -> activity.goBack());
         binding.toolbarInclude.tvSubtitle.setVisibility(View.VISIBLE);
@@ -235,7 +235,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(statistics ->
                     binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats,
-                            statistics.getMembers(), statistics.getOnline())))
+                            statistics.getMembers())))
         );
 
         disposables.add(communityViewModel.observerCurrentMember(chainID)

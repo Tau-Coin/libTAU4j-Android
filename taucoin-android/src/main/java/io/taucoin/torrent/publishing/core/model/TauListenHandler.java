@@ -31,7 +31,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
@@ -278,22 +277,12 @@ class TauListenHandler {
         if (null == publicKey) {
             return;
         }
-        saveUserInfo(ByteUtil.toHexString(publicKey));
-    }
-
-    /**
-     * 保存用户信息到本地
-     * @param publicKey 公钥
-     */
-    private void saveUserInfo(String publicKey) {
-        if (StringUtil.isEmpty(publicKey)) {
-            return;
-        }
-        User user = userRepo.getUserByPublicKey(publicKey);
+        String userPk = ByteUtil.toHexString(publicKey);
+        User user = userRepo.getUserByPublicKey(userPk);
         if (null == user) {
-            user = new User(publicKey);
+            user = new User(userPk);
             userRepo.addUser(user);
-            logger.info("SaveUserInfo to local, publicKey::{}", publicKey);
+            logger.info("SaveUserInfo to local, publicKey::{}", userPk);
         }
     }
 
