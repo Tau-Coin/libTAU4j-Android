@@ -15,28 +15,28 @@
         android:id="@+id/positiveButton"
         android:layout_width="wrap_content"
         android:minWidth="@dimen/widget_size_150"
-        android:layout_height="@dimen/widget_size_50"
+        android:layout_height="@dimen/widget_size_44"
         android:layout_marginTop="@dimen/widget_size_30"
         android:maxLines="1"
         android:textColor="@color/color_white"
-        android:textSize="@dimen/font_size_18"
         android:gravity="center_vertical|center"
         android:textAllCaps="false"
         android:ellipsize="end"
-        android:background="@drawable/primary_rect_round_bg" />
+        android:background="@drawable/primary_rect_round_bg"
+        android:textAppearance="@style/TextAppearanceBody1"/>
 
     <TextView
         android:id="@+id/negativeButton"
         android:layout_width="wrap_content"
         android:minWidth="@dimen/widget_size_150"
-        android:layout_height="@dimen/widget_size_50"
+        android:layout_height="@dimen/widget_size_44"
         android:layout_marginTop="@dimen/widget_size_15"
         android:textColor="@color/color_white"
-        android:textSize="@dimen/font_size_18"
         android:gravity="center_vertical|center"
         android:textAllCaps="false"
         android:maxLines="1"
         android:ellipsize="end"
-        android:background="@drawable/black_light_rect_round_bg" />
+        android:background="@drawable/black_light_rect_round_bg"
+        android:textAppearance="@style/TextAppearanceBody1"/>
 
 </LinearLayout>

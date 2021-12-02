@@ -18,17 +18,14 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
-import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.ToastUtils;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityMiningInfoBinding;
 import io.taucoin.torrent.publishing.databinding.ViewHelpDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
@@ -45,6 +42,7 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
     private CompositeDisposable disposables = new CompositeDisposable();
     private CommonDialog helpDialog;
     private CommonDialog closeDialog;
+    private SettingsRepository settingsRepo;
     private String chainID;
 
     @Override
@@ -52,6 +50,7 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
         viewModel = provider.get(CommunityViewModel.class);
+        settingsRepo = RepositoryHelper.getSettingsRepository(getApplicationContext());
         binding = DataBindingUtil.setContentView(this, R.layout.activity_mining_info);
         binding.setListener(this);
         initLayout();
@@ -82,6 +81,9 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
+        boolean isAutoRenewal = settingsRepo.getBooleanValue(getString(R.string.pref_key_account_auto_renewal),
+                true);
+        binding.itemSwitch.setChecked(isAutoRenewal);
         binding.itemSwitch.setOnTouchListener((v, event) -> {
             if (binding.itemSwitch.isChecked()) {
                 if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -92,7 +94,7 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
             return false;
         });
         binding.itemSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            ToastUtils.showShortToast("Auto-Renewal::" + isChecked);
+            settingsRepo.setBooleanValue(getString(R.string.pref_key_account_auto_renewal), isChecked);
         });
     }
 
@@ -143,7 +145,6 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
         binding.itemPerishableDate.setRightText(DateUtil.formatTime(perishableDate, DateUtil.pattern4));
         binding.itemPerishableDate.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);
-        binding.rlAutoRenewal.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);
     }
 
     @Override

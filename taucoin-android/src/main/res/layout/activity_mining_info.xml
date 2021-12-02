@@ -30,6 +30,48 @@
                 android:layout_height="wrap_content">
 
                 <RelativeLayout
+                    android:id="@+id/rl_auto_renewal"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_10"
+                    android:minHeight="@dimen/widget_size_44">
+
+                    <TextView
+                        android:id="@+id/tv_auto_renewal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="0dp"
+                        android:lineSpacingMultiplier="0.7"
+                        android:includeFontPadding="false"
+                        android:layout_centerVertical="true"
+                        android:text="@string/community_auto_renewal"
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
+
+                    <ImageView
+                        android:layout_toEndOf="@+id/tv_auto_renewal"
+                        android:id="@+id/iv_auto_renewal"
+                        android:layout_width="@dimen/widget_size_26"
+                        android:layout_height="@dimen/widget_size_26"
+                        android:padding="@dimen/widget_size_7"
+                        android:layout_centerVertical="true"
+                        android:onClick="@{listener::onClick}"
+                        android:src="@mipmap/icon_help"
+                        android:contentDescription="@null"/>
+
+                    <Switch
+                        android:id="@+id/item_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"/>
+                </RelativeLayout>
+
+                <include layout="@layout/view_line" />
+
+                <RelativeLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -128,46 +170,6 @@
                     app:lineLeftText="@string/community_perishable_date"
                     app:lineRightTextColor="@color/color_blue_light"
                     app:lineVisibility="false"/>
-
-                <RelativeLayout
-                    android:id="@+id/rl_auto_renewal"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_20"
-                    android:layout_marginEnd="@dimen/widget_size_10"
-                    android:minHeight="@dimen/widget_size_44">
-
-                    <TextView
-                        android:id="@+id/tv_auto_renewal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:lineSpacingExtra="0dp"
-                        android:lineSpacingMultiplier="0.7"
-                        android:includeFontPadding="false"
-                        android:layout_centerVertical="true"
-                        android:text="@string/community_auto_renewal"
-                        android:textColor="@color/gray_dark"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    <ImageView
-                        android:layout_toEndOf="@+id/tv_auto_renewal"
-                        android:id="@+id/iv_auto_renewal"
-                        android:layout_width="@dimen/widget_size_26"
-                        android:layout_height="@dimen/widget_size_26"
-                        android:padding="@dimen/widget_size_7"
-                        android:layout_centerVertical="true"
-                        android:onClick="@{listener::onClick}"
-                        android:src="@mipmap/icon_help"
-                        android:contentDescription="@null"/>
-
-                    <Switch
-                        android:id="@+id/item_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentEnd="true"/>
-                </RelativeLayout>
 
             </LinearLayout>
 
