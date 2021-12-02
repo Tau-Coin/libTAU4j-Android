@@ -218,6 +218,8 @@ class TauListenHandler {
             tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
             tx.txStatus = isRollback ? 0 : 1;
             tx.blockNumber = blockNumber;
+            tx.timestamp = txMsg.getTimestamp();
+            tx.nonce = txMsg.getNonce();
             if (tx.txType == TxType.WRING_TX.getType()) {
                 // 添加交易
                 tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
