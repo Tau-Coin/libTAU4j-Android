@@ -181,7 +181,7 @@ public class TxViewModel extends AndroidViewModel {
             tx.txID = transaction.getTxID().to_hex();
             tx.timestamp = timestamp;
             tx.senderPk = currentUser.publicKey;
-            tx.nonce = account.getNonce();
+            tx.nonce = nonce;
             txRepo.addTransaction(tx);
             logger.debug("createTransaction txID::{}, senderPk::{}, receiverPk::{}, nonce::{}, memo::{}",
                     tx.txID, tx.senderPk, tx.receiverPk, tx.nonce, tx.memo);
