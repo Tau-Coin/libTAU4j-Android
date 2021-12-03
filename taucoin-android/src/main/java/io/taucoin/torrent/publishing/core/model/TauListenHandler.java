@@ -79,8 +79,11 @@ class TauListenHandler {
     void handleNewBlock(Block block) {
         logger.debug("handleNewBlock");
         handleBlockData(block, false, false);
-        // 新的区块到了检测是否需要更新账户信息
-        accountAutoRenewal();
+        // 每个账户自动更新周期，检测是否需要更新账户信息
+        if (block.getBlockNumber() % Constants.AUTO_RENEWAL_PERIOD_BLOCKS == 0) {
+            logger.debug("accountAutoRenewal block number::{}", block.getBlockNumber());
+            accountAutoRenewal();
+        }
     }
 
     /**
