@@ -17,6 +17,7 @@ import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.MemberAutoRenewal;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 
 /**
@@ -133,5 +134,13 @@ public class MemberRepositoryImpl implements MemberRepository{
     public void submitDataSetChanged() {
         String dateTime = DateUtil.getDateTime();
         sender.submit(() -> dataSetChangedPublish.onNext(dateTime));
+    }
+
+    /**
+     * 获取社区成员统计
+     */
+    @Override
+    public List<MemberAutoRenewal> queryAutoRenewalAccounts() {
+        return db.memberDao().queryAutoRenewalAccounts();
     }
 }

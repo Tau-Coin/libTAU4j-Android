@@ -286,7 +286,8 @@ public class CommunityViewModel extends AndroidViewModel {
             Account account = daemon.getAccountInfo(chainID, currentUser.publicKey);
             if (account != null) {
                 Member member = new Member(community.chainID, currentUser.publicKey,
-                        account.getBalance(), account.getEffectivePower(), account.getBlockNumber());
+                        account.getBalance(), account.getEffectivePower(), account.getNonce(),
+                        account.getBlockNumber());
                 memberRepo.addMember(member);
             }
         } catch (Exception e) {

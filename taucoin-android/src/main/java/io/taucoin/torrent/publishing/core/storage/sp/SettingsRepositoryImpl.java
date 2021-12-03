@@ -347,4 +347,16 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         edit.putStringSet(appContext.getString(R.string.pref_key_community_filters_selected),
                 filters).apply();
     }
+
+    @Override
+    public void setAutoRenewal(boolean isAuto) {
+        edit.putBoolean(appContext.getString(R.string.pref_key_account_auto_renewal),
+                isAuto).apply();
+    }
+
+    @Override
+    public boolean isAutoRenewal() {
+        String key = appContext.getString(R.string.pref_key_account_auto_renewal);
+        return pref.getBoolean(key, true);
+    }
 }

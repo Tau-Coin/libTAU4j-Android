@@ -349,6 +349,7 @@
     <string name="tx_nonce">Nonce:</string>
     <string name="tx_block_number">Blocknumber:</string>
     <string name="tx_memo_airdrop">Airdrop coins</string>
+    <string name="tx_memo_auto_renewal">Auto renewal</string>
 
     <!-- Strings used for notifier -->
     <string name="app_running_in_the_background">TAU running in the background</string>

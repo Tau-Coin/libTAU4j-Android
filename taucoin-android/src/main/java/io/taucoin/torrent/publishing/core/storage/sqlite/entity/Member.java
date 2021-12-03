@@ -19,6 +19,7 @@ public class Member implements Parcelable {
     public String publicKey;            // 成员的公钥
     public long balance;                // 成员的balance
     public long power;                  // 成员的power
+    public long nonce;                  // 成员的nonce
     public long blockNumber;            // 最后一次上链的区块号
 
     public Member(@NonNull String chainID, @NonNull String publicKey){
@@ -28,11 +29,12 @@ public class Member implements Parcelable {
 
     @Ignore
     public Member(@NonNull String chainID, @NonNull String publicKey, long balance, long power,
-                  long blockNumber){
+                  long nonce, long blockNumber) {
         this.chainID = chainID;
         this.publicKey = publicKey;
         this.balance = balance;
         this.power = power;
+        this.nonce = nonce;
         this.blockNumber = blockNumber;
     }
 
@@ -42,6 +44,7 @@ public class Member implements Parcelable {
         balance = in.readLong();
         power = in.readLong();
         blockNumber = in.readLong();
+        nonce = in.readLong();
     }
 
     @Override
@@ -50,6 +53,7 @@ public class Member implements Parcelable {
         dest.writeString(publicKey);
         dest.writeLong(balance);
         dest.writeLong(power);
+        dest.writeLong(nonce);
         dest.writeLong(blockNumber);
     }
 

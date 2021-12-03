@@ -351,4 +351,15 @@ class TauDaemonAlertHandler {
         byte[] chainID = a.get_chain_id();
         tauListenHandler.handleNewTopVotes(chainID, votes);
     }
+
+    /**
+     * 账户自动更新
+     */
+    void accountAutoRenewal() {
+        tauListenHandler.accountAutoRenewal();
+    }
+
+    public void onCleared() {
+        tauListenHandler.onCleared();
+    }
 }

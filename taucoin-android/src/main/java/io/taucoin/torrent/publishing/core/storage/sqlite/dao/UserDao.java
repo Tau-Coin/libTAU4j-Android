@@ -64,7 +64,7 @@ public interface UserDao {
 
     String QUERY_SET_CURRENT_USER = "UPDATE Users SET isCurrentUser = :isCurrentUser WHERE publicKey = :publicKey";
     String QUERY_ADD_USER_BLACKLIST = "UPDATE Users SET isBanned = :isBanned WHERE publicKey = :publicKey";
-    String QUERY_SEED_HISTORY_LIST = "SELECT * FROM Users WHERE isBanned = 0 and seed not null";
+    String QUERY_SEED_HISTORY_LIST = "SELECT * FROM Users WHERE seed not null";
     String QUERY_USER_BY_PUBLIC_KEY = "SELECT * FROM Users WHERE publicKey = :publicKey";
 
     String QUERY_FRIEND_INFO_BY_PUBLIC_KEY = "SELECT u.*, f.lastCommTime AS lastCommTime," +

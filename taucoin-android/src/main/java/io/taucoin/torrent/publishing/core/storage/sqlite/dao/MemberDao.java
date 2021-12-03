@@ -17,6 +17,7 @@ import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.MemberAutoRenewal;
 
 /**
  * Room:Member操作接口
@@ -53,6 +54,24 @@ public interface MemberDao {
             " WHERE m.chainID =:chainID and " + WHERE_ON_CHAIN;
 
     String QUERY_DELETE_COMMUNITY_MEMBERS = "DELETE FROM Members where chainID =:chainID";
+
+    // 查询当前设备可以自动更新的账户信息
+    String QUERY_AUTO_RENEWAL_ACCOUNTS = "SELECT m.*, u.seed" +
+            " FROM Members m" +
+            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+            " LEFT JOIN Users u ON m.publicKey = u.publicKey" +
+            " LEFT JOIN" +
+            " (SELECT tx.chainID, tx.senderPk, COUNT(*) AS count FROM Txs tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
+            " WHERE tx.txStatus = 0 AND tx.autoRenewal = 1" +
+            " AND m.nonce = tx.nonce" +
+            " GROUP BY tx.chainID, tx.senderPk) txs ON m.chainID = txs.chainID AND m.publicKey = txs.senderPk" +
+            " WHERE  u.seed NOT NULL AND ((balance > 0 OR power > 0)" +
+            " AND (c.headBlock - m.blockNumber < "+ Constants.BLOCKS_NOT_PERISHABLE +")" +
+            " AND (c.headBlock - m.blockNumber - IFNULL(txs.count, 0) * " +
+            Constants.AUTO_RENEWAL_PERIOD_BLOCKS + ") >= " +
+            (Constants.BLOCKS_NOT_PERISHABLE - Constants.AUTO_RENEWAL_MAX_BLOCKS) + ")";
+
     /**
      * 添加新社区成员
      */
@@ -111,4 +130,10 @@ public interface MemberDao {
 
     @Query(QUERY_DELETE_COMMUNITY_MEMBERS)
     void deleteCommunityMembers(String chainID);
+
+    /**
+     * 查询当前设备可以自动更新的账户信息
+     */
+    @Query(QUERY_AUTO_RENEWAL_ACCOUNTS)
+    List<MemberAutoRenewal> queryAutoRenewalAccounts();
 }

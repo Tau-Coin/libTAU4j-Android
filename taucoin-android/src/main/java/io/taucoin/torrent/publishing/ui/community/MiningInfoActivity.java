@@ -81,8 +81,7 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        boolean isAutoRenewal = settingsRepo.getBooleanValue(getString(R.string.pref_key_account_auto_renewal),
-                true);
+        boolean isAutoRenewal = settingsRepo.isAutoRenewal();
         binding.itemSwitch.setChecked(isAutoRenewal);
         binding.itemSwitch.setOnTouchListener((v, event) -> {
             if (binding.itemSwitch.isChecked()) {
@@ -94,7 +93,7 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
             return false;
         });
         binding.itemSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            settingsRepo.setBooleanValue(getString(R.string.pref_key_account_auto_renewal), isChecked);
+            settingsRepo.setAutoRenewal(isChecked);
         });
     }
 

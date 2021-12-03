@@ -72,6 +72,7 @@ public abstract class TauDaemon {
     private ExecutorService exec = Executors.newSingleThreadExecutor();
     private TauInfoProvider tauInfoProvider;
     private Disposable updateInterfacesTimer; // 更新libTAU监听接口定时任务
+    TauDaemonAlertHandler tauDaemonAlertHandler; // libTAU上报的Alert处理程序
     volatile boolean isRunning = false;
     private volatile boolean trafficTips = true; // 剩余流量用完提示
     volatile String seed;
@@ -281,7 +282,7 @@ public abstract class TauDaemon {
             updateInterfacesTimer.dispose();
         }
         sessionManager.stop();
-
+        tauDaemonAlertHandler.onCleared();
         sessionStopOver();
     }
 
@@ -364,6 +365,8 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_dht_nodes))) {
             long nodes = settingsRepo.getLongValue(key, 0);
             updateInterfacesTimer(nodes);
+        } else if (key.equals(appContext.getString(R.string.pref_key_account_auto_renewal))) {
+            accountAutoRenewal();
         }
     }
 
@@ -507,6 +510,13 @@ public abstract class TauDaemon {
         }).subscribeOn(Schedulers.io())
                 .subscribe();
         disposables.add(disposable);
+    }
+
+    /**
+     * 账户自动更新
+     */
+    public void accountAutoRenewal() {
+        tauDaemonAlertHandler.accountAutoRenewal();
     }
 
     /**

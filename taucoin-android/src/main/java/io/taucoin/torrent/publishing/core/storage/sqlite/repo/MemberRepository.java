@@ -13,6 +13,7 @@ import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.MemberAutoRenewal;
 
 /**
  * 提供操作Member数据的接口
@@ -76,4 +77,9 @@ public interface MemberRepository {
     Observable<String> observeDataSetChanged();
 
     void submitDataSetChanged();
+
+    /**
+     * 获取社区成员统计
+     */
+    List<MemberAutoRenewal> queryAutoRenewalAccounts();
 }

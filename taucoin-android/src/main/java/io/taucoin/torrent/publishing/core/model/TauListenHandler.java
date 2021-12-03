@@ -6,6 +6,8 @@ import com.google.gson.Gson;
 
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
+import org.libTAU4j.Ed25519;
+import org.libTAU4j.Pair;
 import org.libTAU4j.Transaction;
 import org.libTAU4j.Vote;
 import org.slf4j.Logger;
@@ -15,12 +17,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.MemberAutoRenewal;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
@@ -44,15 +55,21 @@ class TauListenHandler {
     private TxRepository txRepo;
     private CommunityRepository communityRepo;
     private BlockRepository blockRepository;
+    private SettingsRepository settingsRepo;
     private TauDaemon daemon;
+    private Disposable autoRenewalDisposable;
+    private Context appContext;
 
     TauListenHandler(Context appContext, TauDaemon daemon) {
+        this.appContext = appContext;
         this.daemon = daemon;
         userRepo = RepositoryHelper.getUserRepository(appContext);
         memberRepo = RepositoryHelper.getMemberRepository(appContext);
         txRepo = RepositoryHelper.getTxRepository(appContext);
         communityRepo = RepositoryHelper.getCommunityRepository(appContext);
         blockRepository = RepositoryHelper.getBlockRepository(appContext);
+        settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
+        accountAutoRenewal();
     }
 
     /**
@@ -62,6 +79,8 @@ class TauListenHandler {
     void handleNewBlock(Block block) {
         logger.debug("handleNewBlock");
         handleBlockData(block, false, false);
+        // 新的区块到了检测是否需要更新账户信息
+        accountAutoRenewal();
     }
 
     /**
@@ -324,14 +343,16 @@ class TauListenHandler {
         long balance = 0;
         long power = 0;
         long blockNumber = 0;
+        long nonce = 0;
         if (account != null) {
             balance = account.getBalance();
             power = account.getEffectivePower();
             blockNumber = account.getBlockNumber();
+            nonce = account.getNonce();
         }
 
         if (null == member) {
-            member = new Member(chainIDStr, publicKey, balance, power, blockNumber);
+            member = new Member(chainIDStr, publicKey, balance, power, nonce, blockNumber);
             memberRepo.addMember(member);
             logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}, power::{}",
                     chainIDStr, publicKey, balance, power);
@@ -339,6 +360,7 @@ class TauListenHandler {
             member.balance = balance;
             member.power = power;
             member.blockNumber = blockNumber;
+            member.nonce = nonce;
             memberRepo.updateMember(member);
             logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
                     "balance::{}, power::{}", chainIDStr, publicKey, member.balance, member.power);
@@ -417,5 +439,126 @@ class TauListenHandler {
             logger.info("handleNewTopVotes chainID::{}, topConsensus::{}", chainIDStr,
                     community.topConsensus);
         }
+    }
+
+    /**
+     * 账户自动更新
+     */
+    void accountAutoRenewal() {
+        if (autoRenewalDisposable != null && !autoRenewalDisposable.isDisposed()) {
+            autoRenewalDisposable.dispose();
+        }
+        boolean isAuto = settingsRepo.isAutoRenewal();
+        if (!isAuto) {
+            return;
+        }
+        autoRenewalDisposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+            List<MemberAutoRenewal> members = memberRepo.queryAutoRenewalAccounts();
+            logger.debug("accountAutoRenewal members size::{}",
+                    members != null ? members.size() : 0);
+            if (members != null) {
+                for (int i = 0; i < members.size(); i++) {
+                    MemberAutoRenewal member = members.get(i);
+                    if (emitter.isDisposed()) {
+                        break;
+                    }
+                    long txFee = getTxFee(member.chainID);
+                    if (member.balance < txFee) {
+                        logger.debug("accountAutoRenewal {}/{}, publicKey::{}, Insufficient Balance" +
+                                        " (balance::{}, fee::{})", i, members.size(),
+                                member.publicKey, member.balance, txFee);
+                        continue;
+                    }
+                    accountAutoRenewal(member, txFee, emitter);
+                }
+            }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .subscribe();
+    }
+
+    /**
+     * 账户自动更新
+     * @param member 成员信息
+     * @param fee 交易费
+     * @param emitter ObservableEmitter<Void>
+     */
+    private void accountAutoRenewal(MemberAutoRenewal member, long fee, ObservableEmitter<Void> emitter) {
+        if (null == emitter || emitter.isDisposed()) {
+            return;
+        }
+        boolean isRetry = false;
+        try {
+            String chainID = member.chainID;
+            String senderPk = member.publicKey;
+            long timestamp = daemon.getSessionTime();
+            long amount = member.balance - fee;
+            long nonce = member.nonce + 1;
+            String memo = appContext.getString(R.string.tx_memo_auto_renewal);
+            int txType = TxType.WRING_TX.getType();
+
+            byte[] chainIDBytes = ChainIDUtil.encode(chainID);
+            Tx tx = new Tx(chainID, senderPk, amount, fee, txType, memo);
+            tx.senderPk = senderPk;
+            tx.receiverPk = senderPk;
+            tx.nonce = nonce;
+            tx.timestamp = timestamp;
+
+            byte[] senderPkBytes = ByteUtil.toByte(senderPk);
+            TxContent txContent = new TxContent(txType, Utils.textStringToBytes(memo));
+            Transaction transaction = new Transaction(chainIDBytes, 0, timestamp, senderPkBytes,
+                    senderPkBytes, nonce, amount, fee, txContent.getEncoded());
+
+            byte[] senderSeed = ByteUtil.toByte(member.seed);
+            Pair<byte[], byte[]> keypair = Ed25519.createKeypair(senderSeed);
+            byte[] secretKey = keypair.second;
+            transaction.sign(senderPk, ByteUtil.toHexString(secretKey));
+            boolean isSubmitSuccess = daemon.submitTransaction(transaction);
+            tx.txID = transaction.getTxID().to_hex();
+            if (isSubmitSuccess) {
+                txRepo.addTransaction(tx);
+            } else {
+                isRetry = true;
+            }
+            logger.debug("accountAutoRenewal txID::{}, senderPk::{}, nonce::{}, isSubmitSuccess::{}",
+                    tx.txID, tx.senderPk, tx.nonce, isSubmitSuccess);
+        } catch (Exception ignore) {
+            isRetry = true;
+        }
+        if (isRetry) {
+            try {
+                Thread.sleep(Interval.INTERVAL_RETRY.getInterval());
+                logger.debug("accountAutoRenewal retry publicKey::{}", member.publicKey);
+                accountAutoRenewal(member, fee, emitter);
+            } catch (InterruptedException ignore) {
+            }
+        }
+    }
+
+    /**
+     * 0、默认为最小交易费
+     * 1、从交易池中获取前10名交易费的中位数
+     * 2、如果交易池返回小于等于0，用上次交易用的交易费
+     * @param chainID 交易所属的社区chainID
+     */
+    private long getTxFee(String chainID) {
+        long free = Constants.MIN_FEE.longValue();
+        long medianFree = daemon.getMedianTxFree(chainID);
+        if (medianFree > 0) {
+            free = medianFree;
+        } else {
+            long lastTxFee = settingsRepo.lastTxFee(chainID);
+            if (lastTxFee > 0) {
+                free = lastTxFee;
+            }
+        }
+        return free;
+    }
+
+    public void onCleared() {
+        if (autoRenewalDisposable != null && !autoRenewalDisposable.isDisposed()) {
+            autoRenewalDisposable.dispose();
+        }
+        autoRenewalDisposable = null;
     }
 }

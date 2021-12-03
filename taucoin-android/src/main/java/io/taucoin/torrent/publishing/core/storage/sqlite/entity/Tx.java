@@ -24,12 +24,14 @@ public class Tx implements Parcelable {
     public long timestamp;                  // 交易时间戳
     public long nonce;                      // 交易nonce
     public int txType;                      // 交易类型，同MsgType中枚举类型
-    public String memo;                     // 交易的备注、描述、bootstraps、评论等
+    public String memo;                     // 交易的备注、描述等
     public int txStatus;                    // 交易的状态 0：未上链（在交易池中）；1：上链成功 (不上链)
     public long blockNumber;                // 交易所属的区块号
 
     public String receiverPk;               // 交易接收者的公钥 只针对TxType.Wiring类型
     public long amount;                     // 交易金额 只针对TxType.Wiring类型
+
+    public int autoRenewal;                 // 交易是否为账户自动更新创建的交易 0：用户创建；1：自动创建
 
     public Tx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo){
         this.chainID = chainID;
@@ -69,6 +71,7 @@ public class Tx implements Parcelable {
         txType = in.readInt();
         txStatus = in.readInt();
         blockNumber = in.readLong();
+        autoRenewal = in.readInt();
     }
 
     @Override
@@ -85,6 +88,7 @@ public class Tx implements Parcelable {
         dest.writeInt(txType);
         dest.writeInt(txStatus);
         dest.writeLong(blockNumber);
+        dest.writeInt(autoRenewal);
     }
 
     @Override

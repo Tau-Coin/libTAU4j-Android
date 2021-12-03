@@ -41,8 +41,6 @@ import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 public class TauDaemonImpl extends TauDaemon {
     // libTAU上报的Alert消费者发射器
     private ObservableEmitter alertConsumerEmitter;
-    // libTAU上报的Alert处理程序
-    private TauDaemonAlertHandler tauDaemonAlertHandler;
     private FriendRepository friendRepo;
 
     TauDaemonImpl(@NonNull Context appContext) {
@@ -527,5 +525,13 @@ public class TauDaemonImpl extends TauDaemon {
             return sessionManager.getBlockByHash(ChainIDUtil.encode(chainID), hash);
         }
         return null;
+    }
+
+    /**
+     * 账户自动更新
+     */
+    @Override
+    public void accountAutoRenewal() {
+        tauDaemonAlertHandler.accountAutoRenewal();
     }
 }

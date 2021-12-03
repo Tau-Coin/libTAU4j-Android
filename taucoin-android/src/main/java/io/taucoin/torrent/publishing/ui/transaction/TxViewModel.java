@@ -328,6 +328,7 @@ public class TxViewModel extends AndroidViewModel {
         }
         return free;
     }
+
     /**
      * 空投币给朋友
      * @param chainID
