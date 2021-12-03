@@ -99,6 +99,7 @@ public class HeadBlockTabFragment extends CommunityTabFragment {
         Transaction tx = block.getTx();
         byte[] payload = tx.getPayload();
 
+        binding.tvHash.setText(block.Hash());
         boolean isHaveTx = payload != null && payload.length > 0;
         binding.tvTxs.setText(isHaveTx ? "1" : "0");
         binding.tvTimestamp.setText(DateUtil.formatTime(block.getTimestamp(), DateUtil.pattern6));
