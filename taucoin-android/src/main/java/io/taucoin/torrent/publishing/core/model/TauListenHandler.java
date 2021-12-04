@@ -81,7 +81,8 @@ class TauListenHandler {
         handleBlockData(block, false, false);
         // 每个账户自动更新周期，检测是否需要更新账户信息
         if (block.getBlockNumber() % Constants.AUTO_RENEWAL_PERIOD_BLOCKS == 0) {
-            logger.debug("accountAutoRenewal block number::{}", block.getBlockNumber());
+            logger.debug("accountAutoRenewal chainID, block number::{}",
+                    ChainIDUtil.decode(block.getChainID()), block.getBlockNumber());
             accountAutoRenewal();
         }
     }
@@ -457,7 +458,7 @@ class TauListenHandler {
         }
         autoRenewalDisposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             List<MemberAutoRenewal> members = memberRepo.queryAutoRenewalAccounts();
-            logger.debug("accountAutoRenewal members size::{}",
+            logger.debug("accountAutoRenewal, members size::{}",
                     members != null ? members.size() : 0);
             if (members != null) {
                 for (int i = 0; i < members.size(); i++) {
@@ -467,8 +468,8 @@ class TauListenHandler {
                     }
                     long txFee = getTxFee(member.chainID);
                     if (member.balance < txFee) {
-                        logger.debug("accountAutoRenewal {}/{}, publicKey::{}, Insufficient Balance" +
-                                        " (balance::{}, fee::{})", i, members.size(),
+                        logger.debug("accountAutoRenewal chainID::{}, publicKey::{}, Insufficient Balance" +
+                                        " (balance::{}, fee::{})", member.chainID,
                                 member.publicKey, member.balance, txFee);
                         continue;
                     }
@@ -523,15 +524,16 @@ class TauListenHandler {
             } else {
                 isRetry = true;
             }
-            logger.debug("accountAutoRenewal txID::{}, senderPk::{}, nonce::{}, isSubmitSuccess::{}",
-                    tx.txID, tx.senderPk, tx.nonce, isSubmitSuccess);
+            logger.debug("accountAutoRenewal chainID::{}, txID::{}, senderPk::{}, nonce::{}, isSubmitSuccess::{}",
+                    tx.chainID, tx.txID, tx.senderPk, tx.nonce, isSubmitSuccess);
         } catch (Exception ignore) {
             isRetry = true;
         }
         if (isRetry) {
             try {
                 Thread.sleep(Interval.INTERVAL_RETRY.getInterval());
-                logger.debug("accountAutoRenewal retry publicKey::{}", member.publicKey);
+                logger.debug("accountAutoRenewal retry chainID::{}, publicKey::{}",
+                        member.chainID, member.publicKey);
                 accountAutoRenewal(member, fee, emitter);
             } catch (InterruptedException ignore) {
             }
