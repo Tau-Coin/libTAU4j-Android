@@ -56,7 +56,7 @@ public interface MemberDao {
     String QUERY_DELETE_COMMUNITY_MEMBERS = "DELETE FROM Members where chainID =:chainID";
 
     // 查询当前设备可以自动更新的账户信息
-    String QUERY_AUTO_RENEWAL_ACCOUNTS = "SELECT m.*, u.seed" +
+    String QUERY_AUTO_RENEWAL_ACCOUNTS = "SELECT m.*, u.seed, IFNULL(txs.count, 0) AS count" +
             " FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
             " LEFT JOIN Users u ON m.publicKey = u.publicKey" +

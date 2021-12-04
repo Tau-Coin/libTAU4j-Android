@@ -129,6 +129,8 @@ public abstract class TauDaemon {
                     handleSettingsChanged(appContext.getString(R.string.pref_key_main_loop_interval));
                     // 把自己当作朋友添加进libTAU
                     addYourselfAsFriend();
+                    // 账户自动更新
+                    accountAutoRenewal();
                 }
             }
         });

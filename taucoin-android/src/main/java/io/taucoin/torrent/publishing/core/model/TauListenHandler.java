@@ -69,7 +69,6 @@ class TauListenHandler {
         communityRepo = RepositoryHelper.getCommunityRepository(appContext);
         blockRepository = RepositoryHelper.getBlockRepository(appContext);
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
-        accountAutoRenewal();
     }
 
     /**
@@ -81,7 +80,7 @@ class TauListenHandler {
         handleBlockData(block, false, false);
         // 每个账户自动更新周期，检测是否需要更新账户信息
         if (block.getBlockNumber() % Constants.AUTO_RENEWAL_PERIOD_BLOCKS == 0) {
-            logger.debug("accountAutoRenewal chainID, block number::{}",
+            logger.debug("accountAutoRenewal chainID::{}, block number::{}",
                     ChainIDUtil.decode(block.getChainID()), block.getBlockNumber());
             accountAutoRenewal();
         }
@@ -466,14 +465,24 @@ class TauListenHandler {
                     if (emitter.isDisposed()) {
                         break;
                     }
-                    long txFee = getTxFee(member.chainID);
-                    if (member.balance < txFee) {
+                    long medianTxFree = getTxFee(member.chainID);
+                    // 计算合适的交易费
+                    long fee = medianTxFree + member.count * medianTxFree;
+                    if (member.balance > 0 && member.balance < fee) {
+                        for (int j = member.count; j >= 0; j--) {
+                            fee = medianTxFree + j * medianTxFree;
+                            if (member.balance >= fee) {
+                                break;
+                            }
+                        }
+                    }
+                    if (member.balance <= 0 || member.balance < fee) {
                         logger.debug("accountAutoRenewal chainID::{}, publicKey::{}, Insufficient Balance" +
-                                        " (balance::{}, fee::{})", member.chainID,
-                                member.publicKey, member.balance, txFee);
+                                        " (balance::{}, fee::{}), count::{}, medianTxFree::{}", member.chainID,
+                                member.publicKey, member.balance, fee, member.count, medianTxFree);
                         continue;
                     }
-                    accountAutoRenewal(member, txFee, emitter);
+                    accountAutoRenewal(member, fee, emitter);
                 }
             }
             emitter.onComplete();
@@ -524,8 +533,9 @@ class TauListenHandler {
             } else {
                 isRetry = true;
             }
-            logger.debug("accountAutoRenewal chainID::{}, txID::{}, senderPk::{}, nonce::{}, isSubmitSuccess::{}",
-                    tx.chainID, tx.txID, tx.senderPk, tx.nonce, isSubmitSuccess);
+            logger.debug("accountAutoRenewal chainID::{}, txID::{}, senderPk::{}, amount::{}, " +
+                            "fee::{}, nonce::{}, count::{}, isSubmitSuccess::{}",
+                    tx.chainID, tx.txID, senderPk, amount, fee, tx.nonce, member.count, isSubmitSuccess);
         } catch (Exception ignore) {
             isRetry = true;
         }

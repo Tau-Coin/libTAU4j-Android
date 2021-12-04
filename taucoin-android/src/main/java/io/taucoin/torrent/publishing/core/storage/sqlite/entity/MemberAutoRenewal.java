@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
  */
 public class MemberAutoRenewal extends Member {
     public String seed;
-    public String count;
+    public int count;
 
     public MemberAutoRenewal(@NonNull String chainID, @NonNull String publicKey) {
         super(chainID, publicKey);
