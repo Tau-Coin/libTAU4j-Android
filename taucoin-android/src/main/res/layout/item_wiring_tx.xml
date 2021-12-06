@@ -82,7 +82,7 @@
                     android:id="@+id/tv_sender"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/color_blue"
+                    android:textColor="@color/color_blue_dark"
                     android:textAppearance="@style/TextAppearanceBody3" />
             </LinearLayout>
 
@@ -102,7 +102,7 @@
                     android:id="@+id/tv_receiver"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/color_blue"
+                    android:textColor="@color/color_blue_dark"
                     android:textAppearance="@style/TextAppearanceBody3" />
             </LinearLayout>
 
