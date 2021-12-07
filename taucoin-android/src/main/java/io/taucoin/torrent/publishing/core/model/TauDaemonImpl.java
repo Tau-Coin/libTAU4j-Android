@@ -452,7 +452,7 @@ public class TauDaemonImpl extends TauDaemon {
             success = sessionManager.unfollowChain(ChainIDUtil.encode(chainID));
         }
         logger.debug("unfollowChain chainID::{}, success::{}", chainID, success);
-        return false;
+        return success;
     }
 
     /**

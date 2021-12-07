@@ -60,7 +60,8 @@ public interface CommunityDao {
             " LEFT JOIN (SELECT timestamp, memo, chainID FROM (SELECT timestamp, memo, chainID FROM Txs" +
             " WHERE senderPk NOT IN " + QUERY_GET_BANNED_USER_PK +
             " ORDER BY timestamp) GROUP BY chainID) AS c" +
-            " ON a.chainID = c.chainID";
+            " ON a.chainID = c.chainID" +
+            " WHERE isBanned == 0";
 
     String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.power, b.blockNumber," +
             " 0 AS type, 0 AS msgType, '' AS senderPk, '' AS receiverPk, " +
@@ -71,7 +72,8 @@ public interface CommunityDao {
             " LEFT JOIN (SELECT timestamp, memo, chainID FROM (SELECT timestamp, memo, chainID FROM Txs" +
             " WHERE senderPk NOT IN " + QUERY_GET_BANNED_USER_PK +
             " ORDER BY timestamp DESC) GROUP BY chainID) AS c" +
-            " ON a.chainID = c.chainID";
+            " ON a.chainID = c.chainID" +
+            " WHERE isBanned == 0";
 
     String QUERY_FRIENDS_ASC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS balance, 0 AS power, 0 AS blockNumber," +
             " 1 AS type, cm.contentType AS msgType," +
