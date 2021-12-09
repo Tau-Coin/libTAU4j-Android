@@ -381,6 +381,7 @@ class TauListenHandler {
             community.consensusBlock = block.getBlockNumber();
             logger.info("handleNewConsensusBlock, chainID::{}, blockNumber::{}, blockHash::{}",
                     chainID, block.getBlockNumber(), block.Hash());
+            communityRepo.updateCommunity(community);
         }
     }
 
