@@ -160,7 +160,7 @@ class TauListenHandler {
                     community.tailBlock = community.headBlock;
                 }
             }
-            communityRepo.addCommunity(community);
+            communityRepo.updateCommunity(community);
             logger.info("Update Community Info, communityName::{}, chainID::{}, " +
                             "headBlock::{}, tailBlock::{}", community.communityName,
                     community.chainID, community.headBlock, community.tailBlock);
