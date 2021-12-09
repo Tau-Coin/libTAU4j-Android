@@ -126,7 +126,7 @@ public abstract class TauDaemon {
                     isRunning = true;
                     handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
                     // 防止第一次更新时，链端未启动成功，后面无法触发
-                    handleSettingsChanged(appContext.getString(R.string.pref_key_main_loop_interval));
+                    handleSettingsChanged(appContext.getString(R.string.pref_key_main_loop_frequency));
                     // 把自己当作朋友添加进libTAU
                     addYourselfAsFriend();
                     // 账户自动更新
@@ -362,7 +362,7 @@ public abstract class TauDaemon {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
             logger.info("SettingsChanged, UPnP mapped::{}", settingsRepo.isUPnpMapped());
-        } else if (key.equals(appContext.getString(R.string.pref_key_main_loop_interval))) {
+        } else if (key.equals(appContext.getString(R.string.pref_key_main_loop_frequency))) {
             setMainLoopInterval(FrequencyUtil.getMainLoopInterval());
         } else if (key.equals(appContext.getString(R.string.pref_key_dht_nodes))) {
             long nodes = settingsRepo.getLongValue(key, 0);

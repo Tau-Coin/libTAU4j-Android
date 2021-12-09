@@ -19,7 +19,6 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-
         <ScrollView
             android:fillViewport="true"
             android:layout_width="match_parent"
@@ -36,153 +35,76 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/color_white"
+                    android:layout_marginTop="@dimen/widget_size_10">
+
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/tv_working_frequency"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:lineLeftText="@string/setting_work_frequency"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/tv_reset_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:lineLeftText="@string/setting_data_reset_time"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/tv_fore_running_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:lineLeftText="@string/setting_fore_running_time"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/tv_bg_running_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:lineLeftText="@string/setting_bg_running_time"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/tv_doze_running_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:lineVisibility="false"
+                        app:lineLeftText="@string/setting_doze_running_time"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:minHeight="@dimen/widget_size_44"
                     android:layout_marginTop="@dimen/widget_size_10"
-                    android:paddingStart="@dimen/widget_size_20"
-                    android:paddingEnd="@dimen/widget_size_20">
+                    android:layout_height="wrap_content">
 
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/tab_foreground"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical|center"
+                        android:text="@string/setting_foreground"
+                        android:background="@color/color_white"
+                        android:textColor="@color/colorPrimary"
+                        android:onClick="@{listener::onClick}"
+                        android:includeFontPadding="false"
+                        android:textStyle="bold"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_work_frequency"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
+                    <TextView
+                        android:id="@+id/tab_background"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="@string/setting_background"
+                        android:background="@color/colorPrimary"
+                        android:textColor="@color/color_white"
+                        android:gravity="center_vertical|center"
+                        android:onClick="@{listener::onClick}"
+                        android:includeFontPadding="false"
+                        android:textStyle="bold"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
 
-                        <TextView
-                            android:id="@+id/tv_working_frequency"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/gray_dark"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    </LinearLayout>
-
-                    <include layout="@layout/view_line"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_data_reset_time"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <TextView
-                            android:id="@+id/tv_reset_time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/gray_dark"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:text="@string/setting_data_reset_time_value"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    </LinearLayout>
-
-                    <include layout="@layout/view_line"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_fore_running_time"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <TextView
-                            android:id="@+id/tv_fore_running_time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/gray_dark"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    </LinearLayout>
-
-                    <include layout="@layout/view_line"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_bg_running_time"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <TextView
-                            android:id="@+id/tv_bg_running_time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/gray_dark"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    </LinearLayout>
-
-                    <include layout="@layout/view_line"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_doze_running_time"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <TextView
-                            android:id="@+id/tv_doze_running_time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/gray_dark"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
@@ -191,10 +113,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/color_white"
-                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:layout_marginTop="@dimen/widget_size_1"
                     android:paddingTop="@dimen/widget_size_15"
                     android:paddingStart="@dimen/widget_size_20"
-                    android:paddingEnd="0dp">
+                    android:paddingEnd="@dimen/widget_size_0">
 
                     <LinearLayout
                         android:orientation="horizontal"
@@ -215,8 +137,8 @@
                         <ImageView
                             android:visibility="invisible"
                             android:id="@+id/iv_metered_state"
-                            android:layout_width="@dimen/widget_size_20"
-                            android:layout_height="@dimen/widget_size_20"
+                            android:layout_width="@dimen/widget_size_18"
+                            android:layout_height="@dimen/widget_size_18"
                             android:layout_marginEnd="@dimen/widget_size_20"
                             android:contentDescription="@null"
                             android:src="@mipmap/icon_star_yellow"/>
@@ -322,6 +244,41 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:includeFontPadding="false"
+                            android:text="@string/setting_fixed_frequency"
+                            android:textAppearance="@style/TextAppearanceBody1"/>
+
+                        <TextView
+                            android:id="@+id/tv_metered_fixed_frequency"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/gray_dark"
+                            android:paddingStart="@dimen/widget_size_10"
+                            android:paddingEnd="@dimen/widget_size_0"
+                            android:layout_marginEnd="@dimen/widget_size_5"
+                            android:onClick="@{listener::onClick}"
+                            android:drawablePadding="@dimen/widget_size_5"
+                            android:textAppearance="@style/TextAppearanceBody1"/>
+
+                    </LinearLayout>
+
+                    <include layout="@layout/view_line"/>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/widget_size_7"
+                        android:paddingBottom="@dimen/widget_size_7"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:layout_marginEnd="@dimen/widget_size_20"
+                        android:layout_marginTop="0dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:includeFontPadding="false"
                             android:text="@string/setting_network_current_speed"
                             android:textAppearance="@style/TextAppearanceBody1"/>
 
@@ -342,7 +299,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/color_white"
-                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:layout_marginTop="@dimen/widget_size_1"
                     android:paddingTop="@dimen/widget_size_15"
                     android:paddingStart="@dimen/widget_size_20"
                     android:paddingEnd="0dp">
@@ -366,8 +323,8 @@
                         <ImageView
                             android:visibility="invisible"
                             android:id="@+id/iv_wifi_state"
-                            android:layout_width="@dimen/widget_size_20"
-                            android:layout_height="@dimen/widget_size_20"
+                            android:layout_width="@dimen/widget_size_18"
+                            android:layout_height="@dimen/widget_size_18"
                             android:layout_marginEnd="@dimen/widget_size_20"
                             android:contentDescription="@null"
                             android:src="@mipmap/icon_star_yellow"/>
@@ -457,6 +414,41 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/gray_dark"
                             android:layout_marginEnd="@dimen/widget_size_5"
+                            android:textAppearance="@style/TextAppearanceBody1"/>
+
+                    </LinearLayout>
+
+                    <include layout="@layout/view_line"/>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/widget_size_7"
+                        android:paddingBottom="@dimen/widget_size_7"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:layout_marginEnd="@dimen/widget_size_20"
+                        android:layout_marginTop="0dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:includeFontPadding="false"
+                            android:text="@string/setting_fixed_frequency"
+                            android:textAppearance="@style/TextAppearanceBody1"/>
+
+                        <TextView
+                            android:id="@+id/tv_wifi_fixed_frequency"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/gray_dark"
+                            android:layout_marginEnd="@dimen/widget_size_5"
+                            android:paddingStart="@dimen/widget_size_10"
+                            android:paddingEnd="@dimen/widget_size_0"
+                            android:onClick="@{listener::onClick}"
+                            android:drawablePadding="@dimen/widget_size_5"
                             android:textAppearance="@style/TextAppearanceBody1"/>
 
                     </LinearLayout>

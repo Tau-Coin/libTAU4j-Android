@@ -20,6 +20,7 @@ public class TrafficUtil {
     private static final String TRAFFIC_DOWN = "download";
     private static final String TRAFFIC_UP = "upload";
     private static final String TRAFFIC_METERED = "metered";
+    private static final String TRAFFIC_WIFI = "wifi";
 
     private static final String TRAFFIC_VALUE_OLD = "pref_key_traffic_old_";
     private static final String TRAFFIC_VALUE = "pref_key_traffic_";
@@ -37,15 +38,21 @@ public class TrafficUtil {
      * @param statistics 当前网络数据总量
      */
     public static void saveTrafficTotal(@NonNull SessionStatistics statistics) {
-        saveTrafficTotal(TRAFFIC_DOWN, statistics.getTotalDownload());
-        saveTrafficTotal(TRAFFIC_UP, statistics.getTotalUpload());
+        long incrementalDown = saveTrafficTotal(TRAFFIC_DOWN, statistics.getTotalDownload());
+        long incrementalUp = saveTrafficTotal(TRAFFIC_UP, statistics.getTotalUpload());
         // 如果是计费网络，统计当天计费网络使用总量
-        long total = statistics.getTotalDownload() + statistics.getTotalUpload();
-        if (NetworkSetting.isMeteredNetwork()) {
-            saveTrafficTotal(TRAFFIC_METERED, total);
-        } else {
-            String trafficValueOld = TRAFFIC_VALUE_OLD + TRAFFIC_METERED;
-            settingsRepo.setLongValue(trafficValueOld, total);
+        if (!NetworkSetting.isForegroundRunning()) {
+            if (NetworkSetting.isMeteredNetwork()) {
+                long total = getMeteredTrafficTotal();
+                total += incrementalDown + incrementalUp;
+                settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, total);
+                logger.debug("Save metered traffic::{}", total);
+            } else {
+                long total = getWifiTrafficTotal();
+                total += incrementalDown + incrementalUp;
+                settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI, total);
+                logger.debug("Save wifi traffic::::{}", total);
+            }
         }
     }
 
@@ -54,7 +61,7 @@ public class TrafficUtil {
      * @param trafficType
      * @param byteSize
      */
-    private static void saveTrafficTotal(String trafficType, long byteSize) {
+    private static long saveTrafficTotal(String trafficType, long byteSize) {
         resetTrafficInfo();
         String trafficValueOld = TRAFFIC_VALUE_OLD + trafficType;
         long incrementalSize = calculateIncrementalSize(trafficType, byteSize);
@@ -63,6 +70,7 @@ public class TrafficUtil {
         long trafficTotal = settingsRepo.getLongValue(trafficValue);
         trafficTotal += incrementalSize;
         settingsRepo.setLongValue(trafficValue, trafficTotal);
+        return incrementalSize;
     }
 
     /**
@@ -91,6 +99,7 @@ public class TrafficUtil {
         settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_DOWN, -1);
         settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_UP, -1);
         settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_METERED, -1);
+        settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_WIFI, -1);
     }
 
     /**
@@ -130,6 +139,7 @@ public class TrafficUtil {
         settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN, 0);
         settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_UP, 0);
         settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, 0);
+        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI, 0);
         resetTrafficTotalOld();
         // 同时重置前台运行时间
         NetworkSetting.updateForegroundRunningTime(0);
@@ -139,38 +149,29 @@ public class TrafficUtil {
         NetworkSetting.clearMeteredPromptLimit();
 
         logger.debug("resetTrafficInfo TRAFFIC_DOWN::{}, TRAFFIC_UP::{}, TRAFFIC_METERED::{}, " +
-                        "TRAFFIC_DOWN_OLD::{}, TRAFFIC_UP_OLD::{}, TRAFFIC_METERED_OLD::{}",
+                        "TRAFFIC_WIFI::{}, TRAFFIC_DOWN_OLD::{}, TRAFFIC_UP_OLD::{}",
                 settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN),
                 settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_UP),
                 settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_METERED),
+                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI),
                 settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_DOWN),
-                settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_UP),
-                settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_METERED));
+                settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_UP));
     }
 
     /**
      * 获取当天计费网络流量值
-     * @return
      */
-    public static long getMeteredTrafficTotal() {
+    static long getMeteredTrafficTotal() {
         resetTrafficInfo();
         return settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_METERED);
     }
 
     /**
-     * 获取计费网络类型
-     * @return
+     * 获取当天非计费网络流量值
      */
-    public static String getMeteredType() {
-        return TRAFFIC_METERED;
-    }
-
-    public static String getUpType() {
-        return TRAFFIC_UP;
-    }
-
-    public static String getDownType() {
-        return TRAFFIC_DOWN;
+    static long getWifiTrafficTotal() {
+        resetTrafficInfo();
+        return settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI);
     }
 
     public static String getUpKey() {
@@ -182,16 +183,7 @@ public class TrafficUtil {
     }
 
     /**
-     * 获取计费网络本地存储Key
-     * @return
-     */
-    public static String getMeteredKey() {
-        return TRAFFIC_VALUE + TRAFFIC_METERED;
-    }
-
-    /**
      * 获取当天下行网络流量值
-     * @return
      */
     public static long getTrafficDownloadTotal() {
         resetTrafficInfo();
@@ -200,7 +192,6 @@ public class TrafficUtil {
 
     /**
      * 获取当天上行网络流量值
-     * @return
      */
     public static long getTrafficUploadTotal() {
         resetTrafficInfo();

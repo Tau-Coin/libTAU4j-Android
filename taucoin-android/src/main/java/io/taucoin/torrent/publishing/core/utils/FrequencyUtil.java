@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.Interval;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 
@@ -44,34 +45,99 @@ public class FrequencyUtil {
         }
 
         settingsRepo.setIntValue(context.getString(R.string.pref_key_main_loop_average_interval), average);
-        settingsRepo.setIntValue(context.getString(R.string.pref_key_main_loop_interval), interval);
-    }
-
-    /**
-     * 清除主循环时间间隔采样值列表
-     */
-    public static void clearMainLoopIntervalList() {
-        Context context = MainApplication.getInstance();
-        settingsRepo.setIntValue(context.getString(R.string.pref_key_main_loop_average_interval), 0);
+        setMainLoopFrequency(convertTimeToFreq(interval));
     }
 
     /**
      * 获取当前主循环时间间隔
      */
     public static int getMainLoopInterval() {
-        Context context = MainApplication.getInstance();
-        return settingsRepo.getIntValue(context.getString(R.string.pref_key_main_loop_interval), 0);
+        float frequency = getMainLoopFrequency();
+        return convertFreqToTime(frequency);
     }
 
     /**
      * 获取当前主循环频率
      */
-    public static double getMainLoopFrequency() {
-        long interval = getMainLoopInterval();
-        logger.trace("getMainLoopFrequency:: interval::{}", interval);
+    public static void setMainLoopFrequency(float frequency) {
+        Context context = MainApplication.getInstance();
+        settingsRepo.setFloatValue(context.getString(R.string.pref_key_main_loop_frequency), frequency);
+        logger.trace("setMainLoopFrequency:: frequency::{}", frequency);
+    }
+
+    /**
+     * 获取当前主循环频率
+     */
+    public static float getMainLoopFrequency() {
+        Context context = MainApplication.getInstance();
+        float frequency = settingsRepo.getFloatValue(context.getString(R.string.pref_key_main_loop_frequency), 0);
+        logger.trace("getMainLoopFrequency:: frequency::{}", frequency);
+        return frequency;
+    }
+
+    /**
+     * 转化时间间隔为频率
+     */
+    private static float convertTimeToFreq(long interval) {
         if (interval > 0) {
-            return  1.0 * 1000 / interval;
+            return (float) (1.0 * 1000 / interval);
         }
         return 0;
+    }
+
+    /**
+     * 转化时间间隔为频率
+     */
+    private static int convertFreqToTime(float freq) {
+        if (freq > 0) {
+            return (int)(1.0 * 1000 / freq);
+        }
+        return 0;
+    }
+
+    /**
+     * 获取前台Wifi网络固定主循环频率
+     */
+    public static float getWifiFixedFrequency() {
+        Context context = MainApplication.getInstance();
+        float frequency = settingsRepo.getFloatValue(context.getString(R.string.pref_key_wifi_fixed_frequency),
+                convertTimeToFreq(Interval.FORE_DEFAULT_WIFI_MAIN_LOOP.getInterval()));
+        logger.trace("getWifiFixedFrequency:: frequency::{}", frequency);
+        return frequency;
+    }
+
+    /**
+     * 设置前台Wifi网络固定主循环频率
+     */
+    public static void setWifiFixedFrequency(float freq) {
+        Context context = MainApplication.getInstance();
+        settingsRepo.setFloatValue(context.getString(R.string.pref_key_wifi_fixed_frequency), freq);
+        logger.trace("setWifiFixedFrequency:: freq::{}", freq);
+        if (!NetworkSetting.isMeteredNetwork()) {
+            setMainLoopFrequency(freq);
+        }
+    }
+
+    /**
+     * 获取前台Metered网络固定主循环频率
+     */
+    public static float getMeteredFixedFrequency() {
+        Context context = MainApplication.getInstance();
+        float frequency = settingsRepo.getFloatValue(context.getString(R.string.pref_key_metered_fixed_frequency),
+                convertTimeToFreq(Interval.FORE_DEFAULT_METERED_MAIN_LOOP.getInterval()));
+        logger.trace("getMeteredFixedFrequency:: frequency::{}", frequency);
+        return frequency;
+    }
+
+    /**
+     * 设置前台Metered网络固定主循环频率
+     */
+    public static void setMeteredFixedFrequency(float freq) {
+        Context context = MainApplication.getInstance();
+        settingsRepo.setFloatValue(context.getString(R.string.pref_key_metered_fixed_frequency), freq);
+        logger.trace("setMeteredFixedInterval:: freq::{}", freq);
+        if (NetworkSetting.isMeteredNetwork()) {
+            setMainLoopFrequency(freq);
+        }
     }
 }

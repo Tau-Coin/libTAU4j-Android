@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/widget_size_15"
+        android:paddingEnd="@dimen/widget_size_15"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setting_fixed_frequency"
+            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+        <EditText
+            android:id="@+id/et_value"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_50"
+            android:layout_marginTop="@dimen/widget_size_20"
+            android:singleLine="true"
+            android:gravity="center_horizontal|center"
+            android:hint="@string/setting_fixed_frequency_hint"
+            android:inputType="numberDecimal|number"
+            android:autofillHints="@string/tx_fee_hint"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_20"
+            android:textColor="@color/color_red"
+            android:textAppearance="@style/TextAppearanceBody2"/>
+
+    </LinearLayout>
+</layout>

@@ -55,7 +55,7 @@
     <string name="main_pic_messages">[Picture]</string>
     <string name="main_connecting">Joining phone swarm &#8230;</string>
     <string name="main_no_ipv4">IPv4 not found</string>
-    <string name="main_data_used_up">Daily Data Limit Used Up</string>
+    <string name="main_data_used_up">Background Daily Data Limit Used Up</string>
     <string name="main_insufficient_device_space">Insufficient device space</string>
 
     <!-- Strings used for main drawer content -->
@@ -215,7 +215,9 @@
     <string name="setting_data_reset_time_value">%d pm</string>
     <string name="setting_work_frequency">Working Frequency</string>
     <string name="setting_fore_running_time">Foreground Time</string>
+    <string name="setting_foreground">Foreground</string>
     <string name="setting_bg_running_time">Background Time</string>
+    <string name="setting_background">Background</string>
     <string name="setting_doze_running_time">Doze Time</string>
     <string name="setting_survival_mode">Survival Mode</string>
     <string name="setting_doze_time">Doze time: %1$s</string>
@@ -226,7 +228,9 @@
     <string name="setting_daily_quota_unit_m">%1$dM</string>
     <string name="setting_daily_quota_unit_g">%1$dG</string>
     <string name="setting_network_current_speed">Current Speed</string>
-    <string name="setting_average_speed">Foreground Target Speed(3x) </string>
+    <string name="setting_fixed_frequency">Fixed Frequency</string>
+    <string name="setting_fixed_frequency_hint">Please enter a fixed frequency</string>
+    <string name="setting_average_speed">Target Speed </string>
     <string name="setting_network_average_speed">Average Speed</string>
     <string name="setting_network_available_data">Today Remaining Data</string>
     <string name="setting_metered_network_limit_speed">%1$s/s</string>

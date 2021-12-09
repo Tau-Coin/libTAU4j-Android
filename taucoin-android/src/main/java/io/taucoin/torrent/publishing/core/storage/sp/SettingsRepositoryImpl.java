@@ -329,7 +329,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         edit.putLong(appContext.getString(R.string.pref_key_average_heap_size), 0).apply();
         edit.putLong(appContext.getString(R.string.pref_key_current_heap_size), 0).apply();
         // 初始化主循环频率
-        edit.putInt(appContext.getString(R.string.pref_key_main_loop_interval), 0).apply();
+        edit.putFloat(appContext.getString(R.string.pref_key_main_loop_frequency), 0).apply();
         edit.putInt(appContext.getString(R.string.pref_key_main_loop_average_interval), 0).apply();
 
         edit.putLong(appContext.getString(R.string.pref_key_dht_invoked_requests), 0).apply();

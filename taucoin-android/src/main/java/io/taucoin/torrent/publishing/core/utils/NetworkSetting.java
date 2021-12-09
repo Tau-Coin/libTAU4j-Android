@@ -17,6 +17,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 
 /**
  * 网络流量设置相关工具类
+ * 前后流量用户设置，后台流量受流量包限制
  */
 public class NetworkSetting {
     private static final Logger logger = LoggerFactory.getLogger("NetworkSetting");
@@ -24,7 +25,6 @@ public class NetworkSetting {
     private static final int WIFI_LIMITED;                                      // 单位MB
     private static final int SURVIVAL_SPEED_LIMIT = 10;                         // 单位B
     public static final int HEAP_SIZE_LIMIT = 50 * 1024 * 1024;                 // 单位为B
-    private static final int FOREGROUND_TARGET_SPEED_TIMES = 3;                 // 前台网速提升倍数
 
     private static SettingsRepository settingsRepo;
     private static long lastElapsedRealTime = 0;
@@ -144,7 +144,7 @@ public class NetworkSetting {
     /**
      * APP是否在前台运行
      */
-    private static boolean isForegroundRunning() {
+    public static boolean isForegroundRunning() {
         Context appContext = MainApplication.getInstance();
         String foregroundRunningKey = appContext.getString(R.string.pref_key_foreground_running);
         return settingsRepo.getBooleanValue(foregroundRunningKey);
@@ -269,9 +269,6 @@ public class NetworkSetting {
             availableData = bigLimit.subtract(bigUsage).longValue();
             if (today24HLastSeconds > 0) {
                 averageSpeed = availableData / today24HLastSeconds;
-                if (isForegroundRunning()) {
-                    averageSpeed = averageSpeed * FOREGROUND_TARGET_SPEED_TIMES;
-                }
             }
         }
         settingsRepo.setLongValue(context.getString(R.string.pref_key_metered_available_data), availableData);
@@ -284,8 +281,7 @@ public class NetworkSetting {
      */
     public static void updateWiFiSpeedLimit() {
         Context context = MainApplication.getInstance();
-        long total = TrafficUtil.getTrafficUploadTotal() + TrafficUtil.getTrafficDownloadTotal();
-        long usage = total - TrafficUtil.getMeteredTrafficTotal();
+        long usage = TrafficUtil.getWifiTrafficTotal();
         long limit = getWiFiLimit();
         long averageSpeed = 0;
         long availableData = 0;
@@ -293,8 +289,8 @@ public class NetworkSetting {
         BigInteger bigUnit = new BigInteger("1024");
         BigInteger bigLimit = BigInteger.valueOf(limit).multiply(bigUnit).multiply(bigUnit);
         BigInteger bigUsage = BigInteger.valueOf(usage);
-        logger.trace("updateSpeedLimit wifiLimit::{}, total::{}, wifiUsage::{}, compareTo::{}",
-                bigLimit.longValue(), total, bigUsage, bigLimit.compareTo(bigUsage));
+        logger.trace("updateSpeedLimit wifiLimit::{}, wifiUsage::{}, compareTo::{}",
+                bigLimit.longValue(), bigUsage, bigLimit.compareTo(bigUsage));
 
         // 今天剩余的秒数
         long today24HLastSeconds = DateUtil.getTomorrowLastSeconds(TrafficUtil.TRAFFIC_RESET_TIME);
@@ -303,9 +299,6 @@ public class NetworkSetting {
             availableData = bigLimit.subtract(bigUsage).longValue();
             if (today24HLastSeconds > 0) {
                 averageSpeed = availableData / today24HLastSeconds;
-                if (isForegroundRunning()) {
-                    averageSpeed = averageSpeed * FOREGROUND_TARGET_SPEED_TIMES;
-                }
             }
         }
         settingsRepo.setLongValue(context.getString(R.string.pref_key_wifi_available_data), availableData);
@@ -397,14 +390,22 @@ public class NetworkSetting {
      * @return 返回计算的时间间隔
      */
     public static void calculateMainLoopInterval() {
-        Interval min;
-        Interval max = Interval.MAIN_LOOP_MAX;
         boolean isForegroundRunning = isForegroundRunning();
-        if (isForegroundRunning) {
-            min = Interval.FORE_MAIN_LOOP_MIN;
-        } else {
-            min = Interval.BACK_MAIN_LOOP_MIN;
+        if (isForegroundRunning()) {
+            float frequency;
+            boolean isMetered = isMeteredNetwork();
+            if (isMetered) {
+                frequency = FrequencyUtil.getMeteredFixedFrequency();
+            } else {
+                frequency = FrequencyUtil.getWifiFixedFrequency();
+            }
+            FrequencyUtil.setMainLoopFrequency(frequency);
+            logger.debug("calculateMainLoopInterval fixedFrequency::{}, meteredNetwork::{}",
+                    frequency, isMetered);
+            return;
         }
+        Interval min = Interval.BACK_MAIN_LOOP_MIN;
+        Interval max = Interval.BACK_MAIN_LOOP_MAX;
         int timeInterval = 0;
         if (!isHaveAvailableData()) {
             timeInterval = Interval.MAIN_LOOP_NO_DATA.getInterval();

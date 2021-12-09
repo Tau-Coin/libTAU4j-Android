@@ -60,6 +60,15 @@ public class ViewUtils {
         return 0d;
     }
 
+    public static float getFloatText(TextView view) {
+        String text = getText(view);
+        try {
+            return Float.parseFloat(text);
+        }catch (Exception ignore){
+        }
+        return 0f;
+    }
+
     public static void updateViewWeight(View view, float weight) {
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)
                 view.getLayoutParams();
