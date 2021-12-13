@@ -10,9 +10,11 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.List;
 
+import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
+import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -29,6 +31,7 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
+import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 
 /**
  * MsgListener处理程序
@@ -40,8 +43,10 @@ class MsgAlertHandler {
     private DeviceRepository deviceRepo;
     private UserRepository userRepo;
     private TauDaemon daemon;
+    private Context appContext;
 
     MsgAlertHandler(Context appContext, TauDaemon daemon) {
+        this.appContext = appContext;
         this.daemon = daemon;
         chatRepo = RepositoryHelper.getChatRepository(appContext);
         friendRepo = RepositoryHelper.getFriendsRepository(appContext);
@@ -181,9 +186,32 @@ class MsgAlertHandler {
      * @param userPk 当前用户公钥
      */
     void onDiscoveryFriend(String friendPk, long lastSeenTime, String userPk) {
-        logger.debug("onDiscoveryFriend friendPk::{}", friendPk);
+        User user = userRepo.getUserByPublicKey(friendPk);
+        // 多设备朋友同步
+        if (null == user) {
+            user = new User(friendPk);
+            user.updateTime = lastSeenTime;
+            userRepo.addUser(user);
+        }
+
         Friend friend = friendRepo.queryFriend(userPk, friendPk);
-        if (friend != null) {
+        if (null == friend) {
+            // 更新libTAU朋友信息
+            boolean isSuccess = daemon.updateFriendInfo(user);
+            if (isSuccess) {
+                // 发送默认消息
+                String msg = appContext.getString(R.string.contacts_have_added);
+                logger.debug("AddFriendsLocally, syncSendMessageTask userPk::{}, friendPk::{}, msg::{}",
+                        userPk, friendPk, msg);
+                ChatViewModel.syncSendMessageTask(appContext, friendPk, msg, MessageType.TEXT.getType());
+                // 更新本地朋友关系
+                friend = new Friend(userPk, friendPk);
+                friend.status = FriendStatus.CONNECTED.getStatus();
+                friend.lastSeenTime = lastSeenTime;
+                friend.onlineCount = 1;
+                friendRepo.addFriend(friend);
+            }
+        } else {
             boolean isUpdate = false;
             if (friend.status != FriendStatus.CONNECTED.getStatus()) {
                 friend.status = FriendStatus.CONNECTED.getStatus();
@@ -202,10 +230,9 @@ class MsgAlertHandler {
             if (isUpdate) {
                 friendRepo.updateFriend(friend);
             }
-
-            logger.info("onDiscoveryFriend friendPk::{}, lastSeenTime::{}, {}", friendPk,
-                    DateUtil.format(lastSeenTime, DateUtil.pattern9), lastSeenTime);
         }
+        logger.info("onDiscoveryFriend userPk::{}, friendPk::{}, lastSeenTime::{}, {}",
+                userPk, friendPk, DateUtil.format(lastSeenTime, DateUtil.pattern9), lastSeenTime);
     }
 
     /**

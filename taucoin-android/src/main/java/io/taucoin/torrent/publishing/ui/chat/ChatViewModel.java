@@ -1,6 +1,7 @@
 package io.taucoin.torrent.publishing.ui.chat;
 
 import android.app.Application;
+import android.content.Context;
 
 import org.libTAU4j.Message;
 import org.slf4j.Logger;
@@ -12,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -219,8 +219,22 @@ public class ChatViewModel extends AndroidViewModel {
      * @param type 消息类型
      */
     public Result syncSendMessageTask(String friendPk, String text, int type) {
+        return syncSendMessageTask(getApplication(), friendPk, text, type);
+    }
+
+    /**
+     * 同步给朋友发信息任务
+     * @param context Context
+     * @param friendPk 朋友公钥
+     * @param text 消息
+     * @param type 消息类型
+     */
+    public static Result syncSendMessageTask(Context context, String friendPk, String text, int type) {
         Result result = new Result();
-        AppDatabase.getInstance(getApplication()).runInTransaction(() -> {
+        UserRepository userRepo = RepositoryHelper.getUserRepository(context);
+        ChatRepository chatRepo = RepositoryHelper.getChatRepository(context);
+        TauDaemon daemon = TauDaemon.getInstance(context);
+        AppDatabase.getInstance(context).runInTransaction(() -> {
             try {
                 List<byte[]> contents;
                 String logicMsgHash;
@@ -279,7 +293,7 @@ public class ChatViewModel extends AndroidViewModel {
                     ChatMsgStatus status = isConfirmed ? ChatMsgStatus.SYNC_CONFIRMED : ChatMsgStatus.BUILT;
                     // 确认接收的时间精确到秒
                     chatMsgLogs[nonce] = new ChatMsgLog(hash,
-                    status.getStatus(), currentTime);
+                            status.getStatus(), currentTime);
 
                 }
                 // 批量添加到数据库
