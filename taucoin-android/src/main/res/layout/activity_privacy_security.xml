@@ -157,6 +157,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/color_white"
+                android:focusableInTouchMode="true"
+                android:focusable="true"
                 android:layout_marginTop="@dimen/widget_size_20"
                 android:paddingTop="@dimen/widget_size_20"
                 android:paddingStart="@dimen/widget_size_20"
