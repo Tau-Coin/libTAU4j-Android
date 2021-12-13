@@ -98,10 +98,10 @@ public class FrequencyUtil {
     /**
      * 获取前台Wifi网络固定主循环频率
      */
-    public static float getWifiFixedFrequency() {
+    public static int getWifiFixedFrequency() {
         Context context = MainApplication.getInstance();
-        float frequency = settingsRepo.getFloatValue(context.getString(R.string.pref_key_wifi_fixed_frequency),
-                convertTimeToFreq(Interval.FORE_DEFAULT_WIFI_MAIN_LOOP.getInterval()));
+        int frequency = settingsRepo.getIntValue(context.getString(R.string.pref_key_wifi_fixed_frequency),
+                Interval.FORE_DEFAULT_WIFI_FREQUENCY.getInterval());
         logger.trace("getWifiFixedFrequency:: frequency::{}", frequency);
         return frequency;
     }
@@ -109,9 +109,9 @@ public class FrequencyUtil {
     /**
      * 设置前台Wifi网络固定主循环频率
      */
-    public static void setWifiFixedFrequency(float freq) {
+    public static void setWifiFixedFrequency(int freq) {
         Context context = MainApplication.getInstance();
-        settingsRepo.setFloatValue(context.getString(R.string.pref_key_wifi_fixed_frequency), freq);
+        settingsRepo.setIntValue(context.getString(R.string.pref_key_wifi_fixed_frequency), freq);
         logger.trace("setWifiFixedFrequency:: freq::{}", freq);
         if (!NetworkSetting.isMeteredNetwork()) {
             setMainLoopFrequency(freq);
@@ -121,10 +121,10 @@ public class FrequencyUtil {
     /**
      * 获取前台Metered网络固定主循环频率
      */
-    public static float getMeteredFixedFrequency() {
+    public static int getMeteredFixedFrequency() {
         Context context = MainApplication.getInstance();
-        float frequency = settingsRepo.getFloatValue(context.getString(R.string.pref_key_metered_fixed_frequency),
-                convertTimeToFreq(Interval.FORE_DEFAULT_METERED_MAIN_LOOP.getInterval()));
+        int frequency = settingsRepo.getIntValue(context.getString(R.string.pref_key_metered_fixed_frequency),
+                Interval.FORE_DEFAULT_METERED_FREQUENCY.getInterval());
         logger.trace("getMeteredFixedFrequency:: frequency::{}", frequency);
         return frequency;
     }
@@ -132,9 +132,9 @@ public class FrequencyUtil {
     /**
      * 设置前台Metered网络固定主循环频率
      */
-    public static void setMeteredFixedFrequency(float freq) {
+    public static void setMeteredFixedFrequency(int freq) {
         Context context = MainApplication.getInstance();
-        settingsRepo.setFloatValue(context.getString(R.string.pref_key_metered_fixed_frequency), freq);
+        settingsRepo.setIntValue(context.getString(R.string.pref_key_metered_fixed_frequency), freq);
         logger.trace("setMeteredFixedInterval:: freq::{}", freq);
         if (NetworkSetting.isMeteredNetwork()) {
             setMainLoopFrequency(freq);

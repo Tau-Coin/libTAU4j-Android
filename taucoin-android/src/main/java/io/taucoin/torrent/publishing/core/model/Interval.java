@@ -9,8 +9,8 @@ public enum Interval {
     BACK_MAIN_LOOP_MAX(5000),                   // libTAU主循环最大时间间隔
     MAIN_LOOP_NO_DATA(60000),              // 没有可用流量数据，libTAU主循环时间间隔
 
-    FORE_DEFAULT_WIFI_MAIN_LOOP(100),      // libTAU前台默认WIFI网络主循环
-    FORE_DEFAULT_METERED_MAIN_LOOP(200),    // libTAU前台默认计费网络主循环
+    FORE_DEFAULT_WIFI_FREQUENCY(10),      // libTAU前台默认WIFI网络主循环频率
+    FORE_DEFAULT_METERED_FREQUENCY(5),    // libTAU前台默认计费网络主循环频率
 
     // Worker中失败异常重试频率，单位ms
     INTERVAL_RETRY(1000);

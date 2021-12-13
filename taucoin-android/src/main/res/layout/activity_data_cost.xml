@@ -247,17 +247,15 @@
                             android:text="@string/setting_fixed_frequency"
                             android:textAppearance="@style/TextAppearanceBody1"/>
 
-                        <TextView
-                            android:id="@+id/tv_metered_fixed_frequency"
+                        <Spinner
+                            android:id="@+id/metered_fixed_frequency"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/gray_dark"
-                            android:paddingStart="@dimen/widget_size_10"
-                            android:paddingEnd="@dimen/widget_size_0"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:onClick="@{listener::onClick}"
-                            android:drawablePadding="@dimen/widget_size_5"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
+                            android:gravity="end"
+                            android:paddingStart="@dimen/widget_size_5"
+                            android:paddingEnd="@dimen/widget_size_35"
+                            android:spinnerMode="dialog"
+                            android:entries="@array/fixed_frequency"/>
 
                     </LinearLayout>
 
@@ -439,17 +437,16 @@
                             android:text="@string/setting_fixed_frequency"
                             android:textAppearance="@style/TextAppearanceBody1"/>
 
-                        <TextView
-                            android:id="@+id/tv_wifi_fixed_frequency"
+                        <Spinner
+                            style="@style/Widget.AppCompat.TextView.SpinnerItem"
+                            android:id="@+id/wifi_fixed_frequency"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/gray_dark"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:paddingStart="@dimen/widget_size_10"
-                            android:paddingEnd="@dimen/widget_size_0"
-                            android:onClick="@{listener::onClick}"
-                            android:drawablePadding="@dimen/widget_size_5"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
+                            android:spinnerMode="dialog"
+                            android:gravity="end"
+                            android:paddingStart="@dimen/widget_size_5"
+                            android:paddingEnd="@dimen/widget_size_35"
+                            android:entries="@array/fixed_frequency"/>
 
                     </LinearLayout>
 

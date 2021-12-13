@@ -1,12 +1,10 @@
 package io.taucoin.torrent.publishing.ui.setting;
 
 import android.os.Bundle;
-import android.text.InputFilter;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.common.primitives.Ints;
 
@@ -22,32 +20,27 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
-import io.taucoin.torrent.publishing.core.utils.DrawablesUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.Formatter;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
-import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
-import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityDataCostBinding;
-import io.taucoin.torrent.publishing.databinding.EditFixedFrequencyDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
-import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 
 /**
  * 仪表板页面
  */
 public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.OnCheckedChangeListener,
-        CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+        CompoundButton.OnCheckedChangeListener, View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private ActivityDataCostBinding binding;
     private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
     private DailyQuotaAdapter adapterMetered;
     private DailyQuotaAdapter adapterWiFi;
-    private CommonDialog commonDialog;
+    private String[] frequencies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +48,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         settingsRepo = RepositoryHelper.getSettingsRepository(getApplicationContext());
         binding = DataBindingUtil.setContentView(this, R.layout.activity_data_cost);
         binding.setListener(this);
+        frequencies = getResources().getStringArray(R.array.fixed_frequency);
         initView();
     }
 
@@ -94,10 +88,8 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         handleSettingsChanged(getString(R.string.pref_key_wifi_fixed_frequency));
         handleSettingsChanged(getString(R.string.pref_key_metered_fixed_frequency));
 
-        DrawablesUtil.setEndDrawable(binding.tvMeteredFixedFrequency, R.mipmap.icon_arrow,
-                getResources().getDimension(R.dimen.widget_size_12));
-        DrawablesUtil.setEndDrawable(binding.tvWifiFixedFrequency, R.mipmap.icon_arrow,
-                getResources().getDimension(R.dimen.widget_size_12));
+        binding.wifiFixedFrequency.setOnItemSelectedListener(this);
+        binding.meteredFixedFrequency.setOnItemSelectedListener(this);
     }
 
     private void refreshAllData() {
@@ -146,7 +138,6 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
 
     /**
      * 用户设置参数变化
-     * @param key
      */
     private void handleSettingsChanged(String key) {
         if(StringUtil.isEquals(key, getString(R.string.pref_key_current_speed))) {
@@ -216,11 +207,22 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
             binding.tvDozeRunningTime.setRightText(dozeTimeStr);
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_metered_fixed_frequency))) {
-            double frequency = FrequencyUtil.getMeteredFixedFrequency();
-            binding.tvMeteredFixedFrequency.setText(FmtMicrometer.formatTwoDecimal(frequency));
+            int frequency = FrequencyUtil.getMeteredFixedFrequency();
+            for (int i = 0; i < frequencies.length; i++) {
+                if (frequency == Integer.parseInt(frequencies[i])) {
+                    binding.meteredFixedFrequency.setSelection(i);
+                    break;
+                }
+            }
+
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_wifi_fixed_frequency))) {
-            double frequency = FrequencyUtil.getWifiFixedFrequency();
-            binding.tvWifiFixedFrequency.setText(FmtMicrometer.formatTwoDecimal(frequency));
+            int frequency = FrequencyUtil.getWifiFixedFrequency();
+            for (int i = 0; i < frequencies.length; i++) {
+                if (frequency == Integer.parseInt(frequencies[i])) {
+                    binding.wifiFixedFrequency.setSelection(i);
+                    break;
+                }
+            }
         }
     }
 
@@ -231,11 +233,22 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             case R.id.tab_background:
                 changeTabView(v.getId());
                 break;
-            case R.id.tv_metered_fixed_frequency:
-            case R.id.tv_wifi_fixed_frequency:
-                showEditFixedFrequencyDialog((TextView) v);
-                break;
         }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        int frequency = Integer.parseInt(frequencies[position]);
+        if (parent.getId() == R.id.wifi_fixed_frequency) {
+            FrequencyUtil.setWifiFixedFrequency(frequency);
+        } else {
+            FrequencyUtil.setMeteredFixedFrequency(frequency);
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
     private void changeTabView(int id) {
@@ -265,45 +278,9 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         }
     }
 
-    /**
-     * 显示编辑固定频率的对话框
-     */
-    void showEditFixedFrequencyDialog(TextView textView) {
-        String currentValue = ViewUtils.getText(textView);
-        EditFixedFrequencyDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(this),
-                R.layout.edit_fixed_frequency_dialog, null, false);
-        binding.etValue.setText(currentValue);
-        binding.etValue.setFilters(new InputFilter[]{new MoneyValueFilter()});
-
-        commonDialog = new CommonDialog.Builder(this)
-                .setContentView(binding.getRoot())
-                .setPositiveButton(R.string.common_submit, (dialog, which) -> {
-                    dialog.cancel();
-                    float value = ViewUtils.getFloatText(binding.etValue);
-                    if (value > 0) {
-                        textView.setText(FmtMicrometer.formatTwoDecimal(value));
-                        if (textView.getId() == R.id.tv_wifi_fixed_frequency) {
-                            FrequencyUtil.setWifiFixedFrequency(value);
-                        } else {
-                            FrequencyUtil.setMeteredFixedFrequency(value);
-                        }
-                    }
-                })
-                .create();
-        commonDialog.show();
-    }
-
     @Override
     protected void onStop() {
         super.onStop();
         disposables.clear();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (commonDialog != null && commonDialog.isShowing()) {
-            commonDialog.closeDialog();
-        }
     }
 }
