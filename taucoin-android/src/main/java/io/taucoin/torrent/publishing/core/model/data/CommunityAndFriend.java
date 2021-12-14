@@ -13,6 +13,7 @@ public class CommunityAndFriend {
     public long power;                      // 成员在此社区的power
     public long blockNumber;                // 成员状态改变的区块号
     public long headBlock;                  // 社区最新的区块号
+    public int joined;                      // 是否加入此社区
 
     // 朋友相关数据
     public String senderPk;                 // ChatMsg中的消息发送者

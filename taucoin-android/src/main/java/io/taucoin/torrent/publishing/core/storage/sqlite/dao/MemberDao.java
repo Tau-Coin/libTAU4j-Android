@@ -13,7 +13,6 @@ import androidx.room.Update;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.Constants;
-import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;

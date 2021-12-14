@@ -10,7 +10,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
-import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
@@ -116,7 +116,7 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     }
 
     @Override
-    public Observable<MemberAndCommunity> observerCurrentMember(String chainID, String publicKey) {
+    public Observable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey) {
         return db.communityDao().observerCurrentMember(chainID, publicKey);
     }
 

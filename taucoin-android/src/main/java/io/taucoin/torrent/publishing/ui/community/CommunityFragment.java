@@ -55,6 +55,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_community, container, false);
+        binding.setListener(this);
         return binding.getRoot();
     }
 
@@ -247,6 +248,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                         currentTabFragment.handleReadOnly(isReadOnly);
                         this.isReadOnly = isReadOnly;
                     }
+                    binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
                 }));
 
     }
@@ -264,6 +266,10 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             case R.id.tv_off_chain:
             case R.id.tv_wring:
             case R.id.tv_tip_blocks:
+                // 避免同一页面多次刷新
+                if (this.selectedView != null && selectedView.getId() == v.getId()) {
+                    return;
+                }
                 if (this.selectedView != null) {
                     this.selectedView.setBackgroundResource(R.drawable.community_tab_background_default);
                     this.selectedView.setTextColor(getResources().getColor(R.color.color_white));
@@ -273,6 +279,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 selectedView.setTextColor(getResources().getColor(R.color.color_blue_dark));
                 this.selectedView = selectedView;
                 loadTabView(StringUtil.getTag(selectedView));
+                break;
+            case R.id.tv_join:
+                communityViewModel.joinCommunity(chainID);
                 break;
         }
     }

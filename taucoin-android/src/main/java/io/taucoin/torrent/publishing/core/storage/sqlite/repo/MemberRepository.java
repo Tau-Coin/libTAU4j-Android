@@ -2,14 +2,12 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 
 
 import java.util.List;
-import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;

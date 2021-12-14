@@ -7,7 +7,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
-import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 
@@ -72,7 +72,7 @@ public interface CommunityRepository {
      * @param publicKey
      * @return
      */
-    Observable<MemberAndCommunity> observerCurrentMember(String chainID, String publicKey);
+    Observable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey);
 
     /**
      * 观察链上币量前topNum的成员

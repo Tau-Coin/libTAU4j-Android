@@ -158,6 +158,7 @@
     <string name="error_telegram_id_illegal">Telegram ID is illegal!</string>
     <string name="community_added_successfully">Create Community Successful!</string>
     <string name="community_added_failed">Failed to add community!</string>
+    <string name="community_join">Join</string>
     <string name="community_added_members">Add Members</string>
     <string name="community_added_members_empty">Please add or select friends first!</string>
     <string name="community_custom_airdrop_tips">Custom airdrop coins to friends</string>

@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.google.gson.Gson;
-
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -18,7 +16,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
-import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -131,7 +129,7 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
     /**
      * 加载社区当前登陆用户数据
      */
-    private void loadMemberData(MemberAndCommunity member) {
+    private void loadMemberData(CommunityAndMember member) {
         long perishableDate = 0;
         long power = 0;
         boolean isReadOnly = true;

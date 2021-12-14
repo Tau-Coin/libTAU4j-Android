@@ -52,7 +52,7 @@ import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.DrawBean;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
-import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
@@ -525,7 +525,7 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param chainID
      * @return
      */
-    Observable<MemberAndCommunity> observerCurrentMember(String chainID) {
+    Observable<CommunityAndMember> observerCurrentMember(String chainID) {
         String publicKey = MainApplication.getInstance().getPublicKey();
         return communityRepo.observerCurrentMember(chainID, publicKey);
     }
@@ -634,5 +634,26 @@ public class CommunityViewModel extends AndroidViewModel {
      */
     public Flowable<ChainStatus> observerChainStatus(String chainID) {
         return blockRepo.observerChainStatus(chainID);
+    }
+
+    /**
+     * 加入社区
+     * @param chainID 链ID
+     */
+    public void joinCommunity(String chainID) {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
+            List<String> list = queryCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT);
+            Set<String> peers = new HashSet<>(list);
+            boolean success = daemon.followChain(chainID, peers);
+            if (success) {
+                String publicKey = MainApplication.getInstance().getPublicKey();
+                addMemberInfoToLocal(chainID, publicKey);
+            }
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+        disposables.add(disposable);
     }
 }

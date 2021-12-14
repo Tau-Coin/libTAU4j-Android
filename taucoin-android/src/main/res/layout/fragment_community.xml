@@ -157,10 +157,35 @@
             android:background="@color/divider"/>
 
         <androidx.fragment.app.FragmentContainerView
+            android:layout_above="@+id/fl_join"
             android:id="@+id/tab_fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/tab_layout_line"
             android:background="@color/color_chat_bg"/>
+
+        <FrameLayout
+            android:visibility="gone"
+            android:id="@+id/fl_join"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_chat_bg"
+            android:layout_alignParentBottom="true">
+
+            <TextView
+                android:id="@+id/tv_join"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/widget_size_44"
+                android:background="@drawable/blue_dark_rect_round_bg"
+                android:layout_marginTop="@dimen/widget_size_10"
+                android:layout_marginBottom="@dimen/widget_size_10"
+                android:layout_marginStart="@dimen/widget_size_20"
+                android:layout_marginEnd="@dimen/widget_size_20"
+                android:gravity="center_horizontal|center"
+                android:onClick="@{listener::onClick}"
+                android:textColor="@color/color_white"
+                android:text="@string/community_join"/>
+
+        </FrameLayout>
     </RelativeLayout>
 </layout>

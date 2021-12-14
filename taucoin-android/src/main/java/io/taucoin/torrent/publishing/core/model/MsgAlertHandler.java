@@ -186,6 +186,9 @@ class MsgAlertHandler {
      * @param userPk 当前用户公钥
      */
     void onDiscoveryFriend(String friendPk, long lastSeenTime, String userPk) {
+        if (StringUtil.isEmpty(userPk)) {
+            return;
+        }
         User user = userRepo.getUserByPublicKey(friendPk);
         // 多设备朋友同步
         if (null == user) {
