@@ -13,6 +13,7 @@ import androidx.room.Update;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
@@ -66,11 +67,19 @@ public interface MemberDao {
             " WHERE tx.txStatus = 0 AND tx.autoRenewal = 1" +
             " AND m.nonce = tx.nonce" +
             " GROUP BY tx.chainID, tx.senderPk) txs ON m.chainID = txs.chainID AND m.publicKey = txs.senderPk" +
-            " WHERE  u.seed NOT NULL AND ((balance > 0 OR power > 0)" +
+            " WHERE c.isBanned = 0" +
+            " AND u.seed NOT NULL AND ((balance > 0 OR power > 0)" +
             " AND (c.headBlock - m.blockNumber < "+ Constants.BLOCKS_NOT_PERISHABLE +")" +
             " AND (c.headBlock - m.blockNumber - IFNULL(txs.count, 0) * " +
             Constants.AUTO_RENEWAL_PERIOD_BLOCKS + ") >= " +
             (Constants.BLOCKS_NOT_PERISHABLE - Constants.AUTO_RENEWAL_MAX_BLOCKS) + ")";
+
+    // 获取跟随的社区列表
+    String QUERY_FOLLOWED_COMMUNITIES = "SELECT m.chainID" +
+            " FROM Members m" +
+            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+            " WHERE m.publicKey = :userPk AND c.isBanned = 0" +
+            " AND " + WHERE_ON_CHAIN;
 
     /**
      * 添加新社区成员
@@ -136,4 +145,10 @@ public interface MemberDao {
      */
     @Query(QUERY_AUTO_RENEWAL_ACCOUNTS)
     List<MemberAutoRenewal> queryAutoRenewalAccounts();
+
+    /**
+     * 获取跟随的社区列表
+     */
+    @Query(QUERY_FOLLOWED_COMMUNITIES)
+    List<String> queryFollowedCommunities(String userPk);
 }

@@ -9,6 +9,7 @@ import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndCommunity;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
@@ -82,4 +83,9 @@ public interface MemberRepository {
      * 获取社区成员统计
      */
     List<MemberAutoRenewal> queryAutoRenewalAccounts();
+
+    /**
+     * 获取跟随的社区列表
+     */
+    List<String> queryFollowedCommunities(String publicKey);
 }

@@ -19,7 +19,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.CrashHandler;
 import io.taucoin.torrent.publishing.core.utils.FixMemLeak;
 import io.taucoin.torrent.publishing.ui.TauNotifier;
-import io.taucoin.torrent.publishing.ui.constant.Constants;
+import io.taucoin.torrent.publishing.core.Constants;
 
 public class MainApplication extends MultiDexApplication {
     static {

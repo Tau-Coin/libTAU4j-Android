@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -80,5 +81,14 @@ public class FriendRepositoryImpl implements FriendRepository{
     @Override
     public Flowable<List<String>> getActiveFriends() {
         return db.friendDao().getActiveFriends();
+    }
+
+    /**
+     * 查询自己的朋友
+     * @return 朋友列表
+     */
+    @Override
+    public List<FriendAndUser> queryFriendsByUserPk(String userPk) {
+        return db.friendDao().queryFriendsByUserPk(userPk);
     }
 }

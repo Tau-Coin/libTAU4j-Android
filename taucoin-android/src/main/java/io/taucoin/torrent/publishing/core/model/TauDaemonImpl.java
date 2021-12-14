@@ -160,7 +160,7 @@ public class TauDaemonImpl extends TauDaemon {
                     if (!emitter.isDisposed() && alert != null) {
                         // 防止OOM，此处超过队列容量，直接丢弃
                         if (alertQueue.size() <= ALERT_QUEUE_CAPACITY) {
-                            alertQueue.offer(new AlertAndUser(alert, seed));
+                            alertQueue.offer(new AlertAndUser(alert));
                         } else {
                             logger.warn("Queue full, Alert data is discarded::{}", alert.message());
                         }

@@ -22,7 +22,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,6 +43,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
@@ -69,7 +72,7 @@ import io.taucoin.torrent.publishing.databinding.SeedDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
-import io.taucoin.torrent.publishing.ui.constant.Constants;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
 import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
@@ -196,41 +199,83 @@ public class UserViewModel extends AndroidViewModel {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<String>) emitter -> {
             String result = "";
             try {
+                // 必须顺序执行以下逻辑, 保证数据不会错乱
+                // 0、清除libTAU中的朋友关系和跟随的社区链
+                User oldUser = userRepo.getCurrentUser();
+                if (oldUser != null) {
+                    // 清除libTAU中的朋友关系
+                    List<FriendAndUser> friends = friendRepo.queryFriendsByUserPk(oldUser.publicKey);
+                    if (friends != null && friends.size() > 0) {
+                        for (Friend friend : friends) {
+                            boolean isSuccess = daemon.deleteFriend(friend.friendPK);
+                            logger.debug("importSeed deleteFriend::{}, isSuccess::{}, size::{}",
+                                    friend.friendPK, isSuccess, friends.size());
+                        }
+                    }
+                    // 清除libTAU中跟随的社区链
+                    List<String> communities = memRepo.queryFollowedCommunities(oldUser.publicKey);
+                    if (communities != null && communities.size() > 0) {
+                        for (String chainID : communities) {
+                            boolean isSuccess = daemon.unfollowChain(chainID);
+                            logger.debug("importSeed unfollowChain::{}, isSuccess::{}, size::{}",
+                                    chainID, isSuccess, communities.size());
+                        }
+                    }
+                }
                 byte[] seedBytes = ByteUtil.toByte(seed);
                 Pair<byte[], byte[]> keypair = Ed25519.createKeypair(seedBytes);
                 String publicKey = ByteUtil.toHexString(keypair.first);
-                logger.debug("import publicKey::{}, size::{}", publicKey, publicKey.length());
-                User user = userRepo.getUserByPublicKey(publicKey);
-                User currentUser = userRepo.getCurrentUser();
-                if(currentUser != null){
-                    userRepo.setCurrentUser(currentUser.publicKey, false);
+                logger.debug("importSeed publicKey::{}, size::{}", publicKey, publicKey.length());
+                User newUser = userRepo.getUserByPublicKey(publicKey);
+                if (oldUser != null) {
+                    userRepo.setCurrentUser(oldUser.publicKey, false);
                 }
-                // 1、更新本地数据库数据
-                if (null == user) {
-                    user = new User(publicKey, seed, name, true);
-                    userRepo.addUser(user);
+                // 1、更新本地数据库数据, TauService中观察者自动触发updateSeed
+                if (null == newUser) {
+                    newUser = new User(publicKey, seed, name, true);
+                    userRepo.addUser(newUser);
                 } else {
-                    if(StringUtil.isNotEmpty(name)){
-                        user.nickname = name;
-                        user.updateTime = daemon.getSessionTime() / 1000;
+                    if (StringUtil.isNotEmpty(name)) {
+                        newUser.nickname = name;
+                        newUser.updateTime = daemon.getSessionTime() / 1000;
                     }
-                    user.seed = seed;
-                    user.isCurrentUser = true;
-                    userRepo.updateUser(user);
+                    newUser.seed = seed;
+                    newUser.isCurrentUser = true;
+                    userRepo.updateUser(newUser);
                 }
                 // 2、把自己当作自己的朋友
                 Friend friend = friendRepo.queryFriend(publicKey, publicKey);
                 if (null == friend) {
                     friend = new Friend(publicKey, publicKey, FriendStatus.CONNECTED.getStatus());
                     friendRepo.addFriend(friend);
-                    // 更新libTAU朋友信息
-                    daemon.updateFriendInfo(user);
                 }
                 // 3、更新本地的用户公钥
-                MainApplication.getInstance().setCurrentUser(user);
-                /* 保证数据不会错乱，必须顺序执行以下逻辑 */
-                // 4、更新链端seed
+                MainApplication.getInstance().setCurrentUser(newUser);
+                // 4、更新本地的用户公钥
                 daemon.updateSeed(seed);
+
+                // 5、向libTAU中添加当前用户的朋友关系和其跟随的社区链
+
+                // 向libTAU中添加当前用户的朋友关系
+                List<FriendAndUser> friends = friendRepo.queryFriendsByUserPk(newUser.publicKey);
+                if (friends != null && friends.size() > 0) {
+                    for (FriendAndUser fau : friends) {
+                        boolean isSuccess = daemon.updateFriendInfo(fau.user);
+                        logger.debug("importSeed updateFriendInfo::{}, isSuccess::{}, size::{}",
+                                fau.friendPK, isSuccess, friends.size());
+                    }
+                }
+                // 向libTAU中添加当前用户跟随的社区链
+                List<String> communities = memRepo.queryFollowedCommunities(newUser.publicKey);
+                if (communities != null && communities.size() > 0) {
+                    for (String chainID : communities) {
+                        List<String> list = memRepo.queryCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT);
+                        Set<String> peers = new HashSet<>(list);
+                        boolean isSuccess = daemon.followChain(chainID, peers);
+                        logger.debug("importSeed followChain::{}, peers size::{}, isSuccess::{}, size::{}", chainID,
+                                peers.size(), isSuccess, communities.size());
+                    }
+                }
             } catch (Exception e){
                 result = getApplication().getString(R.string.user_seed_invalid);
                 logger.debug("import seed error::{}", result);
@@ -595,7 +640,8 @@ public class UserViewModel extends AndroidViewModel {
                 result.setMsg(publicKey);
                 // 发送默认消息
                 String msg = getApplication().getString(R.string.contacts_have_added);
-                chatViewModel.syncSendMessageTask(publicKey, msg, MessageType.TEXT.getType());
+                String senderPk = MainApplication.getInstance().getPublicKey();
+                chatViewModel.syncSendMessageTask(senderPk, publicKey, msg, MessageType.TEXT.getType());
                 logger.debug("AddFriendsLocally, syncSendMessageTask::{}", msg);
             } else {
                 result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));

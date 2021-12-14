@@ -19,12 +19,9 @@
 
 package io.taucoin.torrent.publishing.core.model.data;
 
-import org.libTAU4j.Ed25519;
-import org.libTAU4j.Pair;
 import org.libTAU4j.alerts.Alert;
 
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
+import io.taucoin.torrent.publishing.MainApplication;
 
 /**
  * libTAU上报的Alert
@@ -34,14 +31,9 @@ public class AlertAndUser {
     private Alert alert;
     private String userPk;
 
-    public AlertAndUser(Alert alert, String seed) {
+    public AlertAndUser(Alert alert) {
         this.alert = alert;
-
-        if (StringUtil.isNotEmpty(seed)) {
-            byte[] seedBytes = ByteUtil.toByte(seed);
-            Pair<byte[], byte[]> keypair = Ed25519.createKeypair(seedBytes);
-            this.userPk = ByteUtil.toHexString(keypair.first);
-        }
+        this.userPk = MainApplication.getInstance().getPublicKey();
     }
 
     public Alert getAlert() {

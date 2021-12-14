@@ -12,7 +12,7 @@ import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.databinding.ActivityFontSizeBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
-import io.taucoin.torrent.publishing.ui.constant.Constants;
+import io.taucoin.torrent.publishing.core.Constants;
 
 /**
  * 字体大小设置页面

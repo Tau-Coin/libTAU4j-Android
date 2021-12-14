@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 
 /**
@@ -45,4 +46,10 @@ public interface FriendRepository {
      * @return 活跃的朋友列表
      */
     Flowable<List<String>> getActiveFriends();
+
+    /**
+     * 查询自己的朋友
+     * @return 朋友列表
+     */
+    List<FriendAndUser> queryFriendsByUserPk(String userPk);
 }

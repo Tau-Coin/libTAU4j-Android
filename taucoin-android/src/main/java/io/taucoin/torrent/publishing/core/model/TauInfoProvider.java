@@ -30,7 +30,7 @@ import io.taucoin.torrent.publishing.core.utils.Sampler;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
-import io.taucoin.torrent.publishing.ui.constant.Constants;
+import io.taucoin.torrent.publishing.core.Constants;
 
 import static java.lang.Runtime.getRuntime;
 

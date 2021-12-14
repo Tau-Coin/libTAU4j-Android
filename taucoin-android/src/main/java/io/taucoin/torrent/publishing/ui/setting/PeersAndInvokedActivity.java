@@ -35,7 +35,7 @@ import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.LargeValueFormatter;
 import io.taucoin.torrent.publishing.databinding.ActivityDataStatisticsBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
-import io.taucoin.torrent.publishing.ui.constant.Constants;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.ui.customviews.MyMarkerView;
 
 /**

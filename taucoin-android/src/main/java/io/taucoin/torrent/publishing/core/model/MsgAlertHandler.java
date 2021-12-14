@@ -203,7 +203,7 @@ class MsgAlertHandler {
                 String msg = appContext.getString(R.string.contacts_have_added);
                 logger.debug("AddFriendsLocally, syncSendMessageTask userPk::{}, friendPk::{}, msg::{}",
                         userPk, friendPk, msg);
-                ChatViewModel.syncSendMessageTask(appContext, friendPk, msg, MessageType.TEXT.getType());
+                ChatViewModel.syncSendMessageTask(appContext, userPk, friendPk, msg, MessageType.TEXT.getType());
                 // 更新本地朋友关系
                 friend = new Friend(userPk, friendPk);
                 friend.status = FriendStatus.CONNECTED.getStatus();

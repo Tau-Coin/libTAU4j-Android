@@ -12,7 +12,7 @@ import io.taucoin.torrent.publishing.core.model.data.MemoryStatistics;
 import io.taucoin.torrent.publishing.core.model.data.PeersAndInvoked;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Statistic;
-import io.taucoin.torrent.publishing.ui.constant.Constants;
+import io.taucoin.torrent.publishing.core.Constants;
 
 /**
  * StatisticRepository接口实现

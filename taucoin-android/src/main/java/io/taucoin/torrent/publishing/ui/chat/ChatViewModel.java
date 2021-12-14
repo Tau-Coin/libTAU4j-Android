@@ -24,6 +24,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
@@ -118,7 +119,8 @@ public class ChatViewModel extends AndroidViewModel {
      */
     void sendMessage(String friendPk, String msg, int type) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Result>) emitter -> {
-            Result result = syncSendMessageTask(friendPk, msg, type);
+            String senderPk = MainApplication.getInstance().getPublicKey();
+            Result result = syncSendMessageTask(senderPk, friendPk, msg, type);
             emitter.onNext(result);
             emitter.onComplete();
         }).subscribeOn(Schedulers.single())
@@ -155,7 +157,8 @@ public class ChatViewModel extends AndroidViewModel {
                     msg.append(new String(bytes, StandardCharsets.UTF_8));
                     long startTime = System.currentTimeMillis();
 
-                    syncSendMessageTask(friendPk, msg.toString(), MessageType.TEXT.getType());
+                    String senderPk = MainApplication.getInstance().getPublicKey();
+                    syncSendMessageTask(senderPk, friendPk, msg.toString(), MessageType.TEXT.getType());
                     long endTime = System.currentTimeMillis();
                     logger.debug("sendBatchDebugMessage no::{}, time::{}", i, endTime - startTime);
                     msg.setLength(0);
@@ -201,7 +204,8 @@ public class ChatViewModel extends AndroidViewModel {
                         break;
                     }
                     String msg = randomChar + FmtMicrometer.fmtTestData( i + 1);
-                    syncSendMessageTask(friendPk, msg, MessageType.TEXT.getType());
+                    String senderPk = MainApplication.getInstance().getPublicKey();
+                    syncSendMessageTask(senderPk, friendPk, msg, MessageType.TEXT.getType());
                 }
             } catch (Exception ignore) {
             }
@@ -214,22 +218,25 @@ public class ChatViewModel extends AndroidViewModel {
 
     /**
      * 同步给朋友发信息任务
+     * @param senderPk 发送者公钥
      * @param friendPk 朋友公钥
      * @param text 消息
      * @param type 消息类型
      */
-    public Result syncSendMessageTask(String friendPk, String text, int type) {
-        return syncSendMessageTask(getApplication(), friendPk, text, type);
+    public Result syncSendMessageTask(String senderPk, String friendPk, String text, int type) {
+        return syncSendMessageTask(getApplication(), senderPk, friendPk, text, type);
     }
 
     /**
      * 同步给朋友发信息任务
      * @param context Context
+     * @param senderPk 发送者公钥
      * @param friendPk 朋友公钥
      * @param text 消息
      * @param type 消息类型
      */
-    public static Result syncSendMessageTask(Context context, String friendPk, String text, int type) {
+    public static Result syncSendMessageTask(Context context, String senderPk, String friendPk,
+                                             String text, int type) {
         Result result = new Result();
         UserRepository userRepo = RepositoryHelper.getUserRepository(context);
         ChatRepository chatRepo = RepositoryHelper.getChatRepository(context);
@@ -244,8 +251,7 @@ public class ChatViewModel extends AndroidViewModel {
                 } else {
                     throw new Exception("Unknown message type");
                 }
-                User user = userRepo.getCurrentUser();
-                String senderPk = user.publicKey;
+                User user = userRepo.getUserByPublicKey(senderPk);
                 ChatMsg[] messages = new ChatMsg[contents.size()];
                 ChatMsgLog[] chatMsgLogs = new ChatMsgLog[contents.size()];
                 int contentSize = contents.size();
