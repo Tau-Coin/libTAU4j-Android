@@ -65,12 +65,12 @@ public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHol
             if (type == TopPeersFragment.TOP_COIN) {
                 String midHideName = UsersUtil.getMidHideName(member.publicKey, 6);
                 holder.binding.tvCol2.setText(midHideName);
-                holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_blue));
+                holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_yellow));
                 holder.binding.tvCol3.setText(FmtMicrometer.fmtBalance(member.balance));
             } else if (type == TopPeersFragment.TOP_POWER) {
                 String midHideName = UsersUtil.getMidHideName(member.publicKey, 6);
                 holder.binding.tvCol2.setText(midHideName);
-                holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_blue));
+                holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_yellow));
                 holder.binding.tvCol3.setText(String.valueOf(member.power));
             }
 

@@ -48,7 +48,7 @@
     <string name="main_open_link">Open the link?</string>
 
     <string name="main_publish_video">Publish Video</string>
-    <string name="main_new_community">New Community</string>
+    <string name="main_new_community">New Coin Community</string>
     <string name="main_community_settings">Community Settings</string>
     <string name="main_other_transaction">Other Transaction</string>
     <string name="main_no_messages">[No messages]</string>
@@ -61,7 +61,7 @@
     <!-- Strings used for main drawer content -->
     <string name="drawer_new_community">New Community</string>
     <string name="drawer_peers">Friends</string>
-    <string name="drawer_mining">Mining</string>
+    <string name="drawer_communities">Communities</string>
     <string name="drawer_setting">Settings</string>
     <string name="drawer_data_cost">Data Cost</string>
     <string name="drawer_working_condition">Working Condition</string>
@@ -85,7 +85,6 @@
     <string name="community_chain_status">Chain Status</string>
     <string name="community_blacklist">Blacklist</string>
     <string name="community_members">Members</string>
-    <string name="community_mining_info">Mining</string>
     <string name="community_sync_rate">Sync Rate</string>
     <string name="community_miners_online">Miners Online</string>
     <string name="community_total_blocks">Total Blocks</string>
@@ -104,13 +103,13 @@
     <string name="community_users_stats">%1$d members</string>
     <string name="common_loading">loading&#8230;</string>
 
-    <string name="community_community_name">Community Name(required)</string>
+    <string name="community_community_name">Name(required)</string>
     <string name="community_name">Community Name</string>
     <string name="community_total_coins">Total coins: %s</string>
     <string name="community_unified_airdrop">Unified airdrop coins per account</string>
     <string name="community_custom_coins">Custom airdrop coins</string>
     <string name="community_custom_coins_tips">Coins</string>
-    <string name="community_selected_friends">Selected friends: %d</string>
+    <string name="community_selected_friends">Selected: %d</string>
     <string name="community_coin_name">Coin Name(optional)</string>
     <string name="community_announce">Announce on TAU</string>
     <string name="community_total_coin">Total Coins</string>
@@ -140,14 +139,14 @@
     <string name="chain_peers_blocks">Peers &#038; Blocks</string>
     <string name="chain_total_coins">Total Coins</string>
     <string name="chain_top_peers">Top 10 peers</string>
-    <string name="chain_top_consensus">Top 3 consensus</string>
+    <string name="chain_votes">Votes</string>
     <string name="chain_current_fork">Current Fork</string>
     <string name="chain_block_number">Block Number</string>
     <string name="chain_block_hash">Hash</string>
     <string name="chain_top_tab_coin">Coin</string>
     <string name="chain_top_tab_power">Power</string>
     <string name="chain_top_tab_consensus">Consensus</string>
-    <string name="chain_top_tab_tip">Tip</string>
+    <string name="chain_top_tab_head">Head</string>
     <string name="chain_top_tab_rank">Rank</string>
     <string name="chain_top_tab_peer">Peer</string>
 
@@ -228,8 +227,8 @@
     <string name="setting_daily_quota">Daily Data Limit</string>
     <string name="setting_daily_quota_unit_m">%1$dM</string>
     <string name="setting_daily_quota_unit_g">%1$dG</string>
-    <string name="setting_network_current_speed">Current Speed</string>
-    <string name="setting_fixed_frequency">Fixed Frequency</string>
+    <string name="setting_network_current_speed">Speed</string>
+    <string name="setting_fixed_frequency">Frequency</string>
     <string name="setting_fixed_frequency_hint">Please enter a fixed frequency</string>
     <string name="setting_average_speed">Target Speed </string>
     <string name="setting_network_average_speed">Average Speed</string>
@@ -291,7 +290,6 @@
     <string name="user_start_chat">Chat</string>
     <string name="user_add_to_contact">Add To Friends</string>
     <string name="user_share_qr">Share QR To Friend</string>
-    <string name="user_share_qr_dialog_tips">Share your QR code to friends for 100% connection</string>
 
     <string name="copy_seed">Key copied</string>
     <string name="copy_public_key">My Public Key copied</string>
@@ -364,7 +362,7 @@
     <string name="foreground_notification">Foreground notification</string>
 
     <!-- Strings used for connected peers -->
-    <string name="contacts_exchange_qr">Exchange QR code to add friend</string>
+    <string name="contacts_exchange_qr">Show QR code to add friend</string>
     <string name="contacts_import_friend_pk">Import Public Key to add friend</string>
     <string name="contacts_have_added">I have added you as a friend.</string>
     <string name="contacts_yourself">&#160;-&#160;yourself</string>
@@ -397,6 +395,7 @@
     <string name="qr_code_step_one">Share QR code to friends</string>
     <string name="qr_code_step_two">Scan friend’s QR code</string>
     <string name="qr_code_scan_friend_qr">Scan Friend\'s QR Code</string>
+    <string name="qr_code_scan_community_qr">Scan QR Code</string>
     <string name="qr_code_scan_key_qr">Scan secrete key QR code</string>
     <string name="qr_code_scan_qr">Scan QR</string>
     <string name="qr_code_scan_cancelled">Cancelled</string>

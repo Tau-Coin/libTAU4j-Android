@@ -12,8 +12,8 @@ public class Constants {
     public static final BigInteger TOTAL_COIN = new BigInteger("1000000", 10).multiply(COIN);
     // 给朋友空投币的数量 10 COIN
     public static final BigInteger AIRDROP_COIN = new BigInteger("10", 10).multiply(COIN);
-    // 创建新社区空投币的数量 1% TOTAL_COIN
-    public static final BigInteger CREATION_AIRDROP_COIN = TOTAL_COIN.divide(new BigInteger("100", 10));
+    // 创建新社区空投币的数量 1000 TOTAL_COIN
+    public static final BigInteger CREATION_AIRDROP_COIN = new BigInteger("1000", 10).multiply(COIN);
     // 小数保留2位(0.01 COIN), 最大为8
     public static final int COIN_DECIMAL = 2;
     // 最小值交易费 0.01 COIN

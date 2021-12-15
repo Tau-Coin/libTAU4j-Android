@@ -20,7 +20,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.MenuItemCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -58,12 +57,11 @@ import io.taucoin.torrent.publishing.ui.community.CommunityFragment;
 import io.taucoin.torrent.publishing.ui.ExternalLinkActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityCreateActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
-import io.taucoin.torrent.publishing.ui.community.MiningInfoActivity;
+import io.taucoin.torrent.publishing.ui.community.CommunitiesActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.BadgeActionProvider;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.download.DownloadViewModel;
-import io.taucoin.torrent.publishing.ui.notify.NotificationActivity;
 import io.taucoin.torrent.publishing.ui.notify.NotificationViewModel;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.KeyQRCodeActivity;
@@ -332,7 +330,7 @@ public class MainActivity extends ScanTriggerActivity {
                 ActivityUtil.startActivity(this, FriendsActivity.class);
                 break;
             case R.id.item_mining:
-                ActivityUtil.startActivity(this, MiningInfoActivity.class);
+                ActivityUtil.startActivity(this, CommunitiesActivity.class);
                 break;
             case R.id.item_setting:
                 ActivityUtil.startActivityForResult(this, SettingActivity.class,

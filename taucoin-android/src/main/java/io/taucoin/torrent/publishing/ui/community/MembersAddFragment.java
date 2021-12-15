@@ -2,19 +2,14 @@ package io.taucoin.torrent.publishing.ui.community;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,7 +24,6 @@ import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
-import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.FragmentMembersAddBinding;
 import io.taucoin.torrent.publishing.databinding.ViewConfirmDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
@@ -41,7 +35,7 @@ import io.taucoin.torrent.publishing.ui.transaction.TxViewModel;
 /**
  * 社区成员添加页面
  */
-public class MembersAddFragment extends BaseFragment implements CompoundButton.OnCheckedChangeListener {
+public class MembersAddFragment extends BaseFragment {
 
     private FragmentActivity activity;
     private FragmentMembersAddBinding binding;
@@ -99,11 +93,7 @@ public class MembersAddFragment extends BaseFragment implements CompoundButton.O
             txFree = viewModel.getTxFee(chainID);
         }
         medianFee = FmtMicrometer.fmtFeeValue(txFree);
-        binding.rbUnified.setChecked(true);
-
-        binding.etAirdropCoins.setText(FmtMicrometer.fmtFormat(String.valueOf(airdropCoin)));
-        boolean isUnified = binding.rbUnified.isChecked();
-        adapter = new MembersAddAdapter(isUnified, airdropCoin);
+        adapter = new MembersAddAdapter(airdropCoin);
         adapter.setListener(new MembersAddAdapter.ClickListener() {
             @Override
             public void onSelectClicked() {
@@ -115,50 +105,12 @@ public class MembersAddFragment extends BaseFragment implements CompoundButton.O
                 calculateTotalCoins();
             }
         });
-
-        binding.etAirdropCoins.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                calculateTotalCoins();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         binding.recyclerList.setLayoutManager(layoutManager);
         binding.recyclerList.setItemAnimator(null);
         binding.recyclerList.setAdapter(adapter);
 
-        binding.rbUnified.setOnCheckedChangeListener(this);
-        binding.rbCustom.setOnCheckedChangeListener(this);
-
         adapter.submitFriendList(friends);
-        calculateTotalCoins();
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (!isChecked) {
-            return;
-        }
-        boolean isUnified = buttonView.getId() == R.id.rb_unified;
-        if (isUnified) {
-            binding.rbCustom.setChecked(false);
-        } else {
-            binding.rbUnified.setChecked(false);
-        }
-        if (adapter != null) {
-            adapter.updateUnified(isUnified);
-            adapter.notifyDataSetChanged();
-        }
         calculateTotalCoins();
     }
 
@@ -179,24 +131,14 @@ public class MembersAddFragment extends BaseFragment implements CompoundButton.O
     }
 
     Map<String, String> getSelectedMap() {
-        Map<String, String> selectedMap = adapter.getSelectedMap();
-        Set<String> keys = selectedMap.keySet();
-        if (binding.rbUnified.isChecked()) {
-            Map<String, String> newSelectedMap = new ArrayMap<>();
-            for (String key : keys) {
-                newSelectedMap.put(key, ViewUtils.getText(binding.etAirdropCoins));
-            }
-            return newSelectedMap;
-        } else {
-            return selectedMap;
-        }
+        return adapter.getSelectedMap();
     }
 
     /**
      * 观察添加社区的状态
      */
     private void observeAirdropState() {
-        viewModel.getAirdropState().observe(this, state -> {
+        viewModel.getAirdropState().observe(getViewLifecycleOwner(), state -> {
             if (state.isSuccess()) {
                 closeProgressDialog();
                 if (confirmDialog != null) {

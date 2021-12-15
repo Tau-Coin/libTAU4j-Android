@@ -31,7 +31,6 @@ public class UserQRCodeActivity extends ScanTriggerActivity implements View.OnCl
 
     public static final int TYPE_QR_DISPLAY = 0x01;
     public static final int TYPE_QR_SHARE = 0x02;
-    public static final int TYPE_QR_SHARE_ADDED = 0x03;
     private ActivityQrCodeBinding binding;
     private UserViewModel userViewModel;
     private int type;
@@ -57,7 +56,6 @@ public class UserQRCodeActivity extends ScanTriggerActivity implements View.OnCl
      * 初始化布局
      */
     private void initView() {
-        binding.tvTips.setVisibility(type == TYPE_QR_SHARE_ADDED ? View.VISIBLE : View.GONE);
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(R.string.qr_code_title);
         setSupportActionBar(binding.toolbarInclude.toolbar);

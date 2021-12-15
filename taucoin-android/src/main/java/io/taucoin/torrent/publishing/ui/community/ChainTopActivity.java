@@ -24,7 +24,7 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 public class ChainTopActivity extends BaseActivity {
 
     public static final int TOP_PEERS = 0x01;
-    public static final int TOP_CONSENSUS = 0x02;
+    public static final int TOP_VOTES = 0x02;
     private ActivityChainTopBinding binding;
     private List<Fragment> fragmentList = new ArrayList<>();
     private int[] titles = null;
@@ -55,13 +55,13 @@ public class ChainTopActivity extends BaseActivity {
     private void initLayout() {
         boolean isTopPeers = type == TOP_PEERS;
         binding.toolbarInclude.toolbar.setTitle(isTopPeers ? R.string.chain_top_peers :
-                R.string.chain_top_consensus);
+                R.string.chain_votes);
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         titles = isTopPeers ? new int[]{R.string.chain_top_tab_coin, R.string.chain_top_tab_power} :
-                new int[]{R.string.chain_top_tab_consensus, R.string.chain_top_tab_tip};
+                new int[]{R.string.chain_top_tab_consensus, R.string.chain_top_tab_head};
 
         binding.tvCol1.setText(R.string.chain_top_tab_rank);
         binding.tvCol2.setText(isTopPeers ? R.string.chain_top_tab_peer : R.string.chain_block_number);

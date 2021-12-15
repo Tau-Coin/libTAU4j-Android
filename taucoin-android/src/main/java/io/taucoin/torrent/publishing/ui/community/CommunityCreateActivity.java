@@ -17,7 +17,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
@@ -66,7 +65,6 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        binding.tvPublicKey.setText(MainApplication.getInstance().getPublicKey());
         String totalCoin = getString(R.string.community_total_coins,
                 FmtMicrometer.fmtBalance(Constants.TOTAL_COIN.longValue()));
         binding.tvTotalCoin.setText(totalCoin);

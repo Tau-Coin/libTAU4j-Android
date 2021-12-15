@@ -75,12 +75,12 @@
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
                 <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_top_consensus"
+                    android:id="@+id/item_chain_votes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:onClick="onClick"
-                    app:lineLeftText="@string/chain_top_consensus"
+                    app:lineLeftText="@string/chain_votes"
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
                 <LinearLayout

@@ -31,9 +31,9 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 
 /**
- * 挖矿信息页面
+ * 社区信息页面
  */
-public class MiningInfoActivity extends BaseActivity implements View.OnClickListener {
+public class CommunitiesActivity extends BaseActivity implements View.OnClickListener {
     private static final int CHOOSE_REQUEST_CODE = 0x01;
     private ActivityMiningInfoBinding binding;
     private CommunityViewModel viewModel;
@@ -75,7 +75,7 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
     @SuppressLint("ClickableViewAccessibility")
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.community_mining_info);
+        binding.toolbarInclude.toolbar.setTitle(R.string.drawer_communities);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
@@ -206,7 +206,7 @@ public class MiningInfoActivity extends BaseActivity implements View.OnClickList
                 .setHorizontal()
                 .setNegativeButton(R.string.common_turn_off, (dialog, which) -> {
                     dialog.dismiss();
-                    MiningInfoActivity.this.binding.itemSwitch.setChecked(false);
+                    CommunitiesActivity.this.binding.itemSwitch.setChecked(false);
                 }).setPositiveButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
 
         closeDialog = builder.create();

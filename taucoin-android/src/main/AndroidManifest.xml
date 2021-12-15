@@ -71,7 +71,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name=".ui.community.MiningInfoActivity"
+            android:name=".ui.community.CommunitiesActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
@@ -97,10 +97,6 @@
         <activity
             android:name=".ui.friends.FriendsActivity"
             android:launchMode="singleTop"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
-
-        <activity
-            android:name=".ui.friends.ExchangeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity

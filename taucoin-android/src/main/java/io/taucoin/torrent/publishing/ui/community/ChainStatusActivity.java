@@ -108,9 +108,9 @@ public class ChainStatusActivity extends BaseActivity {
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, ChainTopActivity.class);
                 break;
-            case R.id.item_top_consensus:
+            case R.id.item_chain_votes:
                 intent = new Intent();
-                intent.putExtra(IntentExtra.TYPE, ChainTopActivity.TOP_CONSENSUS);
+                intent.putExtra(IntentExtra.TYPE, ChainTopActivity.TOP_VOTES);
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, ChainTopActivity.class);
                 break;

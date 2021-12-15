@@ -65,18 +65,11 @@
                     <TextView
                         android:layout_toEndOf="@+id/round_button"
                         android:layout_below="@+id/et_community_name"
-                        android:id="@+id/tv_public_key"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="@style/TextAppearanceBody2" />
-
-                    <TextView
-                        android:layout_toEndOf="@+id/round_button"
-                        android:layout_below="@+id/tv_public_key"
                         android:id="@+id/tv_total_coin"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:layout_marginTop="@dimen/widget_size_6"
+                        android:layout_marginStart="@dimen/widget_size_2"
                         android:text="@string/community_total_coins"
                         android:textAppearance="@style/TextAppearanceBody2" />
 
@@ -87,7 +80,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="@dimen/widget_size_44"
-                    android:layout_marginTop="@dimen/widget_size_20"
+                    android:layout_marginTop="@dimen/widget_size_50"
                     android:text="@string/community_added_members"
                     android:textColor="@color/color_white"
                     android:gravity="center_vertical|center"

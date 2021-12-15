@@ -170,7 +170,7 @@
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_mining"
-                        app:rightText="@string/drawer_mining"/>
+                        app:rightText="@string/drawer_communities"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_data_cost"

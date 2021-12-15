@@ -139,7 +139,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
                 showName = UsersUtil.getShowName(user, user.publicKey);
                 showNameBuilder.append(showName);
                 showNameBuilder.append(context.getString(R.string.common_parentheses,
-                        UsersUtil.getLastPublicKey(user.publicKey)))
+                        UsersUtil.getHideLastPublicKey(user.publicKey)))
                         .setForegroundColor(context.getResources().getColor(R.color.gray_dark))
                         .setFontSize(14, true);
             }

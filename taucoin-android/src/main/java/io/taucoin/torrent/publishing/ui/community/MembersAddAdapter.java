@@ -1,7 +1,6 @@
 package io.taucoin.torrent.publishing.ui.community;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -20,7 +18,6 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.SpanUtils;
@@ -35,13 +32,11 @@ import io.taucoin.torrent.publishing.databinding.ItemAddMembersBinding;
  */
 public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewHolder> {
     private ClickListener listener;
-    private boolean isUnified;
     private long airdropCoin;
     private Map<String, String> selectedMap = new HashMap<>();
 
-    MembersAddAdapter(boolean isUnified, long airdropCoin) {
+    MembersAddAdapter(long airdropCoin) {
         super(diffCallback);
-        this.isUnified = isUnified;
         this.airdropCoin = airdropCoin;
     }
 
@@ -75,11 +70,6 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
         this.listener = listener;
     }
 
-    void updateUnified(boolean isUnified) {
-        this.isUnified = isUnified;
-        diffCallback.updateUnified(isUnified ? 1 : 0);
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -94,7 +84,7 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(holder, getItem(position), isUnified);
+        holder.bind(holder, getItem(position));
     }
 
     List<User> getSelectedList() {
@@ -124,7 +114,7 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
             this.selectedMap = selectedMap;
         }
 
-        void bind(ViewHolder holder, User user, boolean isUnified) {
+        void bind(ViewHolder holder, User user) {
             if(null == holder || null == user){
                 return;
             }
@@ -144,7 +134,7 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
             SpanUtils showNameBuilder = new SpanUtils()
                     .append(showName)
                     .append(context.getString(R.string.common_parentheses,
-                            UsersUtil.getLastPublicKey(user.publicKey)))
+                            UsersUtil.getHideLastPublicKey(user.publicKey)))
                     .setForegroundColor(context.getResources().getColor(R.color.gray_dark))
                     .setFontSize(14, true);
 
@@ -178,14 +168,9 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
             if (oldTextWatcher != null) {
                 holder.binding.etAirdropCoins.removeTextChangedListener(oldTextWatcher);
             }
-            if (isUnified) {
-                holder.binding.etAirdropCoins.setVisibility(View.GONE);
-            } else {
-                holder.binding.etAirdropCoins.setVisibility(View.VISIBLE);
-                holder.binding.etAirdropCoins.setText(getInputCoins(this.selectedMap, user.publicKey));
-                holder.binding.etAirdropCoins.addTextChangedListener(textWatcher);
-                holder.binding.etAirdropCoins.setTag(textWatcher);
-            }
+            holder.binding.etAirdropCoins.setText(getInputCoins(this.selectedMap, user.publicKey));
+            holder.binding.etAirdropCoins.addTextChangedListener(textWatcher);
+            holder.binding.etAirdropCoins.setTag(textWatcher);
         }
     }
 
@@ -194,20 +179,11 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
         void onTextChanged();
     }
 
-    static abstract class ItemCallback extends DiffUtil.ItemCallback<User> {
-        int isUnifiedOld;
-        int isUnified;
+    private static final DiffUtil.ItemCallback diffCallback = new DiffUtil.ItemCallback<User>() {
 
-        void updateUnified(int isUnified) {
-            this.isUnifiedOld = this.isUnified;
-            this.isUnified = isUnified;
-        }
-    }
-
-    private static final ItemCallback diffCallback = new ItemCallback() {
         @Override
         public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
-            return oldItem.equals(newItem) && isUnifiedOld == isUnified;
+            return oldItem.equals(newItem);
         }
 
         @Override

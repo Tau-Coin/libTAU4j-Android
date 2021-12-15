@@ -32,19 +32,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/tv_tips"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_40"
-                    android:layout_marginEnd="@dimen/widget_size_40"
-                    android:includeFontPadding="false"
-                    android:gravity="center_horizontal"
-                    android:textColor="@color/primary"
-                    android:text="@string/user_share_qr_dialog_tips"
-                    android:layout_marginBottom="@dimen/widget_size_20"
-                    android:textAppearance="@style/TextAppearanceBody1" />
-
                 <include
                     android:id="@+id/qr_code"
                     layout="@layout/qr_code"/>

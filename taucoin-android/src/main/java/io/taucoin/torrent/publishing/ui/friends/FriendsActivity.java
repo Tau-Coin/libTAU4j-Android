@@ -217,7 +217,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     public void onProcessClicked(UserAndFriend user) {
         if (user.isAdded()) {
             Intent intent = new Intent();
-            intent.putExtra(IntentExtra.TYPE, UserQRCodeActivity.TYPE_QR_SHARE_ADDED);
+            intent.putExtra(IntentExtra.TYPE, UserQRCodeActivity.TYPE_QR_SHARE);
             ActivityUtil.startActivity(intent, this, UserQRCodeActivity.class);
         } else {
             onItemClicked(user);
@@ -244,7 +244,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.ll_exchange_qr) {
-            ActivityUtil.startActivity(this, ExchangeActivity.class);
+            ActivityUtil.startActivity(FriendsActivity.this, UserQRCodeActivity.class);
         } else if (v.getId() == R.id.ll_add_friend) {
             userViewModel.showAddFriendDialog(this);
         }

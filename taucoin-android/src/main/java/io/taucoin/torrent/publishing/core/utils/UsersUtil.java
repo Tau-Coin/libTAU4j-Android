@@ -156,7 +156,7 @@ public class UsersUtil {
     }
 
     /**
-     * 获取公钥后六为
+     * 获取公钥后六位
      * @param publicKey
      * @return
      */
@@ -164,6 +164,21 @@ public class UsersUtil {
         if (StringUtil.isNotEmpty(publicKey) && publicKey.length() > 6) {
             int length = publicKey.length();
             return publicKey.substring(length - 6, length);
+        }
+        return publicKey;
+    }
+
+    /**
+     * 获取公钥后四位
+     * @param publicKey
+     * @return
+     */
+    public static String getHideLastPublicKey(String publicKey) {
+        if (StringUtil.isNotEmpty(publicKey) && publicKey.length() > 4) {
+            int length = publicKey.length();
+            String hidePublicKey = "***";
+            hidePublicKey += publicKey.substring(length - 4, length);
+            return hidePublicKey;
         }
         return publicKey;
     }
