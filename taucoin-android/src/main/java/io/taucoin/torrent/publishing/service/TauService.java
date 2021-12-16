@@ -10,7 +10,9 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.Nullable;
+import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposables;
@@ -126,14 +128,15 @@ public class TauService extends Service {
      */
     private void shutdown() {
         logger.info("shutdown");
-//        disposables.add(Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-//            daemon.doStop();
-//            emitter.onNext(true);
-//            emitter.onComplete();
-//        }).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(this::stopServiceWaitAlertDisposed));
-        stopService();
+        disposables.add(Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            logger.info("Wait daemon stop");
+            daemon.doStop();
+            logger.info("Daemon stop successfully");
+            emitter.onNext(true);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::stopServiceWaitAlertDisposed));
     }
 
     @Override
