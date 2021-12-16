@@ -198,14 +198,4 @@ public interface SettingsRepository {
      * 设置社区选择过滤
      */
     void setFiltersSelected(Set<String> filters);
-
-    /**
-     * 设置是否自动账户更新
-     */
-    void setAutoRenewal(boolean isAuto);
-
-    /**
-     * 是否自动账户更新
-     */
-    boolean isAutoRenewal();
 }

@@ -49,5 +49,4 @@
     <string name="pref_key_community_filters_selected" translatable="false">pref_key_community_filters_selected</string>
 
     <string name="pref_key_show_blacklist_dialog" translatable="false">pref_key_show_blacklist_dialog</string>
-    <string name="pref_key_account_auto_renewal" translatable="false">pref_key_account_auto_renewal</string>
 </resources>

@@ -367,8 +367,6 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_dht_nodes))) {
             long nodes = settingsRepo.getLongValue(key, 0);
             updateInterfacesTimer(nodes);
-        } else if (key.equals(appContext.getString(R.string.pref_key_account_auto_renewal))) {
-            accountAutoRenewal();
         }
     }
 

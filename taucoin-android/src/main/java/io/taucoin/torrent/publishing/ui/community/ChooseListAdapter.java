@@ -60,7 +60,7 @@ public class ChooseListAdapter extends ListAdapter<Community, ChooseListAdapter.
             }
             binding.tvName.setText(community.communityName);
             boolean isChoose = StringUtil.isEquals(chainID, community.chainID);
-            int colorRes = binding.getRoot().getResources().getColor(isChoose ? R.color.color_blue :
+            int colorRes = binding.getRoot().getResources().getColor(isChoose ? R.color.color_yellow :
                     R.color.color_black);
             binding.tvName.setTextColor(colorRes);
         }

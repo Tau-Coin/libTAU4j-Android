@@ -11,7 +11,6 @@
     <string name="common_install_browser">Please install mobile browser first!</string>
     <string name="common_parentheses">(%1$s)</string>
     <string name="common_proceed">Proceed</string>
-    <string name="common_turn_off">Turn Off</string>
     <string name="common_back">Back</string>
     <string name="common_slant">(%1$d/%2$d)</string>
     <string name="common_confirm">Confirm</string>
@@ -90,9 +89,8 @@
     <string name="community_total_blocks">Total Blocks</string>
     <string name="community_mining_power">Mining Power</string>
     <string name="community_last_block">Last Block</string>
-    <string name="community_perishable_date">Perishable Date</string>
-    <string name="community_auto_renewal">Auto-Renewal</string>
-    <string name="community_auto_renewal_turn_off_tip">Turn off Auto-renewal?</string>
+    <string name="community_expiry_date">Expiry Date</string>
+    <string name="community_renewal_date">Renewal Date</string>
     <string name="community_info">Info</string>
     <string name="community_invite_link">Invite Link</string>
     <string name="community_qr_code">Community QR Code</string>
@@ -120,7 +118,7 @@
     <string name="community_bootstrap_node">DHT Bootstrap Node</string>
     <string name="community_transaction">Transaction</string>
     <string name="community_nickname">Community Nickname</string>
-    <string name="community_choose_community">Mining Pool</string>
+    <string name="community_choose_community">Chains</string>
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>
     <string name="community_mining_income">Mining Income</string>
@@ -164,9 +162,6 @@
     <string name="community_airdrop_peers">Peers/%1$d</string>
     <string name="community_airdrop_coins">Coins/%1$s</string>
     <string name="community_airdrop_free">Free/%1$s</string>
-    <string name="community_auto_renewal_help_title">What is Auto-Renewal?</string>
-    <string name="community_auto_renewal_help_content">Auto Renewal keeps account available on chain
-        when remaining balance covers the transaction fee.</string>
 
     <string name="community_head_block">Head Block</string>
     <string name="community_tail_block">Tail Block</string>

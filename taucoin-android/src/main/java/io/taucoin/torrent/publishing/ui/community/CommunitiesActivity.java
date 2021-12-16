@@ -3,8 +3,6 @@ package io.taucoin.torrent.publishing.ui.community;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -17,30 +15,23 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
-import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
-import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.databinding.ActivityMiningInfoBinding;
-import io.taucoin.torrent.publishing.databinding.ViewHelpDialogBinding;
+import io.taucoin.torrent.publishing.databinding.ActivityCommunitiesBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 
 /**
  * 社区信息页面
  */
 public class CommunitiesActivity extends BaseActivity implements View.OnClickListener {
     private static final int CHOOSE_REQUEST_CODE = 0x01;
-    private ActivityMiningInfoBinding binding;
+    private ActivityCommunitiesBinding binding;
     private CommunityViewModel viewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
-    private CommonDialog helpDialog;
-    private CommonDialog closeDialog;
-    private SettingsRepository settingsRepo;
     private String chainID;
 
     @Override
@@ -48,8 +39,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
         viewModel = provider.get(CommunityViewModel.class);
-        settingsRepo = RepositoryHelper.getSettingsRepository(getApplicationContext());
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_mining_info);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_communities);
         binding.setListener(this);
         initLayout();
         loadMemberData(null);
@@ -78,21 +68,6 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         binding.toolbarInclude.toolbar.setTitle(R.string.drawer_communities);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
-
-        boolean isAutoRenewal = settingsRepo.isAutoRenewal();
-        binding.itemSwitch.setChecked(isAutoRenewal);
-        binding.itemSwitch.setOnTouchListener((v, event) -> {
-            if (binding.itemSwitch.isChecked()) {
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    showAutoRenewalClosedDialog();
-                }
-                return true;
-            }
-            return false;
-        });
-        binding.itemSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            settingsRepo.setAutoRenewal(isChecked);
-        });
     }
 
     private void loadMiningInfo() {
@@ -130,18 +105,23 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
      * 加载社区当前登陆用户数据
      */
     private void loadMemberData(CommunityAndMember member) {
-        long perishableDate = 0;
         long power = 0;
         boolean isReadOnly = true;
         if (member != null) {
             isReadOnly = member.isReadOnly();
             power = member.power;
-            perishableDate = Constants.BLOCKS_NOT_PERISHABLE * Constants.BLOCK_IN_AVG +
-                    DateUtil.getTime();
+            long currentTime = DateUtil.getTime();
+            long expiryDate = Constants.BLOCKS_NOT_PERISHABLE * Constants.BLOCK_IN_AVG +
+                    currentTime;
+            binding.itemExpiryDate.setRightText(DateUtil.formatTime(expiryDate, DateUtil.pattern4));
+
+            long renewalDate = (Constants.BLOCKS_NOT_PERISHABLE - Constants.AUTO_RENEWAL_MAX_BLOCKS)
+                    * Constants.BLOCK_IN_AVG + currentTime;
+            binding.itemRenewalDate.setRightText(DateUtil.formatTime(renewalDate, DateUtil.pattern4));
         }
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
-        binding.itemPerishableDate.setRightText(DateUtil.formatTime(perishableDate, DateUtil.pattern4));
-        binding.itemPerishableDate.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);
+        binding.itemExpiryDate.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);
+        binding.itemRenewalDate.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -153,9 +133,6 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivityForResult(intent, this, CommunityChooseActivity.class,
                         CHOOSE_REQUEST_CODE);
-                break;
-            case R.id.iv_auto_renewal:
-                showAutoRenewalHelpDialog();
                 break;
         }
     }
@@ -171,48 +148,6 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
-    /**
-     * 显示Auto-Renewal帮助对话框
-     */
-    private void showAutoRenewalHelpDialog() {
-        ViewHelpDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(this),
-                R.layout.view_help_dialog, null, false);
-        binding.tvTitle.setText(R.string.community_auto_renewal_help_title);
-        binding.tvContent.setText(R.string.community_auto_renewal_help_content);
-        helpDialog = new CommonDialog.Builder(this)
-                .setContentView(binding.getRoot())
-                .setCanceledOnTouchOutside(false)
-                .create();
-        binding.ivClose.setOnClickListener(v -> {
-            helpDialog.closeDialog();
-        });
-        helpDialog.show();
-    }
-
-    /**
-     * 显示关闭Auto-Renewal对话框
-     */
-    private void showAutoRenewalClosedDialog() {
-        ViewHelpDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(this),
-                R.layout.view_help_dialog, null, false);
-        binding.ivClose.setVisibility(View.GONE);
-        binding.tvContent.setVisibility(View.GONE);
-        binding.tvTitle.setTextColor(getResources().getColor(R.color.color_black));
-        binding.tvTitle.setText(R.string.community_auto_renewal_turn_off_tip);
-
-        CommonDialog.Builder builder = new CommonDialog.Builder(this)
-                .setContentView(binding.getRoot())
-                .setCanceledOnTouchOutside(false)
-                .setHorizontal()
-                .setNegativeButton(R.string.common_turn_off, (dialog, which) -> {
-                    dialog.dismiss();
-                    CommunitiesActivity.this.binding.itemSwitch.setChecked(false);
-                }).setPositiveButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
-
-        closeDialog = builder.create();
-        closeDialog.show();
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -223,16 +158,5 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
     protected void onStop() {
         super.onStop();
         disposables.clear();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (helpDialog != null) {
-            helpDialog.closeDialog();
-        }
-        if (closeDialog != null ) {
-            closeDialog.closeDialog();
-        }
     }
 }

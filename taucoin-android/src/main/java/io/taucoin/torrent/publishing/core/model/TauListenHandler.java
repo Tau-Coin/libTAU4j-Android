@@ -452,10 +452,6 @@ class TauListenHandler {
         if (autoRenewalDisposable != null && !autoRenewalDisposable.isDisposed()) {
             autoRenewalDisposable.dispose();
         }
-        boolean isAuto = settingsRepo.isAutoRenewal();
-        if (!isAuto) {
-            return;
-        }
         autoRenewalDisposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             List<MemberAutoRenewal> members = memberRepo.queryAutoRenewalAccounts();
             logger.debug("accountAutoRenewal, members size::{}",
