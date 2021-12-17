@@ -263,7 +263,7 @@ public class NetworkSetting {
                 bigLimit.longValue(), bigUsage, bigLimit.compareTo(bigUsage));
 
         // 今天剩余的秒数
-        long today24HLastSeconds = DateUtil.getTomorrowLastSeconds(TrafficUtil.TRAFFIC_RESET_TIME);;
+        long today24HLastSeconds = DateUtil.getTomorrowLastSeconds(TrafficUtil.TRAFFIC_RESET_TIME);
 
         if (bigLimit.compareTo(bigUsage) > 0) {
             availableData = bigLimit.subtract(bigUsage).longValue();

@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
@@ -58,6 +60,7 @@ import io.taucoin.torrent.publishing.ui.setting.TrafficTipsActivity;
 public abstract class TauDaemon {
     private static final String TAG = TauDaemon.class.getSimpleName();
     static final Logger logger = LoggerFactory.getLogger(TAG);
+    private static final int SHOW_DIALOG_THRESHOLD = 10;        // 单位s
     private static final int UPDATE_INTERFACE_THRESHOLD = 30;   // 单位s
     static final int ALERT_QUEUE_CAPACITY = 10000;              // Alert缓存队列
     private static volatile TauDaemon instance;
@@ -71,13 +74,13 @@ public abstract class TauDaemon {
     private SystemServiceManager systemServiceManager;
     private ExecutorService exec = Executors.newSingleThreadExecutor();
     private TauInfoProvider tauInfoProvider;
-    private Disposable updateInterfacesTimer; // 更新libTAU监听接口定时任务
+    private Disposable updateInterfacesTimer;    // 更新libTAU监听接口定时任务
+    private Disposable noRemainingDataTimer; // 触发无剩余流量的提示定时任务
     TauDaemonAlertHandler tauDaemonAlertHandler; // libTAU上报的Alert处理程序
     volatile boolean isRunning = false;
     private volatile boolean trafficTips = true; // 剩余流量用完提示
     volatile String seed;
     String deviceID;
-    private long noRemainingDataTimes = 0; // 触发无剩余流量的次数
 
     // libTAU上报的Alert缓存队列
     LinkedBlockingQueue<AlertAndUser> alertQueue = new LinkedBlockingQueue<>();
@@ -283,6 +286,9 @@ public abstract class TauDaemon {
         if (updateInterfacesTimer != null && !updateInterfacesTimer.isDisposed()) {
             updateInterfacesTimer.dispose();
         }
+        if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
+            noRemainingDataTimer.dispose();
+        }
         sessionManager.stop();
         tauDaemonAlertHandler.onCleared();
         sessionStopOver();
@@ -392,25 +398,6 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 根据当前的流量包的使用，判断是否给用户更换流量包的提示
-     */
-    void handleNoRemainingDataTips() {
-        if (!isRunning) {
-            return;
-        }
-        // 判断有无网络连接
-        if (settingsRepo.internetState()) {
-            if (NetworkSetting.isHaveAvailableData()) {
-                // 重置无可用流量提示对话框的参数
-                trafficTips = true;
-                noRemainingDataTimes = 0;
-            } else {
-                showNoRemainingDataTipsDialog();
-            }
-        }
-    }
-
-    /**
      * 更新libTAU监听接口
      * 必须有网络才会更新
      */
@@ -441,22 +428,48 @@ public abstract class TauDaemon {
     }
 
     /**
+     * 根据当前的流量包的使用，判断是否给用户更换流量包的提示
+     */
+    void handleNoRemainingDataTips() {
+        if (!isRunning || !NetworkSetting.isForegroundRunning()) {
+            return;
+        }
+        // 判断有无网络连接
+        if (settingsRepo.internetState()) {
+            if (NetworkSetting.isHaveAvailableData()) {
+                // 重置无可用流量提示对话框的参数
+                trafficTips = true;
+                if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
+                    noRemainingDataTimer.dispose();
+                }
+            } else {
+                showNoRemainingDataTipsDialog();
+            }
+        }
+    }
+
+    /**
      * 显示没有剩余流量提示对话框
      * 必须同时满足需要提示、触发次数大于等于网速采样数、APP在前台、目前没有打开的流量提示Activity
      */
     private void showNoRemainingDataTipsDialog() {
-        if (trafficTips) {
-            if (noRemainingDataTimes < 10) {
-                noRemainingDataTimes += 1;
-                return;
-            }
+        if (!trafficTips) {
+            return;
         }
-        if (trafficTips && AppUtil.isOnForeground(appContext) &&
-                !AppUtil.isForeground(appContext, TrafficTipsActivity.class)) {
-            Intent intent = new Intent(appContext, TrafficTipsActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            appContext.startActivity(intent);
+        if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
+            return;
         }
+        noRemainingDataTimer = Observable.timer(SHOW_DIALOG_THRESHOLD, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(aLong -> {
+                    if (AppUtil.isOnForeground(appContext) && !AppUtil.isForeground(appContext,
+                            TrafficTipsActivity.class)) {
+                        Intent intent = new Intent(appContext, TrafficTipsActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        appContext.startActivity(intent);
+                    }
+                });
     }
 
     /**
@@ -465,6 +478,11 @@ public abstract class TauDaemon {
      */
     public void handleUserSelected(boolean updateDailyDataLimit) {
         trafficTips = updateDailyDataLimit;
+        if (!trafficTips) {
+            if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
+                noRemainingDataTimer.dispose();
+            }
+        }
     }
 
     /**
