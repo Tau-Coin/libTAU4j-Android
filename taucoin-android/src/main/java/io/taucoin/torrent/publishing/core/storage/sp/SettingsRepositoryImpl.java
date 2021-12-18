@@ -347,4 +347,23 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         edit.putStringSet(appContext.getString(R.string.pref_key_community_filters_selected),
                 filters).apply();
     }
+
+    /**
+     * 设置电池电量
+     * @param level 电量百分比
+     */
+    @Override
+    public void setBatteryLevel(int level) {
+        edit.putInt(appContext.getString(R.string.pref_key_battery_level), level).apply();
+    }
+
+    /**
+     * 获取电池电量
+     * @return 电量百分比
+     */
+    @Override
+    public int getBatteryLevel() {
+        String key = appContext.getString(R.string.pref_key_battery_level);
+        return pref.getInt(key, 0);
+    }
 }

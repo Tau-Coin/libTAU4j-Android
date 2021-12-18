@@ -107,6 +107,23 @@ public class SystemServiceManager {
     }
 
     /**
+     * 获取电池电量
+     */
+    public int getBatteryLevel() {
+        //创建过滤器拦截电量改变广播
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        //通过过滤器来获取电量改变intent 电量改变是系统广播所以无需去设置所以receiver传null即可
+        Intent intent = appContext.registerReceiver(null, intentFilter);
+        int level = 0;
+        if(intent != null){
+            //获取电量信息
+            level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+        }
+        logger.debug("battery changed::{}", level);
+        return level;
+    }
+
+    /**
      * 通过NetworkInterface.getNetworkInterfaces()获取解析整个设备的网络地址
      * @param ipv4List List<String>
      * @param ipv6List List<String>

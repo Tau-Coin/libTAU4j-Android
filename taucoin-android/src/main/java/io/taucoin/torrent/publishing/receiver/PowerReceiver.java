@@ -4,6 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.BatteryManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -13,6 +17,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
  */
 
 public class PowerReceiver extends BroadcastReceiver {
+    private static final Logger logger = LoggerFactory.getLogger("PowerReceiver");
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
@@ -28,6 +33,11 @@ public class PowerReceiver extends BroadcastReceiver {
             case Intent.ACTION_POWER_DISCONNECTED:
                 settingsRepo.chargingState(false);
                 break;
+            case Intent.ACTION_BATTERY_CHANGED:
+                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+                logger.debug("battery changed::{}", level);
+                settingsRepo.setBatteryLevel(level);
+                break;
         }
     }
 
@@ -35,6 +45,7 @@ public class PowerReceiver extends BroadcastReceiver {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_POWER_CONNECTED);
         filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
         return filter;
     }
 }

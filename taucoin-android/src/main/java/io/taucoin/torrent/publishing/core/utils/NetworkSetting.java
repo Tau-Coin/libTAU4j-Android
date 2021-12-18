@@ -25,6 +25,7 @@ public class NetworkSetting {
     private static final int WIFI_LIMITED;                                      // 单位MB
     private static final int SURVIVAL_SPEED_LIMIT = 10;                         // 单位B
     public static final int HEAP_SIZE_LIMIT = 50 * 1024 * 1024;                 // 单位为B
+    private static final int LOW_BATTERY_LEVEL_THRESHOLD = 20;                        // 单位为%
 
     private static SettingsRepository settingsRepo;
     private static long lastElapsedRealTime = 0;
@@ -407,7 +408,8 @@ public class NetworkSetting {
         Interval min = Interval.BACK_MAIN_LOOP_MIN;
         Interval max = Interval.BACK_MAIN_LOOP_MAX;
         int timeInterval = 0;
-        if (!isHaveAvailableData()) {
+        if (!isHaveAvailableData() || (!settingsRepo.chargingState()
+                && settingsRepo.getBatteryLevel() < LOW_BATTERY_LEVEL_THRESHOLD)) {
             timeInterval = Interval.MAIN_LOOP_NO_DATA.getInterval();
         } else if (getCurrentSpeed() < SURVIVAL_SPEED_LIMIT) {
             timeInterval = (min.getInterval() + max.getInterval()) / 2;

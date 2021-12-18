@@ -198,4 +198,16 @@ public interface SettingsRepository {
      * 设置社区选择过滤
      */
     void setFiltersSelected(Set<String> filters);
+
+    /**
+     * 设置电池电量
+     * @param level 电量百分比
+     */
+    void setBatteryLevel(int level);
+
+    /**
+     * 获取电池电量
+     * @return 电量百分比
+     */
+    int getBatteryLevel();
 }

@@ -324,6 +324,7 @@ public abstract class TauDaemon {
      */
     private void switchPowerReceiver() {
         settingsRepo.chargingState(systemServiceManager.isPlugged());
+        settingsRepo.setBatteryLevel(systemServiceManager.getBatteryLevel());
         try {
             appContext.unregisterReceiver(powerReceiver);
         } catch (IllegalArgumentException ignore) {
