@@ -154,19 +154,6 @@
 
                 <TextView
                     android:visibility="gone"
-                    android:id="@+id/tv_share_qr"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/widget_size_44"
-                    android:onClick="@{listener::onClick}"
-                    android:background="@color/color_white"
-                    android:layout_marginTop="@dimen/widget_size_5"
-                    android:textAppearance="@style/TextAppearanceBody1"
-                    android:textColor="@color/color_yellow"
-                    android:gravity="center_horizontal|center"
-                    android:text="@string/user_share_qr"/>
-
-                <TextView
-                    android:visibility="gone"
                     android:id="@+id/tv_start_chat"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/widget_size_44"

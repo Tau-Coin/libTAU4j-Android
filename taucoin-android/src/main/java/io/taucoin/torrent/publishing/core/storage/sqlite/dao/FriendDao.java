@@ -21,7 +21,7 @@ public interface FriendDao {
             " WHERE userPK = :userPK AND friendPK = :friendPK";
 
     String QUERY_CONNECTED_FRIENDS = "SELECT friendPK FROM Friends" +
-            " WHERE userPK = :userPK AND status = 2" +
+            " WHERE userPK = :userPK AND (status = 2 || status = 1)" +
             " limit :limit";
 
     String QUERY_ACTIVE_FRIENDS = "SELECT friendPK FROM Friends" +

@@ -236,9 +236,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(friend -> {
-                    binding.llBottomInput.setVisibility(friend.status == FriendStatus.CONNECTED.getStatus()
+                    binding.llBottomInput.setVisibility(friend.status != FriendStatus.DISCOVERED.getStatus()
                             ? View.VISIBLE : View.GONE);
-                    binding.llShareQr.setVisibility(friend.status != FriendStatus.CONNECTED.getStatus()
+                    binding.llShareQr.setVisibility(friend.status == FriendStatus.DISCOVERED.getStatus()
                             ? View.VISIBLE : View.GONE);
                 }));
 
@@ -249,7 +249,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                     // 跟当前用户有关系的才触发刷新
                     if (result != null && StringUtil.isNotEmpty(result.getMsg())
                             && result.getMsg().contains(friendPK)) {
-
                         binding.refreshLayout.setRefreshing(false);
                         binding.refreshLayout.setEnabled(false);
                         // 立即执行刷新

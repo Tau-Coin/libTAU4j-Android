@@ -45,7 +45,7 @@ public interface UserDao {
     String QUERY_USERS_ORDER_BY_LAST_COMM_TIME = QUERY_GET_USERS_NOT_IN_BAN_LIST +
             " ORDER BY f.lastCommTime DESC";
 
-    String QUERY_CONNECTED_USERS_WHERE = " AND f.status = 2";
+    String QUERY_CONNECTED_USERS_WHERE = " AND (f.status = 2 || f.status = 1)";
 
     // 统计所有用户数据的详细sql
     String QUERY_NUM_CONNECTED_USERS = "SELECT count(*)" +
