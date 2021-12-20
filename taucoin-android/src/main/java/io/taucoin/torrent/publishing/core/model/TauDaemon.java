@@ -289,6 +289,8 @@ public abstract class TauDaemon {
         if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
             noRemainingDataTimer.dispose();
         }
+        appContext.unregisterReceiver(powerReceiver);
+        appContext.unregisterReceiver(connectionReceiver);
         sessionManager.stop();
         tauDaemonAlertHandler.onCleared();
         sessionStopOver();
