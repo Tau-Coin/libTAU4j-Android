@@ -108,6 +108,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.setting.DebugActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.setting.BlacklistActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 

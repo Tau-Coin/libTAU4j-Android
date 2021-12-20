@@ -15,6 +15,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -69,6 +70,10 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
                 subscribeCurrentUser();
             }
         });
+
+        if (!BuildConfig.DEBUG) {
+            binding.debugLayout.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -130,6 +135,9 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
                 logger.debug("DisplayMetrics density::{}", dm.density);
                 logger.debug("DisplayMetrics dpi::{}", dm.density * 160);
                 logger.debug("DisplayMetrics density::{}", dm.scaledDensity);
+                break;
+            case R.id.item_debug:
+                ActivityUtil.startActivity(this, DebugActivity.class);
                 break;
             case R.id.tv_public_key:
             case R.id.tv_import_new_key:

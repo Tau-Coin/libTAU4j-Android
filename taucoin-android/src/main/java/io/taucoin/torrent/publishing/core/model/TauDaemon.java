@@ -260,8 +260,9 @@ public abstract class TauDaemon {
                 .setAccountSeed(seed)
                 .setDeviceID(deviceID)
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
-                .setReadOnly(true)
-                .setDhtBootstrapInterval(1800)
+//                .setDhtNonReferable(true)
+//                .setDhtPingInterval(3600)
+                .setDhtBootstrapInterval(60)
                 .setNetworkInterface(getLocalNetworkAddress())
                 .build();
         sessionManager.start(sessionParams);
@@ -531,6 +532,18 @@ public abstract class TauDaemon {
         }).subscribeOn(Schedulers.io())
                 .subscribe();
         disposables.add(disposable);
+    }
+
+    /**
+     *  更新libTAU Bootstrap Interval
+     * @param interval 时间间隔
+     */
+    public boolean updateBootstrapInterval(int interval) {
+        if (isRunning) {
+            logger.debug("updateBootstrapInterval::{}s, success::{}", interval, true);
+            return true;
+        }
+        return false;
     }
 
     /**

@@ -1,0 +1,19 @@
+<resources>
+    <string name="common_debug_digit1">1-100</string>
+    <string name="common_debug_digit2">1-1000</string>
+    <string name="common_debug_str1">100*10KB</string>
+    <string name="common_debug_str2">1000*1KB</string>
+
+    <string name="debug_title">Debug</string>
+    <string name="debug_test">Batch Test</string>
+    <string name="debug_test_hint">Friend name prefix</string>
+    <string name="debug_test_num">100</string>
+    <string name="debug_test_num_hint">Number of friends to add</string>
+    <string name="debug_test_add_friends">Add Friends</string>
+
+    <string name="debug_session_params">Session Params</string>
+    <string name="debug_bootstrap_interval_value">60</string>
+    <string name="debug_update_bootstrap_interval">Update Bootstrap interval</string>
+    <string name="debug_update_bootstrap_interval_toast">Update bootstrap interval::%ds, success::%b</string>
+
+</resources>

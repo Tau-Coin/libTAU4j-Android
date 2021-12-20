@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <ScrollView
+            android:fillViewport="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/color_white"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:paddingTop="@dimen/widget_size_20"
+                    android:paddingBottom="@dimen/widget_size_20"
+                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingEnd="@dimen/widget_size_20">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/debug_test"
+                        android:textAppearance="@style/TextAppearanceBody1"
+                        android:textColor="@color/primary_light"
+                        android:includeFontPadding="false"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/tv_friends_name"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:layout_height="wrap_content"
+                        android:text="@string/debug_test"
+                        android:gravity="center_horizontal"
+                        android:inputType="text"
+                        android:textAppearance="@style/TextAppearanceBody1"
+                        android:hint="@string/debug_test_hint"
+                        android:autofillHints="Friend name prefix" />
+
+                    <EditText
+                        android:id="@+id/tv_friends_num"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:text="@string/debug_test_num"
+                        android:gravity="center_horizontal"
+                        android:inputType="number"
+                        android:textAppearance="@style/TextAppearanceBody1"
+                        android:hint="@string/debug_test_num_hint"
+                        android:autofillHints="@string/debug_test_num_hint" />
+
+                    <TextView
+                        android:id="@+id/tv_batch_add_friends"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:layout_gravity="center_vertical"
+                        android:onClick="@{listener::onClick}"
+                        android:text="@string/debug_test_add_friends"
+                        android:gravity="center_vertical|center"
+                        android:layout_marginEnd="@dimen/widget_size_20"
+                        android:layout_marginTop="@dimen/widget_size_20"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:textColor="@color/color_white"
+                        android:background="@drawable/primary_rect_round_bg"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/color_white"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:paddingTop="@dimen/widget_size_20"
+                    android:paddingBottom="@dimen/widget_size_20"
+                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingEnd="@dimen/widget_size_20">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/debug_session_params"
+                        android:textAppearance="@style/TextAppearanceBody1"
+                        android:textColor="@color/primary_light"
+                        android:includeFontPadding="false"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/et_bootstrap_interval"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_horizontal"
+                        android:inputType="number"
+                        android:text="@string/debug_bootstrap_interval_value"
+                        android:textAppearance="@style/TextAppearanceBody1" />
+
+                    <TextView
+                        android:id="@+id/tv_update_bootstrap_interval"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:layout_gravity="center_vertical"
+                        android:onClick="@{listener::onClick}"
+                        android:text="@string/debug_update_bootstrap_interval"
+                        android:gravity="center_vertical|center"
+                        android:layout_marginEnd="@dimen/widget_size_20"
+                        android:layout_marginTop="@dimen/widget_size_20"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:textColor="@color/color_white"
+                        android:background="@drawable/primary_rect_round_bg"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</layout>

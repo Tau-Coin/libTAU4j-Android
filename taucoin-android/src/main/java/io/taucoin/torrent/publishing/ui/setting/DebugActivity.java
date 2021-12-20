@@ -1,6 +1,5 @@
 package io.taucoin.torrent.publishing.ui.setting;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -8,29 +7,31 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.databinding.ActivityPrivacySecurityBinding;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.ToastUtils;
+import io.taucoin.torrent.publishing.databinding.ActivityDebugBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
-import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.user.SeedActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
  * 隐私安全页面页面
  */
-public class PrivacySecurityActivity extends BaseActivity implements View.OnClickListener {
+public class DebugActivity extends BaseActivity implements View.OnClickListener {
 
-    private ActivityPrivacySecurityBinding binding;
+    private ActivityDebugBinding binding;
     private UserViewModel viewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private TauDaemon tauDaemon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
         viewModel = provider.get(UserViewModel.class);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_privacy_security);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_debug);
         binding.setListener(this);
+        tauDaemon = TauDaemon.getInstance(getApplicationContext());
         initView();
     }
 
@@ -39,7 +40,7 @@ public class PrivacySecurityActivity extends BaseActivity implements View.OnClic
      */
     private void initView() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.setting_privacy_security);
+        binding.toolbarInclude.toolbar.setTitle(R.string.debug_title);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
     @Override
@@ -57,21 +58,18 @@ public class PrivacySecurityActivity extends BaseActivity implements View.OnClic
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.tv_blacklist_users:
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.TYPE, BlacklistActivity.TYPE_USERS);
-                ActivityUtil.startActivity(intent, this, BlacklistActivity.class);
+            case R.id.tv_batch_add_friends:
+                String name = StringUtil.getText(binding.tvFriendsName);
+                int num = StringUtil.getIntText(binding.tvFriendsNum);
+                viewModel.batchAddFriends(name, num);
                 break;
-            case R.id.tv_blacklist_communities:
-                intent = new Intent();
-                intent.putExtra(IntentExtra.TYPE, BlacklistActivity.TYPE_COMMUNITIES);
-                ActivityUtil.startActivity(intent, this, BlacklistActivity.class);
-                break;
-            case R.id.ll_seeds:
-                ActivityUtil.startActivity(this, SeedActivity.class);
-                break;
-            case R.id.ll_devices:
-                ActivityUtil.startActivity(this, DevicesActivity.class);
+            case R.id.tv_update_bootstrap_interval:
+                int interval = StringUtil.getIntText(binding.etBootstrapInterval);
+                if (interval > 0) {
+                    boolean isSuccess = tauDaemon.updateBootstrapInterval(interval);
+                    ToastUtils.showShortToast(getString(R.string.debug_update_bootstrap_interval_toast,
+                            interval, isSuccess));
+                }
                 break;
         }
     }

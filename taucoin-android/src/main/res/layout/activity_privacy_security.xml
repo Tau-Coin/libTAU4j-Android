@@ -7,216 +7,155 @@
             type="android.view.View.OnClickListener" />
     </data>
 
-    <ScrollView
-        android:fillViewport="true"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <ScrollView
+            android:fillViewport="true"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            android:background="@color/color_bg"
-            android:orientation="vertical">
-
-            <include
-                android:id="@+id/toolbar_include"
-                layout="@layout/toolbar" />
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/color_white"
-                android:paddingTop="@dimen/widget_size_20"
-                android:paddingStart="@dimen/widget_size_20"
-                android:paddingEnd="0dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/setting_privacy"
-                    android:textAppearance="@style/TextAppearanceBody1"
-                    android:textColor="@color/primary_light"
-                    android:includeFontPadding="false"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tv_blacklist_users"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/widget_size_7"
-                    android:paddingBottom="@dimen/widget_size_7"
-                    android:minHeight="@dimen/widget_size_50"
-                    android:includeFontPadding="false"
-                    android:onClick="@{listener::onClick}"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:gravity="center_vertical"
-                    android:text="@string/setting_blacklist_users"
-                    android:textAppearance="@style/TextAppearanceBody1"/>
-
-
-                <include
-                    android:visibility="gone"
-                    layout="@layout/view_line"/>
-
-                <TextView
-                    android:id="@+id/tv_blacklist_communities"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/widget_size_50"
-                    android:includeFontPadding="false"
-                    android:onClick="@{listener::onClick}"
-                    android:gravity="center_vertical"
-                    android:text="@string/setting_blacklist_communities"
-                    android:textAppearance="@style/TextAppearanceBody1"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/widget_size_15"
-                android:background="@color/color_white"
-                android:paddingStart="@dimen/widget_size_20"
-                android:paddingEnd="@dimen/widget_size_20"
-                android:paddingTop="@dimen/widget_size_20"
-                android:paddingBottom="@dimen/widget_size_5">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/setting_security"
-                    android:textAppearance="@style/TextAppearanceBody1"
-                    android:textColor="@color/primary_light"
-                    android:includeFontPadding="false"
-                    android:textStyle="bold" />
+                android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:id="@+id/ll_seeds"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/widget_size_7"
-                    android:paddingBottom="@dimen/widget_size_7"
-                    android:minHeight="@dimen/widget_size_50"
-                    android:onClick="@{listener::onClick}"
-                    android:layout_marginTop="@dimen/widget_size_5"
-                    android:gravity="center_vertical">
+                    android:background="@color/color_white"
+                    android:paddingTop="@dimen/widget_size_20"
+                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingEnd="0dp">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:text="@string/setting_privacy"
+                        android:textAppearance="@style/TextAppearanceBody1"
+                        android:textColor="@color/primary_light"
                         android:includeFontPadding="false"
-                        android:text="@string/setting_seeds"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_blacklist_users"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/widget_size_7"
+                        android:paddingBottom="@dimen/widget_size_7"
+                        android:minHeight="@dimen/widget_size_50"
+                        android:includeFontPadding="false"
+                        android:onClick="@{listener::onClick}"
+                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:gravity="center_vertical"
+                        android:text="@string/setting_blacklist_users"
                         android:textAppearance="@style/TextAppearanceBody1"/>
 
-                    <ImageView
-                        android:layout_width="@dimen/widget_size_16"
-                        android:layout_height="@dimen/widget_size_16"
-                        android:contentDescription="@null"
-                        android:src="@mipmap/icon_arrow"/>
+
+                    <include
+                        android:visibility="gone"
+                        layout="@layout/view_line"/>
+
+                    <TextView
+                        android:id="@+id/tv_blacklist_communities"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/widget_size_50"
+                        android:includeFontPadding="false"
+                        android:onClick="@{listener::onClick}"
+                        android:gravity="center_vertical"
+                        android:text="@string/setting_blacklist_communities"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
 
                 </LinearLayout>
 
-                <include layout="@layout/view_line"/>
-
                 <LinearLayout
-                    android:id="@+id/ll_devices"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/widget_size_7"
-                    android:paddingBottom="@dimen/widget_size_7"
-                    android:minHeight="@dimen/widget_size_50"
-                    android:onClick="@{listener::onClick}"
-                    android:layout_marginTop="@dimen/widget_size_5"
-                    android:gravity="center_vertical">
+                    android:layout_marginTop="@dimen/widget_size_15"
+                    android:background="@color/color_white"
+                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingEnd="@dimen/widget_size_20"
+                    android:paddingTop="@dimen/widget_size_20"
+                    android:paddingBottom="@dimen/widget_size_5">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:text="@string/setting_security"
+                        android:textAppearance="@style/TextAppearanceBody1"
+                        android:textColor="@color/primary_light"
                         android:includeFontPadding="false"
-                        android:text="@string/setting_login_devices"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
+                        android:textStyle="bold" />
 
-                    <ImageView
-                        android:layout_width="@dimen/widget_size_16"
-                        android:layout_height="@dimen/widget_size_16"
-                        android:contentDescription="@null"
-                        android:src="@mipmap/icon_arrow"/>
+                    <LinearLayout
+                        android:id="@+id/ll_seeds"
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/widget_size_7"
+                        android:paddingBottom="@dimen/widget_size_7"
+                        android:minHeight="@dimen/widget_size_50"
+                        android:onClick="@{listener::onClick}"
+                        android:layout_marginTop="@dimen/widget_size_5"
+                        android:gravity="center_vertical">
 
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:includeFontPadding="false"
+                            android:text="@string/setting_seeds"
+                            android:textAppearance="@style/TextAppearanceBody1"/>
+
+                        <ImageView
+                            android:layout_width="@dimen/widget_size_16"
+                            android:layout_height="@dimen/widget_size_16"
+                            android:contentDescription="@null"
+                            android:src="@mipmap/icon_arrow"/>
+
+                    </LinearLayout>
+
+                    <include layout="@layout/view_line"/>
+
+                    <LinearLayout
+                        android:id="@+id/ll_devices"
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/widget_size_7"
+                        android:paddingBottom="@dimen/widget_size_7"
+                        android:minHeight="@dimen/widget_size_50"
+                        android:onClick="@{listener::onClick}"
+                        android:layout_marginTop="@dimen/widget_size_5"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:includeFontPadding="false"
+                            android:text="@string/setting_login_devices"
+                            android:textAppearance="@style/TextAppearanceBody1"/>
+
+                        <ImageView
+                            android:layout_width="@dimen/widget_size_16"
+                            android:layout_height="@dimen/widget_size_16"
+                            android:contentDescription="@null"
+                            android:src="@mipmap/icon_arrow"/>
+
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_test"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/color_white"
-                android:focusableInTouchMode="true"
-                android:focusable="true"
-                android:layout_marginTop="@dimen/widget_size_20"
-                android:paddingTop="@dimen/widget_size_20"
-                android:paddingStart="@dimen/widget_size_20"
-                android:paddingEnd="0dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Test"
-                    android:textAppearance="@style/TextAppearanceBody1"
-                    android:textColor="@color/primary_light"
-                    android:includeFontPadding="false"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/tv_friends_name"
-                    android:layout_width="match_parent"
-                    android:layout_gravity="center_vertical"
-                    android:layout_height="wrap_content"
-                    android:text="Test"
-                    android:gravity="center_horizontal"
-                    android:inputType="text"
-                    android:textAppearance="@style/TextAppearanceBody1"
-                    android:hint="Friend name prefix"
-                    android:autofillHints="Friend name prefix" />
-
-                <EditText
-                    android:id="@+id/tv_friends_num"
-                    android:layout_width="match_parent"
-                    android:layout_gravity="center_vertical"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:text="100"
-                    android:gravity="center_horizontal"
-                    android:inputType="number"
-                    android:textAppearance="@style/TextAppearanceBody1"
-                    android:hint="Number of friends to add"
-                    android:autofillHints="Number of friends to add" />
-
-                <TextView
-                    android:id="@+id/tv_batch_add_friends"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:layout_gravity="center_vertical"
-                    android:onClick="@{listener::onClick}"
-                    android:text="Add Friends"
-                    android:gravity="center_vertical|center"
-                    android:layout_marginEnd="@dimen/widget_size_20"
-                    android:layout_marginTop="@dimen/widget_size_20"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:textColor="@color/color_white"
-                    android:background="@drawable/primary_rect_round_bg"
-                    android:textAppearance="@style/TextAppearanceBody1"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </ScrollView>
+        </ScrollView>
+    </LinearLayout>
 </layout>

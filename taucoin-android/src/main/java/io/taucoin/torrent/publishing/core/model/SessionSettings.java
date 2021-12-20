@@ -75,10 +75,30 @@ class SessionSettings {
 
         /**
          * set dht bootstrap interval
-         * @param interval 时间间隔
+         * @param interval 时间间隔 单位：s
          */
         SessionParamsBuilder setDhtBootstrapInterval(int interval) {
             logger.debug("setDhtBootstrapInterval::{}", interval);
+            sp.set_int(settings_pack.int_types.dht_bootstrap_interval.swigValue(), interval);
+            return this;
+        }
+
+        /**
+         * set dht non referable
+         * @param nonReferable non referable
+         */
+        SessionParamsBuilder setDhtNonReferable(boolean nonReferable) {
+            logger.debug("setDhtNonReferable::{}", nonReferable);
+            sp.set_bool(settings_pack.int_types.dht_bootstrap_interval.swigValue(), nonReferable);
+            return this;
+        }
+
+        /**
+         * set dht ping interval
+         * @param interval 时间间隔 单位：s
+         */
+        SessionParamsBuilder setDhtPingInterval(int interval) {
+            logger.debug("setDhtPingInterval::{}", interval);
             sp.set_int(settings_pack.int_types.dht_bootstrap_interval.swigValue(), interval);
             return this;
         }
