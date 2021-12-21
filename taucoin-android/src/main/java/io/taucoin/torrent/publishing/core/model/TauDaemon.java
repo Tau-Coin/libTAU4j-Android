@@ -260,8 +260,8 @@ public abstract class TauDaemon {
                 .setAccountSeed(seed)
                 .setDeviceID(deviceID)
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
-//                .setDhtNonReferable(true)
-//                .setDhtPingInterval(3600)
+                .setDhtNonReferable(true)
+                .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(60)
                 .setNetworkInterface(getLocalNetworkAddress())
                 .build();

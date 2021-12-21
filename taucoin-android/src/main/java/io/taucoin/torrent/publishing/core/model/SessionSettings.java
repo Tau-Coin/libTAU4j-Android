@@ -89,7 +89,7 @@ class SessionSettings {
          */
         SessionParamsBuilder setDhtNonReferable(boolean nonReferable) {
             logger.debug("setDhtNonReferable::{}", nonReferable);
-            sp.set_bool(settings_pack.int_types.dht_bootstrap_interval.swigValue(), nonReferable);
+            sp.set_bool(settings_pack.bool_types.dht_non_referrable.swigValue(), nonReferable);
             return this;
         }
 
@@ -99,7 +99,7 @@ class SessionSettings {
          */
         SessionParamsBuilder setDhtPingInterval(int interval) {
             logger.debug("setDhtPingInterval::{}", interval);
-            sp.set_int(settings_pack.int_types.dht_bootstrap_interval.swigValue(), interval);
+            sp.set_int(settings_pack.int_types.dht_ping_interval.swigValue(), interval);
             return this;
         }
 
