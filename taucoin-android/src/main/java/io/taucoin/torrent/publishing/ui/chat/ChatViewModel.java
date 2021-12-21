@@ -368,25 +368,25 @@ public class ChatViewModel extends AndroidViewModel {
      * @param friendPk 要访问的朋友
      */
     public void startVisitFriend(String friendPk) {
-        if (StringUtil.isEmpty(friendPk)) {
-            return;
-        }
-        if (null == chattingDisposable) {
-            daemon.setChattingFriend(friendPk);
-        }
-        chattingDisposable = ObservableUtil.intervalSeconds(1)
-            .subscribeOn(Schedulers.io())
-            .subscribe(l -> daemon.setChattingFriend(friendPk));
+//        if (StringUtil.isEmpty(friendPk)) {
+//            return;
+//        }
+//        if (null == chattingDisposable) {
+//            daemon.setChattingFriend(friendPk);
+//        }
+//        chattingDisposable = ObservableUtil.intervalSeconds(1)
+//            .subscribeOn(Schedulers.io())
+//            .subscribe(l -> daemon.setChattingFriend(friendPk));
     }
 
     /**
      * 当离开朋友聊天页面时，取消对朋友的单独访问
      */
     public void stopVisitFriend() {
-        if (chattingDisposable != null && !chattingDisposable.isDisposed()) {
-            chattingDisposable.dispose();
-        }
-        daemon.unsetChattingFriend();
+//        if (chattingDisposable != null && !chattingDisposable.isDisposed()) {
+//            chattingDisposable.dispose();
+//        }
+//        daemon.unsetChattingFriend();
     }
 
     void loadMessagesData(String friendPk, int pos) {

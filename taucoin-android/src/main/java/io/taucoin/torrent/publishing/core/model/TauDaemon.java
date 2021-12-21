@@ -583,21 +583,21 @@ public abstract class TauDaemon {
      */
     public abstract boolean deleteFriend(String friendPk);
 
-    /**
-     * 设置正在聊天的朋友
-     * @param friendPk 朋友公钥
-     */
-    public abstract void setChattingFriend(String friendPk);
+//    /**
+//     * 设置正在聊天的朋友
+//     * @param friendPk 朋友公钥
+//     */
+//    public abstract void setChattingFriend(String friendPk);
 
-    /**
-     * 取消正在聊天的朋友
-     */
-    public abstract void unsetChattingFriend();
-
-    /**
-     * 设置活跃的朋友
-     */
-    public abstract void setActiveFriends(List<String> friends);
+//    /**
+//     * 取消正在聊天的朋友
+//     */
+//    public abstract void unsetChattingFriend();
+//
+//    /**
+//     * 设置活跃的朋友
+//     */
+//    public abstract void setActiveFriends(List<String> friends);
 
     /**
      * 设置libTAU主循环时间间隔
