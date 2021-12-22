@@ -550,7 +550,8 @@ public abstract class TauDaemon {
      */
     public boolean updateBootstrapInterval(int interval) {
         if (isRunning) {
-            logger.debug("updateBootstrapInterval::{}s, success::{}", interval, true);
+            sessionManager.updateBootstrapIntervel(interval);
+            logger.debug("updateBootstrapInterval::{}s", interval);
             return true;
         }
         return false;
