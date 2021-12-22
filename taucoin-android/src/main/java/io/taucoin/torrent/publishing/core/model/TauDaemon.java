@@ -539,8 +539,10 @@ public abstract class TauDaemon {
      */
     public void requestFriendInfo(String friendPk) {
         if (isRunning) {
-            sessionManager.requestFriendInfo(friendPk);
-            logger.debug("requestFriendInfo::{}", friendPk);
+            if (StringUtil.isNotEmpty(friendPk)) {
+                sessionManager.requestFriendInfo(friendPk);
+                logger.debug("requestFriendInfo::{}", friendPk);
+            }
         }
     }
 

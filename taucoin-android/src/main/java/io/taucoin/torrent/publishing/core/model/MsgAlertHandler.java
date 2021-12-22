@@ -218,7 +218,7 @@ class MsgAlertHandler {
      * @param userPk 当前用户的公钥
      */
     void addNewDeviceID(String deviceID, String userPk) {
-        logger.debug("onNewDeviceID userPk::{}, deviceID::{}",
+        logger.debug("addNewDeviceID userPk::{}, deviceID::{}",
                 userPk, deviceID);
         if (StringUtil.isNotEmpty(deviceID) && StringUtil.isNotEmpty(userPk)) {
             Device device = new Device(userPk, deviceID, DateUtil.getTime());
@@ -233,25 +233,31 @@ class MsgAlertHandler {
      */
     void onFriendInfo(String userPk, FriendInfo bean) {
         String friendPkStr = ByteUtil.toHexString(bean.getPubKey());
-        byte[] nickname = bean.getNickname();
-        byte[] remark = bean.getRemark();
+        boolean isMyself = StringUtil.isEquals(userPk, friendPkStr);
+        String nickname = Utils.textBytesToString(bean.getNickname());
+        String remark = Utils.textBytesToString(bean.getRemark());
         BigInteger timestamp = bean.getTimestamp();
-        logger.debug("onNewFriend userPk::{}, friendPk::{}", userPk, friendPkStr);
+        logger.debug("onFriendInfo userPk::{}, friendPk::{}, nickname::{}, remark::{}",
+                userPk, friendPkStr, nickname, remark);
         User user = userRepo.getUserByPublicKey(friendPkStr);
         // 多设备朋友同步
         if (null == user) {
             user = new User(friendPkStr);
-            user.nickname = Utils.textBytesToString(nickname);
-            user.remark = Utils.textBytesToString(remark);
+            user.nickname = nickname;
             user.updateTime = timestamp.longValue();
+            if (isMyself) {
+                user.remark = remark;
+            }
             userRepo.addUser(user);
         } else {
             // 多设备朋友昵称同步
             if ((nickname != null || remark != null) && timestamp != null &&
                     timestamp.compareTo(BigInteger.valueOf(user.updateTime)) > 0) {
-                user.nickname = Utils.textBytesToString(nickname);
-                user.remark = Utils.textBytesToString(remark);
+                user.nickname = nickname;
                 user.updateTime = timestamp.longValue();
+                if (isMyself) {
+                    user.remark = remark;
+                }
                 userRepo.updateUser(user);
             }
         }

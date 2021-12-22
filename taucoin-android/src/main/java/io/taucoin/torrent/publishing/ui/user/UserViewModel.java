@@ -515,7 +515,7 @@ public class UserViewModel extends AndroidViewModel {
             if (user != null) {
                 if (StringUtil.isNotEmpty(name)) {
                     user.nickname = name;
-                    user.updateTime = daemon.getSessionTime() / 1000;
+                    user.updateTime = DateUtil.getTime();
                 }
                 String currentUserPk = userRepo.getCurrentUser().publicKey;
                 userRepo.updateUser(user);
@@ -1061,6 +1061,8 @@ public class UserViewModel extends AndroidViewModel {
      * 请求更新朋友信息
      */
     public void requestFriendInfo(String friendPk) {
-        daemon.requestFriendInfo(friendPk);
+        if (StringUtil.isNotEmpty(friendPk)) {
+            daemon.requestFriendInfo(friendPk);
+        }
     }
 }

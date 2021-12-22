@@ -232,7 +232,6 @@ public class TauDaemonImpl extends TauDaemon {
             String friendPk = friend.publicKey;
             // 添加新朋友
             isSuccess = addNewFriend(friend.publicKey);
-
             String deviceID = DeviceUtils.getCustomDeviceID(appContext);
             byte[] nickname = null;
             byte[] remark = null;
@@ -245,6 +244,8 @@ public class TauDaemonImpl extends TauDaemon {
             }
             FriendInfo friendInfo = new FriendInfo(Utils.textStringToBytes(deviceID),
                     ByteUtil.toByte(friendPk), nickname, remark, avatar, timestamp);
+            logger.debug("updateFriendInfo publicKey::{}, nickname::{}, remark::{}, isSuccess::{}",
+                    friend.publicKey, friend.nickname, friend.remark, isSuccess);
             // 更新朋友信息
             updateFriendInfo(friendPk, friendInfo.getEncoded());
         }
