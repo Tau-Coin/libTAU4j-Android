@@ -96,7 +96,7 @@ public class UserViewModel extends AndroidViewModel {
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<String> changeResult = new MutableLiveData<>();
     private MutableLiveData<Result> addFriendResult = new MutableLiveData<>();
-    private MutableLiveData<Boolean> editNameResult = new MutableLiveData<>();
+    private MutableLiveData<Boolean> editRemarkResult = new MutableLiveData<>();
     private MutableLiveData<List<User>> blackList = new MutableLiveData<>();
     private MutableLiveData<Result> editBlacklistResult = new MutableLiveData<>();
     private MutableLiveData<UserAndFriend> userDetail = new MutableLiveData<>();
@@ -425,8 +425,8 @@ public class UserViewModel extends AndroidViewModel {
         return blackList;
     }
 
-    public MutableLiveData<Boolean> getEditNameResult() {
-        return editNameResult;
+    public MutableLiveData<Boolean> getEditRemarkResult() {
+        return editRemarkResult;
     }
 
     public MutableLiveData<List<UserAndFriend>> getUserList() {
@@ -532,7 +532,42 @@ public class UserViewModel extends AndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {
                     submitDataSetChanged();
-                    editNameResult.postValue(result);
+                });
+        disposables.add(disposable);
+    }
+
+    /**
+     * 保存备注
+     */
+    private void saveRemarkName(String publicKey, String name) {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
+            User user;
+            if (StringUtil.isNotEmpty(publicKey)) {
+                user = userRepo.getUserByPublicKey(publicKey);
+            } else {
+                user = userRepo.getCurrentUser();
+            }
+            if (user != null) {
+                if (StringUtil.isNotEmpty(name)) {
+                    user.remark = name;
+                    user.updateTime = daemon.getSessionTime() / 1000;
+                }
+                String currentUserPk = userRepo.getCurrentUser().publicKey;
+                userRepo.updateUser(user);
+                Friend friend = friendRepo.queryFriend(currentUserPk, publicKey);
+                // 必须是朋友关系，才能更新朋友
+                if (friend != null && friend.status != FriendStatus.DISCOVERED.getStatus()) {
+                    daemon.updateFriendInfo(user);
+                }
+            }
+            emitter.onNext(true);
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                    submitDataSetChanged();
+                    editRemarkResult.postValue(result);
                 });
         disposables.add(disposable);
     }
@@ -691,7 +726,8 @@ public class UserViewModel extends AndroidViewModel {
         binding.tvSubmit.setOnClickListener(v -> {
             String newName = StringUtil.getText(binding.etPublicKey);
             if (StringUtil.isNotEmpty(newName)) {
-                int nicknameLength = Utils.textStringToBytes(newName).length;
+                byte[] nameBytes = Utils.textStringToBytes(newName);
+                int nicknameLength = null == nameBytes ? 0 : nameBytes.length;
                 if (nicknameLength > Constants.NICKNAME_LENGTH) {
                     ToastUtils.showShortToast(R.string.user_new_name_too_long);
                 } else {
@@ -702,6 +738,39 @@ public class UserViewModel extends AndroidViewModel {
                 }
             } else {
                 ToastUtils.showShortToast(R.string.user_invalid_new_name);
+            }
+        });
+        editNameDialog = new CommonDialog.Builder(activity)
+                .setContentView(binding.getRoot())
+                .setCanceledOnTouchOutside(false)
+                .setButtonWidth(R.dimen.widget_size_240)
+                .create();
+        editNameDialog.show();
+    }
+
+    /**
+     * 显示编辑名字的对话框
+     */
+    public void showRemarkDialog(AppCompatActivity activity, String publicKey) {
+        ContactsDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
+                R.layout.contacts_dialog, null, false);
+        binding.etPublicKey.setHint(R.string.user_remark);
+        binding.ivClose.setOnClickListener(v -> {
+            if (editNameDialog != null) {
+                editNameDialog.closeDialog();
+            }
+        });
+        binding.tvSubmit.setOnClickListener(v -> {
+            String newName = StringUtil.getText(binding.etPublicKey);
+            byte[] nameBytes = Utils.textStringToBytes(newName);
+            int nicknameLength = null == nameBytes ? 0 : nameBytes.length;
+            if (nicknameLength > Constants.NICKNAME_LENGTH) {
+                ToastUtils.showShortToast(R.string.user_remark_too_long);
+            } else {
+                saveRemarkName(publicKey, newName);
+                if (editNameDialog != null) {
+                    editNameDialog.closeDialog();
+                }
             }
         });
         editNameDialog = new CommonDialog.Builder(activity)
@@ -923,7 +992,7 @@ public class UserViewModel extends AndroidViewModel {
     /**
      * 观察朋友信息变化
      */
-    public Flowable<Friend> observeFriend(String friendPk) {
+    public Flowable<FriendAndUser> observeFriend(String friendPk) {
         return userRepo.observeFriend(friendPk);
     }
 

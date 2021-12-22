@@ -267,6 +267,8 @@
     <string name="user_seed_invalid">Key is invalid!</string>
     <string name="user_seed_save_tips">Please make sure your key\nhas been saved</string>
     <string name="user_show_name">%1$s(%2$s)</string>
+    <string name="user_nick_name">Nickname: %s</string>
+    <string name="user_public_key">Public Key: %s</string>
     <string name="user_ban">Ban</string>
     <string name="user_ban_list">Banlist</string>
     <string name="user_edit_name">Edit Name</string>
@@ -279,6 +281,8 @@
     <string name="user_no_messages_from">No messages from</string>
     <string name="user_until_removed">until removed from the ban list.</string>
     <string name="user_start_chat">Chat</string>
+    <string name="user_remark">Remark</string>
+    <string name="user_remark_too_long">Remark too long</string>
     <string name="user_add_to_contact">Add To Friends</string>
     <string name="user_share_qr">Share QR To Friend</string>
 

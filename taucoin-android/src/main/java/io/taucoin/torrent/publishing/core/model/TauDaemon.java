@@ -65,7 +65,7 @@ public abstract class TauDaemon {
     static final int ALERT_QUEUE_CAPACITY = 10000;              // Alert缓存队列
     private static volatile TauDaemon instance;
 
-    private Context appContext;
+    Context appContext;
     private SettingsRepository settingsRepo;
     CompositeDisposable disposables = new CompositeDisposable();
     private PowerReceiver powerReceiver = new PowerReceiver();

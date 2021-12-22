@@ -229,7 +229,7 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     }
     @Override
     public void onEditNameClicked(String senderPk){
-        userViewModel.showEditNameDialog(activity, senderPk);
+        userViewModel.showRemarkDialog(activity, senderPk);
     }
     @Override
     public void onBanClicked(UserAndTx tx){

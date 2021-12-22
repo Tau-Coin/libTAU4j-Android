@@ -212,6 +212,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
         public boolean areContentsTheSame(@NonNull UserAndFriend oldItem, @NonNull UserAndFriend newItem) {
             return oldItem.equals(newItem) && oldOrder == order &&
                     oldItem.status == newItem.status &&
+                    StringUtil.isEquals(oldItem.remark, newItem.remark) &&
                     oldItem.onlineCount == newItem.onlineCount &&
                     ((order == 0 && oldItem.lastSeenTime == newItem.lastSeenTime) ||
                             (order == 1 && oldItem.lastCommTime == newItem.lastCommTime));

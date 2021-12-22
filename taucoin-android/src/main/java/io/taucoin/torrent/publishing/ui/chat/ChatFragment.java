@@ -234,6 +234,11 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(friend -> {
+                    if (friend.user != null) {
+                        String friendNickName = UsersUtil.getShowName(friend.user);
+                        binding.toolbarInclude.tvTitle.setText(friendNickName);
+                        adapter.setFriend(friend.user);
+                    }
                     binding.llBottomInput.setVisibility(friend.status != FriendStatus.DISCOVERED.getStatus()
                             ? View.VISIBLE : View.GONE);
                     binding.llShareQr.setVisibility(friend.status == FriendStatus.DISCOVERED.getStatus()

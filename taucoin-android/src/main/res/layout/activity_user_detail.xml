@@ -55,7 +55,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_name"
+                    android:id="@+id/tv_show_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
@@ -63,10 +63,22 @@
                     android:ellipsize="end"
                     android:textAppearance="@style/TextAppearanceHeadline6" />
 
+                <TextView
+                    android:id="@+id/tv_nick_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:layout_marginTop="@dimen/widget_size_3"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody3" />
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:id="@+id/ll_public_key"
-                    android:paddingEnd="@dimen/widget_size_30"
+                    android:paddingEnd="@dimen/widget_size_15"
+                    android:layout_marginTop="@dimen/widget_size_3"
                     android:paddingStart="0dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
@@ -80,17 +92,18 @@
                         android:singleLine="true"
                         android:onClick="@{listener::onClick}"
                         android:ellipsize="end"
-                        android:textAppearance="@style/TextAppearanceBody1" />
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody3" />
 
                     <ImageView
                         android:id="@+id/iv_public_key_copy"
-                        android:layout_width="@dimen/widget_size_25"
-                        android:layout_height="@dimen/widget_size_25"
+                        android:layout_width="@dimen/widget_size_20"
+                        android:layout_height="@dimen/widget_size_20"
                         android:padding="@dimen/widget_size_5"
                         android:onClick="@{listener::onClick}"
                         android:contentDescription="@null"
                         android:layout_marginStart="@dimen/widget_size_5"
-                        android:src="@mipmap/icon_copy"/>
+                        android:src="@mipmap/icon_copy_text"/>
 
                 </LinearLayout>
             </LinearLayout>
@@ -151,6 +164,18 @@
                     android:textColor="@color/color_yellow"
                     android:gravity="center_horizontal|center"
                     android:text="@string/user_add_to_contact"/>
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/tv_remark"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_44"
+                    android:onClick="@{listener::onClick}"
+                    android:background="@color/color_white"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:textAppearance="@style/TextAppearanceBody1"
+                    android:gravity="center_horizontal|center"
+                    android:text="@string/user_remark"/>
 
                 <TextView
                     android:visibility="gone"

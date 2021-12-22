@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import org.apache.commons.io.CopyUtils;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -39,7 +41,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     private CommunityViewModel communityViewModel;
     private UserCommunityListAdapter adapter;
     private String publicKey;
-    private String nickName;
     private UserAndFriend user;
     private int type;
     @Override
@@ -70,9 +71,8 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
      * 初始化布局
      */
     private void initView() {
-        if(getIntent() != null){
+        if (getIntent() != null) {
             publicKey = getIntent().getStringExtra(IntentExtra.PUBLIC_KEY);
-            nickName = getIntent().getStringExtra(IntentExtra.NICK_NAME);
         }
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle("");
@@ -114,6 +114,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             } else {
                 binding.tvAddToContact.setVisibility(View.GONE);
                 binding.tvStartChat.setVisibility(View.VISIBLE);
+                binding.tvRemark.setVisibility(View.VISIBLE);
             }
         });
 
@@ -135,6 +136,10 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 ToastUtils.showShortToast(R.string.blacklist_failed);
             }
         });
+
+        userViewModel.getEditRemarkResult().observe(this, result -> {
+            userViewModel.getUserDetail(publicKey);
+        });
     }
 
     private void showUserInfo(UserAndFriend userInfo) {
@@ -142,15 +147,19 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         binding.tvAddToContact.setVisibility(!isMine && userInfo.isDiscovered() ? View.VISIBLE : View.GONE);
         boolean isShowChat = !isMine && !userInfo.isDiscovered() && type != TYPE_CHAT_PAGE;
         binding.tvStartChat.setVisibility(isShowChat ? View.VISIBLE : View.GONE);
+        binding.tvRemark.setVisibility(!isMine && !userInfo.isDiscovered() ? View.VISIBLE : View.GONE);
         this.user = userInfo;
-        String showName = UsersUtil.getCurrentUserName(user);
-        if (StringUtil.isNotEmpty(nickName)) {
-            showName = nickName;
+        if (!isMine) {
+            String nickName = UsersUtil.getCurrentUserName(user);
+            binding.tvNickName.setText(getString(R.string.user_nick_name, nickName));
         }
-        binding.tvName.setText(showName);
+        binding.tvNickName.setVisibility(isMine ? View.GONE : View.VISIBLE);
+        String showName = UsersUtil.getShowName(user);
+        binding.tvShowName.setText(showName);
         binding.leftView.setText(StringUtil.getFirstLettersOfName(showName));
         binding.leftView.setBgColor(Utils.getGroupColor(user.publicKey));
-        binding.tvPublicKey.setText(UsersUtil.getMidHideName(user.publicKey));
+        String midHideName = UsersUtil.getMidHideName(user.publicKey);
+        binding.tvPublicKey.setText(getString(R.string.user_public_key, midHideName));
         binding.ivPublicKeyCopy.setOnClickListener(v -> {
             copyPublicKey(user.publicKey);
         });
@@ -185,8 +194,15 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 showProgressDialog();
                 communityViewModel.createChat(user.publicKey);
                 break;
+            case R.id.tv_remark:
+                userViewModel.showRemarkDialog(this, publicKey);
+                break;
             case R.id.tv_ban:
                 userViewModel.setUserBlacklist(publicKey, true);
+                break;
+            case R.id.iv_public_key_copy:
+                CopyManager.copyText(publicKey);
+                ToastUtils.showShortToast(R.string.copy_successfully);
                 break;
         }
     }

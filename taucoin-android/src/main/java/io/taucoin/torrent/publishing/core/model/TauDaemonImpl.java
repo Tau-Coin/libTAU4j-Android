@@ -28,6 +28,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
@@ -234,13 +235,18 @@ public class TauDaemonImpl extends TauDaemon {
             // 添加新朋友
             isSuccess = addNewFriend(friend.publicKey);
 
+            String deviceID = DeviceUtils.getCustomDeviceID(appContext);
             byte[] nickname = null;
+            byte[] remark = null;
+            byte[] avatar = null;
             BigInteger timestamp = BigInteger.ZERO;
-            if (StringUtil.isNotEmpty(friend.nickname)) {
+            if (StringUtil.isNotEmpty(friend.nickname) || StringUtil.isNotEmpty(friend.remark)) {
                 nickname = Utils.textStringToBytes(friend.nickname);
+                remark = Utils.textStringToBytes(friend.remark);
                 timestamp = BigInteger.valueOf(friend.updateTime);
             }
-            FriendInfo friendInfo = new FriendInfo(ByteUtil.toByte(friendPk), nickname, timestamp);
+            FriendInfo friendInfo = new FriendInfo(Utils.textStringToBytes(deviceID),
+                    ByteUtil.toByte(friendPk), nickname, remark, avatar, timestamp);
             // 更新朋友信息
             updateFriendInfo(friendPk, friendInfo.getEncoded());
         }

@@ -71,7 +71,13 @@ public class UsersUtil {
      * @return 显示名字
      */
     public static String getShowName(@NonNull User user) {
-        return getShowName(user.publicKey, user.nickname);
+        if (StringUtil.isNotEmpty(user.remark)) {
+            return user.remark;
+        } else if (StringUtil.isNotEmpty(user.nickname)) {
+            return user.nickname;
+        } else {
+            return UsersUtil.getDefaultName(user.publicKey);
+        }
     }
 
     public static String getShowNameWithYourself(User user, String publicKey) {
@@ -91,19 +97,8 @@ public class UsersUtil {
         if(null == user){
             return UsersUtil.getDefaultName(publicKey);
         }else{
-            return getShowName(user.publicKey, user.nickname);
+            return getShowName(user);
         }
-    }
-
-    public static String getShowName(String publicKey, String localName) {
-        String showName = UsersUtil.getDefaultName(publicKey);
-        if(StringUtil.isNotEmpty(localName)){
-//                && StringUtil.isNotEquals(localName.trim(), showName.trim())){
-//            Context context = MainApplication.getInstance();
-//            showName = context.getString(R.string.user_show_name, localName, showName);
-            showName = localName;
-        }
-        return showName;
     }
 
     /**
@@ -114,14 +109,14 @@ public class UsersUtil {
     public static String getCurrentUserName(@NonNull User user) {
         if(StringUtil.isNotEmpty(user.nickname)){
             return user.nickname;
-        }else{
+        } else {
             return UsersUtil.getDefaultName(user.publicKey);
         }
     }
 
     public static String getUserName(User user, String publicKey) {
         if(user != null){
-            return getCurrentUserName(user);
+            return getShowName(user);
         }else{
             return UsersUtil.getDefaultName(publicKey);
         }

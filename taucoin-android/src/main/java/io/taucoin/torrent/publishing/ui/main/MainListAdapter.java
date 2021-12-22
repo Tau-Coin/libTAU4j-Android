@@ -161,6 +161,8 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                     isSame = oldItem.timestamp == newItem.timestamp &&
                             oldItem.msgUnread == newItem.msgUnread &&
                             Arrays.equals(oldItem.msg, newItem.msg) &&
+                            StringUtil.isEquals(oldItem.friend != null ? oldItem.friend.remark : null,
+                                    newItem.friend != null ? newItem.friend.remark : null) &&
                             StringUtil.isEquals(oldItem.friend != null ? oldItem.friend.nickname : null,
                                     newItem.friend != null ? newItem.friend.nickname : null);
                 }

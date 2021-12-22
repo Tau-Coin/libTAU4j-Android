@@ -1,7 +1,5 @@
 package io.taucoin.torrent.publishing.core.model.data;
 
-import org.spongycastle.util.encoders.Hex;
-
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -11,14 +9,21 @@ import io.taucoin.torrent.publishing.core.utils.rlp.RLPList;
 public class FriendInfo {
     byte[] pubKey;
     byte[] nickname;
+    byte[] remark;
+    byte[] deviceID;
+    byte[] avatar;
     BigInteger timestamp;
 
     private byte[] rlpEncoded; // 编码数据
     private boolean parsed = false; // 解析标志
 
-    public FriendInfo(byte[] pubKey, byte[] nickname, BigInteger timestamp) {
+    public FriendInfo(byte[] deviceID, byte[] pubKey, byte[] nickname, byte[] remark, byte[] avatar,
+                      BigInteger timestamp) {
+        this.deviceID = deviceID;
         this.pubKey = pubKey;
         this.nickname = nickname;
+        this.remark = remark;
+        this.avatar = avatar;
         this.timestamp = timestamp;
 
         this.parsed = true;
@@ -59,12 +64,13 @@ public class FriendInfo {
         RLPList params = RLP.decode2(this.rlpEncoded);
         RLPList list = (RLPList) params.get(0);
 
-        this.pubKey = list.get(0).getRLPData();
-
-        this.nickname = list.get(1).getRLPData();
-
-        byte[] timeBytes = list.get(2).getRLPData();
+        this.deviceID = list.get(0).getRLPData();
+        this.pubKey = list.get(1).getRLPData();
+        this.nickname = list.get(2).getRLPData();
+        this.remark = list.get(3).getRLPData();
+        byte[] timeBytes = list.get(4).getRLPData();
         this.timestamp = (null == timeBytes) ? BigInteger.ZERO: new BigInteger(1, timeBytes);
+        this.avatar = list.get(5).getRLPData();
 
         this.parsed = true;
     }
@@ -75,11 +81,14 @@ public class FriendInfo {
      */
     public byte[] getEncoded(){
         if (null == rlpEncoded) {
+            byte[] deviceID = RLP.encodeElement(this.deviceID);
             byte[] pubKey = RLP.encodeElement(this.pubKey);
             byte[] nickname = RLP.encodeElement(this.nickname);
+            byte[] remark = RLP.encodeElement(this.remark);
+            byte[] avatar = RLP.encodeElement(this.avatar);
             byte[] timestamp = RLP.encodeBigInteger(this.timestamp);
 
-            this.rlpEncoded = RLP.encodeList(pubKey, nickname, timestamp);
+            this.rlpEncoded = RLP.encodeList(deviceID, pubKey, nickname, remark, avatar, timestamp);
         }
 
         return rlpEncoded;
@@ -96,33 +105,5 @@ public class FriendInfo {
     @Override
     public int hashCode() {
         return Arrays.hashCode(pubKey);
-    }
-
-    @Override
-    public String toString() {
-
-        byte[] pubKey = getPubKey();
-        byte[] nickname = getNickname();
-        BigInteger timestamp = getTimestamp();
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.append("{");
-        if (null != pubKey) {
-            stringBuilder.append("public key=");
-            stringBuilder.append(Hex.toHexString(pubKey));
-        }
-        if (null != nickname) {
-            stringBuilder.append(", nickname=");
-            stringBuilder.append(new String(nickname));
-        }
-        if (null != timestamp) {
-            stringBuilder.append(", timestamp=");
-            stringBuilder.append(timestamp);
-        }
-
-        stringBuilder.append("}");
-
-        return stringBuilder.toString();
     }
 }

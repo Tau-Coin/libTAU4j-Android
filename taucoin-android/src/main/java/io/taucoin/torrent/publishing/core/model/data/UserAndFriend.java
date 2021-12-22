@@ -30,8 +30,4 @@ public class UserAndFriend extends User {
     public boolean isAdded() {
         return status == 1;
     }
-
-    public boolean isConnected() {
-        return status == 2;
-    }
 }

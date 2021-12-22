@@ -17,8 +17,9 @@ public class User implements Parcelable {
     @PrimaryKey
     public String publicKey;                // 用户的公钥
     public String seed;                     // 用户的seed
+    public String remark;                   // 用户备注
     public String nickname;                 // 用户昵称
-    public long updateTime;                 // 用户昵称更新时间
+    public long updateTime;                 // 用户昵称和备注更新时间
     public boolean isCurrentUser = false;   // 是否是当前用户
     public boolean isBanned = false;        // 用户是否被用户拉入黑名单
 
@@ -45,6 +46,7 @@ public class User implements Parcelable {
     protected User(Parcel in) {
         publicKey = in.readString();
         seed = in.readString();
+        remark = in.readString();
         nickname = in.readString();
         isCurrentUser = in.readByte() != 0;
         isBanned = in.readByte() != 0;
@@ -56,6 +58,7 @@ public class User implements Parcelable {
         dest.writeString(publicKey);
         dest.writeString(seed);
         dest.writeString(nickname);
+        dest.writeString(remark);
         dest.writeByte((byte) (isCurrentUser ? 1 : 0));
         dest.writeByte((byte) (isBanned ? 1 : 0));
         dest.writeLong(updateTime);
