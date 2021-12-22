@@ -647,14 +647,14 @@ public class UserViewModel extends AndroidViewModel {
             user = new User(publicKey);
             if (StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
-                user.updateTime = daemon.getSessionTime() / 1000;
+                user.updateTime = DateUtil.getTime();
             }
             userRepo.addUser(user);
         } else {
             logger.debug("AddFriendsLocally, user exist");
             if (StringUtil.isEmpty(user.nickname) && StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
-                user.updateTime = daemon.getSessionTime() / 1000;
+                user.updateTime = DateUtil.getTime();
                 userRepo.updateUser(user);
             }
         }

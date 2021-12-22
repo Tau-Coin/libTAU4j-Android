@@ -19,7 +19,7 @@ public class User implements Parcelable {
     public String seed;                     // 用户的seed
     public String remark;                   // 用户备注
     public String nickname;                 // 用户昵称
-    public long updateTime;                 // 用户昵称和备注更新时间
+    public long updateTime;                 // 备注更新时间
     public boolean isCurrentUser = false;   // 是否是当前用户
     public boolean isBanned = false;        // 用户是否被用户拉入黑名单
 

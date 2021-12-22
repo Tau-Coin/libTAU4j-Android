@@ -232,6 +232,9 @@ class MsgAlertHandler {
      * @param bean 朋友信息
      */
     void onFriendInfo(String userPk, FriendInfo bean) {
+        if (StringUtil.isEmpty(userPk)) {
+            return;
+        }
         String friendPkStr = ByteUtil.toHexString(bean.getPubKey());
         boolean isMyself = StringUtil.isEquals(userPk, friendPkStr);
         String nickname = Utils.textBytesToString(bean.getNickname());
@@ -240,6 +243,7 @@ class MsgAlertHandler {
         logger.debug("onFriendInfo userPk::{}, friendPk::{}, nickname::{}, remark::{}",
                 userPk, friendPkStr, nickname, remark);
         User user = userRepo.getUserByPublicKey(friendPkStr);
+
         // 多设备朋友同步
         if (null == user) {
             user = new User(friendPkStr);
@@ -251,11 +255,10 @@ class MsgAlertHandler {
             userRepo.addUser(user);
         } else {
             // 多设备朋友昵称同步
-            if ((nickname != null || remark != null) && timestamp != null &&
-                    timestamp.compareTo(BigInteger.valueOf(user.updateTime)) > 0) {
+            if ((nickname != null || remark != null)) {
                 user.nickname = nickname;
                 user.updateTime = timestamp.longValue();
-                if (isMyself) {
+                if (isMyself && timestamp.compareTo(BigInteger.valueOf(user.updateTime)) > 0) {
                     user.remark = remark;
                 }
                 userRepo.updateUser(user);
