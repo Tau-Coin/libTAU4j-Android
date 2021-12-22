@@ -157,9 +157,7 @@ public class MsgLogsDialog extends Dialog {
                 String time;
                 if (log.status == ChatMsgStatus.SYNC_CONFIRMED.getStatus()) {
                     timePointRes = R.mipmap.icon_msg_received;
-                } else if (log.status == ChatMsgStatus.SYNCING.getStatus()) {
-                    timePointRes = R.mipmap.icon_put_success;
-                }  else {
+                } else {
                     timePointRes = R.mipmap.icon_msg_built;
                 }
                 time = DateUtil.format(log.timestamp, DateUtil.pattern9);

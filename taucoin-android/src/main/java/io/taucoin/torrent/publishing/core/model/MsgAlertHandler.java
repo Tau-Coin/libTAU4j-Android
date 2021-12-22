@@ -123,33 +123,6 @@ class MsgAlertHandler {
     }
 
     /**
-     * 消息正在同步
-     * @param msgHash 当前同步的消息
-     * @param timestamp 开始同步时间
-     */
-    void onSyncMessage(byte[] msgHash, long timestamp, String userPk) {
-        try {
-            String hash = ByteUtil.toHexString(msgHash);
-            ChatMsg msg = chatRepo.queryChatMsg(hash);
-            String senderPk = msg != null ? msg.senderPk : null;
-            if (StringUtil.isNotEquals(senderPk, userPk)) {
-                logger.debug("onSyncMessage MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
-                return;
-            }
-            ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
-                    ChatMsgStatus.SYNCING.getStatus());
-            logger.trace("onSyncMessage MessageHash::{}, exist::{}", hash, msgLog != null);
-            if (null == msgLog) {
-                msgLog = new ChatMsgLog(hash, ChatMsgStatus.SYNCING.getStatus(), timestamp);
-                chatRepo.addChatMsgLogs(msgLog);
-            }
-        } catch (SQLiteConstraintException ignore) {
-        } catch (Exception e) {
-            logger.error("onSyncMessage error", e);
-        }
-    }
-
-    /**
      * 消息已被接收
      * @param hashList 消息root
      */

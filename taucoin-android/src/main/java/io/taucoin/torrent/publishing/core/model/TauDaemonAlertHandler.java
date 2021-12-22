@@ -99,10 +99,6 @@ class TauDaemonAlertHandler {
                 // 消息确认
                 onConfirmRoot(alert, alertAndUser.getUserPk());
                 break;
-            case COMM_SYNC_MSG:
-                // 消息同步
-                onSyncMessage(alert, alertAndUser.getUserPk());
-                break;
             case BLOCK_CHAIN_HEAD_BLOCK:
                 onNewBlock(alert);
                 break;
@@ -141,19 +137,6 @@ class TauDaemonAlertHandler {
         byte[] friendPk = lastSeenAlert.get_peer();
         long lastSeenTime = lastSeenAlert.get_last_seen();
         msgListenHandler.onDiscoveryFriend(ByteUtil.toHexString(friendPk), lastSeenTime, userPk);
-    }
-
-    /**
-     * 消息正在同步
-     * @param alert libTAU上报
-     * @param userPk 当前用户公钥
-     */
-    private void onSyncMessage(Alert alert, String userPk) {
-        CommSyncMsgAlert syncMsgAlert = (CommSyncMsgAlert) alert;
-        logger.info(syncMsgAlert.get_message());
-        byte[] hash = syncMsgAlert.getSyncing_msg_hash();
-        long timestamp = syncMsgAlert.get_timestamp();
-        msgListenHandler.onSyncMessage(hash, timestamp, userPk);
     }
 
     /**

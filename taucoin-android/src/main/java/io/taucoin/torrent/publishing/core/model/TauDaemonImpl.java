@@ -141,7 +141,6 @@ public class TauDaemonImpl extends TauDaemon {
                         AlertType.COMM_FRIEND_INFO.swig(),
                         AlertType.COMM_NEW_MSG.swig(),
                         AlertType.COMM_CONFIRM_ROOT.swig(),
-                        AlertType.COMM_SYNC_MSG.swig(),
                         AlertType.COMM_LAST_SEEN.swig(),
                         AlertType.BLOCK_CHAIN_HEAD_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_TAIL_BLOCK.swig(),
