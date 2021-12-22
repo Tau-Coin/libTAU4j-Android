@@ -90,6 +90,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         chatViewModel.observeNeedStartDaemon();
         initParameter();
         initLayout();
+        userViewModel.requestFriendInfo(friendPK);
     }
 
     /**
@@ -179,7 +180,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     public void onStart() {
         super.onStart();
         subscribeChatViewModel();
-        userViewModel.requestFriendInfo(friendPK);
     }
 
     @Override
