@@ -21,7 +21,6 @@ import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityFriendsBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
-import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.community.MembersAddActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
@@ -41,7 +40,6 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     private ActivityFriendsBinding binding;
     private UserViewModel userViewModel;
     private CommunityViewModel communityViewModel;
-    private ChatViewModel chatViewModel;
     private FriendsListAdapter adapter;
     private CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
@@ -57,7 +55,6 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         binding.setListener(this);
         ViewModelProvider provider = new ViewModelProvider(this);
         userViewModel = provider.get(UserViewModel.class);
-        chatViewModel = provider.get(ChatViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
         initParameter(getIntent());
         initView();
@@ -126,14 +123,12 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         super.onStart();
         onRefresh();
         subscribeUserList();
-        chatViewModel.startVisitFriend(scannedFriendPk);
 
         userViewModel.getAddFriendResult().observe(this, result -> {
             if (result.isSuccess()) {
                 ToastUtils.showShortToast(result.getMsg());
             } else {
                 userViewModel.closeDialog();
-                chatViewModel.startVisitFriend(scannedFriendPk);
                 scannedFriendPk = result.getMsg();
                 adapter = new FriendsListAdapter(this, page, order, scannedFriendPk);
                 binding.recyclerList.setAdapter(adapter);
@@ -145,7 +140,6 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     @Override
     public void onStop() {
         super.onStop();
-        chatViewModel.stopVisitFriend();
         disposables.clear();
     }
 
@@ -210,17 +204,6 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
             intent.putExtra(IntentExtra.PUBLIC_KEY, user.publicKey);
             intent.putExtra(IntentExtra.TYPE, UserDetailActivity.TYPE_FRIEND_LIST);
             ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
-        }
-    }
-
-    @Override
-    public void onProcessClicked(UserAndFriend user) {
-        if (user.isAdded()) {
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.TYPE, UserQRCodeActivity.TYPE_QR_SHARE);
-            ActivityUtil.startActivity(intent, this, UserQRCodeActivity.class);
-        } else {
-            onItemClicked(user);
         }
     }
 

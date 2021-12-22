@@ -52,17 +52,6 @@ public class FriendRepositoryImpl implements FriendRepository{
         return db.friendDao().queryFriend(userPK, friendPK);
     }
 
-    /**
-     * 查询已获得连接的朋友列表
-     * @param userPK
-     * @param limit
-     * @return
-     */
-    @Override
-    public List<String> queryConnectedFriends(String userPK, int limit) {
-        return db.friendDao().queryConnectedFriends(userPK, limit);
-    }
-
     @Override
     public Observable<String> observeDataSetChanged() {
         return dataSetChangedPublish;
@@ -72,15 +61,6 @@ public class FriendRepositoryImpl implements FriendRepository{
     public void submitDataSetChanged() {
         String dateTime = DateUtil.getDateTime();
         sender.submit(() -> dataSetChangedPublish.onNext(dateTime));
-    }
-
-    /**
-     * 获取活跃的朋友
-     * @return 活跃的朋友列表
-     */
-    @Override
-    public Flowable<List<String>> getActiveFriends() {
-        return db.friendDao().getActiveFriends();
     }
 
     /**

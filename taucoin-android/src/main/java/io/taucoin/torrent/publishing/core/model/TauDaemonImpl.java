@@ -10,11 +10,9 @@ import org.libTAU4j.alerts.Alert;
 import org.libTAU4j.alerts.AlertType;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
@@ -47,7 +45,6 @@ public class TauDaemonImpl extends TauDaemon {
         super(appContext);
         tauDaemonAlertHandler = new TauDaemonAlertHandler(appContext, this);
         friendRepo = RepositoryHelper.getFriendsRepository(appContext);
-        observeActiveFriends();
     }
 
     /**
@@ -290,52 +287,6 @@ public class TauDaemonImpl extends TauDaemon {
         }
         return isSuccess;
     }
-
-//    /**
-//     * 设置正在聊天的朋友
-//     * @param friendPk 朋友公钥
-//     */
-//    @Override
-//    public void setChattingFriend(String friendPk) {
-//        if (isRunning) {
-//            sessionManager.setChattingFriend(friendPk);
-//            logger.debug("setChattingFriend friendPk::{}", friendPk);
-//        }
-//    }
-//
-//    /**
-//     * 取消正在聊天的朋友
-//     */
-//    @Override
-//    public void unsetChattingFriend() {
-//        if (isRunning) {
-//            sessionManager.unsetChattingFriend();
-//            logger.debug("unsetChattingFriend success");
-//        }
-//    }
-
-    /**
-     * 观察活跃朋友的变化
-     */
-    private void observeActiveFriends() {
-//        Disposable disposable = friendRepo.getActiveFriends()
-//                .subscribeOn(Schedulers.io())
-//                .sample(1, TimeUnit.MINUTES, true)
-//                .subscribe(this::setActiveFriends);
-//        disposables.add(disposable);
-    }
-
-//    /**
-//     * 设置活跃的朋友
-//     */
-//    @Override
-//    public void setActiveFriends(List<String> friends) {
-//        if (isRunning) {
-//            ArrayList<String> activeFriends = new ArrayList<>(friends);
-//            sessionManager.setActiveFriends(activeFriends);
-//            logger.debug("setActiveFriends size::{}", activeFriends.size());
-//        }
-//    }
 
     /**
      * 设置libTAU主循环时间间隔

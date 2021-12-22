@@ -30,22 +30,9 @@ public interface FriendRepository {
      */
     Friend queryFriend(String userPK, String friendPK);
 
-    /**
-     * 查询已获得连接的朋友列表
-     * @param userPK
-     * @return
-     */
-    List<String> queryConnectedFriends(String userPK, int limit);
-
     Observable<String> observeDataSetChanged();
 
     void submitDataSetChanged();
-
-    /**
-     * 获取活跃的朋友
-     * @return 活跃的朋友列表
-     */
-    Flowable<List<String>> getActiveFriends();
 
     /**
      * 查询自己的朋友

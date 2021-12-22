@@ -453,7 +453,7 @@ public class CommunityViewModel extends AndroidViewModel {
                 String userPk = MainApplication.getInstance().getPublicKey();
                 Friend friend = friendRepo.queryFriend(userPk, friendPk);
                 if (friend != null) {
-                    friend.status = FriendStatus.CONNECTED.getStatus();
+                    friend.status = FriendStatus.ADDED.getStatus();
                 }
                 result.setMsg(friendPk);
             }catch (Exception e){

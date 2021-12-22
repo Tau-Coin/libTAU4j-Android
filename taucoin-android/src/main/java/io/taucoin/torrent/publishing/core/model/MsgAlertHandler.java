@@ -209,15 +209,15 @@ class MsgAlertHandler {
                 ChatViewModel.syncSendMessageTask(appContext, userPk, friendPk, msg, MessageType.TEXT.getType());
                 // 更新本地朋友关系
                 friend = new Friend(userPk, friendPk);
-                friend.status = FriendStatus.CONNECTED.getStatus();
+                friend.status = FriendStatus.ADDED.getStatus();
                 friend.lastSeenTime = lastSeenTime;
                 friend.onlineCount = 1;
                 friendRepo.addFriend(friend);
             }
         } else {
             boolean isUpdate = false;
-            if (friend.status != FriendStatus.CONNECTED.getStatus()) {
-                friend.status = FriendStatus.CONNECTED.getStatus();
+            if (friend.status != FriendStatus.ADDED.getStatus()) {
+                friend.status = FriendStatus.ADDED.getStatus();
                 isUpdate = true;
             }
             // 当前时间比上次更新时间大于1s

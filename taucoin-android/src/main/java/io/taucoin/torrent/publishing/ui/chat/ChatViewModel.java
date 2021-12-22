@@ -41,7 +41,6 @@ import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.HashUtil;
 import io.taucoin.torrent.publishing.core.utils.MsgSplitUtil;
-import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
@@ -62,7 +61,6 @@ public class ChatViewModel extends AndroidViewModel {
     private MutableLiveData<Result> resentResult = new MutableLiveData<>();
     private MutableLiveData<List<ChatMsg>> chatMessages = new MutableLiveData<>();
     private TauDaemon daemon;
-    private Disposable chattingDisposable = null;
     public ChatViewModel(@NonNull Application application) {
         super(application);
         chatRepo = RepositoryHelper.getChatRepository(getApplication());
@@ -92,9 +90,6 @@ public class ChatViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
         disposables.clear();
-        if (chattingDisposable != null && !chattingDisposable.isDisposed()) {
-            chattingDisposable.dispose();
-        }
     }
 
     /**
@@ -361,32 +356,6 @@ public class ChatViewModel extends AndroidViewModel {
      */
     Observable<List<ChatMsgLog>> observerMsgLogs(String hash) {
         return chatRepo.observerMsgLogs(hash);
-    }
-
-    /**
-     * 当留在该朋友聊天页面时，只访问该朋友
-     * @param friendPk 要访问的朋友
-     */
-    public void startVisitFriend(String friendPk) {
-//        if (StringUtil.isEmpty(friendPk)) {
-//            return;
-//        }
-//        if (null == chattingDisposable) {
-//            daemon.setChattingFriend(friendPk);
-//        }
-//        chattingDisposable = ObservableUtil.intervalSeconds(1)
-//            .subscribeOn(Schedulers.io())
-//            .subscribe(l -> daemon.setChattingFriend(friendPk));
-    }
-
-    /**
-     * 当离开朋友聊天页面时，取消对朋友的单独访问
-     */
-    public void stopVisitFriend() {
-//        if (chattingDisposable != null && !chattingDisposable.isDisposed()) {
-//            chattingDisposable.dispose();
-//        }
-//        daemon.unsetChattingFriend();
     }
 
     void loadMessagesData(String friendPk, int pos) {

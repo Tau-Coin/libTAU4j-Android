@@ -112,17 +112,9 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
             if (type == FriendsActivity.PAGE_FRIENDS_LIST) {
                 showName = UsersUtil.getShowNameWithYourself(user, user.publicKey);
                 showNameBuilder.append(showName);
-                int stateProgress = 100;
                 if (user.isDiscovered()) {
-                    stateProgress = 0;
                     showNameBuilder.append(" ")
                             .append(context.getString(R.string.contacts_discovered))
-                            .setForegroundColor(context.getResources().getColor(R.color.color_blue))
-                            .setFontSize(12, true);
-                } else if (user.isAdded()) {
-                    stateProgress = 50;
-                    showNameBuilder.append(" ")
-                            .append(context.getString(R.string.contacts_added))
                             .setForegroundColor(context.getResources().getColor(R.color.color_blue))
                             .setFontSize(12, true);
                 } else {
@@ -132,9 +124,6 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
                             .setFontSize(12, true)
                             .setSuperscript();
                 }
-
-                holder.binding.stateProgress.setVisibility(View.VISIBLE);
-                holder.binding.stateProgress.setProgress(stateProgress);
             } else {
                 showName = UsersUtil.getShowName(user, user.publicKey);
                 showNameBuilder.append(showName);
@@ -195,11 +184,6 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
                     listener.onShareClicked(user);
                 }
             });
-            holder.binding.stateProgress.setOnClickListener(v -> {
-                if(listener != null){
-                    listener.onProcessClicked(user);
-                }
-            });
             // 新朋友高亮显示
             boolean isNewScanFriend = StringUtil.isEquals(friendPk, user.publicKey);
             bgColor = isNewScanFriend ? R.color.color_bg : R.color.color_white;
@@ -210,7 +194,6 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
     public interface ClickListener {
         void onItemClicked(UserAndFriend item);
         void onShareClicked(UserAndFriend item);
-        void onProcessClicked(UserAndFriend item);
     }
 
     static abstract class ItemCallback extends DiffUtil.ItemCallback<UserAndFriend> {

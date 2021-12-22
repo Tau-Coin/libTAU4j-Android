@@ -179,13 +179,11 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     public void onStart() {
         super.onStart();
         subscribeChatViewModel();
-        chatViewModel.startVisitFriend(friendPK);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        chatViewModel.stopVisitFriend();
         disposables.clear();
         // 关闭键盘和加号视图窗口
         binding.etMessage.clearFocus();
