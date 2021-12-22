@@ -49,6 +49,22 @@ public class FriendInfo {
         return nickname;
     }
 
+    public byte[] getRemark() {
+        if (!parsed) {
+            parseRLP();
+        }
+
+        return remark;
+    }
+
+    public byte[] getDeviceID() {
+        if (!parsed) {
+            parseRLP();
+        }
+
+        return deviceID;
+    }
+
     public BigInteger getTimestamp() {
         if (!parsed) {
             parseRLP();

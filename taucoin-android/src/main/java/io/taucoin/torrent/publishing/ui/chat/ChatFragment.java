@@ -179,6 +179,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     public void onStart() {
         super.onStart();
         subscribeChatViewModel();
+        userViewModel.requestFriendInfo(friendPK);
     }
 
     @Override

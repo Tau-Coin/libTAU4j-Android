@@ -13,6 +13,7 @@ import java.util.List;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
+import io.taucoin.torrent.publishing.core.model.data.FriendInfo;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
@@ -212,42 +213,44 @@ class MsgAlertHandler {
     }
 
     /**
-     * 新device ID通知
+     * 添加新的device ID
      * @param deviceID device id
      * @param userPk 当前用户的公钥
      */
-    void onNewDeviceID(String deviceID, String userPk) {
+    void addNewDeviceID(String deviceID, String userPk) {
         logger.debug("onNewDeviceID userPk::{}, deviceID::{}",
                 userPk, deviceID);
-        Device device = new Device(userPk, deviceID, DateUtil.getTime());
-        deviceRepo.addDevice(device);
+        if (StringUtil.isNotEmpty(deviceID) && StringUtil.isNotEmpty(userPk)) {
+            Device device = new Device(userPk, deviceID, DateUtil.getTime());
+            deviceRepo.addDevice(device);
+        }
     }
 
     /**
-     * 多设备的新朋友通知
+     * 多设备或者朋友信息同步
      * @param userPk 当前用户的公钥
-     * @param friendPk 发现的新朋友公钥
-     * @param nickname 昵称
-     * @param timestamp 起名字的时间戳
+     * @param bean 朋友信息
      */
-    void onNewFriendFromMultiDevice(String userPk, byte[] friendPk, byte[] nickname, BigInteger timestamp) {
-        String friendPkStr = ByteUtil.toHexString(friendPk);
-        logger.debug("onNewFriend userPk::{}, friendPk::{}",
-                userPk, friendPkStr);
+    void onFriendInfo(String userPk, FriendInfo bean) {
+        String friendPkStr = ByteUtil.toHexString(bean.getPubKey());
+        byte[] nickname = bean.getNickname();
+        byte[] remark = bean.getRemark();
+        BigInteger timestamp = bean.getTimestamp();
+        logger.debug("onNewFriend userPk::{}, friendPk::{}", userPk, friendPkStr);
         User user = userRepo.getUserByPublicKey(friendPkStr);
         // 多设备朋友同步
         if (null == user) {
             user = new User(friendPkStr);
-            if (nickname != null && timestamp != null) {
-                user.nickname = Utils.textBytesToString(nickname);
-                user.updateTime = timestamp.longValue();
-            }
+            user.nickname = Utils.textBytesToString(nickname);
+            user.remark = Utils.textBytesToString(remark);
+            user.updateTime = timestamp.longValue();
             userRepo.addUser(user);
         } else {
             // 多设备朋友昵称同步
-            if (nickname != null && timestamp != null &&
+            if ((nickname != null || remark != null) && timestamp != null &&
                     timestamp.compareTo(BigInteger.valueOf(user.updateTime)) > 0) {
                 user.nickname = Utils.textBytesToString(nickname);
+                user.remark = Utils.textBytesToString(remark);
                 user.updateTime = timestamp.longValue();
                 userRepo.updateUser(user);
             }
@@ -260,7 +263,7 @@ class MsgAlertHandler {
         if (StringUtil.isNotEquals(userPk, friendPkStr)) {
             Friend friend = friendRepo.queryFriend(userPk, friendPkStr);
             if (friend != null) {
-                if (friend.status == FriendStatus.DISCOVERED.getStatus()) {
+                if (isSuccess && friend.status == FriendStatus.DISCOVERED.getStatus()) {
                     friend.status = FriendStatus.ADDED.getStatus();
                     friendRepo.updateFriend(friend);
                 }
@@ -269,6 +272,12 @@ class MsgAlertHandler {
                 friend = new Friend(userPk, friendPkStr, status);
                 friendRepo.addFriend(friend);
             }
+        }
+
+        byte[] deviceID = bean.getDeviceID();
+        // 如果是自己的信息，添加设备ID
+        if (StringUtil.isEquals(userPk, friendPkStr)) {
+            addNewDeviceID(Utils.textBytesToString(deviceID), userPk);
         }
     }
 }

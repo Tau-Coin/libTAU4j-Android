@@ -1056,4 +1056,11 @@ public class UserViewModel extends AndroidViewModel {
             .subscribe();
         disposables.add(disposable);
     }
+
+    /**
+     * 请求更新朋友信息
+     */
+    public void requestFriendInfo(String friendPk) {
+        daemon.requestFriendInfo(friendPk);
+    }
 }

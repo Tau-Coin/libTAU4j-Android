@@ -137,7 +137,6 @@ public class TauDaemonImpl extends TauDaemon {
                         AlertType.PORTMAP.swig(),
                         AlertType.PORTMAP_ERROR.swig(),
                         AlertType.LISTEN_SUCCEEDED.swig(),
-                        AlertType.COMM_NEW_DEVICE_ID.swig(),
                         AlertType.COMM_FRIEND_INFO.swig(),
                         AlertType.COMM_NEW_MSG.swig(),
                         AlertType.COMM_CONFIRM_ROOT.swig(),

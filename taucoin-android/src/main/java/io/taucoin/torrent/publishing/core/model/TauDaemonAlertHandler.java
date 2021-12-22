@@ -83,10 +83,6 @@ class TauDaemonAlertHandler {
                 // 多设备新的DeviceID
                 onDiscoverFriend(alert, alertAndUser.getUserPk());
                 break;
-            case COMM_NEW_DEVICE_ID:
-                // 多设备新的DeviceID
-                onNewDeviceID(alert, alertAndUser.getUserPk());
-                break;
             case COMM_FRIEND_INFO:
                 // 朋友信息
                 onFriendInfo(alert, alertAndUser.getUserPk());
@@ -164,18 +160,6 @@ class TauDaemonAlertHandler {
     }
 
     /**
-     * 多设备新的DeviceID
-     * @param alert libTAU上报
-     * @param userPk 当前用户公钥
-     */
-    private void onNewDeviceID(Alert alert, String userPk) {
-        CommNewDeviceIdAlert deviceIdAlert = (CommNewDeviceIdAlert) alert;
-        logger.info(deviceIdAlert.get_message());
-        String deviceID = deviceIdAlert.get_device_id();
-        msgListenHandler.onNewDeviceID(deviceID, userPk);
-    }
-
-    /**
      * 更新本地朋友信息
      * @param alert libTAU上报
      * @param userPk 当前用户公钥
@@ -186,9 +170,8 @@ class TauDaemonAlertHandler {
         byte[] friendInfo = friendInfoAlert.get_friend_info();
         if (friendInfo.length > 0) {
             FriendInfo bean = new FriendInfo(friendInfo);
-            // 更新朋友信息：昵称
-            msgListenHandler.onNewFriendFromMultiDevice(userPk, bean.getPubKey(), bean.getNickname(),
-                    bean.getTimestamp());
+            // 更新朋友信息
+            msgListenHandler.onFriendInfo(userPk, bean);
         }
     }
 
@@ -201,7 +184,7 @@ class TauDaemonAlertHandler {
             byte[] seedBytes = ByteUtil.toByte(seed);
             Pair<byte[], byte[]> keypair = Ed25519.createKeypair(seedBytes);
             String userPk = ByteUtil.toHexString(keypair.first);
-            msgListenHandler.onNewDeviceID(deviceID, userPk);
+            msgListenHandler.addNewDeviceID(deviceID, userPk);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .subscribe();

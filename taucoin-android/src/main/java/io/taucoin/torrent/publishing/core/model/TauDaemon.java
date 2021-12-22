@@ -535,6 +535,16 @@ public abstract class TauDaemon {
     }
 
     /**
+     * 请求更新朋友信息
+     */
+    public void requestFriendInfo(String friendPk) {
+        if (isRunning) {
+            sessionManager.requestFriendInfo(friendPk);
+            logger.debug("requestFriendInfo::{}", friendPk);
+        }
+    }
+
+    /**
      *  更新libTAU Bootstrap Interval
      * @param interval 时间间隔
      */
