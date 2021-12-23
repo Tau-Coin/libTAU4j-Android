@@ -157,6 +157,11 @@ public class ChatViewModel extends AndroidViewModel {
                     long endTime = System.currentTimeMillis();
                     logger.debug("sendBatchDebugMessage no::{}, time::{}", i, endTime - startTime);
                     msg.setLength(0);
+                    try {
+                        Thread.sleep(100);
+                    } catch (Exception e) {
+                        break;
+                    }
                 }
                 inputStream.close();
             } catch (Exception e) {
@@ -201,6 +206,12 @@ public class ChatViewModel extends AndroidViewModel {
                     String msg = randomChar + FmtMicrometer.fmtTestData( i + 1);
                     String senderPk = MainApplication.getInstance().getPublicKey();
                     syncSendMessageTask(senderPk, friendPk, msg, MessageType.TEXT.getType());
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (Exception e) {
+                        break;
+                    }
                 }
             } catch (Exception ignore) {
             }
