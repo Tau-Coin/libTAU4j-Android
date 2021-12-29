@@ -1,10 +1,13 @@
 package io.taucoin.torrent.publishing.core.utils;
 
+import android.graphics.Bitmap;
+
 import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.utils.media.MediaUtil;
 
 /**
  * 用户相关逻辑处理类
@@ -176,5 +179,23 @@ public class UsersUtil {
             return hidePublicKey;
         }
         return publicKey;
+    }
+
+    /**
+     * 获取用户头像
+     * @param user 用户信息
+     * @return Bitmap
+     */
+    public static Bitmap getHeadPic(@NonNull User user) {
+        Bitmap bitmap = null;
+        if (user.headPic != null) {
+            bitmap = MediaUtil.bytes2Bitmap(user.headPic);
+        }
+        if (null == bitmap) {
+            int bgColor = Utils.getGroupColor(user.publicKey);
+            String firstLettersName = StringUtil.getFirstLettersOfName(getShowName(user));
+            bitmap = BitmapUtil.createLogoBitmap(bgColor, firstLettersName);
+        }
+        return bitmap;
     }
 }

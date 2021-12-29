@@ -9,21 +9,23 @@ import io.taucoin.torrent.publishing.core.utils.rlp.RLPList;
 public class FriendInfo {
     byte[] pubKey;
     byte[] nickname;
-    byte[] remark;
     byte[] deviceID;
-    byte[] avatar;
+    byte[] headPic;
     BigInteger timestamp;
+    double longitude;
+    double latitude;
 
     private byte[] rlpEncoded; // 编码数据
     private boolean parsed = false; // 解析标志
 
-    public FriendInfo(byte[] deviceID, byte[] pubKey, byte[] nickname, byte[] remark, byte[] avatar,
-                      BigInteger timestamp) {
+    public FriendInfo(byte[] deviceID, byte[] pubKey, byte[] nickname, byte[] headPic,
+                      double longitude, double latitude, BigInteger timestamp) {
         this.deviceID = deviceID;
         this.pubKey = pubKey;
         this.nickname = nickname;
-        this.remark = remark;
-        this.avatar = avatar;
+        this.headPic = headPic;
+        this.longitude = longitude;
+        this.latitude = latitude;
         this.timestamp = timestamp;
 
         this.parsed = true;
@@ -49,12 +51,28 @@ public class FriendInfo {
         return nickname;
     }
 
-    public byte[] getRemark() {
+    public byte[] getHeadPic() {
         if (!parsed) {
             parseRLP();
         }
 
-        return remark;
+        return headPic;
+    }
+
+    public double getLongitude() {
+        if (!parsed) {
+            parseRLP();
+        }
+
+        return longitude;
+    }
+
+    public double getLatitude() {
+        if (!parsed) {
+            parseRLP();
+        }
+
+        return latitude;
     }
 
     public byte[] getDeviceID() {
@@ -83,10 +101,11 @@ public class FriendInfo {
         this.deviceID = list.get(0).getRLPData();
         this.pubKey = list.get(1).getRLPData();
         this.nickname = list.get(2).getRLPData();
-        this.remark = list.get(3).getRLPData();
-        byte[] timeBytes = list.get(4).getRLPData();
+        byte[] timeBytes = list.get(3).getRLPData();
         this.timestamp = (null == timeBytes) ? BigInteger.ZERO: new BigInteger(1, timeBytes);
-        this.avatar = list.get(5).getRLPData();
+        this.headPic = list.get(4).getRLPData();
+        this.longitude = RLP.decodeDouble(list, 5, 0);
+        this.latitude = RLP.decodeDouble(list, 6, 0);
 
         this.parsed = true;
     }
@@ -100,11 +119,13 @@ public class FriendInfo {
             byte[] deviceID = RLP.encodeElement(this.deviceID);
             byte[] pubKey = RLP.encodeElement(this.pubKey);
             byte[] nickname = RLP.encodeElement(this.nickname);
-            byte[] remark = RLP.encodeElement(this.remark);
-            byte[] avatar = RLP.encodeElement(this.avatar);
+            byte[] headPic = RLP.encodeElement(this.headPic);
             byte[] timestamp = RLP.encodeBigInteger(this.timestamp);
+            byte[] longitude = RLP.encodeDouble(this.longitude);
+            byte[] latitude = RLP.encodeDouble(this.latitude);
 
-            this.rlpEncoded = RLP.encodeList(deviceID, pubKey, nickname, remark, avatar, timestamp);
+            this.rlpEncoded = RLP.encodeList(deviceID, pubKey, nickname, timestamp, headPic,
+                    longitude, latitude);
         }
 
         return rlpEncoded;

@@ -159,7 +159,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
 
         binding.refreshLayout.setOnRefreshListener(this);
 
-        adapter = new ChatListAdapter(this, friendPK);
+        adapter = new ChatListAdapter(this);
         adapter.setFriend(friend);
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         layoutManager.setStackFromEnd(true);
@@ -206,6 +206,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
 
         chatViewModel.onCleared();
         userViewModel.onCleared();
+        adapter.recycle();
     }
 
     private final Runnable handleUpdateAdapter = () -> {

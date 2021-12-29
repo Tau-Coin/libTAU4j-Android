@@ -18,21 +18,13 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true">
 
-            <io.taucoin.torrent.publishing.ui.customviews.RoundButton
+            <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
                 android:id="@+id/left_view"
                 android:layout_width="@dimen/widget_size_50"
                 android:layout_height="@dimen/widget_size_50"
                 android:layout_marginEnd="@dimen/widget_size_7"
                 android:layout_marginTop="@dimen/widget_size_2"
-                android:gravity="center"
-                android:textAllCaps="true"
-                android:textColor="@color/color_white"
-                android:textAppearance="@style/TextAppearanceHeadline6"
-                app:btnStrokeColor="@color/primary_light"
-                app:btnStrokeWidth="0dp"
-                app:btnCornerRadius="@dimen/widget_size_7"
-                app:btnSolidColor="@color/primary_light"
-                app:btnPressedRatio="1.5" />
+                android:scaleType="centerCrop"/>
 
             <View
                 android:id="@+id/msg_unread"

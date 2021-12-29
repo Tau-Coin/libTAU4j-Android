@@ -427,6 +427,14 @@
         Please enable camera rights for TAU, it is forbidden now.
     </string>
 
+    <string name="permission_tip_location_denied">
+         Please enable location rights for TAU, it is disabled.
+    </string>
+
+    <string name="permission_tip_location_never_ask_again">
+        Please enable location rights for TAU, it is forbidden now.
+    </string>
+
     <string name="permission_tip_upgrade_denied">
          Please enable storage rights for TAU, it is disabled.
     </string>

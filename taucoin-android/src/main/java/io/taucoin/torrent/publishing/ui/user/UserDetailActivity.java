@@ -17,6 +17,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
@@ -156,8 +157,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         binding.tvNickName.setVisibility(isMine ? View.GONE : View.VISIBLE);
         String showName = UsersUtil.getShowName(user);
         binding.tvShowName.setText(showName);
-        binding.leftView.setText(StringUtil.getFirstLettersOfName(showName));
-        binding.leftView.setBgColor(Utils.getGroupColor(user.publicKey));
+        binding.leftView.setImageBitmap(UsersUtil.getHeadPic(userInfo));
         String midHideName = UsersUtil.getMidHideName(user.publicKey);
         binding.tvPublicKey.setText(getString(R.string.user_public_key, midHideName));
         binding.ivPublicKeyCopy.setOnClickListener(v -> {
@@ -228,12 +228,18 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
      * 打开聊天页面
      * @param chainID
      */
-    private void openChatActivity(String chainID){
+    private void openChatActivity(String chainID) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.CHAIN_ID, chainID);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(IntentExtra.TYPE, 1);
         intent.putExtra(IntentExtra.BEAN, this.user);
         ActivityUtil.startActivity(intent, this, MainActivity.class);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BitmapUtil.recycleImageView(binding.leftView);
     }
 }

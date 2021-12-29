@@ -39,9 +39,12 @@ import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
+import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
@@ -74,7 +77,9 @@ public abstract class TauDaemon {
     private SystemServiceManager systemServiceManager;
     private ExecutorService exec = Executors.newSingleThreadExecutor();
     private TauInfoProvider tauInfoProvider;
+    private LocationManagerUtil locationManager;
     private Disposable updateInterfacesTimer;    // 更新libTAU监听接口定时任务
+    private Disposable updateLocationTimer;    // 更新位置信息定时任务
     private Disposable noRemainingDataTimer; // 触发无剩余流量的提示定时任务
     TauDaemonAlertHandler tauDaemonAlertHandler; // libTAU上报的Alert处理程序
     volatile boolean isRunning = false;
@@ -104,7 +109,7 @@ public abstract class TauDaemon {
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
         systemServiceManager = SystemServiceManager.getInstance();
         tauInfoProvider = TauInfoProvider.getInstance(this);
-
+        locationManager = new LocationManagerUtil(appContext);
         deviceID = DeviceUtils.getCustomDeviceID(appContext);
         sessionManager = new SessionManager(true);
 
@@ -130,8 +135,8 @@ public abstract class TauDaemon {
                     handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
                     // 防止第一次更新时，链端未启动成功，后面无法触发
                     handleSettingsChanged(appContext.getString(R.string.pref_key_main_loop_frequency));
-                    // 把自己当作朋友添加进libTAU
-                    addYourselfAsFriend();
+                    // 更新当前用户自己的信息
+                    updateCurrentUserInfo();
                     // 账户自动更新
                     accountAutoRenewal();
                 }
@@ -290,6 +295,10 @@ public abstract class TauDaemon {
         if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
             noRemainingDataTimer.dispose();
         }
+        if (updateLocationTimer != null && !updateLocationTimer.isDisposed()) {
+            updateLocationTimer.dispose();
+        }
+        locationManager.stopLocation();
         appContext.unregisterReceiver(powerReceiver);
         appContext.unregisterReceiver(connectionReceiver);
         sessionManager.stop();
@@ -522,12 +531,24 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 更新朋友信息
+     * 更新当前用户信息
      */
-    private void addYourselfAsFriend() {
+    public void updateCurrentUserInfo() {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
-            User user = RepositoryHelper.getUserRepository(appContext).getCurrentUser();
-            updateFriendInfo(user);
+            UserRepository userRepo = RepositoryHelper.getUserRepository(appContext);
+            User user = userRepo.getCurrentUser();
+            if (user != null) {
+                double longitude = locationManager.getLongitude();
+                double latitude = locationManager.getLatitude();
+                if ((longitude > 0 && user.longitude != longitude) ||
+                        (latitude > 0 && user.latitude != latitude)) {
+                    user.longitude = longitude;
+                    user.latitude = latitude;
+                    user.updateTime = getSessionTime() / 1000;
+                    userRepo.updateUser(user);
+                }
+                updateFriendInfo(user);
+            }
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .subscribe();
@@ -564,6 +585,22 @@ public abstract class TauDaemon {
      */
     public void accountAutoRenewal() {
         tauDaemonAlertHandler.accountAutoRenewal();
+    }
+
+    /**
+     * 开始定位
+     */
+    public void startLocation() {
+        if (locationManager.isNeedPermission()) {
+            logger.debug("No location permission");
+            return;
+        }
+        if (null == updateLocationTimer || updateLocationTimer.isDisposed()) {
+            locationManager.startLocation();
+            updateLocationTimer = ObservableUtil.intervalSeconds(3600)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe( l -> locationManager.startLocation());
+        }
     }
 
     /**

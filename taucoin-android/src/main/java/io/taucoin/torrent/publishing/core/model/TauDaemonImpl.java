@@ -234,20 +234,23 @@ public class TauDaemonImpl extends TauDaemon {
             isSuccess = addNewFriend(friend.publicKey);
             String deviceID = DeviceUtils.getCustomDeviceID(appContext);
             byte[] nickname = null;
-            byte[] remark = null;
-            byte[] avatar = null;
-            BigInteger timestamp = BigInteger.ZERO;
-            if (StringUtil.isNotEmpty(friend.nickname) || StringUtil.isNotEmpty(friend.remark)) {
+            byte[] headPic = null;
+            if (StringUtil.isNotEmpty(friend.nickname) || friend.headPic!= null ||
+                friend.longitude > 0 || friend.latitude > 0) {
                 nickname = Utils.textStringToBytes(friend.nickname);
-                remark = Utils.textStringToBytes(friend.remark);
-                timestamp = BigInteger.valueOf(friend.updateTime);
+                headPic = friend.headPic;
             }
+            BigInteger timestamp = BigInteger.valueOf(getSessionTime() / 1000);
             FriendInfo friendInfo = new FriendInfo(Utils.textStringToBytes(deviceID),
-                    ByteUtil.toByte(friendPk), nickname, remark, avatar, timestamp);
-            logger.debug("updateFriendInfo publicKey::{}, nickname::{}, remark::{}, isSuccess::{}",
-                    friend.publicKey, friend.nickname, friend.remark, isSuccess);
+                    ByteUtil.toByte(friendPk), nickname, headPic, friend.longitude,
+                    friend.latitude, timestamp);
+            byte[] encoded = friendInfo.getEncoded();
+            logger.debug("updateFriendInfo publicKey::{}, nickname::{}, longitude::{}, " +
+                            "latitude::{}, isSuccess::{}, encoded.length::{}",
+                    friend.publicKey, friend.nickname, friend.longitude,
+                    friend.latitude, isSuccess, encoded.length);
             // 更新朋友信息
-            updateFriendInfo(friendPk, friendInfo.getEncoded());
+            updateFriendInfo(friendPk, encoded);
         }
         return isSuccess;
     }

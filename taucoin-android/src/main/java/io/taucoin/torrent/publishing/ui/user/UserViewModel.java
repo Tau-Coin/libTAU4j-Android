@@ -13,6 +13,8 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.manager.PictureCacheManager;
 
 import org.libTAU4j.Ed25519;
 import org.libTAU4j.Pair;
@@ -65,6 +67,7 @@ import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
+import io.taucoin.torrent.publishing.core.utils.media.MediaUtil;
 import io.taucoin.torrent.publishing.databinding.AddFriendDialogBinding;
 import io.taucoin.torrent.publishing.databinding.BanDialogBinding;
 import io.taucoin.torrent.publishing.databinding.ContactsDialogBinding;
@@ -237,7 +240,6 @@ public class UserViewModel extends AndroidViewModel {
                 } else {
                     if (StringUtil.isNotEmpty(name)) {
                         newUser.nickname = name;
-                        newUser.updateTime = daemon.getSessionTime() / 1000;
                     }
                     newUser.seed = seed;
                     newUser.isCurrentUser = true;
@@ -515,7 +517,6 @@ public class UserViewModel extends AndroidViewModel {
             if (user != null) {
                 if (StringUtil.isNotEmpty(name)) {
                     user.nickname = name;
-                    user.updateTime = DateUtil.getTime();
                 }
                 String currentUserPk = userRepo.getCurrentUser().publicKey;
                 userRepo.updateUser(user);
@@ -550,7 +551,6 @@ public class UserViewModel extends AndroidViewModel {
             if (user != null) {
                 if (StringUtil.isNotEmpty(name)) {
                     user.remark = name;
-                    user.updateTime = daemon.getSessionTime() / 1000;
                 }
                 String currentUserPk = userRepo.getCurrentUser().publicKey;
                 userRepo.updateUser(user);
@@ -647,14 +647,12 @@ public class UserViewModel extends AndroidViewModel {
             user = new User(publicKey);
             if (StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
-                user.updateTime = DateUtil.getTime();
             }
             userRepo.addUser(user);
         } else {
             logger.debug("AddFriendsLocally, user exist");
             if (StringUtil.isEmpty(user.nickname) && StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
-                user.updateTime = DateUtil.getTime();
                 userRepo.updateUser(user);
             }
         }
@@ -1064,5 +1062,22 @@ public class UserViewModel extends AndroidViewModel {
         if (StringUtil.isNotEmpty(friendPk)) {
             daemon.requestFriendInfo(friendPk);
         }
+    }
+
+    public void updateHeadPic(LocalMedia media) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            byte[] headPic = MediaUtil.media2Bytes(media);
+            User user = userRepo.getCurrentUser();
+            if (headPic != null) {
+                user.headPic = headPic;
+                daemon.updateFriendInfo(user);
+                userRepo.updateUser(user);
+            }
+            MediaUtil.deleteAllCacheImageFile();
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+        disposables.add(disposable);
     }
 }

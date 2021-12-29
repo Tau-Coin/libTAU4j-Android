@@ -20,6 +20,9 @@ public class User implements Parcelable {
     public String remark;                   // 用户备注
     public String nickname;                 // 用户昵称
     public long updateTime;                 // 备注更新时间
+    public double longitude;                // 经纬度
+    public double latitude;                 // 纬度
+    public byte[] headPic;                  // 头像图片
     public boolean isCurrentUser = false;   // 是否是当前用户
     public boolean isBanned = false;        // 用户是否被用户拉入黑名单
 
@@ -51,6 +54,8 @@ public class User implements Parcelable {
         isCurrentUser = in.readByte() != 0;
         isBanned = in.readByte() != 0;
         updateTime = in.readLong();
+        longitude = in.readDouble();
+        latitude = in.readDouble();
     }
 
     @Override
@@ -62,6 +67,8 @@ public class User implements Parcelable {
         dest.writeByte((byte) (isCurrentUser ? 1 : 0));
         dest.writeByte((byte) (isBanned ? 1 : 0));
         dest.writeLong(updateTime);
+        dest.writeDouble(longitude);
+        dest.writeDouble(latitude);
     }
 
     @Override

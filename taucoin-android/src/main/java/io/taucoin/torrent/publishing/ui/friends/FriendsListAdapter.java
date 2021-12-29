@@ -15,11 +15,14 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.GeoUtils;
 import io.taucoin.torrent.publishing.core.utils.SpanUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
@@ -133,8 +136,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
                         .setFontSize(14, true);
             }
             holder.binding.tvName.setText(showNameBuilder.create());
-            String firstLetters = StringUtil.getFirstLettersOfName(showName);
-            holder.binding.leftView.setText(firstLetters);
+            holder.binding.leftView.setImageBitmap(UsersUtil.getHeadPic(user));
 
             String time = "";
             if (order == 0 && user.lastSeenTime > 0) {
@@ -171,9 +173,21 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
                     ? View.GONE : View.VISIBLE);
             holder.binding.tvCommunities.setText(communities.toString());
 
-            int bgColor = Utils.getGroupColor(user.publicKey);
-            holder.binding.leftView.setBgColor(bgColor);
-
+            User currentUser = MainApplication.getInstance().getCurrentUser();
+            String distance = null;
+            if (currentUser != null) {
+                if (user.longitude != 0 && user.latitude != 0 &&
+                        currentUser.longitude != 0 && currentUser.latitude != 0) {
+                    distance = GeoUtils.getDistanceStr(user.longitude, user.latitude,
+                            currentUser.longitude, currentUser.latitude);
+                }
+            }
+            if (StringUtil.isNotEmpty(distance)) {
+                holder.binding.tvDistance.setText(distance);
+                holder.binding.tvDistance.setVisibility(View.VISIBLE);
+            } else {
+                holder.binding.tvDistance.setVisibility(View.GONE);
+            }
             holder.binding.getRoot().setOnClickListener(v -> {
                 if(listener != null){
                     listener.onItemClicked(user);
@@ -186,6 +200,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
             });
             // 新朋友高亮显示
             boolean isNewScanFriend = StringUtil.isEquals(friendPk, user.publicKey);
+            int bgColor = Utils.getGroupColor(user.publicKey);
             bgColor = isNewScanFriend ? R.color.color_bg : R.color.color_white;
             holder.binding.getRoot().setBackgroundColor(context.getResources().getColor(bgColor));
         }

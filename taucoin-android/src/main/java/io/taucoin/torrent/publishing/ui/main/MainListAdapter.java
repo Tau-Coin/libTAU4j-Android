@@ -114,10 +114,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;
                 String friendNickName = UsersUtil.getShowNameWithYourself(bean.friend, bean.ID);
                 binding.tvGroupName.setText(friendNickName);
-                String firstLetters = StringUtil.getFirstLettersOfName(friendNickName);
-                binding.leftView.setText(firstLetters);
-                int bgColor = Utils.getGroupColor(bean.ID);
-                binding.leftView.setBgColor(bgColor);
+                binding.leftView.setImageBitmap(UsersUtil.getHeadPic(bean.friend));
 
                 byte[] msg = bean.msg;
                 if (bean.msgType == MessageType.PICTURE.getType()) {
@@ -164,7 +161,9 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                             StringUtil.isEquals(oldItem.friend != null ? oldItem.friend.remark : null,
                                     newItem.friend != null ? newItem.friend.remark : null) &&
                             StringUtil.isEquals(oldItem.friend != null ? oldItem.friend.nickname : null,
-                                    newItem.friend != null ? newItem.friend.nickname : null);
+                                    newItem.friend != null ? newItem.friend.nickname : null) &&
+                            Arrays.equals(oldItem.friend != null ? oldItem.friend.headPic : null,
+                            newItem.friend != null ? newItem.friend.headPic : null);
                 }
             }
             return isSame;

@@ -903,6 +903,10 @@ public class RLP {
         return encodeElement(srcString.getBytes());
     }
 
+    public static byte[] encodeDouble(double dou) {
+        return encodeString(String.valueOf(dou));
+    }
+
     public static byte[] encodeInteger(Integer srcInteger) {
         if (srcInteger < 0) throw new RuntimeException("negative numbers are not allowed");
 
@@ -934,6 +938,11 @@ public class RLP {
     public static String decodeString(RLPList list, int index, String defaultVal) {
         byte[] bytes = list.get(index).getRLPData();
         return null == bytes ? defaultVal : new String(bytes);
+    }
+
+    public static double decodeDouble(RLPList list, int index, double defaultVal) {
+        String str = decodeString(list, index, String.valueOf(defaultVal));
+        return Double.parseDouble(str);
     }
 
     public static byte[] decodeElement(RLPList list, int index) {

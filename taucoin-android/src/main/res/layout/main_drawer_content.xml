@@ -22,21 +22,12 @@
                 android:paddingBottom="@dimen/widget_size_5"
                 android:background="@color/color_chat_bg">
 
-                <io.taucoin.torrent.publishing.ui.customviews.RoundButton
+                <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
                     android:id="@+id/round_button"
                     android:layout_width="@dimen/widget_size_60"
                     android:layout_height="@dimen/widget_size_60"
-                    android:textAllCaps="true"
-                    android:textColor="@color/color_white"
-                    android:textStyle="bold"
                     android:layout_centerVertical="true"
-                    android:gravity="center_vertical|center"
-                    android:textAppearance="@style/TextAppearanceHeadline6"
-                    app:btnStrokeColor="@color/primary_light"
-                    app:btnStrokeWidth="0dp"
-                    app:btnSolidColor="@color/primary_dark"
-                    app:btnCornerRadius="@dimen/widget_size_35"
-                    app:btnPressedRatio="1.5" />
+                    android:scaleType="centerCrop"/>
 
                 <LinearLayout
                     android:id="@+id/ll_user_info"

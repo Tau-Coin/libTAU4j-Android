@@ -10,6 +10,8 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/widget_size_2"
+        android:layout_marginBottom="@dimen/widget_size_2"
         android:layout_marginEnd="@dimen/widget_size_10" >
 
         <TextView
@@ -31,19 +33,11 @@
             android:layout_marginStart="@dimen/widget_size_10"
             android:gravity="top">
 
-            <io.taucoin.torrent.publishing.ui.customviews.RoundButton
-                android:id="@+id/round_button"
+            <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
+                android:id="@+id/iv_head_pic"
                 android:layout_width="@dimen/widget_size_40"
                 android:layout_height="@dimen/widget_size_40"
-                android:gravity="center_vertical|center"
-                android:textColor="@color/color_white"
-                android:textAppearance="@style/TextAppearanceHeadline6"
-                android:includeFontPadding="false"
-                app:btnStrokeColor="@color/primary_light"
-                app:btnStrokeWidth="0dp"
-                app:btnCornerRadius="@dimen/widget_size_7"
-                app:btnSolidColor="@color/primary_light"
-                app:btnPressedRatio="1.5" />
+                android:scaleType="centerCrop"/>
 
             <LinearLayout
                 android:id="@+id/middle_view"

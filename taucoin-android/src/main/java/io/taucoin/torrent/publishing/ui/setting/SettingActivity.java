@@ -1,12 +1,20 @@
 package io.taucoin.torrent.publishing.ui.setting;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 
+import com.luck.picture.lib.PictureSelector;
+import com.luck.picture.lib.config.PictureConfig;
+import com.luck.picture.lib.entity.LocalMedia;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -19,9 +27,11 @@ import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
+import io.taucoin.torrent.publishing.core.utils.media.MediaUtil;
 import io.taucoin.torrent.publishing.databinding.ActivitySettingBinding;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
@@ -92,13 +102,19 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
      * @param user 当前用户
      */
     private void updateUserInfo(User user) {
-        if(null == user){
+        if (null == user) {
             return;
         }
         logger.debug("updateUserInfo::{}", user.nickname);
         binding.tvPublicKey.setText(UsersUtil.getMidHideName(user.publicKey));
         String userName = UsersUtil.getCurrentUserName(user);
         binding.tvUsername.setText(userName);
+
+        Bitmap bitmap = UsersUtil.getHeadPic(user);
+        if (bitmap != null) {
+            BitmapUtil.recycleImageView(binding.ivHeadPic);
+            binding.ivHeadPic.setImageBitmap(bitmap);
+        }
     }
 
     @Override
@@ -148,14 +164,44 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
                 String publicKey = MainApplication.getInstance().getPublicKey();
                 viewModel.showEditNameDialog(this, publicKey);
                 break;
+            case R.id.iv_head_pic:
+                MediaUtil.openGalleryAndCamera(this);
+                break;
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == FontSizeActivity.REQUEST_CODE_FONT_SIZE) {
-            refreshAllView();
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case FontSizeActivity.REQUEST_CODE_FONT_SIZE:
+                    refreshAllView();
+                    break;
+                case PictureConfig.CHOOSE_REQUEST:
+                    // 例如 LocalMedia 里面返回五种path
+                    // 1.media.getPath(); 原图path
+                    // 2.media.getCutPath();裁剪后path，需判断media.isCut();切勿直接使用
+                    // 3.media.getCompressPath();压缩后path，需判断media.isCompressed();切勿直接使用
+                    // 4.media.getOriginalPath()); media.isOriginal());为true时此字段才有值
+                    // 5.media.getAndroidQToPath();Android Q版本特有返回的字段，但如果开启了压缩或裁剪还是取裁剪或压缩路径；
+                    // 注意：.isAndroidQTransform 为false 此字段将返回空
+                    // 如果同时开启裁剪和压缩，则取压缩路径为准因为是先裁剪后压缩
+                    List<LocalMedia> result = PictureSelector.obtainMultipleResult(data);
+                    if (result != null && result.size() > 0) {
+                        LocalMedia media = result.get(0);
+                        viewModel.updateHeadPic(media);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BitmapUtil.recycleImageView(binding.ivHeadPic);
     }
 }

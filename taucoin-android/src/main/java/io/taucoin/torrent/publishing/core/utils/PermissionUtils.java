@@ -35,6 +35,7 @@ public class PermissionUtils {
     public static final int REQUEST_PERMISSIONS_CAMERA = 0x10;
     public static final int REQUEST_PERMISSIONS_STORAGE = 0x20;
     public static final int REQUEST_PERMISSIONS_NETWORK = 0x30;
+    public static final int REQUEST_PERMISSIONS_LOCATION = 0x40;
 
     /*Check if the user has completely prohibited pop-up permission requests*/
     public static void checkUserBanPermission(AppCompatActivity activity, String permission, int resMsg) {
@@ -57,7 +58,7 @@ public class PermissionUtils {
         checkUserBanPermission(activity, null, deniedPerms, resMsg);
     }
 
-    static void checkUserBanPermission(AppCompatActivity activity, DialogInterface.OnClickListener onCancelListener,
+    public static void checkUserBanPermission(AppCompatActivity activity, DialogInterface.OnClickListener onCancelListener,
                                        List<String> deniedPerms, int resMsg) {
         String message = activity.getString(resMsg);
         CharSequence positiveButton = activity.getString(R.string.ok);

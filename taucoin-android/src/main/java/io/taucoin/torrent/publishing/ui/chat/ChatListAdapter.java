@@ -1,11 +1,14 @@
 package io.taucoin.torrent.publishing.ui.chat;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import java.util.Arrays;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -16,20 +19,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
-import io.taucoin.torrent.publishing.databinding.ItemPictureBinding;
-import io.taucoin.torrent.publishing.databinding.ItemPictureRightBinding;
 import io.taucoin.torrent.publishing.databinding.ItemTextBinding;
 import io.taucoin.torrent.publishing.databinding.ItemTextRightBinding;
-import io.taucoin.torrent.publishing.ui.customviews.HashImageView;
 import io.taucoin.torrent.publishing.ui.customviews.HashTextView;
-import io.taucoin.torrent.publishing.ui.customviews.RoundButton;
-import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
+import io.taucoin.torrent.publishing.ui.customviews.RoundImageView;
 
 /**
  * 聊天消息的Adapter
@@ -38,24 +37,26 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
 
     enum ViewType {
         LEFT_TEXT,
-        LEFT_PICTURE,
-        RIGHT_TEXT,
-        RIGHT_PICTURE
+        RIGHT_TEXT
     }
     private ClickListener listener;
-    private String showName;
-    private byte[] cryptoKey;
+    private byte[] headPic;
+    private byte[] myHeadPic;
+    private Bitmap bitmap;
+    private Bitmap myBitmap;
 
-    ChatListAdapter(ClickListener listener, String friendPk) {
+    ChatListAdapter(ClickListener listener) {
         super(diffCallback);
         this.listener = listener;
-        this.cryptoKey = Utils.keyExchange(friendPk, MainApplication.getInstance().getSeed());
     }
 
     public void setFriend(User friend) {
         if (friend != null) {
-            this.showName = UsersUtil.getShowName(friend);
-            diffCallback.updateName(showName);
+            if (null == bitmap || bitmap.isRecycled() || !Arrays.equals(headPic, friend.headPic)) {
+                headPic = friend.headPic;
+                this.bitmap = UsersUtil.getHeadPic(friend);
+                notifyDataSetChanged();
+            }
         }
     }
 
@@ -65,19 +66,9 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         ViewDataBinding binding;
-        if (viewType == ViewType.RIGHT_PICTURE.ordinal()) {
-            binding = DataBindingUtil.inflate(inflater,
-                    R.layout.item_picture_right,
-                    parent,
-                    false);
-        } else if (viewType == ViewType.RIGHT_TEXT.ordinal()) {
+        if (viewType == ViewType.RIGHT_TEXT.ordinal()) {
             binding = DataBindingUtil.inflate(inflater,
                     R.layout.item_text_right,
-                    parent,
-                    false);
-        }  else if (viewType == ViewType.LEFT_PICTURE.ordinal()) {
-            binding = DataBindingUtil.inflate(inflater,
-                    R.layout.item_picture,
                     parent,
                     false);
         } else {
@@ -86,7 +77,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
                     parent,
                     false);
         }
-        return new ViewHolder(binding, listener, cryptoKey);
+        return new ViewHolder(binding, listener);
     }
 
     @Override
@@ -100,17 +91,9 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
         String userPk = MainApplication.getInstance().getPublicKey();
         if (chat != null) {
             if (StringUtil.isEquals(userPk, chat.senderPk) ) {
-                if (chat.contentType == MessageType.PICTURE.getType()) {
-                    return ViewType.RIGHT_PICTURE.ordinal();
-                } else {
-                    return ViewType.RIGHT_TEXT.ordinal();
-                }
+                return ViewType.RIGHT_TEXT.ordinal();
             } else {
-                if (chat.contentType == MessageType.PICTURE.getType()) {
-                    return ViewType.LEFT_PICTURE.ordinal();
-                } else {
-                    return ViewType.LEFT_TEXT.ordinal();
-                }
+                return ViewType.LEFT_TEXT.ordinal();
             }
         }
         return ViewType.LEFT_TEXT.ordinal();
@@ -122,59 +105,58 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
         if (position > 0) {
             previousChat = getItem(position - 1);
         }
-        if (getItemViewType(position) == ViewType.RIGHT_PICTURE.ordinal()) {
-            ItemPictureRightBinding binding = (ItemPictureRightBinding) holder.binding;
-            holder.bindPictureRight(binding, getItem(position), previousChat);
-        } else if (getItemViewType(position) == ViewType.RIGHT_TEXT.ordinal()) {
+        if (getItemViewType(position) == ViewType.RIGHT_TEXT.ordinal()) {
+            User myself = MainApplication.getInstance().getCurrentUser();
+            if (myself != null) {
+                if (null == myBitmap || myBitmap.isRecycled() ||
+                        Arrays.equals(myself.headPic, myHeadPic)) {
+                    myBitmap = UsersUtil.getHeadPic(myself);
+                    myHeadPic = myself.headPic;
+                }
+            }
             ItemTextRightBinding binding = (ItemTextRightBinding) holder.binding;
-            holder.bindTextRight(binding, getItem(position), previousChat);
-        } else if (getItemViewType(position) == ViewType.LEFT_PICTURE.ordinal()) {
-            ItemPictureBinding binding = (ItemPictureBinding) holder.binding;
-            holder.bindPicture(binding, getItem(position), previousChat, showName);
+            holder.bindTextRight(binding, getItem(position), previousChat, myBitmap);
         } else {
             ItemTextBinding binding = (ItemTextBinding) holder.binding;
-            holder.bindText(binding, getItem(position), previousChat, showName);
+            holder.bindText(binding, getItem(position), previousChat, bitmap);
         }
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewDataBinding binding;
         private ClickListener listener;
-        private byte[] cryptoKey;
 
-        ViewHolder(ViewDataBinding binding, ClickListener listener, byte[] cryptoKey) {
+        ViewHolder(ViewDataBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
-            this.cryptoKey = cryptoKey;
         }
 
-        void bindTextRight(ItemTextRightBinding binding, ChatMsg msg, ChatMsg previousChat) {
+        void bindTextRight(ItemTextRightBinding binding, ChatMsg msg, ChatMsg previousChat, Bitmap myBitmap) {
             if (null == binding || null == msg) {
                 return;
             }
             showStatusView(binding.ivStats, binding.tvProgress, binding.ivWarning, msg);
-            bindText(binding.roundButton, binding.tvTime, binding.tvMsg, msg, previousChat, null);
+            bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, msg, previousChat, null, myBitmap);
         }
 
-        void bindText(ItemTextBinding binding, ChatMsg msg, ChatMsg previousChat, String showName) {
+        void bindText(ItemTextBinding binding, ChatMsg msg, ChatMsg previousChat, Bitmap headPic) {
             if (null == binding || null == msg) {
                 return;
             }
-            bindText(binding.roundButton, binding.tvTime, binding.tvMsg, msg, previousChat, showName);
+            bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, msg, previousChat, headPic, null);
         }
 
-        private void bindText(RoundButton roundButton, TextView tvTime, HashTextView tvMsg,
-                              ChatMsg msg, ChatMsg previousChat, String showName) {
+        private void bindText(RoundImageView roundButton, TextView tvTime, HashTextView tvMsg,
+                              ChatMsg msg, ChatMsg previousChat, Bitmap headPic, Bitmap myBitmap) {
             if (null == msg) {
                 return;
             }
-            roundButton.setBgColor(Utils.getGroupColor(msg.senderPk));
-
-            if (StringUtil.isEquals(msg.senderPk, MainApplication.getInstance().getPublicKey())) {
-                showName = UsersUtil.getShowName(MainApplication.getInstance().getCurrentUser(), msg.senderPk);
+            if (headPic != null) {
+                roundButton.setImageBitmap(headPic);
+            } else {
+                roundButton.setImageBitmap(myBitmap);
             }
-            roundButton.setText(StringUtil.getFirstLettersOfName(showName));
             roundButton.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onUserClicked(msg);
@@ -219,46 +201,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
             }
             return true;
         }
-
-        void bindPictureRight(ItemPictureRightBinding binding, ChatMsg msg, ChatMsg previousChat) {
-            if (null == binding || null == msg) {
-                return;
-            }
-            showStatusView(binding.ivStats, binding.tvProgress, null, msg);
-            bindPicture(binding.roundButton, binding.tvTime, binding.tvImage, msg, previousChat, null);
-        }
-
-        void bindPicture(ItemPictureBinding binding, ChatMsg msg, ChatMsg previousChat, String showName) {
-            if(null == binding || null == msg){
-                return;
-            }
-            bindPicture(binding.roundButton, binding.tvTime, binding.tvImage, msg, previousChat, showName);
-        }
-
-        private void bindPicture(RoundButton roundButton, TextView tvTime, HashImageView tvImage,
-                                 ChatMsg msg, ChatMsg previousChat, String showName) {
-            if (null == msg) {
-                return;
-            }
-            roundButton.setBgColor(Utils.getGroupColor(msg.senderPk));
-            if (StringUtil.isEquals(msg.senderPk, MainApplication.getInstance().getPublicKey())) {
-                showName = UsersUtil.getShowName(MainApplication.getInstance().getCurrentUser(), msg.senderPk);
-            }
-            roundButton.setText(StringUtil.getFirstLettersOfName(showName));
-            roundButton.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onUserClicked(msg);
-                }
-            });
-
-            boolean isShowTime = isShowTime(msg, previousChat);
-            if (isShowTime) {
-                String time = DateUtil.getWeekTimeWithHours(msg.timestamp);
-                tvTime.setText(time);
-            }
-            tvTime.setVisibility(isShowTime ? View.VISIBLE : View.GONE);
-            tvImage.setImageHash(msg.hash, msg.senderPk, cryptoKey);
-        }
     }
 
     public interface ClickListener {
@@ -267,22 +209,10 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
         void onUserClicked(ChatMsg msg);
     }
 
-    static abstract class ItemCallback extends DiffUtil.ItemCallback<ChatMsg> {
-        String oldName;
-        String newName;
-
-        void updateName(String newName) {
-            this.oldName = this.newName;
-            this.newName = newName;
-
-        }
-    }
-
-    private static final ItemCallback diffCallback = new ItemCallback() {
+    private static final DiffUtil.ItemCallback<ChatMsg> diffCallback = new DiffUtil.ItemCallback<ChatMsg>() {
         @Override
         public boolean areContentsTheSame(@NonNull ChatMsg oldItem, @NonNull ChatMsg newItem) {
             return oldItem.equals(newItem)
-                    && StringUtil.isEquals(oldName, newName)
                     && StringUtil.isEquals(oldItem.logicMsgHash, newItem.logicMsgHash)
                     && oldItem.unsent == newItem.unsent;
         }
@@ -292,4 +222,9 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
             return oldItem.equals(newItem);
         }
     };
+
+    public void recycle() {
+        BitmapUtil.recycleBitmap(bitmap);
+        BitmapUtil.recycleBitmap(myBitmap);
+    }
 }

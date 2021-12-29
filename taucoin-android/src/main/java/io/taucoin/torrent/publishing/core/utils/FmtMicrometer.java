@@ -207,4 +207,9 @@ public class FmtMicrometer {
         BigDecimal bigDecimal = new BigDecimal(balance);
         return df.format(bigDecimal);
     }
+
+    public static double formatDecimal(double num, int scale) {
+        BigDecimal bd = new BigDecimal(num);
+        return bd.setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
 }

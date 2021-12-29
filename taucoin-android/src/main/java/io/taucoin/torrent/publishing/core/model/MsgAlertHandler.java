@@ -167,7 +167,6 @@ class MsgAlertHandler {
         // 多设备朋友同步
         if (null == user) {
             user = new User(friendPk);
-            user.updateTime = lastSeenTime;
             userRepo.addUser(user);
         }
 
@@ -236,33 +235,32 @@ class MsgAlertHandler {
             return;
         }
         String friendPkStr = ByteUtil.toHexString(bean.getPubKey());
-        boolean isMyself = StringUtil.isEquals(userPk, friendPkStr);
         String nickname = Utils.textBytesToString(bean.getNickname());
-        String remark = Utils.textBytesToString(bean.getRemark());
+        byte[] headPic = bean.getHeadPic();
+        double longitude = bean.getLongitude();
+        double latitude = bean.getLatitude();
         BigInteger timestamp = bean.getTimestamp();
-        logger.debug("onFriendInfo userPk::{}, friendPk::{}, nickname::{}, remark::{}",
-                userPk, friendPkStr, nickname, remark);
+        logger.debug("onFriendInfo userPk::{}, friendPk::{}, updateTime::{}, nickname::{}, longitude::{}, latitude::{}," +
+                        " headPic.size::{}", userPk, friendPkStr, timestamp.longValue(), nickname,
+                longitude, latitude, headPic != null ? headPic.length : 0);
         User user = userRepo.getUserByPublicKey(friendPkStr);
 
         // 多设备朋友同步
         if (null == user) {
             user = new User(friendPkStr);
-            user.nickname = nickname;
             user.updateTime = timestamp.longValue();
-            if (isMyself) {
-                user.remark = remark;
-            }
+            user.nickname = nickname;
+            user.headPic = headPic;
+            user.longitude = longitude;
+            user.latitude = latitude;
             userRepo.addUser(user);
         } else {
-            // 多设备朋友昵称同步
-            if ((nickname != null || remark != null)) {
-                user.nickname = nickname;
-                user.updateTime = timestamp.longValue();
-                if (isMyself && timestamp.compareTo(BigInteger.valueOf(user.updateTime)) > 0) {
-                    user.remark = remark;
-                }
-                userRepo.updateUser(user);
-            }
+            user.updateTime = timestamp.longValue();
+            user.nickname = nickname;
+            user.headPic = headPic;
+            user.longitude = longitude;
+            user.latitude = latitude;
+            userRepo.updateUser(user);
         }
         // 更新libTAU朋友信息
         // 多设备同步，可直接更新朋友信息,

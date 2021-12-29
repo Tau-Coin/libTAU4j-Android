@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 
+import com.luck.picture.lib.io.ArrayPoolProvide;
+import com.yalantis.ucrop.UCropActivity;
+
 import java.util.concurrent.Executors;
 
 import androidx.appcompat.app.AppCompatDelegate;
@@ -134,6 +137,10 @@ public class MainApplication extends MultiDexApplication {
                 // app回到后台
                 settingsRepo.setBooleanValue(activity.getString(
                         R.string.pref_key_foreground_running), false);
+            }
+            // 清除裁剪页面内存
+            if (activity instanceof UCropActivity) {
+                ArrayPoolProvide.getInstance().clearMemory();
             }
         }
 

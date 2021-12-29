@@ -31,6 +31,50 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <RelativeLayout
+                    android:background="@color/color_white"
+                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingEnd="@dimen/widget_size_10"
+                    android:paddingTop="@dimen/widget_size_15"
+                    android:paddingBottom="@dimen/widget_size_15"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
+                        android:id="@+id/iv_head_pic"
+                        android:layout_width="@dimen/widget_size_50"
+                        android:layout_height="@dimen/widget_size_50"
+                        android:scaleType="centerCrop"
+                        android:onClick="onClick"/>
+
+                    <TextView
+                        android:layout_toEndOf="@+id/iv_head_pic"
+                        android:id="@+id/tv_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/widget_size_10"
+                        android:layout_marginTop="@dimen/widget_size_3"
+                        android:singleLine="true"
+                        android:onClick="onClick"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false"
+                        android:textAppearance="@style/TextAppearanceHeadline5" />
+
+                    <TextView
+                        android:layout_below="@+id/tv_username"
+                        android:layout_toEndOf="@+id/iv_head_pic"
+                        android:id="@+id/tv_username_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/widget_size_10"
+                        android:layout_marginTop="@dimen/widget_size_5"
+                        android:textColor="@color/gray_dark"
+                        android:text="@string/setting_username_app"
+                        android:includeFontPadding="false"
+                        android:textAppearance="@style/TextAppearanceBody2"/>
+
+                </RelativeLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -80,45 +124,45 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/color_white"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:paddingTop="@dimen/widget_size_10"
-                    android:paddingBottom="@dimen/widget_size_5"
-                    android:paddingStart="@dimen/widget_size_20"
-                    android:paddingEnd="@dimen/widget_size_20">
+<!--                <LinearLayout-->
+<!--                    android:orientation="vertical"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:background="@color/color_white"-->
+<!--                    android:layout_marginTop="@dimen/widget_size_10"-->
+<!--                    android:paddingTop="@dimen/widget_size_10"-->
+<!--                    android:paddingBottom="@dimen/widget_size_5"-->
+<!--                    android:paddingStart="@dimen/widget_size_20"-->
+<!--                    android:paddingEnd="@dimen/widget_size_20">-->
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/primary"
-                        android:text="@string/setting_nickname"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:textColor="@color/primary"-->
+<!--                        android:text="@string/setting_nickname"-->
+<!--                        android:textAppearance="@style/TextAppearanceBody1"/>-->
 
-                    <TextView
-                        android:id="@+id/tv_username"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        android:singleLine="true"
-                        android:onClick="onClick"
-                        android:ellipsize="end"
-                        android:textAppearance="@style/TextAppearanceBody1" />
+<!--                    <TextView-->
+<!--                        android:id="@+id/tv_username"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:background="@null"-->
+<!--                        android:layout_marginTop="@dimen/widget_size_5"-->
+<!--                        android:singleLine="true"-->
+<!--                        android:onClick="onClick"-->
+<!--                        android:ellipsize="end"-->
+<!--                        android:textAppearance="@style/TextAppearanceBody1" />-->
 
-                    <TextView
-                        android:id="@+id/tv_username_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/widget_size_0"
-                        android:textColor="@color/gray_dark"
-                        android:text="@string/setting_username_app"
-                        android:textAppearance="@style/TextAppearanceBody2"/>
+<!--                    <TextView-->
+<!--                        android:id="@+id/tv_username_title"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginTop="@dimen/widget_size_0"-->
+<!--                        android:textColor="@color/gray_dark"-->
+<!--                        android:text="@string/setting_username_app"-->
+<!--                        android:textAppearance="@style/TextAppearanceBody2"/>-->
 
-                </LinearLayout>
+<!--                </LinearLayout>-->
 
                 <LinearLayout
                     android:orientation="vertical"

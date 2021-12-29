@@ -39,6 +39,8 @@ import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
+import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
+import io.taucoin.torrent.publishing.core.utils.PermissionUtils;
 import io.taucoin.torrent.publishing.core.utils.RootUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
@@ -110,6 +112,7 @@ public class MainActivity extends ScanTriggerActivity {
         checkCurrentUser();
         initExitApp();
         subscribeAddCommunity();
+        LocationManagerUtil.requestLocationPermissions(this);
         WorkloadManager.startWakeUpWorker(getApplicationContext());
         RootUtil.checkRoot();
     }
@@ -245,7 +248,7 @@ public class MainActivity extends ScanTriggerActivity {
         binding.drawer.ivPublicKeyCopy.setTag(user.publicKey);
         String showName = UsersUtil.getCurrentUserName(user);
         binding.drawer.tvNoteName.setText(showName);
-        binding.drawer.roundButton.setText(StringUtil.getFirstLettersOfName(showName));
+        binding.drawer.roundButton.setImageBitmap(UsersUtil.getHeadPic(user));
         userViewModel.promptUserFirstStartApp(this, user);
     }
 
@@ -629,6 +632,14 @@ public class MainActivity extends ScanTriggerActivity {
             }
         } else if (resultCode == RESULT_OK && requestCode == FontSizeActivity.REQUEST_CODE_FONT_SIZE) {
             refreshAllView();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PermissionUtils.REQUEST_PERMISSIONS_LOCATION) {
+            LocationManagerUtil.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
         }
     }
 }

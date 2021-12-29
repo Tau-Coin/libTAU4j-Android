@@ -459,4 +459,27 @@ public class BitmapUtil {
             }
         }
     }
+
+    /**
+     * 回收Bitmap内存
+     * @param bitmap
+     */
+    public static void recycleBitmap(Bitmap bitmap) {
+        if (bitmap != null && !bitmap.isRecycled()) {
+            bitmap.recycle();
+        }
+    }
+
+    private boolean compare2Image(Bitmap bmp1, Bitmap bmp2) {
+        int iteration = 0;
+        int width = bmp1.getWidth();
+        int height = bmp1.getHeight();
+        if (width != bmp2.getWidth()) return false;
+        if (height != bmp2.getHeight()) return false;
+        iteration = Math.min(width, height);
+        for (int i = 0; i < iteration; ++i) {
+            if (bmp1.getPixel(i, i) != bmp2.getPixel(i,i)) return false;
+        }
+        return true;
+    }
 }
