@@ -239,51 +239,56 @@ class MsgAlertHandler {
         byte[] headPic = bean.getHeadPic();
         double longitude = bean.getLongitude();
         double latitude = bean.getLatitude();
-        BigInteger timestamp = bean.getTimestamp();
-        logger.debug("onFriendInfo userPk::{}, friendPk::{}, updateTime::{}, nickname::{}, longitude::{}, latitude::{}," +
-                        " headPic.size::{}", userPk, friendPkStr, timestamp.longValue(), nickname,
-                longitude, latitude, headPic != null ? headPic.length : 0);
+        long updateNNTime = bean.getUpdateNNTime().longValue();
+        long updateHPTime = bean.getUpdateHPTime().longValue();
+        long updateLocationTime = bean.getUpdateLocationTime().longValue();
+        logger.debug("onFriendInfo userPk::{}, friendPk::{}, updaterNNTime::{}, nickname::{}, longitude::{}, latitude::{}," +
+                        " updateHPTime::{}, headPic.size::{}", userPk, friendPkStr, updateNNTime, nickname,
+                longitude, latitude, updateHPTime, headPic != null ? headPic.length : 0);
         User user = userRepo.getUserByPublicKey(friendPkStr);
 
+        boolean isNeedUpdate = false;
         // 多设备朋友同步
         if (null == user) {
             user = new User(friendPkStr);
-            user.updateTime = timestamp.longValue();
             user.nickname = nickname;
+            user.updateNNTime = updateNNTime;
             user.headPic = headPic;
+            user.updateHPTime = updateHPTime;
             user.longitude = longitude;
             user.latitude = latitude;
+            user.updateLocationTime = updateLocationTime;
             userRepo.addUser(user);
+            isNeedUpdate = true;
         } else {
-            user.updateTime = timestamp.longValue();
-            user.nickname = nickname;
-            user.headPic = headPic;
-            user.longitude = longitude;
-            user.latitude = latitude;
-            userRepo.updateUser(user);
-        }
-        // 更新libTAU朋友信息
-        // 多设备同步，可直接更新朋友信息,
-        // 如果又把数据更新到libTAU，则状态为ADDED，否则为DISCOVERED
-        boolean isSuccess = daemon.updateFriendInfo(user);
-        // 多设备朋友关系状态同步
-        if (StringUtil.isNotEquals(userPk, friendPkStr)) {
-            Friend friend = friendRepo.queryFriend(userPk, friendPkStr);
-            if (friend != null) {
-                if (isSuccess && friend.status == FriendStatus.DISCOVERED.getStatus()) {
-                    friend.status = FriendStatus.ADDED.getStatus();
-                    friendRepo.updateFriend(friend);
-                }
-            } else {
-                int status = isSuccess ? FriendStatus.ADDED.getStatus() : FriendStatus.DISCOVERED.getStatus();
-                friend = new Friend(userPk, friendPkStr, status);
-                friendRepo.addFriend(friend);
+            if (updateNNTime > user.updateNNTime) {
+                user.nickname = nickname;
+                user.updateNNTime = updateNNTime;
+                isNeedUpdate = true;
+            }
+            if (updateHPTime > user.updateHPTime) {
+                user.headPic = headPic;
+                user.updateHPTime = updateHPTime;
+                isNeedUpdate = true;
+            }
+            if (updateLocationTime > user.updateLocationTime) {
+                user.longitude = longitude;
+                user.latitude = latitude;
+                user.updateLocationTime = updateLocationTime;
+                isNeedUpdate = true;
+            }
+            if (isNeedUpdate) {
+                userRepo.updateUser(user);
             }
         }
+        if (isNeedUpdate) {
+            daemon.updateFriendInfo(user);
+        }
 
-        byte[] deviceID = bean.getDeviceID();
         // 如果是自己的信息，添加设备ID
-        if (StringUtil.isEquals(userPk, friendPkStr)) {
+        boolean isMyself = StringUtil.isEquals(userPk, friendPkStr);
+        if (isMyself) {
+            byte[] deviceID = bean.getDeviceID();
             addNewDeviceID(Utils.textBytesToString(deviceID), userPk);
         }
     }

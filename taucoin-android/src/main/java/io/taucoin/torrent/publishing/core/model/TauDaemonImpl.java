@@ -233,17 +233,7 @@ public class TauDaemonImpl extends TauDaemon {
             // 添加新朋友
             isSuccess = addNewFriend(friend.publicKey);
             String deviceID = DeviceUtils.getCustomDeviceID(appContext);
-            byte[] nickname = null;
-            byte[] headPic = null;
-            if (StringUtil.isNotEmpty(friend.nickname) || friend.headPic!= null ||
-                friend.longitude > 0 || friend.latitude > 0) {
-                nickname = Utils.textStringToBytes(friend.nickname);
-                headPic = friend.headPic;
-            }
-            BigInteger timestamp = BigInteger.valueOf(getSessionTime() / 1000);
-            FriendInfo friendInfo = new FriendInfo(Utils.textStringToBytes(deviceID),
-                    ByteUtil.toByte(friendPk), nickname, headPic, friend.longitude,
-                    friend.latitude, timestamp);
+            FriendInfo friendInfo = new FriendInfo(deviceID, friend);
             byte[] encoded = friendInfo.getEncoded();
             logger.debug("updateFriendInfo publicKey::{}, nickname::{}, longitude::{}, " +
                             "latitude::{}, isSuccess::{}, encoded.length::{}",

@@ -14,7 +14,6 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.luck.picture.lib.entity.LocalMedia;
-import com.luck.picture.lib.manager.PictureCacheManager;
 
 import org.libTAU4j.Ed25519;
 import org.libTAU4j.Pair;
@@ -240,6 +239,7 @@ public class UserViewModel extends AndroidViewModel {
                 } else {
                     if (StringUtil.isNotEmpty(name)) {
                         newUser.nickname = name;
+                        newUser.updateNNTime = daemon.getSessionTime() / 1000;
                     }
                     newUser.seed = seed;
                     newUser.isCurrentUser = true;
@@ -517,6 +517,7 @@ public class UserViewModel extends AndroidViewModel {
             if (user != null) {
                 if (StringUtil.isNotEmpty(name)) {
                     user.nickname = name;
+                    user.updateNNTime = daemon.getSessionTime() / 1000;
                 }
                 String currentUserPk = userRepo.getCurrentUser().publicKey;
                 userRepo.updateUser(user);
@@ -647,12 +648,14 @@ public class UserViewModel extends AndroidViewModel {
             user = new User(publicKey);
             if (StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
+                user.updateNNTime = daemon.getSessionTime() / 1000;
             }
             userRepo.addUser(user);
         } else {
             logger.debug("AddFriendsLocally, user exist");
             if (StringUtil.isEmpty(user.nickname) && StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
+                user.updateNNTime = daemon.getSessionTime() / 1000;
                 userRepo.updateUser(user);
             }
         }
@@ -1070,6 +1073,7 @@ public class UserViewModel extends AndroidViewModel {
             User user = userRepo.getCurrentUser();
             if (headPic != null) {
                 user.headPic = headPic;
+                user.updateHPTime = daemon.getSessionTime() / 1000;
                 daemon.updateFriendInfo(user);
                 userRepo.updateUser(user);
             }

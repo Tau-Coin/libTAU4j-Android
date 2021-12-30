@@ -19,10 +19,12 @@ public class User implements Parcelable {
     public String seed;                     // 用户的seed
     public String remark;                   // 用户备注
     public String nickname;                 // 用户昵称
-    public long updateTime;                 // 备注更新时间
+    public long updateNNTime;              // 更新昵称时间
     public double longitude;                // 经纬度
     public double latitude;                 // 纬度
+    public long updateLocationTime;         // 更新位置时间
     public byte[] headPic;                  // 头像图片
+    public long updateHPTime;               // 更新头像图片时间
     public boolean isCurrentUser = false;   // 是否是当前用户
     public boolean isBanned = false;        // 用户是否被用户拉入黑名单
 
@@ -34,10 +36,9 @@ public class User implements Parcelable {
     }
 
     @Ignore
-    public User(@NonNull String publicKey, String nickname, long updateTime){
+    public User(@NonNull String publicKey, String nickname){
         this.publicKey = publicKey;
         this.nickname = nickname;
-        this.updateTime = updateTime;
     }
 
     @Ignore
@@ -51,24 +52,26 @@ public class User implements Parcelable {
         seed = in.readString();
         remark = in.readString();
         nickname = in.readString();
+        updateNNTime = in.readLong();
         isCurrentUser = in.readByte() != 0;
         isBanned = in.readByte() != 0;
-        updateTime = in.readLong();
         longitude = in.readDouble();
         latitude = in.readDouble();
+        updateLocationTime = in.readLong();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(publicKey);
         dest.writeString(seed);
-        dest.writeString(nickname);
         dest.writeString(remark);
+        dest.writeString(nickname);
+        dest.writeLong(updateNNTime);
         dest.writeByte((byte) (isCurrentUser ? 1 : 0));
         dest.writeByte((byte) (isBanned ? 1 : 0));
-        dest.writeLong(updateTime);
         dest.writeDouble(longitude);
         dest.writeDouble(latitude);
+        dest.writeLong(updateLocationTime);
     }
 
     @Override

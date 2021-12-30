@@ -41,7 +41,6 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
@@ -544,7 +543,7 @@ public abstract class TauDaemon {
                         (latitude > 0 && user.latitude != latitude)) {
                     user.longitude = longitude;
                     user.latitude = latitude;
-                    user.updateTime = getSessionTime() / 1000;
+                    user.updateLocationTime = getSessionTime() / 1000;
                     userRepo.updateUser(user);
                 }
                 updateFriendInfo(user);
