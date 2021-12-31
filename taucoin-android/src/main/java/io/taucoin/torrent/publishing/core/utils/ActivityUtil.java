@@ -113,11 +113,17 @@ public class ActivityUtil {
         context.startActivity(intentSplash);
     }
 
+    public static void openUri(String uriStr) {
+        openUri(MainApplication.getInstance(), uriStr);
+    }
+
     public static void openUri(Context context, String uriStr) {
         boolean isExistBrowser = true;
         try{
             Uri uri = Uri.parse(uriStr);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             PackageManager pm = context.getPackageManager();
             List<ResolveInfo> list = pm.queryIntentActivities(intent, 0);
             if(list != null && list.size() > 0){

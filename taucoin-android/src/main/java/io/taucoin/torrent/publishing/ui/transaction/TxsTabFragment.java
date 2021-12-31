@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.core.utils.SpannableUrl;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityTabs;
@@ -35,7 +36,6 @@ import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.FragmentTxsTabBinding;
 import io.taucoin.torrent.publishing.databinding.ItemOperationsBinding;
@@ -252,7 +252,7 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         }
         binding.replay.setTag(tx);
         binding.copy.setTag(msg);
-        String link = Utils.parseUrlFormStr(msg);
+        String link = SpannableUrl.parseUrlFormStr(msg);
         if(StringUtil.isNotEmpty(link)){
             binding.copyLink.setTag(link);
         }else{

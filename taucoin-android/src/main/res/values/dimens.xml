@@ -22,6 +22,9 @@
     <dimen name="font_size_0_5">0.5sp</dimen>
 
     <!--   ********************Widget******************** -->
+    <dimen name="widget_size_03">-3dp</dimen>
+    <dimen name="widget_size_02">-2dp</dimen>
+    <dimen name="widget_size_01">-1dp</dimen>
     <dimen name="widget_size_0">0dp</dimen>
     <dimen name="widget_size_1">1dp</dimen>
     <dimen name="widget_size_2">2dp</dimen>

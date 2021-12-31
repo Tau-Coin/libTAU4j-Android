@@ -58,6 +58,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="start"
                     android:maxWidth="@dimen/widget_size_220"
+                    android:autoLink="web"
+                    android:textColorLink="@color/color_blue_link"
                     android:textAppearance="@style/TextAppearanceBody2" />
 
             </LinearLayout>

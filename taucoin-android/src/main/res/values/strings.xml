@@ -286,6 +286,8 @@
     <string name="user_add_to_contact">Add To Friends</string>
     <string name="user_share_qr">Share QR To Friend</string>
 
+    <string name="operation_copy">Copy</string>
+    <string name="operation_select_all">Select All</string>
     <string name="copy_seed">Key copied</string>
     <string name="copy_public_key">My Public Key copied</string>
     <string name="copy_share_link">Share link copied</string>
@@ -314,6 +316,7 @@
     <string name="tx_comment">Comment(required)</string>
     <string name="tx_operation_reply">Reply</string>
     <string name="tx_operation_copy">Copy</string>
+    <string name="tx_operation_select_all">Select All</string>
     <string name="tx_operation_copy_link">Copy link</string>
     <string name="tx_operation_forward">Forward</string>
     <string name="tx_operation_blacklist">Blacklist</string>

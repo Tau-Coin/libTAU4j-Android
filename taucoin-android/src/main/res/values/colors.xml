@@ -68,6 +68,7 @@
     <color name="color_blue">#477df9</color>
     <color name="color_blue_light">#0E88EF</color>
     <color name="color_blue_dark">#46A7EB</color>
+    <color name="color_blue_link">#1379D6</color>
     <color name="color_blue_white">#9FC5EB</color>
 
     <color name="color_black_transparent">#66000000</color>

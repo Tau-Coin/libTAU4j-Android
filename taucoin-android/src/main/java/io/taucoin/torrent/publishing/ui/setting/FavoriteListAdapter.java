@@ -17,6 +17,7 @@ import io.taucoin.torrent.publishing.core.model.data.FavoriteAndUser;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.SpannableUrl;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -83,7 +84,7 @@ public class FavoriteListAdapter extends PagedListAdapter<FavoriteAndUser,
             }
             String time = DateUtil.getWeekTime(favorite.timestamp);
             int bgColor = Utils.getGroupColor(favorite.senderPk);
-            SpannableStringBuilder memo = Utils.getSpannableStringUrl(favorite.memo);
+            SpannableStringBuilder memo = SpannableUrl.generateSpannableUrl(favorite.memo);
             String userName = UsersUtil.getUserName(favorite.sender, favorite.senderPk);
             String firstLettersName = StringUtil.getFirstLettersOfName(userName);
             String communityName = ChainIDUtil.getName(favorite.chainID);

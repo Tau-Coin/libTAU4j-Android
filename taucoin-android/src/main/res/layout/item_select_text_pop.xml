@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_pop_item"
+    android:layout_width="60dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/widget_size_5"
+    android:paddingTop="@dimen/widget_size_4"
+    android:paddingBottom="@dimen/widget_size_4"
+    android:orientation="vertical"
+    tools:background="#4c4c4c">
+
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/iv_pop_icon"
+        android:layout_width="@dimen/widget_size_22"
+        android:layout_height="@dimen/widget_size_22"
+        android:layout_gravity="center_horizontal"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/tv_pop_func"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/widget_size_20"
+        android:ellipsize="end"
+        android:gravity="center_vertical|center"
+        android:includeFontPadding="false"
+        android:layout_marginTop="@dimen/widget_size_2"
+        android:maxLines="1"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/TextAppearanceBody3"
+        tools:text="@string/operation_select_all" />
+
+</LinearLayout>

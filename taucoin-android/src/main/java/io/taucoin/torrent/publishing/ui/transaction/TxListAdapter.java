@@ -18,6 +18,7 @@ import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.SpannableUrl;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -110,7 +111,7 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
             String time = DateUtil.getWeekTime(tx.timestamp);
             int bgColor = Utils.getGroupColor(tx.senderPk);
             String showName = UsersUtil.getShowName(tx.sender, tx.senderPk);
-            SpannableStringBuilder memo = Utils.getSpannableStringUrl(tx.memo);
+            SpannableStringBuilder memo = SpannableUrl.generateSpannableUrl(tx.memo);
             String firstLettersName = StringUtil.getFirstLettersOfName(showName);
             String userName = UsersUtil.getUserName(tx.sender, tx.senderPk);
             if (binding instanceof ItemWiringTxBinding) {

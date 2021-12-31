@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 import org.libTAU4j.ChainURL;
@@ -47,6 +48,7 @@ import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
+import io.taucoin.torrent.publishing.core.utils.selecttext.SelectTextEventBus;
 import io.taucoin.torrent.publishing.databinding.ActivityMainDrawerBinding;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.databinding.ExternalLinkDialogBinding;
@@ -641,5 +643,13 @@ public class MainActivity extends ScanTriggerActivity {
         if (requestCode == PermissionUtils.REQUEST_PERMISSIONS_LOCATION) {
             LocationManagerUtil.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            SelectTextEventBus.getDefault().dispatchDismissAllPopDelayed();
+        }
+        return super.dispatchTouchEvent(ev);
     }
 }
