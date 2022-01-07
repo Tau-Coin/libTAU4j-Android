@@ -20,8 +20,12 @@ package io.taucoin.torrent.publishing.core.model.data.message;
  * 交易类型
  */
 public enum TxType {
-    CHAIN_NOTE(1),
-    WRING_TX(2);
+    UNKNOWN(0),
+    NOTE_TX(1),
+    WRING_TX(2),
+    SELL_TX(3),
+    TRUST_TX(4),
+    AIRDROP_TX(5);
 
     private int type;
     TxType(int type) {
@@ -30,5 +34,15 @@ public enum TxType {
 
     public int getType() {
         return type;
+    }
+
+    public static TxType valueOf(int type) {
+        TxType[] values = TxType.values();
+        for (TxType value : values) {
+            if (value.type == type) {
+                return value;
+            }
+        }
+        return TxType.UNKNOWN;
     }
 }

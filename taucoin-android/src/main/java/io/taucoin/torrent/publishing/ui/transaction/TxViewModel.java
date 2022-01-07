@@ -36,11 +36,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
+import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
-import io.taucoin.torrent.publishing.ui.community.CommunityTabs;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.MainApplication;
@@ -64,6 +64,11 @@ import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.NOTE_TX;
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.SELL_TX;
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.TRUST_TX;
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.WRING_TX;
+
 /**
  * 交易模块相关的ViewModel
  */
@@ -78,6 +83,7 @@ public class TxViewModel extends AndroidViewModel {
     private TauDaemon daemon;
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<List<UserAndTx>> chainTxs = new MutableLiveData<>();
+    private MutableLiveData<List<Tx>> trustTxs = new MutableLiveData<>();
     private MutableLiveData<Result> airdropState = new MutableLiveData<>();
     private MutableLiveData<String> addState = new MutableLiveData<>();
     private CommonDialog editFeeDialog;
@@ -112,6 +118,10 @@ public class TxViewModel extends AndroidViewModel {
      */
     public MutableLiveData<List<UserAndTx>> observerChainTxs() {
         return chainTxs;
+    }
+
+    public MutableLiveData<List<Tx>> observerTrustTxs() {
+        return trustTxs;
     }
 
     @Override
@@ -161,16 +171,35 @@ public class TxViewModel extends AndroidViewModel {
             }
             long timestamp = daemon.getSessionTime();
             byte[] receiverPk;
-            if (tx.txType == TxType.WRING_TX.getType()) {
+            if (tx.txType == WRING_TX.getType() || tx.txType == TRUST_TX.getType()) {
                 receiverPk = ByteUtil.toByte(tx.receiverPk);
             } else {
                 // Note交易无接受者时，默认为senderPk
                 receiverPk = senderPk;
             }
-            TxContent txContent = new TxContent(tx.txType, Utils.textStringToBytes(tx.memo));
+            byte[] content = Utils.textStringToBytes(tx.memo);
+            byte[] txEncoded = null;
+            switch (TxType.valueOf(tx.txType)) {
+                case NOTE_TX:
+                case WRING_TX:
+                case TRUST_TX:
+                    TxContent txContent = new TxContent(tx.txType, content);
+                    txEncoded = txContent.getEncoded();
+                    break;
+                case SELL_TX:
+                    SellTxContent sellTxContent = new SellTxContent(tx.coinName, tx.link,
+                            tx.location, tx.memo);
+                    txEncoded = sellTxContent.getEncoded();
+                    break;
+                default:
+                    break;
+            }
+            if (null == txEncoded) {
+                return result;
+            }
             long nonce = account.getNonce() + 1;
             Transaction transaction = new Transaction(chainID, 0, timestamp, senderPk, receiverPk,
-                    nonce, tx.amount, tx.fee, txContent.getEncoded());
+                    nonce, tx.amount, tx.fee, txEncoded);
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
             boolean isSubmitSuccess = daemon.submitTransaction(transaction);
             if (!isSubmitSuccess) {
@@ -200,7 +229,7 @@ public class TxViewModel extends AndroidViewModel {
      * @param tx 交易
      */
     private void addUserInfoToLocal(Tx tx) {
-        if (tx.txType == TxType.WRING_TX.getType()) {
+        if (tx.txType == WRING_TX.getType()) {
             User receiverUser = userRepo.getUserByPublicKey(tx.receiverPk);
             if (null == receiverUser) {
                 receiverUser = new User(tx.receiverPk);
@@ -222,7 +251,7 @@ public class TxViewModel extends AndroidViewModel {
             memberRepo.addMember(member);
             logger.info("addMemberInfoToLocal, senderPk::{}", tx.senderPk);
         }
-        if (txType == TxType.WRING_TX.getType() && StringUtil.isNotEquals(tx.senderPk, tx.receiverPk)) {
+        if (txType == WRING_TX.getType() && StringUtil.isNotEquals(tx.senderPk, tx.receiverPk)) {
             Member receiverMember = memberRepo.getMemberByChainIDAndPk(tx.chainID, tx.receiverPk);
             if (null == receiverMember) {
                 receiverMember = new Member(tx.chainID, tx.receiverPk);
@@ -245,7 +274,7 @@ public class TxViewModel extends AndroidViewModel {
         String senderPk = MainApplication.getInstance().getPublicKey();
         Account account = daemon.getAccountInfo(chainID, senderPk);
         long balance = account != null ? account.getBalance() : 0;
-        if (msgType == TxType.CHAIN_NOTE.getType()) {
+        if (msgType == NOTE_TX.getType()) {
             if (StringUtil.isEmpty(tx.memo)) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_message);
                 return false;
@@ -256,7 +285,7 @@ public class TxViewModel extends AndroidViewModel {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_free);
                 return false;
             }
-        } else if (msgType == TxType.WRING_TX.getType()) {
+        } else if (msgType == WRING_TX.getType()) {
             if (StringUtil.isEmpty(tx.receiverPk) ||
                     ByteUtil.toByte(tx.receiverPk).length != Ed25519.PUBLIC_KEY_SIZE) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_pk);
@@ -269,6 +298,11 @@ public class TxViewModel extends AndroidViewModel {
                 return false;
             } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
                 ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
+                return false;
+            }
+        } else if (msgType == SELL_TX.getType()) {
+            if (StringUtil.isEmpty(tx.coinName)) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_coin_name);
                 return false;
             }
         }
@@ -387,7 +421,7 @@ public class TxViewModel extends AndroidViewModel {
      * @param friendPk
      */
     public String airdropToFriend(String chainID, String friendPk, long amount, long fee) {
-        Tx tx = new Tx(chainID, friendPk, amount, fee, TxType.WRING_TX.getType(),
+        Tx tx = new Tx(chainID, friendPk, amount, fee, WRING_TX.getType(),
                 getApplication().getString(R.string.tx_memo_airdrop));
         return createTransaction(tx);
     }
@@ -402,17 +436,9 @@ public class TxViewModel extends AndroidViewModel {
         Disposable disposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
             List<UserAndTx> txs = new ArrayList<>();
             try {
-                int txType;
-                if (currentTab == CommunityTabs.ON_CHAIN_NOTE.getIndex()) {
-                    txType = TxType.CHAIN_NOTE.getType();
-                } else if (currentTab == CommunityTabs.WRING_TX.getIndex()) {
-                    txType = TxType.WRING_TX.getType();
-                } else {
-                    txType = -1;
-                }
                 long startTime = System.currentTimeMillis();
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
-                txs = txRepo.queryCommunityTxs(chainID, txType, pos, pageSize);
+                txs = txRepo.queryCommunityTxs(chainID, currentTab, pos, pageSize);
                 long getMessagesTime = System.currentTimeMillis();
                 logger.trace("loadTxsData pos::{}, pageSize::{}, messages.size::{}",
                         pos, pageSize, txs.size());
@@ -434,9 +460,51 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     /**
+     * 加载Trust交易分页数据
+     * @param chainID 社区链ID
+     * @param trustPk trust用户
+     * @param pos 分页位置
+     */
+    void loadTrustTxsData(String chainID, String trustPk, int pos) {
+        int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+        loadTrustTxsData(chainID, trustPk, pos, pageSize);
+
+    }
+
+    void loadTrustTxsData(String chainID, String trustPk, int pos, int pageSize) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<List<Tx>>) emitter -> {
+            List<Tx> trustTxs = new ArrayList<>();
+            try {
+                long startTime = System.currentTimeMillis();
+                trustTxs = txRepo.queryCommunityTrustTxs(chainID, trustPk, pos, pageSize);
+                long getMessagesTime = System.currentTimeMillis();
+                logger.trace("loadTrustTxsData pos::{}, pageSize::{}, messages.size::{}",
+                        pos, pageSize, trustTxs.size());
+                logger.trace("loadTrustTxsData getMessagesTime::{}", getMessagesTime - startTime);
+                Collections.reverse(trustTxs);
+                long endTime = System.currentTimeMillis();
+                logger.trace("loadTrustTxsData reverseTime Time::{}", endTime - getMessagesTime);
+            } catch (Exception e) {
+                logger.error("loadTrustTxsData error::", e);
+            }
+            emitter.onNext(trustTxs);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(txs -> {
+                    trustTxs.postValue(txs);
+                });
+        disposables.add(disposable);
+    }
+
+    /**
      * 观察社区的消息的变化
      */
     Observable<DataChanged> observeDataSetChanged() {
         return txRepo.observeDataSetChanged();
+    }
+
+    public Observable<UserAndTx> observeSellTxDetail(String chainID, String txID) {
+        return txRepo.observeSellTxDetail(chainID, txID);
     }
 }

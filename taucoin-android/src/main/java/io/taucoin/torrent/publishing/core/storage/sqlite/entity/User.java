@@ -19,7 +19,7 @@ public class User implements Parcelable {
     public String seed;                     // 用户的seed
     public String remark;                   // 用户备注
     public String nickname;                 // 用户昵称
-    public long updateNNTime;              // 更新昵称时间
+    public long updateNNTime;               // 更新昵称时间
     public double longitude;                // 经纬度
     public double latitude;                 // 纬度
     public long updateLocationTime;         // 更新位置时间
@@ -58,6 +58,11 @@ public class User implements Parcelable {
         longitude = in.readDouble();
         latitude = in.readDouble();
         updateLocationTime = in.readLong();
+        int length = in.readInt();
+        if (length > 0) {
+            this.headPic = new byte[length];
+            in.readByteArray(this.headPic);
+        }
     }
 
     @Override
@@ -72,6 +77,11 @@ public class User implements Parcelable {
         dest.writeDouble(longitude);
         dest.writeDouble(latitude);
         dest.writeLong(updateLocationTime);
+        int length = headPic != null ? headPic.length : 0;
+        dest.writeInt(length);
+        if (length > 0) {
+            dest.writeByteArray(headPic);
+        }
     }
 
     @Override

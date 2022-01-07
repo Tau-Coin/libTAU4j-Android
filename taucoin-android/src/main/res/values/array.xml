@@ -42,4 +42,17 @@
         <item>10</item>
         <item>15</item>
     </string-array>
+
+    <string-array name="coin_name">
+        <item>TAU</item>
+        <item></item>
+        <item>BTC</item>
+        <item>ETH</item>
+        <item>LTC</item>
+        <item>ADA</item>
+        <item>DOT</item>
+        <item>DOGE</item>
+        <item>SHIB</item>
+        <item>XRP</item>
+    </string-array>
 </resources>

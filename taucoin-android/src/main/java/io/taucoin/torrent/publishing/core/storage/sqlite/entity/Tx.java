@@ -23,15 +23,19 @@ public class Tx implements Parcelable {
     public long fee;                        // 交易费
     public long timestamp;                  // 交易时间戳
     public long nonce;                      // 交易nonce
-    public int txType;                      // 交易类型，同MsgType中枚举类型
+    public int txType;                      // 交易类型，同TxType中枚举类型
     public String memo;                     // 交易的备注、描述等
     public int txStatus;                    // 交易的状态 0：未上链（在交易池中）；1：上链成功 (不上链)
     public long blockNumber;                // 交易所属的区块号
 
-    public String receiverPk;               // 交易接收者的公钥 只针对TxType.Wiring类型
-    public long amount;                     // 交易金额 只针对TxType.Wiring类型
+    public String receiverPk;               // 交易接收者的公钥 只针对TxType.WRING_TX类型
+    public long amount;                     // 交易金额 只针对TxType.WRING_TX类型
 
     public int autoRenewal;                 // 交易是否为账户自动更新创建的交易 0：用户创建；1：自动创建
+
+    public String coinName;                 // 币名 只针对TxType.SELL_TX类型
+    public String link;                     // 用户link 只针对TxType.SELL_TX类型
+    public String location;                 // 位置信息 只针对TxType.SELL_TX类型
 
     public Tx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo){
         this.chainID = chainID;
@@ -47,6 +51,26 @@ public class Tx implements Parcelable {
         this.chainID = chainID;
         this.fee = fee;
         this.txType = txType;
+        this.memo = memo;
+    }
+
+    @Ignore
+    public Tx(@NonNull String chainID, String receiverPk, long fee, int txType){
+        this.chainID = chainID;
+        this.receiverPk = receiverPk;
+        this.fee = fee;
+        this.txType = txType;
+    }
+
+    @Ignore
+    public Tx(@NonNull String chainID, long fee, int txType, String coinName,
+              String link, String location, String memo){
+        this.chainID = chainID;
+        this.fee = fee;
+        this.txType = txType;
+        this.coinName = coinName;
+        this.link = link;
+        this.location = location;
         this.memo = memo;
     }
 

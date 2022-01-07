@@ -57,6 +57,7 @@ import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.model.data.Result;
+import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
@@ -96,10 +97,10 @@ public class CommunityViewModel extends AndroidViewModel {
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> addCommunityState = new MutableLiveData<>();
     private MutableLiveData<Boolean> setBlacklistState = new MutableLiveData<>();
-    private MutableLiveData<Result> chatState = new MutableLiveData<>();
     private MutableLiveData<List<Community>> blackList = new MutableLiveData<>();
     private MutableLiveData<List<Community>> joinedList = new MutableLiveData<>();
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
+    private MutableLiveData<UserAndFriend> largestCoinHolder = new MutableLiveData<>();
 
     public CommunityViewModel(@NonNull Application application) {
         super(application);
@@ -140,14 +141,6 @@ public class CommunityViewModel extends AndroidViewModel {
     }
 
     /**
-     * 获取设置社区静音状态的被观察者
-     * @return 被观察者
-     */
-    public LiveData<Result> getChatState() {
-        return chatState;
-    }
-
-    /**
      * 获取社区黑名单的被观察者
      * @return 被观察者
      */
@@ -160,6 +153,13 @@ public class CommunityViewModel extends AndroidViewModel {
      */
     public MutableLiveData<Bitmap> getQRBitmap() {
         return qrBitmap;
+    }
+
+    /**
+     * 观察社区最大币持有者
+     */
+    public MutableLiveData<UserAndFriend> getLargestCoinHolder() {
+        return largestCoinHolder;
     }
 
     /**
@@ -442,33 +442,6 @@ public class CommunityViewModel extends AndroidViewModel {
     }
 
     /**
-     * 和联系人创建Chat
-     * @param friendPk friend's PK
-     */
-    public void createChat(String friendPk) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
-            Result result = new Result();
-            try {
-                // 处理ChatName，如果为空，取显朋友显示名
-                String userPk = MainApplication.getInstance().getPublicKey();
-                Friend friend = friendRepo.queryFriend(userPk, friendPk);
-                if (friend != null) {
-                    friend.status = FriendStatus.ADDED.getStatus();
-                }
-                result.setMsg(friendPk);
-            }catch (Exception e){
-                result.setFailMsg(e.getMessage());
-            }
-            emitter.onNext(result);
-            emitter.onComplete();
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(state -> chatState.postValue(state));
-        disposables.add(disposable);
-    }
-
-    /**
      * 查询社区成员
      * @param chainID
      * @return DataSource.Factory
@@ -654,6 +627,21 @@ public class CommunityViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
+        disposables.add(disposable);
+    }
+
+    public void getCommunityLargestCoinHolder(String chainID) {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<UserAndFriend>) emitter -> {
+            String coinHolder = memberRepo.getCommunityLargestCoinHolder(chainID);
+            UserAndFriend user = userRepo.getFriend(coinHolder);
+            emitter.onNext(user);
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(userAndFriend -> {
+                    largestCoinHolder.postValue(userAndFriend);
+                });
         disposables.add(disposable);
     }
 }

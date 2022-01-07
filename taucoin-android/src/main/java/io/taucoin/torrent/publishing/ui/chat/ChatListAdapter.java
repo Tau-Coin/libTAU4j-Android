@@ -212,8 +212,8 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
                     .setPopStyle(R.drawable.shape_color_4c4c4c_radius_8, R.mipmap.ic_arrow)
                     .addItem(0, R.string.operation_copy,
                             ()-> copyText(mSelectableTextHelper, selectedText))
-                    .addItem(0, R.string.operation_select_all,
-                            this::selectAll)
+//                    .addItem(0, R.string.operation_select_all,
+//                            this::selectAll)
                     .build();
 
             mSelectableTextHelper.setSelectListener(new SelectTextHelper.OnSelectListener() {

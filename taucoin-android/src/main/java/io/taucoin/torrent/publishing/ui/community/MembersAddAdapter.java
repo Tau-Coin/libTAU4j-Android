@@ -21,9 +21,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.SpanUtils;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ItemAddMembersBinding;
 
@@ -139,11 +137,7 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
                     .setFontSize(14, true);
 
             holder.binding.tvName.setText(showNameBuilder.create());
-            String firstLetters = StringUtil.getFirstLettersOfName(showName);
-            holder.binding.leftView.setText(firstLetters);
-
-            int bgColor = Utils.getGroupColor(user.publicKey);
-            holder.binding.leftView.setBgColor(bgColor);
+            holder.binding.leftView.setImageBitmap(UsersUtil.getHeadPic(user));
 
             TextWatcher textWatcher = new TextWatcher() {
                 @Override

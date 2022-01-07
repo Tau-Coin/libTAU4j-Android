@@ -86,4 +86,6 @@ public interface MemberRepository {
      * 获取跟随的社区列表
      */
     List<String> queryFollowedCommunities(String publicKey);
+
+    String getCommunityLargestCoinHolder(String chainID);
 }

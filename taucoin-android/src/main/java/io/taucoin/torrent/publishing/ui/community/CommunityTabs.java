@@ -10,11 +10,9 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
  * 社区页面Tabs枚举类
  */
 public enum CommunityTabs {
-    ON_CHAIN_NOTE(0, R.string.community_chain_note),
-    OFF_CHAIN_MSG(1, R.string.community_chain_note),
-    WRING_TX(2, R.string.community_wired),
-    TIP_BLOCKS(3, R.string.community_head_blocks);
-
+    NOTE(0, R.string.community_chain_note),
+    MARKET(1, R.string.community_chain_market),
+    CHAIN(2, R.string.community_on_chain);
     private int index;
     private int name;
     CommunityTabs(int index, int name) {

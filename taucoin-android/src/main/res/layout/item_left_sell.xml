@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/widget_size_20"
+        android:layout_marginStart="@dimen/widget_size_10"
+        android:layout_marginTop="@dimen/widget_size_15"
+        android:gravity="start">
+
+        <include
+            android:id="@+id/left_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_0"
+            android:layout_marginEnd="@dimen/widget_size_5"
+            layout="@layout/tx_left_view"/>
+
+        <LinearLayout
+            android:layout_toEndOf="@+id/left_view"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:minWidth="@dimen/widget_size_220"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginStart="@dimen/widget_size_10">
+
+                <TextView
+                    android:id="@+id/tv_name"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/widget_size_1"
+                    android:includeFontPadding="false"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody3"/>
+
+                <TextView
+                    android:id="@+id/tv_trust"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:layout_marginEnd="@dimen/widget_size_1"
+                    android:includeFontPadding="false"
+                    android:gravity="end"
+                    android:text="@string/common_numerical_value"
+                    android:textColor="@color/color_yellow"
+                    android:textAppearance="@style/TextAppearanceBody3"/>
+
+                <ImageView
+                    android:id="@+id/iv_trust"
+                    android:layout_width="@dimen/widget_size_16"
+                    android:layout_height="@dimen/widget_size_16"
+                    android:padding="@dimen/widget_size_2"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_logo_orange"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/middle_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/icon_chat_left"
+                android:layout_marginTop="@dimen/widget_size_1"
+                android:minHeight="@dimen/widget_size_50"
+                android:layout_marginBottom="@dimen/widget_size_3"
+                android:paddingStart="@dimen/widget_size_20"
+                android:paddingEnd="@dimen/widget_size_10"
+                android:paddingTop="@dimen/widget_size_5"
+                android:paddingBottom="@dimen/widget_size_5">
+
+                <TextView
+                    android:id="@+id/tv_msg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_2"
+                    android:layout_marginBottom="@dimen/widget_size_2"
+                    android:lineSpacingExtra="@dimen/widget_size_5"
+                    android:textAppearance="@style/TextAppearanceBody3" />
+
+                <TextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody3" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

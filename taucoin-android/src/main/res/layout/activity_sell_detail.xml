@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_15"
+                    android:layout_marginEnd="@dimen/widget_size_15"
+                    android:paddingTop="@dimen/widget_size_15"
+                    android:paddingBottom="@dimen/widget_size_15">
+
+                    <include
+                        android:id="@+id/left_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        layout="@layout/tx_left_view"/>
+
+                    <LinearLayout
+                        android:layout_toEndOf="@+id/left_view"
+                        android:layout_toStartOf="@+id/tv_direct_talk"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="@dimen/widget_size_15"
+                        android:paddingStart="@dimen/widget_size_5"
+                        android:layout_centerVertical="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:singleLine="true"
+                            android:ellipsize="end"
+                            android:textAppearance="@style/TextAppearanceBody2" />
+
+                        <TextView
+                            android:id="@+id/tv_trusts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:layout_marginTop="@dimen/widget_size_3"
+                            android:singleLine="true"
+                            android:ellipsize="end"
+                            android:textColor="@color/color_yellow"
+                            android:textAppearance="@style/TextAppearanceBody3" />
+
+                        <TextView
+                            android:id="@+id/tv_distance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:layout_marginTop="@dimen/widget_size_3"
+                            android:singleLine="true"
+                            android:ellipsize="end"
+                            android:textColor="@color/gray_dark"
+                            android:textAppearance="@style/TextAppearanceBody3" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_direct_talk"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|center"
+                        android:text="@string/tx_sell_add_friend"
+                        android:layout_alignParentEnd="true"
+                        android:includeFontPadding="false"
+                        android:layout_marginTop="@dimen/widget_size_5"
+                        android:paddingStart="@dimen/widget_size_10"
+                        android:paddingEnd="@dimen/widget_size_10"
+                        android:paddingTop="@dimen/widget_size_5"
+                        android:paddingBottom="@dimen/widget_size_5"
+                        android:background="@drawable/yellow_rect_round_border"
+                        android:textColor="@color/color_yellow"
+                        android:onClick="@{listener::onClick}"
+                        android:textAppearance="@style/TextAppearanceBody2"/>
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/tv_sell_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/color_white"
+                    android:includeFontPadding="false"
+                    android:padding="@dimen/widget_size_15"
+                    android:lineSpacingExtra="@dimen/widget_size_5"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
+
+                <LinearLayout
+                    android:id="@+id/ll_trust_hash"
+                    android:background="@color/color_white"
+                    android:orientation="vertical"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:paddingTop="@dimen/widget_size_15"
+                    android:paddingBottom="@dimen/widget_size_15"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text="@string/tx_sell_detail_trust_hash"
+                        android:layout_marginStart="@dimen/widget_size_15"
+                        android:layout_marginBottom="@dimen/widget_size_10"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody2" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:background="@color/color_white"
+                        android:id="@+id/recycler_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:scrollbars="vertical"
+                        android:focusable="true"
+                        android:scrollbarStyle="outsideOverlay" />
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:id="@+id/ll_trust_more"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        android:layout_gravity="end"
+                        android:onClick="@{listener::onClick}"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/common_more"
+                            android:includeFontPadding="false"
+                            android:textAppearance="@style/TextAppearanceBody2"/>
+
+                        <ImageView
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:contentDescription="@null"
+                            android:src="@mipmap/icon_arrow"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:paddingStart="@dimen/widget_size_15"
+                    android:paddingEnd="@dimen/widget_size_15"
+                    android:paddingTop="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_10"
+                    android:background="@color/color_white">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_toStartOf="@+id/tv_escrow_now"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineSpacingExtra="@dimen/widget_size_2"
+                            android:textAppearance="@style/TextAppearanceBody2"
+                            android:text="@string/escrow_tip"/>
+
+                        <TextView
+                            android:id="@+id/tv_escrow_now"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:text="@string/escrow_now"
+                            android:layout_alignParentEnd="true"
+                            android:includeFontPadding="false"
+                            android:layout_marginTop="@dimen/widget_size_5"
+                            android:paddingStart="@dimen/widget_size_10"
+                            android:paddingEnd="@dimen/widget_size_10"
+                            android:paddingTop="@dimen/widget_size_5"
+                            android:paddingBottom="@dimen/widget_size_5"
+                            android:background="@drawable/yellow_rect_round_border"
+                            android:textColor="@color/color_yellow"
+                            android:onClick="@{listener::onClick}"
+                            android:textAppearance="@style/TextAppearanceBody2"/>
+
+                    </RelativeLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/widget_size_2"
+                        android:lineSpacingExtra="@dimen/widget_size_2"
+                        android:textAppearance="@style/TextAppearanceBody2"
+                        android:text="@string/escrow_secure_tip"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearanceBody3"
+                        android:layout_marginTop="@dimen/widget_size_2"
+                        android:lineSpacingExtra="@dimen/widget_size_2"
+                        android:textColor="@color/gray_dark"
+                        android:text="@string/escrow_fee_tip"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</layout>

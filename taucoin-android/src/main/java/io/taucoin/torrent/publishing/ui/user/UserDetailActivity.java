@@ -119,16 +119,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             }
         });
 
-        communityViewModel.getChatState().observe(this, state -> {
-            closeProgressDialog();
-            if (!state.isSuccess()) {
-                ToastUtils.showShortToast(state.getMsg());
-            } else {
-                onBackPressed();
-                openChatActivity(state.getMsg());
-            }
-        });
-
         userViewModel.getEditBlacklistResult().observe(this, result -> {
             if (result.isSuccess()) {
                 ToastUtils.showShortToast(R.string.blacklist_successfully);
@@ -191,8 +181,8 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 userViewModel.addFriend(publicKey);
                 break;
             case R.id.tv_start_chat:
-                showProgressDialog();
-                communityViewModel.createChat(user.publicKey);
+                onBackPressed();
+                openChatActivity(user.publicKey);
                 break;
             case R.id.tv_remark:
                 userViewModel.showRemarkDialog(this, publicKey);

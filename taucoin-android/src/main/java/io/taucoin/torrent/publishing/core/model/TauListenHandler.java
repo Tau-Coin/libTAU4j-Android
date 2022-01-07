@@ -281,7 +281,7 @@ class TauListenHandler {
         }
         TxContent txContent = new TxContent(txMsg.getPayload());
         int txType = txContent.getType();
-        if (txType == TxType.CHAIN_NOTE.getType()) {
+        if (txType == TxType.NOTE_TX.getType()) {
             saveUserInfo(txMsg.getSender());
         } else if (txType == TxType.WRING_TX.getType()) {
             saveUserInfo(txMsg.getSender());
@@ -300,7 +300,7 @@ class TauListenHandler {
         }
         TxContent txContent = new TxContent(txMsg.getPayload());
         int txType = txContent.getType();
-        if (txType == TxType.CHAIN_NOTE.getType()) {
+        if (txType == TxType.NOTE_TX.getType()) {
             addMemberInfo(txMsg.getChainID(), txMsg.getSender());
         } else if (txType == TxType.WRING_TX.getType()) {
             addMemberInfo(txMsg.getChainID(), txMsg.getSender());

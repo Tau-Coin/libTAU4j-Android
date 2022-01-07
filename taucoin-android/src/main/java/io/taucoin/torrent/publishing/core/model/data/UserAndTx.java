@@ -9,13 +9,16 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 /**
  * Room: 包含被回复的交易信息的实体类
  */
-public class UserAndTx extends Tx{
+public class UserAndTx extends Tx {
 
     @Relation(parentColumn = "senderPk",
             entityColumn = "publicKey")
     public User sender;                     // 交易发送者对应的用户信息
+    @Relation(parentColumn = "receiverPk",
+            entityColumn = "publicKey")
+    public User receiver;                   // 交易接受者对应的用户信息
 
-    public long senderBalance;              // 交易发送者的余额
+    public int trusts;
 
     public UserAndTx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo) {
         super(chainID, receiverPk, amount, fee, txType, memo);

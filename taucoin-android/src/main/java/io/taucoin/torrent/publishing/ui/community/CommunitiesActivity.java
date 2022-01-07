@@ -97,7 +97,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             return;
         }
         binding.itemMiningIncome.setRightText(FmtMicrometer.fmtBalance(status.totalRewards));
-        binding.itemLastBlock.setRightText(FmtMicrometer.fmtLong(status.blockNumber));
+        binding.itemLastBlock.setRightText(FmtMicrometer.fmtLong(status.headBlock));
         binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
     }
 

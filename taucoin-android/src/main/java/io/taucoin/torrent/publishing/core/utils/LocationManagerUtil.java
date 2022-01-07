@@ -82,6 +82,9 @@ public class LocationManagerUtil {
      * 开始定位
      */
     public void startLocation() {
+        if (null == locationManager) {
+            return;
+        }
         logger.debug("startLocation");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && (
                 ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)

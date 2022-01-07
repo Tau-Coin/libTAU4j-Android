@@ -29,6 +29,7 @@
     <string name="common_later">Later</string>
     <string name="common_ignore">Ignore</string>
     <string name="common_accept">Accept</string>
+    <string name="common_more">More</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
@@ -84,7 +85,6 @@
     <string name="community_miners_online">Miners Online</string>
     <string name="community_total_blocks">Total Blocks</string>
     <string name="community_mining_power">Mining Power</string>
-    <string name="community_last_block">Last Block</string>
     <string name="community_expiry_date">Expiry Date</string>
     <string name="community_renewal_date">Renewal Date</string>
     <string name="community_info">Info</string>
@@ -112,19 +112,20 @@
     <string name="community_intro">Introduction(optional)</string>
     <string name="community_more_settings">More Settings</string>
     <string name="community_bootstrap_node">DHT Bootstrap Node</string>
-    <string name="community_transaction">Transaction</string>
+    <string name="community_transaction">Wiring Transaction</string>
     <string name="community_nickname">Community Nickname</string>
     <string name="community_choose_community">Chains</string>
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>
     <string name="community_mining_income">Mining Income</string>
     <string name="community_filter_all">All</string>
-    <string name="community_chain_note">Onchain Note Transaction</string>
-    <string name="community_off_chain_msg">Offchain Message</string>
-    <string name="community_member_off_chain">Offchain</string>
-    <string name="community_wired">Wiring Transaction</string>
-    <string name="community_head_blocks">Head Blocks</string>
-    <string name="community_chain_note_title">Onchain Note Transaction</string>
+    <string name="community_chain_note">Note</string>
+    <string name="community_chain_market">Market</string>
+    <string name="community_on_chain">Chain</string>
+    <string name="community_escrow_service_enter">Community\'s largest coinholder provide Escrow Service</string>
+    <string name="community_chain_note_title">Note Transaction</string>
+    <string name="community_sell_coins">Sell Coins</string>
+    <string name="community_sell_detail">Sell Detail</string>
     <string name="community_filter_by">Filter by</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
 
@@ -307,13 +308,17 @@
     <string name="tx_address_hint">Address</string>
     <string name="tx_amount_hint">Amount</string>
     <string name="tx_memo_hint">Memo(optional)</string>
-    <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction median fee: <font color="#477df9">%1$s</font> %2$s]]></Data></string>
+    <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction fee: <font color="#477df9">%1$s</font> %2$s]]></Data></string>
     <string name="tx_new_name">Nick Name(required)</string>
     <string name="tx_personal_profile">Personal profile(Optional)</string>
     <string name="tx_message">Comments(required)</string>
     <string name="tx_contact_id">%1$s(Optional)</string>
     <string name="tx_bootstrap_node">Bootstrap node(required)</string>
     <string name="tx_comment">Comment(required)</string>
+    <string name="tx_coin_name">Coin Name</string>
+    <string name="tx_link">Link(optional)</string>
+    <string name="tx_location">Location(optional)</string>
+    <string name="tx_description">Description(optional)</string>
     <string name="tx_operation_reply">Reply</string>
     <string name="tx_operation_copy">Copy</string>
     <string name="tx_operation_select_all">Select All</string>
@@ -337,6 +342,7 @@
     <string name="tx_error_invalid_message">Invalid Message</string>
     <string name="tx_error_invalid_comment">Invalid Comment</string>
     <string name="tx_error_send_failed">Transaction sending failed, please try again later!</string>
+    <string name="tx_error_invalid_coin_name">Invalid coin name</string>
 
     <string name="tx_result_successfully">Successfully</string>
     <string name="tx_result_processing">In processing,expected to confirm</string>
@@ -351,6 +357,27 @@
     <string name="tx_block_number">Blocknumber:</string>
     <string name="tx_memo_airdrop">Airdrop coins</string>
     <string name="tx_memo_auto_renewal">Auto renewal</string>
+    <string name="tx_give_trust">Give a trust</string>
+    <string name="tx_give_trust_tip" formatted="false"><Data><![CDATA[Seller <font color="#000000">%1$s</font> happy to receive your trust!]]></Data></string>
+    <string name="tx_give_trust_info">%s %s give %s a trust</string>
+    <string name="tx_sell_detail_trust">Trust %s</string>
+    <string name="tx_sell_detail_trust_hash">Trust Onchain Hash</string>
+    <string name="tx_sell_direct_talk">Talk\nto me</string>
+    <string name="tx_sell_add_friend">Add\nFriend</string>
+    <string name="tx_unknown">Unknown Transaction</string>
+    <string name="escrow_now">Escrow Now</string>
+    <string name="escrow_tip">Need a escrow services?\nTalk width the community\'s largest coinholder.</string>
+    <string name="escrow_secure_tip">Making your transactions more secure.</string>
+    <string name="escrow_fee_tip">*The guarantee fee is agreed between the guarantor parties and TAU does not derive any fees from it.</string>
+    <string name="escrow_service">Escrow Service</string>
+    <string name="escrow_service_safe">Safe Transaction Anywhere</string>
+    <string name="escrow_service_button">Click here to talk to community escrower</string>
+    <string name="escrow_service_step">Step 1. Seller accepts buyer\'s offer and both parties reach a consensus
+    of an escrower. Now the escrow process begins.\n\n
+        Step 2. Buyer send coins and escrow fee to Escrower.\n\n
+        Step 3. Escrower received the transaction and talk to Seller to finished the tradement.\n\n
+        Step 4. Seller send coins to Escrower.\n\n
+        Step 5. Escrower send coins to Seller. The trade process copmplete.</string>
 
     <!-- Strings used for notifier -->
     <string name="app_running_in_the_background">TAU running in the background</string>

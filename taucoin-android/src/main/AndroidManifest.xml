@@ -133,11 +133,27 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.transaction.EscrowServiceActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.transaction.TransactionCreateActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
             android:name=".ui.transaction.NoteCreateActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.transaction.SellCreateActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.transaction.SellDetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.transaction.TrustMoreActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <service

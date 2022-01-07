@@ -151,4 +151,9 @@ public class MemberRepositoryImpl implements MemberRepository{
     public List<String> queryFollowedCommunities(String userPk) {
         return db.memberDao().queryFollowedCommunities(userPk);
     }
+
+    @Override
+    public String getCommunityLargestCoinHolder(String chainID) {
+        return db.memberDao().getCommunityLargestCoinHolder(chainID);
+    }
 }

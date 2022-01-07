@@ -30,7 +30,7 @@ import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
-import io.taucoin.torrent.publishing.ui.transaction.HeadBlockTabFragment;
+import io.taucoin.torrent.publishing.ui.transaction.EscrowServiceActivity;
 import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
 
 /**
@@ -38,6 +38,7 @@ import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
  */
 public class CommunityFragment extends BaseFragment implements View.OnClickListener {
 
+    public static boolean showEscrowServiceEnter = true;
     public static final int MEMBERS_REQUEST_CODE = 0x100;
     public static final int FILTER_REQUEST_CODE = 0x101;
     private MainActivity activity;
@@ -104,6 +105,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
             ActivityUtil.startActivityForResult(intent, activity, CommunityDetailActivity.class, MEMBERS_REQUEST_CODE);
         });
+        binding.llEscrowService.setVisibility(showEscrowServiceEnter ? View.VISIBLE : View.GONE);
 
         refreshFilterView();
     }
@@ -145,37 +147,30 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private void loadTabView(String tab) {
         switch (tab) {
             case "0":
-                // Onchain note transaction
+                // note
                 currentTabFragment = new TxsTabFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString(IntentExtra.CHAIN_ID, chainID);
                 bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
-                bundle.putInt(IntentExtra.TYPE, CommunityTabs.ON_CHAIN_NOTE.getIndex());
+                bundle.putInt(IntentExtra.TYPE, CommunityTabs.NOTE.getIndex());
                 currentTabFragment.setArguments(bundle);
                 break;
             case "1":
-                // offchian message
+                // market
                 currentTabFragment = new TxsTabFragment();
                 bundle = new Bundle();
                 bundle.putString(IntentExtra.CHAIN_ID, chainID);
                 bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
-                bundle.putInt(IntentExtra.TYPE, CommunityTabs.OFF_CHAIN_MSG.getIndex());
+                bundle.putInt(IntentExtra.TYPE, CommunityTabs.MARKET.getIndex());
                 currentTabFragment.setArguments(bundle);
                 break;
             case "2":
-                // Wiring transaction
+                // chain
                 currentTabFragment = new TxsTabFragment();
                 bundle = new Bundle();
                 bundle.putString(IntentExtra.CHAIN_ID, chainID);
                 bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
-                bundle.putInt(IntentExtra.TYPE, CommunityTabs.WRING_TX.getIndex());
-                currentTabFragment.setArguments(bundle);
-                break;
-            case "3":
-                // head block
-                currentTabFragment = new HeadBlockTabFragment();
-                bundle = new Bundle();
-                bundle.putString(IntentExtra.CHAIN_ID, chainID);
+                bundle.putInt(IntentExtra.TYPE, CommunityTabs.CHAIN.getIndex());
                 currentTabFragment.setArguments(bundle);
                 break;
         }
@@ -256,32 +251,34 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.iv_filter:
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                ActivityUtil.startActivityForResult(intent, activity,
-                        FilterChooseActivity.class, FILTER_REQUEST_CODE);
-                break;
             case R.id.tv_chain_note:
-            case R.id.tv_off_chain:
-            case R.id.tv_wring:
-            case R.id.tv_tip_blocks:
+            case R.id.tv_chain_market:
+            case R.id.tv_chain_tx:
                 // 避免同一页面多次刷新
                 if (this.selectedView != null && selectedView.getId() == v.getId()) {
                     return;
                 }
                 if (this.selectedView != null) {
-                    this.selectedView.setBackgroundResource(R.drawable.community_tab_background_default);
+                    this.selectedView.setBackgroundResource(R.drawable.grey_dark_rect_round_bg);
                     this.selectedView.setTextColor(getResources().getColor(R.color.color_white));
                 }
                 TextView selectedView = (TextView) v;
-                selectedView.setBackgroundResource(R.drawable.community_tab_background_selected);
-                selectedView.setTextColor(getResources().getColor(R.color.color_blue_dark));
+                selectedView.setBackgroundColor(getResources().getColor(R.color.color_transparent));
+                selectedView.setTextColor(getResources().getColor(R.color.color_yellow));
                 this.selectedView = selectedView;
                 loadTabView(StringUtil.getTag(selectedView));
                 break;
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
+                break;
+            case R.id.tv_escrow_service:
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, EscrowServiceActivity.class);
+                break;
+            case R.id.iv_close_escrow_service:
+                showEscrowServiceEnter = false;
+                binding.llEscrowService.setVisibility(View.GONE);
                 break;
         }
     }

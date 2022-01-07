@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +24,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.SpannableUrl;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
+import io.taucoin.torrent.publishing.databinding.DialogTrustBinding;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityTabs;
 import io.taucoin.torrent.publishing.ui.constant.Page;
@@ -60,6 +68,7 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     private CompositeDisposable disposables = new CompositeDisposable();
     private TxListAdapter adapter;
     private CommonDialog operationsDialog;
+    private CommonDialog trustDialog;
 
     private String chainID;
     private int currentTab;
@@ -112,7 +121,7 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         adapter = new TxListAdapter(this, chainID);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
-        layoutManager.setStackFromEnd(true);
+//        layoutManager.setStackFromEnd(true);
         binding.txList.setLayoutManager(layoutManager);
         binding.txList.setItemAnimator(null);
         binding.txList.setAdapter(adapter);
@@ -143,10 +152,6 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
      * 初始化右下角悬浮按钮组件
      */
     private void initFabSpeedDial() {
-        if (currentTab == CommunityTabs.OFF_CHAIN_MSG.getIndex()) {
-            binding.fabButton.setVisibility(View.GONE);
-            return;
-        }
         // 自定义点击事件
         binding.fabButton.getMainFab().setOnClickListener(v ->{
             if (isReadOnly) {
@@ -154,11 +159,14 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
             }
             Intent intent = new Intent();
             intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            if (currentTab == CommunityTabs.WRING_TX.getIndex()) {
-                ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
+            if (currentTab == CommunityTabs.NOTE.getIndex()) {
+                ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
+                        TX_REQUEST_CODE);
+            } else if (currentTab == CommunityTabs.MARKET.getIndex()) {
+                ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
                         TX_REQUEST_CODE);
             } else {
-                ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
+                ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
                         TX_REQUEST_CODE);
             }
         });
@@ -227,14 +235,64 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         intent.putExtra(IntentExtra.PUBLIC_KEY, senderPk);
         ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
     }
+
     @Override
     public void onEditNameClicked(String senderPk){
         userViewModel.showRemarkDialog(activity, senderPk);
     }
+
     @Override
     public void onBanClicked(UserAndTx tx){
         String showName = UsersUtil.getShowName(tx.sender, tx.senderPk);
         userViewModel.showBanDialog(activity, tx.senderPk, showName);
+    }
+
+    @Override
+    public void onTrustClicked(User user) {
+        showTrustDialog(user);
+    }
+
+    @Override
+    public void onItemClicked(UserAndTx tx) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.ID, tx.txID);
+        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
+        intent.putExtra(IntentExtra.PUBLIC_KEY, tx.senderPk);
+        ActivityUtil.startActivity(intent, activity, SellDetailActivity.class);
+    }
+
+    /**
+     * 显示信任的对话框
+     */
+    private void showTrustDialog(User user) {
+        DialogTrustBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
+                R.layout.dialog_trust, null, false);
+        String showName = UsersUtil.getShowName(user);
+
+        Spanned trustTip = Html.fromHtml(getString(R.string.tx_give_trust_tip, showName));
+        binding.tvTrustTip.setText(trustTip);
+        long txFee = txViewModel.getTxFee(chainID);
+        String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
+
+        String medianFree = getString(R.string.tx_median_fee, txFeeStr,
+                ChainIDUtil.getCoinName(chainID));
+        binding.tvTrustFee.setText(Html.fromHtml(medianFree));
+        binding.tvTrustFee.setTag(txFeeStr);
+
+        binding.ivClose.setOnClickListener(v -> trustDialog.closeDialog());
+        binding.tvSubmit.setOnClickListener(v -> {
+            int txType = TxType.TRUST_TX.getType();
+            String fee = ViewUtils.getStringTag(binding.tvTrustFee);
+            Tx tx = new Tx(chainID, user.publicKey, FmtMicrometer.fmtTxLongValue(fee), txType);
+            txViewModel.addTransaction(tx);
+            trustDialog.closeDialog();
+        });
+        trustDialog = new CommonDialog.Builder(activity)
+                .setContentView(binding.getRoot())
+                .setCanceledOnTouchOutside(false)
+                .enableWarpWidth(true)
+                .create();
+        trustDialog.show();
     }
 
     /**
@@ -271,23 +329,22 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(operationsDialog != null){
+        closeAllDialog();
+    }
+
+    private void closeAllDialog() {
+        if (operationsDialog != null) {
             operationsDialog.closeDialog();
+        }
+        if (trustDialog != null) {
+            trustDialog.closeDialog();
         }
     }
 
     @Override
     public void onClick(View v) {
-        if(operationsDialog != null){
-            operationsDialog.closeDialog();
-        }
+        closeAllDialog();
         switch (v.getId()){
-//            case R.id.replay:
-//                UserAndTx tx = (UserAndTx) v.getTag();
-//                Intent intent = new Intent();
-//                intent.putExtra(IntentExtra.BEAN, community);
-//                ActivityUtil.startActivity(intent, this, MessageActivity.class);
-//                break;
             case R.id.copy:
                 String msg = ViewUtils.getStringTag(v);
                 CopyManager.copyText(msg);

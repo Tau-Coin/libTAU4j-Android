@@ -13,9 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemMemberListBinding;
 
 /**
@@ -67,8 +65,7 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberL
                 showName = UsersUtil.getShowName(member.user);
             }
             holder.binding.tvName.setText(showName);
-            String firstLetters = StringUtil.getFirstLettersOfName(showName);
-            holder.binding.leftView.setText(firstLetters);
+            holder.binding.leftView.setImageBitmap(UsersUtil.getHeadPic(member.user));
 
             if (member.lastSeenTime > 0) {
                 String time = DateUtil.format(member.lastSeenTime, DateUtil.pattern6);
@@ -82,9 +79,6 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberL
             holder.binding.tvCommunities.setVisibility(View.GONE);
             holder.binding.ivShare.setVisibility(View.GONE);
             holder.binding.ivShare.setVisibility(View.GONE);
-
-            int bgColor = Utils.getGroupColor(member.publicKey);
-            holder.binding.leftView.setBgColor(bgColor);
 
             holder.binding.ivShare.setOnClickListener(v -> {
                 if (listener != null) {

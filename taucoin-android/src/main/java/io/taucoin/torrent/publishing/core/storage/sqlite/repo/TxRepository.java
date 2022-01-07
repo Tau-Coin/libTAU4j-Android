@@ -24,16 +24,16 @@ public interface TxRepository {
     int updateTransaction(Tx transaction);
 
     /**
-     * 根据chainID查询社区交易数
-     * @param chainID 社区链ID
-     */
-    int queryNumCommunityTxs(String chainID, int txType);
-
-    /**
      * 根据chainID查询社区交易
      * @param chainID 社区链ID
      */
-    List<UserAndTx> queryCommunityTxs(String chainID, int txType, int startPos, int loadSize);
+    List<UserAndTx> queryCommunityTxs(String chainID, int currentTab, int startPos, int loadSize);
+
+    /**
+     * 查询社区用户被Trust列表
+     * @param chainID 社区链ID
+     */
+    List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPos, int loadSize);
 
     /**
      * 获取社区里用户未上链并且未过期的交易数
@@ -54,29 +54,12 @@ public interface TxRepository {
     @Deprecated
     Tx getEarliestExpireTx(String chainID, String senderPk, long expireTime);
 
-    /**
-     * 根据txID查询交易
-     * @param txID 交易ID
-     */
-    Single<Tx> getTxByTxIDSingle(String txID);
 
     /**
      * 根据txID查询交易
      * @param txID 交易ID
      */
     Tx getTxByTxID(String txID);
-
-    /**
-     * 观察中位数交易费
-     * @param chainID 交易所属的社区chainID
-     */
-    Single<List<Long>> observeMedianFee(String chainID);
-
-    /**
-     * 获取中位数交易费
-     * @param chainID 交易所属的社区chainID
-     */
-    List<Long> getMedianFee(String chainID);
 
     /**
      * 观察社区的交易的变化
@@ -92,4 +75,6 @@ public interface TxRepository {
      * 提交数据变化
      */
     void submitDataSetChanged();
+
+    Observable<UserAndTx> observeSellTxDetail(String chainID, String txID);
 }

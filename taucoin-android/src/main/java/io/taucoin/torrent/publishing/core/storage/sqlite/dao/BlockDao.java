@@ -19,11 +19,13 @@ public interface BlockDao {
     String QUERY_BLOCK = "SELECT * FROM Blocks " +
             " WHERE chainID = :chainID and blockHash= :blockHash";
 
-    String QUERY_CHAIN_STATUS = "SELECT a.* , b.peerBlocks, b.totalRewards, c.totalPeers, c.totalCoin FROM" +
-            " (SELECT blockNumber, difficulty FROM Blocks " +
+    String QUERY_CHAIN_STATUS = "SELECT a.* , b.peerBlocks, b.totalRewards, b.headBlock, b.tailBlock," +
+            " b.consensusBlock, c.totalPeers, c.totalCoin FROM" +
+            " (SELECT difficulty FROM Blocks " +
             " WHERE chainID = :chainID AND status = 1 ORDER BY blockNumber DESC" +
             " LIMIT 1) AS a," +
-            " (SELECT count(*) peerBlocks, SUM(rewards) AS totalRewards FROM Blocks bb" +
+            " (SELECT count(*) peerBlocks, SUM(rewards) AS totalRewards, c.headBlock, c.tailBlock, c.consensusBlock" +
+            " FROM Blocks bb" +
             " LEFT JOIN Communities c ON bb.chainID = c.chainID" +
             " WHERE bb.chainID = :chainID" +
             " AND miner =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +

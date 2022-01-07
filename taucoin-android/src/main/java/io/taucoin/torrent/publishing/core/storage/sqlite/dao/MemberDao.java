@@ -80,6 +80,11 @@ public interface MemberDao {
             " WHERE m.publicKey = :userPk AND c.isBanned = 0" +
             " AND " + WHERE_ON_CHAIN;
 
+    // 获取社区最大币持有者
+    String QUERY_LARGEST_COIN_HOLDER = "SELECT publicKey FROM Members" +
+            " WHERE chainID = :chainID" +
+            " ORDER BY balance DESC LIMIT 1";
+
     /**
      * 添加新社区成员
      */
@@ -150,4 +155,10 @@ public interface MemberDao {
      */
     @Query(QUERY_FOLLOWED_COMMUNITIES)
     List<String> queryFollowedCommunities(String userPk);
+
+    /**
+     * 获取社区最大币持有者
+     */
+    @Query(QUERY_LARGEST_COIN_HOLDER)
+    String getCommunityLargestCoinHolder(String chainID);
 }

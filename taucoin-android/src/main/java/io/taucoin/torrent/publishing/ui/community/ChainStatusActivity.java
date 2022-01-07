@@ -75,7 +75,9 @@ public class ChainStatusActivity extends BaseActivity {
         if (null == status) {
             return;
         }
-        binding.itemLastBlock.setRightText(FmtMicrometer.fmtLong(status.blockNumber));
+        binding.itemHeadBlock.setRightText(FmtMicrometer.fmtLong(status.headBlock));
+        binding.itemTailBlock.setRightText(FmtMicrometer.fmtLong(status.tailBlock));
+        binding.itemConsensusBlock.setRightText(FmtMicrometer.fmtLong(status.consensusBlock));
         binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
         binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
         binding.itemPeersBlocks.setRightText(FmtMicrometer.fmtLong(status.peerBlocks));

@@ -74,6 +74,10 @@
     <color name="color_black_transparent">#66000000</color>
     <color name="color_black">#000000</color>
     <color name="color_black_light">#454545</color>
+    <color name="color_black_spinner">#67646A</color>
+
+    <color name="color_gray_dark">#AAAAAA</color>
+    <color name="color_gray_light">#CACACA</color>
 
     <color name="color_transparent">#00000000</color>
 

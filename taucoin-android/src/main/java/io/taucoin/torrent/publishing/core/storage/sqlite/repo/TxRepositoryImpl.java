@@ -12,9 +12,11 @@ import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.ui.community.CommunityTabs;
 
 /**
  * TxRepository接口实现
@@ -61,25 +63,23 @@ public class TxRepositoryImpl implements TxRepository{
      * @param chainID 社区链ID
      */
     @Override
-    public int queryNumCommunityTxs(String chainID, int txType){
-        if (txType == -1) {
-            return db.txDao().queryNumCommunityTxsNotOnChain(chainID, 0);
+    public List<UserAndTx> queryCommunityTxs(String chainID, int currentTab, int startPos, int loadSize) {
+        if (currentTab == CommunityTabs.CHAIN.getIndex()) {
+            return db.txDao().queryCommunityOnChainTxs(chainID, startPos, loadSize);
+        } else if (currentTab == CommunityTabs.MARKET.getIndex()) {
+            return db.txDao().queryCommunityMarketTxs(chainID, startPos, loadSize);
         } else {
-            return db.txDao().queryNumCommunityTxsOnChain(chainID, txType, 1);
+            return db.txDao().queryCommunityTxs(chainID, startPos, loadSize);
         }
     }
 
     /**
-     * 根据chainID查询社区交易
+     * 查询社区用户被Trust列表
      * @param chainID 社区链ID
      */
     @Override
-    public List<UserAndTx> queryCommunityTxs(String chainID, int txType, int startPos, int loadSize){
-        if(txType == -1){
-            return db.txDao().queryCommunityTxsNotOnChain(chainID, 0, startPos, loadSize);
-        }else{
-            return db.txDao().queryCommunityTxsOnChain(chainID, txType, 1, startPos, loadSize);
-        }
+    public List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPos, int loadSize) {
+        return db.txDao().queryCommunityTrustTxs(chainID, trustPk, startPos, loadSize);
     }
 
     /**
@@ -113,35 +113,13 @@ public class TxRepositoryImpl implements TxRepository{
      * @param txID 交易ID
      */
     @Override
-    public Single<Tx> getTxByTxIDSingle(String txID){
-        return db.txDao().getTxByTxIDSingle(txID);
-    }
-
-    /**
-     * 根据txID查询交易
-     * @param txID 交易ID
-     */
-    @Override
     public Tx getTxByTxID(String txID){
         return db.txDao().getTxByTxID(txID);
     }
 
-    /**
-     * 观察中位数交易费
-     * @param chainID 交易所属的社区chainID
-     */
     @Override
-    public Single<List<Long>> observeMedianFee(String chainID){
-        return db.txDao().observeMedianFee(chainID);
-    }
-
-    /**
-     * 获取中位数交易费
-     * @param chainID 交易所属的社区chainID
-     */
-    @Override
-    public List<Long> getMedianFee(String chainID){
-        return db.txDao().getMedianFee(chainID);
+    public Observable<UserAndTx> observeSellTxDetail(String chainID, String txID) {
+        return db.txDao().observeSellTxDetail(chainID, txID);
     }
 
     @Override

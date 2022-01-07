@@ -5,7 +5,9 @@ package io.taucoin.torrent.publishing.core.model.data;
  */
 public class ChainStatus {
 
-    public long blockNumber;                     // 区块号
+    public long headBlock;                       // 头区块号
+    public long tailBlock;                       // 尾块号
+    public long consensusBlock;                  // 共识区块号
     public long difficulty;                      // 区块难度
     public long peerBlocks;                      // 当前peer的出块数
     public long totalRewards;                    // 当前peer的出块总奖励

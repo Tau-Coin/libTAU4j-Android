@@ -2,15 +2,13 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.dao;
 
 import java.util.List;
 
-import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
+import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 
@@ -19,38 +17,53 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
  */
 @Dao
 public interface TxDao {
-    // SQL:查询社区里的交易(上链，区分交易类型)
-    String QUERY_GET_TXS_BY_CHAIN_WHERE = " WHERE tx.chainID = :chainID AND tx.txStatus = :txStatus" +
-            " and tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST;
 
-    String QUERY_GET_TXS_NUM_BY_CHAIN_ID_AND_TYPE_ON_CHAIN = "SELECT count(*) FROM Txs AS tx" +
-            QUERY_GET_TXS_BY_CHAIN_WHERE;
-
-    // SQL:查询社区里的交易(未上链，不区分交易类型)
-    String QUERY_GET_TXS_BY_CHAIN_ID_NOT_ON_CHAIN = "SELECT tx.*, mem.balance AS senderBalance" +
+    String QUERY_GET_SELL_DETAIL = "SELECT tx.*, t.trusts" +
             " FROM Txs AS tx" +
-            " LEFT JOIN Members AS mem ON tx.senderPk = mem.publicKey AND tx.chainID = mem.chainID" +
-            QUERY_GET_TXS_BY_CHAIN_WHERE +
+            " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
+            " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
+            " ON tx.senderPk = t.receiverPk" +
+            " WHERE tx.chainID = :chainID AND tx.txID = :txID";
+
+    // SQL:查询社区里的交易(MARKET交易，排除Trust Tx)
+    String QUERY_GET_MARKET_TXS = "SELECT tx.*, t.trusts" +
+            " FROM Txs AS tx" +
+            " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
+            " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
+            " ON tx.senderPk = t.receiverPk" +
+            " WHERE tx.chainID = :chainID" +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
+            " AND (tx.txType = 3 OR tx.txType = 5)" +
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
-    // SQL:查询社区里的交易数(未上链，不区分交易类型)
-    String QUERY_GET_TXS_NUM_BY_CHAIN_ID_NOT_ON_CHAIN = QUERY_GET_TXS_NUM_BY_CHAIN_ID_AND_TYPE_ON_CHAIN +
-            " AND tx.txType = :txType";
-
-    // SQL:查询社区里的交易(上链，区分交易类型)
-    String QUERY_GET_TXS_BY_CHAIN_ID_AND_TYPE_ON_CHAIN = "SELECT tx.*, mem.balance AS senderBalance" +
+    // SQL:查询社区里的交易(所有，排除Trust Tx)
+    String QUERY_GET_TXS = "SELECT tx.*, t.trusts" +
             " FROM Txs AS tx" +
-            " LEFT JOIN Members AS mem ON tx.senderPk = mem.publicKey AND tx.chainID = mem.chainID" +
-            QUERY_GET_TXS_BY_CHAIN_WHERE +
-            " AND tx.txType = :txType" +
+            " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
+            " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
+            " ON tx.senderPk = t.receiverPk" +
+            " WHERE tx.chainID = :chainID" +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
+    // SQL:查询社区里的交易(上链，排除Trust Tx)
+    String QUERY_GET_ON_CHAIN_TXS = "SELECT tx.*, t.trusts" +
+            " FROM Txs AS tx" +
+            " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
+            " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
+            " ON tx.senderPk = t.receiverPk" +
+            " WHERE tx.chainID = :chainID AND tx.txStatus = 1" +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
+            " ORDER BY tx.timestamp DESC" +
+            " limit :loadSize offset :startPosition";
 
-    // SQL:查询社区里的交易数(上链，区分交易类型)
-    String QUERY_GET_TXS_NUM_BY_CHAIN_ID_ON_CHAIN = QUERY_GET_TXS_NUM_BY_CHAIN_ID_NOT_ON_CHAIN +
-            " AND tx.txType = :txType";
+    // SQL:查询社区里用户Trust交易(上链)
+    String QUERY_GET_TRUST_TXS = "SELECT * FROM Txs WHERE chainID = :chainID" +
+            " AND txType = 4 AND txStatus = 1 AND receiverPk = :trustPk" +
+            " ORDER BY timestamp DESC" +
+            " limit :loadSize offset :startPosition";
 
     // SQL:查询未上链并且已过期的条件语句
     String QUERY_PENDING_TXS_NOT_EXPIRED_WHERE = " WHERE senderPk = :senderPk AND chainID = :chainID" +
@@ -71,10 +84,6 @@ public interface TxDao {
     String QUERY_GET_TX_BY_TX_ID = "SELECT * FROM Txs" +
             " WHERE txID = :txID";
 
-    String QUERY_TX_MEDIAN_FEE = "SELECT fee FROM Txs " +
-            " WHERE chainID = :chainID and " +
-            " senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
-            " ORDER BY fee limit 10";
     /**
      * 添加新的交易
      */
@@ -92,20 +101,19 @@ public interface TxDao {
      * @param chainID 社区链id
      */
     @Transaction
-    @Query(QUERY_GET_TXS_BY_CHAIN_ID_AND_TYPE_ON_CHAIN)
-    List<UserAndTx> queryCommunityTxsOnChain(String chainID, int txType, int txStatus,
-                                             int startPosition, int loadSize);
-
-    @Query(QUERY_GET_TXS_NUM_BY_CHAIN_ID_ON_CHAIN)
-    int queryNumCommunityTxsOnChain(String chainID, int txType, int txStatus);
+    @Query(QUERY_GET_ON_CHAIN_TXS)
+    List<UserAndTx> queryCommunityOnChainTxs(String chainID, int startPosition, int loadSize);
 
     @Transaction
-    @Query(QUERY_GET_TXS_BY_CHAIN_ID_NOT_ON_CHAIN)
-    List<UserAndTx> queryCommunityTxsNotOnChain(String chainID, int txStatus,
-                                                int startPosition, int loadSize);
+    @Query(QUERY_GET_MARKET_TXS)
+    List<UserAndTx> queryCommunityMarketTxs(String chainID, int startPosition, int loadSize);
 
-    @Query(QUERY_GET_TXS_NUM_BY_CHAIN_ID_AND_TYPE_ON_CHAIN)
-    int queryNumCommunityTxsNotOnChain(String chainID, int txStatus);
+    @Transaction
+    @Query(QUERY_GET_TXS)
+    List<UserAndTx> queryCommunityTxs(String chainID, int startPosition, int loadSize);
+
+    @Query(QUERY_GET_TRUST_TXS)
+    List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPosition, int loadSize);
 
     /**
      * 获取社区里用户未上链并且未过期的交易数
@@ -133,26 +141,9 @@ public interface TxDao {
      * @param txID 交易ID
      */
     @Query(QUERY_GET_TX_BY_TX_ID)
-    Single<Tx> getTxByTxIDSingle(String txID);
-
-    /**
-     * 根据txID查询交易
-     * @param txID 交易ID
-     */
-    @Query(QUERY_GET_TX_BY_TX_ID)
     Tx getTxByTxID(String txID);
 
-    /**
-     * 观察中位数交易费
-     * @param chainID 交易所属的社区chainID
-     */
-    @Query(QUERY_TX_MEDIAN_FEE)
-    Single<List<Long>> observeMedianFee(String chainID);
-
-    /**
-     * 获取中位数交易费
-     * @param chainID 交易所属的社区chainID
-     */
-    @Query(QUERY_TX_MEDIAN_FEE)
-    List<Long> getMedianFee(String chainID);
+    @Transaction
+    @Query(QUERY_GET_SELL_DETAIL)
+    Observable<UserAndTx> observeSellTxDetail(String chainID, String txID);
 }

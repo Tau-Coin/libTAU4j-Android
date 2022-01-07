@@ -30,11 +30,25 @@
                 android:layout_height="wrap_content">
 
                 <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_last_block"
+                    android:id="@+id/item_head_block"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    app:lineLeftText="@string/community_last_block"/>
+                    app:lineLeftText="@string/community_head_block"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_tail_block"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    app:lineLeftText="@string/community_tail_block"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_consensus_block"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    app:lineLeftText="@string/community_consensus_block"/>
 
                 <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_difficulty"

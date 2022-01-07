@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/widget_size_20"
+                android:layout_marginBottom="@dimen/widget_size_40"
+                android:gravity="center_horizontal"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="@dimen/widget_size_180"
+                    android:layout_height="@dimen/widget_size_180"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_logo_orange"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:text="@string/escrow_service_safe"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_20"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_20"
+                    android:paddingStart="@dimen/widget_size_15"
+                    android:paddingEnd="@dimen/widget_size_15"
+                    android:paddingTop="@dimen/widget_size_20"
+                    android:paddingBottom="@dimen/widget_size_20"
+                    android:lineSpacingExtra="@dimen/widget_size_2"
+                    android:text="@string/escrow_service_step"
+                    android:background="@drawable/white_rect_round_bg_no_border"
+                    android:textAppearance="@style/TextAppearanceBody3"/>
+
+                <TextView
+                    android:id="@+id/tv_escrow_now"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|center"
+                    android:text="@string/escrow_service_button"
+                    android:includeFontPadding="false"
+                    android:layout_marginTop="@dimen/widget_size_15"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_20"
+                    android:paddingStart="@dimen/widget_size_10"
+                    android:paddingEnd="@dimen/widget_size_10"
+                    android:paddingTop="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_10"
+                    android:background="@drawable/yellow_rect_round_border"
+                    android:textColor="@color/color_yellow"
+                    android:onClick="@{listener::onClick}"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
+
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
+</layout>

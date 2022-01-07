@@ -21,6 +21,7 @@ import io.taucoin.torrent.publishing.ui.BaseActivity;
 /**
  * 群组过滤选择页面
  */
+@Deprecated
 public class FilterChooseActivity extends BaseActivity implements FilterListAdapter.Callback {
 
     private ActivityCommunityChooseBinding binding;
