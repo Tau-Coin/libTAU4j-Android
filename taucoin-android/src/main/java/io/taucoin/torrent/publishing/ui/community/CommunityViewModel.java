@@ -187,6 +187,7 @@ public class CommunityViewModel extends AndroidViewModel {
                         for (String peer : peers) {
                             addUserInfoToLocal(peer);
                             addMemberInfoToLocal(chainID, peer);
+                            addMemberInfoToLocal(chainID, MainApplication.getInstance().getPublicKey());
                         }
                     }
                 }
