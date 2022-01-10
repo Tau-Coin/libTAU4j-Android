@@ -1,11 +1,5 @@
 apply plugin: 'com.android.application'
 
-repositories {
-    mavenCentral()
-    maven { url 'https://dl.bintray.com/stojan/android' }
-    maven { url 'https://dl.bintray.com/jenly/maven' }
-}
-
 android {
     compileSdkVersion 28
 
