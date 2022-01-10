@@ -7,20 +7,20 @@ import io.taucoin.torrent.publishing.core.utils.rlp.RLPList;
  * 交易内容类
  */
 public class TxContent {
-    private int version;                    // 标识消息版本
-    private int type;                       // 可以标识消息类型
-    private byte[] content;                 // 原始消息体
+    protected int version;                    // 标识消息版本
+    protected int type;                       // 可以标识消息类型
+    protected byte[] memo;                      // 原始消息体
 
-    public TxContent(int type, byte[] content) {
+    public TxContent(int type, byte[] memo) {
         this.version = TxVersion.VERSION1.getV();
         this.type = type;
-        this.content = content;
+        this.memo = memo;
     }
 
-    private TxContent(int version, int type, byte[] content) {
+    private TxContent(int version, int type, byte[] memo) {
         this.version = version;
         this.type = type;
-        this.content = content;
+        this.memo = memo;
     }
 
     public TxContent(byte[] encode) {
@@ -29,21 +29,21 @@ public class TxContent {
         }
     }
 
-    private void parseRLP(byte[] encode) {
+    public void parseRLP(byte[] encode) {
         RLPList params = RLP.decode2(encode);
         RLPList messageList = (RLPList) params.get(0);
 
         this.version = RLP.decodeInteger(messageList, 0, TxVersion.VERSION1.getV());
         this.type = RLP.decodeInteger(messageList, 1, TxType.WRING_TX.getType());
-        this.content = RLP.decodeElement(messageList, 2);
+        this.memo = RLP.decodeElement(messageList, 2);
     }
 
     public byte[] getEncoded() {
         byte[] version = RLP.encodeInteger(this.version);
         byte[] type = RLP.encodeInteger(this.type);
-        byte[] content = RLP.encodeElement(this.content);
+        byte[] memo = RLP.encodeElement(this.memo);
 
-       return RLP.encodeList(version, type, content);
+       return RLP.encodeList(version, type, memo);
     }
 
     public int getVersion() {
@@ -55,6 +55,6 @@ public class TxContent {
     }
 
     public byte[] getContent() {
-        return content;
+        return memo;
     }
 }

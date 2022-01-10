@@ -26,6 +26,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
+import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -261,10 +262,15 @@ class TauListenHandler {
         tx.blockNumber = blockNumber;
         tx.timestamp = txMsg.getTimestamp();
         tx.nonce = txMsg.getNonce();
-        if (tx.txType == TxType.WRING_TX.getType()) {
-            // 添加交易
-            tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
-            tx.amount = txMsg.getAmount();
+        tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
+        tx.amount = txMsg.getAmount();
+
+        if (tx.txType == TxType.SELL_TX.getType()) {
+            SellTxContent sellTxContent = new SellTxContent(txMsg.getPayload());
+            // 添加Sell信息
+            tx.coinName = Utils.textBytesToString(sellTxContent.getCoinName());
+            tx.link = Utils.textBytesToString(sellTxContent.getLink());
+            tx.location = Utils.textBytesToString(sellTxContent.getLocation());
         }
         txRepo.addTransaction(tx);
         logger.info("Add transaction to local, txID::{}, txType::{}", txID, tx.txType);

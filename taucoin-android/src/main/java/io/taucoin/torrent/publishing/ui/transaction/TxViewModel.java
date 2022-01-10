@@ -177,13 +177,13 @@ public class TxViewModel extends AndroidViewModel {
                 // Note交易无接受者时，默认为senderPk
                 receiverPk = senderPk;
             }
-            byte[] content = Utils.textStringToBytes(tx.memo);
+            byte[] memo = Utils.textStringToBytes(tx.memo);
             byte[] txEncoded = null;
             switch (TxType.valueOf(tx.txType)) {
                 case NOTE_TX:
                 case WRING_TX:
                 case TRUST_TX:
-                    TxContent txContent = new TxContent(tx.txType, content);
+                    TxContent txContent = new TxContent(tx.txType, memo);
                     txEncoded = txContent.getEncoded();
                     break;
                 case SELL_TX:
