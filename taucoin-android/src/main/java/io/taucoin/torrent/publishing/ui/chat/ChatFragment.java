@@ -28,12 +28,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.GeoUtils;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
@@ -133,6 +135,20 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             KeyboardUtils.hideSoftInput(activity);
             activity.goBack();
         });
+        User currentUser = MainApplication.getInstance().getCurrentUser();
+        String distance = null;
+        if (currentUser != null) {
+            if (friend.longitude != 0 && friend.latitude != 0 &&
+                    currentUser.longitude != 0 && currentUser.latitude != 0) {
+                distance = GeoUtils.getDistanceStr(friend.longitude, friend.latitude,
+                        currentUser.longitude, currentUser.latitude);
+            }
+        }
+        boolean isShowSubtitle = StringUtil.isNotEmpty(distance);
+        binding.toolbarInclude.tvSubtitle.setVisibility(isShowSubtitle ? View.VISIBLE : View.GONE);
+        if (isShowSubtitle) {
+            binding.toolbarInclude.tvSubtitle.setText(distance);
+        }
         binding.etMessage.addTextChangedListener(textWatcher);
         binding.etMessage.setOnFocusChangeListener((v, hasFocus) -> {
             showOrHideChatAddView(false);

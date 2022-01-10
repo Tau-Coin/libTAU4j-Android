@@ -33,7 +33,7 @@
                 android:layout_height="@dimen/widget_size_80"
                 android:layout_gravity="center_horizontal"
                 android:contentDescription="@null"
-                android:src="@mipmap/icon_logo_orange" />
+                android:src="@mipmap/icon_give_trust" />
 
             <TextView
                 android:id="@+id/tv_trust_tip"

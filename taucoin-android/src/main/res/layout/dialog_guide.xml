@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_rect_round_bg_no_border">
+
+            <TextView
+                android:id="@+id/tv_skip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray_dark"
+                android:text="@string/common_skip"
+                android:layout_gravity="end"
+                android:textAllCaps="true"
+                android:padding="@dimen/widget_size_15"
+                android:layout_marginTop="@dimen/widget_size_0"
+                android:layout_marginEnd="@dimen/widget_size_5"
+                android:textAppearance="@style/TextAppearanceBody2"/>
+
+            <io.taucoin.torrent.publishing.ui.customviews.ViewPager
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:id="@+id/ll_point"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/widget_size_10"
+                android:gravity="center_horizontal">
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

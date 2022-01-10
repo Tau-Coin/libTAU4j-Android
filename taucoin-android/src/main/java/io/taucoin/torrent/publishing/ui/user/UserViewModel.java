@@ -58,6 +58,7 @@ import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FileUtil;
+import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
@@ -79,6 +80,7 @@ import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
 import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
+import io.taucoin.torrent.publishing.ui.customviews.GuideDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
@@ -108,6 +110,7 @@ public class UserViewModel extends AndroidViewModel {
     private MutableLiveData<List<UserAndFriend>> userList = new MutableLiveData<>();
     private CommonDialog commonDialog;
     private CommonDialog editNameDialog;
+    private GuideDialog guideDialog;
     private TauDaemon daemon;
     private ChatViewModel chatViewModel;
     public UserViewModel(@NonNull Application application) {
@@ -132,13 +135,17 @@ public class UserViewModel extends AndroidViewModel {
     public void onCleared() {
         super.onCleared();
         disposables.clear();
-        if(commonDialog != null){
+        if (commonDialog != null) {
             commonDialog.closeDialog();
             commonDialog = null;
         }
-        if(editNameDialog != null){
+        if (editNameDialog != null) {
             editNameDialog.closeDialog();
             editNameDialog = null;
+        }
+        if (guideDialog != null) {
+            guideDialog.closeDialog();
+            guideDialog = null;
         }
     }
 
@@ -235,6 +242,11 @@ public class UserViewModel extends AndroidViewModel {
                 // 1、更新本地数据库数据, TauService中观察者自动触发updateSeed
                 if (null == newUser) {
                     newUser = new User(publicKey, seed, name, true);
+                    // 直接更新新用户的经纬度
+                    if (oldUser != null) {
+                        newUser.longitude = oldUser.longitude;
+                        newUser.latitude = oldUser.latitude;
+                    }
                     userRepo.addUser(newUser);
                 } else {
                     if (StringUtil.isNotEmpty(name)) {
@@ -902,7 +914,7 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     /**
-     * 第一次APP启动，提示用户操作：设置昵称和每日流量限制
+     * 第一次APP启动，提示用户操作：先提示引导页，再设置昵称和每日流量限制
      * @param activity
      * @param user
      */
@@ -912,14 +924,20 @@ public class UserViewModel extends AndroidViewModel {
         boolean isForeground = AppUtil.isForeground(activity, MainActivity.class.getName());
         // 如果APP是第一次启动, 并且MainActivity也在前台
         if (isFirstStart && isForeground) {
-            settingsRepo.setBooleanValue(firstStartKey, false);
-            // 如果用户没有nickname
-            String showName = UsersUtil.getCurrentUserName(user);
-            String defaultName = UsersUtil.getDefaultName(user.publicKey);
-            logger.trace("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
-            if (StringUtil.isEquals(showName, defaultName)) {
-                showEditNameDialog(activity, user.publicKey);
-            }
+            GuideDialog.Builder builder = new GuideDialog.Builder(activity);
+            builder.setCanceledOnTouchOutside(false);
+            builder.setGuideListener(() -> {
+                // 如果用户没有nickname
+                settingsRepo.setBooleanValue(firstStartKey, false);
+                String showName = UsersUtil.getCurrentUserName(user);
+                String defaultName = UsersUtil.getDefaultName(user.publicKey);
+                logger.trace("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
+                if (StringUtil.isEquals(showName, defaultName)) {
+                    showEditNameDialog(activity, user.publicKey);
+                }
+            });
+            guideDialog = builder.create();
+            guideDialog.show();
         }
     }
 

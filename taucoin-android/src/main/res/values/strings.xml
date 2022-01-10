@@ -30,6 +30,7 @@
     <string name="common_ignore">Ignore</string>
     <string name="common_accept">Accept</string>
     <string name="common_more">More</string>
+    <string name="common_skip">Skip</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
@@ -488,4 +489,7 @@
 
     <!-- Send text to clipboard -->
     <string name="chatting_resend_failed">Resend failed, please try again later!</string>
+
+    <string name="home_guide1" formatted="false"><Data><![CDATA[Using TAU app to create a community can save up to <font color="#f19322">5ETH</font>(≈US$19692.85)]]></Data></string>
+    <string name="home_guide2">Earn crypto &#038; join the best airdrop and more!</string>
 </resources>

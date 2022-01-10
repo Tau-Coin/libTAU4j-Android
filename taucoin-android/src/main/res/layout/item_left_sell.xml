@@ -66,7 +66,7 @@
                     android:layout_height="@dimen/widget_size_16"
                     android:padding="@dimen/widget_size_2"
                     android:contentDescription="@null"
-                    android:src="@mipmap/icon_logo_orange"/>
+                    android:src="@mipmap/icon_trust"/>
 
             </LinearLayout>
 

@@ -116,7 +116,7 @@
                 android:layout_marginStart="@dimen/widget_size_10"
                 android:contentDescription="@null"
                 android:onClick="@{listener::onClick}"
-                android:src="@mipmap/icon_close_drawer"/>
+                android:src="@mipmap/icon_close_white"/>
 
         </LinearLayout>
 
