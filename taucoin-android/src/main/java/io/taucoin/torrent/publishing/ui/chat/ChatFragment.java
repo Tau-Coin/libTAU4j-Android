@@ -83,8 +83,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         activity = (MainActivity) getActivity();
         ViewModelProvider provider = new ViewModelProvider(this);
         userViewModel = provider.get(UserViewModel.class);

@@ -56,8 +56,8 @@ public class MembersAddFragment extends BaseFragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         activity = getActivity();
         ViewModelProvider provider = new ViewModelProvider(this);
         viewModel = provider.get(TxViewModel.class);

@@ -1,8 +1,10 @@
 package io.taucoin.torrent.publishing.ui;
 
 import android.content.Context;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.taucoin.torrent.publishing.core.utils.FixMemLeak;
@@ -46,5 +48,9 @@ public abstract class BaseFragment extends Fragment implements
         getViewModelStore().clear();
         FixMemLeak.fixOPPOLeak(this);
         FixMemLeak.fixSamSungInputConnectionLeak(baseActivity);
+    }
+
+    public void onFragmentResult(int requestCode, int resultCode, @Nullable Intent data) {
+
     }
 }

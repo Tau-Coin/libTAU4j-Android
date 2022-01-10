@@ -51,8 +51,8 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         activity = (MainActivity) getActivity();
         ViewModelProvider provider = new ViewModelProvider(activity);
         viewModel = provider.get(MainViewModel.class);

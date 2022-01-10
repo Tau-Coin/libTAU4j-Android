@@ -61,8 +61,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         activity = (MainActivity) getActivity();
         settingsRepo = RepositoryHelper.getSettingsRepository(activity.getApplicationContext());
         ViewModelProvider provider = new ViewModelProvider(this);
@@ -284,13 +284,13 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onFragmentResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onFragmentResult(requestCode, resultCode, data);
         if (requestCode == CommunityFragment.FILTER_REQUEST_CODE) {
             refreshFilterView();
         } else {
             if (currentTabFragment != null) {
-                currentTabFragment.onActivityResult(requestCode, resultCode, data);
+                currentTabFragment.onFragmentResult(requestCode, resultCode, data);
             }
         }
     }

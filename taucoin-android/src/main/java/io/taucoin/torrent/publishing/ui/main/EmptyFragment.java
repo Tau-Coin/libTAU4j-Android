@@ -27,8 +27,8 @@ public class EmptyFragment extends BaseFragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         binding.toolbarRight.ivBack.setVisibility(View.GONE);
         binding.toolbarRight.ivAction.setVisibility(View.GONE);
     }

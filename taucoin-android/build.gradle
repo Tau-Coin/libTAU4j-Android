@@ -107,7 +107,8 @@ dependencies {
     androidTestImplementation "com.google.dagger:dagger:$DAGGER_VERSION"
     testAnnotationProcessor "com.google.auto.service:auto-service:1.0-rc6"
     /* AndroidX libraries */
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    // pictureselector 中含有高版本appcompat
+//    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0-beta02'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.recyclerview:recyclerview-selection:1.2.0-alpha01'

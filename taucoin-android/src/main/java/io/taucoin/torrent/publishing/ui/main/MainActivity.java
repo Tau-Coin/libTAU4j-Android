@@ -55,6 +55,7 @@ import io.taucoin.torrent.publishing.databinding.ExternalLinkDialogBinding;
 import io.taucoin.torrent.publishing.databinding.UserDialogBinding;
 import io.taucoin.torrent.publishing.receiver.NotificationReceiver;
 import io.taucoin.torrent.publishing.service.WorkloadManager;
+import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.chat.ChatFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityFragment;
@@ -96,7 +97,7 @@ public class MainActivity extends ScanTriggerActivity {
     private CommonDialog seedDialog;
     private CommonDialog linkDialog;
     private User user;
-    private Fragment currentFragment;
+    private BaseFragment currentFragment;
     private BadgeActionProvider badgeProvider;
 
     @Override
@@ -496,7 +497,7 @@ public class MainActivity extends ScanTriggerActivity {
      */
     private void updateMainRightFragment(CommunityAndFriend bean, Intent intent) {
         // 创建修改实例
-        Fragment newFragment = null;
+        BaseFragment newFragment = null;
         Bundle bundle = new Bundle();
         if (bean != null) {
             if (bean.type == 0) {
@@ -630,7 +631,7 @@ public class MainActivity extends ScanTriggerActivity {
         } else if (requestCode == CommunityFragment.FILTER_REQUEST_CODE ||
                 requestCode == TxsTabFragment.TX_REQUEST_CODE) {
             if (currentFragment != null) {
-                currentFragment.onActivityResult(requestCode, resultCode, data);
+                currentFragment.onFragmentResult(requestCode, resultCode, data);
             }
         } else if (resultCode == RESULT_OK && requestCode == FontSizeActivity.REQUEST_CODE_FONT_SIZE) {
             refreshAllView();

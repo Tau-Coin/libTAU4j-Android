@@ -84,8 +84,8 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         activity = (BaseActivity) getActivity();
         assert activity != null;
         ViewModelProvider provider = new ViewModelProvider(this);
@@ -394,8 +394,8 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onFragmentResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onFragmentResult(requestCode, resultCode, data);
         if (requestCode == TX_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             loadData(0);
         }
