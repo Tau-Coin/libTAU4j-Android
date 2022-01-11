@@ -99,7 +99,8 @@ public class LocationManagerUtil {
         if (providers != null) {
             for (String provider: providers) {
                 Location l = locationManager.getLastKnownLocation(provider);
-                logger.debug("provider::{}, location==null::{}", provider, null == l);
+                logger.debug("provider::{}, enabled::{}, location==null::{}", provider,
+                        locationManager.isProviderEnabled(provider), null == l);
                 if (null == l) {
                     continue;
                 }
@@ -122,6 +123,7 @@ public class LocationManagerUtil {
                     minDistance, locationListener);
             locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, minTime,
                     minDistance, locationListener);
+            logger.debug("request Location Updates...");
         }
     }
 
