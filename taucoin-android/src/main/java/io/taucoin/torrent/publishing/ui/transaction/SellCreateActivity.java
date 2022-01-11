@@ -1,5 +1,6 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
@@ -49,7 +50,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
      * 初始化参数
      */
     private void initParameter() {
-        if(getIntent() != null){
+        if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
         }
     }
@@ -57,6 +58,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     /**
      * 初始化布局
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(R.string.community_sell_coins);
@@ -84,8 +86,19 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
         binding.coinSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                binding.etCoinName.setText(items[position]);
+                String coinName = items[position];
+                binding.etCoinName.setText(coinName);
+                binding.etCoinName.setSelection(coinName.length());
                 adapter.setSelectPos(position);
+                if (position == items.length -1) {
+                    binding.etCoinName.getText().clear();
+                    binding.etCoinName.setFocusable(true);
+                    binding.etCoinName.setFocusableInTouchMode(true);
+                    binding.etCoinName.requestFocus();
+                } else {
+                    binding.etCoinName.setFocusable(false);
+                    binding.etCoinName.setFocusableInTouchMode(false);
+                }
             }
 
             @Override
@@ -93,6 +106,17 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
 
             }
         });
+
+        binding.etCoinName.setOnTouchListener((v, event) -> {
+            if (adapter.getSelectPos() != items.length -1) {
+                KeyboardUtils.hideSoftInput(SellCreateActivity.this);
+                binding.coinSpinner.performClick();
+                return true;
+            } else {
+                return false;
+            }
+        });
+
         binding.coinSpinner.setOnTouchListener((v, event) -> {
             v.performClick();
             KeyboardUtils.hideSoftInput(SellCreateActivity.this);

@@ -24,9 +24,10 @@
 
                 <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
                     android:id="@+id/round_button"
-                    android:layout_width="@dimen/widget_size_60"
-                    android:layout_height="@dimen/widget_size_60"
+                    android:layout_width="@dimen/widget_size_55"
+                    android:layout_height="@dimen/widget_size_55"
                     android:layout_centerVertical="true"
+                    android:src="@drawable/primary_rect_round_bg"
                     android:scaleType="centerCrop"/>
 
                 <LinearLayout

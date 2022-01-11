@@ -24,6 +24,10 @@ public class SpinnerAdapter extends BaseAdapter {
         this.selectPos = selectPos;
     }
 
+    public int getSelectPos() {
+        return selectPos;
+    }
+
     @Override
     public int getCount() {
         return null == array ? 0 : array.length;

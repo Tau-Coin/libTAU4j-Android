@@ -54,5 +54,6 @@
         <item>DOGE</item>
         <item>SHIB</item>
         <item>XRP</item>
+        <item>Other</item>
     </string-array>
 </resources>
