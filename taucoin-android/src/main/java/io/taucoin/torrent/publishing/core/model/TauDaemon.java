@@ -74,7 +74,6 @@ public abstract class TauDaemon {
     private ConnectionReceiver connectionReceiver = new ConnectionReceiver();
     SessionManager sessionManager;
     private SystemServiceManager systemServiceManager;
-    private ExecutorService exec = Executors.newSingleThreadExecutor();
     private TauInfoProvider tauInfoProvider;
     private LocationManagerUtil locationManager;
     private Disposable updateInterfacesTimer;    // 更新libTAU监听接口定时任务
@@ -179,75 +178,23 @@ public abstract class TauDaemon {
      */
     public Flowable<Boolean> observeNeedStartDaemon() {
         return Flowable.create((emitter) -> {
-            if (emitter.isCancelled()){
-                return;
-            }
-            Runnable emitLoop = () -> {
-                while (!Thread.interrupted()) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                    if (emitter.isCancelled() || isRunning){
-                        return;
-                    }
-                    emitter.onNext(true);
-                }
-            };
-
-            Disposable d = observeDaemonRunning()
-                    .subscribeOn(Schedulers.io())
-                    .subscribe((isRunning) -> {
-                        if (emitter.isCancelled())
-                            return;
-
-                        if (!isRunning) {
-                            emitter.onNext(true);
-                            exec.submit(emitLoop);
-                        }
-                    });
             if (!emitter.isCancelled()) {
                 emitter.onNext(!isRunning);
-                emitter.setDisposable(d);
-            }
-
-        }, BackpressureStrategy.LATEST);
-    }
-
-    /**
-     * 观察Daemon是否是在运行
-     */
-    public Flowable<Boolean> observeDaemonRunning() {
-        return Flowable.create((emitter) -> {
-            if (emitter.isCancelled())
-                return;
-
-            TauDaemonAlertListener listener = new TauDaemonAlertListener() {
-
-                @Override
-                public int[] types() {
-                    return new int[]{AlertType.SES_START_OVER.swig(), AlertType.SES_STOP_OVER.swig()};
-                }
-
-                @Override
-                public void alert(Alert<?> alert) {
-                    if (alert != null && alert.type() == AlertType.SES_START_OVER) {
-                        if (!emitter.isCancelled())
-                            emitter.onNext(true);
-                    } else if (alert != null && alert.type() == AlertType.SES_STOP_OVER) {
-                        if (!emitter.isCancelled())
-                            emitter.onNext(false);
+                if (!isRunning) {
+                    while (!Thread.interrupted() && !emitter.isCancelled()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                        if (emitter.isCancelled() || isRunning) {
+                            break;
+                        }
+                        emitter.onNext(true);
                     }
                 }
-            };
-
-            if (!emitter.isCancelled()) {
-                emitter.onNext(isRunning);
-                registerAlertListener(listener);
-                emitter.setDisposable(Disposables.fromAction(() -> unregisterAlertListener(listener)));
             }
-
+            emitter.onComplete();
         }, BackpressureStrategy.LATEST);
     }
 

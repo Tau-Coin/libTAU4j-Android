@@ -111,6 +111,7 @@ public class MainActivity extends ScanTriggerActivity {
         notificationViewModel = provider.get(NotificationViewModel.class);
         downloadViewModel = provider.get(DownloadViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_drawer);
+        mainViewModel.observeNeedStartDaemon();
         initLayout();
         checkCurrentUser();
         initExitApp();
@@ -216,18 +217,6 @@ public class MainActivity extends ScanTriggerActivity {
     /**
      * 订阅是否需要启动TauDaemon
      */
-    private void subscribeNeedStartDaemon(){
-        disposables.add(mainViewModel.observeNeedStartEngine()
-                .subscribeOn(Schedulers.io())
-                .filter((needStart) -> needStart)
-                .subscribe((needStart) -> {
-                    mainViewModel.startDaemon();
-                }));
-    }
-
-    /**
-     * 订阅是否需要启动TauDaemon
-     */
     private void subscribeAddCommunity(){
         communityViewModel.getAddCommunityState().observe(this, result -> {
             if(result.isSuccess()){
@@ -259,7 +248,6 @@ public class MainActivity extends ScanTriggerActivity {
     public void onStart() {
         super.onStart();
         subscribeCurrentUser();
-        subscribeNeedStartDaemon();
 //        downloadViewModel.checkAppVersion(this);
     }
 

@@ -18,6 +18,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -242,6 +243,13 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
                 });
             }
         }
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        View view = holder.binding.getRoot().findViewById(R.id.iv_head_pic);
+        BitmapUtil.recycleImageView(view);
+        super.onViewRecycled(holder);
     }
 
     public interface ClickListener {

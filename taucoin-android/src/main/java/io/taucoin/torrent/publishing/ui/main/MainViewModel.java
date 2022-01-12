@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
@@ -43,16 +44,12 @@ public class MainViewModel extends AndroidViewModel {
 
     /**
      * 观察是否需要启动Daemon
-     * @return Flowable
      */
-    Flowable<Boolean> observeNeedStartEngine() {
-        return daemon.observeNeedStartDaemon();
+    void observeNeedStartDaemon() {
+        disposables.add(daemon.observeNeedStartDaemon()
+                .subscribeOn(Schedulers.io())
+                .filter((needStart) -> needStart)
+                .subscribe((needStart) -> daemon.start()));
     }
 
-    /**
-     * 启动TauDaemon
-     */
-    void startDaemon() {
-        daemon.start();
-    }
 }

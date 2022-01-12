@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
+import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -138,6 +139,14 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 }
             });
         }
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        if (holder.binding instanceof ItemChatListBinding) {
+            BitmapUtil.recycleImageView(((ItemChatListBinding) holder.binding).leftView);
+        }
+        super.onViewRecycled(holder);
     }
 
     public interface ClickListener {
