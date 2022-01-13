@@ -317,9 +317,9 @@
     <string name="tx_bootstrap_node">Bootstrap node(required)</string>
     <string name="tx_comment">Comment(required)</string>
     <string name="tx_coin_name">Coin Name</string>
-    <string name="tx_link">Link(optional)</string>
-    <string name="tx_location">Location(optional)</string>
-    <string name="tx_description">Description(optional)</string>
+    <string name="tx_link">link - optional</string>
+    <string name="tx_location">location - optional</string>
+    <string name="tx_description">description - optional</string>
     <string name="tx_operation_reply">Reply</string>
     <string name="tx_operation_copy">Copy</string>
     <string name="tx_operation_select_all">Select All</string>
@@ -363,7 +363,7 @@
     <string name="tx_give_trust_info">%s %s give %s a trust</string>
     <string name="tx_sell_detail_trust">Trust %s</string>
     <string name="tx_sell_detail_trust_hash">Trust Onchain Hash</string>
-    <string name="tx_sell_direct_talk">Talk\nto me</string>
+    <string name="tx_sell_direct_talk">Connect</string>
     <string name="tx_sell_add_friend">Add\nFriend</string>
     <string name="tx_unknown">Unknown Transaction</string>
     <string name="escrow_now">Escrow Now</string>
@@ -373,12 +373,11 @@
     <string name="escrow_service">Escrow Service</string>
     <string name="escrow_service_safe">Safe Transaction Anywhere</string>
     <string name="escrow_service_button">Click here to talk to community escrower</string>
-    <string name="escrow_service_step">Step 1. Seller accepts buyer\'s offer and both parties reach a consensus
-    of an escrower. Now the escrow process begins.\n\n
-        Step 2. Buyer send coins and escrow fee to Escrower.\n\n
-        Step 3. Escrower received the transaction and talk to Seller to finished the tradement.\n\n
-        Step 4. Seller send coins to Escrower.\n\n
-        Step 5. Escrower send coins to Seller. The trade process copmplete.</string>
+    <string name="escrow_service_step">1. Seller and buyer agrees the transaction to start escrow process.\n\n
+        2. Buyer sends the amount to the escrow agent.\n\n
+        3. Escrow agent confirms to seller of received funds.\n\n
+        4. Seller sends the coins to buyers.\n\n
+        5. Escrow agent send the amount to the seller.</string>
 
     <!-- Strings used for notifier -->
     <string name="app_running_in_the_background">TAU running in the background</string>
@@ -390,7 +389,7 @@
     <!-- Strings used for connected peers -->
     <string name="contacts_exchange_qr">Show QR code to add friend</string>
     <string name="contacts_import_friend_pk">Import Public Key to add friend</string>
-    <string name="contacts_have_added">We are friends now. Let\'s talk.</string>
+    <string name="contacts_have_added">Welcome friend.</string>
     <string name="contacts_yourself">&#160;-&#160;yourself</string>
     <string name="contacts_discovered">Discovered</string>
     <string name="contacts_added">Added</string>
@@ -490,6 +489,6 @@
     <!-- Send text to clipboard -->
     <string name="chatting_resend_failed">Resend failed, please try again later!</string>
 
-    <string name="home_guide1" formatted="false"><Data><![CDATA[Using TAU app to create a community can save up to <font color="#f19322">5ETH</font>(≈US$19692.85)]]></Data></string>
-    <string name="home_guide2">Earn crypto &#038; join the best airdrop and more!</string>
+    <string name="home_guide1" formatted="false"><Data><![CDATA[Create coins and trade community for <font color="#f19322">Free</font>]]></Data></string>
+    <string name="home_guide2" formatted="false"><Data><![CDATA[Airdrop coins to contacts and emails for <font color="#f19322">Free</font> to expand community.]]></Data></string>
 </resources>

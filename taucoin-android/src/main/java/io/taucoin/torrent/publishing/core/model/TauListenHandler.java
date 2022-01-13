@@ -32,7 +32,7 @@ import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.MemberAutoRenewal;
+import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
