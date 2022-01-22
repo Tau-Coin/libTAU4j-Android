@@ -84,6 +84,10 @@ public interface TxDao {
     String QUERY_GET_TX_BY_TX_ID = "SELECT * FROM Txs" +
             " WHERE txID = :txID";
 
+    String QUERY_GET_NOT_ON_CHAIN_TX = "SELECT * FROM Txs" +
+            " WHERE chainID = :chainID AND txType = :txType AND nonce = :nonce" +
+            " ORDER BY timestamp DESC LIMIT 1";
+
     /**
      * 添加新的交易
      */
@@ -146,4 +150,14 @@ public interface TxDao {
     @Transaction
     @Query(QUERY_GET_SELL_DETAIL)
     Observable<UserAndTx> observeSellTxDetail(String chainID, String txID);
+
+    /**
+     * 获取在当前nonce上是否有未上链的转账交易
+     * @param chainID 链ID
+     * @param txType 类型
+     * @param nonce nonce
+     * @return Tx
+     */
+    @Query(QUERY_GET_NOT_ON_CHAIN_TX)
+    Tx getNotOnChainTx(String chainID, int txType, long nonce);
 }

@@ -100,6 +100,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.community.TxQueueActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.friends.FriendsActivity"
             android:launchMode="singleTop"
             android:configChanges="orientation|keyboardHidden|screenSize"/>

@@ -150,4 +150,16 @@ public class TxRepositoryImpl implements TxRepository{
             dataSetChangedPublish.onNext(result);
         });
     }
+
+    /**
+     * 获取在当前nonce上是否有未上链的转账交易
+     * @param chainID 链ID
+     * @param txType 类型
+     * @param nonce nonce
+     * @return Tx
+     */
+    @Override
+    public Tx getNotOnChainTx(String chainID, int txType, long nonce) {
+        return db.txDao().getNotOnChainTx(chainID, txType, nonce);
+    }
 }

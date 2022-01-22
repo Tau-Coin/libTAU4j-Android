@@ -28,7 +28,7 @@
                 android:layout_weight="1"
                 android:minHeight="@dimen/widget_size_50"
                 android:layout_marginStart="@dimen/widget_size_20"
-                android:layout_marginEnd="0dp"
+                android:layout_marginEnd="@dimen/widget_size_0"
                 android:layout_marginTop="@dimen/widget_size_10"
                 android:hint="@string/tx_address_hint"
                 android:inputType="textMultiLine"
@@ -36,6 +36,7 @@
                 android:autofillHints="@string/tx_public_key_hint" />
 
             <ImageView
+                android:visibility="visible"
                 android:id="@+id/iv_select_pk"
                 android:layout_width="@dimen/widget_size_22"
                 android:layout_height="@dimen/widget_size_22"

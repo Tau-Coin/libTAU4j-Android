@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Set;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -20,8 +18,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
-import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -31,6 +27,7 @@ import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.transaction.EscrowServiceActivity;
+import io.taucoin.torrent.publishing.ui.transaction.QueueTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
 
 /**
@@ -40,12 +37,10 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 
     public static boolean showEscrowServiceEnter = true;
     public static final int MEMBERS_REQUEST_CODE = 0x100;
-    public static final int FILTER_REQUEST_CODE = 0x101;
     private MainActivity activity;
     private FragmentCommunityBinding binding;
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
-    private SettingsRepository settingsRepo;
     private CommunityTabFragment currentTabFragment = null;
     private TextView selectedView = null;
     private String chainID;
@@ -64,13 +59,13 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         activity = (MainActivity) getActivity();
-        settingsRepo = RepositoryHelper.getSettingsRepository(activity.getApplicationContext());
         ViewModelProvider provider = new ViewModelProvider(this);
         communityViewModel = provider.get(CommunityViewModel.class);
         binding.setListener(this);
         binding.toolbarInclude.setListener(this);
         initParameter();
         initLayout();
+        onClick(binding.tvChainNote);
     }
 
     /**
@@ -105,48 +100,26 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
             ActivityUtil.startActivityForResult(intent, activity, CommunityDetailActivity.class, MEMBERS_REQUEST_CODE);
         });
+
+//        binding.toolbarInclude.ivAction1.setVisibility(View.VISIBLE);
+//        binding.toolbarInclude.ivAction1.setOnClickListener(v -> {
+//            if(StringUtil.isEmpty(chainID)) {
+//                return;
+//            }
+//            Intent intent = new Intent();
+//            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+//            ActivityUtil.startActivity(intent, activity, TxQueueActivity.class);
+//        });
         binding.llEscrowService.setVisibility(showEscrowServiceEnter ? View.VISIBLE : View.GONE);
 
-        refreshFilterView();
-    }
-
-    private void refreshFilterView() {
-        Set<String> set = settingsRepo.getFiltersSelected();
-        String selectedTab = null;
-        if (null == set) {
-            set = CommunityTabs.getIndexSet();
-        }
-        if (set.size() > 0) {
-            if (selectedView != null && set.contains(StringUtil.getTag(selectedView))) {
-                selectedTab = StringUtil.getTag(selectedView);
-            } else {
-                selectedTab = set.iterator().next();
-            }
-        }
-        if (set.size() <= 0) {
-            replaceOrRemoveFragment(true);
-        }
-        ViewGroup viewGroup = binding.llFilter;
-        int count = viewGroup.getChildCount();
-        for (int i = 0; i < count; i++) {
-            View view = viewGroup.getChildAt(i);
-            if (set.contains(StringUtil.getTag(view))) {
-                view.setVisibility(View.VISIBLE);
-            } else {
-                view.setVisibility(View.GONE);
-            }
-            if (StringUtil.isEquals(StringUtil.getTag(view), selectedTab)) {
-                onClick(view);
-            }
-        }
     }
 
     /**
      * 加载Tab视图
      */
-    private void loadTabView(String tab) {
+    private void loadTabView(int tab) {
         switch (tab) {
-            case "0":
+            case 0:
                 // note
                 currentTabFragment = new TxsTabFragment();
                 Bundle bundle = new Bundle();
@@ -155,7 +128,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 bundle.putInt(IntentExtra.TYPE, CommunityTabs.NOTE.getIndex());
                 currentTabFragment.setArguments(bundle);
                 break;
-            case "1":
+            case 1:
                 // market
                 currentTabFragment = new TxsTabFragment();
                 bundle = new Bundle();
@@ -164,13 +137,21 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 bundle.putInt(IntentExtra.TYPE, CommunityTabs.MARKET.getIndex());
                 currentTabFragment.setArguments(bundle);
                 break;
-            case "2":
-                // chain
+            case 2:
+                // queue
                 currentTabFragment = new TxsTabFragment();
                 bundle = new Bundle();
                 bundle.putString(IntentExtra.CHAIN_ID, chainID);
                 bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
                 bundle.putInt(IntentExtra.TYPE, CommunityTabs.CHAIN.getIndex());
+                currentTabFragment.setArguments(bundle);
+                break;
+            case 3:
+                // chain
+                currentTabFragment = new QueueTabFragment();
+                bundle = new Bundle();
+                bundle.putString(IntentExtra.CHAIN_ID, chainID);
+                bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
                 currentTabFragment.setArguments(bundle);
                 break;
         }
@@ -254,6 +235,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             case R.id.tv_chain_note:
             case R.id.tv_chain_market:
             case R.id.tv_chain_tx:
+            case R.id.tv_tx_queue:
                 // 避免同一页面多次刷新
                 if (this.selectedView != null && selectedView.getId() == v.getId()) {
                     return;
@@ -266,7 +248,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 selectedView.setBackgroundColor(getResources().getColor(R.color.color_transparent));
                 selectedView.setTextColor(getResources().getColor(R.color.color_yellow));
                 this.selectedView = selectedView;
-                loadTabView(StringUtil.getTag(selectedView));
+                loadTabView(StringUtil.getIntTag(selectedView));
                 break;
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
@@ -286,12 +268,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onFragmentResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onFragmentResult(requestCode, resultCode, data);
-        if (requestCode == CommunityFragment.FILTER_REQUEST_CODE) {
-            refreshFilterView();
-        } else {
-            if (currentTabFragment != null) {
-                currentTabFragment.onFragmentResult(requestCode, resultCode, data);
-            }
+        if (currentTabFragment != null) {
+            currentTabFragment.onFragmentResult(requestCode, resultCode, data);
         }
+
     }
 }

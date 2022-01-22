@@ -7,12 +7,17 @@ import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
+import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
@@ -23,7 +28,6 @@ import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityTransactionCreateBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
@@ -40,6 +44,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
     private TxViewModel txViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
+    private TxQueue txQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +64,10 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
     private void initParameter() {
         if(getIntent() != null){
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
+            txQueue = getIntent().getParcelableExtra(IntentExtra.BEAN);
+            if (txQueue != null) {
+                chainID = txQueue.chainID;
+            }
         }
     }
 
@@ -74,7 +83,22 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         binding.etAmount.setFilters(new InputFilter[]{new MoneyValueFilter()});
 
         if (StringUtil.isNotEmpty(chainID)) {
-            long txFee = txViewModel.getTxFee(chainID);
+            long txFee;
+            if (txQueue != null) {
+                txFee = txQueue.fee;
+                binding.etMemo.setText(txQueue.memo);
+                binding.etPublicKey.setText(txQueue.receiverPk);
+                binding.etPublicKey.setEnabled(false);
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)
+                        binding.etPublicKey.getLayoutParams();
+                layoutParams.rightMargin = getResources().getDimensionPixelSize(R.dimen.widget_size_20);
+                binding.etPublicKey.setLayoutParams(layoutParams);
+                binding.ivSelectPk.setVisibility(View.GONE);
+                binding.etAmount.setText(FmtMicrometer.fmtBalance(txQueue.amount));
+                binding.etMemo.setText(txQueue.memo);
+            } else {
+                txFee = txViewModel.getTxFee(chainID);
+            }
             String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
             binding.tvFee.setTag(R.id.median_fee, txFee);
 
@@ -83,12 +107,6 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
             binding.tvFee.setText(Html.fromHtml(medianFree));
             binding.tvFee.setTag(txFeeStr);
         }
-    }
-
-    private void showFeeView(TextView tvFee, String fee) {
-        String medianFree = getString(R.string.tx_median_fee, fee, ChainIDUtil.getCoinName(chainID));
-        tvFee.setText(Html.fromHtml(medianFree));
-        tvFee.setTag(fee);
     }
 
     @Override
@@ -102,22 +120,6 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
                 onBackPressed();
             }
         });
-//        if(StringUtil.isNotEmpty(chainID)){
-//            disposables.add(txViewModel.observeMedianFee(chainID)
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(fees -> {
-//                        long medianFee = txViewModel.getMedianFee(chainID);
-//                        if (medianFee <= 0) {
-//                            medianFee = Utils.getMedianData(fees);
-//                        }
-//                        String medianFeeStr = FmtMicrometer.fmtFeeValue(medianFee);
-//                        binding.tvFee.setTag(R.id.median_fee, medianFeeStr);
-//                        if(StringUtil.isEmpty(txViewModel.getLastTxFee(chainID))){
-//                            showFeeView(binding.tvFee, medianFeeStr);
-//                        }
-//                    }));
-//        }
     }
 
     @Override
@@ -142,9 +144,9 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
     public boolean onOptionsItemSelected(MenuItem item) {
         // 交易创建事件
         if (item.getItemId() == R.id.menu_done) {
-            Tx tx = buildTx();
-            if(txViewModel.validateTx(tx)){
-                txViewModel.addTransaction(tx);
+            TxQueue tx = buildTx();
+            if (txViewModel.validateTx(tx)) {
+                txViewModel.addWringTransaction(tx, null == txQueue);
             }
         }
         return true;
@@ -154,14 +156,18 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
      * 构建交易数据
      * @return Tx
      */
-    private Tx buildTx() {
-        int txType = TxType.WRING_TX.getType();
+    private TxQueue buildTx() {
+        String senderPk = MainApplication.getInstance().getPublicKey();
         String receiverPk = ViewUtils.getText(binding.etPublicKey);
         String amount = ViewUtils.getText(binding.etAmount);
         String fee = ViewUtils.getStringTag(binding.tvFee);
         String memo = ViewUtils.getText(binding.etMemo);
-        return new Tx(chainID, receiverPk, FmtMicrometer.fmtTxLongValue(amount),
-                FmtMicrometer.fmtTxLongValue(fee), txType, memo);
+        TxQueue tx = new TxQueue(chainID, senderPk, receiverPk, FmtMicrometer.fmtTxLongValue(amount),
+                    FmtMicrometer.fmtTxLongValue(fee), memo);
+        if (txQueue != null) {
+            tx.queueID = txQueue.queueID;
+        }
+        return tx;
     }
 
     @Override

@@ -25,8 +25,7 @@
         <LinearLayout
             android:layout_toEndOf="@+id/left_view"
             android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:minWidth="@dimen/widget_size_220"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <LinearLayout

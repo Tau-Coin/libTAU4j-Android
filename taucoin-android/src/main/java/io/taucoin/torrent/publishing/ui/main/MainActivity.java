@@ -616,8 +616,7 @@ public class MainActivity extends ScanTriggerActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CommunityFragment.MEMBERS_REQUEST_CODE && resultCode == RESULT_OK) {
             goBack();
-        } else if (requestCode == CommunityFragment.FILTER_REQUEST_CODE ||
-                requestCode == TxsTabFragment.TX_REQUEST_CODE) {
+        } else if (requestCode == TxsTabFragment.TX_REQUEST_CODE) {
             if (currentFragment != null) {
                 currentFragment.onFragmentResult(requestCode, resultCode, data);
             }

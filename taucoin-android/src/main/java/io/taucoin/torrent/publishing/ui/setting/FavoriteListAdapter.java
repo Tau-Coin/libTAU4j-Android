@@ -40,7 +40,7 @@ public class FavoriteListAdapter extends PagedListAdapter<FavoriteAndUser,
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ViewDataBinding binding;
-        if(viewType == TxType.WRING_TX.getType()){
+        if(viewType == TxType.WIRING_TX.getType()){
             binding = DataBindingUtil.inflate(inflater,
                     R.layout.item_favorite_wiring,
                     parent,

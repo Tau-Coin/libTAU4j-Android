@@ -26,6 +26,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -36,8 +37,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
+import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
@@ -67,7 +71,7 @@ import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.NOTE_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.SELL_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.TRUST_TX;
-import static io.taucoin.torrent.publishing.core.model.data.message.TxType.WRING_TX;
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.WIRING_TX;
 
 /**
  * 交易模块相关的ViewModel
@@ -80,6 +84,7 @@ public class TxViewModel extends AndroidViewModel {
     private UserRepository userRepo;
     private MemberRepository memberRepo;
     private SettingsRepository settingsRepo;
+    private TxQueueRepository txQueueRepo;
     private TauDaemon daemon;
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<List<UserAndTx>> chainTxs = new MutableLiveData<>();
@@ -95,6 +100,7 @@ public class TxViewModel extends AndroidViewModel {
         daemon  = TauDaemon.getInstance(application);
         settingsRepo  = RepositoryHelper.getSettingsRepository(application);
         memberRepo = RepositoryHelper.getMemberRepository(application);
+        txQueueRepo = RepositoryHelper.getTxQueueRepository(application);
     }
 
     public void observeNeedStartDaemon () {
@@ -138,6 +144,33 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     /**
+     * 添加新的转账交易
+     * @param tx 根据用户输入构建的用户数据
+     */
+    void addWringTransaction(TxQueue tx, boolean isAdd) {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<String>) emitter -> {
+            String result = addWringTransactionTask(tx, isAdd);
+            emitter.onNext(result);
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(state -> addState.postValue(state));
+        disposables.add(disposable);
+    }
+
+    private String addWringTransactionTask(TxQueue tx, boolean isAdd) {
+        if (isAdd) {
+            txQueueRepo.addQueue(tx);
+            daemon.updateTxQueue(tx.chainID);
+        } else {
+            txQueueRepo.updateQueue(tx);
+            daemon.resendTxQueue(tx);
+        }
+        return "";
+    }
+
+    /**
      * 添加新的交易
      * @param tx 根据用户输入构建的用户数据
      */
@@ -171,7 +204,7 @@ public class TxViewModel extends AndroidViewModel {
             }
             long timestamp = daemon.getSessionTime();
             byte[] receiverPk;
-            if (tx.txType == WRING_TX.getType() || tx.txType == TRUST_TX.getType()) {
+            if (tx.txType == WIRING_TX.getType() || tx.txType == TRUST_TX.getType()) {
                 receiverPk = ByteUtil.toByte(tx.receiverPk);
             } else {
                 // Note交易无接受者时，默认为senderPk
@@ -181,7 +214,7 @@ public class TxViewModel extends AndroidViewModel {
             byte[] txEncoded = null;
             switch (TxType.valueOf(tx.txType)) {
                 case NOTE_TX:
-                case WRING_TX:
+                case WIRING_TX:
                 case TRUST_TX:
                     TxContent txContent = new TxContent(tx.txType, memo);
                     txEncoded = txContent.getEncoded();
@@ -197,7 +230,9 @@ public class TxViewModel extends AndroidViewModel {
             if (null == txEncoded) {
                 return result;
             }
-            long nonce = account.getNonce() + 1;
+            // 除了转账交易，nonce都为0
+//            long nonce = account.getNonce() + 1;
+            long nonce = 0;
             Transaction transaction = new Transaction(chainID, 0, timestamp, senderPk, receiverPk,
                     nonce, tx.amount, tx.fee, txEncoded);
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
@@ -229,7 +264,7 @@ public class TxViewModel extends AndroidViewModel {
      * @param tx 交易
      */
     private void addUserInfoToLocal(Tx tx) {
-        if (tx.txType == WRING_TX.getType()) {
+        if (tx.txType == WIRING_TX.getType()) {
             User receiverUser = userRepo.getUserByPublicKey(tx.receiverPk);
             if (null == receiverUser) {
                 receiverUser = new User(tx.receiverPk);
@@ -251,7 +286,7 @@ public class TxViewModel extends AndroidViewModel {
             memberRepo.addMember(member);
             logger.info("addMemberInfoToLocal, senderPk::{}", tx.senderPk);
         }
-        if (txType == WRING_TX.getType() && StringUtil.isNotEquals(tx.senderPk, tx.receiverPk)) {
+        if (txType == WIRING_TX.getType() && StringUtil.isNotEquals(tx.senderPk, tx.receiverPk)) {
             Member receiverMember = memberRepo.getMemberByChainIDAndPk(tx.chainID, tx.receiverPk);
             if (null == receiverMember) {
                 receiverMember = new Member(tx.chainID, tx.receiverPk);
@@ -259,6 +294,28 @@ public class TxViewModel extends AndroidViewModel {
                 logger.info("addMemberInfoToLocal, receiverPk::{}", tx.receiverPk);
             }
         }
+    }
+
+    boolean validateTx(TxQueue tx) {
+        byte[] chainID = ChainIDUtil.encode(tx.chainID);
+        String senderPk = MainApplication.getInstance().getPublicKey();
+        Account account = daemon.getAccountInfo(chainID, senderPk);
+        long balance = account != null ? account.getBalance() : 0;
+        if (StringUtil.isEmpty(tx.receiverPk) ||
+                ByteUtil.toByte(tx.receiverPk).length != Ed25519.PUBLIC_KEY_SIZE) {
+            ToastUtils.showShortToast(R.string.tx_error_invalid_pk);
+            return false;
+        } else if (tx.amount <= 0) {
+            ToastUtils.showShortToast(R.string.tx_error_invalid_amount);
+            return false;
+        } else if (tx.fee <= 0) {
+            ToastUtils.showShortToast(R.string.tx_error_invalid_free);
+            return false;
+        } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
+            ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -285,7 +342,7 @@ public class TxViewModel extends AndroidViewModel {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_free);
                 return false;
             }
-        } else if (msgType == WRING_TX.getType()) {
+        } else if (msgType == WIRING_TX.getType()) {
             if (StringUtil.isEmpty(tx.receiverPk) ||
                     ByteUtil.toByte(tx.receiverPk).length != Ed25519.PUBLIC_KEY_SIZE) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_pk);
@@ -394,7 +451,7 @@ public class TxViewModel extends AndroidViewModel {
                         String amount = friendPks.get(friend);
                         logger.debug("airdropToFriends chainID::{}, friend::{}, amount::{}, fee::{}",
                                 chainID, friend, amount, fee);
-                        String airdropResult = airdropToFriend(chainID, friend,
+                        String airdropResult = airdropToFriend(chainID, senderPk, friend,
                                 FmtMicrometer.fmtTxLongValue(amount),
                                 FmtMicrometer.fmtTxLongValue(fee));
                         if (StringUtil.isNotEmpty(airdropResult)) {
@@ -417,13 +474,12 @@ public class TxViewModel extends AndroidViewModel {
 
     /**
      * 空投币给朋友
-     * @param chainID
-     * @param friendPk
      */
-    public String airdropToFriend(String chainID, String friendPk, long amount, long fee) {
-        Tx tx = new Tx(chainID, friendPk, amount, fee, WRING_TX.getType(),
-                getApplication().getString(R.string.tx_memo_airdrop));
-        return createTransaction(tx);
+    private String airdropToFriend(String chainID, String senderPk, String friendPk,
+                                  long amount, long fee) {
+        String memo = getApplication().getString(R.string.tx_memo_airdrop);
+        TxQueue tx = new TxQueue(chainID, senderPk, friendPk, amount, fee, memo);
+        return addWringTransactionTask(tx, true);
     }
 
     /**
@@ -506,5 +562,10 @@ public class TxViewModel extends AndroidViewModel {
 
     public Observable<UserAndTx> observeSellTxDetail(String chainID, String txID) {
         return txRepo.observeSellTxDetail(chainID, txID);
+    }
+
+    public Observable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID) {
+        String userPk = MainApplication.getInstance().getPublicKey();
+        return txQueueRepo.observeCommunityTxQueue(chainID, userPk);
     }
 }

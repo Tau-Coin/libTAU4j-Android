@@ -43,6 +43,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
@@ -79,11 +80,31 @@ class TauListenHandler {
     void handleNewBlock(Block block) {
         logger.debug("handleNewBlock");
         handleBlockData(block, false, false);
+        updateTxQueue(block);
         // 每个账户自动更新周期，检测是否需要更新账户信息
         if (block.getBlockNumber() % Constants.AUTO_RENEWAL_PERIOD_BLOCKS == 0) {
             logger.debug("accountAutoRenewal chainID::{}, block number::{}",
                     ChainIDUtil.decode(block.getChainID()), block.getBlockNumber());
             accountAutoRenewal();
+        }
+    }
+
+    /**
+     * 更新发交易队列
+     * @param block Block
+     */
+    private void updateTxQueue(Block block) {
+        String chainID = ChainIDUtil.decode(block.getChainID());
+        User currentUser = userRepo.getCurrentUser();
+        if (currentUser != null) {
+            Transaction transaction = block.getTx();
+            if (transaction != null) {
+                String sender = ByteUtil.toHexString(transaction.getSender());
+                if (StringUtil.isEquals(sender, currentUser.publicKey)) {
+                    daemon.updateTxQueue(chainID);
+                    logger.debug("updateTxQueue chainID::{}, sender::{}", chainID, sender);
+                }
+            }
         }
     }
 
@@ -289,7 +310,7 @@ class TauListenHandler {
         int txType = txContent.getType();
         if (txType == TxType.NOTE_TX.getType()) {
             saveUserInfo(txMsg.getSender());
-        } else if (txType == TxType.WRING_TX.getType()) {
+        } else if (txType == TxType.WIRING_TX.getType()) {
             saveUserInfo(txMsg.getSender());
             saveUserInfo(txMsg.getReceiver());
         }
@@ -308,7 +329,7 @@ class TauListenHandler {
         int txType = txContent.getType();
         if (txType == TxType.NOTE_TX.getType()) {
             addMemberInfo(txMsg.getChainID(), txMsg.getSender());
-        } else if (txType == TxType.WRING_TX.getType()) {
+        } else if (txType == TxType.WIRING_TX.getType()) {
             addMemberInfo(txMsg.getChainID(), txMsg.getSender());
             addMemberInfo(txMsg.getChainID(), txMsg.getReceiver());
         }
@@ -511,7 +532,7 @@ class TauListenHandler {
             long amount = member.balance - fee;
             long nonce = member.nonce + 1;
             String memo = appContext.getString(R.string.tx_memo_auto_renewal);
-            int txType = TxType.WRING_TX.getType();
+            int txType = TxType.WIRING_TX.getType();
 
             byte[] chainIDBytes = ChainIDUtil.encode(chainID);
             Tx tx = new Tx(chainID, senderPk, amount, fee, txType, memo);

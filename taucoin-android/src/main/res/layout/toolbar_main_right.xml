@@ -51,7 +51,6 @@
         </RelativeLayout>
 
         <ImageView
-            android:visibility="gone"
             android:id="@+id/iv_action"
             android:layout_width="@dimen/widget_size_35"
             android:layout_height="@dimen/widget_size_35"

@@ -7,6 +7,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.SpanUtils;
@@ -18,8 +19,8 @@ public class TxUtils {
         switch (TxType.valueOf(tx.txType)) {
             case NOTE_TX:
                 return createSpanNoteTx(tx);
-            case WRING_TX:
-                return createSpanWringTx(tx);
+            case WIRING_TX:
+                return createSpanWiringTx(tx);
             case SELL_TX:
                 return createSpanSellTx(tx);
         }
@@ -32,7 +33,7 @@ public class TxUtils {
         return msg.create();
     }
 
-    private static SpannableStringBuilder createSpanWringTx(Tx tx) {
+    private static SpannableStringBuilder createSpanWiringTx(Tx tx) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         int blueColor = context.getResources().getColor(R.color.color_blue_link);
@@ -77,6 +78,19 @@ public class TxUtils {
             msg.append("\n").append("Description: ").setForegroundColor(titleColor)
                     .append(tx.memo);
         }
+        return msg.create();
+    }
+
+    public static SpannableStringBuilder createSpanTxQueue(TxQueue tx) {
+        SpanUtils msg = new SpanUtils()
+                .append("Amount: ")
+                .append(FmtMicrometer.fmtBalance(tx.amount))
+                .append("\n").append("Fee:")
+                .append(FmtMicrometer.fmtFeeValue(tx.fee))
+                .append("\n").append("To:")
+                .append(tx.receiverPk)
+                .append("\n").append("Memo:")
+                .append(tx.memo);
         return msg.create();
     }
 }

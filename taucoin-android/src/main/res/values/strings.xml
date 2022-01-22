@@ -114,6 +114,7 @@
     <string name="community_more_settings">More Settings</string>
     <string name="community_bootstrap_node">DHT Bootstrap Node</string>
     <string name="community_transaction">Wiring Transaction</string>
+    <string name="community_transaction_queue">Wiring Transaction Queue</string>
     <string name="community_nickname">Community Nickname</string>
     <string name="community_choose_community">Chains</string>
     <string name="community_mining_status">Mining Status</string>
@@ -123,6 +124,7 @@
     <string name="community_chain_note">Note</string>
     <string name="community_chain_market">Market</string>
     <string name="community_on_chain">Chain</string>
+    <string name="community_tx_queue">Queue</string>
     <string name="community_escrow_service_enter">Community\'s largest coinholder provide Escrow Service</string>
     <string name="community_chain_note_title">Note Transaction</string>
     <string name="community_sell_coins">Sell Coins</string>
@@ -345,6 +347,8 @@
     <string name="tx_error_send_failed">Transaction sending failed, please try again later!</string>
     <string name="tx_error_invalid_coin_name">Invalid coin name</string>
 
+    <string name="tx_result_status_waiting">Waiting...</string>
+    <string name="tx_result_status_processing">Processing...</string>
     <string name="tx_result_successfully">Successfully</string>
     <string name="tx_result_processing">In processing,expected to confirm</string>
     <string name="tx_result_failed">Failed</string>
@@ -366,6 +370,7 @@
     <string name="tx_sell_direct_talk">Connect</string>
     <string name="tx_sell_add_friend">Add\nFriend</string>
     <string name="tx_unknown">Unknown Transaction</string>
+
     <string name="escrow_now">Escrow Now</string>
     <string name="escrow_tip">Need a escrow services?\nTalk width the community\'s largest coinholder.</string>
     <string name="escrow_secure_tip">Making your transactions more secure.</string>

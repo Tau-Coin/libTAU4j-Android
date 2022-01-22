@@ -22,7 +22,7 @@ package io.taucoin.torrent.publishing.core.model.data.message;
 public enum TxType {
     UNKNOWN(0),
     NOTE_TX(1),
-    WRING_TX(2),
+    WIRING_TX(2),
     SELL_TX(3),
     TRUST_TX(4),
     AIRDROP_TX(5);

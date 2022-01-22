@@ -23,6 +23,8 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.NotificationReposi
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.NotificationRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.StatisticRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.StatisticRepositoryImpl;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
@@ -43,7 +45,8 @@ public class RepositoryHelper {
     private static ChatRepositoryImpl chatRepo;
     private static DeviceRepositoryImpl deviceRepo;
     private static StatisticRepositoryImpl statisticRepo;
-    private static BlockRepositoryImpl blockRepository;
+    private static BlockRepositoryImpl blockRepo;
+    private static TxQueueRepositoryImpl txQueueRepo;
 
     /**
      * 获取CommunityRepository单例
@@ -193,10 +196,23 @@ public class RepositoryHelper {
      * @return BlockRepository
      */
     public synchronized static BlockRepository getBlockRepository(@NonNull Context appContext) {
-        if (blockRepository == null)
-            blockRepository = new BlockRepositoryImpl(appContext,
+        if (blockRepo == null)
+            blockRepo = new BlockRepositoryImpl(appContext,
                     AppDatabase.getInstance(appContext));
 
-        return blockRepository;
+        return blockRepo;
+    }
+
+    /**
+     * 获取TxQueueRepository单例
+     * @param appContext 上下文
+     * @return TxQueueRepository
+     */
+    public synchronized static TxQueueRepository getTxQueueRepository(@NonNull Context appContext) {
+        if (txQueueRepo == null)
+            txQueueRepo = new TxQueueRepositoryImpl(appContext,
+                    AppDatabase.getInstance(appContext));
+
+        return txQueueRepo;
     }
 }

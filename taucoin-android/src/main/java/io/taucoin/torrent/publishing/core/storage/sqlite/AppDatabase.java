@@ -21,6 +21,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.dao.MemberDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.dao.NotificationDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.dao.StatisticDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.dao.TxDao;
+import io.taucoin.torrent.publishing.core.storage.sqlite.dao.TxQueueDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.dao.UserDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -33,12 +34,14 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Notification;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Statistic;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 
 @Database(entities = {Community.class,
         Member.class,
         User.class,
         Tx.class,
+        TxQueue.class,
         BlockInfo.class,
         Favorite.class,
         Notification.class,
@@ -65,6 +68,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract DeviceDao deviceDao();
     public abstract StatisticDao statisticDao();
     public abstract BlockDao blockDao();
+    public abstract TxQueueDao txQueueDao();
 
     /**
      * 获取数据库实例

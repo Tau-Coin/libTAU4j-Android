@@ -12,7 +12,8 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 public enum CommunityTabs {
     NOTE(0, R.string.community_chain_note),
     MARKET(1, R.string.community_chain_market),
-    CHAIN(2, R.string.community_on_chain);
+    QUEUE(2, R.string.community_tx_queue),
+    CHAIN(3, R.string.community_on_chain);
     private int index;
     private int name;
     CommunityTabs(int index, int name) {

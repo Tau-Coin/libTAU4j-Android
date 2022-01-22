@@ -445,4 +445,14 @@ public class DateUtil {
         String timeStr = FmtMicrometer.formatTwoDecimal(time);
         return context.getString(unitResId, timeStr);
     }
+
+    public static float timeDiffHours(long date1, long date2) {
+        long millisecond;
+        if (date1 >= date2) {
+            millisecond = date1 - date2;
+        } else {
+            millisecond = date2 - date1;
+        }
+        return millisecond * 1.0f / 36000000;
+    }
 }

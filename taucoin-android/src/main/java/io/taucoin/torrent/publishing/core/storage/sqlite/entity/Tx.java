@@ -36,6 +36,7 @@ public class Tx implements Parcelable {
     public String coinName;                 // 币名 只针对TxType.SELL_TX类型
     public String link;                     // 用户link 只针对TxType.SELL_TX类型
     public String location;                 // 位置信息 只针对TxType.SELL_TX类型
+    public long queueID = -1;               // 交易对应的队列ID
 
     public Tx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo){
         this.chainID = chainID;

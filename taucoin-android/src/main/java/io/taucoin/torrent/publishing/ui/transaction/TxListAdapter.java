@@ -99,7 +99,7 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
                 case TRUST_TX:
                     viewType = ViewType.TRUST_ITEM.ordinal();
                     break;
-                case WRING_TX:
+                case WIRING_TX:
                 case SELL_TX:
                     viewType = isMine ? ViewType.SELL_RIGHT.ordinal() : ViewType.SELL_LEFT.ordinal();
                     break;

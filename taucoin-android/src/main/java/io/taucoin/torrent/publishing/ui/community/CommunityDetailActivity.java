@@ -103,6 +103,11 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, ChainStatusActivity.class);
                 break;
+            case R.id.item_tx_queue:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, TxQueueActivity.class);
+                break;
             case R.id.item_add_member:
                 intent = new Intent();
                 intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_ADD_MEMBERS);

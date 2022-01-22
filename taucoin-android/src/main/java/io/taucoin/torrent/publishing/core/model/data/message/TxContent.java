@@ -34,7 +34,7 @@ public class TxContent {
         RLPList messageList = (RLPList) params.get(0);
 
         this.version = RLP.decodeInteger(messageList, 0, TxVersion.VERSION1.getV());
-        this.type = RLP.decodeInteger(messageList, 1, TxType.WRING_TX.getType());
+        this.type = RLP.decodeInteger(messageList, 1, TxType.WIRING_TX.getType());
         this.memo = RLP.decodeElement(messageList, 2);
     }
 

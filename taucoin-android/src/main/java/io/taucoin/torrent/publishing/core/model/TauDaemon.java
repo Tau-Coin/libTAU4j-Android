@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,12 +30,12 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
@@ -80,6 +78,7 @@ public abstract class TauDaemon {
     private Disposable updateLocationTimer;    // 更新位置信息定时任务
     private Disposable noRemainingDataTimer; // 触发无剩余流量的提示定时任务
     TauDaemonAlertHandler tauDaemonAlertHandler; // libTAU上报的Alert处理程序
+    private TxQueueManager txQueueManager; //交易队列管理
     volatile boolean isRunning = false;
     private volatile boolean trafficTips = true; // 剩余流量用完提示
     volatile String seed;
@@ -110,6 +109,7 @@ public abstract class TauDaemon {
         locationManager = new LocationManagerUtil(appContext);
         deviceID = DeviceUtils.getCustomDeviceID(appContext);
         sessionManager = new SessionManager(true);
+        txQueueManager = new TxQueueManager(this);
 
         observeTauDaemon();
         initLocalParam();
@@ -249,6 +249,7 @@ public abstract class TauDaemon {
         appContext.unregisterReceiver(connectionReceiver);
         sessionManager.stop();
         tauDaemonAlertHandler.onCleared();
+        txQueueManager.onCleared();
         sessionStopOver();
     }
 
@@ -547,6 +548,17 @@ public abstract class TauDaemon {
                     .subscribeOn(Schedulers.io())
                     .subscribe( l -> locationManager.startLocation());
         }
+    }
+
+    /**
+     * 发送更新转账交易队列
+     */
+    public void updateTxQueue(String chainID) {
+        txQueueManager.updateTxQueue(chainID);
+    }
+
+    public void resendTxQueue(TxQueue tx) {
+        txQueueManager.resendTxQueue(tx);
     }
 
     /**
