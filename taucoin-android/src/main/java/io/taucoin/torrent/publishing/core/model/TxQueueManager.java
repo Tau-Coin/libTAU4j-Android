@@ -96,6 +96,7 @@ class TxQueueManager {
     void updateTxQueue(String chainID) {
         if (!chainIDQueue.contains(chainID)) {
             chainIDQueue.offer(chainID);
+            logger.debug("updateTxQueue chainID::{}", chainID);
         }
     }
 
@@ -118,7 +119,7 @@ class TxQueueManager {
         try {
             logger.debug("sendWiringTx status::{}, sendCount::{}, timestamp::{}", txQueue.status,
                     txQueue.sendCount, txQueue.timestamp);
-            if (txQueue.status <= 0 && txQueue.queueID != editedID) {
+            if (txQueue.status == 0 && txQueue.queueID != editedID) {
                 logger.debug("sendWiringTx status::{}, waiting...", txQueue.status);
                 return false;
             }
