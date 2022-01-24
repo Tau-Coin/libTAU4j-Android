@@ -491,4 +491,17 @@ public class Utils {
             return null;
         }
     }
+
+    public static boolean isChinese(String str) {
+        if (StringUtil.isEmpty(str)) {
+            return false;
+        }
+        char[] chars = str.toCharArray();
+        for (char c : chars) {
+            if (c >= 0x4E00 && c <= 0x9FA5) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -17,23 +17,14 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <TextView
-            android:id="@+id/tv_reply"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/widget_size_20"
-            android:layout_marginEnd="@dimen/widget_size_20"
-            android:layout_marginTop="@dimen/widget_size_15"
-            android:textAppearance="@style/TextAppearanceBody2"/>
-
-        <EditText
+        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="@dimen/widget_size_50"
             android:layout_marginStart="@dimen/widget_size_20"
             android:layout_marginEnd="@dimen/widget_size_20"
-            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_marginTop="@dimen/widget_size_40"
             android:hint="@string/tx_message"
             android:inputType="textMultiLine"
             android:textAppearance="@style/TextAppearanceBody1"

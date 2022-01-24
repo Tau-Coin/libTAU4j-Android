@@ -49,7 +49,7 @@
                         android:includeFontPadding="false"
                         android:textStyle="bold" />
 
-                    <EditText
+                    <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
                         android:id="@+id/tv_friends_name"
                         android:layout_width="match_parent"
                         android:layout_gravity="center_vertical"

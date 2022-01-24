@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <EditText
+            <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
                 android:id="@+id/et_public_key"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
 
         </LinearLayout>
 
-        <EditText
+        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_amount"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_50"
@@ -61,7 +61,7 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_amount_hint" />
 
-        <EditText
+        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_memo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

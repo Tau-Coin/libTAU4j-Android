@@ -50,7 +50,7 @@
                         app:btnSolidColor="@color/primary_light"
                         app:btnPressedRatio="1.5" />
 
-                    <EditText
+                    <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
                         android:layout_toEndOf="@+id/round_button"
                         android:id="@+id/et_community_name"
                         android:layout_width="match_parent"

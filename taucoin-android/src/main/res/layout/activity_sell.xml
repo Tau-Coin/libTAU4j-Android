@@ -32,7 +32,7 @@
                 android:popupBackground="@drawable/spinner_rect_round_bg"
                 android:spinnerMode="dropdown"/>
 
-            <EditText
+            <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
                 android:id="@+id/et_coin_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
 
         </RelativeLayout>
 
-        <EditText
+        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_link"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_link" />
 
-        <EditText
+        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_location" />
 
-        <EditText
+        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
