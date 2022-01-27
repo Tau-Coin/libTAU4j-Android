@@ -14,7 +14,7 @@
         android:layout_marginStart="@dimen/widget_size_10"
         android:layout_marginEnd="@dimen/widget_size_10"
         android:layout_marginTop="@dimen/widget_size_2"
-        android:paddingTop="@dimen/widget_size_10"
+        android:paddingTop="@dimen/widget_size_0"
         android:paddingBottom="@dimen/widget_size_10"
         android:paddingStart="@dimen/widget_size_10"
         android:paddingEnd="@dimen/widget_size_10"

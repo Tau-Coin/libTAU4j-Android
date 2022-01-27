@@ -3,12 +3,12 @@ package io.taucoin.torrent.publishing.ui.community;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
-import java.util.List;
+import org.libTAU4j.Block;
+import org.libTAU4j.Transaction;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,13 +17,17 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
-import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.Formatter;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityChainStatusBinding;
+import io.taucoin.torrent.publishing.databinding.ItemBlockLayoutBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 
@@ -36,6 +40,7 @@ public class ChainStatusActivity extends BaseActivity {
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
+    private ChainStatus status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +80,11 @@ public class ChainStatusActivity extends BaseActivity {
         if (null == status) {
             return;
         }
-        binding.itemHeadBlock.setRightText(FmtMicrometer.fmtLong(status.headBlock));
-        binding.itemTailBlock.setRightText(FmtMicrometer.fmtLong(status.tailBlock));
-        binding.itemConsensusBlock.setRightText(FmtMicrometer.fmtLong(status.consensusBlock));
+        this.status = status;
+        binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(status.headBlock));
+        binding.tvHeadBlock.setTag(status.headBlock);
+        binding.tvTailBlock.setText(FmtMicrometer.fmtLong(status.tailBlock));
+        binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(status.consensusBlock));
         binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
         binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
         binding.itemPeersBlocks.setRightText(FmtMicrometer.fmtLong(status.peerBlocks));
@@ -116,7 +123,61 @@ public class ChainStatusActivity extends BaseActivity {
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, ChainTopActivity.class);
                 break;
+            case R.id.item_head_block:
+                if (null == status) {
+                    return;
+                }
+                showBlockDetail(binding.headBlock, binding.ivHeadDetail, status.headBlock);
+                break;
+            case R.id.item_tail_block:
+                if (null == status) {
+                    return;
+                }
+                showBlockDetail(binding.tailBlock, binding.ivTailDetail, status.tailBlock);
+                break;
+            case R.id.item_consensus_block:
+                if (null == status) {
+                    return;
+                }
+                showBlockDetail(binding.consensusBlock, binding.ivConsensusDetail, status.consensusBlock);
+                break;
         }
+    }
+
+    private void showBlockDetail(ItemBlockLayoutBinding binding, ImageView ivHeadDetail, long blockNumber) {
+        View blockView = binding.getRoot();
+        boolean isVisible = blockView.getVisibility() == View.VISIBLE;
+        blockView.setVisibility(isVisible ? View.GONE : View.VISIBLE);
+        ivHeadDetail.setRotation(isVisible ? 90 : -90);
+
+        Block headBlock = communityViewModel.getBlockByNumber(chainID, blockNumber);
+        loadBlockDetailData(binding, headBlock);
+    }
+
+    /**
+     * 加载区块详细信息
+     */
+    private void loadBlockDetailData(ItemBlockLayoutBinding binding, Block block) {
+        if (null == block) {
+            return;
+        }
+        Transaction tx = block.getTx();
+        byte[] payload = tx.getPayload();
+
+        binding.tvHash.setText(block.Hash());
+        boolean isHaveTx = payload != null && payload.length > 0;
+        binding.tvTxs.setText(isHaveTx ? "1" : "0");
+        binding.tvTimestamp.setText(DateUtil.formatTime(block.getTimestamp(), DateUtil.pattern6));
+        binding.tvMiner.setText(ByteUtil.toHexString(block.getMiner()));
+        String blockReward = FmtMicrometer.fmtBalance(tx.getFee());
+        if (block.getBlockNumber() <= 0) {
+            blockReward = FmtMicrometer.fmtBalance(block.getMinerBalance());
+        }
+        blockReward += " " + ChainIDUtil.getCoinName(chainID);
+        binding.tvReward.setText(blockReward);
+        String difficulty = FmtMicrometer.fmtDecimal(block.getCumulativeDifficulty().longValue());
+        binding.tvDifficulty.setText(difficulty);
+        binding.tvSize.setText(Formatter.formatFileSize(this, block.Size()));
     }
 
     @Override
