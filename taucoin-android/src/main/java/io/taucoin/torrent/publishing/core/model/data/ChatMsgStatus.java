@@ -6,6 +6,8 @@ package io.taucoin.torrent.publishing.core.model.data;
 public enum ChatMsgStatus {
     BUILT(-1,
             "Message built"),
+    RESEND(0,
+            "Message resent"),
     SYNC_CONFIRMED(1,
             "Message sync confirmed");
 

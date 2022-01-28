@@ -9,6 +9,7 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Observable;
+import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 
@@ -31,7 +32,7 @@ public interface ChatDao {
 
     // 查询消息的所有日志
     String QUERY_CHAT_MSG_LOGS = "SELECT * FROM ChatMsgLogs WHERE hash = :hash" +
-            " GROUP BY status ORDER BY status DESC";
+            " ORDER BY status DESC";
 
     // 查询消息单独状态日志数据
     String QUERY_CHAT_MSG_LOG = "SELECT * FROM ChatMsgLogs WHERE hash = :hash AND status = :status";
@@ -75,7 +76,7 @@ public interface ChatDao {
      */
     @Query(QUERY_MESSAGES_BY_FRIEND_PK)
     @Transaction
-    List<ChatMsg> getMessages(String senderPk, String receiverPk, int startPosition, int loadSize);
+    List<ChatMsgAndLog> getMessages(String senderPk, String receiverPk, int startPosition, int loadSize);
 
     /**
      * 添加消息日志

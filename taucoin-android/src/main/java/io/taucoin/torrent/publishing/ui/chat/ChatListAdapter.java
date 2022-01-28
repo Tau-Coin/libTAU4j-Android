@@ -15,6 +15,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Arrays;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -24,7 +25,11 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
+import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
@@ -46,7 +51,7 @@ import io.taucoin.torrent.publishing.ui.customviews.RoundImageView;
 /**
  * 聊天消息的Adapter
  */
-public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHolder> {
+public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.ViewHolder> {
 
     enum ViewType {
         LEFT_TEXT,
@@ -116,7 +121,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ChatMsg previousChat = null;
+        ChatMsgAndLog previousChat = null;
         if (position > 0) {
             previousChat = getItem(position - 1);
         }
@@ -152,7 +157,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
             this.listener = listener;
         }
 
-        void bindTextRight(ItemTextRightBinding binding, ChatMsg msg, ChatMsg previousChat, Bitmap myBitmap) {
+        void bindTextRight(ItemTextRightBinding binding, ChatMsgAndLog msg, ChatMsgAndLog previousChat, Bitmap myBitmap) {
             if (null == binding || null == msg) {
                 return;
             }
@@ -297,14 +302,15 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
             }
         }
 
-        private void showStatusView(ImageView ivStats, ProgressBar tvProgress, ImageView ivWarning, ChatMsg msg) {
+        private void showStatusView(ImageView ivStats, ProgressBar tvProgress, ImageView ivWarning, ChatMsgAndLog msg) {
             if (null == ivWarning) {
                 return;
             }
             ivStats.setImageResource(R.mipmap.icon_logs);
             ivStats.setVisibility(View.VISIBLE);
             tvProgress.setVisibility(View.GONE);
-            ivWarning.setVisibility(msg.unsent == 1 ? View.GONE : View.VISIBLE);
+            boolean isNeedResend = msg.unsent != 1 || isNeedResend(msg);
+            ivWarning.setVisibility(isNeedResend ? View.VISIBLE : View.GONE);
             ivWarning.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onResendClicked(msg);
@@ -407,6 +413,24 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
         }
     }
 
+    private static boolean isNeedResend(ChatMsgAndLog msg) {
+        List<ChatMsgLog> logs = msg.logs;
+        if (null == logs || logs.size() <= 0) {
+            return false;
+        }
+        long maxTimestamp = 0;
+        for (ChatMsgLog log : logs) {
+            if (log.status == ChatMsgStatus.SYNC_CONFIRMED.getStatus()) {
+                return false;
+            } else {
+                maxTimestamp = log.timestamp;
+            }
+        }
+        long currentTime = DateUtil.getMillisTime();
+        return maxTimestamp > 0 && DateUtil.timeDiffHours(maxTimestamp, currentTime) >=
+                Constants.MSG_RESEND_PERIOD;
+    }
+
     /**
      * 复制
      */
@@ -421,7 +445,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
 
     @Override
     public void onViewRecycled(@NonNull ViewHolder holder) {
-        holder.listener = null;
         holder.mSelectableTextHelper.destroy();
         holder.mSelectableTextHelper.setSelectListener(null);
         holder.mSelectableTextHelper = null;
@@ -431,20 +454,21 @@ public class ChatListAdapter extends ListAdapter<ChatMsg, ChatListAdapter.ViewHo
 
     public interface ClickListener {
         void onMsgLogsClicked(ChatMsg msg);
-        void onResendClicked(ChatMsg msg);
+        void onResendClicked(ChatMsgAndLog msg);
         void onUserClicked(ChatMsg msg);
     }
 
-    private static final DiffUtil.ItemCallback<ChatMsg> diffCallback = new DiffUtil.ItemCallback<ChatMsg>() {
+    private static final DiffUtil.ItemCallback<ChatMsgAndLog> diffCallback = new DiffUtil.ItemCallback<ChatMsgAndLog>() {
         @Override
-        public boolean areContentsTheSame(@NonNull ChatMsg oldItem, @NonNull ChatMsg newItem) {
+        public boolean areContentsTheSame(@NonNull ChatMsgAndLog oldItem, @NonNull ChatMsgAndLog newItem) {
             return oldItem.equals(newItem)
                     && StringUtil.isEquals(oldItem.logicMsgHash, newItem.logicMsgHash)
-                    && oldItem.unsent == newItem.unsent;
+                    && oldItem.unsent == newItem.unsent
+                    && isNeedResend(oldItem) == isNeedResend(newItem);
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull ChatMsg oldItem, @NonNull ChatMsg newItem) {
+        public boolean areItemsTheSame(@NonNull ChatMsgAndLog oldItem, @NonNull ChatMsgAndLog newItem) {
             return oldItem.equals(newItem);
         }
     };

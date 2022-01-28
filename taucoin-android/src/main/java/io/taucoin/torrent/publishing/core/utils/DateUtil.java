@@ -453,6 +453,6 @@ public class DateUtil {
         } else {
             millisecond = date2 - date1;
         }
-        return millisecond * 1.0f / 36000000;
+        return millisecond * 1.0f / 3600000;
     }
 }

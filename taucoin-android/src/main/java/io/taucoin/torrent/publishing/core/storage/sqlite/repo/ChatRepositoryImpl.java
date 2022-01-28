@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -98,7 +99,7 @@ public class ChatRepositoryImpl implements ChatRepository{
     }
 
     @Override
-    public List<ChatMsg> getMessages(String friendPk, int startPosition, int loadSize) {
+    public List<ChatMsgAndLog> getMessages(String friendPk, int startPosition, int loadSize) {
         String senderPk = MainApplication.getInstance().getPublicKey();
         return db.chatDao().getMessages(senderPk, friendPk, startPosition, loadSize);
     }

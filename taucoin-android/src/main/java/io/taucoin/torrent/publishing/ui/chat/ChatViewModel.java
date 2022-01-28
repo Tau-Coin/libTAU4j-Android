@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.ui.chat;
 
 import android.app.Application;
 import android.content.Context;
+import android.database.sqlite.SQLiteConstraintException;
 
 import org.libTAU4j.Message;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
@@ -59,7 +61,7 @@ public class ChatViewModel extends AndroidViewModel {
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> chatResult = new MutableLiveData<>();
     private MutableLiveData<Result> resentResult = new MutableLiveData<>();
-    private MutableLiveData<List<ChatMsg>> chatMessages = new MutableLiveData<>();
+    private MutableLiveData<List<ChatMsgAndLog>> chatMessages = new MutableLiveData<>();
     private TauDaemon daemon;
     public ChatViewModel(@NonNull Application application) {
         super(application);
@@ -95,7 +97,7 @@ public class ChatViewModel extends AndroidViewModel {
     /**
      * 观察查询的聊天信息
      */
-    LiveData<List<ChatMsg>> observerChatMessages() {
+    LiveData<List<ChatMsgAndLog>> observerChatMessages() {
         return chatMessages;
     }
 
@@ -323,7 +325,7 @@ public class ChatViewModel extends AndroidViewModel {
      * 重发消息
      * @param msg
      */
-    void resendMessage(ChatMsg msg, int pos) {
+    void resendMessage(ChatMsgAndLog msg, int pos) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Result>) emitter -> {
             ChatMsg chatMsg = chatRepo.queryChatMsg(msg.hash);
             Result result = new Result();
@@ -345,11 +347,19 @@ public class ChatViewModel extends AndroidViewModel {
                 chatMsg.unsent = 1;
                 chatRepo.updateMsgSendStatus(chatMsg);
 
-                // 如何是自己给自己发，直接确认接收
-                if (StringUtil.isEquals(chatMsg.senderPk, chatMsg.receiverPk)) {
-                    ChatMsgLog  chatMsgLog = new ChatMsgLog(chatMsg.hash,
-                            ChatMsgStatus.SYNC_CONFIRMED.getStatus(), daemon.getSessionTime());
-                    chatRepo.addChatMsgLogs(chatMsgLog);
+                try {
+                    // 如何是自己给自己发，直接确认接收
+                    if (StringUtil.isEquals(chatMsg.senderPk, chatMsg.receiverPk)) {
+                        ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
+                                ChatMsgStatus.SYNC_CONFIRMED.getStatus(), daemon.getSessionTime());
+                        chatRepo.addChatMsgLogs(chatMsgLog);
+                    } else {
+                        ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
+                                ChatMsgStatus.RESEND.getStatus(), daemon.getSessionTime());
+                        chatRepo.addChatMsgLogs(chatMsgLog);
+                        msg.logs.add(chatMsgLog);
+                    }
+                } catch (SQLiteConstraintException ignore) {
                 }
             }
             result.setMsg(String.valueOf(pos));
@@ -370,8 +380,8 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     void loadMessagesData(String friendPk, int pos) {
-        Disposable disposable = Observable.create((ObservableOnSubscribe<List<ChatMsg>>) emitter -> {
-            List<ChatMsg> messages = new ArrayList<>();
+        Disposable disposable = Observable.create((ObservableOnSubscribe<List<ChatMsgAndLog>>) emitter -> {
+            List<ChatMsgAndLog> messages = new ArrayList<>();
             try {
                 long startTime = System.currentTimeMillis();
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;

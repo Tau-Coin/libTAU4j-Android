@@ -39,6 +39,9 @@ public class Constants {
     // 自动更新账户周期（1天）（给自己发转账交易）
     public static final int AUTO_RENEWAL_PERIOD_BLOCKS = 288;
 
+    // 发送失败消息重发时间 (24Hours)
+    public static final int MSG_RESEND_PERIOD = 24;
+
     // 默认社区链平均出块时间，单位:s
     public static final int BLOCK_IN_AVG = 300;
 

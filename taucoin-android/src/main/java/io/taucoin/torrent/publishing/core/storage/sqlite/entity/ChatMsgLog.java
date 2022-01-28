@@ -11,13 +11,12 @@ import androidx.room.Ignore;
  * Room: 数据库存储ChatMsgLog实体类
  * 聊天消息状态
  */
-@Entity(tableName = "ChatMsgLogs", primaryKeys = {"hash", "status"})
+@Entity(tableName = "ChatMsgLogs", primaryKeys = {"hash", "status", "timestamp"})
 public class ChatMsgLog implements Parcelable {
     @NonNull
     public String hash;                    // 消息的Hash
     @NonNull
-    public int status;                     // 消息状态 0: 未进入队列，1: 已进入队列，2: 已送达
-    @NonNull
+    public int status;                     // 消息状态 -1: 消息构建，1: 消息同步确认
     public long timestamp;                 // 消息状态对应的时间
 
     public ChatMsgLog(@NonNull String hash, int status, long timestamp){
