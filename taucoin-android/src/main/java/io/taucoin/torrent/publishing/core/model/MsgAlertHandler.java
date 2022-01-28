@@ -186,6 +186,8 @@ class MsgAlertHandler {
                 friend.lastSeenTime = lastSeenTime;
                 friend.onlineCount = 1;
                 friendRepo.addFriend(friend);
+                // 更新朋友信息
+                daemon.requestFriendInfo(friendPk);
             }
         } else {
             boolean isUpdate = false;

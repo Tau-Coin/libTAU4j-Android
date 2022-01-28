@@ -691,6 +691,8 @@ public class UserViewModel extends AndroidViewModel {
                 String senderPk = MainApplication.getInstance().getPublicKey();
                 chatViewModel.syncSendMessageTask(senderPk, publicKey, msg, MessageType.TEXT.getType());
                 logger.debug("AddFriendsLocally, syncSendMessageTask::{}", msg);
+                // 更新朋友信息
+                daemon.requestFriendInfo(publicKey);
             } else {
                 result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));
                 logger.debug("AddFriendsLocally, {}", result.getMsg());
