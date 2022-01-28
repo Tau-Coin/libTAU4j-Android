@@ -40,7 +40,6 @@ public class ChainStatusActivity extends BaseActivity {
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
-    private ChainStatus status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,11 +79,18 @@ public class ChainStatusActivity extends BaseActivity {
         if (null == status) {
             return;
         }
-        this.status = status;
         binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(status.headBlock));
-        binding.tvHeadBlock.setTag(status.headBlock);
+        Block headBlock = communityViewModel.getBlockByNumber(chainID, status.headBlock);
+        loadBlockDetailData(binding.headBlock, headBlock);
+
         binding.tvTailBlock.setText(FmtMicrometer.fmtLong(status.tailBlock));
+        Block tailBlock = communityViewModel.getBlockByNumber(chainID, status.tailBlock);
+        loadBlockDetailData(binding.tailBlock, tailBlock);
+
         binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(status.consensusBlock));
+        Block consensusBlock = communityViewModel.getBlockByNumber(chainID, status.consensusBlock);
+        loadBlockDetailData(binding.consensusBlock, consensusBlock);
+
         binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
         binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
         binding.itemPeersBlocks.setRightText(FmtMicrometer.fmtLong(status.peerBlocks));
@@ -124,34 +130,22 @@ public class ChainStatusActivity extends BaseActivity {
                 ActivityUtil.startActivity(intent, this, ChainTopActivity.class);
                 break;
             case R.id.item_head_block:
-                if (null == status) {
-                    return;
-                }
-                showBlockDetail(binding.headBlock, binding.ivHeadDetail, status.headBlock);
+                showBlockDetail(binding.headBlock, binding.ivHeadDetail);
                 break;
             case R.id.item_tail_block:
-                if (null == status) {
-                    return;
-                }
-                showBlockDetail(binding.tailBlock, binding.ivTailDetail, status.tailBlock);
+                showBlockDetail(binding.tailBlock, binding.ivTailDetail);
                 break;
             case R.id.item_consensus_block:
-                if (null == status) {
-                    return;
-                }
-                showBlockDetail(binding.consensusBlock, binding.ivConsensusDetail, status.consensusBlock);
+                showBlockDetail(binding.consensusBlock, binding.ivConsensusDetail);
                 break;
         }
     }
 
-    private void showBlockDetail(ItemBlockLayoutBinding binding, ImageView ivHeadDetail, long blockNumber) {
+    private void showBlockDetail(ItemBlockLayoutBinding binding, ImageView ivHeadDetail) {
         View blockView = binding.getRoot();
         boolean isVisible = blockView.getVisibility() == View.VISIBLE;
         blockView.setVisibility(isVisible ? View.GONE : View.VISIBLE);
         ivHeadDetail.setRotation(isVisible ? 90 : -90);
-
-        Block headBlock = communityViewModel.getBlockByNumber(chainID, blockNumber);
-        loadBlockDetailData(binding, headBlock);
     }
 
     /**
