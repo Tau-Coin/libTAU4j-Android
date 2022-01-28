@@ -341,23 +341,27 @@ public class ChatViewModel extends AndroidViewModel {
                     ByteUtil.toByte(receiver), encryptedEncoded);
             boolean isSuccess = daemon.addNewMessage(message);
             if (isSuccess) {
-                // 更新界面数据
-                msg.unsent = 1;
-                // 更新数据库值
-                chatMsg.unsent = 1;
-                chatRepo.updateMsgSendStatus(chatMsg);
-
                 try {
-                    // 如何是自己给自己发，直接确认接收
-                    if (StringUtil.isEquals(chatMsg.senderPk, chatMsg.receiverPk)) {
+                    boolean isMyself = StringUtil.isEquals(chatMsg.senderPk, chatMsg.receiverPk);
+                    if (isMyself) {
+                        // 如何是自己给自己发，直接确认接收
                         ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
                                 ChatMsgStatus.SYNC_CONFIRMED.getStatus(), daemon.getSessionTime());
                         chatRepo.addChatMsgLogs(chatMsgLog);
                     } else {
-                        ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
-                                ChatMsgStatus.RESEND.getStatus(), daemon.getSessionTime());
-                        chatRepo.addChatMsgLogs(chatMsgLog);
-                        msg.logs.add(chatMsgLog);
+                        if (msg.unsent == 1) {
+                            ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
+                                    ChatMsgStatus.RESEND.getStatus(), daemon.getSessionTime());
+                            chatRepo.addChatMsgLogs(chatMsgLog);
+                            msg.logs.add(chatMsgLog);
+                        }
+                    }
+                    if (msg.unsent == 0) {
+                        // 更新界面数据
+                        msg.unsent = 1;
+                        // 更新数据库值
+                        chatMsg.unsent = 1;
+                        chatRepo.updateMsgSendStatus(chatMsg);
                     }
                 } catch (SQLiteConstraintException ignore) {
                 }
