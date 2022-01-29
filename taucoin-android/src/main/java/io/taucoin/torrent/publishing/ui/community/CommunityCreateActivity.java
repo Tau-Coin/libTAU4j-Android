@@ -21,6 +21,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.ChineseFilter;
 import io.taucoin.torrent.publishing.core.utils.EditTextInhibitInput;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -69,7 +70,8 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
                 FmtMicrometer.fmtBalance(Constants.TOTAL_COIN.longValue()));
         binding.tvTotalCoin.setText(totalCoin);
         // 社区名字禁止输入#特殊符号
-        binding.etCommunityName.setFilters(new InputFilter[]{new EditTextInhibitInput(EditTextInhibitInput.WELL_REGEX)});
+        binding.etCommunityName.setFilters(new InputFilter[]{new ChineseFilter(),
+                new EditTextInhibitInput(EditTextInhibitInput.WELL_REGEX)});
         binding.etCommunityName.addTextChangedListener(mTextWatcher);
     }
 
