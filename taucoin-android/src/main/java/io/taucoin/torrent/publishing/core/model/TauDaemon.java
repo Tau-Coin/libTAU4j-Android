@@ -546,6 +546,7 @@ public abstract class TauDaemon {
             locationManager.startLocation();
             updateLocationTimer = ObservableUtil.intervalSeconds(3600)
                     .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe( l -> locationManager.startLocation());
         }
     }
