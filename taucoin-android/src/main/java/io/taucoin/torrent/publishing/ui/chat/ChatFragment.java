@@ -136,6 +136,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             KeyboardUtils.hideSoftInput(activity);
             activity.goBack();
         });
+        binding.toolbarInclude.ivAction.setVisibility(View.INVISIBLE);
         User currentUser = MainApplication.getInstance().getCurrentUser();
         String distance = null;
         if (currentUser != null) {
