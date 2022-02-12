@@ -24,19 +24,21 @@
             android:layout_marginEnd="@dimen/widget_size_20"
             android:layout_marginTop="@dimen/widget_size_35">
 
-            <Spinner
-                android:id="@+id/coin_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/widget_size_50"
+            <ImageView
+                android:id="@+id/iv_coins"
+                android:layout_width="@dimen/widget_size_20"
+                android:layout_height="@dimen/widget_size_20"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:popupBackground="@drawable/spinner_rect_round_bg"
-                android:spinnerMode="dropdown"/>
+                android:contentDescription="@null"
+                android:onClick="@{listener::onClick}"
+                android:src="@mipmap/icon_choose_contact"/>
 
             <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
                 android:id="@+id/et_coin_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/widget_size_45"
+                android:layout_marginEnd="@dimen/widget_size_15"
                 android:minHeight="@dimen/widget_size_50"
                 android:hint="@string/tx_coin_name"
                 android:inputType="textMultiLine"

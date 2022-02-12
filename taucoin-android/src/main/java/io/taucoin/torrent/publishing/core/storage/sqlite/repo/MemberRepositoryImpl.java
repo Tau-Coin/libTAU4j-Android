@@ -74,9 +74,15 @@ public class MemberRepositoryImpl implements MemberRepository{
     public Member getMemberByChainIDAndPk(@NonNull String chainID, @NonNull String publicKey){
         return db.memberDao().getMemberByChainIDAndPk(chainID, publicKey);
     }
+
     @Override
     public Flowable<List<MemberAndUser>> observeCommunityMembers(String chainID){
         return db.memberDao().observeCommunityMembers(chainID);
+    }
+
+    @Override
+    public Flowable<Member> observeCommunityAirdropDetail(String chainID) {
+        return db.memberDao().observeCommunityAirdropDetail(chainID);
     }
 
     /**
@@ -155,5 +161,13 @@ public class MemberRepositoryImpl implements MemberRepository{
     @Override
     public String getCommunityLargestCoinHolder(String chainID) {
         return db.memberDao().getCommunityLargestCoinHolder(chainID);
+    }
+
+    /**
+     * 获取自己加入的未过期社区列表
+     */
+    @Override
+    public List<Member> getJoinedUnexpiredCommunityList(String userPk) {
+        return db.memberDao().getJoinedUnexpiredCommunityList(userPk);
     }
 }

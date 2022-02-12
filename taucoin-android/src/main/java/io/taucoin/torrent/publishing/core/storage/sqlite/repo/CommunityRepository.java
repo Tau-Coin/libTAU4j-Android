@@ -89,4 +89,6 @@ public interface CommunityRepository {
      * @return Observable<List<Member>>
      */
     Observable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum);
+
+    Flowable<List<CommunityAndMember>> observeCommunities();
 }

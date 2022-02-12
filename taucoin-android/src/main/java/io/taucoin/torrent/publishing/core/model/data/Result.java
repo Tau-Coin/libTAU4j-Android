@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.core.model.data;
 public class Result {
     private boolean success = true;     // 是否成功
     private String msg;                 // 消息
+    private String key;                 // 唯一key
     private boolean isExist;            // 消息
 
     public boolean isSuccess() {
@@ -32,5 +33,13 @@ public class Result {
 
     public void setExist(boolean exist) {
         isExist = exist;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

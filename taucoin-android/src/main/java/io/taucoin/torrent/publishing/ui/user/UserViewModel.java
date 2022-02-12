@@ -632,14 +632,26 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     /**
+     * 添加发布Airdrop的peer为朋友
+     * @param publicKey
+     * @param airdropChain
+     */
+    public void addAirdropFriend(String publicKey, String airdropChain) {
+        addFriend(publicKey, null, airdropChain);
+    }
+
+    /**
      * 添加朋友
      * 根据BuildConfig.DEBUG 添加测试代码，多次调用添加测试朋友
      * @param publicKey
      * @param nickname
      */
     public void addFriend(String publicKey, String nickname) {
+        addFriend(publicKey, nickname, null);
+    }
+    public void addFriend(String publicKey, String nickname, String airdropChain) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
-            Result result = addFriendTask(publicKey, nickname);
+            Result result = addFriendTask(publicKey, nickname, airdropChain);
 
             result.setSuccess(result.isExist());
             emitter.onNext(result);
@@ -651,9 +663,10 @@ public class UserViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private Result addFriendTask(String publicKey, String nickname) {
+    private Result addFriendTask(String publicKey, String nickname, String airdropChain) {
         logger.debug("AddFriendsLocally, publicKey::{}, nickname::{}", publicKey, nickname);
         Result result = new Result();
+        result.setKey(publicKey);
         User user = userRepo.getUserByPublicKey(publicKey);
         if(null == user){
             logger.debug("AddFriendsLocally, new user");
@@ -687,9 +700,11 @@ public class UserViewModel extends AndroidViewModel {
                 isExist = false;
                 result.setMsg(publicKey);
                 // 发送默认消息
-                String msg = getApplication().getString(R.string.contacts_have_added);
+                boolean isAirdrop = StringUtil.isNotEmpty(airdropChain);
+                String msg = getApplication().getString(!isAirdrop ? R.string.contacts_have_added : R.string.contacts_accepting_airdrop);
+                int type = !isAirdrop ? MessageType.TEXT.getType() : MessageType.AIRDROP.getType();
                 String senderPk = MainApplication.getInstance().getPublicKey();
-                chatViewModel.syncSendMessageTask(senderPk, publicKey, msg, MessageType.TEXT.getType());
+                chatViewModel.syncSendMessageTask(senderPk, publicKey, msg, type, airdropChain);
                 logger.debug("AddFriendsLocally, syncSendMessageTask::{}", msg);
                 // 更新朋友信息
                 daemon.requestFriendInfo(publicKey);
@@ -700,6 +715,12 @@ public class UserViewModel extends AndroidViewModel {
         } else {
             result.setMsg(getApplication().getString(R.string.contacts_friend_already_exists));
             logger.debug("AddFriendsLocally, {}", result.getMsg());
+            if (StringUtil.isNotEmpty(airdropChain)) {
+                String senderPk = MainApplication.getInstance().getPublicKey();
+                String msg = getApplication().getString(R.string.contacts_accepting_airdrop);
+                int type = MessageType.AIRDROP.getType();
+                chatViewModel.syncSendMessageTask(senderPk, publicKey, msg, type, airdropChain);
+            }
         }
         result.setExist(isExist);
         return result;

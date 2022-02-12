@@ -141,4 +141,9 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     public Observable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum) {
         return db.communityDao().observeChainTopPowerMembers(chainID, topNum);
     }
+
+    @Override
+    public Flowable<List<CommunityAndMember>> observeCommunities() {
+        return db.communityDao().observeCommunities();
+    }
 }

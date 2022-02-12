@@ -117,7 +117,7 @@ public class ChatViewModel extends AndroidViewModel {
     void sendMessage(String friendPk, String msg, int type) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Result>) emitter -> {
             String senderPk = MainApplication.getInstance().getPublicKey();
-            Result result = syncSendMessageTask(senderPk, friendPk, msg, type);
+            Result result = syncSendMessageTask(senderPk, friendPk, msg, type, null);
             emitter.onNext(result);
             emitter.onComplete();
         }).subscribeOn(Schedulers.single())
@@ -232,7 +232,19 @@ public class ChatViewModel extends AndroidViewModel {
      * @param type 消息类型
      */
     public Result syncSendMessageTask(String senderPk, String friendPk, String text, int type) {
-        return syncSendMessageTask(getApplication(), senderPk, friendPk, text, type);
+        return syncSendMessageTask(getApplication(), senderPk, friendPk, text, type, null);
+    }
+
+    /**
+     * 同步给朋友发信息任务
+     * @param senderPk 发送者公钥
+     * @param friendPk 朋友公钥
+     * @param text 消息
+     * @param type 消息类型
+     * @param airdropChain 发币的链
+     */
+    public Result syncSendMessageTask(String senderPk, String friendPk, String text, int type, String airdropChain) {
+        return syncSendMessageTask(getApplication(), senderPk, friendPk, text, type, airdropChain);
     }
 
     /**
@@ -245,20 +257,28 @@ public class ChatViewModel extends AndroidViewModel {
      */
     public static Result syncSendMessageTask(Context context, String senderPk, String friendPk,
                                              String text, int type) {
+        return syncSendMessageTask(context, senderPk, friendPk, text, type, null);
+    }
+
+    /**
+     * 同步给朋友发信息任务
+     * @param context Context
+     * @param senderPk 发送者公钥
+     * @param friendPk 朋友公钥
+     * @param text 消息
+     * @param type 消息类型
+     * @param airdropChain 发币的链
+     */
+    public static Result syncSendMessageTask(Context context, String senderPk, String friendPk,
+                                             String text, int type, String airdropChain) {
         Result result = new Result();
         UserRepository userRepo = RepositoryHelper.getUserRepository(context);
         ChatRepository chatRepo = RepositoryHelper.getChatRepository(context);
         TauDaemon daemon = TauDaemon.getInstance(context);
         AppDatabase.getInstance(context).runInTransaction(() -> {
             try {
-                List<byte[]> contents;
-                String logicMsgHash;
-                if(type == MessageType.TEXT.getType()) {
-                    logicMsgHash = HashUtil.makeSha256HashWithTimeStamp(text);
-                    contents = MsgSplitUtil.splitTextMsg(text);
-                } else {
-                    throw new Exception("Unknown message type");
-                }
+                String logicMsgHash = HashUtil.makeSha256HashWithTimeStamp(text);
+                List<byte[]> contents = MsgSplitUtil.splitTextMsg(text);
                 User user = userRepo.getUserByPublicKey(senderPk);
                 ChatMsg[] messages = new ChatMsg[contents.size()];
                 ChatMsgLog[] chatMsgLogs = new ChatMsgLog[contents.size()];
@@ -277,12 +297,7 @@ public class ChatViewModel extends AndroidViewModel {
                     currentTime = Math.max(currentTime, myLastSendTime + 1);
                     // 3、更新自己发送的最后一条的时间
                     myLastSendTime = currentTime;
-                    MsgContent msgContent;
-                    if (type == MessageType.TEXT.getType()) {
-                        msgContent = MsgContent.createTextContent(logicMsgHash, content);
-                    } else {
-                        throw new Exception("Unknown message type");
-                    }
+                    MsgContent msgContent = MsgContent.createContent(logicMsgHash, type, content, airdropChain);
 
                     // 加密填充模式为16的倍数896, 最大控制为895
                     byte[] encryptedEncoded = CryptoUtil.encrypt(msgContent.getEncoded(), key);
@@ -333,8 +348,9 @@ public class ChatViewModel extends AndroidViewModel {
             String sender = chatMsg.senderPk;
             String receiver = chatMsg.receiverPk;
             String logicMsgHash = chatMsg.logicMsgHash;
+            String airdropChain = chatMsg.airdropChain;
             User user = userRepo.getUserByPublicKey(sender);
-            MsgContent msgContent = MsgContent.createTextContent(logicMsgHash, chatMsg.content);
+            MsgContent msgContent = MsgContent.createTextContent(logicMsgHash, chatMsg.content, airdropChain);
             byte[] key = Utils.keyExchange(receiver, user.seed);
             byte[] encryptedEncoded = CryptoUtil.encrypt(msgContent.getEncoded(), key);
             Message message = new Message(timestamp, ByteUtil.toByte(sender),

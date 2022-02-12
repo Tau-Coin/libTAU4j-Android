@@ -21,9 +21,19 @@ public interface TxQueueRepository {
      */
     void addQueue(TxQueue tx);
 
+    void deleteQueue(TxQueue tx);
+
     Observable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String userPk);
+
+    List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String userPk);
 
     TxQueueAndStatus getQueueFirstTx(String chainID, String userPk);
 
     List<String> getNeedWiringTxCommunities(String userPk);
+
+    int getAirdropCount(String chainID, String currentPk, long currentTime);
+
+    TxQueue getAirdropTxQueue(String chainID, String currentPk, String friendPk);
+
+    Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);
 }

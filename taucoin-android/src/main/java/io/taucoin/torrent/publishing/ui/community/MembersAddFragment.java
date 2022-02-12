@@ -181,7 +181,7 @@ public class MembersAddFragment extends BaseFragment {
                 .setButtonWidth(R.dimen.widget_size_240)
                 .setPositiveButton(R.string.common_confirm, (dialog, which) -> {
                     showProgressDialog();
-                    viewModel.airdropToFriends(chainID, getSelectedMap(), medianFee);
+                    viewModel.addMembers(chainID, getSelectedMap(), medianFee);
                 }).create();
         confirmDialog.show();
     }

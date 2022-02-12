@@ -24,7 +24,6 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemChatListBinding;
 import io.taucoin.torrent.publishing.databinding.ItemGroupListBinding;
-import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 
 /**
  * 主页显示的群组列表的Adapter
@@ -118,11 +117,9 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 binding.leftView.setImageBitmap(UsersUtil.getHeadPic(bean.friend));
 
                 byte[] msg = bean.msg;
-                if (bean.msgType == MessageType.PICTURE.getType()) {
-                    binding.tvUserMessage.setText(context.getString(R.string.main_pic_messages));
-                } else if (bean.msgType == MessageType.TEXT.getType() && msg != null) {
+                if (msg != null) {
                     binding.tvUserMessage.setTextContent(bean.msg, bean.senderPk, bean.receiverPk);
-                } else if (null == msg) {
+                } else {
                     binding.tvUserMessage.setText(context.getString(R.string.main_no_messages));
                 }
                 if (bean.timestamp > 0) {

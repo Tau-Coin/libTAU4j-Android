@@ -27,6 +27,8 @@ public class Constants {
     // Chain link中bs默认数
     public static final int CHAIN_LINK_BS_LIMIT = 10;
 
+    public static final int AIRDROP_LINK_BS_LIMIT = 2;
+
     // 社区成员在线时间在多少小时内都认为在线
     public static final int ONLINE_HOURS = 12;
 

@@ -12,99 +12,111 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
         android:orientation="vertical">
 
         <include
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <RelativeLayout
-            android:background="@color/color_bg"
+        <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+            android:id="@+id/ll_exchange_qr"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:onClick="@{listener::onClick}"
+            app:lineLeftImage="@mipmap/icon_qr_code"
+            app:lineLeftTextStartMargin="@dimen/widget_size_10"
+            app:lineLeftText="@string/contacts_exchange_qr"/>
 
-            <LinearLayout
-                android:id="@+id/ll_exchange_qr"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@color/color_white"
-                android:paddingStart="@dimen/widget_size_20"
-                android:paddingEnd="@dimen/widget_size_0"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:layout_width="match_parent"
+        <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+            android:id="@+id/ll_add_friend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="@{listener::onClick}"
+            app:lineLeftImage="@mipmap/icon_invite_friends"
+            app:lineLeftTextStartMargin="@dimen/widget_size_10"
+            app:lineLeftText="@string/contacts_import_friend_pk"/>
+
+        <TextView
+            android:id="@+id/tv_yourself_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="@string/bot_yourself"
+            android:textColor="@color/gray_dark"
+            android:layout_marginStart="@dimen/widget_size_10"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_marginBottom="@dimen/widget_size_5"
+            android:textAppearance="@style/TextAppearanceBody3"/>
+
+        <LinearLayout
+            android:id="@+id/ll_yourself"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/widget_size_10"
+            android:paddingBottom="@dimen/widget_size_10"
+            android:paddingStart="@dimen/widget_size_10"
+            android:paddingEnd="@dimen/widget_size_10"
+            android:gravity="center_vertical"
+            android:onClick="@{listener::onClick}"
+            android:background="@color/color_white">
+
+            <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
+                android:id="@+id/iv_head_pic"
+                android:layout_width="@dimen/widget_size_45"
+                android:layout_height="@dimen/widget_size_45"
+                android:src="@drawable/primary_rect_round_bg"
+                android:scaleType="centerCrop"/>
+
+            <TextView
+                android:id="@+id/tv_nick_name"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/widget_size_44"
-                android:onClick="@{listener::onClick}">
+                android:includeFontPadding="false"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:layout_marginEnd="@dimen/widget_size_10"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:layout_marginBottom="@dimen/widget_size_5"
+                android:textAppearance="@style/TextAppearanceBody1"/>
 
-                <ImageView
-                    android:layout_width="@dimen/widget_size_20"
-                    android:layout_height="@dimen/widget_size_20"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/icon_qr_code"/>
+            <ImageView
+                android:id="@+id/iv_bot"
+                android:layout_width="@dimen/widget_size_30"
+                android:layout_height="@dimen/widget_size_30"
+                android:scaleType="centerCrop"
+                android:onClick="@{listener::onClick}"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_bot" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_15"
-                    android:text="@string/contacts_exchange_qr"
-                    android:textAppearance="@style/TextAppearanceBody1"/>
-            </LinearLayout>
+        </LinearLayout>
 
-            <include
-                android:id="@+id/view_line"
-                android:layout_below="@+id/ll_exchange_qr"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/widget_size_1"
-                layout="@layout/view_line"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="@string/drawer_peers"
+            android:textColor="@color/gray_dark"
+            android:layout_marginStart="@dimen/widget_size_10"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_marginBottom="@dimen/widget_size_5"
+            android:textAppearance="@style/TextAppearanceBody3"/>
 
-            <LinearLayout
-                android:layout_below="@+id/view_line"
-                android:id="@+id/ll_add_friend"
-                android:orientation="horizontal"
-                android:layout_marginBottom="@dimen/widget_size_7"
-                android:gravity="center_vertical"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/refresh_layout"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent">
+
+            <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
                 android:background="@color/color_white"
-                android:paddingStart="@dimen/widget_size_20"
-                android:paddingEnd="@dimen/widget_size_0"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:id="@+id/recycler_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="@dimen/widget_size_44"
-                android:onClick="@{listener::onClick}">
-
-                <ImageView
-                    android:layout_width="@dimen/widget_size_20"
-                    android:layout_height="@dimen/widget_size_20"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/icon_invite_friends"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_15"
-                    android:text="@string/contacts_import_friend_pk"
-                    android:textAppearance="@style/TextAppearanceBody1"/>
-            </LinearLayout>
-
-            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                android:layout_below="@+id/ll_add_friend"
-                android:id="@+id/refresh_layout"
                 android:layout_height="match_parent"
-                android:layout_width="match_parent">
+                android:clipToPadding="false"
+                android:scrollbars="vertical"
+                android:focusable="true"
+                android:scrollbarStyle="outsideOverlay" />
 
-                <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
-                    android:background="@color/color_white"
-                    android:id="@+id/recycler_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:scrollbars="vertical"
-                    android:focusable="true"
-                    android:scrollbarStyle="outsideOverlay" />
-
-            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-        </RelativeLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </LinearLayout>
 </layout>

@@ -421,11 +421,11 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     /**
-     * 空投币给朋友
+     * 添加朋友为社区成员
      * @param chainID
      * @param friendPks
      */
-    public void airdropToFriends(String chainID, Map<String, String> friendPks, String fee) {
+    public void addMembers(String chainID, Map<String, String> friendPks, String fee) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             Result result = new Result();
             try {
@@ -444,14 +444,14 @@ public class TxViewModel extends AndroidViewModel {
                     balance = account.getBalance();
                 }
                 if (totalPay > balance) {
-                    result.setFailMsg(application.getString(R.string.tx_error_no_enough_coins_for_airdrop));
+                    result.setFailMsg(application.getString(R.string.tx_error_insufficient_balance));
                 } else {
                     Set<String> friends = friendPks.keySet();
                     for (String friend : friends) {
                         String amount = friendPks.get(friend);
                         logger.debug("airdropToFriends chainID::{}, friend::{}, amount::{}, fee::{}",
                                 chainID, friend, amount, fee);
-                        String airdropResult = airdropToFriend(chainID, senderPk, friend,
+                        String airdropResult = addMembers(chainID, senderPk, friend,
                                 FmtMicrometer.fmtTxLongValue(amount),
                                 FmtMicrometer.fmtTxLongValue(fee));
                         if (StringUtil.isNotEmpty(airdropResult)) {
@@ -473,11 +473,11 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     /**
-     * 空投币给朋友
+     * 添加朋友为社区成员
      */
-    private String airdropToFriend(String chainID, String senderPk, String friendPk,
+    private String addMembers(String chainID, String senderPk, String friendPk,
                                   long amount, long fee) {
-        String memo = getApplication().getString(R.string.tx_memo_airdrop);
+        String memo = getApplication().getString(R.string.community_added_members);
         TxQueue tx = new TxQueue(chainID, senderPk, friendPk, amount, fee, memo);
         return addWringTransactionTask(tx, true);
     }
@@ -567,5 +567,19 @@ public class TxViewModel extends AndroidViewModel {
     public Observable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID) {
         String userPk = MainApplication.getInstance().getPublicKey();
         return txQueueRepo.observeCommunityTxQueue(chainID, userPk);
+    }
+
+    void deleteTxQueue(TxQueue tx) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+            try {
+                txQueueRepo.deleteQueue(tx);
+            } catch (Exception e) {
+                logger.error("deleteTxQueue error::", e);
+            }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+        disposables.add(disposable);
     }
 }

@@ -170,18 +170,10 @@ public class UserRepositoryImpl implements UserRepository{
     @Override
     public List<UserAndFriend> getUsers(boolean isAll, int order, @NonNull String friendPk) {
         List<UserAndFriend> list;
-        if (isAll) {
-            if (order == 0) {
-                list = db.userDao().queryUsersOrderByLastSeenTime(friendPk);
-            } else {
-                list = db.userDao().queryUsersOrderByLastCommTime(friendPk);
-            }
+        if (order == 0) {
+            list = db.userDao().queryUsersOrderByLastSeenTime(friendPk);
         } else {
-            if (order == 0) {
-                list = db.userDao().queryUsersByStatusOrderByLastSeenTime(friendPk);
-            } else {
-                list = db.userDao().queryUsersByStatusOrderByLastCommTime(friendPk);
-            }
+            list = db.userDao().queryUsersOrderByLastCommTime(friendPk);
         }
         if (null == list) {
             list = new ArrayList<>();
@@ -193,9 +185,11 @@ public class UserRepositoryImpl implements UserRepository{
                 list.add(0, userAndFriend);
             }
         }
-        UserAndFriend self = getFriend(mySelf);
-        if (mySelf != null) {
-            list.add(0, self);
+        if (isAll) {
+            UserAndFriend self = getFriend(mySelf);
+            if (mySelf != null) {
+                list.add(0, self);
+            }
         }
         return list;
     }

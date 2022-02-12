@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import androidx.databinding.DataBindingUtil;
@@ -35,6 +36,7 @@ public class LeftRightLineView extends RelativeLayout {
     private int rightImage;
     private boolean lineVisibility;
     private int lineHeight;
+    private int lineLeftTextStartMargin;
     private ViewLeftRightLineBinding binding;
 
     public LeftRightLineView(Context context) {
@@ -61,6 +63,7 @@ public class LeftRightLineView extends RelativeLayout {
         this.rightTextColor = a.getColor(R.styleable.LeftRightLineView_lineRightTextColor, getResources().getColor(R.color.gray_dark));
         this.lineVisibility = a.getBoolean(R.styleable.LeftRightLineView_lineVisibility, true);
         this.lineHeight = a.getDimensionPixelSize(R.styleable.LeftRightLineView_lineHeight, getResources().getDimensionPixelSize(R.dimen.widget_size_44));
+        this.lineLeftTextStartMargin = a.getDimensionPixelSize(R.styleable.LeftRightLineView_lineLeftTextStartMargin, getResources().getDimensionPixelSize(R.dimen.widget_size_5));
         a.recycle();
         loadView();
     }
@@ -76,6 +79,9 @@ public class LeftRightLineView extends RelativeLayout {
             if (leftImage != -1) {
                 binding.tvLeft1.setText(leftText);
                 binding.tvLeft2.setVisibility(VISIBLE);
+                RelativeLayout.LayoutParams layoutParams = (LayoutParams) binding.tvLeft1.getLayoutParams();
+                layoutParams.leftMargin = lineLeftTextStartMargin;
+                binding.tvLeft1.setLayoutParams(layoutParams);
             } else {
                 binding.tvLeft2.setText(leftText);
                 binding.tvLeft1.setVisibility(VISIBLE);

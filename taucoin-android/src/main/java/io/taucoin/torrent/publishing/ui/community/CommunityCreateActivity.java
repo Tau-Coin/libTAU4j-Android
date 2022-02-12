@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChineseFilter;
@@ -32,6 +33,8 @@ import io.taucoin.torrent.publishing.databinding.ActivityCommunityCreateBinding;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.friends.AirdropDetailActivity;
+import io.taucoin.torrent.publishing.ui.friends.AirdropSetupActivity;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
@@ -44,6 +47,7 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
     private CommunityViewModel viewModel;
     private String chainID;
     private MembersAddFragment currentFragment;
+    private boolean isOpenBot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,12 +112,20 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
     private void observeAddCommunityState() {
         viewModel.getAddCommunityState().observe(this, state -> {
             if (state.isSuccess()) {
-                // 进入社区页面
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, state.getMsg());
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra(IntentExtra.TYPE, 0);
-                ActivityUtil.startActivity(intent, this, MainActivity.class);
+                if (isOpenBot) {
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, state.getMsg());
+                    intent.putExtra(IntentExtra.OPEN_COMMUNITY, true);
+                    ActivityUtil.startActivity(intent, this, AirdropSetupActivity.class);
+                } else {
+                    // 进入社区页面
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, state.getMsg());
+                    intent.putExtra(IntentExtra.SHOW_LINK, true);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra(IntentExtra.TYPE, 0);
+                    ActivityUtil.startActivity(intent, this, MainActivity.class);
+                }
             } else {
                 ToastUtils.showShortToast(state.getMsg());
             }
@@ -136,23 +148,24 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
     public boolean onOptionsItemSelected(MenuItem item) {
         // 添加新社区处理事件
         if (item.getItemId() == R.id.menu_done) {
-            Community community = buildCommunity();
-            community.chainID = chainID;
-
-            Map<String, String> selectedMap = null;
-            if (currentFragment != null) {
-                selectedMap = currentFragment.getSelectedMap();
-            }
-            if (viewModel.validateCommunity(community, selectedMap)) {
-                viewModel.addCommunity(community, selectedMap);
-            }
+            createNewCommunity(false);
         }
         return true;
     }
 
-    private Community buildCommunity() {
+    private void createNewCommunity(boolean isOpenBot) {
+        this.isOpenBot = isOpenBot;
         String communityName = ViewUtils.getText(binding.etCommunityName);
-        return new Community(chainID, communityName);
+        Community community = new Community(chainID, communityName);
+        community.chainID = chainID;
+
+        Map<String, String> selectedMap = null;
+        if (currentFragment != null) {
+            selectedMap = currentFragment.getSelectedMap();
+        }
+        if (viewModel.validateCommunity(community, selectedMap)) {
+            viewModel.addCommunity(community, selectedMap);
+        }
     }
 
     @Override
@@ -171,6 +184,8 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
             intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_CREATION_ADD_MEMBERS);
             ActivityUtil.startActivityForResult(intent, this, FriendsActivity.class,
                     ADD_MEMBERS_CODE);
+        } else if (v.getId() == R.id.tv_open_bot) {
+            createNewCommunity(true);
         }
     }
 

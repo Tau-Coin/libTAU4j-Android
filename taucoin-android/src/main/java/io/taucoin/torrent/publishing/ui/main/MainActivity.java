@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +36,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
@@ -45,19 +47,24 @@ import io.taucoin.torrent.publishing.core.utils.PermissionUtils;
 import io.taucoin.torrent.publishing.core.utils.RootUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
+import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.core.utils.selecttext.SelectTextEventBus;
 import io.taucoin.torrent.publishing.databinding.ActivityMainDrawerBinding;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.databinding.ExternalAirdropLinkDialogBinding;
+import io.taucoin.torrent.publishing.databinding.ExternalErrorLinkDialogBinding;
 import io.taucoin.torrent.publishing.databinding.ExternalLinkDialogBinding;
+import io.taucoin.torrent.publishing.databinding.PromptDialogBinding;
 import io.taucoin.torrent.publishing.databinding.UserDialogBinding;
 import io.taucoin.torrent.publishing.receiver.NotificationReceiver;
 import io.taucoin.torrent.publishing.service.WorkloadManager;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.chat.ChatFragment;
+import io.taucoin.torrent.publishing.ui.community.BalanceActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityFragment;
 import io.taucoin.torrent.publishing.ui.ExternalLinkActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityCreateActivity;
@@ -67,6 +74,7 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.BadgeActionProvider;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.download.DownloadViewModel;
+import io.taucoin.torrent.publishing.ui.friends.YourselfActivity;
 import io.taucoin.torrent.publishing.ui.notify.NotificationViewModel;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.KeyQRCodeActivity;
@@ -96,6 +104,7 @@ public class MainActivity extends ScanTriggerActivity {
     private Subject<Integer> mBackClick = PublishSubject.create();
     private CommonDialog seedDialog;
     private CommonDialog linkDialog;
+    private CommonDialog joinDialog;
     private User user;
     private BaseFragment currentFragment;
     private BadgeActionProvider badgeProvider;
@@ -132,18 +141,27 @@ public class MainActivity extends ScanTriggerActivity {
         } else if (StringUtil.isNotEmpty(action) && StringUtil.isEquals(action,
                 ExternalLinkActivity.ACTION_CHAIN_LINK_CLICK)) {
             logger.info("MainActivity::chain link clicked");
-            if (intent.hasExtra(IntentExtra.CHAIN_LINK)) {
-                String chainLink = intent.getStringExtra(IntentExtra.CHAIN_LINK);
-                ChainURL decode = ChainUrlUtil.decode(chainLink);
-                if (decode != null) {
-                    String chainID = ChainIDUtil.decode(decode.getChainID());
-                    openExternalLink(chainID, chainLink);
-                }
+            if (intent.hasExtra(IntentExtra.LINK)) {
+                String chainLink = intent.getStringExtra(IntentExtra.LINK);
+                openExternalChainLink(chainLink);
             }
+        } else if (StringUtil.isNotEmpty(action) && StringUtil.isEquals(action,
+                ExternalLinkActivity.ACTION_AIRDROP_LINK_CLICK)) {
+            logger.info("MainActivity::airdrop link clicked");
+            if (intent.hasExtra(IntentExtra.LINK)) {
+                String link = intent.getStringExtra(IntentExtra.LINK);
+                openExternalAirdropLink(link);
+            }
+        } else if (StringUtil.isNotEmpty(action) && StringUtil.isEquals(action,
+                ExternalLinkActivity.ACTION_ERROR_LINK_CLICK)) {
+            logger.info("MainActivity::error link clicked");
+            showErrorLinkDialog();
         } else if (0 != (Intent.FLAG_ACTIVITY_CLEAR_TOP & intent.getFlags())) {
-            String chainID = intent.getStringExtra(IntentExtra.CHAIN_ID);
-            int type = intent.getIntExtra(IntentExtra.TYPE, -1);
-            updateMainRightFragment(type, chainID, intent);
+            Bundle bundle = new Bundle();
+            bundle.putString(IntentExtra.CHAIN_ID, intent.getStringExtra(IntentExtra.CHAIN_ID));
+            bundle.putString(IntentExtra.TYPE, intent.getStringExtra(IntentExtra.TYPE));
+            bundle.putString(IntentExtra.SHOW_LINK, intent.getStringExtra(IntentExtra.SHOW_LINK));
+            updateMainRightFragment(bundle);
         }
     }
 
@@ -220,7 +238,10 @@ public class MainActivity extends ScanTriggerActivity {
     private void subscribeAddCommunity(){
         communityViewModel.getAddCommunityState().observe(this, result -> {
             if(result.isSuccess()){
-                updateMainRightFragment(0, result.getMsg());
+                updateCommunityFragment(result.getMsg());
+                if (joinDialog != null) {
+                    joinDialog.show();
+                }
             }
         });
     }
@@ -283,6 +304,9 @@ public class MainActivity extends ScanTriggerActivity {
         if(linkDialog != null){
             linkDialog.closeDialog();
         }
+        if(joinDialog != null){
+            joinDialog.closeDialog();
+        }
         if (currentFragment != null) {
             FragmentManager fm = getSupportFragmentManager();
             if (!fm.isDestroyed()) {
@@ -339,6 +363,12 @@ public class MainActivity extends ScanTriggerActivity {
             case R.id.item_working_condition:
                 ActivityUtil.startActivity(this, WorkingConditionActivity.class);
                 break;
+            case R.id.item_airdrop_coins:
+                ActivityUtil.startActivity(this, YourselfActivity.class);
+                break;
+            case R.id.item_balance:
+                ActivityUtil.startActivity(this, BalanceActivity.class);
+                break;
         }
         if (binding != null) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
@@ -379,8 +409,40 @@ public class MainActivity extends ScanTriggerActivity {
     /**
      * 显示打开外部chain url的对话框（来自剪切板或外部链接）
      */
-    private boolean showOpenExternalLinkDialog(String chainUrl) {
-        ChainURL decode = ChainUrlUtil.decode(chainUrl);
+    private boolean showOpenExternalLinkDialog(String url) {
+        AirdropUrl airdropUrl = UrlUtil.decodeAirdropUrl(url);
+        if (airdropUrl != null) {
+            if (StringUtil.isEquals(MainApplication.getInstance().getPublicKey(),
+                    airdropUrl.getAirdropPeer())) {
+                return false;
+            }
+            ExternalAirdropLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
+                    R.layout.external_airdrop_link_dialog, null, false);
+            String airdropPeerName = UsersUtil.getShowName(null, airdropUrl.getAirdropPeer());
+            String airdropPeerTip = getString(R.string.main_airdrop_link_peer, airdropPeerName);
+            dialogBinding.tvPeer.setText(Html.fromHtml(airdropPeerTip));
+            String communityName = ChainIDUtil.getName(airdropUrl.getChainID());
+            String communityNameTip = getString(R.string.main_airdrop_link_community, communityName);
+            dialogBinding.tvCommunity.setText(Html.fromHtml(communityNameTip));
+            dialogBinding.tvSkip.setOnClickListener(v -> {
+                if (linkDialog != null) {
+                    linkDialog.closeDialog();
+                }
+            });
+            dialogBinding.tvJoin.setOnClickListener(v -> {
+                if (linkDialog != null) {
+                    linkDialog.closeDialog();
+                }
+                openExternalAirdropLink(url);
+            });
+            linkDialog = new CommonDialog.Builder(this)
+                    .setContentView(dialogBinding.getRoot())
+                    .setCanceledOnTouchOutside(false)
+                    .create();
+            linkDialog.show();
+            return true;
+        }
+        ChainURL decode = ChainUrlUtil.decode(url);
         if (decode != null) {
             String chainID = ChainIDUtil.decode(decode.getChainID());
             ExternalLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
@@ -395,7 +457,7 @@ public class MainActivity extends ScanTriggerActivity {
                 if(linkDialog != null){
                     linkDialog.closeDialog();
                 }
-                openExternalLink(chainID, chainUrl);
+                openExternalChainLink(url);
             });
             linkDialog = new CommonDialog.Builder(this)
                     .setContentView(dialogBinding.getRoot())
@@ -403,8 +465,41 @@ public class MainActivity extends ScanTriggerActivity {
                     .create();
             linkDialog.show();
             return true;
+        } else {
+            if (UrlUtil.isTauUrl(url)) {
+                showErrorLinkDialog();
+                return true;
+            }
         }
         return false;
+    }
+
+    private void showErrorLinkDialog() {
+        ExternalErrorLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
+                R.layout.external_error_link_dialog, null, false);
+        dialogBinding.tvClose.setOnClickListener(v -> {
+            if(linkDialog != null){
+                linkDialog.closeDialog();
+            }
+        });
+        linkDialog = new CommonDialog.Builder(this)
+                .setContentView(dialogBinding.getRoot())
+                .setCanceledOnTouchOutside(false)
+                .create();
+        linkDialog.show();
+    }
+
+    private void initJoinSuccessDialog(String airdropPeer) {
+        PromptDialogBinding joinBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
+                R.layout.prompt_dialog, null, false);
+        String airdropPeerName = UsersUtil.getShowName(null, airdropPeer);
+        String joinSuccess = getString(R.string.main_chain_join_success_tips, airdropPeerName);
+        joinBinding.tvContent.setText(Html.fromHtml(joinSuccess));
+        joinDialog = new CommonDialog.Builder(this)
+                .setContentView(joinBinding.getRoot())
+                .setCanceledOnTouchOutside(true)
+                .create();
+        joinDialog.setOnCancelListener(l -> joinDialog = null);
     }
 
     @Override
@@ -459,48 +554,29 @@ public class MainActivity extends ScanTriggerActivity {
     }
 
     public void goBack() {
-        updateMainRightFragment(null);
+        updateMainRightFragment(new Bundle());
     }
 
-    public void updateMainRightFragment(int type, String ID) {
-        CommunityAndFriend bean = new CommunityAndFriend();
-        bean.type = type;
-        bean.ID = ID;
-        updateMainRightFragment(bean);
-    }
-
-    public void updateMainRightFragment(int type, String ID, Intent intent) {
-        CommunityAndFriend bean = new CommunityAndFriend();
-        bean.type = type;
-        bean.ID = ID;
-        updateMainRightFragment(bean, intent);
-    }
-
-    public void updateMainRightFragment(CommunityAndFriend bean) {
-        updateMainRightFragment(bean, getIntent());
+    protected void updateCommunityFragment(String ID) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(IntentExtra.TYPE, 0);
+        bundle.putString(IntentExtra.ID, ID);
+        updateMainRightFragment(bundle);
     }
 
     /**
      * 更新主页右面Fragment
      */
-    private void updateMainRightFragment(CommunityAndFriend bean, Intent intent) {
+    protected void updateMainRightFragment(Bundle bundle) {
         // 创建修改实例
         BaseFragment newFragment = null;
-        Bundle bundle = new Bundle();
-        if (bean != null) {
-            if (bean.type == 0) {
+        if (!bundle.isEmpty()) {
+            int type = bundle.getInt(IntentExtra.TYPE, -1);
+            if (type == 0) {
                 newFragment = new CommunityFragment();
-            } else if (bean.type == 1) {
-                User friend = bean.friend;
-                if (null == friend && intent != null) {
-                    friend = intent.getParcelableExtra(IntentExtra.BEAN);
-                }
-                if (friend != null) {
-                    bundle.putParcelable(IntentExtra.BEAN, friend);
-                }
+            } else if (type == 1) {
                 newFragment = new ChatFragment();
             }
-            bundle.putString(IntentExtra.ID, bean.ID);
         }
         currentFragment = newFragment;
         if (null == newFragment) {
@@ -528,17 +604,41 @@ public class MainActivity extends ScanTriggerActivity {
 
     /**
      * 打开外部chain link
-     * @param chainID
+     * @param link chain link
      */
-    private void openExternalLink(String chainID, String chainLink) {
-        disposables.add(communityViewModel.getCommunityByChainIDSingle(chainID)
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(community -> {
-                updateMainRightFragment(0, chainID);
-            }, it -> {
-                communityViewModel.addCommunity(chainID, chainLink);
-            }));
+    private void openExternalChainLink(String link) {
+        ChainURL decode = ChainUrlUtil.decode(link);
+        if (decode != null) {
+            String chainID = ChainIDUtil.decode(decode.getChainID());
+            disposables.add(communityViewModel.getCommunityByChainIDSingle(chainID)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(community -> {
+                        updateCommunityFragment(chainID);
+                        if (joinDialog != null) {
+                            joinDialog.closeDialog();
+                        }
+                    }, it -> {
+                        communityViewModel.addCommunity(chainID, link);
+                    }));
+        }
+    }
+
+    /**
+     * 打开外部Airdrop link
+     * @param link Airdrop link
+     */
+    private void openExternalAirdropLink(String link) {
+        AirdropUrl decode = UrlUtil.decodeAirdropUrl(link);
+        if (decode != null) {
+            // 加朋友
+            String airdropPeer = decode.getAirdropPeer();
+            userViewModel.addAirdropFriend(airdropPeer, decode.getChainID());
+            // 加入社区
+            String chainUrl = decode.getChainUrl();
+            initJoinSuccessDialog(decode.getAirdropPeer());
+            openExternalChainLink(chainUrl);
+        }
     }
 
     /**

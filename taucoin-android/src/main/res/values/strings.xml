@@ -16,11 +16,14 @@
     <string name="common_confirm">Confirm</string>
     <string name="common_submit">Submit</string>
     <string name="common_percent">%1$d%%</string>
+    <string name="common_unknown">Unknown</string>
     <string name="common_on">ON</string>
     <string name="common_off">OFF</string>
+    <string name="common_setup">Setup</string>
     <string name="common_do_not_show">Do not show this dialog again</string>
     <string name="common_start">Start</string>
     <string name="common_yes">Yes</string>
+    <string name="common_join">Join</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="exit">Exit</string>
@@ -32,6 +35,7 @@
     <string name="common_more">More</string>
     <string name="common_skip">Skip</string>
     <string name="common_chinese_not_supported">Sorry, Chinese is not supported!</string>
+    <string name="common_close">Close</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
@@ -43,14 +47,19 @@
     <string name="main_exit">Click again to exit the application!</string>
     <string name="main_balance_power">Balance %1$s, Power %2$s</string>
     <string name="main_read_only">Read\nOnly</string>
+    <string name="main_error_link">Invalid link!</string>
     <string name="main_open_link">Open the link?</string>
+    <string name="main_airdrop_link_peer" formatted="false"><Data><![CDATA[<font color="#000000">%1$s</font> send you an airdrop link]]></Data></string>
+    <string name="main_airdrop_link_community" formatted="false"><Data><![CDATA[Welcome to <font color="#000000">%1$s</font>! Check airdrop for fee coins.]]></Data></string>
+    <string name="main_chain_join_success">Happy you join us!</string>
+    <string name="main_chain_join_success_tips" formatted="false"><Data><![CDATA[I\'m <font color="#000000">%1$s</font>, the creator of this community. We are friends now.]]></Data></string>
+    <string name="main_airdrop_link_share">Share link to airdrop to friends.</string>
 
     <string name="main_publish_video">Publish Video</string>
     <string name="main_new_community">New Coin Community</string>
     <string name="main_community_settings">Community Settings</string>
     <string name="main_other_transaction">Other Transaction</string>
     <string name="main_no_messages">[No messages]</string>
-    <string name="main_pic_messages">[Picture]</string>
     <string name="main_connecting">Joining phone swarm &#8230;</string>
     <string name="main_no_ipv4">IPv4 not found</string>
     <string name="main_data_used_up">Background Daily Data Limit Used Up</string>
@@ -58,6 +67,9 @@
 
     <!-- Strings used for main drawer content -->
     <string name="drawer_new_community">New Community</string>
+    <string name="drawer_airdrop_coins">Airdrop Coins</string>
+    <string name="drawer_balance">Balance</string>
+    <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Friends</string>
     <string name="drawer_communities">Communities</string>
     <string name="drawer_setting">Settings</string>
@@ -118,6 +130,7 @@
     <string name="community_transaction_queue">Wiring Transaction Queue</string>
     <string name="community_nickname">Community Nickname</string>
     <string name="community_choose_community">Chains</string>
+    <string name="community_choose_coin">Choose Coin</string>
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>
     <string name="community_mining_income">Mining Income</string>
@@ -130,7 +143,6 @@
     <string name="community_chain_note_title">Note Transaction</string>
     <string name="community_sell_coins">Sell Coins</string>
     <string name="community_sell_detail">Sell Detail</string>
-    <string name="community_filter_by">Filter by</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
 
     <string name="chain_difficulty">Difficulty</string>
@@ -341,7 +353,8 @@
     <string name="tx_error_invalid_free">Invalid Transaction free</string>
     <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Balance</string>
     <string name="tx_error_no_enough_coins_for_fee">Insufficient Balance :\nTransaction Fee > Balance</string>
-    <string name="tx_error_no_enough_coins_for_airdrop">Insufficient Balance</string>
+    <string name="tx_error_insufficient_balance">Insufficient Balance</string>
+    <string name="tx_error_nonce_conflict">Invalidation: nonce conflict</string>
     <string name="tx_error_invalid_name">Invalid Name</string>
     <string name="tx_error_invalid_message">Invalid Message</string>
     <string name="tx_error_invalid_comment">Invalid Comment</string>
@@ -396,13 +409,12 @@
     <string name="contacts_exchange_qr">Show QR code to add friend</string>
     <string name="contacts_import_friend_pk">Import Public Key to add friend</string>
     <string name="contacts_have_added">Welcome friend.</string>
+    <string name="contacts_accepting_airdrop">Accepting airdrop.</string>
     <string name="contacts_yourself">&#160;-&#160;yourself</string>
     <string name="contacts_discovered">Discovered</string>
     <string name="contacts_added">Added</string>
     <string name="contacts_share_qr_code">Share QR Code to</string>
     <string name="contacts_empty">No contacts！</string>
-    <string name="contacts_community_from">From&#160;</string>
-    <string name="contacts_community_more">,C/%1$s</string>
     <string name="contacts_last_seen">Last seen %1$s</string>
     <string name="contacts_last_communication">Last comm %1$s</string>
     <string name="contacts_share_link_via">Share community link via</string>
@@ -417,6 +429,27 @@
     <string name="contacts_friend_add_failed">Failed to add friend, please try again!</string>
     <string name="contacts_error_invalid_qr">Invalid QR code, please copy/paste key text instead.</string>
     <string name="contacts_airdrop_successfully">You have send %1$s coins to your friends!</string>
+
+
+    <string name="bot_yourself">Yourself</string>
+    <string name="bot_airdrop_tip">Airdrop Bot</string>
+    <string name="bot_airdrop_open">Open Bot</string>
+    <string name="bot_tip">Bot</string>
+    <string name="bot_airdrop">Airdrop</string>
+    <string name="bot_airdrop_community">Airdrop Community</string>
+    <string name="bot_airdrop_members">Members</string>
+    <string name="bot_airdrop_members_error">Members invalid</string>
+    <string name="bot_airdrop_members_hit">input how many address to airdrop</string>
+    <string name="bot_airdrop_coins">Airdrop Coins</string>
+    <string name="bot_airdrop_coins_error">Airdrop Coins invalid</string>
+    <string name="bot_airdrop_coins_hit">input how many airdrop coins to an address</string>
+    <string name="bot_airdrop_referral_bonus">Referral Bonus</string>
+    <string name="bot_airdrop_coins_total">In total</string>
+    <string name="bot_airdrop_coins_total_value">%1$scoins</string>
+    <string name="bot_airdrop_participants_progress">Participants Progress</string>
+    <string name="bot_airdrop_coins_usage">Coins Usage</string>
+    <string name="bot_airdrop_tau_link">TAU Link</string>
+    <string name="bot_hello_world">HelloWorld</string>
 
     <!-- Strings used for QRCode -->
     <string name="qr_code_title">My Public Key QR Code</string>

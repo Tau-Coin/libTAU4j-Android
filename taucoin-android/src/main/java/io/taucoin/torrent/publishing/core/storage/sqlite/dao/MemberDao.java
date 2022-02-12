@@ -85,6 +85,16 @@ public interface MemberDao {
             " WHERE chainID = :chainID" +
             " ORDER BY balance DESC LIMIT 1";
 
+    String QUERY_JOINED_UNEXPIRED_COMMUNITY = "SELECT m.*" +
+            " FROM Members m" +
+            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+            " WHERE m.publicKey = :userPk AND c.isBanned = 0" +
+            " AND " + WHERE_ON_CHAIN;
+
+    String QUERY_AIRDROP_DETAIL = "SELECT * FROM Members" +
+            " WHERE chainID = :chainID AND" +
+            " publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
+
     /**
      * 添加新社区成员
      */
@@ -161,4 +171,13 @@ public interface MemberDao {
      */
     @Query(QUERY_LARGEST_COIN_HOLDER)
     String getCommunityLargestCoinHolder(String chainID);
+
+    /**
+     * 获取自己加入的未过期社区列表
+     */
+    @Query(QUERY_JOINED_UNEXPIRED_COMMUNITY)
+    List<Member> getJoinedUnexpiredCommunityList(String userPk);
+
+    @Query(QUERY_AIRDROP_DETAIL)
+    Flowable<Member> observeCommunityAirdropDetail(String chainID);
 }

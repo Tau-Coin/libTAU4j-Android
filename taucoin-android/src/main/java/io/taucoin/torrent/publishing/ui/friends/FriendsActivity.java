@@ -13,12 +13,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
+import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityFriendsBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
@@ -97,6 +100,20 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         binding.recyclerList.setLayoutManager(layoutManager);
         binding.recyclerList.setItemAnimator(null);
         binding.recyclerList.setAdapter(adapter);
+
+        if (page != PAGE_FRIENDS_LIST) {
+            binding.llYourself.setVisibility(View.GONE);
+            binding.tvYourselfTip.setVisibility(View.GONE);
+        }
+    }
+
+    private void updateMyselfInfo(User user) {
+        if(null == user){
+            return;
+        }
+        String showName = UsersUtil.getCurrentUserName(user);
+        binding.tvNickName.setText(showName);
+        binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(user));
     }
 
     private void subscribeUserList() {
@@ -116,6 +133,13 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
             adapter.setOrder(order);
             adapter.submitList(list);
         });
+
+        if (page == PAGE_FRIENDS_LIST) {
+            disposables.add(userViewModel.observeCurrentUser()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::updateMyselfInfo));
+        }
     }
 
     @Override
@@ -193,15 +217,19 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     }
 
     @Override
-    public void onItemClicked(@NonNull UserAndFriend user) {
-        if(page == PAGE_SELECT_CONTACT){
+    public void onItemClicked(@NonNull User user) {
+        onItemClicked(user.publicKey);
+    }
+
+    private void onItemClicked(@NonNull String publicKey) {
+        if (page == PAGE_SELECT_CONTACT) {
             Intent intent = new Intent();
-            intent.putExtra(IntentExtra.PUBLIC_KEY, user.publicKey);
+            intent.putExtra(IntentExtra.PUBLIC_KEY, publicKey);
             setResult(RESULT_OK, intent);
             onBackPressed();
         } else {
             Intent intent = new Intent();
-            intent.putExtra(IntentExtra.PUBLIC_KEY, user.publicKey);
+            intent.putExtra(IntentExtra.PUBLIC_KEY, publicKey);
             intent.putExtra(IntentExtra.TYPE, UserDetailActivity.TYPE_FRIEND_LIST);
             ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
         }
@@ -230,12 +258,16 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
             ActivityUtil.startActivity(FriendsActivity.this, UserQRCodeActivity.class);
         } else if (v.getId() == R.id.ll_add_friend) {
             userViewModel.showAddFriendDialog(this);
+        } else if (v.getId() == R.id.iv_bot) {
+            ActivityUtil.startActivity(FriendsActivity.this, YourselfActivity.class);
+        } else if (v.getId() == R.id.ll_yourself) {
+            onItemClicked(MainApplication.getInstance().getPublicKey());
         }
     }
 
     @Override
     public void onRefresh() {
         // 立即执行刷新
-        userViewModel.loadUsersList(order, true, scannedFriendPk);
+        userViewModel.loadUsersList(order, page != PAGE_FRIENDS_LIST, scannedFriendPk);
     }
 }

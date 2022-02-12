@@ -28,6 +28,7 @@ import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
+import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 
 /**
  * 群组列表页面
@@ -151,6 +152,9 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
      */
     @Override
     public void onItemClicked(@NonNull CommunityAndFriend item) {
-        activity.updateMainRightFragment(item);
+        Bundle bundle = new Bundle();
+        bundle.putInt(IntentExtra.TYPE, item.type);
+        bundle.putString(IntentExtra.ID, item.ID);
+        activity.updateMainRightFragment(bundle);
     }
 }

@@ -339,6 +339,13 @@
         <item name="android:textSize">@dimen/font_size_14</item>
     </style>
 
+    <style name="TextAppearanceHeadline4" parent="Base.TextAppearance.MaterialComponents.Headline6">
+        <!-- Roboto Medium was added in this api level -->
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/font_size_20</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 
     <style name="TextAppearanceHeadline5" parent="Base.TextAppearance.MaterialComponents.Headline6">
         <!-- Roboto Medium was added in this api level -->

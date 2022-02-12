@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 
 import org.libTAU4j.Message;
+import org.libTAU4j.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,18 +16,29 @@ import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.FriendInfo;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
+import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
+import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Device;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.DeviceRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -43,6 +55,8 @@ class MsgAlertHandler {
     private FriendRepository friendRepo;
     private DeviceRepository deviceRepo;
     private UserRepository userRepo;
+    private TxQueueRepository txQueueRepo;
+    private MemberRepository memberRepo;
     private TauDaemon daemon;
     private Context appContext;
 
@@ -53,6 +67,8 @@ class MsgAlertHandler {
         friendRepo = RepositoryHelper.getFriendsRepository(appContext);
         deviceRepo = RepositoryHelper.getDeviceRepository(appContext);
         userRepo = RepositoryHelper.getUserRepository(appContext);
+        txQueueRepo = RepositoryHelper.getTxQueueRepository(appContext);
+        memberRepo = RepositoryHelper.getMemberRepository(appContext);
     }
     /**
      * 处理新的消息
@@ -117,10 +133,58 @@ class MsgAlertHandler {
                         friendRepo.updateFriend(friend);
                     }
                 }
+
+                // 如果是Airdrop, 则给此消息的发送者airdrop coins
+                if (msgContent.getType() == MessageType.AIRDROP.getType()) {
+                    String chainID = msgContent.getAirdropChain();
+                    handleAirdropCoins(chainID, userPk, senderPk);
+                }
             }
         } catch (Exception e) {
             logger.error("onNewMessage error", e);
         }
+    }
+
+    /**
+     * 给消息的发送者airdrop coins
+     * @param currentPk 当前用户
+     * @param friendPk 接受airdrop的朋友
+     */
+    private void handleAirdropCoins(String chainID, String currentPk, String friendPk) {
+        logger.debug("handleAirdropCoins: yourself::{}, currentPk::{}, friendPk::{}, chainID::{}",
+                StringUtil.isEquals(currentPk, friendPk), currentPk, friendPk, chainID);
+        if (StringUtil.isEquals(currentPk, friendPk)) {
+           return;
+        }
+        Member member = memberRepo.getMemberByChainIDAndPk(chainID, currentPk);
+        if (null == member) {
+            logger.debug("handleAirdropCoins: not a member of the community");
+            return;
+        }
+        if (member.airdropStatus != AirdropStatus.ON.getStatus()) {
+            AirdropStatus status = AirdropStatus.valueOf(member.airdropStatus);
+            logger.debug("handleAirdropCoins: airdrop status::{}", status.getName());
+            return;
+        }
+        // 一个朋友只能airdrop一次
+        TxQueue txQueue = txQueueRepo.getAirdropTxQueue(chainID, currentPk, friendPk);
+        if (txQueue != null) {
+            logger.debug("handleAirdropCoins: A peer can only be sent once!");
+            return;
+        }
+        long currentTime = member.airdropTime;
+        int airdropCount = txQueueRepo.getAirdropCount(chainID, currentPk, currentTime);
+        logger.debug("handleAirdropCoins: airdrop progress::{}/{}", airdropCount, member.airdropMembers);
+        // airdrop朋友数是否完成
+        if (airdropCount >= member.airdropMembers) {
+            return;
+        }
+        String memo = appContext.getString(R.string.tx_memo_airdrop);
+        long amount = member.airdropCoins;
+        long fee = 0L;
+        TxQueue tx = new TxQueue(chainID, currentPk, friendPk, amount, fee, 1, memo);
+        txQueueRepo.addQueue(tx);
+        daemon.updateTxQueue(tx.chainID);
     }
 
     /**

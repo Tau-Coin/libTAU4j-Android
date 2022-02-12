@@ -17,9 +17,11 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
@@ -46,6 +48,7 @@ class TxQueueManager {
     private TxRepository txRepo;
     private UserRepository userRepo;
     private MemberRepository memberRepo;
+    private SettingsRepository settingsRepo;
     private LinkedBlockingQueue<String> chainIDQueue = new LinkedBlockingQueue<>();
     private Disposable queueDisposable;
 
@@ -57,6 +60,7 @@ class TxQueueManager {
         txRepo = RepositoryHelper.getTxRepository(context);
         userRepo = RepositoryHelper.getUserRepository(context);
         memberRepo = RepositoryHelper.getMemberRepository(context);
+        settingsRepo = RepositoryHelper.getSettingsRepository(context);
         createQueueConsumer();
     }
 
@@ -130,6 +134,12 @@ class TxQueueManager {
                 return true;
             }
             long fee = txQueue.fee;
+            if (txQueue.queueType == 1) {
+                fee = getMedianTxFree(chainID);
+                txQueue.fee = fee;
+                // 更新airdrop的交易费
+                txQueueRepos.updateQueue(txQueue);
+            }
             if (txQueue.amount + fee > account.getBalance()) {
                 logger.debug("sendWiringTx amount({}) + fee({}) > balance({})", txQueue.amount,
                         fee, account.getBalance());
@@ -169,6 +179,26 @@ class TxQueueManager {
             logger.debug("Error adding transaction::{}", e.getMessage());
         }
         return false;
+    }
+
+    /**
+     * 0、默认为最小交易费
+     * 1、从交易池中获取前10名交易费的中位数
+     * 2、如果交易池返回小于等于0，用上次交易用的交易费
+     * @param chainID 交易所属的社区chainID
+     */
+    private long getMedianTxFree(String chainID) {
+        long free = Constants.MIN_FEE.longValue();
+        long medianFree = daemon.getMedianTxFree(chainID);
+        if (medianFree > 0) {
+            free = medianFree;
+        } else {
+            long lastTxFee = settingsRepo.lastTxFee(chainID);
+            if (lastTxFee > 0) {
+                free = lastTxFee;
+            }
+        }
+        return free;
     }
 
     /**

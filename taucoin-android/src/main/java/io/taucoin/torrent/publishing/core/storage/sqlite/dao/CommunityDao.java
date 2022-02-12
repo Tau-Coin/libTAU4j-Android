@@ -53,7 +53,7 @@ public interface CommunityDao {
 
     String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.power, b.blockNumber," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
-            " 0 AS type, 0 AS msgType, '' AS senderPk, '' AS receiverPk, " +
+            " 0 AS type, '' AS senderPk, '' AS receiverPk, " +
             " 0 AS msgUnread, '' AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
@@ -66,7 +66,7 @@ public interface CommunityDao {
 
     String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.power, b.blockNumber," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
-            " 0 AS type, 0 AS msgType, '' AS senderPk, '' AS receiverPk, " +
+            " 0 AS type, '' AS senderPk, '' AS receiverPk, " +
             " 0 AS msgUnread, '' AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
@@ -78,7 +78,7 @@ public interface CommunityDao {
             " WHERE isBanned == 0";
 
     String QUERY_FRIENDS_ASC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS balance, 0 AS power, 0 AS blockNumber," +
-            " 0 AS joined, 1 AS type, cm.contentType AS msgType," +
+            " 0 AS joined, 1 AS type," +
             " cm.senderPk AS senderPk, cm.receiverPk AS receiverPk," +
             " f.msgUnread AS msgUnread," +
             " cm.content AS msg, '' AS memo, cm.timestamp AS timestamp" +
@@ -90,7 +90,7 @@ public interface CommunityDao {
             " AND f.friendPK NOT IN " + QUERY_GET_BANNED_USER_PK;
 
     String QUERY_FRIENDS_DESC = "SELECT f.friendPK AS ID,0 AS headBlock, 0 AS balance, 0 AS power, 0 AS blockNumber," +
-            " 0 AS joined, 1 AS type, cm.contentType AS msgType," +
+            " 0 AS joined, 1 AS type," +
             " cm.senderPk AS senderPk, cm.receiverPk AS receiverPk," +
             " f.msgUnread AS msgUnread," +
             " cm.content AS msg, '' AS memo, cm.timestamp AS timestamp" +
@@ -109,14 +109,14 @@ public interface CommunityDao {
             " UNION ALL " + QUERY_COMMUNITIES_ASC + ")" +
             " ORDER BY timestamp DESC";
 
-    String QUERY_GET_COMMUNITIES_IN_BLACKLIST = "SELECT * FROM Communities where isBanned = 1";
+    String QUERY_GET_COMMUNITIES_IN_BLACKLIST = "SELECT * FROM Communities WHERE isBanned = 1";
     String QUERY_GET_COMMUNITY_BY_CHAIN_ID = "SELECT * FROM Communities WHERE chainID = :chainID";
     String QUERY_ADD_COMMUNITY_BLACKLIST = "Update Communities set isBanned =:isBanned WHERE chainID = :chainID";
-    String QUERY_JOINED_COMMUNITY = "SELECT * FROM Communities";
+    String QUERY_JOINED_COMMUNITY = "SELECT * FROM Communities WHERE isBanned = 0";
     String QUERY_CLEAR_COMMUNITY_STATE = "UPDATE Communities SET headBlock = 0, tailBlock = 0" +
             " WHERE chainID = :chainID";
 
-    String QUERY_CURRENT_COMMUNITY_MEMBER = "SELECT c.*, m.balance, m.balance, m.power, m.blockNumber," +
+    String QUERY_CURRENT_COMMUNITY_MEMBER = "SELECT c.*, m.balance, m.balance, m.power, m.nonce, m.blockNumber," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
             " FROM Communities c" +
             " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = :publicKey" +
@@ -129,6 +129,13 @@ public interface CommunityDao {
     String QUERY_CHAIN_TOP_POWER_MEMBERS = "SELECT * FROM Members" +
             " WHERE chainID = :chainID"  +
             " ORDER BY power DESC LIMIT :topNum";
+
+    String QUERY_COMMUNITIES = "SELECT c.*, m.balance, m.balance, m.power, m.nonce, m.blockNumber," +
+            " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
+            " FROM Communities c" +
+            " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" +
+            UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " WHERE isBanned = 0";
 
     /**
      * 添加新的社区
@@ -207,4 +214,7 @@ public interface CommunityDao {
      */
     @Query(QUERY_CHAIN_TOP_POWER_MEMBERS)
     Observable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum);
+
+    @Query(QUERY_COMMUNITIES)
+    Flowable<List<CommunityAndMember>> observeCommunities();
 }

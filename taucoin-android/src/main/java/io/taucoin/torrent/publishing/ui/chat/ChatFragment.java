@@ -31,6 +31,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
+import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
@@ -68,7 +69,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     private CompositeDisposable disposables = new CompositeDisposable();
     private Disposable logsDisposable;
     private String friendPK;
-    private User friend;
     private Handler handler = new Handler();
     private MsgLogsDialog msgLogsDialog;
 
@@ -102,7 +102,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     private void initParameter() {
         if(getArguments() != null){
             friendPK = getArguments().getString(IntentExtra.ID);
-            friend = getArguments().getParcelable(IntentExtra.BEAN);
         }
     }
 
@@ -130,27 +129,11 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
      */
     @SuppressLint("ClickableViewAccessibility")
     private void initLayout() {
-        String friendNickName = UsersUtil.getShowName(friend, friend.publicKey);
-        binding.toolbarInclude.tvTitle.setText(friendNickName);
         binding.toolbarInclude.ivBack.setOnClickListener(v -> {
             KeyboardUtils.hideSoftInput(activity);
             activity.goBack();
         });
         binding.toolbarInclude.ivAction.setVisibility(View.INVISIBLE);
-        User currentUser = MainApplication.getInstance().getCurrentUser();
-        String distance = null;
-        if (currentUser != null) {
-            if (friend.longitude != 0 && friend.latitude != 0 &&
-                    currentUser.longitude != 0 && currentUser.latitude != 0) {
-                distance = GeoUtils.getDistanceStr(friend.longitude, friend.latitude,
-                        currentUser.longitude, currentUser.latitude);
-            }
-        }
-        boolean isShowSubtitle = StringUtil.isNotEmpty(distance);
-        binding.toolbarInclude.tvSubtitle.setVisibility(isShowSubtitle ? View.VISIBLE : View.GONE);
-        if (isShowSubtitle) {
-            binding.toolbarInclude.tvSubtitle.setText(distance);
-        }
         binding.etMessage.addTextChangedListener(textWatcher);
         binding.etMessage.setOnFocusChangeListener((v, hasFocus) -> {
             showOrHideChatAddView(false);
@@ -178,7 +161,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         binding.refreshLayout.setOnRefreshListener(this);
 
         adapter = new ChatListAdapter(activity, this);
-        adapter.setFriend(friend);
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
 //        layoutManager.setStackFromEnd(true);
         binding.msgList.setLayoutManager(layoutManager);
@@ -192,6 +174,28 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         });
         loadData(0);
 
+    }
+
+    private void updateFriendInfo(User friend) {
+        if (friend != null) {
+            String friendNickName = UsersUtil.getShowName(friend);
+            binding.toolbarInclude.tvTitle.setText(friendNickName);
+            adapter.setFriend(friend);
+        }
+        User currentUser = MainApplication.getInstance().getCurrentUser();
+        String distance = null;
+        if (currentUser != null) {
+            if (friend.longitude != 0 && friend.latitude != 0 &&
+                    currentUser.longitude != 0 && currentUser.latitude != 0) {
+                distance = GeoUtils.getDistanceStr(friend.longitude, friend.latitude,
+                        currentUser.longitude, currentUser.latitude);
+            }
+        }
+        boolean isShowSubtitle = StringUtil.isNotEmpty(distance);
+        binding.toolbarInclude.tvSubtitle.setVisibility(isShowSubtitle ? View.VISIBLE : View.GONE);
+        if (isShowSubtitle) {
+            binding.toolbarInclude.tvSubtitle.setText(distance);
+        }
     }
 
     @Override
@@ -254,11 +258,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(friend -> {
-                    if (friend.user != null) {
-                        String friendNickName = UsersUtil.getShowName(friend.user);
-                        binding.toolbarInclude.tvTitle.setText(friendNickName);
-                        adapter.setFriend(friend.user);
-                    }
+                    updateFriendInfo(friend.user);
                     binding.llBottomInput.setVisibility(friend.status != FriendStatus.DISCOVERED.getStatus()
                             ? View.VISIBLE : View.GONE);
                     binding.llShareQr.setVisibility(friend.status == FriendStatus.DISCOVERED.getStatus()

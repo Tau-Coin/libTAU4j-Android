@@ -13,6 +13,7 @@
     <dimen name="splash_size_alpha">25dp</dimen>
 
     <!--   ********************Font******************** -->
+    <dimen name="font_size_20">20sp</dimen>
     <dimen name="font_size_18">18sp</dimen>
     <dimen name="font_size_16">16sp</dimen>
     <dimen name="font_size_14">14sp</dimen>

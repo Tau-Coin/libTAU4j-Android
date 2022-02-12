@@ -47,8 +47,18 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     }
 
     @Override
+    public void deleteQueue(TxQueue tx) {
+        db.txQueueDao().deleteQueue(tx);
+    }
+
+    @Override
     public Observable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String userPk) {
         return db.txQueueDao().observeCommunityTxQueue(chainID, userPk);
+    }
+
+    @Override
+    public List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String userPk) {
+        return db.txQueueDao().getCommunityTxQueue(chainID, userPk);
     }
 
     @Override
@@ -59,5 +69,20 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     @Override
     public List<String> getNeedWiringTxCommunities(String userPk) {
         return db.txQueueDao().getNeedWiringTxCommunities(userPk);
+    }
+
+    @Override
+    public int getAirdropCount(String chainID, String currentPk, long currentTime) {
+        return db.txQueueDao().getAirdropCount(chainID, currentPk, currentTime);
+    }
+
+    @Override
+    public TxQueue getAirdropTxQueue(String chainID, String currentPk, String friendPk) {
+        return db.txQueueDao().getAirdropTxQueue(chainID, currentPk, friendPk);
+    }
+
+    @Override
+    public Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime) {
+        return db.txQueueDao().observeAirdropCountOnChain(chainID, senderPk, currentTime);
     }
 }

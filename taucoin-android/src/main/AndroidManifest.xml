@@ -96,11 +96,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name=".ui.community.FilterChooseActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
-
-        <activity
-            android:name=".ui.community.TxQueueActivity"
+            android:name=".ui.community.BalanceActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
@@ -150,6 +146,10 @@
 
         <activity
             android:name=".ui.transaction.SellCreateActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.transaction.CoinsChooseActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
@@ -257,6 +257,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="tauchain" />
+                <data android:scheme="tau" />
             </intent-filter>
         </activity>
 
@@ -303,6 +304,22 @@
 
         <activity
             android:name=".ui.setting.FontSizeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.friends.YourselfActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.friends.AirdropCommunityActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.friends.AirdropDetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.friends.AirdropSetupActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
     </application>

@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.libTAU4j.Account;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
@@ -22,6 +24,7 @@ import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
 public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAdapter.ViewHolder> {
     private ClickListener listener;
     private boolean isReadOnly;
+    private Account account;
 
     public QueueListAdapter(ClickListener listener, boolean isReadOnly) {
         super(diffCallback);
@@ -49,12 +52,25 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
     @Override
     public void onBindViewHolder(@NonNull QueueListAdapter.ViewHolder holder, int position) {
         TxQueueAndStatus tx = getItem(position);
-        holder.bindTransaction(tx, isReadOnly);
+        holder.bindTransaction(tx, isReadOnly, account);
     }
 
     public void setReadOnly(boolean isReadOnly) {
         if (this.isReadOnly != isReadOnly) {
             this.isReadOnly = isReadOnly;
+            notifyDataSetChanged();
+        }
+    }
+
+    public void setAccount(Account account) {
+        if (null == this.account && account != null) {
+            this.account = account;
+            notifyDataSetChanged();
+            return;
+        }
+        if (this.account != null && account != null && (this.account.getBalance() != account.getBalance()
+            || this.account.getNonce() != account.getNonce())) {
+            this.account = account;
             notifyDataSetChanged();
         }
     }
@@ -72,27 +88,45 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
         /**
          * 绑定交易数据
          */
-        void bindTransaction(TxQueueAndStatus tx, boolean isReadOnly) {
+        void bindTransaction(TxQueueAndStatus tx, boolean isReadOnly, Account account) {
             if (null == tx) {
                 return;
             }
-            int progressText = tx.status == 0 ? R.string.tx_result_status_processing :
+            int progressText = tx.isProcessing() ? R.string.tx_result_status_processing :
                     R.string.tx_result_status_waiting;
             int progressColor = tx.status == 0 ? R.color.color_yellow : R.color.color_black;
             Resources resources = binding.getRoot().getResources();
             binding.tvProgress.setText(resources.getString(progressText));
             binding.tvProgress.setTextColor(resources.getColor(progressColor));
             binding.tvContent.setText(TxUtils.createSpanTxQueue(tx));
+            binding.ivDelete.setVisibility(isReadOnly || tx.isProcessing() ? View.GONE : View.VISIBLE);
+            binding.ivDelete.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onDeleteClicked(tx);
+                }
+            });
             binding.ivEdit.setVisibility(isReadOnly ? View.GONE : View.VISIBLE);
             binding.ivEdit.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onEditClicked(tx);
                 }
             });
+            String errorMsg = "";
+            if (account != null) {
+                if (account.getBalance() < tx.amount + tx.fee) {
+                    errorMsg = resources.getString(R.string.tx_error_insufficient_balance);
+                } else if (account.getNonce() > tx.nonce + 1) {
+                    errorMsg = resources.getString(R.string.tx_error_nonce_conflict);
+                }
+            }
+            binding.tvError.setVisibility((!isReadOnly && tx.isProcessing() && StringUtil.isNotEmpty(errorMsg))
+                    ? View.VISIBLE : View.GONE);
+            binding.tvError.setText(errorMsg);
         }
     }
 
     public interface ClickListener {
+        void onDeleteClicked(TxQueueAndStatus tx);
         void onEditClicked(TxQueueAndStatus tx);
     }
 

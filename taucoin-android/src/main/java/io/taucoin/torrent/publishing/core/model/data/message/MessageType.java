@@ -5,7 +5,7 @@ package io.taucoin.torrent.publishing.core.model.data.message;
  */
 public enum MessageType {
     TEXT(0),
-    PICTURE(1),
+    AIRDROP(2),
     UNKNOWN(-1);
 
     private int type;

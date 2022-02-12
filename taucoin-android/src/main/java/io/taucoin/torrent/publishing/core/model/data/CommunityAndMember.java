@@ -9,6 +9,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 public class CommunityAndMember extends Community {
     public long balance;
     public long power;
+    public long nonce;
     public long blockNumber;
     public int joined;
 

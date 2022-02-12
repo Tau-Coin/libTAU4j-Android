@@ -4,9 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
@@ -16,16 +13,12 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemUserCommunityBinding;
-import io.taucoin.torrent.publishing.ui.Selectable;
 
 /**
  * 用户加入社区的列表的Adapter
  */
-public class UserCommunityListAdapter extends ListAdapter<Member, UserCommunityListAdapter.ViewHolder>
-        implements Selectable<Member> {
-    private List<Member> dataList = new ArrayList<>();
+public class UserCommunityListAdapter extends ListAdapter<Member, UserCommunityListAdapter.ViewHolder> {
     private ClickListener clickListener;
 
     UserCommunityListAdapter(ClickListener clickListener) {
@@ -47,32 +40,7 @@ public class UserCommunityListAdapter extends ListAdapter<Member, UserCommunityL
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(holder, getItemKey(position));
-    }
-
-    @Override
-    public int getItemCount() {
-        return dataList.size();
-    }
-
-    @Override
-    public Member getItemKey(int position) {
-        return dataList.get(position);
-    }
-
-    @Override
-    public int getItemPosition(Member key) {
-        return getCurrentList().indexOf(key);
-    }
-
-    /**
-     * 设置示数据
-     * @param user 用户数据
-     */
-    void setDataList(List<Member> user) {
-        dataList.clear();
-        dataList.addAll(user);
-        notifyDataSetChanged();
+        holder.bind(holder, getItem(position));
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

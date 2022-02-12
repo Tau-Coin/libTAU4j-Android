@@ -8,14 +8,17 @@ public class IntentExtra {
     public static final String TYPE = "type";
     public static final String CHAIN_ID = "chainID";
     public static final String ID = "ID";
-    public static final String CHAIN_LINK = "chainLink";
+    public static final String LINK = "link";
     public static final String PUBLIC_KEY = "publicKey";
     public static final String ON_CHAIN = "onChain";
     public static final String IMMEDIATE_EXECUTION = "immediateExecution";
     public static final String NICK_NAME = "nickname";
+    public static final String COIN_NAME = "coinName";
     public static final String CRYPTO_KEY = "cryptoKey";
     public static final String DATA = "data";
     public static final String SCAN_KEY_ONLY = "scanKeyOnly";
     public static final String READ_ONLY = "readOnly";
     public static final String AIRDROP_COIN = "airdropCoin";
+    public static final String OPEN_COMMUNITY = "openCommunity";
+    public static final String SHOW_LINK = "showLink";
 }

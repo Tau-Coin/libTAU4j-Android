@@ -130,6 +130,17 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         userViewModel.getEditRemarkResult().observe(this, result -> {
             userViewModel.getUserDetail(publicKey);
         });
+        communityViewModel.getJoinedUnexpiredCommunityList(publicKey);
+        communityViewModel.getJoinedUnexpiredList().observe(this, members -> {
+            if (adapter != null) {
+                if(members != null) {
+                    adapter.submitList(members);
+                    if (members.size() > 0) {
+                        binding.llMutualCommunities.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
     }
 
     private void showUserInfo(UserAndFriend userInfo) {
@@ -155,12 +166,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         binding.tvPublicKey.setOnClickListener(v -> {
             copyPublicKey(user.publicKey);
         });
-        if(user.members != null){
-            adapter.setDataList(user.members);
-            if (user.members.size() > 0) {
-                binding.llMutualCommunities.setVisibility(View.VISIBLE);
-            }
-        }
     }
 
     /**

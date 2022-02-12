@@ -99,7 +99,6 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
             boolean isShowSelect = type == FriendsActivity.PAGE_ADD_MEMBERS ||
                     type == FriendsActivity.PAGE_CREATION_ADD_MEMBERS;
             holder.binding.cbSelect.setVisibility(isShowSelect ? View.VISIBLE : View.GONE);
-            holder.binding.ivShare.setVisibility(View.GONE);
             if (isShowSelect) {
                 holder.binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
                     if(isChecked){
@@ -141,37 +140,13 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
             String time = "";
             if (order == 0 && user.lastSeenTime > 0) {
                 time = DateUtil.format(user.lastSeenTime, DateUtil.pattern6);
-                time = context.getResources().getString(R.string.contacts_last_seen, time);
+//                time = context.getResources().getString(R.string.contacts_last_seen, time);
             } else if (order != 0 && user.lastCommTime > 0) {
                 time = DateUtil.format(user.lastCommTime, DateUtil.pattern6);
-                time = context.getResources().getString(R.string.contacts_last_communication, time);
+//                time = context.getResources().getString(R.string.contacts_last_communication, time);
             }
             holder.binding.tvTime.setVisibility(StringUtil.isEmpty(time) ? View.GONE : View.VISIBLE);
             holder.binding.tvTime.setText(time);
-
-            StringBuilder communities = new StringBuilder();
-            if(user.members != null && user.members.size() > 0){
-                List<Member> members = user.members;
-                int size = members.size();
-                for (int i = 0; i < size; i++) {
-                    Member member = members.get(i);
-                    if(member.balance <=0 && member.power <= 0){
-                        continue;
-                    }
-                    if(communities.length() == 0){
-                        communities.append(context.getResources().getString(R.string.contacts_community_from));
-                    }
-                    String communityName = ChainIDUtil.getName(member.chainID);
-                    String community = context.getResources().getString(R.string.contacts_community_more, communityName);
-                    if(i == 0){
-                        community = community.substring(1);
-                    }
-                    communities.append(community);
-                }
-            }
-            holder.binding.tvCommunities.setVisibility(communities.length() == 0
-                    ? View.GONE : View.VISIBLE);
-            holder.binding.tvCommunities.setText(communities.toString());
 
             User currentUser = MainApplication.getInstance().getCurrentUser();
             String distance = null;
@@ -193,21 +168,15 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
                     listener.onItemClicked(user);
                 }
             });
-            holder.binding.ivShare.setOnClickListener(v -> {
-                if(listener != null){
-                    listener.onShareClicked(user);
-                }
-            });
             // 新朋友高亮显示
             boolean isNewScanFriend = StringUtil.isEquals(friendPk, user.publicKey);
-            int bgColor = Utils.getGroupColor(user.publicKey);
-            bgColor = isNewScanFriend ? R.color.color_bg : R.color.color_white;
+            int bgColor = isNewScanFriend ? R.color.color_bg : R.color.color_white;
             holder.binding.getRoot().setBackgroundColor(context.getResources().getColor(bgColor));
         }
     }
 
     public interface ClickListener {
-        void onItemClicked(UserAndFriend item);
+        void onItemClicked(User item);
         void onShareClicked(UserAndFriend item);
     }
 

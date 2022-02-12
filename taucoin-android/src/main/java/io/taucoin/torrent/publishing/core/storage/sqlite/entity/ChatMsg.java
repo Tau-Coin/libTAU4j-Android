@@ -22,6 +22,7 @@ public class ChatMsg implements Parcelable {
     public String senderPk;                // 发送者的公钥
     @NonNull
     public String receiverPk;              // 接收者的公钥
+    public String airdropChain;            // 接收者发币的链
     @NonNull
     public long timestamp;                 // 时间戳
     @NonNull

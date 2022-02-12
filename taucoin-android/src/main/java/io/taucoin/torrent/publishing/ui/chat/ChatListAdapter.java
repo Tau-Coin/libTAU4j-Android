@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.ui.chat;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -37,6 +39,7 @@ import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
+import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.selecttext.CustomPop;
@@ -203,6 +206,12 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             String contentStr = Utils.textBytesToString(msg.content);
 //            tvMsg.setText(SpannableUrl.generateSpannableUrl(contentStr));
             tvMsg.setText(contentStr);
+
+            Linkify.addLinks(tvMsg, Linkify.WEB_URLS);
+            Pattern airdrop = Pattern.compile(UrlUtil.AIRDROP_PATTERN, 0);
+            Linkify.addLinks(tvMsg, airdrop, null);
+            Pattern chain = Pattern.compile(UrlUtil.CHAIN_PATTERN, 0);
+            Linkify.addLinks(tvMsg, chain, null);
 
             mSelectableTextHelper = new SelectTextHelper
                     .Builder(tvMsg)// 放你的textView到这里！！

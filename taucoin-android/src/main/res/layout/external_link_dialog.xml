@@ -8,7 +8,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/widget_size_50"
+        android:paddingStart="@dimen/widget_size_0"
         android:paddingEnd="0dp"
         android:paddingBottom="0dp"
         android:background="@color/color_white">
@@ -46,10 +46,12 @@
         <TextView
             android:layout_below="@+id/tv_name"
             android:id="@+id/tv_yes"
-            android:layout_width="@dimen/widget_size_240"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_44"
             android:layout_marginTop="@dimen/widget_size_20"
             android:layout_centerHorizontal="true"
+            android:layout_marginStart="@dimen/widget_size_50"
+            android:layout_marginEnd="@dimen/widget_size_50"
             android:gravity="center_horizontal|center"
             android:background="@drawable/primary_rect_round_bg"
             android:text="@string/common_yes"

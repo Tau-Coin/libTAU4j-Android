@@ -1,22 +1,23 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
@@ -29,6 +30,7 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
  */
 public class SellCreateActivity extends BaseActivity implements View.OnClickListener {
 
+    private static final int CHOOSE_REQUEST_CODE = 0x01;
     private ActivitySellBinding binding;
     private TxViewModel txViewModel;
     private String chainID;
@@ -79,49 +81,6 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
         String coinName = ChainIDUtil.getCoinName(chainID);
         String[] items = getResources().getStringArray(R.array.coin_name);
         items[1] = coinName;
-
-        SpinnerAdapter adapter = new SpinnerAdapter(this, items);
-        binding.coinSpinner.setAdapter(adapter);
-        binding.coinSpinner.setDropDownVerticalOffset(getResources().getDimensionPixelSize(R.dimen.widget_size_45));
-        binding.coinSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String coinName = items[position];
-                binding.etCoinName.setText(coinName);
-                binding.etCoinName.setSelection(coinName.length());
-                adapter.setSelectPos(position);
-                if (position == items.length -1) {
-                    binding.etCoinName.getText().clear();
-                    binding.etCoinName.setFocusable(true);
-                    binding.etCoinName.setFocusableInTouchMode(true);
-                    binding.etCoinName.requestFocus();
-                } else {
-                    binding.etCoinName.setFocusable(false);
-                    binding.etCoinName.setFocusableInTouchMode(false);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        binding.etCoinName.setOnTouchListener((v, event) -> {
-            if (adapter.getSelectPos() != items.length -1) {
-                KeyboardUtils.hideSoftInput(SellCreateActivity.this);
-                binding.coinSpinner.performClick();
-                return true;
-            } else {
-                return false;
-            }
-        });
-
-        binding.coinSpinner.setOnTouchListener((v, event) -> {
-            v.performClick();
-            KeyboardUtils.hideSoftInput(SellCreateActivity.this);
-            return false;
-        });
     }
 
     @Override
@@ -184,9 +143,32 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            case R.id.iv_coins:
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.COIN_NAME, ViewUtils.getText(binding.etCoinName));
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivityForResult(intent, this, CoinsChooseActivity.class,
+                        CHOOSE_REQUEST_CODE);
+                break;
             case R.id.tv_fee:
                 txViewModel.showEditFeeDialog(this, binding.tvFee, chainID);
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == CHOOSE_REQUEST_CODE) {
+            if (data != null) {
+                String coinName = data.getStringExtra(IntentExtra.COIN_NAME);
+                if (StringUtil.isNotEmpty(coinName)) {
+                    binding.etCoinName.setText(coinName);
+                    binding.etCoinName.setSelection(coinName.length());
+                } else {
+                    binding.etCoinName.getText().clear();
+                }
+            }
         }
     }
 }

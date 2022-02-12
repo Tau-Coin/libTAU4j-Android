@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.dao;
 import java.util.List;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -17,11 +18,11 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 @Dao
 public interface TxQueueDao {
     String QUERY_COMMUNITY_TX_QUEUE = "SELECT * FROM" +
-            " (SELECT tq.*, t.timestamp, t.sendCount," +
+            " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
             " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
-            " MAX(timestamp) AS timestamp, queueID From Txs" +
+            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID From Txs" +
             " WHERE chainID = :chainID AND senderPk = :senderPk AND txType = 2" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
@@ -43,11 +44,38 @@ public interface TxQueueDao {
             " GROUP BY chainID" +
             " ORDER BY queueID";
 
+    String QUERY_AIRDROP_COUNT_ON_CHAIN = "SELECT count(*) FROM" +
+            " (SELECT tq.chainID, tq.queueID," +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
+            " FROM TxQueues tq" +
+            " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID From Txs" +
+            " WHERE senderPk = :senderPk AND txType = 2" +
+            " GROUP BY queueID) AS t" +
+            " ON tq.queueID = t.queueID" +
+            " WHERE tq.senderPk = :senderPk AND tq.chainID = :chainID" +
+            " AND queueTime >= :currentTime AND queueType = 1)" +
+            " WHERE status > 0";
+
+    String QUERY_AIRDROP_TX_QUEUE = "SELECT * FROM TxQueues" +
+            " WHERE chainID = :chainID AND senderPk = :currentPk" +
+            " AND receiverPk = :friendPk" +
+            " AND queueType = 1";
+
+    String QUERY_AIRDROP_COUNT = "SELECT count(*) FROM TxQueues" +
+            " WHERE chainID = :chainID AND senderPk = :currentPk" +
+            " AND queueTime >= :currentTime AND queueType = 1";
+
     /**
      * 入队列
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addQueue(TxQueue tx);
+
+    /**
+     * 删除交易队列
+     */
+    @Delete
+    void deleteQueue(TxQueue tx);
 
     /**
      * 更新交易队列
@@ -58,9 +86,21 @@ public interface TxQueueDao {
     @Query(QUERY_COMMUNITY_TX_QUEUE)
     Observable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String senderPk);
 
+    @Query(QUERY_COMMUNITY_TX_QUEUE)
+    List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String senderPk);
+
     @Query(QUERY_QUEUE_FIRST_TX)
     TxQueueAndStatus getQueueFirstTx(String chainID, String senderPk);
 
     @Query(QUERY_NEED_WIRING_TX_COMMUNITIES)
     List<String> getNeedWiringTxCommunities(String senderPk);
+
+    @Query(QUERY_AIRDROP_TX_QUEUE)
+    TxQueue getAirdropTxQueue(String chainID, String currentPk, String friendPk);
+
+    @Query(QUERY_AIRDROP_COUNT)
+    int getAirdropCount(String chainID, String currentPk, long currentTime);
+
+    @Query(QUERY_AIRDROP_COUNT_ON_CHAIN)
+    Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);
 }

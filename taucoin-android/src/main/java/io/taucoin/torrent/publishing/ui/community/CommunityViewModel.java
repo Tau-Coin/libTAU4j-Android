@@ -51,25 +51,25 @@ import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.DrawBean;
-import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.model.data.Result;
+import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
+import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
@@ -91,15 +91,17 @@ public class CommunityViewModel extends AndroidViewModel {
     private CommunityRepository communityRepo;
     private MemberRepository memberRepo;
     private BlockRepository blockRepo;
-    private FriendRepository friendRepo;
+    private TxQueueRepository txQueueRepo;
     private UserRepository userRepo;
     private SettingsRepository settingsRepo;
     private TauDaemon daemon;
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> addCommunityState = new MutableLiveData<>();
     private MutableLiveData<Boolean> setBlacklistState = new MutableLiveData<>();
+    private MutableLiveData<Boolean> airdropResult = new MutableLiveData<>();
     private MutableLiveData<List<Community>> blackList = new MutableLiveData<>();
     private MutableLiveData<List<Community>> joinedList = new MutableLiveData<>();
+    private MutableLiveData<List<Member>> joinedUnexpiredList = new MutableLiveData<>();
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
     private MutableLiveData<UserAndFriend> largestCoinHolder = new MutableLiveData<>();
 
@@ -108,7 +110,7 @@ public class CommunityViewModel extends AndroidViewModel {
         communityRepo = RepositoryHelper.getCommunityRepository(getApplication());
         memberRepo = RepositoryHelper.getMemberRepository(getApplication());
         userRepo = RepositoryHelper.getUserRepository(getApplication());
-        friendRepo = RepositoryHelper.getFriendsRepository(getApplication());
+        txQueueRepo = RepositoryHelper.getTxQueueRepository(getApplication());
         blockRepo = RepositoryHelper.getBlockRepository(getApplication());
         settingsRepo = RepositoryHelper.getSettingsRepository(getApplication());
         daemon = TauDaemon.getInstance(getApplication());
@@ -121,8 +123,16 @@ public class CommunityViewModel extends AndroidViewModel {
                 .subscribe((needStart) -> daemon.start()));
     }
 
+    public MutableLiveData<Boolean> getAirdropResult() {
+        return airdropResult;
+    }
+
     MutableLiveData<List<Community>> getJoinedList() {
         return joinedList;
+    }
+
+    public MutableLiveData<List<Member>> getJoinedUnexpiredList() {
+        return joinedUnexpiredList;
     }
 
     /**
@@ -435,12 +445,47 @@ public class CommunityViewModel extends AndroidViewModel {
     }
 
     /**
+     * 获取用户加入的社区列表
+     */
+    public void getJoinedUnexpiredCommunityList(String userPk) {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<List<Member>>) emitter -> {
+            List<Member> list = memberRepo.getJoinedUnexpiredCommunityList(userPk);
+            emitter.onNext(list);
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list -> joinedUnexpiredList.postValue(list));
+        disposables.add(disposable);
+    }
+
+    /**
      * 观察社区成员变化
      * @param chainID
      * @return
      */
     public Flowable<List<MemberAndUser>> observeCommunityMembers(String chainID) {
         return memberRepo.observeCommunityMembers(chainID);
+    }
+
+    /**
+     * 观察社区信息变化
+     */
+    public Flowable<List<CommunityAndMember>> observeCommunities() {
+        return communityRepo.observeCommunities();
+    }
+
+    /**
+     * 观察社区发币详情
+     * @param chainID 链ID
+     * @return Flowable<Member>
+     */
+    public Flowable<Member> observeCommunityAirdropDetail(String chainID) {
+        return memberRepo.observeCommunityAirdropDetail(chainID);
+    }
+
+    public Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime) {
+        return txQueueRepo.observeAirdropCountOnChain(chainID, senderPk, currentTime);
     }
 
     /**
@@ -500,7 +545,7 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param chainID
      * @return
      */
-    Observable<CommunityAndMember> observerCurrentMember(String chainID) {
+    public Observable<CommunityAndMember> observerCurrentMember(String chainID) {
         String publicKey = MainApplication.getInstance().getPublicKey();
         return communityRepo.observerCurrentMember(chainID, publicKey);
     }
@@ -643,6 +688,70 @@ public class CommunityViewModel extends AndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(userAndFriend -> {
                     largestCoinHolder.postValue(userAndFriend);
+                });
+        disposables.add(disposable);
+    }
+
+    /**
+     * 设置Airdrop Bot
+     * @param chainID 链ID
+     * @param members airdrop个数
+     * @param coins 每次发币的coins
+     */
+    public void setupAirdropBot(String chainID, int members, float coins) {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
+            User user = userRepo.getCurrentUser();
+            if (user != null) {
+                Member member = memberRepo.getMemberByChainIDAndPk(chainID, user.publicKey);
+                if (member != null) {
+                    member.airdropStatus = AirdropStatus.ON.getStatus();
+                    member.airdropMembers = members;
+                    member.airdropCoins = FmtMicrometer.fmtTxLongValue(String.valueOf(coins));
+                    member.airdropTime = DateUtil.getMillisTime();
+                    memberRepo.updateMember(member);
+                }
+            }
+            emitter.onNext(true);
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(userAndFriend -> {
+                    airdropResult.postValue(userAndFriend);
+                });
+        disposables.add(disposable);
+    }
+
+    /**
+     * 删除Airdrop Bot
+     * @param chainID 链ID
+     */
+    public void deleteAirdropBot(String chainID) {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
+            User user = userRepo.getCurrentUser();
+            if (user != null) {
+                Member member = memberRepo.getMemberByChainIDAndPk(chainID, user.publicKey);
+                if (member != null) {
+                    List<TxQueueAndStatus> queueList = txQueueRepo.getCommunityTxQueue(chainID, user.publicKey);
+                    if (queueList != null && queueList.size() > 0) {
+                        // 删除未被发送的交易
+                        for (TxQueueAndStatus tx :queueList) {
+                            if (tx.status < 0) {
+                                txQueueRepo.deleteQueue(tx);
+                            }
+                        }
+                    }
+                    member.airdropStatus = AirdropStatus.SETUP.getStatus();
+                    memberRepo.updateMember(member);
+                }
+            }
+            emitter.onNext(true);
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(userAndFriend -> {
+                    airdropResult.postValue(userAndFriend);
                 });
         disposables.add(disposable);
     }

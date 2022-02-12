@@ -289,6 +289,7 @@
 
     <declare-styleable name="LeftRightLineView">
         <attr name="lineLeftImage" format="reference" />
+        <attr name="lineLeftTextStartMargin" format="dimension" />
         <attr name="lineLeftText" format="string" />
         <attr name="lineLeftTextColor" format="color" />
         <attr name="lineRightImage" format="reference" />

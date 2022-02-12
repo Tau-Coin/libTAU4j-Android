@@ -98,9 +98,20 @@ class TauListenHandler {
         User currentUser = userRepo.getCurrentUser();
         if (currentUser != null) {
             Transaction transaction = block.getTx();
+            String miner = ByteUtil.toHexString(block.getMiner());
             if (transaction != null) {
                 String sender = ByteUtil.toHexString(transaction.getSender());
-                if (StringUtil.isEquals(sender, currentUser.publicKey)) {
+                String receiver = null;
+                if (transaction.getReceiver() != null) {
+                    receiver = ByteUtil.toHexString(transaction.getReceiver());
+                }
+                // 检查更新交易队列
+                // 1、miner是自己，balance变化
+                // 2、sender是自己，nonce变化
+                // 3、receiver是自己， balance变化
+                if (StringUtil.isEquals(currentUser.publicKey, miner) ||
+                        StringUtil.isEquals(currentUser.publicKey, sender)
+                        || StringUtil.isEquals(currentUser.publicKey, receiver)) {
                     daemon.updateTxQueue(chainID);
                     logger.debug("updateTxQueue chainID::{}, sender::{}", chainID, sender);
                 }

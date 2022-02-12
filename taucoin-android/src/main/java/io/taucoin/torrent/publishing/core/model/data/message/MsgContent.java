@@ -11,16 +11,23 @@ public class MsgContent {
     private String logicHash;               // 用于确认区分逻辑消息，带时间戳（可能连发两次）
     private int type;                       // 可以标识消息类型
     private byte[] content;                 // 原始消息体
+    private String airdropChain;            // 发币的链
 
-    public static MsgContent createTextContent(String logicMsgHash, byte[] content) {
-        return new MsgContent(MessageVersion.VERSION1.getV(), logicMsgHash, MessageType.TEXT.getType(), content);
+    public static MsgContent createTextContent(String logicMsgHash, byte[] content, String airdropChain) {
+        return new MsgContent(MessageVersion.VERSION1.getV(), logicMsgHash, MessageType.TEXT.getType(),
+                content, airdropChain);
     }
 
-    private MsgContent(int version, String logicMsgHash, int type, byte[] content) {
+    public static MsgContent createContent(String logicMsgHash, int type, byte[] content, String airdropChain) {
+        return new MsgContent(MessageVersion.VERSION1.getV(), logicMsgHash, type, content, airdropChain);
+    }
+
+    private MsgContent(int version, String logicMsgHash, int type, byte[] content, String airdropChain) {
         this.version = version;
         this.logicHash = logicMsgHash;
         this.type = type;
         this.content = content;
+        this.airdropChain = airdropChain;
     }
 
     public MsgContent(byte[] encode) {
@@ -37,6 +44,7 @@ public class MsgContent {
         this.logicHash = RLP.decodeString(messageList, 1, null);
         this.type = RLP.decodeInteger(messageList, 2, MessageType.TEXT.getType());
         this.content = RLP.decodeElement(messageList, 3);
+        this.airdropChain = RLP.decodeString(messageList, 4, null);
     }
 
     public byte[] getEncoded() {
@@ -44,8 +52,9 @@ public class MsgContent {
         byte[] logicHash = RLP.encodeString(this.logicHash);
         byte[] type = RLP.encodeInteger(this.type);
         byte[] content = RLP.encodeElement(this.content);
+        byte[] airdropChain = RLP.encodeString(this.airdropChain);
 
-       return RLP.encodeList(version, logicHash, type, content);
+       return RLP.encodeList(version, logicHash, type, content, airdropChain);
     }
 
     public int getVersion() {
@@ -62,5 +71,9 @@ public class MsgContent {
 
     public byte[] getContent() {
         return content;
+    }
+
+    public String getAirdropChain() {
+        return airdropChain;
     }
 }

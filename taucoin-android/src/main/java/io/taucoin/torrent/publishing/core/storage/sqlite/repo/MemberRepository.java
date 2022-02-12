@@ -8,9 +8,11 @@ import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
 
@@ -42,6 +44,8 @@ public interface MemberRepository {
     Member getMemberByChainIDAndPk(@NonNull String chainID, @NonNull String publicKey);
 
     Flowable<List<MemberAndUser>> observeCommunityMembers(String chainID);
+
+    Flowable<Member> observeCommunityAirdropDetail(String chainID);
 
     DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID);
 
@@ -88,4 +92,10 @@ public interface MemberRepository {
     List<String> queryFollowedCommunities(String publicKey);
 
     String getCommunityLargestCoinHolder(String chainID);
+
+    /**
+     * 获取自己加入的未过期社区列表
+     */
+    List<Member> getJoinedUnexpiredCommunityList(String userPk);
+
 }

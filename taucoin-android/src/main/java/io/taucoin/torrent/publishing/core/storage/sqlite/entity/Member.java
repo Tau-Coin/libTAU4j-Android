@@ -6,7 +6,6 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 
 /**
  * 数据库存储社区Member实体类
@@ -21,6 +20,10 @@ public class Member implements Parcelable {
     public long power;                  // 成员的power
     public long nonce;                  // 成员的nonce
     public long blockNumber;            // 最后一次上链的区块号
+    public int airdropStatus;           // 发币开关状态
+    public int airdropMembers;          // 总的发币成员数
+    public long airdropCoins;           // 每次发币的coins
+    public long airdropTime;            // 开始发币的时间
 
     public Member(@NonNull String chainID, @NonNull String publicKey){
         this.chainID = chainID;

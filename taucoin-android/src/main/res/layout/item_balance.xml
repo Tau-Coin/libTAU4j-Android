@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/widget_size_15"
+        android:paddingEnd="@dimen/widget_size_15"
+        android:minHeight="@dimen/widget_size_40">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/widget_size_10"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+        <TextView
+            android:id="@+id/tv_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_yellow"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+    </LinearLayout>
+</layout>
