@@ -25,30 +25,30 @@ public interface TxDao {
             " ON tx.senderPk = t.receiverPk" +
             " WHERE tx.chainID = :chainID AND tx.txID = :txID";
 
-    // SQL:查询社区里的交易(MARKET交易，排除Trust Tx)
+    // SQL:查询社区里的交易(MARKET交易，排除Trust Tx, 并且上链)
     String QUERY_GET_MARKET_TXS = "SELECT tx.*, t.trusts" +
             " FROM Txs AS tx" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
             " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
             " ON tx.senderPk = t.receiverPk" +
-            " WHERE tx.chainID = :chainID" +
+            " WHERE tx.chainID = :chainID AND txStatus = 1" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
             " AND (tx.txType = 3 OR tx.txType = 5)" +
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
-    // SQL:查询社区里的交易(所有，排除Trust Tx)
-    String QUERY_GET_TXS = "SELECT tx.*, t.trusts" +
+    // SQL:查询社区里的交易(所有，排除WIRING Tx)
+    String QUERY_GET_NOTE_TXS = "SELECT tx.*, t.trusts" +
             " FROM Txs AS tx" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
             " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
             " ON tx.senderPk = t.receiverPk" +
-            " WHERE tx.chainID = :chainID" +
+            " WHERE tx.chainID = :chainID AND txType != 2" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
-    // SQL:查询社区里的交易(上链，排除Trust Tx)
+    // SQL:查询社区里的交易(上链)
     String QUERY_GET_ON_CHAIN_TXS = "SELECT tx.*, t.trusts" +
             " FROM Txs AS tx" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
@@ -113,8 +113,8 @@ public interface TxDao {
     List<UserAndTx> queryCommunityMarketTxs(String chainID, int startPosition, int loadSize);
 
     @Transaction
-    @Query(QUERY_GET_TXS)
-    List<UserAndTx> queryCommunityTxs(String chainID, int startPosition, int loadSize);
+    @Query(QUERY_GET_NOTE_TXS)
+    List<UserAndTx> queryCommunityNoteTxs(String chainID, int startPosition, int loadSize);
 
     @Query(QUERY_GET_TRUST_TXS)
     List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPosition, int loadSize);

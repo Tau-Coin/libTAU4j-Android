@@ -139,7 +139,7 @@
     <string name="community_chain_market">Market</string>
     <string name="community_on_chain">Chain</string>
     <string name="community_tx_queue">Queue</string>
-    <string name="community_escrow_service_enter">Community\'s largest coinholder provide Escrow Service</string>
+    <string name="community_escrow_service_enter">Escrow Service</string>
     <string name="community_chain_note_title">Note Transaction</string>
     <string name="community_sell_coins">Sell Coins</string>
     <string name="community_sell_detail">Sell Detail</string>

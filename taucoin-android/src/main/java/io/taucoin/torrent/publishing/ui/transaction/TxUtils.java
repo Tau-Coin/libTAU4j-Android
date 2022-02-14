@@ -5,6 +5,7 @@ import android.text.SpannableStringBuilder;
 
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
@@ -81,16 +82,18 @@ public class TxUtils {
         return msg.create();
     }
 
-    public static SpannableStringBuilder createSpanTxQueue(TxQueue tx) {
+    public static SpannableStringBuilder createSpanTxQueue(TxQueueAndStatus tx) {
         SpanUtils msg = new SpanUtils()
                 .append("Amount: ")
                 .append(FmtMicrometer.fmtBalance(tx.amount))
                 .append("\n").append("Fee:")
                 .append(FmtMicrometer.fmtFeeValue(tx.fee))
                 .append("\n").append("To:")
-                .append(tx.receiverPk)
-                .append("\n").append("Memo:")
-                .append(tx.memo);
+                .append(tx.receiverPk);
+        if (tx.nonce > 0) {
+            msg.append("\n").append("Nonce:").append(FmtMicrometer.fmtLong(tx.nonce));
+        }
+        msg.append("\n").append("Memo:").append(tx.memo);
         return msg.create();
     }
 }

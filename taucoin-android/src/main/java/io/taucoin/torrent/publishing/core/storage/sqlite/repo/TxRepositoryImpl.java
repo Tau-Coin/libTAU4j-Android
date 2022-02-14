@@ -8,11 +8,9 @@ import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
-import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -69,7 +67,7 @@ public class TxRepositoryImpl implements TxRepository{
         } else if (currentTab == CommunityTabs.MARKET.getIndex()) {
             return db.txDao().queryCommunityMarketTxs(chainID, startPos, loadSize);
         } else {
-            return db.txDao().queryCommunityTxs(chainID, startPos, loadSize);
+            return db.txDao().queryCommunityNoteTxs(chainID, startPos, loadSize);
         }
     }
 

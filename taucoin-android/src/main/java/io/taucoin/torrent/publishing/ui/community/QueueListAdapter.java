@@ -52,7 +52,7 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
     @Override
     public void onBindViewHolder(@NonNull QueueListAdapter.ViewHolder holder, int position) {
         TxQueueAndStatus tx = getItem(position);
-        holder.bindTransaction(tx, isReadOnly, account);
+        holder.bindTransaction(tx, isReadOnly, account, position);
     }
 
     public void setReadOnly(boolean isReadOnly) {
@@ -88,7 +88,7 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
         /**
          * 绑定交易数据
          */
-        void bindTransaction(TxQueueAndStatus tx, boolean isReadOnly, Account account) {
+        void bindTransaction(TxQueueAndStatus tx, boolean isReadOnly, Account account, int pos) {
             if (null == tx) {
                 return;
             }
@@ -113,13 +113,13 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
             });
             String errorMsg = "";
             if (account != null) {
-                if (account.getBalance() < tx.amount + tx.fee) {
+                if (account.getBalance() < tx.amount + tx.fee && !tx.isProcessing() && pos == 0) {
                     errorMsg = resources.getString(R.string.tx_error_insufficient_balance);
-                } else if (account.getNonce() > tx.nonce + 1) {
+                } else if (account.getNonce() > tx.nonce + 1 && tx.isProcessing()) {
                     errorMsg = resources.getString(R.string.tx_error_nonce_conflict);
                 }
             }
-            binding.tvError.setVisibility((!isReadOnly && tx.isProcessing() && StringUtil.isNotEmpty(errorMsg))
+            binding.tvError.setVisibility((!isReadOnly && StringUtil.isNotEmpty(errorMsg))
                     ? View.VISIBLE : View.GONE);
             binding.tvError.setText(errorMsg);
         }
