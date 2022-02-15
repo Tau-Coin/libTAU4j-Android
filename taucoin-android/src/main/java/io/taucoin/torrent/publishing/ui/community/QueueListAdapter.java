@@ -115,7 +115,7 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
             if (account != null) {
                 if (account.getBalance() < tx.amount + tx.fee && !tx.isProcessing() && pos == 0) {
                     errorMsg = resources.getString(R.string.tx_error_insufficient_balance);
-                } else if (account.getNonce() > tx.nonce + 1 && tx.isProcessing()) {
+                } else if (account.getNonce() >= tx.nonce && tx.isProcessing()) {
                     errorMsg = resources.getString(R.string.tx_error_nonce_conflict);
                 }
             }

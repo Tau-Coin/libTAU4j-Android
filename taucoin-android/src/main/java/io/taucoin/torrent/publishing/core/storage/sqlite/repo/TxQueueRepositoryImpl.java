@@ -62,8 +62,13 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     }
 
     @Override
-    public TxQueueAndStatus getQueueFirstTx(String chainID, String userPk) {
-        return db.txQueueDao().getQueueFirstTx(chainID, userPk);
+    public TxQueueAndStatus getQueueFirstTx(String chainID, String userPk, int offset) {
+        return db.txQueueDao().getQueueFirstTx(chainID, userPk, offset);
+    }
+
+    @Override
+    public TxQueueAndStatus getTxQueueByID(long queueID) {
+        return db.txQueueDao().getTxQueueByID(queueID);
     }
 
     @Override

@@ -29,7 +29,18 @@ public interface TxQueueDao {
             " WHERE tq.chainID = :chainID AND tq.senderPk = :senderPk)" +
             " WHERE status <= 0 ORDER BY queueID";
 
-    String QUERY_QUEUE_FIRST_TX = QUERY_COMMUNITY_TX_QUEUE + " LIMIT 1";
+    String QUERY_QUEUE_FIRST_TX = QUERY_COMMUNITY_TX_QUEUE + " LIMIT 1 offset :offset";
+
+    String QUERY_TX_QUEUE_BY_ID = "SELECT * FROM" +
+            " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
+            " FROM TxQueues tq" +
+            " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
+            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID From Txs" +
+            " WHERE queueID = :queueID AND txType = 2" +
+            " GROUP BY queueID) AS t" +
+            " ON tq.queueID = t.queueID" +
+            " WHERE tq.queueID = :queueID)";
 
     String QUERY_NEED_WIRING_TX_COMMUNITIES = "SELECT chainID FROM" +
             " (SELECT tq.chainID, tq.queueID," +
@@ -90,7 +101,10 @@ public interface TxQueueDao {
     List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String senderPk);
 
     @Query(QUERY_QUEUE_FIRST_TX)
-    TxQueueAndStatus getQueueFirstTx(String chainID, String senderPk);
+    TxQueueAndStatus getQueueFirstTx(String chainID, String senderPk, int offset);
+
+    @Query(QUERY_TX_QUEUE_BY_ID)
+    TxQueueAndStatus getTxQueueByID(long queueID);
 
     @Query(QUERY_NEED_WIRING_TX_COMMUNITIES)
     List<String> getNeedWiringTxCommunities(String senderPk);

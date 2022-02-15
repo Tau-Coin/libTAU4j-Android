@@ -163,11 +163,11 @@ public class TxViewModel extends AndroidViewModel {
         if (isAdd) {
             txQueueRepo.addQueue(tx);
             daemon.updateTxQueue(tx.chainID);
+            return "";
         } else {
-            txQueueRepo.updateQueue(tx);
-            daemon.resendTxQueue(tx);
+            // 重发交易队列
+            return daemon.resendTxQueue(tx);
         }
-        return "";
     }
 
     /**

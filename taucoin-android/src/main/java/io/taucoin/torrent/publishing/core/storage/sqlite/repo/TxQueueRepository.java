@@ -27,7 +27,9 @@ public interface TxQueueRepository {
 
     List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String userPk);
 
-    TxQueueAndStatus getQueueFirstTx(String chainID, String userPk);
+    TxQueueAndStatus getQueueFirstTx(String chainID, String userPk, int offset);
+
+    TxQueueAndStatus getTxQueueByID(long queueID);
 
     List<String> getNeedWiringTxCommunities(String userPk);
 

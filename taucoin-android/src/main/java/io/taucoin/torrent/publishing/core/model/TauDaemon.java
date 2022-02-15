@@ -558,8 +558,8 @@ public abstract class TauDaemon {
         txQueueManager.updateTxQueue(chainID);
     }
 
-    public void resendTxQueue(TxQueue tx) {
-        txQueueManager.resendTxQueue(tx);
+    public String resendTxQueue(TxQueue tx) {
+        return txQueueManager.resendTxQueue(tx);
     }
 
     /**
