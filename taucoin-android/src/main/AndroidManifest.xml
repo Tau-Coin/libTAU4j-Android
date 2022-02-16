@@ -322,6 +322,10 @@
             android:name=".ui.friends.AirdropSetupActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
+        <activity
+            android:name=".ui.friends.AirdropHistoryActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
     </application>
 
 </manifest>

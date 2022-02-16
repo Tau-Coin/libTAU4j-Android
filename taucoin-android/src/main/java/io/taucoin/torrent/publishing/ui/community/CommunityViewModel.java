@@ -60,6 +60,7 @@ import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
+import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
@@ -486,6 +487,10 @@ public class CommunityViewModel extends AndroidViewModel {
 
     public Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime) {
         return txQueueRepo.observeAirdropCountOnChain(chainID, senderPk, currentTime);
+    }
+
+    public Observable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime) {
+        return txQueueRepo.observeAirdropHistoryOnChain(chainID, senderPk, currentTime);
     }
 
     /**

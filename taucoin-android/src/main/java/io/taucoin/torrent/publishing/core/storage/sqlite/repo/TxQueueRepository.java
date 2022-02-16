@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
+import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 
 /**
@@ -38,4 +39,6 @@ public interface TxQueueRepository {
     TxQueue getAirdropTxQueue(String chainID, String currentPk, String friendPk);
 
     Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);
+
+    Observable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime);
 }

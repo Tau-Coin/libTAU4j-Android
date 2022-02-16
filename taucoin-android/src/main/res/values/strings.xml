@@ -88,6 +88,7 @@
     <string name="menu_rank_c">Last Seen</string>
     <string name="menu_rank_a">Last Communication</string>
     <string name="menu_delete">Delete</string>
+    <string name="menu_history">History</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_community_info">Community Info</string>
 
@@ -437,6 +438,7 @@
     <string name="bot_tip">Bot</string>
     <string name="bot_airdrop">Airdrop</string>
     <string name="bot_airdrop_community">Airdrop Community</string>
+    <string name="bot_airdrop_history">Airdrop History</string>
     <string name="bot_airdrop_members">Members</string>
     <string name="bot_airdrop_members_error">Members invalid</string>
     <string name="bot_airdrop_members_hit">input how many address to airdrop</string>

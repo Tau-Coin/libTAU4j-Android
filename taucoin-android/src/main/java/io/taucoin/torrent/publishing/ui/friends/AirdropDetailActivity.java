@@ -1,5 +1,6 @@
 package io.taucoin.torrent.publishing.ui.friends;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.view.Menu;
@@ -16,6 +17,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
@@ -37,6 +39,7 @@ public class AirdropDetailActivity extends BaseActivity {
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
+    private Member member;
     private Disposable airdropDisposable;
 
     @Override
@@ -67,6 +70,7 @@ public class AirdropDetailActivity extends BaseActivity {
     }
 
     private void updateAirdropDetail(Member member) {
+        this.member = member;
         if (member != null) {
             if (airdropDisposable != null && !airdropDisposable.isDisposed()) {
                 airdropDisposable.dispose();
@@ -106,7 +110,7 @@ public class AirdropDetailActivity extends BaseActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_delete, menu);
+        getMenuInflater().inflate(R.menu.menu_airdrop, menu);
         return true;
     }
 
@@ -117,6 +121,14 @@ public class AirdropDetailActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_delete) {
             communityViewModel.deleteAirdropBot(chainID);
+        } else if (item.getItemId() == R.id.menu_history) {
+            if (member != null) {
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, member.chainID);
+                intent.putExtra(IntentExtra.PUBLIC_KEY, member.publicKey);
+                intent.putExtra(IntentExtra.TIMESTAMP, member.airdropTime);
+                ActivityUtil.startActivity(intent, this, AirdropHistoryActivity.class);
+            }
         }
         return true;
     }

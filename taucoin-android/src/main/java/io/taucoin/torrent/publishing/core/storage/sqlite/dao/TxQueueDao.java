@@ -7,9 +7,11 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
+import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 
 /**
@@ -57,6 +59,18 @@ public interface TxQueueDao {
 
     String QUERY_AIRDROP_COUNT_ON_CHAIN = "SELECT count(*) FROM" +
             " (SELECT tq.chainID, tq.queueID," +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
+            " FROM TxQueues tq" +
+            " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID From Txs" +
+            " WHERE senderPk = :senderPk AND txType = 2" +
+            " GROUP BY queueID) AS t" +
+            " ON tq.queueID = t.queueID" +
+            " WHERE tq.senderPk = :senderPk AND tq.chainID = :chainID" +
+            " AND queueTime >= :currentTime AND queueType = 1)" +
+            " WHERE status > 0";
+
+    String QUERY_AIRDROP_HISTORY_ON_CHAIN = "SELECT queueID, receiverPk FROM" +
+            " (SELECT tq.chainID, tq.queueID, tq.receiverPk," +
             " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID From Txs" +
@@ -117,4 +131,8 @@ public interface TxQueueDao {
 
     @Query(QUERY_AIRDROP_COUNT_ON_CHAIN)
     Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);
+
+    @Query(QUERY_AIRDROP_HISTORY_ON_CHAIN)
+    @Transaction
+    Observable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime);
 }

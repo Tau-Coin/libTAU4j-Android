@@ -7,4 +7,9 @@
         android:icon="@mipmap/icon_delete"
         android:title="@string/menu_delete" />
 
+    <item android:id="@+id/menu_history"
+        app:showAsAction="ifRoom"
+        android:icon="@mipmap/icon_history"
+        android:title="@string/menu_history" />
+
 </menu>

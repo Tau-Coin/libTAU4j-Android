@@ -3,20 +3,13 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 import android.content.Context;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
-import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
-import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
-import io.taucoin.torrent.publishing.ui.community.CommunityTabs;
 
 /**
  * TxQueueRepository接口实现
@@ -89,5 +82,10 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     @Override
     public Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime) {
         return db.txQueueDao().observeAirdropCountOnChain(chainID, senderPk, currentTime);
+    }
+
+    @Override
+    public Observable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime) {
+        return db.txQueueDao().observeAirdropHistoryOnChain(chainID, senderPk, currentTime);
     }
 }
