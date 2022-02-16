@@ -19,12 +19,12 @@ public interface BlockDao {
     String QUERY_BLOCK = "SELECT * FROM Blocks " +
             " WHERE chainID = :chainID and blockHash= :blockHash";
 
-    String QUERY_CHAIN_STATUS = "SELECT a.* , b.peerBlocks, b.totalRewards, b.headBlock, b.tailBlock," +
-            " b.consensusBlock, c.totalPeers, c.totalCoin FROM" +
+    String QUERY_CHAIN_STATUS = "SELECT a.* , b.peerBlocks, b.totalRewards, d.headBlock, d.tailBlock," +
+            " d.consensusBlock, c.totalPeers, c.totalCoin FROM" +
             " (SELECT difficulty FROM Blocks " +
             " WHERE chainID = :chainID AND status = 1 ORDER BY blockNumber DESC" +
             " LIMIT 1) AS a," +
-            " (SELECT count(*) peerBlocks, SUM(rewards) AS totalRewards, c.headBlock, c.tailBlock, c.consensusBlock" +
+            " (SELECT count(*) peerBlocks, SUM(rewards) AS totalRewards" +
             " FROM Blocks bb" +
             " LEFT JOIN Communities c ON bb.chainID = c.chainID" +
             " WHERE bb.chainID = :chainID" +
@@ -34,7 +34,9 @@ public interface BlockDao {
             ") AS b," +
             " (SELECT count(*) totalPeers, SUM(balance) AS totalCoin FROM Members mm" +
             " LEFT JOIN Communities c ON mm.chainID = c.chainID" +
-            " WHERE mm.chainID = :chainID AND "+ MemberDao.WHERE_ON_CHAIN +") AS c";
+            " WHERE mm.chainID = :chainID AND "+ MemberDao.WHERE_ON_CHAIN +") AS c," +
+            " (SELECT headBlock, tailBlock, consensusBlock FROM Communities WHERE " +
+            " chainID = :chainID) AS d";
 
     /**
      * 添加用户设备信息
