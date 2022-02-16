@@ -91,6 +91,18 @@ public interface MemberDao {
             " WHERE m.publicKey = :userPk AND c.isBanned = 0" +
             " AND " + WHERE_ON_CHAIN;
 
+    String QUERY_JOINED_UNEXPIRED_CHAIN_ID = "SELECT m.chainID" +
+            " FROM Members m" +
+            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+            " WHERE m.publicKey = :userPk AND c.isBanned = 0" +
+            " AND " + WHERE_ON_CHAIN;
+
+    String QUERY_UN_JOINED_EXPIRED_COMMUNITY = "SELECT m.*" +
+            " FROM Members m" +
+            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+            " WHERE m.publicKey = :userPk AND c.isBanned = 0" +
+            " AND m.chainID NOT IN (" + QUERY_JOINED_UNEXPIRED_CHAIN_ID + ")";
+
     String QUERY_AIRDROP_DETAIL = "SELECT * FROM Members" +
             " WHERE chainID = :chainID AND" +
             " publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
@@ -177,6 +189,12 @@ public interface MemberDao {
      */
     @Query(QUERY_JOINED_UNEXPIRED_COMMUNITY)
     List<Member> getJoinedUnexpiredCommunityList(String userPk);
+
+    /**
+     * 获取自己未加入的或者过期社区列表
+     */
+    @Query(QUERY_UN_JOINED_EXPIRED_COMMUNITY)
+    List<Member> getUnJoinedExpiredCommunityList(String userPk);
 
     @Query(QUERY_AIRDROP_DETAIL)
     Flowable<Member> observeCommunityAirdropDetail(String chainID);

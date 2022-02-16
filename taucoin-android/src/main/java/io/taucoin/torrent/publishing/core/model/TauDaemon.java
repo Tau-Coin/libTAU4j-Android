@@ -35,10 +35,13 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
@@ -137,6 +140,8 @@ public abstract class TauDaemon {
                     updateCurrentUserInfo();
                     // 账户自动更新
                     accountAutoRenewal();
+                    // 更新用户社区账户状态
+                    updateUserAccountInfo();
                 }
             }
         });
@@ -500,6 +505,42 @@ public abstract class TauDaemon {
         }).subscribeOn(Schedulers.io())
                 .subscribe();
         disposables.add(disposable);
+    }
+
+    /**
+     * 更新用户社区账户状态
+     */
+    public void updateUserAccountInfo() {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+            UserRepository userRepo = RepositoryHelper.getUserRepository(appContext);
+            MemberRepository memberRepo = RepositoryHelper.getMemberRepository(appContext);
+            User user = userRepo.getCurrentUser();
+            if (user != null) {
+                // 获取未加入或者过期社区列表
+                List<Member> list = memberRepo.getUnJoinedExpiredCommunityList(user.publicKey);
+                logger.debug("updateUserAccountInfo count::{}", null == list ? 0 : list.size());
+                if (list != null && list.size() > 0) {
+                    for (Member m: list) {
+                        requestChainState(m.chainID);
+                    }
+                }
+            }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .subscribe();
+        disposables.add(disposable);
+    }
+
+    /**
+     * 请求用户社区账户状态
+     */
+    public void requestChainState(String chainID) {
+        if (isRunning) {
+            if (StringUtil.isNotEmpty(chainID)) {
+                sessionManager.requestChainState(ChainIDUtil.encode(chainID));
+                logger.debug("requestChainState::{}", chainID);
+            }
+        }
     }
 
     /**

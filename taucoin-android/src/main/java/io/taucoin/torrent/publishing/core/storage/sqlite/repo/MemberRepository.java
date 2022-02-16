@@ -98,4 +98,5 @@ public interface MemberRepository {
      */
     List<Member> getJoinedUnexpiredCommunityList(String userPk);
 
+    List<Member> getUnJoinedExpiredCommunityList(String publicKey);
 }

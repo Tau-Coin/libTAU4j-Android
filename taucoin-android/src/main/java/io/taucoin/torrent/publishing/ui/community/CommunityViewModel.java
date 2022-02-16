@@ -673,6 +673,7 @@ public class CommunityViewModel extends AndroidViewModel {
             if (success) {
                 String publicKey = MainApplication.getInstance().getPublicKey();
                 addMemberInfoToLocal(chainID, publicKey);
+                daemon.requestChainState(chainID);
             }
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)

@@ -170,4 +170,9 @@ public class MemberRepositoryImpl implements MemberRepository{
     public List<Member> getJoinedUnexpiredCommunityList(String userPk) {
         return db.memberDao().getJoinedUnexpiredCommunityList(userPk);
     }
+
+    @Override
+    public List<Member> getUnJoinedExpiredCommunityList(String userPk) {
+        return db.memberDao().getUnJoinedExpiredCommunityList(userPk);
+    }
 }
