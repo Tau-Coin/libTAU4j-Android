@@ -586,6 +586,28 @@ class TauListenHandler {
     }
 
     /**
+     * 节点账户状态
+     * @param chainIDBytes 链ID
+     * @param userPk 用户公钥
+     * @param account 账户状态
+     */
+    void onAccountState(byte[] chainIDBytes, String userPk, Account account) {
+        String chainID = ChainIDUtil.decode(chainIDBytes);
+        logger.debug("onAccountState chainID::{}, userPk::{}, account empty::{}",
+                chainID, userPk, null == account);
+        if (account != null) {
+            Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
+            if (member != null && account.getBlockNumber() > member.blockNumber) {
+                member.blockNumber = account.getBlockNumber();
+                member.balance = account.getBalance();
+                member.power = account.getEffectivePower();
+                member.nonce = account.getNonce();
+                memberRepo.updateMember(member);
+            }
+        }
+    }
+
+    /**
      * 0、默认为最小交易费
      * 1、从交易池中获取前10名交易费的中位数
      * 2、如果交易池返回小于等于0，用上次交易用的交易费

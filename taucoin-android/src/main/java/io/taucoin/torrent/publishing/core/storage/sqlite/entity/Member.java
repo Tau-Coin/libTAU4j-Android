@@ -20,6 +20,7 @@ public class Member implements Parcelable {
     public long power;                  // 成员的power
     public long nonce;                  // 成员的nonce
     public long blockNumber;            // 最后一次上链的区块号
+    public long stateTime;              // 更新状态信息
     public int airdropStatus;           // 发币开关状态
     public int airdropMembers;          // 总的发币成员数
     public long airdropCoins;           // 每次发币的coins

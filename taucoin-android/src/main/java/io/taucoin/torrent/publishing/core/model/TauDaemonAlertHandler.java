@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
 
+import org.libTAU4j.Account;
 import org.libTAU4j.Block;
 import org.libTAU4j.Ed25519;
 import org.libTAU4j.Message;
@@ -16,6 +17,7 @@ import org.libTAU4j.alerts.BlockChainNewHeadBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewTailBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewTransactionAlert;
 import org.libTAU4j.alerts.BlockChainRollbackBlockAlert;
+import org.libTAU4j.alerts.BlockChainStateAlert;
 import org.libTAU4j.alerts.BlockChainTopThreeVotesAlert;
 import org.libTAU4j.alerts.CommConfirmRootAlert;
 import org.libTAU4j.alerts.CommFriendInfoAlert;
@@ -115,6 +117,9 @@ class TauDaemonAlertHandler {
                 break;
             case BLOCK_CHAIN_TOP_THREE_VOTES:
                 onNewTopVotes(alert);
+                break;
+            case BLOCK_CHAIN_STATE:
+                onAccountState(alert, alertAndUser.getUserPk());
                 break;
             default:
                 logger.info("Unknown alert");
@@ -316,6 +321,18 @@ class TauDaemonAlertHandler {
         List<Vote> votes = a.get_votes();
         byte[] chainID = a.get_chain_id();
         tauListenHandler.handleNewTopVotes(chainID, votes);
+    }
+
+    /**
+     * libTAU上报节点账户状态
+     * @param alert libTAU上报
+     */
+    private void onAccountState(Alert alert, String userPk) {
+        BlockChainStateAlert a = (BlockChainStateAlert) alert;
+        logger.info(a.get_message());
+        Account account = a.get_account();
+        byte[] chainID = a.get_chain_id();
+        tauListenHandler.onAccountState(chainID, userPk, account);
     }
 
     /**
