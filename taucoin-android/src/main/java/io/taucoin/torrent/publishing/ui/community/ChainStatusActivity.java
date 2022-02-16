@@ -181,9 +181,7 @@ public class ChainStatusActivity extends BaseActivity {
             disposables.add(communityViewModel.observerChainStatus(chainID)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::loadChainStatusData, it -> {
-                    // 查询异常
-                }));
+                .subscribe(this::loadChainStatusData));
 
             disposables.add(communityViewModel.observerCommunityByChainID(chainID)
                     .subscribeOn(Schedulers.newThread())
