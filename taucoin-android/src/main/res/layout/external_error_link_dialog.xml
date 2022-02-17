@@ -15,11 +15,12 @@
 
         <ImageView
             android:id="@+id/iv_invalid_link"
-            android:layout_width="@dimen/widget_size_60"
-            android:layout_height="@dimen/widget_size_60"
+            android:layout_width="@dimen/widget_size_80"
+            android:layout_height="@dimen/widget_size_80"
             android:layout_marginTop="@dimen/widget_size_20"
             android:layout_centerHorizontal="true"
-            android:src="@mipmap/icon_airdrop_coins"/>
+            android:contentDescription="@null"
+            android:src="@mipmap/icon_invalid_link"/>
 
         <TextView
             android:layout_below="@+id/iv_invalid_link"
@@ -27,7 +28,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/widget_size_15"
+            android:includeFontPadding="false"
+            android:layout_marginTop="@dimen/widget_size_0"
             android:textColor="@color/gray_dark"
             android:text="@string/main_error_link"
             android:textAppearance="@style/TextAppearanceBody1"/>
