@@ -782,6 +782,9 @@ public final class SpanUtils {
     }
 
     private void updateCharCharSequence() {
+        if (null == mText) {
+            mText = "";
+        }
         if (mText.length() == 0) return;
         int start = mBuilder.length();
         mBuilder.append(mText);
