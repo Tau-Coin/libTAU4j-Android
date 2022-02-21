@@ -43,6 +43,7 @@ import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.ui.constant.Page;
@@ -112,10 +113,6 @@ public class TxViewModel extends AndroidViewModel {
 
     MutableLiveData<String> getAddState() {
         return addState;
-    }
-
-    public void setAddState(MutableLiveData<String> addState) {
-        this.addState = addState;
     }
 
     /**
@@ -515,6 +512,37 @@ public class TxViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
+    public Observable<List<Tx>> observeLatestPinnedMsg(int currentTab, String chainID) {
+        return txRepo.observeLatestPinnedMsg(currentTab, chainID);
+    }
+
+    /**
+     * 加载交易固定数据
+     * @param currentTab 用户选择的tab页
+     * @param chainID 社区链ID
+     */
+    void loadPinnedTxsData(int currentTab, String chainID) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
+            List<UserAndTx> txs = new ArrayList<>();
+            try {
+                long startTime = System.currentTimeMillis();
+                txs = txRepo.queryCommunityPinnedTxs(chainID, currentTab);
+                long getMessagesTime = System.currentTimeMillis();
+                logger.trace("loadPinnedTxsData, messages.size::{}, getMessagesTime::{}", txs.size(),
+                        getMessagesTime - startTime);
+            } catch (Exception e) {
+                logger.error("loadPinnedTxsData error::", e);
+            }
+            emitter.onNext(txs);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(messages -> {
+                    chainTxs.postValue(messages);
+                });
+        disposables.add(disposable);
+    }
+
     /**
      * 加载Trust交易分页数据
      * @param chainID 社区链ID
@@ -576,6 +604,19 @@ public class TxViewModel extends AndroidViewModel {
             } catch (Exception e) {
                 logger.error("deleteTxQueue error::", e);
             }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+        disposables.add(disposable);
+    }
+
+    public void setMessagePinned(UserAndTx tx) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            int pinned = tx.pinned == 0 ? 1 : 0;
+            tx.pinned = pinned;
+            tx.pinnedTime = DateUtil.getMillisTime();
+            txRepo.setMessagePinned(tx.txID, pinned, tx.pinnedTime);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

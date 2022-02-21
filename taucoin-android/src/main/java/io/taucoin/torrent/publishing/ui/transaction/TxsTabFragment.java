@@ -6,9 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.style.URLSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.noober.menu.FloatMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +28,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.SpannableUrl;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.DialogTrustBinding;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
@@ -46,7 +50,6 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.FragmentTxsTabBinding;
-import io.taucoin.torrent.publishing.databinding.ItemOperationsBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
@@ -67,7 +70,7 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     private FavoriteViewModel favoriteViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
     private TxListAdapter adapter;
-    private CommonDialog operationsDialog;
+    private FloatMenu operationsMenu;
     private CommonDialog trustDialog;
 
     private String chainID;
@@ -80,6 +83,7 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_txs_tab, container, false);
+        binding.setListener(this);
         return binding.getRoot();
     }
 
@@ -216,6 +220,20 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
                 ToastUtils.showShortToast(R.string.ban_failed);
             }
         });
+
+        if (currentTab != CommunityTabs.MARKET.getIndex()) {
+            binding.llPinnedMessage.setVisibility(View.GONE);
+            disposables.add(txViewModel.observeLatestPinnedMsg(currentTab, chainID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(list -> {
+                        boolean isHavePinnedMsg = list != null && list.size() > 0;
+                        binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
+                        if (isHavePinnedMsg) {
+                            binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
+                        }
+                    }));
+        }
     }
 
     @Override
@@ -224,9 +242,60 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         disposables.clear();
     }
 
+    /**
+     * 显示每个item长按操作选项对话框
+     */
     @Override
-    public void onItemLongClicked(UserAndTx tx, String msg) {
-        showItemOperationDialog(tx, msg);
+    public void onItemLongClicked(TextView view, UserAndTx tx) {
+        List<OperationMenuItem> menuList = new ArrayList<>();
+        menuList.add(new OperationMenuItem(R.string.tx_operation_copy));
+        final URLSpan[] urls = view.getUrls();
+        if (urls != null && urls.length > 0) {
+            menuList.add(new OperationMenuItem(R.string.tx_operation_copy_link));
+        }
+        // 用户不能拉黑自己
+        if(StringUtil.isNotEquals(tx.senderPk,
+                MainApplication.getInstance().getPublicKey())){
+            menuList.add(new OperationMenuItem(R.string.tx_operation_blacklist));
+        }
+        menuList.add(new OperationMenuItem(tx.pinned == 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
+        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
+
+        operationsMenu = new FloatMenu(activity);
+        operationsMenu.items(menuList);
+        operationsMenu.setOnItemClickListener((v, position) -> {
+            OperationMenuItem item = menuList.get(position);
+            int resId = item.getResId();
+            switch (resId) {
+                case R.string.tx_operation_copy:
+                    CopyManager.copyText(view.getText());
+                    ToastUtils.showShortToast(R.string.copy_successfully);
+                    break;
+                case R.string.tx_operation_copy_link:
+                    if (urls != null && urls.length > 0) {
+                        String link = urls[0].getURL();
+                        CopyManager.copyText(link);
+                        ToastUtils.showShortToast(R.string.copy_link_successfully);
+                    }
+                    break;
+                case R.string.tx_operation_blacklist:
+                    String publicKey = tx.senderPk;
+                    userViewModel.setUserBlacklist(publicKey, true);
+                    ToastUtils.showShortToast(R.string.blacklist_successfully);
+                    break;
+                case R.string.tx_operation_pin:
+                case R.string.tx_operation_unpin:
+                    txViewModel.setMessagePinned(tx);
+                    break;
+                case R.string.tx_operation_msg_hash:
+                    String msgHash = tx.txID;
+                    CopyManager.copyText(msgHash);
+                    ToastUtils.showShortToast(R.string.copy_message_hash);
+                    break;
+
+            }
+        });
+        operationsMenu.show(activity.getPoint());
     }
 
     @Override
@@ -259,6 +328,11 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
         intent.putExtra(IntentExtra.PUBLIC_KEY, tx.senderPk);
         ActivityUtil.startActivity(intent, activity, SellDetailActivity.class);
+    }
+
+    @Override
+    public void onLinkClick(String link) {
+        ActivityUtil.openUri(activity, link);
     }
 
     /**
@@ -295,37 +369,6 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         trustDialog.show();
     }
 
-    /**
-     * 显示每个item长按操作选项对话框
-     */
-    private void showItemOperationDialog(UserAndTx tx, String msg) {
-        ItemOperationsBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
-                R.layout.item_operations, null, false);
-        binding.setListener(this);
-        binding.replay.setVisibility(View.GONE);
-        // 用户不能拉黑自己
-        if(StringUtil.isEquals(tx.senderPk,
-                MainApplication.getInstance().getPublicKey())){
-            binding.blacklist.setVisibility(View.GONE);
-        }
-        binding.replay.setTag(tx);
-        binding.copy.setTag(msg);
-        String link = SpannableUrl.parseUrlFormStr(msg);
-        if(StringUtil.isNotEmpty(link)){
-            binding.copyLink.setTag(link);
-        }else{
-            binding.copyLink.setVisibility(View.GONE);
-        }
-        binding.blacklist.setTag(tx.senderPk);
-        binding.favourite.setTag(tx.txID);
-        binding.msgHash.setTag(tx.txID);
-        operationsDialog = new CommonDialog.Builder(activity)
-                .setContentView(binding.getRoot())
-                .enableWarpWidth(true)
-                .create();
-        operationsDialog.show();
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -333,8 +376,9 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     }
 
     private void closeAllDialog() {
-        if (operationsDialog != null) {
-            operationsDialog.closeDialog();
+        if (operationsMenu != null) {
+            operationsMenu.setOnItemClickListener(null);
+            operationsMenu.dismiss();
         }
         if (trustDialog != null) {
             trustDialog.closeDialog();
@@ -344,31 +388,18 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     @Override
     public void onClick(View v) {
         closeAllDialog();
-        switch (v.getId()){
-            case R.id.copy:
-                String msg = ViewUtils.getStringTag(v);
-                CopyManager.copyText(msg);
-                ToastUtils.showShortToast(R.string.copy_successfully);
-                break;
-            case R.id.copy_link:
-                String link = ViewUtils.getStringTag(v);
-                CopyManager.copyText(link);
-                ToastUtils.showShortToast(R.string.copy_link_successfully);
-                break;
-            case R.id.blacklist:
-                String publicKey = ViewUtils.getStringTag(v);
-                userViewModel.setUserBlacklist(publicKey, true);
-                ToastUtils.showShortToast(R.string.blacklist_successfully);
+        switch (v.getId()) {
+            case R.id.ll_pinned_message:
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                intent.putExtra(IntentExtra.TYPE, currentTab);
+                ActivityUtil.startActivityForResult(intent, activity, PinnedActivity.class,
+                        TxsTabFragment.TX_REQUEST_CODE);
                 break;
             case R.id.favourite:
                 String txID = ViewUtils.getStringTag(v);
                 favoriteViewModel.addTxFavorite(txID);
                 ToastUtils.showShortToast(R.string.favourite_successfully);
-                break;
-            case R.id.msg_hash:
-                String msgHash = ViewUtils.getStringTag(v);
-                CopyManager.copyText(msgHash);
-                ToastUtils.showShortToast(R.string.copy_message_hash);
                 break;
         }
     }

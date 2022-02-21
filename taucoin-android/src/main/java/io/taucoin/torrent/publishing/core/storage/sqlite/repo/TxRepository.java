@@ -30,6 +30,12 @@ public interface TxRepository {
     List<UserAndTx> queryCommunityTxs(String chainID, int currentTab, int startPos, int loadSize);
 
     /**
+     * 加载交易固定数据
+     * @param chainID 社区链ID
+     */
+    List<UserAndTx> queryCommunityPinnedTxs(String chainID, int currentTab);
+
+    /**
      * 查询社区用户被Trust列表
      * @param chainID 社区链ID
      */
@@ -86,4 +92,8 @@ public interface TxRepository {
      * @return Tx
      */
     Tx getNotOnChainTx(String chainID, int txType, long nonce);
+
+    void setMessagePinned(String txID, int pinned, long pinnedTime);
+
+    Observable<List<Tx>> observeLatestPinnedMsg(int currentTab, String chainID);
 }

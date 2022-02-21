@@ -160,6 +160,10 @@
             android:name=".ui.transaction.TrustMoreActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
+        <activity
+            android:name=".ui.transaction.PinnedActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
         <service
             android:name=".service.TauService" />
 

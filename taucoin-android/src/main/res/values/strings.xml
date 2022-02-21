@@ -141,6 +141,7 @@
     <string name="community_on_chain">Chain</string>
     <string name="community_tx_queue">Queue</string>
     <string name="community_escrow_service_enter">Escrow Service</string>
+    <string name="community_pinned_message">Pinned Message</string>
     <string name="community_chain_note_title">Note Transaction</string>
     <string name="community_sell_coins">Sell Coins</string>
     <string name="community_sell_detail">Sell Detail</string>
@@ -344,6 +345,8 @@
     <string name="tx_operation_blacklist">Blacklist</string>
     <string name="tx_operation_favorite">Favorite</string>
     <string name="tx_operation_msg_hash">Message Hash</string>
+    <string name="tx_operation_pin">Pin</string>
+    <string name="tx_operation_unpin">Unpin</string>
     <string name="tx_error_type">No such transaction type!</string>
     <string name="tx_on_chain_msg">On-Chain Message</string>
     <string name="tx_fee_hint">Fee</string>

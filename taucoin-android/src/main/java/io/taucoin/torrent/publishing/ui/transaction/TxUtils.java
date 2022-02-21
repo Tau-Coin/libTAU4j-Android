@@ -37,7 +37,6 @@ public class TxUtils {
     private static SpannableStringBuilder createSpanWiringTx(Tx tx) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
-        int blueColor = context.getResources().getColor(R.color.color_blue_link);
         SpanUtils msg = new SpanUtils()
                 .append("Amount: ").setForegroundColor(titleColor)
                 .append(FmtMicrometer.fmtBalance(tx.amount))
@@ -46,9 +45,9 @@ public class TxUtils {
                 .append("\n").append("Fee:").setForegroundColor(titleColor)
                 .append(FmtMicrometer.fmtFeeValue(tx.fee))
                 .append("\n").append("To:").setForegroundColor(titleColor)
-                .append(tx.receiverPk).setForegroundColor(blueColor)
+                .append(tx.receiverPk)
                 .append("\n").append("Hash:").setForegroundColor(titleColor)
-                .append(tx.txID).setForegroundColor(blueColor);
+                .append(tx.txID);
         if (tx.txStatus == 1) {
             msg.append("\n").append("Blocknumber:").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtLong(tx.blockNumber));
@@ -63,13 +62,13 @@ public class TxUtils {
     private static SpannableStringBuilder createSpanSellTx(Tx tx) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
-        int blueColor = context.getResources().getColor(R.color.color_blue_link);
+        int blueColor1 = context.getResources().getColor(R.color.color_blue_link);
         SpanUtils msg = new SpanUtils()
                 .append("Sell: ").setForegroundColor(titleColor)
                 .append(tx.coinName);
         if (StringUtil.isNotEmpty(tx.link)) {
             msg.append("\n").append("Link: ").setForegroundColor(titleColor)
-                    .append(tx.link).setForegroundColor(blueColor);
+                    .append(tx.link);
         }
         if (StringUtil.isNotEmpty(tx.location)) {
             msg.append("\n").append("Location: ").setForegroundColor(titleColor)

@@ -32,7 +32,6 @@ import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
-import io.taucoin.torrent.publishing.ui.transaction.EscrowServiceActivity;
 import io.taucoin.torrent.publishing.ui.transaction.QueueTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
 
@@ -41,7 +40,6 @@ import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
  */
 public class CommunityFragment extends BaseFragment implements View.OnClickListener {
 
-    public static boolean showEscrowServiceEnter = true;
     public static final int MEMBERS_REQUEST_CODE = 0x100;
     private MainActivity activity;
     private FragmentCommunityBinding binding;
@@ -108,18 +106,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
             ActivityUtil.startActivityForResult(intent, activity, CommunityDetailActivity.class, MEMBERS_REQUEST_CODE);
         });
-
-//        binding.toolbarInclude.ivAction1.setVisibility(View.VISIBLE);
-//        binding.toolbarInclude.ivAction1.setOnClickListener(v -> {
-//            if(StringUtil.isEmpty(chainID)) {
-//                return;
-//            }
-//            Intent intent = new Intent();
-//            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-//            ActivityUtil.startActivity(intent, activity, TxQueueActivity.class);
-//        });
-        binding.llEscrowService.setVisibility(showEscrowServiceEnter ? View.VISIBLE : View.GONE);
-
     }
 
     /**
@@ -290,26 +276,17 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     return;
                 }
                 if (this.selectedView != null) {
-                    this.selectedView.setBackgroundResource(R.drawable.grey_dark_rect_round_bg);
-                    this.selectedView.setTextColor(getResources().getColor(R.color.color_white));
+                    this.selectedView.setBackgroundResource(R.drawable.white_rect_round_bg_no_border);
+                    this.selectedView.setTextColor(getResources().getColor(R.color.gray_dark));
                 }
                 TextView selectedView = (TextView) v;
-                selectedView.setBackgroundColor(getResources().getColor(R.color.color_transparent));
+                selectedView.setBackgroundResource(R.drawable.yellow_rect_round_border_small_radius);
                 selectedView.setTextColor(getResources().getColor(R.color.color_yellow));
                 this.selectedView = selectedView;
                 loadTabView(StringUtil.getIntTag(selectedView));
                 break;
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
-                break;
-            case R.id.tv_escrow_service:
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                ActivityUtil.startActivity(intent, this, EscrowServiceActivity.class);
-                break;
-            case R.id.iv_close_escrow_service:
-                showEscrowServiceEnter = false;
-                binding.llEscrowService.setVisibility(View.GONE);
                 break;
         }
     }

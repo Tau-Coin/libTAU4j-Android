@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.style.URLSpan;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.noober.menu.FloatMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +36,12 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
+import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.GeoUtils;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -47,6 +52,7 @@ import io.taucoin.torrent.publishing.databinding.FragmentChatBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.constant.Page;
+import io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView;
 import io.taucoin.torrent.publishing.ui.customviews.MsgLogsDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.UserQRCodeActivity;
@@ -71,6 +77,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     private String friendPK;
     private Handler handler = new Handler();
     private MsgLogsDialog msgLogsDialog;
+    private FloatMenu operationsMenu;
 
     private int currentPos = 0;
 
@@ -229,6 +236,11 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         chatViewModel.onCleared();
         userViewModel.onCleared();
         adapter.recycle();
+
+        if (operationsMenu != null) {
+            operationsMenu.setOnItemClickListener(null);
+            operationsMenu.dismiss();
+        }
     }
 
     private final Runnable handleUpdateAdapter = () -> {
@@ -383,6 +395,41 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         intent.putExtra(IntentExtra.PUBLIC_KEY, msg.senderPk);
         intent.putExtra(IntentExtra.TYPE, UserDetailActivity.TYPE_CHAT_PAGE);
         ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
+    }
+
+    @Override
+    public void onLongClick(AutoLinkTextView view) {
+        List<OperationMenuItem> menuList = new ArrayList<>();
+        menuList.add(new OperationMenuItem(R.string.tx_operation_copy));
+        final URLSpan[] urls = view.getUrls();
+        if (urls != null && urls.length > 0) {
+            menuList.add(new OperationMenuItem(R.string.tx_operation_copy_link));
+        }
+        operationsMenu = new FloatMenu(activity);
+        operationsMenu.items(menuList);
+        operationsMenu.setOnItemClickListener((v, position) -> {
+            OperationMenuItem item = menuList.get(position);
+            int resId = item.getResId();
+            switch (resId) {
+                case R.string.tx_operation_copy:
+                    CopyManager.copyText(view.getText());
+                    ToastUtils.showShortToast(R.string.copy_successfully);
+                    break;
+                case R.string.tx_operation_copy_link:
+                    if (urls != null && urls.length > 0) {
+                        String link = urls[0].getURL();
+                        CopyManager.copyText(link);
+                        ToastUtils.showShortToast(R.string.copy_link_successfully);
+                    }
+                    break;
+            }
+        });
+        operationsMenu.show(activity.getPoint());
+    }
+
+    @Override
+    public void onLinkClick(String link) {
+        ActivityUtil.openUri(activity, link);
     }
 
     /**

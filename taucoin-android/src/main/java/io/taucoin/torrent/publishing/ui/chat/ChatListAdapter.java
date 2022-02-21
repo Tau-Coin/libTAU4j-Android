@@ -2,18 +2,13 @@ package io.taucoin.torrent.publishing.ui.chat;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.text.TextUtils;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +28,6 @@ import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
-import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -42,13 +36,11 @@ import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
-import io.taucoin.torrent.publishing.core.utils.selecttext.CustomPop;
-import io.taucoin.torrent.publishing.core.utils.selecttext.SelectTextEvent;
 import io.taucoin.torrent.publishing.core.utils.selecttext.SelectTextEventBus;
 import io.taucoin.torrent.publishing.core.utils.selecttext.SelectTextHelper;
 import io.taucoin.torrent.publishing.databinding.ItemTextBinding;
 import io.taucoin.torrent.publishing.databinding.ItemTextRightBinding;
-import io.taucoin.torrent.publishing.ui.customviews.HashTextView;
+import io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView;
 import io.taucoin.torrent.publishing.ui.customviews.RoundImageView;
 
 /**
@@ -145,13 +137,9 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
         }
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewDataBinding binding;
         private ClickListener listener;
-        private SelectTextHelper mSelectableTextHelper;
-        private String selectedText;
-        private HashTextView textView;
-        private LinearLayout textContainer;
         private ChatMsg msg;
 
         ViewHolder(ViewDataBinding binding, ClickListener listener) {
@@ -164,8 +152,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             if (null == binding || null == msg) {
                 return;
             }
-            this.textView = binding.tvMsg;
-            this.textContainer = binding.middleView;
             this.msg = msg;
             showStatusView(binding.ivStats, binding.tvProgress, binding.ivWarning, msg);
             bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, previousChat, null, myBitmap);
@@ -175,13 +161,11 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             if (null == binding || null == msg) {
                 return;
             }
-            this.textView = binding.tvMsg;
-            this.textContainer = binding.middleView;
             this.msg = msg;
             bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, previousChat, headPic, null);
         }
 
-        private void bindText(RoundImageView roundButton, TextView tvTime, HashTextView tvMsg,
+        private void bindText(RoundImageView roundButton, TextView tvTime, AutoLinkTextView tvMsg,
                               ChatMsg previousChat, Bitmap headPic, Bitmap myBitmap) {
             if (null == msg) {
                 return;
@@ -204,7 +188,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             }
             tvTime.setVisibility(isShowTime ? View.VISIBLE : View.GONE);
             String contentStr = Utils.textBytesToString(msg.content);
-//            tvMsg.setText(SpannableUrl.generateSpannableUrl(contentStr));
             tvMsg.setText(contentStr);
 
             Linkify.addLinks(tvMsg, Linkify.WEB_URLS);
@@ -213,102 +196,27 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             Pattern chain = Pattern.compile(UrlUtil.CHAIN_PATTERN, 0);
             Linkify.addLinks(tvMsg, chain, null);
 
-            mSelectableTextHelper = new SelectTextHelper
-                    .Builder(tvMsg)// 放你的textView到这里！！
-                    .setCursorHandleColor(0xFF1379D6)
-                    .setCursorHandleSizeInDp(16)
-                    .setSelectedColor(0xFFAFE1F4)
-                    .setSelectAll(true)
-                    .setScrollShow(true)
-                    .setSelectedAllNoPop(true)// 已经全选无弹窗，设置了true在监听会回调 onSelectAllShowCustomPop 方法 default false
-                    .setMagnifierShow(false)// 放大镜 default true
-                    .setPopSpanCount(5)// 设置操作弹窗每行个数 default 5
-                    .setPopStyle(R.drawable.shape_color_4c4c4c_radius_8, R.mipmap.ic_arrow)
-                    .addItem(0, R.string.operation_copy,
-                            ()-> copyText(mSelectableTextHelper, selectedText))
-//                    .addItem(0, R.string.operation_select_all,
-//                            this::selectAll)
-                    .build();
+            tvMsg.setAutoLinkListener(new AutoLinkTextView.AutoLinkListener() {
 
-            mSelectableTextHelper.setSelectListener(new SelectTextHelper.OnSelectListener() {
-                /**
-                 * 点击回调
-                 */
                 @Override
-                public void onClick(View v) {
+                public void onClick(AutoLinkTextView view) {
+
                 }
 
-                /**
-                 * 长按回调
-                 */
                 @Override
-                public void onLongClick(View v) {
-                    postShowCustomPop();
+                public void onLongClick(AutoLinkTextView view) {
+                    if (listener != null) {
+                        listener.onLongClick(view);
+                    }
                 }
 
-                /**
-                 * 选中文本回调
-                 */
                 @Override
-                public void onTextSelected(CharSequence content) {
-                    selectedText = content.toString();
-                }
-
-                /**
-                 * 弹窗关闭回调
-                 */
-                @Override
-                public void onDismiss() {
-                }
-
-                /**
-                 * 点击TextView里的url回调
-                 *
-                 * 已被下面重写
-                 * textView.setMovementMethod(new LinkMovementMethodInterceptor());
-                 */
-                @Override
-                public void onClickUrl(String url) {
-                    ActivityUtil.openUri(url);
-                }
-
-                /**
-                 * 全选显示自定义弹窗回调
-                 */
-                @Override
-                public void onSelectAllShowCustomPop() {
-                    postShowCustomPop();
-                }
-
-                /**
-                 * 重置回调
-                 */
-                @Override
-                public void onReset() {
-                    SelectTextEventBus.getDefault().dispatchDismissOperatePop();
-                }
-
-                /**
-                 * 解除自定义弹窗回调
-                 */
-                @Override
-                public void onDismissCustomPop() {
-                    SelectTextEventBus.getDefault().dispatchDismissOperatePop();
-                }
-
-                /**
-                 * 是否正在滚动回调
-                 */
-                @Override
-                public void onScrolling() {
-                    removeShowSelectView();
+                public void onLinkClick(String link) {
+                    if (listener != null) {
+                        listener.onLinkClick(link);
+                    }
                 }
             });
-
-            // 注册
-            if (!SelectTextEventBus.getDefault().isRegistered(this)) {
-                SelectTextEventBus.getDefault().register(this);
-            }
         }
 
         private void showStatusView(ImageView ivStats, ProgressBar tvProgress, ImageView ivWarning, ChatMsgAndLog msg) {
@@ -339,86 +247,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
                 return interval > 2 * 60;
             }
             return true;
-        }
-
-        /**
-         * 全选
-         */
-        private void selectAll() {
-            SelectTextEventBus.getDefault().dispatchDismissAllPop();
-            if (null != mSelectableTextHelper) {
-                mSelectableTextHelper.selectAll();
-            }
-        }
-
-        /**
-         * 延迟显示CustomPop
-         * 防抖
-         */
-        private void postShowCustomPop() {
-            textView.removeCallbacks(mShowCustomPopRunnable);
-            textView.postDelayed(mShowCustomPopRunnable, 100);
-        }
-
-        private final Runnable mShowCustomPopRunnable =
-                () -> showCustomPop(textContainer);
-
-        /**
-         * 延迟重置
-         * 为了支持滑动不重置
-         */
-        private void postReset() {
-            textView.removeCallbacks(mShowSelectViewRunnable);
-            textView.postDelayed(mShowSelectViewRunnable, 120);
-        }
-
-        private void removeShowSelectView() {
-            textView.removeCallbacks(mShowSelectViewRunnable);
-        }
-
-        private final Runnable mShowSelectViewRunnable =
-                () -> {
-                    if (mSelectableTextHelper != null) {
-                        mSelectableTextHelper.reset();
-                    }
-                };
-
-        /**
-         * 自定义弹窗
-         *
-         * @param targetView 目标View
-         */
-        private void showCustomPop(View targetView) {
-            CustomPop msgPop = new CustomPop(mContext, targetView, true);
-            msgPop.addItem(0, R.string.operation_copy, () ->
-                    copyText(mSelectableTextHelper, selectedText));
-            // 设置每个item自适应
-//             msgPop.setItemWrapContent();
-            // 设置背景 和 箭头
-            // msgPop.setPopStyle(R.drawable.shape_color_666666_radius_8, R.drawable.ic_arrow_666);
-            msgPop.show();
-        }
-
-        /**
-         * 自定义SelectTextEvent 隐藏 光标
-         */
-        @Subscribe(threadMode = ThreadMode.MAIN)
-        public void handleSelector(SelectTextEvent event) {
-            if (null == mSelectableTextHelper) {
-                return;
-            }
-            String type = event.getType();
-            if (TextUtils.isEmpty(type)) {
-                return;
-            }
-            switch (type) {
-                case SelectTextEventBus.DISMISS_ALL_POP:
-                    mSelectableTextHelper.reset();
-                    break;
-                case SelectTextEventBus.DISMISS_ALL_POP_DELAYED:
-                    postReset();
-                    break;
-            }
         }
     }
 
@@ -452,19 +280,12 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
         }
     }
 
-    @Override
-    public void onViewRecycled(@NonNull ViewHolder holder) {
-        holder.mSelectableTextHelper.destroy();
-        holder.mSelectableTextHelper.setSelectListener(null);
-        holder.mSelectableTextHelper = null;
-        SelectTextEventBus.getDefault().unregister(holder);
-        super.onViewRecycled(holder);
-    }
-
     public interface ClickListener {
         void onMsgLogsClicked(ChatMsg msg);
         void onResendClicked(ChatMsgAndLog msg);
         void onUserClicked(ChatMsg msg);
+        void onLongClick(AutoLinkTextView view);
+        void onLinkClick(String link);
     }
 
     private static final DiffUtil.ItemCallback<ChatMsgAndLog> diffCallback = new DiffUtil.ItemCallback<ChatMsgAndLog>() {
@@ -485,7 +306,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
     public void recycle() {
         BitmapUtil.recycleBitmap(bitmap);
         BitmapUtil.recycleBitmap(myBitmap);
-        SelectTextEventBus.getDefault().unregister();
         this.listener = null;
     }
 }

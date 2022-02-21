@@ -175,4 +175,7 @@ dependencies {
     implementation "com.madgag.spongycastle:core:${CASTLE_VERSION}"
     implementation "com.madgag.spongycastle:prov:${CASTLE_VERSION}"
     implementation 'com.google.guava:guava:24.1-jre'
+
+    // float menu
+    implementation 'com.noober.floatmenu:common:1.0.4'
 }

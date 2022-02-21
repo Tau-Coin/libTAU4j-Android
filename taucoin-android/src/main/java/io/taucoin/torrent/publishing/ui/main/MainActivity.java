@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.ui.main;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -731,13 +732,5 @@ public class MainActivity extends ScanTriggerActivity {
         if (requestCode == PermissionUtils.REQUEST_PERMISSIONS_LOCATION) {
             LocationManagerUtil.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
         }
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-            SelectTextEventBus.getDefault().dispatchDismissAllPopDelayed();
-        }
-        return super.dispatchTouchEvent(ev);
     }
 }

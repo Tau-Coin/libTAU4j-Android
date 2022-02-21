@@ -2,8 +2,10 @@ package io.taucoin.torrent.publishing.ui;
 
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -16,6 +18,7 @@ import io.taucoin.torrent.publishing.ui.customviews.ProgressManager;
 public abstract class BaseActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener {
     private ProgressManager progressManager = null;
+    protected Point point = new Point();
 
     private boolean isFullScreen = true;
     public void setIsFullScreen(boolean isFullScreen){
@@ -105,5 +108,18 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     public void onRefresh() {
 
+    }
+
+    public Point getPoint() {
+        return point;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            point.x = (int) ev.getRawX();
+            point.y = (int) ev.getRawY();
+        }
+        return super.dispatchTouchEvent(ev);
     }
 }

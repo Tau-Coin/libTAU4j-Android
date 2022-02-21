@@ -23,8 +23,9 @@
             android:minHeight="@dimen/widget_size_40"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/widget_size_1"
-            android:paddingEnd="@dimen/widget_size_1"
+            android:background="@color/color_bg"
+            android:paddingStart="@dimen/widget_size_2"
+            android:paddingEnd="@dimen/widget_size_2"
             android:paddingTop="@dimen/widget_size_1"
             android:paddingBottom="@dimen/widget_size_1">
 
@@ -37,12 +38,12 @@
                 android:paddingBottom="@dimen/widget_size_5"
                 android:paddingStart="@dimen/widget_size_2"
                 android:paddingEnd="@dimen/widget_size_2"
-                android:textColor="@color/color_white"
+                android:textColor="@color/gray_dark"
                 android:text="@string/community_chain_note"
                 android:tag="0"
                 android:includeFontPadding="false"
-                android:background="@drawable/grey_dark_rect_round_bg"
                 android:gravity="center|center_vertical"
+                android:background="@drawable/white_rect_round_bg_no_border"
                 android:onClick="@{listener::onClick}"
                 android:textAppearance="@style/TextAppearanceBody2"/>
 
@@ -51,18 +52,18 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:layout_marginStart="@dimen/widget_size_1"
-                android:layout_marginEnd="@dimen/widget_size_1"
+                android:layout_marginStart="@dimen/widget_size_2"
+                android:layout_marginEnd="@dimen/widget_size_2"
                 android:paddingTop="@dimen/widget_size_5"
                 android:paddingBottom="@dimen/widget_size_5"
                 android:paddingStart="@dimen/widget_size_2"
                 android:paddingEnd="@dimen/widget_size_2"
-                android:textColor="@color/color_white"
+                android:textColor="@color/gray_dark"
                 android:text="@string/community_chain_market"
                 android:tag="1"
                 android:includeFontPadding="false"
-                android:background="@drawable/grey_dark_rect_round_bg"
                 android:gravity="center|center_vertical"
+                android:background="@drawable/white_rect_round_bg_no_border"
                 android:onClick="@{listener::onClick}"
                 android:textAppearance="@style/TextAppearanceBody2"/>
 
@@ -71,16 +72,16 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="@dimen/widget_size_1"
+                android:layout_marginEnd="@dimen/widget_size_2"
                 android:paddingTop="@dimen/widget_size_5"
                 android:paddingBottom="@dimen/widget_size_5"
                 android:paddingStart="@dimen/widget_size_2"
                 android:paddingEnd="@dimen/widget_size_2"
-                android:textColor="@color/color_white"
+                android:textColor="@color/gray_dark"
                 android:text="@string/community_on_chain"
                 android:tag="2"
                 android:includeFontPadding="false"
-                android:background="@drawable/grey_dark_rect_round_bg"
+                android:background="@drawable/white_rect_round_bg_no_border"
                 android:gravity="center|center_vertical"
                 android:onClick="@{listener::onClick}"
                 android:textAppearance="@style/TextAppearanceBody2"/>
@@ -94,48 +95,14 @@
                 android:paddingBottom="@dimen/widget_size_5"
                 android:paddingStart="@dimen/widget_size_2"
                 android:paddingEnd="@dimen/widget_size_2"
-                android:textColor="@color/color_white"
+                android:textColor="@color/gray_dark"
                 android:text="@string/community_tx_queue"
                 android:tag="3"
                 android:includeFontPadding="false"
-                android:background="@drawable/grey_dark_rect_round_bg"
+                android:background="@drawable/white_rect_round_bg_no_border"
                 android:gravity="center|center_vertical"
                 android:onClick="@{listener::onClick}"
                 android:textAppearance="@style/TextAppearanceBody2"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_escrow_service"
-            android:layout_below="@+id/ll_filter"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingStart="@dimen/widget_size_10"
-            android:paddingEnd="@dimen/widget_size_10"
-            android:background="@color/color_gray_light">
-
-            <TextView
-                android:id="@+id/tv_escrow_service"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="@string/community_escrow_service_enter"
-                android:paddingTop="@dimen/widget_size_7"
-                android:paddingBottom="@dimen/widget_size_7"
-                android:textColor="@color/color_white"
-                android:onClick="@{listener::onClick}"
-                android:textAppearance="@style/TextAppearanceBody3"/>
-
-            <ImageView
-                android:id="@+id/iv_close_escrow_service"
-                android:layout_width="@dimen/widget_size_14"
-                android:layout_height="@dimen/widget_size_14"
-                android:layout_marginStart="@dimen/widget_size_10"
-                android:contentDescription="@null"
-                android:onClick="@{listener::onClick}"
-                android:src="@mipmap/icon_close_white"/>
 
         </LinearLayout>
 
@@ -144,7 +111,7 @@
             android:id="@+id/tab_fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/ll_escrow_service"
+            android:layout_below="@+id/ll_filter"
             android:background="@color/color_chat_bg"/>
 
         <FrameLayout

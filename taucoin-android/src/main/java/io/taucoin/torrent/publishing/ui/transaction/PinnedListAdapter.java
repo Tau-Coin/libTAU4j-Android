@@ -5,7 +5,6 @@ import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.regex.Pattern;
@@ -20,10 +19,8 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
-import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
@@ -38,7 +35,7 @@ import io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView;
 /**
  * 消息/交易列表显示的Adapter
  */
-public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHolder> {
+public class PinnedListAdapter extends ListAdapter<UserAndTx, PinnedListAdapter.ViewHolder> {
 
     enum ViewType {
         UNKNOWN,
@@ -52,7 +49,7 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
     private ClickListener listener;
     private String chainID;
 
-    TxListAdapter(ClickListener listener, String chainID) {
+    PinnedListAdapter(ClickListener listener, String chainID) {
         super(diffCallback);
         this.listener = listener;
         this.chainID = chainID;
@@ -158,13 +155,8 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
                 tvTime = rightBinding.tvTime;
                 headView = rightBinding.leftView;
 
-                boolean isShowTrust = tx.txType == TxType.SELL_TX.getType();
-                rightBinding.tvTrust.setVisibility(isShowTrust ? View.VISIBLE : View.GONE);
-                rightBinding.ivTrust.setVisibility(isShowTrust ? View.VISIBLE : View.GONE);
-                if (isShowTrust) {
-                    rightBinding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
-                    setTrustClickListener(rightBinding.ivTrust, tx);
-                }
+                rightBinding.tvTrust.setVisibility(View.GONE);
+                rightBinding.ivTrust.setVisibility(View.GONE);
             } else if (binding instanceof ItemLeftSellBinding) {
                 isMine = false;
                 ItemLeftSellBinding leftBinding = (ItemLeftSellBinding) holder.binding;
@@ -173,15 +165,9 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
                 tvTime = leftBinding.tvTime;
                 headView = leftBinding.leftView;
                 leftBinding.tvName.setText(UsersUtil.getShowName(tx.sender));
-                setEditNameClickListener(leftBinding.tvName, tx);
 
-                boolean isShowTrust = tx.txType == TxType.SELL_TX.getType();
-                leftBinding.tvTrust.setVisibility(isShowTrust ? View.VISIBLE : View.GONE);
-                leftBinding.ivTrust.setVisibility(isShowTrust ? View.VISIBLE : View.GONE);
-                if (isShowTrust) {
-                    leftBinding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
-                    setTrustClickListener(leftBinding.ivTrust, tx);
-                }
+                leftBinding.tvTrust.setVisibility(View.GONE);
+                leftBinding.ivTrust.setVisibility(View.GONE);
             }  else if (binding instanceof ItemTrustBinding) {
                 ItemTrustBinding trustBinding = (ItemTrustBinding) holder.binding;
                 String time = DateUtil.getWeekTime(tx.timestamp);
@@ -195,7 +181,7 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
             }
 
             tvBlacklist.setVisibility(isMine ? View.GONE : View.VISIBLE);
-            String time = DateUtil.getWeekTime(tx.timestamp);
+            String time = DateUtil.getWeekTime(tx.pinnedTime);
             tvTime.setText(time);
             headView.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
             tvMsg.setText(TxUtils.createTxSpan(tx));
@@ -210,33 +196,13 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
             setLeftViewClickListener(headView, tx);
         }
 
-        private void setTrustClickListener(ImageView ivTrust, UserAndTx tx) {
-            ivTrust.setOnClickListener(view -> {
-                if (listener != null) {
-                    listener.onTrustClicked(tx.sender);
-                }
-            });
-        }
-
         private void setLeftViewClickListener(TxLeftViewBinding binding, UserAndTx tx) {
             binding.ivHeadPic.setOnClickListener(view ->{
                 if (listener != null) {
                     listener.onUserClicked(tx.senderPk);
                 }
             });
-            binding.tvBlacklist.setOnClickListener(view -> {
-                if(listener != null){
-                    listener.onBanClicked(tx);
-                }
-            });
-        }
-
-        private void setEditNameClickListener(TextView textView, UserAndTx tx) {
-            textView.setOnClickListener(view ->{
-                if(listener != null){
-                    listener.onEditNameClicked(tx.senderPk);
-                }
-            });
+            binding.tvBlacklist.setVisibility(View.GONE);
         }
 
         private void setClickListener(AutoLinkTextView tvMsg, UserAndTx tx) {
@@ -273,10 +239,7 @@ public class TxListAdapter extends ListAdapter<UserAndTx, TxListAdapter.ViewHold
     }
 
     public interface ClickListener {
-        void onTrustClicked(User user);
         void onUserClicked(String publicKey);
-        void onEditNameClicked(String publicKey);
-        void onBanClicked(UserAndTx tx);
         void onItemLongClicked(TextView view, UserAndTx tx);
         void onItemClicked(UserAndTx tx);
         void onLinkClick(String link);

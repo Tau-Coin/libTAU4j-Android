@@ -13,7 +13,7 @@
         android:layout_marginStart="@dimen/widget_size_50"
         android:layout_marginTop="@dimen/widget_size_15">
 
-        <TextView
+        <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
             android:id="@+id/tv_trust"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,6 +29,7 @@
             android:background="@drawable/grey_rect_round_bg"
             tool:text="@string/tx_unknown"
             android:textColor="@color/gray_dark"
+            android:textColorLink="@color/color_blue_link"
             android:textAppearance="@style/TextAppearanceBody3"/>
 
     </FrameLayout>

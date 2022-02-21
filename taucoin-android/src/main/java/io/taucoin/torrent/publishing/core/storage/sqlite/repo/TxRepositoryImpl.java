@@ -71,6 +71,32 @@ public class TxRepositoryImpl implements TxRepository{
         }
     }
 
+    @Override
+    public Observable<List<Tx>> observeLatestPinnedMsg(int currentTab, String chainID) {
+        if (currentTab == CommunityTabs.CHAIN.getIndex()) {
+            return db.txDao().observeOnChainLatestPinnedTx(chainID);
+        } else if (currentTab == CommunityTabs.MARKET.getIndex()) {
+            return db.txDao().queryCommunityMarketLatestPinnedTx(chainID);
+        } else {
+            return db.txDao().queryCommunityNoteLatestPinnedTx(chainID);
+        }
+    }
+
+    /**
+     * 加载交易固定数据
+     * @param chainID 社区链ID
+     */
+    @Override
+    public List<UserAndTx> queryCommunityPinnedTxs(String chainID, int currentTab) {
+        if (currentTab == CommunityTabs.CHAIN.getIndex()) {
+            return db.txDao().queryCommunityOnChainPinnedTxs(chainID);
+        } else if (currentTab == CommunityTabs.MARKET.getIndex()) {
+            return db.txDao().queryCommunityMarketPinnedTxs(chainID);
+        } else {
+            return db.txDao().queryCommunityNotePinnedTxs(chainID);
+        }
+    }
+
     /**
      * 查询社区用户被Trust列表
      * @param chainID 社区链ID
@@ -159,5 +185,10 @@ public class TxRepositoryImpl implements TxRepository{
     @Override
     public Tx getNotOnChainTx(String chainID, int txType, long nonce) {
         return db.txDao().getNotOnChainTx(chainID, txType, nonce);
+    }
+
+    @Override
+    public void setMessagePinned(String txID, int pinned, long pinnedTime) {
+        db.txDao().setMessagePinned(txID, pinned, pinnedTime);
     }
 }
