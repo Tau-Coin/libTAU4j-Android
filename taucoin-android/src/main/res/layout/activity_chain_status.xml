@@ -30,8 +30,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_sync_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:onClick="onClick"
+                    app:lineLeftText="@string/community_sync_status"
+                    app:lineRightImage="@mipmap/icon_arrow"/>
+
                 <LinearLayout
-                    android:id="@+id/item_sync_block"
+                    android:id="@+id/item_syncing_head_block"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -46,11 +55,11 @@
                         android:layout_height="wrap_content"
                         android:lineSpacingExtra="0dp"
                         android:lineSpacingMultiplier="0.7"
-                        android:text="@string/community_sync_block"
+                        android:text="@string/community_syncing_head_block"
                         android:textAppearance="@style/TextAppearanceBody1"/>
 
                     <TextView
-                        android:id="@+id/tv_sync_block"
+                        android:id="@+id/tv_syncing_head_block"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/widget_size_10"
@@ -61,7 +70,8 @@
                         android:textAppearance="@style/TextAppearanceBody1" />
 
                     <ImageView
-                        android:id="@+id/iv_sync_detail"
+                        android:visibility="gone"
+                        android:id="@+id/iv_syncing_head_block"
                         android:layout_width="@dimen/widget_size_16"
                         android:layout_height="@dimen/widget_size_16"
                         android:rotation="90"
@@ -72,7 +82,7 @@
 
                 <include
                     android:visibility="gone"
-                    android:id="@+id/sync_block"
+                    android:id="@+id/syncing_head_block"
                     layout="@layout/item_block_layout"/>
 
                 <include layout="@layout/view_line"/>

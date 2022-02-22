@@ -92,6 +92,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.community.SyncStatusActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.community.ChainTopActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 

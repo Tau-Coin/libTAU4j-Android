@@ -19,8 +19,8 @@ public class Community implements Parcelable {
     @NonNull
     public String communityName;            // 社区名字
 
-    public long syncBlock;                  // 同步区块
-    public long headBlock;                  // 头部区块号
+    public long syncingHeadBlock;           // 正在同步（下载）的头部区块
+    public long headBlock;                  // 真实的头部区块号
     public long difficulty;                 // 社区最大难度值
     public long tailBlock;                  // 尾部区块号
     public long consensusBlock;             // 共识点区块
@@ -46,7 +46,7 @@ public class Community implements Parcelable {
     protected Community(Parcel in) {
         chainID = in.readString();
         communityName = in.readString();
-        syncBlock = in.readLong();
+        syncingHeadBlock = in.readLong();
         headBlock = in.readLong();
         tailBlock = in.readLong();
         consensusBlock = in.readLong();
@@ -59,7 +59,7 @@ public class Community implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(chainID);
         dest.writeString(communityName);
-        dest.writeLong(syncBlock);
+        dest.writeLong(syncingHeadBlock);
         dest.writeLong(headBlock);
         dest.writeLong(tailBlock);
         dest.writeLong(consensusBlock);

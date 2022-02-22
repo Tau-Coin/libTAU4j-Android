@@ -1,5 +1,7 @@
 package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -43,4 +45,6 @@ public interface BlockRepository {
      * @return Flowable<ChainStatus>
      */
     Flowable<ChainStatus> observerChainStatus(String chainID);
+
+    Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID);
 }

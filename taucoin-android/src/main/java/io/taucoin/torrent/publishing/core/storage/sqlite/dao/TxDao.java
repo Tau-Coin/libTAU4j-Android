@@ -164,15 +164,15 @@ public interface TxDao {
 
     @Transaction
     @Query(QUERY_GET_ON_CHAIN_PINNED_TXS + " limit 1")
-    Observable<List<Tx>> observeOnChainLatestPinnedTx(String chainID);
+    Observable<List<UserAndTx>> observeOnChainLatestPinnedTx(String chainID);
 
     @Transaction
     @Query(QUERY_GET_MARKET_PINNED_TXS + " limit 1")
-    Observable<List<Tx>> queryCommunityMarketLatestPinnedTx(String chainID);
+    Observable<List<UserAndTx>> queryCommunityMarketLatestPinnedTx(String chainID);
 
     @Transaction
     @Query(QUERY_GET_NOTE_PINNED_TXS + " limit 1")
-    Observable<List<Tx>> queryCommunityNoteLatestPinnedTx(String chainID);
+    Observable<List<UserAndTx>> queryCommunityNoteLatestPinnedTx(String chainID);
 
     @Query(QUERY_GET_TRUST_TXS)
     List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPosition, int loadSize);

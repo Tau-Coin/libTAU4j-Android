@@ -61,6 +61,7 @@ import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
@@ -760,5 +761,13 @@ public class CommunityViewModel extends AndroidViewModel {
                     airdropResult.postValue(userAndFriend);
                 });
         disposables.add(disposable);
+    }
+
+    /**
+     * 观察社区同步状态
+     * @return
+     */
+    public Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID) {
+        return blockRepo.observeCommunitySyncStatus(chainID);
     }
 }

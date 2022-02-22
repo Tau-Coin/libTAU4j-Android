@@ -22,7 +22,7 @@ public class BlockInfo implements Parcelable {
     public String miner;               // 出块者
     public long rewards;               // 出块奖励
     public long difficulty;            // 区块难度
-    public int status;                 // 区块的状态 0：未上链；1：上链成功
+    public int status;                 // 区块的状态 0：未上链；1：上链成功;
 
     public BlockInfo(@NonNull String chainID, @NonNull String blockHash, long blockNumber,
                      @NonNull String miner, long rewards, long difficulty, int status) {

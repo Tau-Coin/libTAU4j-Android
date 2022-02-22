@@ -62,6 +62,12 @@ class TauListenHandler {
     private Disposable autoRenewalDisposable;
     private Context appContext;
 
+    public enum BlockStatus {
+        OFF_CHAIN,
+        ON_CHAIN,
+        SYNCING,
+    }
+
     TauListenHandler(Context appContext, TauDaemon daemon) {
         this.appContext = appContext;
         this.daemon = daemon;
@@ -108,6 +114,7 @@ class TauListenHandler {
      * @param block head Block
      */
     void onNewHeadBlock(Block block) {
+        logger.info("onNewHeadBlock");
         String chainID = ChainIDUtil.decode(block.getChainID());
         Community community = communityRepo.getCommunityByChainID(chainID);
         if (community != null) {
@@ -117,7 +124,8 @@ class TauListenHandler {
                     chainID, community.difficulty, block.getBlockNumber(), block.Hash());
             communityRepo.updateCommunity(community);
         }
-        handleBlockData(block, false, false);
+
+        handleBlockData(block, BlockStatus.ON_CHAIN);
 
         updateTxQueue(block);
         // 每个账户自动更新周期，检测是否需要更新账户信息
@@ -134,71 +142,71 @@ class TauListenHandler {
      */
     void handleRollbackBlock(Block block) {
         logger.debug("handleRollBack");
-        handleBlockData(block, true, false);
+        handleBlockData(block, BlockStatus.OFF_CHAIN);
     }
 
     /**
      * 处理上报向前同步的区块
      * @param block Block
      */
-    void handleSyncBlock(Block block) {
-        logger.debug("handleSyncBlock");
-        handleBlockData(block, false, true);
+    void handleSyncingBlock(Block block) {
+        logger.debug("handleSyncingBlock");
+        String chainID = ChainIDUtil.decode(block.getChainID());
+        Community community = communityRepo.getCommunityByChainID(chainID);
+        // 排除同步共识区块重复数据
+        if (block.getBlockNumber() <= community.syncingHeadBlock ) {
+            handleBlockData(block, BlockStatus.SYNCING);
+        }
+    }
+
+    /**
+     * 处理上报向前同步的区块
+     * @param block Block
+     */
+    void handleSyncingHeadBlock(Block block) {
+        logger.debug("handleSyncingHeadBlock");
+        String chainID = ChainIDUtil.decode(block.getChainID());
+        Community community = communityRepo.getCommunityByChainID(chainID);
+        if (community != null) {
+            community.syncingHeadBlock = block.getBlockNumber();
+            logger.info("handleSyncingHeadBlock chainID::{}, blockNumber::{}, blockHash::{}",
+                    chainID, block.getBlockNumber(), block.Hash());
+            communityRepo.updateCommunity(community);
+        }
+        handleBlockData(block, BlockStatus.SYNCING);
     }
 
     /**
      * 处理Block数据：解析Block数据，处理社区、交易、用户、社区成员数据
-     * 1、更新社区信息
-     * 2、更新区块信息
-     * 3、处理矿工用户数据
-     * 4、处理交易数据、用户数据、社区成员数据
+     * 1、更新区块信息
+     * 2、处理矿工用户数据
+     * 3、处理交易数据、用户数据、社区成员数据
      * @param block 链上区块
-     * @param isRollback 区块回滚
-     * @param isSync 区块同步
+     * @param status 状态
      */
-    private void handleBlockData(Block block, boolean isRollback, boolean isSync) {
+    private void handleBlockData(Block block, BlockStatus status) {
         String chainID = ChainIDUtil.decode(block.getChainID());
         logger.debug("handleBlockData:: chainID::{}，blockNum::{}, blockHash::{}", chainID,
                 block.getBlockNumber(), block.Hash());
-        // 更新社区信息
-        saveCommunityInfo(block, isRollback, isSync);
         // 更新区块信息
-        saveBlockInfo(block, isRollback);
+        saveBlockInfo(block, status);
         // 更新矿工的信息
         saveUserInfo(block.getMiner());
         // 添加矿工为社区成员
         addMemberInfo(block.getChainID(), block.getMiner());
         // 处理交易信息
-        handleTransactionData(block, !isRollback);
-    }
-
-    /**
-     * 保存社区：查询本地是否有此社区，没有则添加到本地
-     * @param block 链上区块
-     */
-    private void saveCommunityInfo(Block block, boolean isRollback, boolean isSync) {
-        String chainID = ChainIDUtil.decode(block.getChainID());
-        Community community = communityRepo.getCommunityByChainID(chainID);
-        if (community != null && block.getBlockNumber() >= 0) {
-            if (isRollback || isSync) {
-                community.syncBlock = block.getBlockNumber();
-                communityRepo.updateCommunity(community);
-                logger.info("saveCommunityInfo, chainID::{}, syncBlock::{}, blockHash::{}",
-                        community.chainID, community.syncBlock, block.Hash());
-            }
-        }
+        handleTransactionData(block, status);
     }
 
     /**
      * 保存区块信息，供UI上统计使用
      * @param block 链上区块
-     * @param isRollback 是否是回滚
+     * @param blockStatus 状态
      */
-    private void saveBlockInfo(Block block, boolean isRollback) {
+    private void saveBlockInfo(Block block, BlockStatus blockStatus) {
         String chainID = ChainIDUtil.decode(block.getChainID());
         String blockHash = block.Hash();
         BlockInfo blockInfo = blockRepository.getBlock(chainID, blockHash);
-        int status = isRollback ? 0 : 1;
         if (null == blockInfo) {
             long blockNumber = block.getBlockNumber();
             String miner = ByteUtil.toHexString(block.getMiner());
@@ -210,15 +218,25 @@ class TauListenHandler {
             } else {
                 rewards = null == transaction ? 0L : transaction.getFee();
             }
+            // 第一次创建
+            int status = blockStatus == BlockStatus.ON_CHAIN ? 1 : 0;
             blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty, status);
             blockRepository.addBlock(blockInfo);
-            logger.info("Save Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}",
-                    chainID, blockHash, blockNumber, rewards);
+            logger.info("Save Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}, status::{}",
+                    chainID, blockHash, blockNumber, rewards, status);
         } else {
+            // 由于第一次同步共识区块
+            // 如果是同步，并且已经是上链状态了, 则保持上链状态
+            int status;
+            if (blockInfo.status == 1 && blockStatus == BlockStatus.SYNCING) {
+                status = 1;
+            } else {
+                status = blockStatus == BlockStatus.ON_CHAIN ? 1 : 0;
+            }
             blockInfo.status = status;
             blockRepository.updateBlock(blockInfo);
-            logger.info("Update Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}",
-                    chainID, blockInfo.blockHash, blockInfo.blockNumber, blockInfo.rewards);
+            logger.info("Update Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}, status::{}",
+                    chainID, blockInfo.blockHash, blockInfo.blockNumber, blockInfo.rewards, status);
         }
     }
 
@@ -232,9 +250,9 @@ class TauListenHandler {
     /**
      * 处理Block数据：解析Block数据，更新用户、社区成员、交易数据
      * @param block 区块
-     * @param onChain 是否是上链
+     * @param blockStatus 状态
      */
-    private void handleTransactionData(Block block, boolean onChain) {
+    private void handleTransactionData(Block block, BlockStatus blockStatus) {
         if (null == block || null == block.getTx()) {
             return;
         }
@@ -247,11 +265,20 @@ class TauListenHandler {
         if (!isEmpty) {
             // 本地存在此交易, 更新交易状态值
             if (tx != null) {
-                tx.txStatus = onChain ? 1 : 0;
+                // 由于第一次同步共识区块
+                // 如果是同步，并且已经是上链状态了, 则保持上链状态
+                int status;
+                if (tx.txStatus == 1 && blockStatus == BlockStatus.SYNCING) {
+                    status = 1;
+                } else {
+                    status = blockStatus == BlockStatus.ON_CHAIN ? 1 : 0;
+                }
+                tx.txStatus = status;
                 tx.blockNumber = block.getBlockNumber();
                 txRepo.updateTransaction(tx);
             } else {
-                handleTransactionData(block.getBlockNumber(), txMsg, onChain);
+                handleTransactionData(block.getBlockNumber(), txMsg,
+                        blockStatus == BlockStatus.ON_CHAIN);
             }
             // 处理用户信息
             handleUserInfo(txMsg);
@@ -402,6 +429,7 @@ class TauListenHandler {
      * @param block tail block
      */
     void handleNewTailBlock(Block block) {
+        logger.info("handleNewTailBlock");
         String chainID = ChainIDUtil.decode(block.getChainID());
         Community community = communityRepo.getCommunityByChainID(chainID);
         if (community != null) {
@@ -411,7 +439,7 @@ class TauListenHandler {
             communityRepo.updateCommunity(community);
         }
 
-        handleBlockData(block, false, false);
+        handleBlockData(block, BlockStatus.ON_CHAIN);
     }
 
     /**
@@ -419,6 +447,7 @@ class TauListenHandler {
      * @param block 共识点区块
      */
     void handleNewConsensusBlock(Block block) {
+        logger.info("handleNewConsensusBlock");
         String chainID = ChainIDUtil.decode(block.getChainID());
         Community community = communityRepo.getCommunityByChainID(chainID);
         if (community != null) {
@@ -427,7 +456,7 @@ class TauListenHandler {
                     chainID, block.getBlockNumber(), block.Hash());
             communityRepo.updateCommunity(community);
         }
-        handleBlockData(block, false, false);
+        handleBlockData(block, BlockStatus.ON_CHAIN);
     }
 
     /**

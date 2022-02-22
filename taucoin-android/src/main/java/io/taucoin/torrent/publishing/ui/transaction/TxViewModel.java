@@ -512,7 +512,7 @@ public class TxViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    public Observable<List<Tx>> observeLatestPinnedMsg(int currentTab, String chainID) {
+    public Observable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID) {
         return txRepo.observeLatestPinnedMsg(currentTab, chainID);
     }
 

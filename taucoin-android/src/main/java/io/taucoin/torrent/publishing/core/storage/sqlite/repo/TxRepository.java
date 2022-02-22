@@ -95,5 +95,5 @@ public interface TxRepository {
 
     void setMessagePinned(String txID, int pinned, long pinnedTime);
 
-    Observable<List<Tx>> observeLatestPinnedMsg(int currentTab, String chainID);
+    Observable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID);
 }

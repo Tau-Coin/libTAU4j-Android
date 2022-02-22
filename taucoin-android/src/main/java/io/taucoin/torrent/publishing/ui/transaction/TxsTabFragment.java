@@ -129,8 +129,6 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         binding.txList.setLayoutManager(layoutManager);
         binding.txList.setItemAnimator(null);
         binding.txList.setAdapter(adapter);
-
-        loadData(0);
     }
 
     private final Runnable handleUpdateAdapter = () -> {
@@ -199,6 +197,8 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
 
             logger.debug("txs.size::{}", txs.size());
         });
+
+        loadData(0);
 
         disposables.add(txViewModel.observeDataSetChanged()
                 .subscribeOn(Schedulers.io())

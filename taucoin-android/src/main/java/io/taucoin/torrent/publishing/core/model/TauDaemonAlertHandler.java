@@ -19,6 +19,7 @@ import org.libTAU4j.alerts.BlockChainNewTransactionAlert;
 import org.libTAU4j.alerts.BlockChainRollbackBlockAlert;
 import org.libTAU4j.alerts.BlockChainStateAlert;
 import org.libTAU4j.alerts.BlockChainSyncingBlockAlert;
+import org.libTAU4j.alerts.BlockChainSyncingHeadBlockAlert;
 import org.libTAU4j.alerts.BlockChainTopThreeVotesAlert;
 import org.libTAU4j.alerts.CommConfirmRootAlert;
 import org.libTAU4j.alerts.CommFriendInfoAlert;
@@ -106,7 +107,10 @@ class TauDaemonAlertHandler {
                 onNewConsensusBlock(alert);
                 break;
             case BLOCK_CHAIN_SYNCING_BLOCK:
-                onSyncBlock(alert);
+                onSyncingBlock(alert);
+                break;
+            case BLOCK_CHAIN_SYNCING_HEAD_BLOCK:
+                onSyncingHeadBlock(alert);
                 break;
             case BLOCK_CHAIN_ROLLBACK_BLOCK:
                 onRollbackBlock(alert);
@@ -251,11 +255,22 @@ class TauDaemonAlertHandler {
      * libTAU上报向前同步的区块
      * @param alert libTAU上报
      */
-    private void onSyncBlock(Alert alert) {
+    private void onSyncingBlock(Alert alert) {
         BlockChainSyncingBlockAlert a = (BlockChainSyncingBlockAlert) alert;
         logger.info(a.get_message());
         Block block = a.get_new_block();
-        tauListenHandler.handleSyncBlock(block);
+        tauListenHandler.handleSyncingBlock(block);
+    }
+
+    /**
+     * libTAU上报同步中的head block
+     * @param alert
+     */
+    private void onSyncingHeadBlock(Alert alert) {
+        BlockChainSyncingHeadBlockAlert a = (BlockChainSyncingHeadBlockAlert) alert;
+        logger.info(a.get_message());
+        Block block = a.get_new_block();
+        tauListenHandler.handleSyncingHeadBlock(block);
     }
 
     /**

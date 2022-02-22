@@ -72,7 +72,7 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public Observable<List<Tx>> observeLatestPinnedMsg(int currentTab, String chainID) {
+    public Observable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID) {
         if (currentTab == CommunityTabs.CHAIN.getIndex()) {
             return db.txDao().observeOnChainLatestPinnedTx(chainID);
         } else if (currentTab == CommunityTabs.MARKET.getIndex()) {

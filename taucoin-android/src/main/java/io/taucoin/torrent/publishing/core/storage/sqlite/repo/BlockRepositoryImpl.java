@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 
 import android.content.Context;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -84,5 +85,10 @@ public class BlockRepositoryImpl implements BlockRepository{
     @Override
     public Flowable<ChainStatus> observerChainStatus(String chainID) {
         return db.blockDao().observerChainStatus(chainID);
+    }
+
+    @Override
+    public Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID) {
+        return db.blockDao().observeCommunitySyncStatus(chainID);
     }
 }

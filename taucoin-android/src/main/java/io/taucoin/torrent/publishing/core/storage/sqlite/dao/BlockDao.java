@@ -1,5 +1,7 @@
 package io.taucoin.torrent.publishing.core.storage.sqlite.dao;
 
+import java.util.List;
+
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -19,7 +21,7 @@ public interface BlockDao {
     String QUERY_BLOCK = "SELECT * FROM Blocks " +
             " WHERE chainID = :chainID and blockHash= :blockHash";
 
-    String QUERY_CHAIN_STATUS = "SELECT a.syncBlock, a.headBlock, a.tailBlock, a.consensusBlock, a.difficulty," +
+    String QUERY_CHAIN_STATUS = "SELECT a.syncingHeadBlock, a.headBlock, a.tailBlock, a.consensusBlock, a.difficulty," +
             " c.peerBlocks, c.totalRewards, d.totalPeers, d.totalCoin" +
             " FROM Communities a" +
             " LEFT JOIN (SELECT bb.chainID, count(*) AS peerBlocks, SUM(rewards) AS totalRewards" +
@@ -35,6 +37,12 @@ public interface BlockDao {
             " WHERE mm.chainID = :chainID AND "+ MemberDao.WHERE_ON_CHAIN +") AS d" +
             " ON a.chainID = d.chainID" +
             " WHERE a.chainID = :chainID";
+
+    String QUERY_CHAIN_SYNC_STATUS = "SELECT * FROM Blocks" +
+            " WHERE chainID = :chainID AND status = 0" +
+//            " AND blockNumber >" +
+//            " (SELECT headBlock FROM Communities WHERE chainID = :chainID)" +
+            " ORDER BY blockNumber DESC";
 
     /**
      * 添加用户设备信息
@@ -56,4 +64,10 @@ public interface BlockDao {
      */
     @Query(QUERY_CHAIN_STATUS)
     Flowable<ChainStatus> observerChainStatus(String chainID);
+
+    /**
+     * 观察链上同步状态信息
+     */
+    @Query(QUERY_CHAIN_SYNC_STATUS)
+    Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID);
 }

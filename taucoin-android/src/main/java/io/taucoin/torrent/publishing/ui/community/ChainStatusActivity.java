@@ -79,9 +79,10 @@ public class ChainStatusActivity extends BaseActivity {
         if (null == status) {
             return;
         }
-        binding.tvSyncBlock.setText(FmtMicrometer.fmtLong(status.syncBlock));
-        Block syncBlock = communityViewModel.getBlockByNumber(chainID, status.syncBlock);
-        loadBlockDetailData(binding.syncBlock, syncBlock);
+
+        binding.tvSyncingHeadBlock.setText(FmtMicrometer.fmtLong(status.syncingHeadBlock));
+        Block syncingHeadBlock = communityViewModel.getBlockByNumber(chainID, status.syncingHeadBlock);
+        loadBlockDetailData(binding.syncingHeadBlock, syncingHeadBlock);
 
         binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(status.headBlock));
         Block headBlock = communityViewModel.getBlockByNumber(chainID, status.headBlock);
@@ -133,9 +134,6 @@ public class ChainStatusActivity extends BaseActivity {
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, ChainTopActivity.class);
                 break;
-            case R.id.item_sync_block:
-                showBlockDetail(binding.syncBlock, binding.ivSyncDetail);
-                break;
             case R.id.item_head_block:
                 showBlockDetail(binding.headBlock, binding.ivHeadDetail);
                 break;
@@ -144,6 +142,14 @@ public class ChainStatusActivity extends BaseActivity {
                 break;
             case R.id.item_consensus_block:
                 showBlockDetail(binding.consensusBlock, binding.ivConsensusDetail);
+                break;
+//            case R.id.item_syncing_head_block:
+//                showBlockDetail(binding.syncingHeadBlock, binding.ivSyncingHeadBlock);
+//                break;
+            case R.id.item_sync_status:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, SyncStatusActivity.class);
                 break;
         }
     }
