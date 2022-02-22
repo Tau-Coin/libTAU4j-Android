@@ -221,8 +221,9 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
             }
         });
 
-        if (currentTab != CommunityTabs.MARKET.getIndex()) {
-            binding.llPinnedMessage.setVisibility(View.GONE);
+        boolean isMarket = currentTab == CommunityTabs.MARKET.getIndex();
+        binding.llPinnedMessage.setVisibility(isMarket ? View.VISIBLE : View.GONE);
+        if (!isMarket) {
             disposables.add(txViewModel.observeLatestPinnedMsg(currentTab, chainID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

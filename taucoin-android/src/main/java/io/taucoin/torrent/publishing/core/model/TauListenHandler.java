@@ -74,22 +74,6 @@ class TauListenHandler {
     }
 
     /**
-     * 处理上报新的区块
-     * @param block Block
-     */
-    void handleNewBlock(Block block) {
-        logger.debug("handleNewBlock");
-        handleBlockData(block, false, false);
-        updateTxQueue(block);
-        // 每个账户自动更新周期，检测是否需要更新账户信息
-        if (block.getBlockNumber() % Constants.AUTO_RENEWAL_PERIOD_BLOCKS == 0) {
-            logger.debug("accountAutoRenewal chainID::{}, block number::{}",
-                    ChainIDUtil.decode(block.getChainID()), block.getBlockNumber());
-            accountAutoRenewal();
-        }
-    }
-
-    /**
      * 更新发交易队列
      * @param block Block
      */
@@ -120,6 +104,31 @@ class TauListenHandler {
     }
 
     /**
+     * libTAU上报新head block
+     * @param block head Block
+     */
+    void onNewHeadBlock(Block block) {
+        String chainID = ChainIDUtil.decode(block.getChainID());
+        Community community = communityRepo.getCommunityByChainID(chainID);
+        if (community != null) {
+            community.headBlock = block.getBlockNumber();
+            community.difficulty = block.getCumulativeDifficulty().longValue();
+            logger.info("onNewHeadBlock, chainID::{}, difficulty::{}, blockNumber::{}, blockHash::{}",
+                    chainID, community.difficulty, block.getBlockNumber(), block.Hash());
+            communityRepo.updateCommunity(community);
+        }
+        handleBlockData(block, false, false);
+
+        updateTxQueue(block);
+        // 每个账户自动更新周期，检测是否需要更新账户信息
+        if (block.getBlockNumber() % Constants.AUTO_RENEWAL_PERIOD_BLOCKS == 0) {
+            logger.debug("accountAutoRenewal chainID::{}, block number::{}",
+                    ChainIDUtil.decode(block.getChainID()), block.getBlockNumber());
+            accountAutoRenewal();
+        }
+    }
+
+    /**
      * 处理上报被回滚的区块
      * @param block Block
      */
@@ -145,14 +154,14 @@ class TauListenHandler {
      * 4、处理交易数据、用户数据、社区成员数据
      * @param block 链上区块
      * @param isRollback 区块回滚
-     * @param isSync 区块向前同步
+     * @param isSync 区块同步
      */
     private void handleBlockData(Block block, boolean isRollback, boolean isSync) {
         String chainID = ChainIDUtil.decode(block.getChainID());
         logger.debug("handleBlockData:: chainID::{}，blockNum::{}, blockHash::{}", chainID,
                 block.getBlockNumber(), block.Hash());
         // 更新社区信息
-        saveCommunityInfo(block, isSync);
+        saveCommunityInfo(block, isRollback, isSync);
         // 更新区块信息
         saveBlockInfo(block, isRollback);
         // 更新矿工的信息
@@ -167,36 +176,16 @@ class TauListenHandler {
      * 保存社区：查询本地是否有此社区，没有则添加到本地
      * @param block 链上区块
      */
-    private void saveCommunityInfo(Block block, boolean isSync) {
+    private void saveCommunityInfo(Block block, boolean isRollback, boolean isSync) {
         String chainID = ChainIDUtil.decode(block.getChainID());
         Community community = communityRepo.getCommunityByChainID(chainID);
-
-        if (null == community) {
-            community = new Community();
-            community.chainID = chainID;
-            community.communityName = ChainIDUtil.getName(community.chainID);
-            community.headBlock = block.getBlockNumber();
-            community.tailBlock = block.getBlockNumber();
-            communityRepo.addCommunity(community);
-            logger.info("SaveCommunity to local, communityName::{}, chainID::{}, " +
-                            "headBlock::{}, tailBlock::{}", community.communityName,
-                    community.chainID, community.headBlock, community.tailBlock);
-        } else {
-            if (isSync) {
-                community.tailBlock = block.getBlockNumber();
-                if(community.headBlock < community.tailBlock){
-                    community.headBlock = community.tailBlock;
-                }
-            } else {
-                community.headBlock = block.getBlockNumber();
-                if(community.headBlock < community.tailBlock){
-                    community.tailBlock = community.headBlock;
-                }
+        if (community != null && block.getBlockNumber() >= 0) {
+            if (isRollback || isSync) {
+                community.syncBlock = block.getBlockNumber();
+                communityRepo.updateCommunity(community);
+                logger.info("saveCommunityInfo, chainID::{}, syncBlock::{}, blockHash::{}",
+                        community.chainID, community.syncBlock, block.Hash());
             }
-            communityRepo.updateCommunity(community);
-            logger.info("Update Community Info, communityName::{}, chainID::{}, " +
-                            "headBlock::{}, tailBlock::{}", community.communityName,
-                    community.chainID, community.headBlock, community.tailBlock);
         }
     }
 
@@ -409,6 +398,23 @@ class TauListenHandler {
     }
 
     /**
+     * libTAU上报新的Tail区块
+     * @param block tail block
+     */
+    void handleNewTailBlock(Block block) {
+        String chainID = ChainIDUtil.decode(block.getChainID());
+        Community community = communityRepo.getCommunityByChainID(chainID);
+        if (community != null) {
+            community.tailBlock = block.getBlockNumber();
+            logger.info("handleNewTailBlock, chainID::{}, blockNumber::{}, blockHash::{}",
+                    chainID, block.getBlockNumber(), block.Hash());
+            communityRepo.updateCommunity(community);
+        }
+
+        handleBlockData(block, false, false);
+    }
+
+    /**
      * libTAU上报当前共识点区块
      * @param block 共识点区块
      */
@@ -421,6 +427,7 @@ class TauListenHandler {
                     chainID, block.getBlockNumber(), block.Hash());
             communityRepo.updateCommunity(community);
         }
+        handleBlockData(block, false, false);
     }
 
     /**

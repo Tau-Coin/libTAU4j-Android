@@ -5,6 +5,7 @@ package io.taucoin.torrent.publishing.core.model.data;
  */
 public class ChainStatus {
 
+    public long syncBlock;                       // 同步块号
     public long headBlock;                       // 头区块号
     public long tailBlock;                       // 尾块号
     public long consensusBlock;                  // 共识区块号

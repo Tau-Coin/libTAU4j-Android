@@ -31,6 +31,53 @@
                 android:layout_height="wrap_content">
 
                 <LinearLayout
+                    android:id="@+id/item_sync_block"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:onClick="onClick"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingEnd="@dimen/widget_size_15">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="0dp"
+                        android:lineSpacingMultiplier="0.7"
+                        android:text="@string/community_sync_block"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
+
+                    <TextView
+                        android:id="@+id/tv_sync_block"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/widget_size_10"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody1" />
+
+                    <ImageView
+                        android:id="@+id/iv_sync_detail"
+                        android:layout_width="@dimen/widget_size_16"
+                        android:layout_height="@dimen/widget_size_16"
+                        android:rotation="90"
+                        android:src="@mipmap/icon_arrow"
+                        android:contentDescription="@null" />
+
+                </LinearLayout>
+
+                <include
+                    android:visibility="gone"
+                    android:id="@+id/sync_block"
+                    layout="@layout/item_block_layout"/>
+
+                <include layout="@layout/view_line"/>
+
+                <LinearLayout
                     android:id="@+id/item_head_block"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
