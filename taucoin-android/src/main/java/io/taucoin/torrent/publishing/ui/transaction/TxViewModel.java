@@ -611,12 +611,12 @@ public class TxViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    public void setMessagePinned(UserAndTx tx) {
+    public void setMessagePinned(UserAndTx tx, boolean isRefresh) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             int pinned = tx.pinned == 0 ? 1 : 0;
             tx.pinned = pinned;
             tx.pinnedTime = DateUtil.getMillisTime();
-            txRepo.setMessagePinned(tx.txID, pinned, tx.pinnedTime);
+            txRepo.setMessagePinned(tx.txID, pinned, tx.pinnedTime, isRefresh);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

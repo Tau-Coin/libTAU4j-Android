@@ -23,7 +23,6 @@ import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityListBinding;
@@ -116,13 +115,14 @@ public class PinnedActivity extends BaseActivity implements PinnedListAdapter.Cl
                 }
             });
         }
-
-        loadData();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
+        loadData();
+
         txViewModel.observerChainTxs().observe(this, txs -> {
             List<UserAndTx> currentList = new ArrayList<>(txs);
             adapter.submitList(currentList);
@@ -177,14 +177,9 @@ public class PinnedActivity extends BaseActivity implements PinnedListAdapter.Cl
                         ToastUtils.showShortToast(R.string.copy_link_successfully);
                     }
                     break;
-                case R.string.tx_operation_blacklist:
-                    String publicKey = tx.senderPk;
-                    userViewModel.setUserBlacklist(publicKey, true);
-                    ToastUtils.showShortToast(R.string.blacklist_successfully);
-                    break;
                 case R.string.tx_operation_pin:
                 case R.string.tx_operation_unpin:
-                    txViewModel.setMessagePinned(tx);
+                    txViewModel.setMessagePinned(tx, true);
                     setResult(RESULT_OK);
                     break;
                 case R.string.tx_operation_msg_hash:

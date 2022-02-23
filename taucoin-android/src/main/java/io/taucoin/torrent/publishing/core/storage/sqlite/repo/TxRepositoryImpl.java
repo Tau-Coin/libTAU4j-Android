@@ -189,7 +189,10 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public void setMessagePinned(String txID, int pinned, long pinnedTime) {
+    public void setMessagePinned(String txID, int pinned, long pinnedTime, boolean isRefresh) {
         db.txDao().setMessagePinned(txID, pinned, pinnedTime);
+        if (isRefresh) {
+            submitDataSetChanged();
+        }
     }
 }

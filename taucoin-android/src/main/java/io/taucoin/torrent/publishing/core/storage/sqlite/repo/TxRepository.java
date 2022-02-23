@@ -94,7 +94,7 @@ public interface TxRepository {
      */
     Tx getNotOnChainTx(String chainID, int txType, long nonce);
 
-    void setMessagePinned(String txID, int pinned, long pinnedTime);
+    void setMessagePinned(String txID, int pinned, long pinnedTime, boolean isRefresh);
 
     Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID);
 }

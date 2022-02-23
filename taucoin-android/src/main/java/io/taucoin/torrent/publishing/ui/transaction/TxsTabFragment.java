@@ -286,7 +286,7 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
                     break;
                 case R.string.tx_operation_pin:
                 case R.string.tx_operation_unpin:
-                    txViewModel.setMessagePinned(tx);
+                    txViewModel.setMessagePinned(tx, false);
                     break;
                 case R.string.tx_operation_msg_hash:
                     String msgHash = tx.txID;
