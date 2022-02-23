@@ -31,6 +31,7 @@ import io.taucoin.torrent.publishing.databinding.ItemLeftNoteBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityTabs;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
@@ -46,7 +47,6 @@ public class PinnedActivity extends BaseActivity implements PinnedListAdapter.Cl
     private String chainID;
     private int currentTab;
     private FloatMenu operationsMenu;
-    private ItemLeftNoteBinding headViewBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +87,7 @@ public class PinnedActivity extends BaseActivity implements PinnedListAdapter.Cl
         binding.recyclerView.setAdapter(adapter);
 
         if (currentTab == CommunityTabs.MARKET.getIndex()) {
-            headViewBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
+            ItemLeftNoteBinding headViewBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
                     R.layout.item_left_note, null, false);
             int padding = getResources().getDimensionPixelSize(R.dimen.widget_size_10);
             headViewBinding.getRoot().setPadding(padding, padding, padding, 0);
@@ -97,10 +97,23 @@ public class PinnedActivity extends BaseActivity implements PinnedListAdapter.Cl
             headViewBinding.tvMsg.setText(R.string.community_escrow_service_enter);
             headViewBinding.tvTime.setVisibility(View.GONE);
             binding.recyclerView.addHeaderView(headViewBinding.getRoot());
-            headViewBinding.middleView.setOnClickListener(v -> {
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                ActivityUtil.startActivity(intent, this, EscrowServiceActivity.class);
+            headViewBinding.tvMsg.setAutoLinkListener(new AutoLinkTextView.AutoLinkListener() {
+                @Override
+                public void onClick(AutoLinkTextView view) {
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    ActivityUtil.startActivity(intent, PinnedActivity.this, EscrowServiceActivity.class);
+                }
+
+                @Override
+                public void onLongClick(AutoLinkTextView view) {
+
+                }
+
+                @Override
+                public void onLinkClick(String link) {
+
+                }
             });
         }
 
