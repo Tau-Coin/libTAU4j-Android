@@ -155,6 +155,7 @@
     <string name="chain_votes">Votes</string>
     <string name="chain_current_fork">Current Fork</string>
     <string name="chain_block_number">Block Number</string>
+    <string name="chain_block">Block</string>
     <string name="chain_block_hash">Hash</string>
     <string name="chain_top_tab_coin">Coin</string>
     <string name="chain_top_tab_power">Power</string>

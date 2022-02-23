@@ -208,6 +208,7 @@
                         android:layout_marginEnd="@dimen/widget_size_10"
                         android:layout_weight="1"
                         android:gravity="end"
+                        android:textColor="@color/gray_dark"
                         android:textAppearance="@style/TextAppearanceBody1" />
 
                     <ImageView

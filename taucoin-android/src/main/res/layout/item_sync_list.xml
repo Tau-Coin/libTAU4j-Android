@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_white">
+
+        <LinearLayout
+            android:id="@+id/item_block"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/widget_size_40"
+            android:paddingStart="@dimen/widget_size_20"
+            android:paddingEnd="@dimen/widget_size_15">
+
+            <TextView
+                android:id="@+id/tv_number"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/widget_size_40"
+                android:gravity="center_vertical"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textAppearance="@style/TextAppearanceBody1" />
+
+            <ImageView
+                android:id="@+id/iv_detail"
+                android:layout_width="@dimen/widget_size_16"
+                android:layout_height="@dimen/widget_size_16"
+                android:rotation="90"
+                android:src="@mipmap/icon_arrow"
+                android:contentDescription="@null" />
+
+        </LinearLayout>
+
+        <include
+            android:visibility="gone"
+            android:id="@+id/item_block_detail"
+            layout="@layout/item_block_detail"/>
+
+        <include layout="@layout/view_line" />
+    </LinearLayout>
+</layout>

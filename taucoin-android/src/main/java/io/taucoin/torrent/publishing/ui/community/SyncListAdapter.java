@@ -1,6 +1,8 @@
 package io.taucoin.torrent.publishing.ui.community;
 
+import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -11,8 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.databinding.ItemCommunityChooseBinding;
+import io.taucoin.torrent.publishing.databinding.ItemSyncListBinding;
 
 /**
  * 社区同步列表的Adapter
@@ -26,8 +27,8 @@ public class SyncListAdapter extends ListAdapter<BlockInfo, SyncListAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ItemCommunityChooseBinding binding = DataBindingUtil.inflate(inflater,
-                R.layout.item_community_choose,
+        ItemSyncListBinding binding = DataBindingUtil.inflate(inflater,
+                R.layout.item_sync_list,
                 parent,
                 false);
 
@@ -41,15 +42,33 @@ public class SyncListAdapter extends ListAdapter<BlockInfo, SyncListAdapter.View
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private ItemCommunityChooseBinding binding;
+        private ItemSyncListBinding binding;
+        private String blockStr;
 
-        ViewHolder(ItemCommunityChooseBinding binding) {
+        ViewHolder(ItemSyncListBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+            Context context = binding.getRoot().getContext();
+            this.blockStr = context.getResources().getString(R.string.chain_block);
         }
 
         void bindBlock(BlockInfo block) {
-            binding.tvName.setText(FmtMicrometer.fmtLong(block.blockNumber));
+            if (null == block) {
+                return;
+            }
+            String blockNumber = blockStr + " " + FmtMicrometer.fmtLong(block.blockNumber);
+            binding.tvNumber.setText(blockNumber);
+            binding.itemBlock.setOnClickListener(l -> {
+                View blockDetail = binding.itemBlockDetail.getRoot();
+                boolean isVisible = blockDetail.getVisibility() == View.VISIBLE;
+                blockDetail.setVisibility(isVisible ? View.GONE : View.VISIBLE);
+                binding.ivDetail.setRotation(isVisible ? 90 : -90);
+            });
+
+            binding.itemBlockDetail.tvMiner.setText(block.miner);
+            binding.itemBlockDetail.tvHash.setText(block.blockHash);
+            binding.itemBlockDetail.tvReward.setText(FmtMicrometer.fmtBalance(block.rewards));
+            binding.itemBlockDetail.tvDifficulty.setText(FmtMicrometer.fmtDecimal(block.difficulty));
         }
     }
 

@@ -174,7 +174,9 @@ public class ChainStatusActivity extends BaseActivity {
         return Observable.create(emitter -> {
             try {
                 Block block = tauDaemon.getBlockByNumber(chainID, blockNumber);
-                emitter.onNext(block);
+                if (block != null) {
+                    emitter.onNext(block);
+                }
             } catch (Exception e) {
             }
             emitter.onComplete();
