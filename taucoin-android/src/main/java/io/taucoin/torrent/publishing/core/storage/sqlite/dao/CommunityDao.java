@@ -122,13 +122,15 @@ public interface CommunityDao {
             " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = :publicKey" +
             " WHERE c.chainID = :chainID";
 
-    String QUERY_CHAIN_TOP_COIN_MEMBERS = "SELECT * FROM Members" +
-            " WHERE chainID = :chainID" +
-            " ORDER BY balance DESC LIMIT :topNum";
+    String QUERY_CHAIN_TOP_COIN_MEMBERS = "SELECT m.* FROM Members m" +
+            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+            " WHERE m.chainID = :chainID AND " + MemberDao.WHERE_ON_CHAIN  +
+            " ORDER BY m.balance DESC LIMIT :topNum";
 
-    String QUERY_CHAIN_TOP_POWER_MEMBERS = "SELECT * FROM Members" +
-            " WHERE chainID = :chainID"  +
-            " ORDER BY power DESC LIMIT :topNum";
+    String QUERY_CHAIN_TOP_POWER_MEMBERS = "SELECT m.* FROM Members m" +
+            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+            " WHERE m.chainID = :chainID AND " + MemberDao.WHERE_ON_CHAIN  +
+            " ORDER BY m.power DESC LIMIT :topNum";
 
     String QUERY_COMMUNITIES = "SELECT c.*, m.balance, m.balance, m.power, m.nonce, m.blockNumber," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
