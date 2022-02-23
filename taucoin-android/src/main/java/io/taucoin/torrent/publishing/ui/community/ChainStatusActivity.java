@@ -12,10 +12,12 @@ import org.libTAU4j.Transaction;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
@@ -39,13 +41,16 @@ public class ChainStatusActivity extends BaseActivity {
     private ActivityChainStatusBinding binding;
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private CompositeDisposable blockDisposables = new CompositeDisposable();
     private String chainID;
+    private TauDaemon tauDaemon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
         communityViewModel = provider.get(CommunityViewModel.class);
+        tauDaemon = TauDaemon.getInstance(this);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chain_status);
         initParameter();
         initLayout();
@@ -79,22 +84,27 @@ public class ChainStatusActivity extends BaseActivity {
         if (null == status) {
             return;
         }
+        blockDisposables.clear();
 
         binding.tvSyncingHeadBlock.setText(FmtMicrometer.fmtLong(status.syncingHeadBlock));
-        Block syncingHeadBlock = communityViewModel.getBlockByNumber(chainID, status.syncingHeadBlock);
-        loadBlockDetailData(binding.syncingHeadBlock, syncingHeadBlock);
 
         binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(status.headBlock));
-        Block headBlock = communityViewModel.getBlockByNumber(chainID, status.headBlock);
-        loadBlockDetailData(binding.headBlock, headBlock);
+        blockDisposables.add(getBlockByNumber(chainID, status.headBlock)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(block -> loadBlockDetailData(binding.headBlock, block)));
 
         binding.tvTailBlock.setText(FmtMicrometer.fmtLong(status.tailBlock));
-        Block tailBlock = communityViewModel.getBlockByNumber(chainID, status.tailBlock);
-        loadBlockDetailData(binding.tailBlock, tailBlock);
+        blockDisposables.add(getBlockByNumber(chainID, status.tailBlock)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(block -> loadBlockDetailData(binding.tailBlock, block)));
 
         binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(status.consensusBlock));
-        Block consensusBlock = communityViewModel.getBlockByNumber(chainID, status.consensusBlock);
-        loadBlockDetailData(binding.consensusBlock, consensusBlock);
+        blockDisposables.add(getBlockByNumber(chainID, status.consensusBlock)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(block -> loadBlockDetailData(binding.consensusBlock, block)));
 
         binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
         binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
@@ -154,6 +164,23 @@ public class ChainStatusActivity extends BaseActivity {
         }
     }
 
+    /**
+     * 获取区块
+     * @param chainID 社区ID
+     * @param blockNumber 区块号
+     * @return Block
+     */
+    Observable<Block> getBlockByNumber(String chainID, long blockNumber) {
+        return Observable.create(emitter -> {
+            try {
+                Block block = tauDaemon.getBlockByNumber(chainID, blockNumber);
+                emitter.onNext(block);
+            } catch (Exception e) {
+            }
+            emitter.onComplete();
+        });
+    }
+
     private void showBlockDetail(ItemBlockLayoutBinding binding, ImageView ivHeadDetail) {
         View blockView = binding.getRoot();
         boolean isVisible = blockView.getVisibility() == View.VISIBLE;
@@ -192,12 +219,12 @@ public class ChainStatusActivity extends BaseActivity {
         super.onStart();
         if (StringUtil.isNotEmpty(chainID)) {
             disposables.add(communityViewModel.observerChainStatus(chainID)
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::loadChainStatusData));
 
             disposables.add(communityViewModel.observerCommunityByChainID(chainID)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::loadCommunityData));
         }
@@ -207,5 +234,6 @@ public class ChainStatusActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
         disposables.clear();
+        blockDisposables.clear();
     }
 }

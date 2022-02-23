@@ -5,7 +5,7 @@ import android.content.Context;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
@@ -45,7 +45,7 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     }
 
     @Override
-    public Observable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String userPk) {
+    public Flowable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String userPk) {
         return db.txQueueDao().observeCommunityTxQueue(chainID, userPk);
     }
 
@@ -80,12 +80,12 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     }
 
     @Override
-    public Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime) {
+    public Flowable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime) {
         return db.txQueueDao().observeAirdropCountOnChain(chainID, senderPk, currentTime);
     }
 
     @Override
-    public Observable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime) {
+    public Flowable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime) {
         return db.txQueueDao().observeAirdropHistoryOnChain(chainID, senderPk, currentTime);
     }
 }

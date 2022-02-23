@@ -9,6 +9,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
@@ -109,7 +110,7 @@ public interface TxQueueDao {
     void updateQueue(TxQueue tx);
 
     @Query(QUERY_COMMUNITY_TX_QUEUE)
-    Observable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String senderPk);
+    Flowable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String senderPk);
 
     @Query(QUERY_COMMUNITY_TX_QUEUE)
     List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String senderPk);
@@ -130,9 +131,9 @@ public interface TxQueueDao {
     int getAirdropCount(String chainID, String currentPk, long currentTime);
 
     @Query(QUERY_AIRDROP_COUNT_ON_CHAIN)
-    Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);
+    Flowable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);
 
     @Query(QUERY_AIRDROP_HISTORY_ON_CHAIN)
     @Transaction
-    Observable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime);
+    Flowable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime);
 }

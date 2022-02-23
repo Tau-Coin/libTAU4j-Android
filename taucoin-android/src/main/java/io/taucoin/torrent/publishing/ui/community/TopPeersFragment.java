@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -107,7 +108,7 @@ public class TopPeersFragment extends BaseFragment implements TopPeersAdapter.Cl
     @Override
     public void onStart() {
         super.onStart();
-        Observable<List<Member>> observable;
+        Flowable<List<Member>> observable;
         if (type == TOP_COIN) {
             observable = communityViewModel.observeChainTopCoinMembers(chainID, 10);
         } else {

@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
@@ -164,15 +165,15 @@ public interface TxDao {
 
     @Transaction
     @Query(QUERY_GET_ON_CHAIN_PINNED_TXS + " limit 1")
-    Observable<List<UserAndTx>> observeOnChainLatestPinnedTx(String chainID);
+    Flowable<List<UserAndTx>> observeOnChainLatestPinnedTx(String chainID);
 
     @Transaction
     @Query(QUERY_GET_MARKET_PINNED_TXS + " limit 1")
-    Observable<List<UserAndTx>> queryCommunityMarketLatestPinnedTx(String chainID);
+    Flowable<List<UserAndTx>> queryCommunityMarketLatestPinnedTx(String chainID);
 
     @Transaction
     @Query(QUERY_GET_NOTE_PINNED_TXS + " limit 1")
-    Observable<List<UserAndTx>> queryCommunityNoteLatestPinnedTx(String chainID);
+    Flowable<List<UserAndTx>> queryCommunityNoteLatestPinnedTx(String chainID);
 
     @Query(QUERY_GET_TRUST_TXS)
     List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPosition, int loadSize);
@@ -207,7 +208,7 @@ public interface TxDao {
 
     @Transaction
     @Query(QUERY_GET_SELL_DETAIL)
-    Observable<UserAndTx> observeSellTxDetail(String chainID, String txID);
+    Flowable<UserAndTx> observeSellTxDetail(String chainID, String txID);
 
     /**
      * 获取在当前nonce上是否有未上链的转账交易

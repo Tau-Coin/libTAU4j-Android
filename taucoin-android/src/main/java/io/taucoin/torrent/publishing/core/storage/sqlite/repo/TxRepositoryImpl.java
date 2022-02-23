@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
@@ -72,7 +73,7 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public Observable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID) {
+    public Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID) {
         if (currentTab == CommunityTabs.CHAIN.getIndex()) {
             return db.txDao().observeOnChainLatestPinnedTx(chainID);
         } else if (currentTab == CommunityTabs.MARKET.getIndex()) {
@@ -142,7 +143,7 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public Observable<UserAndTx> observeSellTxDetail(String chainID, String txID) {
+    public Flowable<UserAndTx> observeSellTxDetail(String chainID, String txID) {
         return db.txDao().observeSellTxDetail(chainID, txID);
     }
 

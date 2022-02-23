@@ -58,7 +58,7 @@ public interface CommunityRepository {
      */
     Single<Community> getCommunityByChainIDSingle(String chainID);
 
-    Observable<Community> observerCommunityByChainID(String chainID);
+    Flowable<Community> observerCommunityByChainID(String chainID);
 
     /**
      * 清除社区状态，totalBlocks, syncBlock数据
@@ -72,7 +72,7 @@ public interface CommunityRepository {
      * @param publicKey
      * @return
      */
-    Observable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey);
+    Flowable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey);
 
     /**
      * 观察链上币量前topNum的成员
@@ -80,7 +80,7 @@ public interface CommunityRepository {
      * @param topNum 查询数目
      * @return Observable<List<Member>>
      */
-    Observable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum);
+    Flowable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum);
 
     /**
      * 观察链上Power前topNum的成员
@@ -88,7 +88,7 @@ public interface CommunityRepository {
      * @param topNum 查询数目
      * @return Observable<List<Member>>
      */
-    Observable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum);
+    Flowable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum);
 
     Flowable<List<CommunityAndMember>> observeCommunities();
 }

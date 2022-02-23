@@ -512,7 +512,7 @@ public class TxViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    public Observable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID) {
+    public Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID) {
         return txRepo.observeLatestPinnedMsg(currentTab, chainID);
     }
 
@@ -588,11 +588,11 @@ public class TxViewModel extends AndroidViewModel {
         return txRepo.observeDataSetChanged();
     }
 
-    public Observable<UserAndTx> observeSellTxDetail(String chainID, String txID) {
+    public Flowable<UserAndTx> observeSellTxDetail(String chainID, String txID) {
         return txRepo.observeSellTxDetail(chainID, txID);
     }
 
-    public Observable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID) {
+    public Flowable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID) {
         String userPk = MainApplication.getInstance().getPublicKey();
         return txQueueRepo.observeCommunityTxQueue(chainID, userPk);
     }

@@ -195,25 +195,25 @@ public interface CommunityDao {
     Single<Community> getCommunityByChainIDSingle(String chainID);
 
     @Query(QUERY_GET_COMMUNITY_BY_CHAIN_ID)
-    Observable<Community> observerCommunityByChainID(String chainID);
+    Flowable<Community> observerCommunityByChainID(String chainID);
 
     @Query(QUERY_CLEAR_COMMUNITY_STATE)
     void clearCommunityState(String chainID);
 
     @Query(QUERY_CURRENT_COMMUNITY_MEMBER)
-    Observable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey);
+    Flowable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey);
 
     /**
      * 观察链上币量前topNum的成员
      */
     @Query(QUERY_CHAIN_TOP_COIN_MEMBERS)
-    Observable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum);
+    Flowable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum);
 
     /**
      * 观察链上Power前topNum的成员
      */
     @Query(QUERY_CHAIN_TOP_POWER_MEMBERS)
-    Observable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum);
+    Flowable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum);
 
     @Query(QUERY_COMMUNITIES)
     Flowable<List<CommunityAndMember>> observeCommunities();

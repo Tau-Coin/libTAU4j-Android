@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,8 +39,11 @@ import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -50,6 +54,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
+import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.DrawBean;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
@@ -486,11 +491,11 @@ public class CommunityViewModel extends AndroidViewModel {
         return memberRepo.observeCommunityAirdropDetail(chainID);
     }
 
-    public Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime) {
+    public Flowable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime) {
         return txQueueRepo.observeAirdropCountOnChain(chainID, senderPk, currentTime);
     }
 
-    public Observable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime) {
+    public Flowable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime) {
         return txQueueRepo.observeAirdropHistoryOnChain(chainID, senderPk, currentTime);
     }
 
@@ -537,7 +542,7 @@ public class CommunityViewModel extends AndroidViewModel {
         return communityRepo.getCommunityByChainIDSingle(chainID);
     }
 
-    public Observable<Community> observerCommunityByChainID(String chainID) {
+    public Flowable<Community> observerCommunityByChainID(String chainID) {
         return communityRepo.observerCommunityByChainID(chainID);
     }
 
@@ -551,7 +556,7 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param chainID
      * @return
      */
-    public Observable<CommunityAndMember> observerCurrentMember(String chainID) {
+    public Flowable<CommunityAndMember> observerCurrentMember(String chainID) {
         String publicKey = MainApplication.getInstance().getPublicKey();
         return communityRepo.observerCurrentMember(chainID, publicKey);
     }
@@ -614,32 +619,12 @@ public class CommunityViewModel extends AndroidViewModel {
     }
 
     /**
-     * 获取tip block列表
-     * @param chainID 社区ID
-     * @param topNum 返回的数目
-     * @return List<Block>
-     */
-    public List<Block> getTopTipBlock(String chainID, int topNum) {
-        return daemon.getTopTipBlock(chainID, topNum);
-    }
-
-    /**
-     * 获取区块
-     * @param chainID 社区ID
-     * @param blockNumber 区块号
-     * @return Block
-     */
-    public Block getBlockByNumber(String chainID, long blockNumber) {
-        return daemon.getBlockByNumber(chainID, blockNumber);
-    }
-
-    /**
      * 观察链上币量前topNum的成员
      * @param chainID 链ID
      * @param topNum 查询数目
      * @return Observable<List<Member>>
      */
-    Observable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum) {
+    Flowable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum) {
         return communityRepo.observeChainTopCoinMembers(chainID, topNum);
     }
 
@@ -649,7 +634,7 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param topNum 查询数目
      * @return Observable<List<Member>>
      */
-    Observable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum) {
+    Flowable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum) {
         return communityRepo.observeChainTopPowerMembers(chainID, topNum);
     }
 

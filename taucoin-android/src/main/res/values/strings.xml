@@ -179,7 +179,7 @@
     <string name="community_airdrop_free">Free/%1$s</string>
 
     <string name="community_sync_status">Sync Status</string>
-    <string name="community_syncing_head_block">Syncing Head Block</string>
+    <string name="community_syncing_head_block">Sync Head Block</string>
     <string name="community_head_block">Head Block</string>
     <string name="community_tail_block">Tail Block</string>
     <string name="community_consensus_block">Consensus Block</string>

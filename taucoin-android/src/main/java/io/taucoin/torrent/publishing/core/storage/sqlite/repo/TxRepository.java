@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
@@ -82,7 +83,7 @@ public interface TxRepository {
      */
     void submitDataSetChanged();
 
-    Observable<UserAndTx> observeSellTxDetail(String chainID, String txID);
+    Flowable<UserAndTx> observeSellTxDetail(String chainID, String txID);
 
     /**
      * 获取在当前nonce上是否有未上链的转账交易
@@ -95,5 +96,5 @@ public interface TxRepository {
 
     void setMessagePinned(String txID, int pinned, long pinnedTime);
 
-    Observable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID);
+    Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID);
 }

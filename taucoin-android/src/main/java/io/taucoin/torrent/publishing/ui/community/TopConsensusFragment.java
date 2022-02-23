@@ -26,10 +26,14 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMemberBinding;
@@ -51,6 +55,7 @@ public class TopConsensusFragment extends BaseFragment implements TopConsensusAd
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
     private TopConsensusAdapter adapter;
+    private TauDaemon tauDaemon;
 
     private String chainID;
     private int type;
@@ -70,6 +75,7 @@ public class TopConsensusFragment extends BaseFragment implements TopConsensusAd
         assert activity != null;
         ViewModelProvider provider = new ViewModelProvider(activity);
         communityViewModel = provider.get(CommunityViewModel.class);
+        tauDaemon = TauDaemon.getInstance(activity);
         initParameter();
         initView();
     }
@@ -115,7 +121,7 @@ public class TopConsensusFragment extends BaseFragment implements TopConsensusAd
         super.onStart();
         if (type == TOP_CONSENSUS) {
             disposables.add(communityViewModel.observerCommunityByChainID(chainID)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(community -> {
                         Type type = new TypeToken<List<ConsensusInfo>>(){}.getType();
@@ -126,20 +132,40 @@ public class TopConsensusFragment extends BaseFragment implements TopConsensusAd
                         }
                     }));
         } else {
-            List<Block> blocks = communityViewModel.getTopTipBlock(chainID, 3);
-            List<ConsensusInfo> list = new ArrayList<>();
-            if (blocks != null && blocks.size() > 0) {
-                for (Block block : blocks) {
-                    ConsensusInfo info = new ConsensusInfo(block.Hash(), block.getBlockNumber(),
-                            block.getBlockNumber());
-                    list.add(info);
-                    if (list.size() == 3) {
-                        break;
+            disposables.add(getTopTipBlock(chainID, 3)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(list -> adapter.submitList(list)));
+        }
+    }
+
+    /**
+     * 获取tip block列表
+     * @param chainID 社区ID
+     * @param topNum 返回的数目
+     * @return Observable<List<Block>>
+     */
+    Observable<List<ConsensusInfo>> getTopTipBlock(String chainID, int topNum) {
+        return Observable.create(emitter -> {
+            try {
+                List<Block> blocks = tauDaemon.getTopTipBlock(chainID, topNum);
+                List<ConsensusInfo> list = new ArrayList<>();
+                if (blocks != null && blocks.size() > 0) {
+                    for (Block block : blocks) {
+                        ConsensusInfo info = new ConsensusInfo(block.Hash(), block.getBlockNumber(),
+                                block.getBlockNumber());
+                        list.add(info);
+                        if (list.size() == 3) {
+                            break;
+                        }
                     }
                 }
+                emitter.onNext(list);
+            } catch (Exception e) {
+                logger.error("getBlockByNumber error ", e);
             }
-            adapter.submitList(list);
-        }
+            emitter.onComplete();
+        });
     }
 
     @Override

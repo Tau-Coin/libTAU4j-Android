@@ -106,7 +106,7 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     }
 
     @Override
-    public Observable<Community> observerCommunityByChainID(String chainID) {
+    public Flowable<Community> observerCommunityByChainID(String chainID) {
         return db.communityDao().observerCommunityByChainID(chainID);
     }
 
@@ -116,7 +116,7 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     }
 
     @Override
-    public Observable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey) {
+    public Flowable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey) {
         return db.communityDao().observerCurrentMember(chainID, publicKey);
     }
 
@@ -127,7 +127,7 @@ public class CommunityRepositoryImpl implements CommunityRepository{
      * @return Observable<List<Member>>
      */
     @Override
-    public Observable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum) {
+    public Flowable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum) {
         return db.communityDao().observeChainTopCoinMembers(chainID, topNum);
     }
 
@@ -138,7 +138,7 @@ public class CommunityRepositoryImpl implements CommunityRepository{
      * @return Observable<List<Member>>
      */
     @Override
-    public Observable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum) {
+    public Flowable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum) {
         return db.communityDao().observeChainTopPowerMembers(chainID, topNum);
     }
 

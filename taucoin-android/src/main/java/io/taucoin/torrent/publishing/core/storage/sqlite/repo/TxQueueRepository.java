@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
@@ -24,7 +25,7 @@ public interface TxQueueRepository {
 
     void deleteQueue(TxQueue tx);
 
-    Observable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String userPk);
+    Flowable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String userPk);
 
     List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String userPk);
 
@@ -38,7 +39,7 @@ public interface TxQueueRepository {
 
     TxQueue getAirdropTxQueue(String chainID, String currentPk, String friendPk);
 
-    Observable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);
+    Flowable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);
 
-    Observable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime);
+    Flowable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime);
 }
