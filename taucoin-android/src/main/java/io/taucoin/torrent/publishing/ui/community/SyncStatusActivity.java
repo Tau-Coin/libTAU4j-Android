@@ -64,8 +64,16 @@ public class SyncStatusActivity extends BaseActivity {
         disposables.add(communityViewModel.observeCommunitySyncStatus(chainID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> adapter.submitList(list)));
+                .subscribe(list -> adapter.submitList(list, handleUpdateAdapter)));
     }
+
+    private final Runnable handleUpdateAdapter = () -> {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) binding.recyclerView.getLayoutManager();
+        boolean isTop = !binding.recyclerView.canScrollVertically(-1);
+        if (layoutManager != null && isTop) {
+            layoutManager.scrollToPositionWithOffset(0, 0);
+        }
+    };
 
     @Override
     protected void onStop() {

@@ -151,12 +151,7 @@ class TauListenHandler {
      */
     void handleSyncingBlock(Block block) {
         logger.debug("handleSyncingBlock");
-        String chainID = ChainIDUtil.decode(block.getChainID());
-        Community community = communityRepo.getCommunityByChainID(chainID);
-        // 排除同步共识区块重复数据
-        if (block.getBlockNumber() <= community.syncingHeadBlock ) {
-            handleBlockData(block, BlockStatus.SYNCING);
-        }
+        handleBlockData(block, BlockStatus.SYNCING);
     }
 
     /**

@@ -42,7 +42,7 @@ public interface BlockDao {
             " WHERE chainID = :chainID AND status = 0" +
 //            " AND blockNumber >" +
 //            " (SELECT headBlock FROM Communities WHERE chainID = :chainID)" +
-            " ORDER BY blockNumber DESC";
+            " ORDER BY blockNumber";
 
     /**
      * 添加用户设备信息
