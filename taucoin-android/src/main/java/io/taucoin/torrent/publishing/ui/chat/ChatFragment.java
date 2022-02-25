@@ -179,7 +179,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             }
             return false;
         });
-        loadData(0);
 
     }
 
@@ -208,6 +207,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void onStart() {
         super.onStart();
+        loadData(0);
         subscribeChatViewModel();
     }
 
