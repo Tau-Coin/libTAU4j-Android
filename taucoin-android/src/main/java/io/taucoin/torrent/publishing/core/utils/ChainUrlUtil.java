@@ -9,6 +9,8 @@ import java.util.Set;
 import androidx.annotation.NonNull;
 
 public class ChainUrlUtil {
+    private static String SPACES_REPLACE = "%20";
+    private static String SPACES = " ";
     /**
      * TAUChain 编码
      * @param url 链URL
@@ -16,7 +18,12 @@ public class ChainUrlUtil {
      */
     public static ChainURL decode(String url) {
         try {
-            return ChainURL.chainURLStringToChainURL(url);
+            if (StringUtil.isNotEmpty(url)) {
+                if (url.contains(SPACES_REPLACE)) {
+                    url = url.replaceAll(SPACES_REPLACE, SPACES);
+                }
+                return ChainURL.chainURLStringToChainURL(url);
+            }
         } catch (Exception ignore) { }
         return null;
     }
@@ -32,6 +39,13 @@ public class ChainUrlUtil {
         Set<String> peersSet = new HashSet<>(peers);
         ChainURL chainURL = new ChainURL(chainIDBytes, peersSet);
         byte[] url = chainURL.getURL();
-        return ChainURL.chainURLBytesToString(url);
+
+        String chainUrl = ChainURL.chainURLBytesToString(url);
+        if (StringUtil.isNotEmpty(chainUrl)) {
+            if (chainUrl.contains(SPACES)) {
+                chainUrl = chainUrl.replaceAll(SPACES, SPACES_REPLACE);
+            }
+        }
+        return chainUrl;
     }
 }

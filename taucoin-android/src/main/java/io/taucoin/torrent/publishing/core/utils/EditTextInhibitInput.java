@@ -11,18 +11,38 @@ import java.util.regex.Pattern;
  */
 public class EditTextInhibitInput implements InputFilter {
     public static final String WELL_REGEX = "^[#]+$";
+    public static final String NAME_REGEX = "^[A-Za-z0-9\\s-]+$"; // 字母、数字、空格、-
     private String regex;
+    private boolean isCanInput;
 
-    public EditTextInhibitInput(String regex){
+    public EditTextInhibitInput(String regex) {
         this.regex = regex;
+        this.isCanInput = true;
     }
+
+    public EditTextInhibitInput(String regex, boolean isCanInput) {
+        this.regex = regex;
+        this.isCanInput = isCanInput;
+    }
+
     @Override
     public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-        if(StringUtil.isNotEmpty(regex)){
+        if (StringUtil.isNotEmpty(regex)) {
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(source.toString());
-            if(matcher.find()){
-                return "";
+            boolean isFind = matcher.find();
+            if (isFind) {
+                if (isCanInput) {
+                    return null;
+                } else {
+                    return "";
+                }
+            } else {
+                if (isCanInput) {
+                    return "";
+                } else {
+                    return null;
+                }
             }
         }
         return null;
