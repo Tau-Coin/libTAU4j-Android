@@ -19,7 +19,6 @@ public class IntentExtra {
     public static final String SCAN_KEY_ONLY = "scanKeyOnly";
     public static final String READ_ONLY = "readOnly";
     public static final String AIRDROP_COIN = "airdropCoin";
-    public static final String OPEN_COMMUNITY = "openCommunity";
     public static final String SHOW_LINK = "showLink";
     public static final String TIMESTAMP = "timestamp";
 }

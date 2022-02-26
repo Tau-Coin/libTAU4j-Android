@@ -315,7 +315,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name=".ui.friends.YourselfActivity"
+            android:name=".ui.friends.BotsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity

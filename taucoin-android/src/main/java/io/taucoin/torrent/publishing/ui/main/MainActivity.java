@@ -3,13 +3,11 @@ package io.taucoin.torrent.publishing.ui.main;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 
 import org.libTAU4j.ChainURL;
@@ -38,7 +36,6 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
-import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
@@ -52,7 +49,6 @@ import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
-import io.taucoin.torrent.publishing.core.utils.selecttext.SelectTextEventBus;
 import io.taucoin.torrent.publishing.databinding.ActivityMainDrawerBinding;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.databinding.ExternalAirdropLinkDialogBinding;
@@ -75,7 +71,7 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.BadgeActionProvider;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.download.DownloadViewModel;
-import io.taucoin.torrent.publishing.ui.friends.YourselfActivity;
+import io.taucoin.torrent.publishing.ui.friends.BotsActivity;
 import io.taucoin.torrent.publishing.ui.notify.NotificationViewModel;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.KeyQRCodeActivity;
@@ -365,7 +361,7 @@ public class MainActivity extends ScanTriggerActivity {
                 ActivityUtil.startActivity(this, WorkingConditionActivity.class);
                 break;
             case R.id.item_airdrop_coins:
-                ActivityUtil.startActivity(this, YourselfActivity.class);
+                ActivityUtil.startActivity(this, BotsActivity.class);
                 break;
             case R.id.item_balance:
                 ActivityUtil.startActivity(this, BalanceActivity.class);

@@ -259,7 +259,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         } else if (v.getId() == R.id.ll_add_friend) {
             userViewModel.showAddFriendDialog(this);
         } else if (v.getId() == R.id.iv_bot) {
-            ActivityUtil.startActivity(FriendsActivity.this, YourselfActivity.class);
+            ActivityUtil.startActivity(FriendsActivity.this, BotsActivity.class);
         } else if (v.getId() == R.id.ll_yourself) {
             onItemClicked(MainApplication.getInstance().getPublicKey());
         }

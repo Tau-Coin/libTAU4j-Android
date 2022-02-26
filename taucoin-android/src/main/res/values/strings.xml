@@ -439,9 +439,7 @@
 
 
     <string name="bot_yourself">Yourself</string>
-    <string name="bot_airdrop_tip">Airdrop Bot</string>
-    <string name="bot_airdrop_open">Open Bot</string>
-    <string name="bot_tip">Bot</string>
+    <string name="bot_title">Bot</string>
     <string name="bot_airdrop">Airdrop</string>
     <string name="bot_airdrop_community">Airdrop Community</string>
     <string name="bot_airdrop_history">Airdrop History</string>

@@ -1,6 +1,5 @@
 package io.taucoin.torrent.publishing.ui.friends;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -11,19 +10,16 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
-import io.taucoin.torrent.publishing.databinding.ActivityAirdropDetailBinding;
 import io.taucoin.torrent.publishing.databinding.ActivityAirdropSetupBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
 /**
  * Airdrop详情页
@@ -34,7 +30,6 @@ public class AirdropSetupActivity extends BaseActivity {
     private CommunityViewModel communityViewModel;
     private ReferralBonusAdapter adapter;
     private String chainID;
-    private boolean openCommunity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +42,6 @@ public class AirdropSetupActivity extends BaseActivity {
 
     private void initLayout() {
         chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-        openCommunity = getIntent().getBooleanExtra(IntentExtra.OPEN_COMMUNITY, false);
 
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(ChainIDUtil.getName(chainID));
@@ -127,13 +121,5 @@ public class AirdropSetupActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (openCommunity) {
-            // 进入社区页面
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.putExtra(IntentExtra.TYPE, 0);
-            ActivityUtil.startActivity(intent, this, MainActivity.class);
-        }
     }
 }

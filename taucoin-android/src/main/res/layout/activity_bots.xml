@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+            android:id="@+id/ll_airdrop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="@{listener::onClick}"
+            app:lineRightImage="@mipmap/icon_arrow"
+            app:lineLeftText="@string/bot_airdrop"/>
+
+        <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+            android:id="@+id/ll_hello_world"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="@{listener::onClick}"
+            app:lineRightImage="@mipmap/icon_arrow"
+            app:lineLeftText="@string/bot_hello_world"
+            app:lineVisibility="false"/>
+
+    </LinearLayout>
+</layout>

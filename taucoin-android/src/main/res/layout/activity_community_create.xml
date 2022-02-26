@@ -52,7 +52,7 @@
                         app:btnSolidColor="@color/primary_light"
                         app:btnPressedRatio="1.5" />
 
-                    <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+                    <EditText
                         android:layout_toEndOf="@+id/round_button"
                         android:id="@+id/et_community_name"
                         android:layout_width="match_parent"
@@ -98,31 +98,6 @@
                     android:layout_height="match_parent"
                     android:layout_marginStart="@dimen/widget_size_20"
                     android:layout_marginEnd="@dimen/widget_size_20"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_30"
-                    android:includeFontPadding="false"
-                    android:text="@string/bot_airdrop_tip"
-                    android:paddingStart="@dimen/widget_size_20"
-                    android:paddingEnd="@dimen/widget_size_20"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    android:gravity="center_vertical"
-                    android:textColor="@color/gray_dark"
-                    android:background="@color/color_bg"
-                    android:textAppearance="@style/TextAppearanceBody2" />
-
-                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/tv_open_bot"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:lineLeftText="@string/bot_airdrop_open"
-                    app:lineRightImage="@mipmap/icon_arrow"
-                    android:onClick="@{listener::onClick}"
-                    app:lineVisibility="false"/>
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
