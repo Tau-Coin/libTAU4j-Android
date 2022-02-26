@@ -113,6 +113,7 @@
     <string name="common_loading">loading&#8230;</string>
 
     <string name="community_community_name">Name(required)</string>
+    <string name="community_community_name_tips">Please enter spaces, -, letters, numbers</string>
     <string name="community_name">Community Name</string>
     <string name="community_total_coins">Total coins: %s</string>
     <string name="community_unified_airdrop">Unified airdrop coins per account</string>
