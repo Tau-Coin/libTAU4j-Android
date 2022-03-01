@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:background="@color/color_white">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginBottom="@dimen/widget_size_15"
+            android:text="@string/community_create_success"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_20"
+            android:layout_gravity="center_horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/widget_size_18"
+                android:layout_height="@dimen/widget_size_18"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_wifi" />
+
+            <ImageView
+                android:layout_width="@dimen/widget_size_18"
+                android:layout_height="@dimen/widget_size_18"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_charge" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_yes"
+            android:minWidth="@dimen/widget_size_240"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_44"
+            android:text="@string/common_yes"
+            android:layout_marginTop="@dimen/widget_size_15"
+            android:textAllCaps="true"
+            android:gravity="center_horizontal|center"
+            android:textColor="@color/color_white"
+            android:textAppearance="@style/TextAppearanceBody1"
+            android:background="@drawable/primary_rect_round_bg" />
+
+    </LinearLayout>
+</layout>

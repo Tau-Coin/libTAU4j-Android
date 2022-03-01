@@ -60,6 +60,7 @@
     <string name="main_community_settings">Community Settings</string>
     <string name="main_other_transaction">Other Transaction</string>
     <string name="main_no_messages">[No messages]</string>
+    <string name="main_network_unavailable">Network connection unavailable</string>
     <string name="main_connecting">Joining phone swarm &#8230;</string>
     <string name="main_no_ipv4">IPv4 not found</string>
     <string name="main_data_used_up">Background Daily Data Limit Used Up</string>
@@ -147,6 +148,8 @@
     <string name="community_sell_coins">Sell Coins</string>
     <string name="community_sell_detail">Sell Detail</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
+    <string name="community_create_success" formatted="false"><Data><![CDATA[Creator shall keep phone in <strong>wifi</strong> and <strong>power charging</strong>
+    as much as possible for community data exchange.]]></Data></string>
 
     <string name="chain_difficulty">Difficulty</string>
     <string name="chain_total_peers">Total Peers</string>

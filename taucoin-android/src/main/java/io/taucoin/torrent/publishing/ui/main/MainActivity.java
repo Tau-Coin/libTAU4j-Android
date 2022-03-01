@@ -155,9 +155,8 @@ public class MainActivity extends ScanTriggerActivity {
             showErrorLinkDialog();
         } else if (0 != (Intent.FLAG_ACTIVITY_CLEAR_TOP & intent.getFlags())) {
             Bundle bundle = new Bundle();
-            bundle.putString(IntentExtra.CHAIN_ID, intent.getStringExtra(IntentExtra.CHAIN_ID));
-            bundle.putString(IntentExtra.TYPE, intent.getStringExtra(IntentExtra.TYPE));
-            bundle.putString(IntentExtra.SHOW_LINK, intent.getStringExtra(IntentExtra.SHOW_LINK));
+            bundle.putString(IntentExtra.ID, intent.getStringExtra(IntentExtra.CHAIN_ID));
+            bundle.putInt(IntentExtra.TYPE, intent.getIntExtra(IntentExtra.TYPE, -1));
             updateMainRightFragment(bundle);
         }
     }

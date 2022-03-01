@@ -17,20 +17,14 @@ import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.UrlUtil;
-import io.taucoin.torrent.publishing.databinding.ExternalAirdropLinkDialogBindingImpl;
 import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.transaction.QueueTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
@@ -49,8 +43,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private TextView selectedView = null;
     private String chainID;
     private boolean isReadOnly = true;
-    private boolean isShowShareLink = false;
-    private CommonDialog shareDialog;
 
     @Nullable
     @Override
@@ -190,9 +182,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     public void onDestroy() {
         super.onDestroy();
         replaceOrRemoveFragment(true);
-        if (shareDialog != null && shareDialog.isShowing()) {
-            shareDialog.closeDialog();
-        }
     }
 
     /**
@@ -223,45 +212,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     }
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
                 }));
-
-        // 获取3个社区成员的公钥
-        if (isShowShareLink) {
-            disposables.add(communityViewModel.getCommunityMembersLimit(chainID, Constants.AIRDROP_LINK_BS_LIMIT)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
-                    isShowShareLink = false;
-                    if (StringUtil.isNotEmpty(chainID)) {
-                        String airdropPeer = MainApplication.getInstance().getPublicKey();
-                        String airdropLink = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, list);
-                        showShareLinkDialog(airdropLink);
-                    }
-                }));
-        }
-    }
-
-    /**
-     * 显示分享airdrop link dialog
-     * @param airdropLink
-     */
-    private void showShareLinkDialog(String airdropLink) {
-        CopyManager.copyText(airdropLink);
-        ExternalAirdropLinkDialogBindingImpl dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
-                R.layout.external_airdrop_link_dialog, null, false);
-        dialogBinding.tvJoin.setVisibility(View.GONE);
-        dialogBinding.tvPeer.setText(R.string.main_airdrop_link_share);
-        dialogBinding.tvPeer.setTextColor(getResources().getColor(R.color.color_black));
-        dialogBinding.tvCommunity.setText(airdropLink);
-        dialogBinding.tvCommunity.setTextColor(getResources().getColor(R.color.color_blue_dark));
-        dialogBinding.tvSkip.setOnClickListener(v -> {
-            if (shareDialog != null) {
-                shareDialog.closeDialog();
-            }
-        });
-        shareDialog = new CommonDialog.Builder(activity)
-                .setContentView(dialogBinding.getRoot())
-                .setCanceledOnTouchOutside(false)
-                .create();
-        shareDialog.show();
     }
 
     @Override

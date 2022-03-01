@@ -3,8 +3,10 @@ package io.taucoin.torrent.publishing.ui.community;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,8 +32,10 @@ import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityCommunityCreateBinding;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
+import io.taucoin.torrent.publishing.databinding.DialogCreateCommunitySuccessBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
@@ -44,6 +48,7 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
     private CommunityViewModel viewModel;
     private String chainID;
     private MembersAddFragment currentFragment;
+    private CommonDialog successDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,17 +113,31 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
     private void observeAddCommunityState() {
         viewModel.getAddCommunityState().observe(this, state -> {
             if (state.isSuccess()) {
-                // 进入社区页面
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, state.getMsg());
-                intent.putExtra(IntentExtra.SHOW_LINK, true);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra(IntentExtra.TYPE, 0);
-                ActivityUtil.startActivity(intent, this, MainActivity.class);
+                showCreateSuccessDialog(state.getMsg());
             } else {
                 ToastUtils.showShortToast(state.getMsg());
             }
         });
+    }
+
+    private void showCreateSuccessDialog(String chainID) {
+        DialogCreateCommunitySuccessBinding binding = DataBindingUtil.inflate(LayoutInflater.from(this),
+                R.layout.dialog_create_community_success, null, false);
+        binding.tvTitle.setText(Html.fromHtml(getString(R.string.community_create_success)));
+        binding.tvYes.setOnClickListener(v -> {
+            // 进入社区页面
+            Intent intent = new Intent();
+            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra(IntentExtra.TYPE, 0);
+            ActivityUtil.startActivity(intent, this, MainActivity.class);
+        });
+        successDialog = new CommonDialog.Builder(this)
+                .setContentView(binding.getRoot())
+                .setCanceledOnTouchOutside(false)
+                .setButtonWidth(R.dimen.widget_size_240)
+                .create();
+        successDialog.show();
     }
 
     /**
@@ -163,6 +182,10 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
             binding.etCommunityName.removeTextChangedListener(mTextWatcher);
         }
         currentFragment = null;
+
+        if (successDialog != null && successDialog.isShowing()) {
+            successDialog.closeDialog();
+        }
     }
 
     @Override
