@@ -55,11 +55,11 @@
                         android:layout_height="wrap_content"
                         android:lineSpacingExtra="0dp"
                         android:lineSpacingMultiplier="0.7"
-                        android:text="@string/community_syncing_head_block"
+                        android:text="@string/community_external_head_block"
                         android:textAppearance="@style/TextAppearanceBody1"/>
 
                     <TextView
-                        android:id="@+id/tv_syncing_head_block"
+                        android:id="@+id/tv_external_head_block"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/widget_size_10"

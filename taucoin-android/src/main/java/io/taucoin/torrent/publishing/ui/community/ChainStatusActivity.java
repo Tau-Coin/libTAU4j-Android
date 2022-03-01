@@ -86,7 +86,7 @@ public class ChainStatusActivity extends BaseActivity {
         }
         blockDisposables.clear();
 
-        binding.tvSyncingHeadBlock.setText(FmtMicrometer.fmtLong(status.syncingHeadBlock));
+        binding.tvExternalHeadBlock.setText(FmtMicrometer.fmtLong(status.syncingHeadBlock));
 
         binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(status.headBlock));
         blockDisposables.add(getBlockByNumber(chainID, status.headBlock)
