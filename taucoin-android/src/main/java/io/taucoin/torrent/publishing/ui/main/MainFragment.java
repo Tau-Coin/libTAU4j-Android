@@ -85,17 +85,22 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::showCommunityList));
 
-        handleSettingsChanged(getString(R.string.pref_key_network_interfaces));
-        handleSettingsChanged(getString(R.string.pref_key_dht_nodes));
+        handleWarningView();
         disposables.add(settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleSettingsChanged));
     }
 
-    private void handleWarningView(long nodes) {
+    private void handleWarningView() {
         binding.llWarning.setVisibility(View.VISIBLE);
-        if (nodes <= 0) {
+        String nodesKey = getString(R.string.pref_key_dht_nodes);
+        String interfacesKey = getString(R.string.pref_key_network_interfaces);
+        if (!settingsRepo.internetState()) {
+            binding.tvWarning.setText(getString(R.string.main_network_unavailable));
+        } else if (StringUtil.isEquals(settingsRepo.getStringValue(interfacesKey, ""), "0.0.0.0")) {
+            binding.tvWarning.setText(getString(R.string.main_no_ipv4));
+        } else if (settingsRepo.getLongValue(nodesKey, 0L) <= 0) {
             binding.tvWarning.setText(getString(R.string.main_connecting));
         } else if (!NetworkSetting.isHaveAvailableData()) {
             binding.tvWarning.setText(getString(R.string.main_data_used_up));
@@ -112,13 +117,11 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
      */
     private void handleSettingsChanged(String key) {
         if (StringUtil.isEquals(key, getString(R.string.pref_key_network_interfaces))) {
-            String networkInterfaces = settingsRepo.getStringValue(key, "");
-            if (StringUtil.isEquals(networkInterfaces, "0.0.0.0")) {
-                binding.tvWarning.setText(getString(R.string.main_no_ipv4));
-            }
+            handleWarningView();
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
-            long nodes = settingsRepo.getLongValue(key, 0L);
-            handleWarningView(nodes);
+            handleWarningView();
+        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_internet_state))) {
+            handleWarningView();
         }
     }
 

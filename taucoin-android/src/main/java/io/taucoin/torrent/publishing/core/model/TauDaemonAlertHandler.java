@@ -81,6 +81,10 @@ class TauDaemonAlertHandler {
                 // 端口监听成功
                 onListenSucceeded(alert);
                 break;
+            case LISTEN_FAILED:
+                // 端口监听失败
+                onListenFailed(alert);
+                break;
             case COMM_LAST_SEEN:
                 // 多设备新的DeviceID
                 onDiscoverFriend(alert, alertAndUser.getUserPk());
@@ -244,11 +248,23 @@ class TauDaemonAlertHandler {
     }
 
     /**
+     * 端口监听失败
+     * @param alert libTAU上报
+     */
+    private void onListenFailed(Alert alert) {
+//        ListenFailedAlert a = (ListenFailedAlert) alert;
+//        String interfaces = a.address().toString() + ":" + a.port();
+//        logger.info("onListenFailed IP::{}", interfaces);
+//        settingsRepo.setStringValue(appContext.getString(R.string.pref_key_network_interfaces),
+//                interfaces);
+    }
+
+    /**
      * 处理日志Alert
      * @param alert libTAU上报
      */
     void handleLogAlert(Alert<?> alert) {
-        logger.info(alert.message());
+        logger.info("{}: {}", alert.type().name(), alert.message());
     }
 
     /**
