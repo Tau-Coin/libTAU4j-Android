@@ -18,8 +18,6 @@ import androidx.annotation.Nullable;
 
 @SuppressLint("AppCompatCustomView")
 public class RoundImageView extends ImageView {
-    // 圆角大小，默认为10
-    private int mBorderRadius = 20;
     private Paint mPaint;
     // 3x3 矩阵，主要用于缩小放大
     private Matrix mMatrix;
@@ -79,7 +77,10 @@ public class RoundImageView extends ImageView {
         mPaint.setShader(mBitmapShader);
 
         rectF.set(0,0, getWidth(), getHeight());
-        canvas.drawRoundRect(rectF, mBorderRadius, mBorderRadius,mPaint);
+
+        float rx = bitmap.getWidth() * scale / 2;
+        float ry = bitmap.getHeight() * scale / 2;
+        canvas.drawRoundRect(rectF, rx, ry, mPaint);
     }
 
     private Bitmap drawableToBitmap(Drawable drawable) {

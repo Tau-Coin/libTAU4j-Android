@@ -11,6 +11,7 @@ import com.luck.picture.lib.config.PictureMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.language.LanguageConfig;
 import com.luck.picture.lib.manager.PictureCacheManager;
+import com.yalantis.ucrop.UCrop;
 import com.yalantis.ucrop.view.OverlayView;
 
 import java.io.ByteArrayOutputStream;
@@ -71,6 +72,13 @@ public class MediaUtil {
     }
 
     public static void openGalleryAndCamera(Activity activity) {
+        UCrop.Options options = new UCrop.Options();
+        // 圆形头像模式
+        options.setCircleDimmedLayer(true);
+        options.setHideBottomControls(true);
+        options.setShowCropFrame(false);
+        options.setShowCropGrid(false);
+
         PictureSelector.create(activity)
             .openGallery(PictureMimeType.ofImage())
             .setLanguage(LanguageConfig.ENGLISH)
@@ -81,6 +89,7 @@ public class MediaUtil {
             .isGif(false)
             .isPreviewImage(true)
             .isEnableCrop(true)
+            .basicUCropConfig(options)
             .freeStyleCropMode(OverlayView.DEFAULT_FREESTYLE_CROP_MODE)// 裁剪框拖动模式
             .isCropDragSmoothToCenter(true)// 裁剪框拖动时图片自动跟随居中
             .withAspectRatio(1, 1)
