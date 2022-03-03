@@ -39,7 +39,7 @@ public class AirdropCommunityActivity extends BaseActivity {
      */
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.bot_airdrop_community);
+        binding.toolbarInclude.toolbar.setTitle(R.string.bot_airdrop);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 

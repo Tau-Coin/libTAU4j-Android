@@ -28,6 +28,7 @@
             app:lineLeftText="@string/bot_airdrop"/>
 
         <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+            android:visibility="gone"
             android:id="@+id/ll_hello_world"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

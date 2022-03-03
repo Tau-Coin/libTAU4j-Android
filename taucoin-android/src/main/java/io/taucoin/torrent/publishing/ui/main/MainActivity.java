@@ -71,7 +71,7 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.BadgeActionProvider;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.download.DownloadViewModel;
-import io.taucoin.torrent.publishing.ui.friends.BotsActivity;
+import io.taucoin.torrent.publishing.ui.friends.AirdropCommunityActivity;
 import io.taucoin.torrent.publishing.ui.notify.NotificationViewModel;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.KeyQRCodeActivity;
@@ -360,7 +360,7 @@ public class MainActivity extends ScanTriggerActivity {
                 ActivityUtil.startActivity(this, WorkingConditionActivity.class);
                 break;
             case R.id.item_airdrop_coins:
-                ActivityUtil.startActivity(this, BotsActivity.class);
+                ActivityUtil.startActivity(this, AirdropCommunityActivity.class);
                 break;
             case R.id.item_balance:
                 ActivityUtil.startActivity(this, BalanceActivity.class);

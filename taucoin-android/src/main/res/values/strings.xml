@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">TAU</string>
-    <string name="app_name_alpha">TAU Alpha Test</string>
+    <string name="app_name_alpha">Version for testing\nand playing only</string>
     <string name="app_share">Share app link via</string>
     <string name="app_share_error">Can\'t find share component to share</string>
 
@@ -68,7 +68,7 @@
 
     <!-- Strings used for main drawer content -->
     <string name="drawer_new_community">New Community</string>
-    <string name="drawer_airdrop_coins">Airdrop Coins</string>
+    <string name="drawer_airdrop_coins">Airdrop</string>
     <string name="drawer_balance">Balance</string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Friends</string>
@@ -445,7 +445,6 @@
     <string name="bot_yourself">Yourself</string>
     <string name="bot_title">Bot</string>
     <string name="bot_airdrop">Airdrop</string>
-    <string name="bot_airdrop_community">Airdrop Community</string>
     <string name="bot_airdrop_history">Airdrop History</string>
     <string name="bot_airdrop_members">Members</string>
     <string name="bot_airdrop_members_error">Members invalid</string>
