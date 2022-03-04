@@ -64,7 +64,7 @@ public abstract class TauDaemon {
     private static final String TAG = TauDaemon.class.getSimpleName();
     static final Logger logger = LoggerFactory.getLogger(TAG);
     private static final int SHOW_DIALOG_THRESHOLD = 10;        // 单位s
-    private static final int UPDATE_INTERFACE_THRESHOLD = 15;   // 单位s
+    private static final int UPDATE_INTERFACE_THRESHOLD = 3;    // 单位s
     static final int ALERT_QUEUE_CAPACITY = 10000;              // Alert缓存队列
     private static volatile TauDaemon instance;
 
