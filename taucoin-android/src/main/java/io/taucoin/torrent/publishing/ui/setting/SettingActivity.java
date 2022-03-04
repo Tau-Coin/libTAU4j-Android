@@ -27,6 +27,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
+import io.taucoin.torrent.publishing.core.utils.DrawablesUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
@@ -71,6 +72,9 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(R.string.setting_title);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        DrawablesUtil.setEndDrawable(binding.tvUsernameTitle, R.mipmap.icon_edit,
+                getResources().getDimension(R.dimen.widget_size_14));
 
         viewModel.getChangeResult().observe(this, result -> {
             if (StringUtil.isNotEmpty(result)) {

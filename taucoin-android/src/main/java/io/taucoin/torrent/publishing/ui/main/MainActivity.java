@@ -10,10 +10,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.luck.picture.lib.PictureSelector;
+import com.luck.picture.lib.config.PictureConfig;
+import com.luck.picture.lib.entity.LocalMedia;
+
 import org.libTAU4j.ChainURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
@@ -49,6 +54,7 @@ import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
+import io.taucoin.torrent.publishing.core.utils.media.MediaUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityMainDrawerBinding;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.databinding.ExternalAirdropLinkDialogBinding;
@@ -79,7 +85,6 @@ import io.taucoin.torrent.publishing.ui.setting.FontSizeActivity;
 import io.taucoin.torrent.publishing.ui.setting.SettingActivity;
 import io.taucoin.torrent.publishing.ui.setting.WorkingConditionActivity;
 import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
-import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.UserQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
@@ -322,9 +327,7 @@ public class MainActivity extends ScanTriggerActivity {
                 ActivityUtil.startActivity(this, UserQRCodeActivity.class);
                 break;
             case R.id.round_button:
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.PUBLIC_KEY, user.publicKey);
-                ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
+                MediaUtil.openGalleryAndCamera(this);
                 break;
             case R.id.tv_public_key:
             case R.id.tv_public_key_title:
@@ -714,6 +717,12 @@ public class MainActivity extends ScanTriggerActivity {
             }
         } else if (resultCode == RESULT_OK && requestCode == FontSizeActivity.REQUEST_CODE_FONT_SIZE) {
             refreshAllView();
+        } else if (resultCode == RESULT_OK && requestCode == PictureConfig.CHOOSE_REQUEST) {
+                List<LocalMedia> result = PictureSelector.obtainMultipleResult(data);
+                if (result != null && result.size() > 0) {
+                    LocalMedia media = result.get(0);
+                    userViewModel.updateHeadPic(media);
+                }
         }
     }
 

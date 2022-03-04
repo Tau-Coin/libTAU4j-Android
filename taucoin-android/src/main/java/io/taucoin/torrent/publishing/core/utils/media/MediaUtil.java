@@ -78,6 +78,9 @@ public class MediaUtil {
         options.setHideBottomControls(true);
         options.setShowCropFrame(false);
         options.setShowCropGrid(false);
+        options.withAspectRatio(1, 1);
+        options.withMaxResultSize(MultimediaUtil.MAX_IMAGE_WIDTH, MultimediaUtil.MAX_IMAGE_HEIGHT);
+        options.setCompressionQuality(100);
 
         PictureSelector.create(activity)
             .openGallery(PictureMimeType.ofImage())

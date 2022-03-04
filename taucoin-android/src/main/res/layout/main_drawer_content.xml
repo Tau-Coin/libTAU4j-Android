@@ -28,6 +28,7 @@
                     android:layout_height="@dimen/widget_size_55"
                     android:layout_centerVertical="true"
                     android:src="@drawable/primary_rect_round_bg"
+                    android:onClick="onClick"
                     android:scaleType="centerCrop"/>
 
                 <LinearLayout
