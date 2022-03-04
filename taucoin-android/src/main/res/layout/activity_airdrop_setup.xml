@@ -87,22 +87,11 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/bot_airdrop_coins_total"
-                    android:layout_marginTop="@dimen/widget_size_25"
-                    android:paddingStart="@dimen/widget_size_0"
-                    android:paddingEnd="@dimen/widget_size_100"
-                    android:layout_gravity="center_horizontal"
-                    android:textColor="@color/gray_dark"
-                    android:textAppearance="@style/TextAppearanceBody2"/>
-
-                <TextView
                     android:id="@+id/tv_total"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/bot_airdrop_coins_total_value"
-                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:layout_marginTop="@dimen/widget_size_25"
                     android:layout_gravity="center_horizontal"
                     android:textAppearance="@style/TextAppearanceHeadline4"/>
 

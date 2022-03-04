@@ -32,15 +32,15 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/widget_size_20"
-                    android:paddingEnd="@dimen/widget_size_20"
+                    android:paddingStart="@dimen/widget_size_15"
+                    android:paddingEnd="@dimen/widget_size_15"
                     android:layout_marginTop="@dimen/widget_size_10">
 
                     <io.taucoin.torrent.publishing.ui.customviews.RoundButton
                         android:id="@+id/round_button"
                         android:layout_width="@dimen/widget_size_60"
                         android:layout_height="@dimen/widget_size_60"
-                        android:layout_marginEnd="@dimen/widget_size_15"
+                        android:layout_marginEnd="@dimen/widget_size_10"
                         android:layout_marginTop="@dimen/widget_size_25"
                         android:gravity="center"
                         android:textSize="@dimen/font_size_18"

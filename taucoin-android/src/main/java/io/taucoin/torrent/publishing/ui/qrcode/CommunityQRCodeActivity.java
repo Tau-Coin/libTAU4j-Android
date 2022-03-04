@@ -23,7 +23,9 @@ import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
+import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityCommunityQrCodeBinding;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
@@ -41,6 +43,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     private CommunityViewModel communityViewModel;
     private UserViewModel userViewModel;
     private String chainID;
+    private String chainUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,14 +76,13 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
         String showName = ChainIDUtil.getName(chainID);
         binding.qrCode.tvName.setText(showName);
         binding.qrCode.tvQrCode.setVisibility(View.GONE);
-        binding.qrCode.ivCopy.setVisibility(View.GONE);
 
         // 获取10个社区成员的公钥
         disposables.add(communityViewModel.getCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
                     if (StringUtil.isNotEmpty(chainID)) {
-                        String chainUrl = ChainUrlUtil.encode(chainID, list);
+                        chainUrl = ChainUrlUtil.encode(chainID, list);
                         logger.debug("chainUrl::{}", chainUrl);
                         communityViewModel.generateQRCode(this, chainUrl, this.chainID, showName);
                     }
@@ -124,6 +126,11 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     public void onClick(View v) {
         if (v.getId() == R.id.ll_scan_qr_code) {
             openScanQRActivityAndExit();
+        } else if (v.getId() == R.id.iv_copy) {
+            if (StringUtil.isNotEmpty(chainUrl)) {
+                CopyManager.copyText(chainUrl);
+                ToastUtils.showShortToast(R.string.copy_share_link);
+            }
         }
     }
 }

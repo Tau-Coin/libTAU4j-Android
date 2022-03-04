@@ -32,7 +32,7 @@
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_220"
+                    android:minHeight="@dimen/widget_size_150"
                     android:layout_marginStart="@dimen/widget_size_20"
                     android:layout_marginEnd="@dimen/widget_size_20"
                     android:layout_marginTop="@dimen/widget_size_20"
@@ -70,17 +70,6 @@
                         android:layout_marginTop="@dimen/widget_size_15"
                         android:includeFontPadding="false"
                         android:textAppearance="@style/TextAppearanceBody3"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/setting_font_size"
-                        android:layout_gravity="center_vertical|center"
-                        android:layout_marginStart="@dimen/widget_size_20"
-                        android:layout_marginEnd="@dimen/widget_size_20"
-                        android:layout_marginTop="@dimen/widget_size_15"
-                        android:includeFontPadding="false"
-                        android:textAppearance="@style/TextAppearanceBody4"/>
 
                 </LinearLayout>
 

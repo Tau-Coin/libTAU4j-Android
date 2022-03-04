@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -14,13 +15,11 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import org.libTAU4j.Account;
-import org.libTAU4j.Block;
 import org.libTAU4j.ChainURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,11 +38,7 @@ import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -54,7 +49,6 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
-import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.DrawBean;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
@@ -100,7 +94,6 @@ public class CommunityViewModel extends AndroidViewModel {
     private BlockRepository blockRepo;
     private TxQueueRepository txQueueRepo;
     private UserRepository userRepo;
-    private SettingsRepository settingsRepo;
     private TauDaemon daemon;
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> addCommunityState = new MutableLiveData<>();
@@ -119,7 +112,6 @@ public class CommunityViewModel extends AndroidViewModel {
         userRepo = RepositoryHelper.getUserRepository(getApplication());
         txQueueRepo = RepositoryHelper.getTxQueueRepository(getApplication());
         blockRepo = RepositoryHelper.getBlockRepository(getApplication());
-        settingsRepo = RepositoryHelper.getSettingsRepository(getApplication());
         daemon = TauDaemon.getInstance(getApplication());
     }
 
@@ -357,12 +349,6 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param chainID 社区chainID
      */
     CommonDialog showBanCommunityTipsDialog(FragmentActivity activity, String chainID) {
-        String key = activity.getString(R.string.pref_key_show_blacklist_dialog);
-        boolean isShowDialog = settingsRepo.getBooleanValue(key, true);
-        if (!isShowDialog) {
-            setCommunityBlacklist(chainID, true);
-            return null;
-        }
         BlacklistDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.blacklist_dialog, null, false);
         String blacklistTip = activity.getString(R.string.community_blacklist_tip, ChainIDUtil.getName(chainID));
@@ -375,9 +361,6 @@ public class CommunityViewModel extends AndroidViewModel {
         blacklistDialog.show();
         dialogBinding.tvSubmit.setOnClickListener(v -> {
             blacklistDialog.closeDialog();
-            if (dialogBinding.cbDoNotShow.isChecked()) {
-                settingsRepo.setBooleanValue(key, true);
-            }
             setCommunityBlacklist(chainID, true);
         });
         dialogBinding.ivClose.setOnClickListener(v -> {

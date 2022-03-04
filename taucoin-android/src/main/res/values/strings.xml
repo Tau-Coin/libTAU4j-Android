@@ -68,7 +68,7 @@
 
     <!-- Strings used for main drawer content -->
     <string name="drawer_new_community">New Community</string>
-    <string name="drawer_airdrop_coins">Airdrop</string>
+    <string name="drawer_airdrop_links">Airdrop Links</string>
     <string name="drawer_balance">Balance</string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Friends</string>
@@ -76,7 +76,7 @@
     <string name="drawer_setting">Settings</string>
     <string name="drawer_data_cost">Data Cost</string>
     <string name="drawer_working_condition">Working Condition</string>
-    <string name="drawer_share">Share</string>
+    <string name="drawer_share">Share TAU App</string>
     <string name="drawer_export_seed">Export Key</string>
 
     <!-- Strings used for menu -->
@@ -95,7 +95,7 @@
 
     <string name="community_settings">Settings</string>
     <string name="community_chain_status">Chain Status</string>
-    <string name="community_blacklist">Blacklist</string>
+    <string name="community_blacklist">Ban This Community</string>
     <string name="community_members">Members</string>
     <string name="community_sync_rate">Sync Rate</string>
     <string name="community_miners_online">Miners Online</string>
@@ -105,16 +105,16 @@
     <string name="community_renewal_date">Renewal Date</string>
     <string name="community_info">Info</string>
     <string name="community_invite_link">Invite Link</string>
-    <string name="community_qr_code">Community QR Code</string>
-    <string name="community_blacklist_tip" formatted="false"><Data><![CDATA[No message from <font color="#477df9">%1$s</font> until
-    remove from the blacklist<br/><font color="#727272">(setting>blacklist)</font>]]></Data></string>
+    <string name="community_qr_code">Share Community</string>
+    <string name="community_blacklist_tip" formatted="false"><Data><![CDATA[No messages from <font color="#477df9">%1$s</font> until
+    removed from \"setting>privacy>blacklist\".]]></Data></string>
 
     <string name="community_input_hint">Message</string>
     <string name="community_users_stats">%1$d members</string>
     <string name="common_loading">loading&#8230;</string>
 
     <string name="community_community_name">Name(required)</string>
-    <string name="community_community_name_tips">Please enter spaces, -, letters, numbers</string>
+    <string name="community_community_name_tips">Only accept letters, numbers, space and “-“ sign.</string>
     <string name="community_name">Community Name</string>
     <string name="community_total_coins">Total coins: %s</string>
     <string name="community_unified_airdrop">Unified airdrop coins per account</string>
@@ -138,7 +138,7 @@
     <string name="community_mining_online">Mining online</string>
     <string name="community_mining_income">Mining Income</string>
     <string name="community_filter_all">All</string>
-    <string name="community_chain_note">Note</string>
+    <string name="community_chain_note">Notes</string>
     <string name="community_chain_market">Market</string>
     <string name="community_on_chain">Chain</string>
     <string name="community_tx_queue">Queue</string>
@@ -200,7 +200,7 @@
     <string name="setting_key_explain">Secret key is your private ID to be kept confidential, public key is your open ID for friends.</string>
     <string name="setting_account">My Public Key</string>
     <string name="setting_nickname">Nickname</string>
-    <string name="setting_import_seed">Tap to import secret key</string>
+    <string name="setting_import_seed">Import secrete key to change public key</string>
     <string name="setting_username_app">Nickname in app</string>
     <string name="setting_privacy_security">Privacy and Security</string>
     <string name="setting_community_setting">Community Setting</string>
@@ -259,8 +259,8 @@
     <string name="setting_processors">Processors</string>
     <string name="setting_dht_invoke">DHT Invoked Requests</string>
     <string name="setting_peers">Peers</string>
-    <string name="setting_download">Total Download</string>
-    <string name="setting_upload">Total Upload</string>
+    <string name="setting_download">Total Daily Download</string>
+    <string name="setting_upload">Total Daily Upload</string>
     <string name="setting_cpu">CPU/Processors</string>
     <string name="setting_memory">Memory</string>
     <string name="setting_heap_size">Heap Size</string>
@@ -299,7 +299,6 @@
     <string name="user_ban_list">Banlist</string>
     <string name="user_edit_name">Edit Name</string>
     <string name="user_mutual_communities">Mutual Communities:</string>
-    <string name="user_community_name">C/%1$s</string>
     <string name="user_new_name_hint">Nick Name</string>
     <string name="user_invalid_new_name">Invalid Nickname</string>
     <string name="user_invalid_friend_pk">Invalid Friend\'s Public Key</string>
@@ -320,7 +319,7 @@
     <string name="copy_message_hash">Message hash copied</string>
     <string name="copy_successfully">Copy successfully</string>
     <string name="copy_link_successfully">Copy link successfully</string>
-    <string name="blacklist_successfully">Blacklist successfully</string>
+    <string name="blacklist_successfully">Blacklisted</string>
     <string name="blacklist_failed">Blacklist failed</string>
     <string name="ban_successfully">Ban successfully</string>
     <string name="ban_failed">Ban failed</string>
@@ -333,10 +332,10 @@
     <string name="tx_address_hint">Address</string>
     <string name="tx_amount_hint">Amount</string>
     <string name="tx_memo_hint">Memo(optional)</string>
-    <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction fee: <font color="#477df9">%1$s</font> %2$s]]></Data></string>
+    <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction fee:<font color="#477df9"><u> %1$s </u></font>%2$s]]></Data></string>
     <string name="tx_new_name">Nick Name(required)</string>
     <string name="tx_personal_profile">Personal profile(Optional)</string>
-    <string name="tx_message">Comments(required)</string>
+    <string name="tx_message">Message(required)</string>
     <string name="tx_contact_id">%1$s(Optional)</string>
     <string name="tx_bootstrap_node">Bootstrap node(required)</string>
     <string name="tx_comment">Comment(required)</string>
@@ -357,8 +356,8 @@
     <string name="tx_error_type">No such transaction type!</string>
     <string name="tx_on_chain_msg">On-Chain Message</string>
     <string name="tx_fee_hint">Fee</string>
-    <string name="tx_median_fee_tips">Transaction median fee:%1$s</string>
-    <string name="tx_fee_tips">*More transaction fees more opportunities be packaged miners.</string>
+    <string name="tx_median_fee_tips">Median fee:%1$s</string>
+    <string name="tx_fee_tips">*The higher fee, the faster the note will be accepted by community.</string>
     <string name="tx_error_invalid_pk">Invalid receiver\'s Public Key!</string>
     <string name="tx_error_invalid_amount">Invalid Transaction amount</string>
     <string name="tx_error_invalid_free">Invalid Transaction free</string>
@@ -419,7 +418,7 @@
     <!-- Strings used for connected peers -->
     <string name="contacts_exchange_qr">Show QR code to add friend</string>
     <string name="contacts_import_friend_pk">Import Public Key to add friend</string>
-    <string name="contacts_have_added">Welcome friend.</string>
+    <string name="contacts_have_added">Hello.</string>
     <string name="contacts_accepting_airdrop">Accepting airdrop.</string>
     <string name="contacts_yourself">&#160;-&#160;yourself</string>
     <string name="contacts_discovered">Discovered</string>
@@ -448,13 +447,12 @@
     <string name="bot_airdrop_history">Airdrop History</string>
     <string name="bot_airdrop_members">Members</string>
     <string name="bot_airdrop_members_error">Members invalid</string>
-    <string name="bot_airdrop_members_hit">input how many address to airdrop</string>
+    <string name="bot_airdrop_members_hit">Max number of airdropping members</string>
     <string name="bot_airdrop_coins">Airdrop Coins</string>
     <string name="bot_airdrop_coins_error">Airdrop Coins invalid</string>
-    <string name="bot_airdrop_coins_hit">input how many airdrop coins to an address</string>
+    <string name="bot_airdrop_coins_hit">Number of coins for each member</string>
     <string name="bot_airdrop_referral_bonus">Referral Bonus</string>
-    <string name="bot_airdrop_coins_total">In total</string>
-    <string name="bot_airdrop_coins_total_value">%1$scoins</string>
+    <string name="bot_airdrop_coins_total_value">Total %1$s coins</string>
     <string name="bot_airdrop_participants_progress">Participants Progress</string>
     <string name="bot_airdrop_coins_usage">Coins Usage</string>
     <string name="bot_airdrop_tau_link">TAU Link</string>

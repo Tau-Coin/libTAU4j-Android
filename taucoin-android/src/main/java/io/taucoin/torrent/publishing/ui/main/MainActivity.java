@@ -75,7 +75,6 @@ import io.taucoin.torrent.publishing.ui.friends.AirdropCommunityActivity;
 import io.taucoin.torrent.publishing.ui.notify.NotificationViewModel;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.KeyQRCodeActivity;
-import io.taucoin.torrent.publishing.ui.setting.DataCostActivity;
 import io.taucoin.torrent.publishing.ui.setting.FontSizeActivity;
 import io.taucoin.torrent.publishing.ui.setting.SettingActivity;
 import io.taucoin.torrent.publishing.ui.setting.WorkingConditionActivity;
@@ -352,9 +351,6 @@ public class MainActivity extends ScanTriggerActivity {
                 break;
             case R.id.item_share:
                 ActivityUtil.shareText(this, getString(R.string.app_share), Constants.APP_SHARE_URL);
-                break;
-            case R.id.item_data_cost:
-                ActivityUtil.startActivity(this, DataCostActivity.class);
                 break;
             case R.id.item_working_condition:
                 ActivityUtil.startActivity(this, WorkingConditionActivity.class);

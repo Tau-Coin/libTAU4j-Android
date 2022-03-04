@@ -60,7 +60,6 @@ public class UserCommunityListAdapter extends ListAdapter<Member, UserCommunityL
                 return;
             }
             String communityName = ChainIDUtil.getName(member.chainID);
-            communityName = context.getString(R.string.user_community_name, communityName);
             holder.binding.tvName.setText(communityName);
 
             String balance = FmtMicrometer.fmtBalance(member.balance);

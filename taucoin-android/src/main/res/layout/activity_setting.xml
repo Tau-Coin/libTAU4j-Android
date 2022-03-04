@@ -109,60 +109,23 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/widget_size_5"
-                        android:onClick="onClick"
                         android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    <TextView
-                        android:id="@+id/tv_import_new_key"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/widget_size_0"
-                        android:textColor="@color/gray_dark"
-                        android:onClick="onClick"
-                        android:text="@string/setting_import_seed"
-                        android:textAppearance="@style/TextAppearanceBody2"/>
 
                 </LinearLayout>
 
-<!--                <LinearLayout-->
-<!--                    android:orientation="vertical"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:background="@color/color_white"-->
-<!--                    android:layout_marginTop="@dimen/widget_size_10"-->
-<!--                    android:paddingTop="@dimen/widget_size_10"-->
-<!--                    android:paddingBottom="@dimen/widget_size_5"-->
-<!--                    android:paddingStart="@dimen/widget_size_20"-->
-<!--                    android:paddingEnd="@dimen/widget_size_20">-->
-
-<!--                    <TextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:textColor="@color/primary"-->
-<!--                        android:text="@string/setting_nickname"-->
-<!--                        android:textAppearance="@style/TextAppearanceBody1"/>-->
-
-<!--                    <TextView-->
-<!--                        android:id="@+id/tv_username"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:background="@null"-->
-<!--                        android:layout_marginTop="@dimen/widget_size_5"-->
-<!--                        android:singleLine="true"-->
-<!--                        android:onClick="onClick"-->
-<!--                        android:ellipsize="end"-->
-<!--                        android:textAppearance="@style/TextAppearanceBody1" />-->
-
-<!--                    <TextView-->
-<!--                        android:id="@+id/tv_username_title"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_marginTop="@dimen/widget_size_0"-->
-<!--                        android:textColor="@color/gray_dark"-->
-<!--                        android:text="@string/setting_username_app"-->
-<!--                        android:textAppearance="@style/TextAppearanceBody2"/>-->
-
-<!--                </LinearLayout>-->
+                <TextView
+                    android:id="@+id/tv_import_new_key"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:background="@color/color_white"
+                    android:onClick="onClick"
+                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingEnd="@dimen/widget_size_20"
+                    android:paddingTop="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_10"
+                    android:text="@string/setting_import_seed"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -218,7 +181,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/color_white"
-                    android:layout_marginTop="@dimen/widget_size_15"
+                    android:layout_marginTop="@dimen/widget_size_10"
                     android:paddingTop="@dimen/widget_size_10"
                     android:paddingBottom="@dimen/widget_size_10">
 
@@ -245,6 +208,24 @@
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_privacy_security"
                         app:rightText="@string/setting_privacy_security"/>
+
+                    <include
+                        android:layout_marginStart="@dimen/widget_size_55"
+                        layout="@layout/view_line"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/widget_size_1" />
+
+                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                        android:id="@+id/item_data_cost"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/widget_size_7"
+                        android:paddingBottom="@dimen/widget_size_7"
+                        android:gravity="center_vertical"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:onClick="onClick"
+                        app:leftImage="@mipmap/icon_dashboard"
+                        app:rightText="@string/drawer_data_cost"/>
 
                     <include
                         android:layout_marginStart="@dimen/widget_size_55"

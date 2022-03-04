@@ -23,8 +23,6 @@ public class RaeSeekBar extends AppCompatSeekBar {
     private String[] mTickMarkTitles = new String[]{
             "A",
             "Default",
-            "",
-            "",
             "A"
     };
 
@@ -34,9 +32,7 @@ public class RaeSeekBar extends AppCompatSeekBar {
     private String[] mFontScaleSize = new String[]{
             "0.85",
             "1.0",
-            "1.15",
-            "1.3",
-            "1.45"
+            "1.15"
     };
 
     // 刻度文本画笔

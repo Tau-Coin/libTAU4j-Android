@@ -2,7 +2,6 @@ package io.taucoin.torrent.publishing.ui.setting;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -138,6 +137,9 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
             case R.id.item_privacy_security:
                 ActivityUtil.startActivity(this, PrivacySecurityActivity.class);
                 break;
+            case R.id.item_data_cost:
+                ActivityUtil.startActivity(this, DataCostActivity.class);
+                break;
             case R.id.item_font_size:
                 ActivityUtil.startActivityForResult(this, FontSizeActivity.class,
                         FontSizeActivity.REQUEST_CODE_FONT_SIZE);
@@ -155,7 +157,6 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
             case R.id.item_debug:
                 ActivityUtil.startActivity(this, DebugActivity.class);
                 break;
-            case R.id.tv_public_key:
             case R.id.tv_import_new_key:
                 viewModel.showSaveSeedDialog(this, false);
                 break;

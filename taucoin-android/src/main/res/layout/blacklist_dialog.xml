@@ -15,7 +15,7 @@
             android:layout_width="@dimen/widget_size_18"
             android:layout_height="@dimen/widget_size_18"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_0"
             android:layout_marginBottom="@dimen/widget_size_10"
             android:contentDescription="@null"
             android:src="@mipmap/icon_close" />
@@ -40,21 +40,12 @@
             android:layout_centerHorizontal="true"
             android:text="@string/common_submit"
             android:layout_marginTop="@dimen/widget_size_25"
+            android:layout_marginBottom="@dimen/widget_size_10"
             android:textAllCaps="true"
             android:gravity="center_horizontal|center"
             android:textColor="@color/color_white"
             android:textAppearance="@style/TextAppearanceBody1"
             android:background="@drawable/primary_rect_round_bg" />
-
-        <CheckBox
-            android:id="@+id/cb_do_not_show"
-            android:layout_below="@+id/tv_submit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="@string/common_do_not_show"
-            android:textColor="@color/gray_dark"
-            android:textAppearance="@style/TextAppearanceBody2"/>
 
     </RelativeLayout>
 </layout>
