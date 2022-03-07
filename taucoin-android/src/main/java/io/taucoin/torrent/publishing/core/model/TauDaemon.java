@@ -218,7 +218,7 @@ public abstract class TauDaemon {
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
                 .setDhtNonReferable(true)
                 .setDhtPingInterval(3600)
-                .setDhtBootstrapInterval(5)
+                .setDhtBootstrapInterval(10)
                 .setNetworkInterface(getLocalNetworkAddress())
                 .build();
         sessionManager.start(sessionParams);
@@ -330,7 +330,7 @@ public abstract class TauDaemon {
             boolean isForeground = settingsRepo.getBooleanValue(key);
             logger.info("foreground running::{}", isForeground);
             if (isRunning && sessionManager != null) {
-                int interval = isForeground ? 5 : 10;
+                int interval = isForeground ? 10 : 15;
                 sessionManager.updateBootstrapIntervel(interval);
                 logger.info("update bootstrap interval::{}", interval);
             }
