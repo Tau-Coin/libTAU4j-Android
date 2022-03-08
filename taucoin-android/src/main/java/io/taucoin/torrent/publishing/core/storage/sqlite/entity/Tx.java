@@ -27,6 +27,7 @@ public class Tx implements Parcelable {
     public String memo;                     // 交易的备注、描述等
     public int txStatus;                    // 交易的状态 0：未上链（在交易池中）；1：上链成功 (不上链)
     public long blockNumber;                // 交易所属的区块号
+    public String blockHash;                // 交易所属的区块哈希
 
     public String receiverPk;               // 交易接收者的公钥 只针对TxType.WRING_TX类型
     public long amount;                     // 交易金额 只针对TxType.WRING_TX类型
@@ -35,6 +36,7 @@ public class Tx implements Parcelable {
 
     public String coinName;                 // 币名 只针对TxType.SELL_TX类型
     public String link;                     // 用户link 只针对TxType.SELL_TX类型
+    public long quantity;                   // 币的数量 只针对TxType.SELL_TX类型
     public String location;                 // 位置信息 只针对TxType.SELL_TX类型
     public long queueID = -1;               // 交易对应的队列ID
     public int pinned;                      // 是否置顶固定 0：未固定；1：固定
@@ -66,12 +68,13 @@ public class Tx implements Parcelable {
     }
 
     @Ignore
-    public Tx(@NonNull String chainID, long fee, int txType, String coinName,
+    public Tx(@NonNull String chainID, long fee, int txType, String coinName, long quantity,
               String link, String location, String memo){
         this.chainID = chainID;
         this.fee = fee;
         this.txType = txType;
         this.coinName = coinName;
+        this.quantity = quantity;
         this.link = link;
         this.location = location;
         this.memo = memo;

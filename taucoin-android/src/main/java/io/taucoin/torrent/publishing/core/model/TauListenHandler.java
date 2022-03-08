@@ -26,6 +26,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
+import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
@@ -215,7 +216,13 @@ class TauListenHandler {
             }
             // 第一次创建
             int status = blockStatus == BlockStatus.ON_CHAIN ? 1 : 0;
-            blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty, status);
+            long timestamp = block.getTimestamp();
+            String previousBlockHash = null;
+            if (block.getPreviousBlockHash() != null) {
+                previousBlockHash = ByteUtil.toHexString(block.getPreviousBlockHash());
+            }
+            blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty, 
+                    status, timestamp, previousBlockHash);
             blockRepository.addBlock(blockInfo);
             logger.info("Save Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}, status::{}",
                     chainID, blockHash, blockNumber, rewards, status);
@@ -270,9 +277,10 @@ class TauListenHandler {
                 }
                 tx.txStatus = status;
                 tx.blockNumber = block.getBlockNumber();
+                tx.blockHash = block.Hash();
                 txRepo.updateTransaction(tx);
             } else {
-                handleTransactionData(block.getBlockNumber(), txMsg,
+                handleTransactionData(block.getBlockNumber(), block.Hash(), txMsg,
                         blockStatus == BlockStatus.ON_CHAIN);
             }
             // 处理用户信息
@@ -285,10 +293,11 @@ class TauListenHandler {
     /**
      * 直接添加新的交易
      * @param blockNumber 区块号
+     * @param blockHash 区块哈希
      * @param txMsg 交易
      * @param onChain 是否上链
      */
-    private void handleTransactionData(long blockNumber, Transaction txMsg, boolean onChain) {
+    private void handleTransactionData(long blockNumber, String blockHash, Transaction txMsg, boolean onChain) {
         if (isTransactionEmpty(txMsg)) {
             logger.info("handleTransactionData transaction empty");
             return;
@@ -303,6 +312,7 @@ class TauListenHandler {
         tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
         tx.txStatus = onChain ? 1 : 0;
         tx.blockNumber = blockNumber;
+        tx.blockHash = blockHash;
         tx.timestamp = txMsg.getTimestamp();
         tx.nonce = txMsg.getNonce();
         tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
@@ -312,8 +322,14 @@ class TauListenHandler {
             SellTxContent sellTxContent = new SellTxContent(txMsg.getPayload());
             // 添加Sell信息
             tx.coinName = Utils.textBytesToString(sellTxContent.getCoinName());
+            tx.quantity = sellTxContent.getQuantity();
             tx.link = Utils.textBytesToString(sellTxContent.getLink());
             tx.location = Utils.textBytesToString(sellTxContent.getLocation());
+        } else if (tx.txType == TxType.AIRDROP_TX.getType()) {
+            AirdropTxContent sellTxContent = new AirdropTxContent(txMsg.getPayload());
+            // 添加Airdrop信息
+            tx.coinName = Utils.textBytesToString(sellTxContent.getCoinName());
+            tx.link = Utils.textBytesToString(sellTxContent.getLink());
         }
         txRepo.addTransaction(tx);
         logger.info("Add transaction to local, txID::{}, txType::{}", txID, tx.txType);
@@ -468,7 +484,7 @@ class TauListenHandler {
         logger.debug("handleNewTransaction txID::{}, timestamp::{}, nonce::{}, exist::{}, transaction empty::{}",
                 txID, txMsg.getTimestamp(), txMsg.getNonce(), tx != null, isTransactionEmpty(txMsg));
         if (null == tx) {
-            handleTransactionData(0, txMsg, false);
+            handleTransactionData(0, null, txMsg, false);
         }
     }
 

@@ -84,8 +84,8 @@ import io.taucoin.torrent.publishing.ui.qrcode.KeyQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.setting.FontSizeActivity;
 import io.taucoin.torrent.publishing.ui.setting.SettingActivity;
 import io.taucoin.torrent.publishing.ui.setting.WorkingConditionActivity;
-import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
 import io.taucoin.torrent.publishing.ui.qrcode.UserQRCodeActivity;
+import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
@@ -711,7 +711,7 @@ public class MainActivity extends ScanTriggerActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CommunityFragment.MEMBERS_REQUEST_CODE && resultCode == RESULT_OK) {
             goBack();
-        } else if (requestCode == TxsTabFragment.TX_REQUEST_CODE) {
+        } else if (requestCode == CommunityTabFragment.TX_REQUEST_CODE) {
             if (currentFragment != null) {
                 currentFragment.onFragmentResult(requestCode, resultCode, data);
             }

@@ -20,7 +20,7 @@ public class SyncStatusActivity extends BaseActivity {
 
     private CompositeDisposable disposables = new CompositeDisposable();
     private ActivityListBinding binding;
-    private SyncListAdapter adapter;
+    private BlockListAdapter adapter;
     private CommunityViewModel communityViewModel;
     private String chainID;
 
@@ -52,7 +52,7 @@ public class SyncStatusActivity extends BaseActivity {
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        adapter = new SyncListAdapter();
+        adapter = new BlockListAdapter();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(adapter);

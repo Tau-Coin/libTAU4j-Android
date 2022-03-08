@@ -11,6 +11,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
+import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -22,7 +23,7 @@ public class BlockRepositoryImpl implements BlockRepository{
 
     private Context appContext;
     private AppDatabase db;
-    private PublishSubject<String> dataSetChangedPublish = PublishSubject.create();
+    private PublishSubject<DataChanged> dataSetChangedPublish = PublishSubject.create();
     private ExecutorService sender = Executors.newSingleThreadExecutor();
 
     /**
@@ -42,7 +43,9 @@ public class BlockRepositoryImpl implements BlockRepository{
      */
     @Override
     public long addBlock(@NonNull BlockInfo block) {
-        return db.blockDao().addBlock(block);
+        long result = db.blockDao().addBlock(block);
+        submitDataSetChanged();
+        return result;
     }
 
     /**
@@ -52,18 +55,29 @@ public class BlockRepositoryImpl implements BlockRepository{
      */
     @Override
     public int updateBlock(@NonNull BlockInfo block) {
-        return db.blockDao().updateBlock(block);
+        int result = db.blockDao().updateBlock(block);
+        submitDataSetChanged();
+        return result;
     }
 
     @Override
-    public Observable<String> observeDataSetChanged() {
+    public Observable<DataChanged> observeDataSetChanged() {
         return dataSetChangedPublish;
     }
 
     @Override
     public void submitDataSetChanged() {
-        String dateTime = DateUtil.getDateTime();
-        sender.submit(() -> dataSetChangedPublish.onNext(dateTime));
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(DateUtil.getDateTime());
+        submitDataSetChangedDirect(stringBuilder);
+    }
+
+    private void submitDataSetChangedDirect(StringBuilder msg) {
+        sender.submit(() -> {
+            DataChanged result = new DataChanged();
+            result.setMsg(msg.toString());
+            dataSetChangedPublish.onNext(result);
+        });
     }
 
     /**
@@ -90,5 +104,10 @@ public class BlockRepositoryImpl implements BlockRepository{
     @Override
     public Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID) {
         return db.blockDao().observeCommunitySyncStatus(chainID);
+    }
+
+    @Override
+    public List<BlockInfo> queryCommunityBlocks(String chainID, int pos, int pageSize) {
+        return db.blockDao().queryCommunityBlocks(chainID, pos, pageSize);
     }
 }

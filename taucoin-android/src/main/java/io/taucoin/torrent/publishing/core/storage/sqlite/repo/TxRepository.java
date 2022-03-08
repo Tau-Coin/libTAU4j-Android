@@ -4,7 +4,6 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
@@ -23,12 +22,6 @@ public interface TxRepository {
      * 更新交易
      */
     int updateTransaction(Tx transaction);
-
-    /**
-     * 根据chainID查询社区交易
-     * @param chainID 社区链ID
-     */
-    List<UserAndTx> queryCommunityTxs(String chainID, int currentTab, int startPos, int loadSize);
 
     /**
      * 加载交易固定数据
@@ -97,4 +90,20 @@ public interface TxRepository {
     void setMessagePinned(String txID, int pinned, long pinnedTime, boolean isRefresh);
 
     Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID);
+
+    List<UserAndTx> loadOnChainNotesData(String chainID, int pos, int pageSize);
+
+    List<UserAndTx> loadOffChainNotesData(String chainID, int pos, int pageSize);
+
+    List<UserAndTx> loadAllNotesData(String chainID, int pos, int pageSize);
+
+    List<UserAndTx> loadAirdropMarketData(String chainID, int pos, int pageSize);
+
+    List<UserAndTx> loadSellMarketData(String chainID, int pos, int pageSize);
+
+    List<UserAndTx> loadAllMarketData(String chainID, int pos, int pageSize);
+
+    List<UserAndTx> loadOnChainAllTxs(String chainID, int pos, int pageSize);
+
+    List<UserAndTx> loadAllWiringTxs(String chainID, int pos, int pageSize);
 }

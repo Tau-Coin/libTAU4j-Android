@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
@@ -66,6 +68,8 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
         binding.toolbarInclude.toolbar.setTitle(R.string.community_sell_coins);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        binding.etQuantity.setFilters(new InputFilter[]{new MoneyValueFilter()});
 
         if (StringUtil.isNotEmpty(chainID)) {
 
@@ -133,11 +137,12 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
         int txType = TxType.SELL_TX.getType();
         String fee = ViewUtils.getStringTag(binding.tvFee);
         String coinName = ViewUtils.getText(binding.etCoinName);
+        String quantity = ViewUtils.getText(binding.etQuantity);
         String link = ViewUtils.getText(binding.etLink);
         String location = ViewUtils.getText(binding.etLocation);
         String description = ViewUtils.getText(binding.etDescription);
-        return new Tx(chainID, FmtMicrometer.fmtTxLongValue(fee), txType, coinName, link,
-                location, description);
+        return new Tx(chainID, FmtMicrometer.fmtTxLongValue(fee), txType, coinName,
+                FmtMicrometer.fmtTxLongValue(quantity), link, location, description);
     }
 
     @Override

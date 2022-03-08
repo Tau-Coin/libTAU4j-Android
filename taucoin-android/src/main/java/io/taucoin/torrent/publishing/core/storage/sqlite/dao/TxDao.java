@@ -9,7 +9,6 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 
@@ -26,69 +25,78 @@ public interface TxDao {
             " ON tx.senderPk = t.receiverPk" +
             " WHERE tx.chainID = :chainID AND tx.txID = :txID";
 
+    String QUERY_GET_TXS_ORDER = " ORDER BY tx.timestamp DESC limit :loadSize offset :startPosition";
+
     // SQL:查询社区里的交易(MARKET交易，排除Trust Tx, 并且上链)
-    String QUERY_GET_MARKET_TXS = "SELECT tx.*, t.trusts" +
+    String QUERY_GET_MARKET_SELECT = "SELECT tx.*, t.trusts" +
             " FROM Txs AS tx" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
             " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
             " ON tx.senderPk = t.receiverPk" +
             " WHERE tx.chainID = :chainID AND txStatus = 1" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
-            " AND (tx.txType = 3 OR tx.txType = 5)" +
-            " ORDER BY tx.timestamp DESC" +
-            " limit :loadSize offset :startPosition";
+            " AND (tx.txType = 3 OR tx.txType = 5)";
+
+    String QUERY_GET_ALL_MARKET = QUERY_GET_MARKET_SELECT +
+            " AND (tx.txType = 3 OR tx.txType = 5)" + QUERY_GET_TXS_ORDER;
+
+    String QUERY_GET_AIRDROP_MARKET = QUERY_GET_MARKET_SELECT +
+            " AND tx.txType = 5" + QUERY_GET_TXS_ORDER;
+
+    String QUERY_GET_SELL_MARKET = QUERY_GET_MARKET_SELECT +
+            " AND tx.txType = 3" + QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区里的交易(所有，排除WIRING Tx)
-    String QUERY_GET_NOTE_TXS = "SELECT tx.*, t.trusts" +
+    String QUERY_GET_NOTES_SELECT = "SELECT tx.*, t.trusts" +
             " FROM Txs AS tx" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
             " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
             " ON tx.senderPk = t.receiverPk" +
             " WHERE tx.chainID = :chainID AND txType != 2" +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
-            " ORDER BY tx.timestamp DESC" +
-            " limit :loadSize offset :startPosition";
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST;
+
+    String QUERY_GET_ALL_NOTES = QUERY_GET_NOTES_SELECT +
+            QUERY_GET_TXS_ORDER;
+
+    String QUERY_GET_ON_CHAIN_NOTES = QUERY_GET_NOTES_SELECT +
+            " AND txStatus = 1" +
+            QUERY_GET_TXS_ORDER;
+
+    String QUERY_GET_OFF_CHAIN_NOTES = QUERY_GET_NOTES_SELECT +
+            " AND txStatus = 0" +
+            QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区里的交易(上链)
-    String QUERY_GET_ON_CHAIN_TXS = "SELECT tx.*, t.trusts" +
+    String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, t.trusts" +
             " FROM Txs AS tx" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
             " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
             " ON tx.senderPk = t.receiverPk" +
-            " WHERE tx.chainID = :chainID AND tx.txStatus = 1" +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
-            " ORDER BY tx.timestamp DESC" +
-            " limit :loadSize offset :startPosition";
+            " WHERE tx.chainID = :chainID" +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST;
+
+    // SQL:查询社区里的交易(上链)
+    String QUERY_GET_ON_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT +
+            " AND tx.txStatus = 1" +
+            QUERY_GET_TXS_ORDER;
+
+    String QUERY_GET_CHAIN_WIRING_TXS = QUERY_GET_CHAIN_TXS_SELECT +
+            " AND tx.txType = 2" +
+            QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区里的置顶交易(所有，排除WIRING Tx)
-    String QUERY_GET_NOTE_PINNED_TXS = "SELECT tx.*, t.trusts" +
-            " FROM Txs AS tx" +
-            " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
-            " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
-            " ON tx.senderPk = t.receiverPk" +
-            " WHERE tx.chainID = :chainID AND txType != 2 AND pinned == 1" +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
+    String QUERY_GET_NOTE_PINNED_TXS = QUERY_GET_NOTES_SELECT +
+            " AND pinned == 1" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里的置顶交易(MARKET交易，排除Trust Tx, 并且上链)
-    String QUERY_GET_MARKET_PINNED_TXS = "SELECT tx.*, t.trusts" +
-            " FROM Txs AS tx" +
-            " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
-            " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
-            " ON tx.senderPk = t.receiverPk" +
-            " WHERE tx.chainID = :chainID AND txStatus = 1 AND pinned == 1" +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
-            " AND (tx.txType = 3 OR tx.txType = 5)" +
+    String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
+            " AND (tx.txType = 3 OR tx.txType = 5)  AND pinned == 1 " +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里的置顶交易(上链)
-    String QUERY_GET_ON_CHAIN_PINNED_TXS = "SELECT tx.*, t.trusts" +
-            " FROM Txs AS tx" +
-            " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
-            " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
-            " ON tx.senderPk = t.receiverPk" +
-            " WHERE tx.chainID = :chainID AND tx.txStatus = 1 AND pinned == 1" +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
+    String QUERY_GET_CHAIN_PINNED_TXS = QUERY_GET_CHAIN_TXS_SELECT +
+            "AND (tx.txStatus = 1 OR tx.txType = 2) AND pinned == 1" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里用户Trust交易(上链)
@@ -140,19 +148,39 @@ public interface TxDao {
      * @param chainID 社区链id
      */
     @Transaction
-    @Query(QUERY_GET_ON_CHAIN_TXS)
-    List<UserAndTx> queryCommunityOnChainTxs(String chainID, int startPosition, int loadSize);
+    @Query(QUERY_GET_ON_CHAIN_ALL_TXS)
+    List<UserAndTx> loadOnChainAllTxs(String chainID, int startPosition, int loadSize);
 
     @Transaction
-    @Query(QUERY_GET_MARKET_TXS)
-    List<UserAndTx> queryCommunityMarketTxs(String chainID, int startPosition, int loadSize);
+    @Query(QUERY_GET_CHAIN_WIRING_TXS)
+    List<UserAndTx> loadAllWiringTxs(String chainID, int startPosition, int loadSize);
 
     @Transaction
-    @Query(QUERY_GET_NOTE_TXS)
-    List<UserAndTx> queryCommunityNoteTxs(String chainID, int startPosition, int loadSize);
+    @Query(QUERY_GET_AIRDROP_MARKET)
+    List<UserAndTx> loadAirdropMarketData(String chainID, int startPosition, int loadSize);
 
     @Transaction
-    @Query(QUERY_GET_ON_CHAIN_PINNED_TXS)
+    @Query(QUERY_GET_SELL_MARKET)
+    List<UserAndTx> loadSellMarketData(String chainID, int startPosition, int loadSize);
+
+    @Transaction
+    @Query(QUERY_GET_ALL_MARKET)
+    List<UserAndTx> loadAllMarketData(String chainID, int startPosition, int loadSize);
+
+    @Transaction
+    @Query(QUERY_GET_ON_CHAIN_NOTES)
+    List<UserAndTx> loadOnChainNotesData(String chainID, int startPosition, int loadSize);
+
+    @Transaction
+    @Query(QUERY_GET_OFF_CHAIN_NOTES)
+    List<UserAndTx> loadOffChainNotesData(String chainID, int startPosition, int loadSize);
+
+    @Transaction
+    @Query(QUERY_GET_ALL_NOTES)
+    List<UserAndTx> loadAllNotesData(String chainID, int startPosition, int loadSize);
+
+    @Transaction
+    @Query(QUERY_GET_CHAIN_PINNED_TXS)
     List<UserAndTx> queryCommunityOnChainPinnedTxs(String chainID);
 
     @Transaction
@@ -164,7 +192,7 @@ public interface TxDao {
     List<UserAndTx> queryCommunityNotePinnedTxs(String chainID);
 
     @Transaction
-    @Query(QUERY_GET_ON_CHAIN_PINNED_TXS + " limit 1")
+    @Query(QUERY_GET_CHAIN_PINNED_TXS + " limit 1")
     Flowable<List<UserAndTx>> observeOnChainLatestPinnedTx(String chainID);
 
     @Transaction

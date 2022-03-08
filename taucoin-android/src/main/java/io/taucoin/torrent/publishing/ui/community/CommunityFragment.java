@@ -6,6 +6,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,11 +24,20 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
-import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
+import io.taucoin.torrent.publishing.ui.transaction.BlocksTabFragment;
+import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
+import io.taucoin.torrent.publishing.ui.transaction.ChainTabFragment;
+import io.taucoin.torrent.publishing.ui.transaction.MarketTabFragment;
+import io.taucoin.torrent.publishing.ui.transaction.NoteCreateActivity;
+import io.taucoin.torrent.publishing.ui.transaction.NotesTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.QueueTabFragment;
-import io.taucoin.torrent.publishing.ui.transaction.TxsTabFragment;
+import io.taucoin.torrent.publishing.ui.transaction.SellCreateActivity;
+import io.taucoin.torrent.publishing.ui.transaction.SpinnerAdapter;
+import io.taucoin.torrent.publishing.ui.transaction.TransactionCreateActivity;
+
+import static io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment.TX_REQUEST_CODE;
 
 /**
  * 单个群组页面
@@ -41,8 +51,12 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private CompositeDisposable disposables = new CompositeDisposable();
     private CommunityTabFragment currentTabFragment = null;
     private TextView selectedView = null;
+    private int currentTab = -1;
+    private int[] spinnerItems;
+    private int spinnerSelected = 0;
     private String chainID;
     private boolean isReadOnly = true;
+    private boolean isFirstLoad = true;
 
     @Nullable
     @Override
@@ -63,7 +77,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.toolbarInclude.setListener(this);
         initParameter();
         initLayout();
-        onClick(binding.tvChainNote);
+        initFabSpeedDial();
+        onClick(binding.tvNotes);
     }
 
     /**
@@ -90,7 +105,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.toolbarInclude.ivAction.setVisibility(View.VISIBLE);
         binding.toolbarInclude.ivAction.setImageResource(R.mipmap.icon_community_detail);
         binding.toolbarInclude.ivAction.setOnClickListener(v -> {
-            if(StringUtil.isEmpty(chainID)) {
+            if (StringUtil.isEmpty(chainID)) {
                 return;
             }
             Intent intent = new Intent();
@@ -98,48 +113,121 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
             ActivityUtil.startActivityForResult(intent, activity, CommunityDetailActivity.class, MEMBERS_REQUEST_CODE);
         });
+
+        int verticalOffset = -getResources().getDimensionPixelSize(R.dimen.widget_size_5);
+        binding.viewSpinner.setDropDownVerticalOffset(verticalOffset);
+        binding.viewSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!isFirstLoad) {
+                    if (currentTab == CommunityTabFragment.TAB_CHAIN) {
+                        spinnerSelected = position;
+                        loadTabView(selectedView);
+                    } else {
+                        if (currentTabFragment != null) {
+                            currentTabFragment.switchView(spinnerItems[position]);
+                        }
+                    }
+                }
+                isFirstLoad = false;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    /**
+     * 初始化右下角悬浮按钮组件
+     */
+    private void initFabSpeedDial() {
+        // 自定义点击事件
+        binding.fabButton.getMainFab().setOnClickListener(v ->{
+            if (isReadOnly) {
+                return;
+            }
+            switch (currentTab) {
+                case ChainTabFragment.TAB_NOTES:
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
+                            TX_REQUEST_CODE);
+                    break;
+                case ChainTabFragment.TAB_MARKET:
+                    intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
+                            TX_REQUEST_CODE);
+                    // market
+                    break;
+                case ChainTabFragment.TAB_CHAIN:
+                    // chain
+                    intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
+                            TX_REQUEST_CODE);
+                    break;
+            }
+        });
+    }
+
+    private void refreshSpinnerView() {
+        if (null == currentTabFragment || null == spinnerItems) {
+            return;
+        }
+        SpinnerAdapter adapter = new SpinnerAdapter(activity, spinnerItems);
+        isFirstLoad = true;
+        binding.viewSpinner.setSelection(0);
+        binding.viewSpinner.setAdapter(adapter);
     }
 
     /**
      * 加载Tab视图
      */
-    private void loadTabView(int tab) {
-        switch (tab) {
-            case 0:
+    private void loadTabView(View view) {
+        Bundle bundle = new Bundle();
+        bundle.putString(IntentExtra.CHAIN_ID, chainID);
+        bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
+
+        switch (view.getId()) {
+            case R.id.tv_notes:
                 // note
-                currentTabFragment = new TxsTabFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString(IntentExtra.CHAIN_ID, chainID);
-                bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
-                bundle.putInt(IntentExtra.TYPE, CommunityTabs.NOTE.getIndex());
-                currentTabFragment.setArguments(bundle);
+                spinnerItems = new int[] {R.string.community_view_all,
+                        R.string.community_view_onchain_notes,
+                        R.string.community_view_offchain_notes};
+                currentTabFragment = new NotesTabFragment();
+                currentTab = CommunityTabFragment.TAB_NOTES;
                 break;
-            case 1:
+            case R.id.tv_market:
                 // market
-                currentTabFragment = new TxsTabFragment();
-                bundle = new Bundle();
-                bundle.putString(IntentExtra.CHAIN_ID, chainID);
-                bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
-                bundle.putInt(IntentExtra.TYPE, CommunityTabs.MARKET.getIndex());
-                currentTabFragment.setArguments(bundle);
+                spinnerItems = new int[] {R.string.community_view_all,
+                        R.string.community_view_airdrop,
+                        R.string.community_view_sell};
+                currentTabFragment = new MarketTabFragment();
+                currentTab = CommunityTabFragment.TAB_MARKET;
                 break;
-            case 2:
-                // queue
-                currentTabFragment = new TxsTabFragment();
-                bundle = new Bundle();
-                bundle.putString(IntentExtra.CHAIN_ID, chainID);
-                bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
-                bundle.putInt(IntentExtra.TYPE, CommunityTabs.CHAIN.getIndex());
-                currentTabFragment.setArguments(bundle);
-                break;
-            case 3:
+            case R.id.tv_chain:
                 // chain
-                currentTabFragment = new QueueTabFragment();
-                bundle = new Bundle();
-                bundle.putString(IntentExtra.CHAIN_ID, chainID);
-                bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
-                currentTabFragment.setArguments(bundle);
+                spinnerItems = new int[] {R.string.community_view_blocks,
+                        R.string.community_view_queue,
+                        R.string.community_view_onchain_txs,
+                        R.string.community_view_wiring_txs};
+                if (spinnerItems[spinnerSelected] == R.string.community_view_queue) {
+                    currentTabFragment = new QueueTabFragment();
+                } else if (spinnerItems[spinnerSelected] == R.string.community_view_blocks) {
+                    currentTabFragment = new BlocksTabFragment();
+                } else {
+                    currentTabFragment = new ChainTabFragment();
+                    boolean onlyWiring = spinnerItems[spinnerSelected] == R.string.community_view_wiring_txs;
+                    bundle.putBoolean(IntentExtra.ONLY_WIRING, onlyWiring);
+                }
+                currentTab = CommunityTabFragment.TAB_CHAIN;
                 break;
+        }
+        if (currentTabFragment != null) {
+            currentTabFragment.setArguments(bundle);
         }
         replaceOrRemoveFragment(false);
     }
@@ -209,6 +297,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     if (currentTabFragment != null) {
                         currentTabFragment.handleReadOnly(isReadOnly);
                         this.isReadOnly = isReadOnly;
+                        int color = isReadOnly ? R.color.gray_light : R.color.primary;
+                        binding.fabButton.setMainFabClosedBackgroundColor(getResources().getColor(color));
                     }
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
                 }));
@@ -217,10 +307,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.tv_chain_note:
-            case R.id.tv_chain_market:
-            case R.id.tv_chain_tx:
-            case R.id.tv_tx_queue:
+            case R.id.tv_notes:
+            case R.id.tv_market:
+            case R.id.tv_chain:
                 // 避免同一页面多次刷新
                 if (this.selectedView != null && selectedView.getId() == v.getId()) {
                     return;
@@ -233,7 +322,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 selectedView.setBackgroundResource(R.drawable.yellow_rect_round_border_small_radius);
                 selectedView.setTextColor(getResources().getColor(R.color.color_yellow));
                 this.selectedView = selectedView;
-                loadTabView(StringUtil.getIntTag(selectedView));
+                this.spinnerSelected = 0;
+                loadTabView(selectedView);
+                refreshSpinnerView();
                 break;
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
@@ -247,6 +338,5 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         if (currentTabFragment != null) {
             currentTabFragment.onFragmentResult(requestCode, resultCode, data);
         }
-
     }
 }

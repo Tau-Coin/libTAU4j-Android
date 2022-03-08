@@ -12,10 +12,10 @@ import io.taucoin.torrent.publishing.R;
 
 public class SpinnerAdapter extends BaseAdapter {
     private Context context;
-    private String[] array;
+    private int[] array;
     private int selectPos;
 
-    SpinnerAdapter(Context context, String[] array) {
+    public SpinnerAdapter(Context context, int[] array) {
         this.context = context;
         this.array = array;
     }
@@ -52,10 +52,10 @@ public class SpinnerAdapter extends BaseAdapter {
         } else {
             view = layoutInflater.inflate(R.layout.item_spinner_dropdown, parent, false);
         }
-        ImageView ivSelected = view.findViewById(R.id.iv_selected);
         TextView tvContent = view.findViewById(R.id.tv_content);
-        ivSelected.setVisibility(position == selectPos ? View.VISIBLE : View.INVISIBLE);
-        tvContent.setText(array[position]);
+        View line = view.findViewById(R.id.view_line);
+        tvContent.setText(view.getResources().getString(array[position]));
+        line.setVisibility(position == array.length - 1 ? View.GONE : View.VISIBLE);
         return view;
     }
 }

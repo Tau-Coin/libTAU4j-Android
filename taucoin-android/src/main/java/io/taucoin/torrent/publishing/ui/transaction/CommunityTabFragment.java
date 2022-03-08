@@ -28,55 +28,61 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
+import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
-import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
-import io.taucoin.torrent.publishing.databinding.DialogTrustBinding;
-import io.taucoin.torrent.publishing.ui.CommunityTabFragment;
-import io.taucoin.torrent.publishing.ui.community.CommunityTabs;
-import io.taucoin.torrent.publishing.ui.constant.Page;
-import io.taucoin.torrent.publishing.ui.setting.FavoriteViewModel;
-import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
-import io.taucoin.torrent.publishing.MainApplication;
-import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
+import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
+import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
+import io.taucoin.torrent.publishing.databinding.DialogTrustBinding;
 import io.taucoin.torrent.publishing.databinding.FragmentTxsTabBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
+import io.taucoin.torrent.publishing.ui.BaseFragment;
+import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
+import io.taucoin.torrent.publishing.ui.setting.FavoriteViewModel;
+import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
-/**
- * 交易Tab页
- */
-public class TxsTabFragment extends CommunityTabFragment implements TxListAdapter.ClickListener,
-        View.OnClickListener {
+public abstract class CommunityTabFragment extends BaseFragment implements View.OnClickListener,
+        CommunityListener {
 
-    private static final Logger logger = LoggerFactory.getLogger("TxsTabFragment");
+    protected static final Logger logger = LoggerFactory.getLogger("CommunityTabFragment");
     public static final int TX_REQUEST_CODE = 0x1002;
-    private BaseActivity activity;
-    private FragmentTxsTabBinding binding;
-    private TxViewModel txViewModel;
-    private UserViewModel userViewModel;
+    public static final int TAB_NOTES = 0;
+    public static final int TAB_MARKET = 1;
+    public static final int TAB_CHAIN = 2;
+    protected BaseActivity activity;
+    protected FragmentTxsTabBinding binding;
+    protected TxViewModel txViewModel;
+    protected UserViewModel userViewModel;
     private FavoriteViewModel favoriteViewModel;
-    private CompositeDisposable disposables = new CompositeDisposable();
-    private TxListAdapter adapter;
+    protected CommunityViewModel communityViewModel;
+    protected CompositeDisposable disposables = new CompositeDisposable();
     private FloatMenu operationsMenu;
     private CommonDialog trustDialog;
 
-    private String chainID;
-    private int currentTab;
-    private boolean isReadOnly;
-    private int currentPos = 0;
+    protected boolean isReadOnly;
+    protected String chainID;
+    int currentTab;
+    int currentPos = 0;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof BaseActivity)
+            activity = (BaseActivity)context;
+    }
 
     @Nullable
     @Override
@@ -96,9 +102,9 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         txViewModel = provider.get(TxViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
         favoriteViewModel = provider.get(FavoriteViewModel.class);
+        communityViewModel = provider.get(CommunityViewModel.class);
         initParameter();
         initView();
-        initFabSpeedDial();
         handleReadOnly(isReadOnly);
     }
 
@@ -108,10 +114,6 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     private void initParameter() {
         if(getArguments() != null){
             chainID = getArguments().getString(IntentExtra.CHAIN_ID);
-            currentTab = getArguments().getInt(IntentExtra.TYPE, -1);
-            if(currentTab == -1){
-                binding.fabButton.setVisibility(View.GONE);
-            }
             isReadOnly = getArguments().getBoolean(IntentExtra.READ_ONLY, false);
         }
     }
@@ -119,129 +121,35 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     /**
      * 初始化视图
      */
-    private void initView() {
+    public void initView() {
         binding.refreshLayout.setOnRefreshListener(this);
-
-        adapter = new TxListAdapter(this, chainID);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
 //        layoutManager.setStackFromEnd(true);
         binding.txList.setLayoutManager(layoutManager);
         binding.txList.setItemAnimator(null);
-        binding.txList.setAdapter(adapter);
     }
 
-    private final Runnable handleUpdateAdapter = () -> {
+    final Runnable handleUpdateAdapter = () -> {
         LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
         if (layoutManager != null) {
-            int bottomPosition = adapter.getItemCount() - 1;
+            int bottomPosition = getItemCount() - 1;
             // 滚动到底部
             logger.debug("handleUpdateAdapter scrollToPosition::{}", bottomPosition);
             layoutManager.scrollToPositionWithOffset(bottomPosition, Integer.MIN_VALUE);
         }
     };
 
-    private final Runnable handlePullAdapter = () -> {
+    final Runnable handlePullAdapter = () -> {
         LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
         if (layoutManager != null) {
-            int bottomPosition = adapter.getItemCount() - 1;
+            int bottomPosition = getItemCount() - 1;
             int position = bottomPosition - currentPos;
             layoutManager.scrollToPositionWithOffset(position, 0);
         }
     };
 
-    /**
-     * 初始化右下角悬浮按钮组件
-     */
-    private void initFabSpeedDial() {
-        // 自定义点击事件
-        binding.fabButton.getMainFab().setOnClickListener(v ->{
-            if (isReadOnly) {
-                return;
-            }
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            if (currentTab == CommunityTabs.NOTE.getIndex()) {
-                ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
-                        TX_REQUEST_CODE);
-            } else if (currentTab == CommunityTabs.MARKET.getIndex()) {
-                ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
-                        TX_REQUEST_CODE);
-            } else {
-                ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
-                        TX_REQUEST_CODE);
-            }
-        });
-    }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof BaseActivity)
-            activity = (BaseActivity)context;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        txViewModel.observerChainTxs().observe(this, txs -> {
-            List<UserAndTx> currentList = new ArrayList<>(txs);
-            if (currentPos == 0) {
-                adapter.submitList(currentList, handleUpdateAdapter);
-            } else {
-                currentList.addAll(adapter.getCurrentList());
-                adapter.submitList(currentList, handlePullAdapter);
-            }
-            binding.refreshLayout.setRefreshing(false);
-            binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
-
-            logger.debug("txs.size::{}", txs.size());
-        });
-
-        loadData(0);
-
-        disposables.add(txViewModel.observeDataSetChanged()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
-                    // 跟当前用户有关系的才触发刷新
-                    if (result != null && StringUtil.isNotEmpty(result.getMsg())) {
-                        binding.refreshLayout.setRefreshing(false);
-                        binding.refreshLayout.setEnabled(false);
-                        // 立即执行刷新
-                        loadData(0);
-                    }
-                }));
-
-        userViewModel.getEditBlacklistResult().observe(this, result -> {
-            if (result.isSuccess()) {
-                ToastUtils.showShortToast(R.string.ban_successfully);
-            } else {
-                ToastUtils.showShortToast(R.string.ban_failed);
-            }
-        });
-
-        boolean isMarket = currentTab == CommunityTabs.MARKET.getIndex();
-        binding.llPinnedMessage.setVisibility(isMarket ? View.VISIBLE : View.GONE);
-        if (!isMarket) {
-            disposables.add(txViewModel.observeLatestPinnedMsg(currentTab, chainID)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(list -> {
-                        boolean isHavePinnedMsg = list != null && list.size() > 0;
-                        binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
-                        if (isHavePinnedMsg) {
-                            binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
-                        }
-                    }));
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        disposables.clear();
-    }
 
     /**
      * 显示每个item长按操作选项对话框
@@ -308,7 +216,12 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
 
     @Override
     public void onEditNameClicked(String senderPk){
-        userViewModel.showRemarkDialog(activity, senderPk);
+        String userPk = MainApplication.getInstance().getPublicKey();
+        if (StringUtil.isEquals(userPk, senderPk)) {
+            userViewModel.showEditNameDialog(activity, senderPk);
+        } else {
+            userViewModel.showRemarkDialog(activity, senderPk);
+        }
     }
 
     @Override
@@ -371,6 +284,37 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
     }
 
     @Override
+    public void onClick(View v) {
+        closeAllDialog();
+        switch (v.getId()) {
+            case R.id.ll_pinned_message:
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                intent.putExtra(IntentExtra.TYPE, currentTab);
+                ActivityUtil.startActivityForResult(intent, activity, PinnedActivity.class,
+                        NotesTabFragment.TX_REQUEST_CODE);
+                break;
+            case R.id.favourite:
+                String txID = ViewUtils.getStringTag(v);
+                favoriteViewModel.addTxFavorite(txID);
+                ToastUtils.showShortToast(R.string.favourite_successfully);
+                break;
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposables.clear();
+    }
+
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         closeAllDialog();
@@ -386,43 +330,24 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        closeAllDialog();
-        switch (v.getId()) {
-            case R.id.ll_pinned_message:
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                intent.putExtra(IntentExtra.TYPE, currentTab);
-                ActivityUtil.startActivityForResult(intent, activity, PinnedActivity.class,
-                        TxsTabFragment.TX_REQUEST_CODE);
-                break;
-            case R.id.favourite:
-                String txID = ViewUtils.getStringTag(v);
-                favoriteViewModel.addTxFavorite(txID);
-                ToastUtils.showShortToast(R.string.favourite_successfully);
-                break;
-        }
-    }
-
-    @Override
     public void handleReadOnly(boolean isReadOnly) {
         if (null == binding) {
             return;
         }
         this.isReadOnly = isReadOnly;
-        int color = isReadOnly ? R.color.gray_light : R.color.primary;
-        binding.fabButton.setMainFabClosedBackgroundColor(getResources().getColor(color));
     }
 
     @Override
     public void onRefresh() {
-        loadData(adapter.getItemCount());
+        loadData(getItemCount());
     }
 
-    private void loadData(int pos) {
+    int getItemCount() {
+        return 0;
+    }
+
+    protected void loadData(int pos) {
         currentPos = pos;
-        txViewModel.loadTxsData(currentTab, chainID, pos);
     }
 
     @Override
@@ -431,5 +356,8 @@ public class TxsTabFragment extends CommunityTabFragment implements TxListAdapte
         if (requestCode == TX_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             loadData(0);
         }
+    }
+
+    public void switchView(int spinnerItem) {
     }
 }

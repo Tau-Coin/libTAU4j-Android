@@ -1,6 +1,5 @@
 package io.taucoin.torrent.publishing.ui.chat;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -29,15 +28,11 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
-import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
-import io.taucoin.torrent.publishing.core.utils.selecttext.SelectTextEventBus;
-import io.taucoin.torrent.publishing.core.utils.selecttext.SelectTextHelper;
 import io.taucoin.torrent.publishing.databinding.ItemTextBinding;
 import io.taucoin.torrent.publishing.databinding.ItemTextRightBinding;
 import io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView;
@@ -57,12 +52,10 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
     private byte[] myHeadPic;
     private Bitmap bitmap;
     private Bitmap myBitmap;
-    private Context mContext;
 
-    ChatListAdapter(Context context, ClickListener listener) {
+    ChatListAdapter(ClickListener listener) {
         super(diffCallback);
         this.listener = listener;
-        this.mContext = context;
     }
 
     public void setFriend(User friend) {
@@ -116,10 +109,12 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ChatMsgAndLog previousChat = null;
+        long previousTime = 0;
         if (position > 0) {
-            previousChat = getItem(position - 1);
+            previousTime = getItem(position - 1).timestamp;
         }
+        ChatMsgAndLog currentChat = getItem(position);
+        boolean isShowTime = DateUtil.isShowTime(currentChat.timestamp, previousTime);
         if (getItemViewType(position) == ViewType.RIGHT_TEXT.ordinal()) {
             User myself = MainApplication.getInstance().getCurrentUser();
             if (myself != null) {
@@ -130,10 +125,10 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
                 }
             }
             ItemTextRightBinding binding = (ItemTextRightBinding) holder.binding;
-            holder.bindTextRight(binding, getItem(position), previousChat, myBitmap);
+            holder.bindTextRight(binding, currentChat, isShowTime, myBitmap);
         } else {
             ItemTextBinding binding = (ItemTextBinding) holder.binding;
-            holder.bindText(binding, getItem(position), previousChat, bitmap);
+            holder.bindText(binding, currentChat, isShowTime, bitmap);
         }
     }
 
@@ -148,25 +143,25 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             this.listener = listener;
         }
 
-        void bindTextRight(ItemTextRightBinding binding, ChatMsgAndLog msg, ChatMsgAndLog previousChat, Bitmap myBitmap) {
+        void bindTextRight(ItemTextRightBinding binding, ChatMsgAndLog msg, boolean isShowTime, Bitmap myBitmap) {
             if (null == binding || null == msg) {
                 return;
             }
             this.msg = msg;
             showStatusView(binding.ivStats, binding.tvProgress, binding.ivWarning, msg);
-            bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, previousChat, null, myBitmap);
+            bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, isShowTime, null, myBitmap);
         }
 
-        void bindText(ItemTextBinding binding, ChatMsg msg, ChatMsg previousChat, Bitmap headPic) {
+        void bindText(ItemTextBinding binding, ChatMsg msg, boolean isShowTime, Bitmap headPic) {
             if (null == binding || null == msg) {
                 return;
             }
             this.msg = msg;
-            bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, previousChat, headPic, null);
+            bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, isShowTime, headPic, null);
         }
 
         private void bindText(RoundImageView roundButton, TextView tvTime, AutoLinkTextView tvMsg,
-                              ChatMsg previousChat, Bitmap headPic, Bitmap myBitmap) {
+                              boolean isShowTime, Bitmap headPic, Bitmap myBitmap) {
             if (null == msg) {
                 return;
             }
@@ -181,7 +176,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
                 }
             });
 
-            boolean isShowTime = isShowTime(msg, previousChat);
             if (isShowTime) {
                 String time = DateUtil.getWeekTimeWithHours(msg.timestamp);
                 tvTime.setText(time);
@@ -240,14 +234,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
                 }
             });
         }
-
-        private boolean isShowTime(ChatMsg chat, ChatMsg previousChat) {
-            if (previousChat != null) {
-                int interval = DateUtil.getSeconds(previousChat.timestamp, chat.timestamp);
-                return interval > 2 * 60;
-            }
-            return true;
-        }
     }
 
     private static boolean isNeedResend(ChatMsgAndLog msg) {
@@ -266,18 +252,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
         long currentTime = DateUtil.getMillisTime();
         return maxTimestamp > 0 && DateUtil.timeDiffHours(maxTimestamp, currentTime) >=
                 Constants.MSG_RESEND_PERIOD;
-    }
-
-    /**
-     * 复制
-     */
-    private void copyText(SelectTextHelper mSelectableTextHelper, String selectedText) {
-        SelectTextEventBus.getDefault().dispatchDismissAllPop();
-        CopyManager.copyText(selectedText);
-        ToastUtils.showShortToast(R.string.copy_successfully);
-        if (null != mSelectableTextHelper) {
-            mSelectableTextHelper.reset();
-        }
     }
 
     public interface ClickListener {

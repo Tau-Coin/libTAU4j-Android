@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
@@ -30,7 +31,7 @@
             android:paddingBottom="@dimen/widget_size_1">
 
             <TextView
-                android:id="@+id/tv_chain_note"
+                android:id="@+id/tv_notes"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -40,7 +41,6 @@
                 android:paddingEnd="@dimen/widget_size_2"
                 android:textColor="@color/gray_dark"
                 android:text="@string/community_chain_note"
-                android:tag="0"
                 android:includeFontPadding="false"
                 android:gravity="center|center_vertical"
                 android:background="@drawable/white_rect_round_bg_no_border"
@@ -48,7 +48,7 @@
                 android:textAppearance="@style/TextAppearanceBody2"/>
 
             <TextView
-                android:id="@+id/tv_chain_market"
+                android:id="@+id/tv_market"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -60,7 +60,6 @@
                 android:paddingEnd="@dimen/widget_size_2"
                 android:textColor="@color/gray_dark"
                 android:text="@string/community_chain_market"
-                android:tag="1"
                 android:includeFontPadding="false"
                 android:gravity="center|center_vertical"
                 android:background="@drawable/white_rect_round_bg_no_border"
@@ -68,36 +67,16 @@
                 android:textAppearance="@style/TextAppearanceBody2"/>
 
             <TextView
-                android:id="@+id/tv_chain_tx"
+                android:id="@+id/tv_chain"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="@dimen/widget_size_2"
                 android:paddingTop="@dimen/widget_size_5"
                 android:paddingBottom="@dimen/widget_size_5"
                 android:paddingStart="@dimen/widget_size_2"
                 android:paddingEnd="@dimen/widget_size_2"
                 android:textColor="@color/gray_dark"
                 android:text="@string/community_on_chain"
-                android:tag="2"
-                android:includeFontPadding="false"
-                android:background="@drawable/white_rect_round_bg_no_border"
-                android:gravity="center|center_vertical"
-                android:onClick="@{listener::onClick}"
-                android:textAppearance="@style/TextAppearanceBody2"/>
-
-            <TextView
-                android:id="@+id/tv_tx_queue"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:paddingTop="@dimen/widget_size_5"
-                android:paddingBottom="@dimen/widget_size_5"
-                android:paddingStart="@dimen/widget_size_2"
-                android:paddingEnd="@dimen/widget_size_2"
-                android:textColor="@color/gray_dark"
-                android:text="@string/community_tx_queue"
-                android:tag="3"
                 android:includeFontPadding="false"
                 android:background="@drawable/white_rect_round_bg_no_border"
                 android:gravity="center|center_vertical"
@@ -106,13 +85,61 @@
 
         </LinearLayout>
 
-        <androidx.fragment.app.FragmentContainerView
-            android:layout_above="@+id/fl_join"
-            android:id="@+id/tab_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <RelativeLayout
             android:layout_below="@+id/ll_filter"
-            android:background="@color/color_chat_bg"/>
+            android:layout_above="@+id/fl_join"
+            android:background="@color/color_chat_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.fragment.app.FragmentContainerView
+                android:layout_above="@+id/rl_bottom"
+                android:id="@+id/tab_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/color_chat_bg"/>
+
+            <RelativeLayout
+                android:id="@+id/rl_bottom"
+                android:layout_toStartOf="@+id/fab_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_size_10"
+                android:layout_marginBottom="@dimen/widget_size_10"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:layout_marginEnd="@dimen/widget_size_10"
+                android:background="@drawable/white_rect_round_bg_big_radius"
+                android:layout_alignParentBottom="true">
+
+                <ImageView
+                    android:layout_width="@dimen/widget_size_14"
+                    android:layout_height="@dimen/widget_size_14"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/widget_size_10"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_up_triangle"/>
+
+                <Spinner
+                    android:id="@+id/view_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_44"
+                    android:background="@color/color_transparent"
+                    android:popupBackground="@drawable/white_rect_round_bg_big_radius"
+                    android:spinnerMode="dropdown"/>
+
+            </RelativeLayout>
+
+            <io.taucoin.torrent.publishing.ui.customviews.ThemedSpeedDialView
+                android:id="@+id/fab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                app:sdMainFabClosedSrc="@drawable/ic_add_36dp"
+                app:sdMainFabAnimationRotateAngle="0" />
+
+        </RelativeLayout>
 
         <FrameLayout
             android:visibility="gone"

@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
+import io.taucoin.torrent.publishing.core.model.data.DataChanged;
+import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 
 /**
@@ -27,7 +29,7 @@ public interface BlockRepository {
      */
     int updateBlock(@NonNull BlockInfo block);
 
-    Observable<String> observeDataSetChanged();
+    Observable<DataChanged> observeDataSetChanged();
 
     void submitDataSetChanged();
 
@@ -47,4 +49,6 @@ public interface BlockRepository {
     Flowable<ChainStatus> observerChainStatus(String chainID);
 
     Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID);
+
+    List<BlockInfo> queryCommunityBlocks(String chainID, int pos, int pageSize);
 }

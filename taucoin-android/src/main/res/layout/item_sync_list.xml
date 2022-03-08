@@ -30,7 +30,19 @@
                 android:gravity="center_vertical"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:textAppearance="@style/TextAppearanceBody1" />
+                android:textAppearance="@style/TextAppearanceBody2" />
+
+            <TextView
+                android:id="@+id/tv_on_chain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/widget_size_40"
+                android:text="@string/community_block_on_chain"
+                android:gravity="center_vertical"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:layout_marginEnd="@dimen/widget_size_10"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody3" />
 
             <ImageView
                 android:id="@+id/iv_detail"

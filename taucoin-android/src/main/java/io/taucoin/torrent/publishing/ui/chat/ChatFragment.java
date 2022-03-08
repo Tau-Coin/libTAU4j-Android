@@ -167,7 +167,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
 
         binding.refreshLayout.setOnRefreshListener(this);
 
-        adapter = new ChatListAdapter(activity, this);
+        adapter = new ChatListAdapter(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
 //        layoutManager.setStackFromEnd(true);
         binding.msgList.setLayoutManager(layoutManager);

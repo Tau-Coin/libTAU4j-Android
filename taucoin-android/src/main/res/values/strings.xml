@@ -141,7 +141,6 @@
     <string name="community_chain_note">Notes</string>
     <string name="community_chain_market">Market</string>
     <string name="community_on_chain">Chain</string>
-    <string name="community_tx_queue">Queue</string>
     <string name="community_escrow_service_enter">Escrow Service</string>
     <string name="community_pinned_message">Pinned Message</string>
     <string name="community_chain_note_title">Note Transaction</string>
@@ -151,9 +150,19 @@
     <string name="community_create_success" formatted="false"><Data><![CDATA[Creator shall keep phone in <strong>wifi</strong> and <strong>power charging</strong>
     as much as possible for community data exchange.]]></Data></string>
 
+    <string name="community_view_all">View All</string>
+    <string name="community_view_onchain_notes">View Onchain Notes</string>
+    <string name="community_view_offchain_notes">View Offchain Notes</string>
+    <string name="community_view_airdrop">View Airdrop</string>
+    <string name="community_view_sell">View Sell</string>
+    <string name="community_view_queue">View Queue</string>
+    <string name="community_view_blocks">View Blocks</string>
+    <string name="community_view_onchain_txs">View Onchain Transactions</string>
+    <string name="community_view_wiring_txs">View Wiring Transactions</string>
+
     <string name="chain_difficulty">Difficulty</string>
     <string name="chain_total_peers">Total Peers</string>
-    <string name="chain_peers_blocks">Peers &#038; Blocks</string>
+    <string name="chain_peers_blocks">Blocks Self-mined</string>
     <string name="chain_total_coins">Total Coins</string>
     <string name="chain_top_peers">Top 10 peers</string>
     <string name="chain_votes">Votes</string>
@@ -195,6 +204,7 @@
     <string name="community_tip_block_reward">Block Reward:</string>
     <string name="community_tip_block_difficulty">Difficulty:</string>
     <string name="community_tip_block_size">Size:</string>
+    <string name="community_block_on_chain">Onchain</string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_key_explain">Secret key is your private ID to be kept confidential, public key is your open ID for friends.</string>
@@ -341,6 +351,7 @@
     <string name="tx_comment">Comment(required)</string>
     <string name="tx_coin_name">Coin Name</string>
     <string name="tx_link">link - optional</string>
+    <string name="tx_quantity">quantity - optional</string>
     <string name="tx_location">location - optional</string>
     <string name="tx_description">description - optional</string>
     <string name="tx_operation_reply">Reply</string>
@@ -389,6 +400,7 @@
     <string name="tx_give_trust">Give a trust</string>
     <string name="tx_give_trust_tip" formatted="false"><Data><![CDATA[Seller <font color="#000000">%1$s</font> happy to receive your trust!]]></Data></string>
     <string name="tx_give_trust_info">%s %s give %s a trust</string>
+    <string name="tx_give_trust_notes">Give %s a trust</string>
     <string name="tx_sell_detail_trust">Trust %s</string>
     <string name="tx_sell_detail_trust_hash">Trust Onchain Hash</string>
     <string name="tx_sell_direct_talk">Connect</string>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
         <variable
@@ -32,6 +31,7 @@
                     android:paddingTop="@dimen/widget_size_5"
                     android:paddingBottom="@dimen/widget_size_5"
                     android:layout_marginTop="@dimen/widget_size_2"
+                    android:layout_marginBottom="@dimen/widget_size_1"
                     android:onClick="@{listener::onClick}"
                     android:background="@color/color_white">
 
@@ -108,7 +108,7 @@
                     android:id="@+id/tx_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@{@dimen/fab_size + @dimen/fab_margin}"
+                    android:paddingBottom="@dimen/widget_size_10"
                     android:clipToPadding="false"
                     android:scrollbars="vertical"
                     android:focusable="true"
@@ -117,15 +117,6 @@
             </LinearLayout>
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <io.taucoin.torrent.publishing.ui.customviews.ThemedSpeedDialView
-            android:id="@+id/fab_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            app:sdMainFabClosedSrc="@drawable/ic_add_36dp"
-            app:sdMainFabAnimationRotateAngle="0" />
 
     </RelativeLayout>
 </layout>

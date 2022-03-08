@@ -20,4 +20,5 @@ public class IntentExtra {
     public static final String READ_ONLY = "readOnly";
     public static final String AIRDROP_COIN = "airdropCoin";
     public static final String TIMESTAMP = "timestamp";
+    public static final String ONLY_WIRING = "onlyWiring";
 }

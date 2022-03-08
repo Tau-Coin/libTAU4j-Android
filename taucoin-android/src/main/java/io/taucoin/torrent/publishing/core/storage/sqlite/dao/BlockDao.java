@@ -44,6 +44,11 @@ public interface BlockDao {
 //            " (SELECT headBlock FROM Communities WHERE chainID = :chainID)" +
             " ORDER BY blockNumber";
 
+    String QUERY_COMMUNITY_BLOCKS = "SELECT * FROM Blocks" +
+            " WHERE chainID = :chainID" +
+            " ORDER BY blockNumber DESC" +
+            " LIMIT :loadSize OFFSET :startPosition";
+
     /**
      * 添加用户设备信息
      */
@@ -70,4 +75,7 @@ public interface BlockDao {
      */
     @Query(QUERY_CHAIN_SYNC_STATUS)
     Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID);
+
+    @Query(QUERY_COMMUNITY_BLOCKS)
+    List<BlockInfo> queryCommunityBlocks(String chainID, int startPosition, int loadSize);
 }

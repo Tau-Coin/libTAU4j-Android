@@ -15,7 +15,7 @@ import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
-import io.taucoin.torrent.publishing.ui.community.CommunityTabs;
+import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
 
 /**
  * TxRepository接口实现
@@ -57,30 +57,55 @@ public class TxRepositoryImpl implements TxRepository{
         return result;
     }
 
-    /**
-     * 根据chainID查询社区交易
-     * @param chainID 社区链ID
-     */
-    @Override
-    public List<UserAndTx> queryCommunityTxs(String chainID, int currentTab, int startPos, int loadSize) {
-        if (currentTab == CommunityTabs.CHAIN.getIndex()) {
-            return db.txDao().queryCommunityOnChainTxs(chainID, startPos, loadSize);
-        } else if (currentTab == CommunityTabs.MARKET.getIndex()) {
-            return db.txDao().queryCommunityMarketTxs(chainID, startPos, loadSize);
-        } else {
-            return db.txDao().queryCommunityNoteTxs(chainID, startPos, loadSize);
-        }
-    }
-
     @Override
     public Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID) {
-        if (currentTab == CommunityTabs.CHAIN.getIndex()) {
+        if (currentTab == CommunityTabFragment.TAB_CHAIN) {
             return db.txDao().observeOnChainLatestPinnedTx(chainID);
-        } else if (currentTab == CommunityTabs.MARKET.getIndex()) {
+        } else if (currentTab == CommunityTabFragment.TAB_MARKET) {
             return db.txDao().queryCommunityMarketLatestPinnedTx(chainID);
         } else {
             return db.txDao().queryCommunityNoteLatestPinnedTx(chainID);
         }
+    }
+
+    @Override
+    public List<UserAndTx> loadOnChainNotesData(String chainID, int startPos, int loadSize) {
+        return db.txDao().loadOnChainNotesData(chainID, startPos, loadSize);
+    }
+
+    @Override
+    public List<UserAndTx> loadOffChainNotesData(String chainID, int startPos, int loadSize) {
+        return db.txDao().loadOffChainNotesData(chainID, startPos, loadSize);
+    }
+
+    @Override
+    public List<UserAndTx> loadAllNotesData(String chainID, int startPos, int loadSize) {
+        return db.txDao().loadAllNotesData(chainID, startPos, loadSize);
+    }
+
+    @Override
+    public List<UserAndTx> loadAirdropMarketData(String chainID, int startPos, int loadSize) {
+        return db.txDao().loadAirdropMarketData(chainID, startPos, loadSize);
+    }
+
+    @Override
+    public List<UserAndTx> loadSellMarketData(String chainID, int startPos, int loadSize) {
+        return db.txDao().loadSellMarketData(chainID, startPos, loadSize);
+    }
+
+    @Override
+    public List<UserAndTx> loadAllMarketData(String chainID, int startPos, int loadSize) {
+        return db.txDao().loadAllMarketData(chainID, startPos, loadSize);
+    }
+
+    @Override
+    public List<UserAndTx> loadOnChainAllTxs(String chainID, int startPos, int loadSize) {
+        return db.txDao().loadOnChainAllTxs(chainID, startPos, loadSize);
+    }
+
+    @Override
+    public List<UserAndTx> loadAllWiringTxs(String chainID, int startPos, int loadSize) {
+        return db.txDao().loadAllWiringTxs(chainID, startPos, loadSize);
     }
 
     /**
@@ -89,9 +114,9 @@ public class TxRepositoryImpl implements TxRepository{
      */
     @Override
     public List<UserAndTx> queryCommunityPinnedTxs(String chainID, int currentTab) {
-        if (currentTab == CommunityTabs.CHAIN.getIndex()) {
+        if (currentTab == CommunityTabFragment.TAB_CHAIN) {
             return db.txDao().queryCommunityOnChainPinnedTxs(chainID);
-        } else if (currentTab == CommunityTabs.MARKET.getIndex()) {
+        } else if (currentTab == CommunityTabFragment.TAB_MARKET) {
             return db.txDao().queryCommunityMarketPinnedTxs(chainID);
         } else {
             return db.txDao().queryCommunityNotePinnedTxs(chainID);

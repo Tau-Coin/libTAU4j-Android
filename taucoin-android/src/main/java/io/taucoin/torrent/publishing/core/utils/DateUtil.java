@@ -455,4 +455,12 @@ public class DateUtil {
         }
         return millisecond * 1.0f / 3600000;
     }
+
+    public static boolean isShowTime(long currentTime, long previousTime) {
+        if (previousTime > 0) {
+            int interval = DateUtil.getSeconds(previousTime, currentTime);
+            return interval > 2 * 60;
+        }
+        return true;
+    }
 }

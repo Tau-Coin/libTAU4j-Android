@@ -26,7 +26,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -71,7 +70,6 @@ import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.NOTE_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.SELL_TX;
-import static io.taucoin.torrent.publishing.core.model.data.message.TxType.TRUST_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.WIRING_TX;
 
 /**
@@ -88,6 +86,7 @@ public class TxViewModel extends AndroidViewModel {
     private TxQueueRepository txQueueRepo;
     private TauDaemon daemon;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private Disposable loadViewDisposable;
     private MutableLiveData<List<UserAndTx>> chainTxs = new MutableLiveData<>();
     private MutableLiveData<List<Tx>> trustTxs = new MutableLiveData<>();
     private MutableLiveData<Result> airdropState = new MutableLiveData<>();
@@ -133,6 +132,9 @@ public class TxViewModel extends AndroidViewModel {
         disposables.clear();
         if(editFeeDialog != null){
             editFeeDialog.closeDialog();
+        }
+        if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
+            loadViewDisposable.dispose();
         }
     }
 
@@ -200,13 +202,6 @@ public class TxViewModel extends AndroidViewModel {
                 return result;
             }
             long timestamp = daemon.getSessionTime();
-            byte[] receiverPk;
-            if (tx.txType == WIRING_TX.getType() || tx.txType == TRUST_TX.getType()) {
-                receiverPk = ByteUtil.toByte(tx.receiverPk);
-            } else {
-                // Note交易无接受者时，默认为senderPk
-                receiverPk = senderPk;
-            }
             byte[] memo = Utils.textStringToBytes(tx.memo);
             byte[] txEncoded = null;
             switch (TxType.valueOf(tx.txType)) {
@@ -217,8 +212,8 @@ public class TxViewModel extends AndroidViewModel {
                     txEncoded = txContent.getEncoded();
                     break;
                 case SELL_TX:
-                    SellTxContent sellTxContent = new SellTxContent(tx.coinName, tx.link,
-                            tx.location, tx.memo);
+                    SellTxContent sellTxContent = new SellTxContent(tx.coinName, tx.quantity,
+                            tx.link, tx.location, tx.memo);
                     txEncoded = sellTxContent.getEncoded();
                     break;
                 default:
@@ -227,11 +222,7 @@ public class TxViewModel extends AndroidViewModel {
             if (null == txEncoded) {
                 return result;
             }
-            // 除了转账交易，nonce都为0
-//            long nonce = account.getNonce() + 1;
-            long nonce = 0;
-            Transaction transaction = new Transaction(chainID, 0, timestamp, senderPk, receiverPk,
-                    nonce, tx.amount, tx.fee, txEncoded);
+            Transaction transaction = new Transaction(chainID, 0, timestamp, senderPk, tx.fee, txEncoded);
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
             boolean isSubmitSuccess = daemon.submitTransaction(transaction);
             if (!isSubmitSuccess) {
@@ -242,10 +233,9 @@ public class TxViewModel extends AndroidViewModel {
             tx.txID = transaction.getTxID().to_hex();
             tx.timestamp = timestamp;
             tx.senderPk = currentUser.publicKey;
-            tx.nonce = nonce;
             txRepo.addTransaction(tx);
-            logger.debug("createTransaction txID::{}, senderPk::{}, receiverPk::{}, nonce::{}, memo::{}",
-                    tx.txID, tx.senderPk, tx.receiverPk, tx.nonce, tx.memo);
+            logger.debug("createTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
+                    tx.txID, tx.senderPk, tx.receiverPk, tx.memo);
             addUserInfoToLocal(tx);
             addMemberInfoToLocal(tx);
             settingsRepo.lastTxFee(tx.chainID, tx.fee);
@@ -480,28 +470,33 @@ public class TxViewModel extends AndroidViewModel {
         return addWringTransactionTask(tx, true);
     }
 
+
     /**
-     * 加载交易分页数据
-     * @param currentTab 用户选择的tab页
+     * 加载交易Notes分页数据
+     * @param filterItem 用户过滤条件
      * @param chainID 社区链ID
      * @param pos 分页位置
      */
-    void loadTxsData(int currentTab, String chainID, int pos) {
-        Disposable disposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
+    void loadNotesData(int filterItem, String chainID, int pos) {
+        if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
+            loadViewDisposable.dispose();
+        }
+        loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
             List<UserAndTx> txs = new ArrayList<>();
             try {
-                long startTime = System.currentTimeMillis();
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
-                txs = txRepo.queryCommunityTxs(chainID, currentTab, pos, pageSize);
-                long getMessagesTime = System.currentTimeMillis();
-                logger.trace("loadTxsData pos::{}, pageSize::{}, messages.size::{}",
-                        pos, pageSize, txs.size());
-                logger.trace("loadTxsData getMessagesTime::{}", getMessagesTime - startTime);
+                if (filterItem == R.string.community_view_onchain_notes) {
+                    txs = txRepo.loadOnChainNotesData(chainID, pos, pageSize);
+                } else if (filterItem == R.string.community_view_offchain_notes) {
+                    txs = txRepo.loadOffChainNotesData(chainID, pos, pageSize);
+                } else {
+                    txs = txRepo.loadAllNotesData(chainID, pos, pageSize);
+                }
+                logger.trace("loadNotesData filterItem::{}, pos::{}, pageSize::{}, messages.size::{}",
+                        application.getString(filterItem), pos, pageSize, txs.size());
                 Collections.reverse(txs);
-                long endTime = System.currentTimeMillis();
-                logger.trace("loadTxsData reverseTime Time::{}", endTime - getMessagesTime);
             } catch (Exception e) {
-                logger.error("loadTxsData error::", e);
+                logger.error("loadNotesData error::", e);
             }
             emitter.onNext(txs);
             emitter.onComplete();
@@ -510,7 +505,76 @@ public class TxViewModel extends AndroidViewModel {
                 .subscribe(messages -> {
                     chainTxs.postValue(messages);
                 });
-        disposables.add(disposable);
+    }
+
+    /**
+     * 加载交易Market分页数据
+     * @param filterItem 用户过滤条件
+     * @param chainID 社区链ID
+     * @param pos 分页位置
+     */
+    void loadMarketData(int filterItem, String chainID, int pos) {
+        if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
+            loadViewDisposable.dispose();
+        }
+        loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
+            List<UserAndTx> txs = new ArrayList<>();
+            try {
+                int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                if (filterItem == R.string.community_view_airdrop) {
+                    txs = txRepo.loadAirdropMarketData(chainID, pos, pageSize);
+                } else if (filterItem == R.string.community_view_sell) {
+                    txs = txRepo.loadSellMarketData(chainID, pos, pageSize);
+                } else {
+                    txs = txRepo.loadAllMarketData(chainID, pos, pageSize);
+                }
+                logger.trace("loadMarketData filterItem::{}, pos::{}, pageSize::{}, messages.size::{}",
+                        application.getString(filterItem), pos, pageSize, txs.size());
+                Collections.reverse(txs);
+            } catch (Exception e) {
+                logger.error("loadMarketData error::", e);
+            }
+            emitter.onNext(txs);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(messages -> {
+                    chainTxs.postValue(messages);
+                });
+    }
+
+    /**
+     * 加载转账交易分页数据
+     * @param onlyWring 仅显示转账交易
+     * @param chainID 社区链ID
+     * @param pos 分页位置
+     */
+    void loadChainTxsData(boolean onlyWring, String chainID, int pos) {
+        if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
+            loadViewDisposable.dispose();
+        }
+        loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
+            List<UserAndTx> txs = new ArrayList<>();
+            try {
+                int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                if (!onlyWring) {
+                    txs = txRepo.loadOnChainAllTxs(chainID, pos, pageSize);
+                } else {
+                    txs = txRepo.loadAllWiringTxs(chainID, pos, pageSize);
+                }
+                logger.trace("loadChainTxsData onlyWring::{}, pos::{}, pageSize::{}, messages.size::{}",
+                        onlyWring, pos, pageSize, txs.size());
+                Collections.reverse(txs);
+            } catch (Exception e) {
+                logger.error("loadChainTxsData error::", e);
+            }
+            emitter.onNext(txs);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(messages -> {
+                    chainTxs.postValue(messages);
+                });
     }
 
     public Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID) {
@@ -526,11 +590,9 @@ public class TxViewModel extends AndroidViewModel {
         Disposable disposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
             List<UserAndTx> txs = new ArrayList<>();
             try {
-                long startTime = System.currentTimeMillis();
                 txs = txRepo.queryCommunityPinnedTxs(chainID, currentTab);
-                long getMessagesTime = System.currentTimeMillis();
-                logger.trace("loadPinnedTxsData, messages.size::{}, getMessagesTime::{}", txs.size(),
-                        getMessagesTime - startTime);
+                logger.trace("loadPinnedTxsData, currentTab::{}, messages.size::{}",
+                        currentTab, txs.size());
             } catch (Exception e) {
                 logger.error("loadPinnedTxsData error::", e);
             }

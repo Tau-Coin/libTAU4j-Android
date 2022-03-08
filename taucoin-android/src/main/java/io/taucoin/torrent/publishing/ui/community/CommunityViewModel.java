@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.Html;
 import android.view.LayoutInflater;
-import android.view.View;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -20,7 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,8 +38,11 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -49,6 +53,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
+import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.DrawBean;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
@@ -58,7 +63,6 @@ import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
-import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
@@ -104,6 +108,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<List<Member>> joinedUnexpiredList = new MutableLiveData<>();
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
     private MutableLiveData<UserAndFriend> largestCoinHolder = new MutableLiveData<>();
+    private MutableLiveData<List<BlockInfo>> chainBlocks = new MutableLiveData<>();
 
     public CommunityViewModel(@NonNull Application application) {
         super(application);
@@ -120,6 +125,10 @@ public class CommunityViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.io())
                 .filter((needStart) -> needStart)
                 .subscribe((needStart) -> daemon.start()));
+    }
+
+    public MutableLiveData<List<BlockInfo>> observerChainBlocks() {
+        return chainBlocks;
     }
 
     public MutableLiveData<Boolean> getAirdropResult() {
@@ -737,5 +746,41 @@ public class CommunityViewModel extends AndroidViewModel {
      */
     public Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID) {
         return blockRepo.observeCommunitySyncStatus(chainID);
+    }
+
+    /**
+     * 加载区块分页数据
+     * @param chainID 社区链ID
+     * @param pos 分页位置
+     */
+    public void loadBlocksData(String chainID, int pos) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<List<BlockInfo>>) emitter -> {
+            List<BlockInfo> blocks = new ArrayList<>();
+            try {
+                long startTime = System.currentTimeMillis();
+                int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                blocks = blockRepo.queryCommunityBlocks(chainID, pos, pageSize);
+                long getMessagesTime = System.currentTimeMillis();
+                logger.trace("loadBlocksData pos::{}, pageSize::{}, blocks.size::{}",
+                        pos, pageSize, blocks.size());
+                logger.trace("loadBlocksData getMessagesTime::{}", getMessagesTime - startTime);
+                Collections.reverse(blocks);
+                long endTime = System.currentTimeMillis();
+                logger.trace("loadBlocksData reverseTime Time::{}", endTime - getMessagesTime);
+            } catch (Exception e) {
+                logger.error("loadBlocksData error::", e);
+            }
+            emitter.onNext(blocks);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(blocks -> {
+                    chainBlocks.postValue(blocks);
+                });
+        disposables.add(disposable);
+    }
+
+    public Observable<DataChanged> observeBlocksSetChanged() {
+        return blockRepo.observeDataSetChanged();
     }
 }

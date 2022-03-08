@@ -23,9 +23,13 @@ public class BlockInfo implements Parcelable {
     public long rewards;               // 出块奖励
     public long difficulty;            // 区块难度
     public int status;                 // 区块的状态 0：未上链；1：上链成功;
+    public long timestamp;             // 区块时间戳
+    public String previousBlockHash;   // 上一个区块hash
+
 
     public BlockInfo(@NonNull String chainID, @NonNull String blockHash, long blockNumber,
-                     @NonNull String miner, long rewards, long difficulty, int status) {
+                     @NonNull String miner, long rewards, long difficulty, int status,
+                     long timestamp, String previousBlockHash) {
         this.chainID = chainID;
         this.blockHash = blockHash;
         this.blockNumber = blockNumber;
@@ -33,6 +37,8 @@ public class BlockInfo implements Parcelable {
         this.rewards = rewards;
         this.difficulty = difficulty;
         this.status = status;
+        this.timestamp = timestamp;
+        this.previousBlockHash = previousBlockHash;
     }
 
     protected BlockInfo(Parcel in) {
@@ -43,6 +49,8 @@ public class BlockInfo implements Parcelable {
         rewards = in.readLong();
         difficulty = in.readLong();
         status = in.readInt();
+        timestamp = in.readLong();
+        previousBlockHash = in.readString();
     }
 
     @Override
@@ -54,6 +62,8 @@ public class BlockInfo implements Parcelable {
         dest.writeLong(rewards);
         dest.writeLong(difficulty);
         dest.writeInt(status);
+        dest.writeLong(timestamp);
+        dest.writeString(previousBlockHash);
     }
 
     @Override

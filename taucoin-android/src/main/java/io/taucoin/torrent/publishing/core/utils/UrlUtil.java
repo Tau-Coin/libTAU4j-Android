@@ -13,9 +13,10 @@ import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
 public class UrlUtil {
 
     private static final String URL_SCHEME = "tau:";
-    public static final String CHAIN_PATTERN = "tauchain:\\?(bs=[A-Fa-f0-9]{64}&)+(dn=[A-Fa-f0-9]{16}\\S{1,24})";
-    public static final String AIRDROP_PATTERN = URL_SCHEME + "//[A-Fa-f0-9]{64}/airdrop/" + CHAIN_PATTERN;
+    public static final String CHAIN_PATTERN = "tauchain:\\?(bs=[a-f0-9]{64}&)+(dn=[a-f0-9]{16}\\S{1,24})";
+    public static final String AIRDROP_PATTERN = URL_SCHEME + "//[a-f0-9]{64}/airdrop/" + CHAIN_PATTERN;
     private static final String AIRDROP_URL = URL_SCHEME + "//%s/airdrop/%s";
+    public static final String HASH_PATTERN = "[a-f0-9]{64}";
 
     public static boolean isTauUrl(String url) {
         return StringUtil.isNotEmpty(url) && url.startsWith("tau");

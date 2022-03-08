@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/widget_size_15"
+        android:layout_marginStart="@dimen/widget_size_15"
+        android:layout_marginTop="@dimen/widget_size_7"
+        android:background="@drawable/white_rect_round_bg_middle_radius">
+
+        <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
+            android:id="@+id/tv_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:paddingStart="@dimen/widget_size_10"
+            android:paddingEnd="@dimen/widget_size_10"
+            android:paddingTop="@dimen/widget_size_10"
+            android:paddingBottom="@dimen/widget_size_10"
+            tool:text="@string/tx_unknown"
+            android:textColorLink="@color/color_blue_link"
+            android:textAppearance="@style/TextAppearanceBody3"/>
+
+    </FrameLayout>
+
+</layout>

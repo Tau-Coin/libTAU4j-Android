@@ -18,8 +18,8 @@ import io.taucoin.torrent.publishing.databinding.ItemSyncListBinding;
 /**
  * 社区同步列表的Adapter
  */
-public class SyncListAdapter extends ListAdapter<BlockInfo, SyncListAdapter.ViewHolder> {
-    SyncListAdapter() {
+public class BlockListAdapter extends ListAdapter<BlockInfo, BlockListAdapter.ViewHolder> {
+    public BlockListAdapter() {
         super(diffCallback);
     }
 
@@ -36,7 +36,7 @@ public class SyncListAdapter extends ListAdapter<BlockInfo, SyncListAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SyncListAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BlockListAdapter.ViewHolder holder, int position) {
         BlockInfo block = getItem(position);
         holder.bindBlock(block);
     }
@@ -69,6 +69,8 @@ public class SyncListAdapter extends ListAdapter<BlockInfo, SyncListAdapter.View
             binding.itemBlockDetail.tvHash.setText(block.blockHash);
             binding.itemBlockDetail.tvReward.setText(FmtMicrometer.fmtBalance(block.rewards));
             binding.itemBlockDetail.tvDifficulty.setText(FmtMicrometer.fmtDecimal(block.difficulty));
+
+            binding.tvOnChain.setVisibility(block.status == 1 ? View.VISIBLE : View.INVISIBLE);
         }
     }
 
