@@ -17,6 +17,7 @@ import io.taucoin.torrent.publishing.ui.BaseActivity;
 /**
  * 社区余额列表页面
  */
+@Deprecated
 public class BalanceActivity extends BaseActivity {
 
     private ActivityCommunityBalanceBinding binding;

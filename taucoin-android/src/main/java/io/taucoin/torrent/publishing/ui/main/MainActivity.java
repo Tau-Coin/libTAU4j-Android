@@ -67,7 +67,6 @@ import io.taucoin.torrent.publishing.service.WorkloadManager;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.chat.ChatFragment;
-import io.taucoin.torrent.publishing.ui.community.BalanceActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityFragment;
 import io.taucoin.torrent.publishing.ui.ExternalLinkActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityCreateActivity;
@@ -360,9 +359,6 @@ public class MainActivity extends ScanTriggerActivity {
                 break;
             case R.id.item_airdrop_coins:
                 ActivityUtil.startActivity(this, AirdropCommunityActivity.class);
-                break;
-            case R.id.item_balance:
-                ActivityUtil.startActivity(this, BalanceActivity.class);
                 break;
         }
         if (binding != null) {

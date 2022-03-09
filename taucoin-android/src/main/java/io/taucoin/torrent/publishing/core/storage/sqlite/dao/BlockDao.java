@@ -22,7 +22,7 @@ public interface BlockDao {
             " WHERE chainID = :chainID and blockHash= :blockHash";
 
     String QUERY_CHAIN_STATUS = "SELECT a.syncingHeadBlock, a.headBlock, a.tailBlock, a.consensusBlock, a.difficulty," +
-            " c.peerBlocks, c.totalRewards, d.totalPeers, d.totalCoin" +
+            " c.peerBlocks, c.totalRewards, d.totalPeers, d.totalCoin, e.balance" +
             " FROM Communities a" +
             " LEFT JOIN (SELECT bb.chainID, count(*) AS peerBlocks, SUM(rewards) AS totalRewards" +
             " FROM Blocks bb" +
@@ -36,6 +36,9 @@ public interface BlockDao {
             " LEFT JOIN Communities cc ON mm.chainID = cc.chainID" +
             " WHERE mm.chainID = :chainID AND "+ MemberDao.WHERE_ON_CHAIN +") AS d" +
             " ON a.chainID = d.chainID" +
+            " LEFT JOIN (SELECT chainID, publicKey, balance FROM Members WHERE chainID = :chainID" +
+            " AND publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")) AS e" +
+            " ON a.chainID = e.chainID" +
             " WHERE a.chainID = :chainID";
 
     String QUERY_CHAIN_SYNC_STATUS = "SELECT * FROM Blocks" +
