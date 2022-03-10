@@ -165,6 +165,7 @@ public class TxViewModel extends AndroidViewModel {
             return "";
         } else {
             // 重发交易队列
+            txQueueRepo.updateQueue(tx);
             return daemon.resendTxQueue(tx);
         }
     }

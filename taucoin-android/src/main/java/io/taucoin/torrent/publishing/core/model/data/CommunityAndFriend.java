@@ -1,7 +1,6 @@
 package io.taucoin.torrent.publishing.core.model.data;
 
 import androidx.room.Relation;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 
 /**
@@ -12,7 +11,8 @@ public class CommunityAndFriend {
     public long balance;                    // 成员在此社区的balance
     public long power;                      // 成员在此社区的power
     public long blockNumber;                // 成员状态改变的区块号
-    public long headBlock;                  // 社区最新的区块号
+    public long headBlock;                  // 社区头区块号
+    public long tailBlock;                  // 社区尾区块号
     public int joined;                      // 是否加入此社区
 
     // 朋友相关数据
@@ -49,7 +49,6 @@ public class CommunityAndFriend {
      * @return read only
      */
     public boolean isReadOnly() {
-        return (balance <= 0 && power <= 0) ||
-                (headBlock - blockNumber >= Constants.BLOCKS_NOT_PERISHABLE);
+        return (balance <= 0 && power <= 0) || blockNumber < tailBlock;
     }
 }

@@ -8,7 +8,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
  */
 public class MemberAutoRenewal extends Member {
     public String seed;
-    public int count;
 
     public MemberAutoRenewal(@NonNull String chainID, @NonNull String publicKey) {
         super(chainID, publicKey);

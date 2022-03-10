@@ -29,9 +29,6 @@ public class Constants {
 
     public static final int AIRDROP_LINK_BS_LIMIT = 2;
 
-    // 社区成员在线时间在多少小时内都认为在线
-    public static final int ONLINE_HOURS = 12;
-
     // 区块未过期的数目（半年）
     public static final int BLOCKS_NOT_PERISHABLE = 288 * 180;
 

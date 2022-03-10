@@ -9,7 +9,6 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
@@ -51,7 +50,7 @@ public interface CommunityDao {
             " ORDER BY timestamp, logicMsgHash COLLATE UNICODE)" +
             " GROUP BY receiverPkTemp)";
 
-    String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.power, b.blockNumber," +
+    String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, a.tailBlock, b.balance, b.power, b.blockNumber," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk, " +
             " 0 AS msgUnread, '' AS msg, c.memo, c.timestamp" +
@@ -64,7 +63,7 @@ public interface CommunityDao {
             " ON a.chainID = c.chainID" +
             " WHERE isBanned == 0";
 
-    String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.power, b.blockNumber," +
+    String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, a.tailBlock, b.balance, b.power, b.blockNumber," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk, " +
             " 0 AS msgUnread, '' AS msg, c.memo, c.timestamp" +
@@ -77,8 +76,8 @@ public interface CommunityDao {
             " ON a.chainID = c.chainID" +
             " WHERE isBanned == 0";
 
-    String QUERY_FRIENDS_ASC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS balance, 0 AS power, 0 AS blockNumber," +
-            " 0 AS joined, 1 AS type," +
+    String QUERY_FRIENDS_ASC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS tailBlock, 0 AS balance," +
+            " 0 AS power, 0 AS blockNumber, 0 AS joined, 1 AS type," +
             " cm.senderPk AS senderPk, cm.receiverPk AS receiverPk," +
             " f.msgUnread AS msgUnread," +
             " cm.content AS msg, '' AS memo, cm.timestamp AS timestamp" +
@@ -89,8 +88,8 @@ public interface CommunityDao {
             " WHERE f.userPk = " + QUERY_GET_CURRENT_USER_PK +
             " AND f.friendPK NOT IN " + QUERY_GET_BANNED_USER_PK;
 
-    String QUERY_FRIENDS_DESC = "SELECT f.friendPK AS ID,0 AS headBlock, 0 AS balance, 0 AS power, 0 AS blockNumber," +
-            " 0 AS joined, 1 AS type," +
+    String QUERY_FRIENDS_DESC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS tailBlock, 0 AS balance," +
+            " 0 AS power, 0 AS blockNumber, 0 AS joined, 1 AS type," +
             " cm.senderPk AS senderPk, cm.receiverPk AS receiverPk," +
             " f.msgUnread AS msgUnread," +
             " cm.content AS msg, '' AS memo, cm.timestamp AS timestamp" +

@@ -158,8 +158,9 @@ public class TxUtils {
                 .append("Amount: ")
                 .append(FmtMicrometer.fmtBalance(tx.amount))
                 .append("\n").append("Fee: ")
-                .append(" ").append(coinName)
                 .append(FmtMicrometer.fmtFeeValue(tx.fee))
+                .append(" ")
+                .append(coinName)
                 .append("\n").append("To: ")
                 .append(tx.receiverPk);
         if (tx.nonce > 0) {

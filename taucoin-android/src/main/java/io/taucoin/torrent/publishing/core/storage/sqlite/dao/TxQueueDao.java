@@ -91,6 +91,9 @@ public interface TxQueueDao {
             " WHERE chainID = :chainID AND senderPk = :currentPk" +
             " AND queueTime >= :currentTime AND queueType = 1";
 
+    String QUERY_ACCOUNT_RENEWAL_OFF_CHAIN = QUERY_COMMUNITY_TX_QUEUE +
+            " AND queueType = 2 LIMIT 1";
+
     /**
      * 入队列
      */
@@ -136,4 +139,7 @@ public interface TxQueueDao {
     @Query(QUERY_AIRDROP_HISTORY_ON_CHAIN)
     @Transaction
     Flowable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime);
+
+    @Query(QUERY_ACCOUNT_RENEWAL_OFF_CHAIN)
+    TxQueueAndStatus getAccountRenewalTxQueue(String chainID, String senderPk);
 }

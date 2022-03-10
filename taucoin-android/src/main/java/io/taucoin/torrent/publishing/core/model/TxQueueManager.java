@@ -254,8 +254,6 @@ class TxQueueManager {
                 boolean isResend = sendWiringTx(account, txQueue);
                 if (isResend) {
                     result = context.getResources().getString(R.string.tx_resend_failed);
-                } else {
-                    txQueueRepos.updateQueue(tx);
                 }
             }
         }

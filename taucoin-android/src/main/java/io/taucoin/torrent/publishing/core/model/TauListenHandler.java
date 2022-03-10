@@ -26,6 +26,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
+import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
@@ -34,16 +35,20 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
@@ -56,6 +61,7 @@ class TauListenHandler {
     private UserRepository userRepo;
     private MemberRepository memberRepo;
     private TxRepository txRepo;
+    private TxQueueRepository txQueueRepo;
     private CommunityRepository communityRepo;
     private BlockRepository blockRepository;
     private SettingsRepository settingsRepo;
@@ -75,6 +81,7 @@ class TauListenHandler {
         userRepo = RepositoryHelper.getUserRepository(appContext);
         memberRepo = RepositoryHelper.getMemberRepository(appContext);
         txRepo = RepositoryHelper.getTxRepository(appContext);
+        txQueueRepo = RepositoryHelper.getTxQueueRepository(appContext);
         communityRepo = RepositoryHelper.getCommunityRepository(appContext);
         blockRepository = RepositoryHelper.getBlockRepository(appContext);
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
@@ -547,89 +554,53 @@ class TauListenHandler {
                     if (emitter.isDisposed()) {
                         break;
                     }
-                    long medianTxFree = getTxFee(member.chainID);
-                    // 计算合适的交易费
-                    long fee = medianTxFree + member.count * medianTxFree;
-                    if (member.balance > 0 && member.balance < fee) {
-                        for (int j = member.count; j >= 0; j--) {
-                            fee = medianTxFree + j * medianTxFree;
-                            if (member.balance >= fee) {
-                                break;
-                            }
-                        }
-                    }
-                    if (member.balance <= 0 || member.balance < fee) {
-                        logger.debug("accountAutoRenewal chainID::{}, publicKey::{}, Insufficient Balance" +
-                                        " (balance::{}, fee::{}), count::{}, medianTxFree::{}", member.chainID,
-                                member.publicKey, member.balance, fee, member.count, medianTxFree);
+                    if (member.balance <= 0) {
+                        logger.debug("accountAutoRenewal chainID::{}, publicKey::{}, Insufficient Balance::{}",
+                                member.chainID, member.publicKey, FmtMicrometer.fmtBalance(member.balance));
                         continue;
                     }
-                    accountAutoRenewal(member, fee, emitter);
+                    long medianTxFree = getTxFee(member.chainID);
+                    long txFree = medianTxFree;
+                    TxQueueAndStatus txQueue = txQueueRepo.getAccountRenewalTxQueue(member.chainID,
+                            member.publicKey);
+                    if (txQueue != null) {
+                        float hours = DateUtil.timeDiffHours(txQueue.timestamp, DateUtil.getMillisTime());
+                        // 一天内只发一次
+                        if (hours < 24) {
+                            logger.debug("accountAutoRenewal, chainID::{}, publicKey::{}, Balance::{}, Hours::{}",
+                                    member.chainID, member.publicKey, FmtMicrometer.fmtBalance(member.balance), hours);
+                            continue;
+                        }
+                        txFree += txQueue.fee;
+                    }
+                    if (member.balance <= txFree) {
+                        txFree = member.balance;
+                    }
+                    long amount = member.balance - txFree;
+                    logger.debug("accountAutoRenewal chainID::{}, publicKey::{} (balance::{}, " +
+                                    "amount::{}, fee::{}), medianTxFree::{}",
+                            member.chainID, member.publicKey, FmtMicrometer.fmtBalance(member.balance),
+                            FmtMicrometer.fmtBalance(amount), FmtMicrometer.fmtFeeValue(txFree),
+                            FmtMicrometer.fmtFeeValue(medianTxFree));
+                    if (null == txQueue) {
+                        String memo = appContext.getString(R.string.tx_memo_auto_renewal);
+                        TxQueue tx = new TxQueue(member.chainID, member.publicKey, member.publicKey,
+                                amount, txFree, 2, memo);
+                        txQueueRepo.addQueue(tx);
+                        daemon.updateTxQueue(tx.chainID);
+                        logger.debug("accountAutoRenewal updateTxQueue");
+                    } else {
+                        txQueue.amount = amount;
+                        txQueue.fee = txFree;
+                        txQueueRepo.updateQueue(txQueue);
+                        String result = daemon.resendTxQueue(txQueue);
+                        logger.debug("accountAutoRenewal resendTxQueue result::{}", result);
+                    }
                 }
             }
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .subscribe();
-    }
-
-    /**
-     * 账户自动更新
-     * @param member 成员信息
-     * @param fee 交易费
-     * @param emitter ObservableEmitter<Void>
-     */
-    private void accountAutoRenewal(MemberAutoRenewal member, long fee, ObservableEmitter<Void> emitter) {
-        if (null == emitter || emitter.isDisposed()) {
-            return;
-        }
-        boolean isRetry = false;
-        try {
-            String chainID = member.chainID;
-            String senderPk = member.publicKey;
-            long timestamp = daemon.getSessionTime();
-            long amount = member.balance - fee;
-            long nonce = member.nonce + 1;
-            String memo = appContext.getString(R.string.tx_memo_auto_renewal);
-            int txType = TxType.WIRING_TX.getType();
-
-            byte[] chainIDBytes = ChainIDUtil.encode(chainID);
-            Tx tx = new Tx(chainID, senderPk, amount, fee, txType, memo);
-            tx.senderPk = senderPk;
-            tx.receiverPk = senderPk;
-            tx.nonce = nonce;
-            tx.timestamp = timestamp;
-
-            byte[] senderPkBytes = ByteUtil.toByte(senderPk);
-            TxContent txContent = new TxContent(txType, Utils.textStringToBytes(memo));
-            Transaction transaction = new Transaction(chainIDBytes, 0, timestamp, senderPkBytes,
-                    senderPkBytes, nonce, amount, fee, txContent.getEncoded());
-
-            byte[] senderSeed = ByteUtil.toByte(member.seed);
-            Pair<byte[], byte[]> keypair = Ed25519.createKeypair(senderSeed);
-            byte[] secretKey = keypair.second;
-            transaction.sign(senderPk, ByteUtil.toHexString(secretKey));
-            boolean isSubmitSuccess = daemon.submitTransaction(transaction);
-            tx.txID = transaction.getTxID().to_hex();
-            if (isSubmitSuccess) {
-                txRepo.addTransaction(tx);
-            } else {
-                isRetry = true;
-            }
-            logger.debug("accountAutoRenewal chainID::{}, txID::{}, senderPk::{}, amount::{}, " +
-                            "fee::{}, nonce::{}, count::{}, isSubmitSuccess::{}",
-                    tx.chainID, tx.txID, senderPk, amount, fee, tx.nonce, member.count, isSubmitSuccess);
-        } catch (Exception ignore) {
-            isRetry = true;
-        }
-        if (isRetry) {
-            try {
-                Thread.sleep(Interval.INTERVAL_RETRY.getInterval());
-                logger.debug("accountAutoRenewal retry chainID::{}, publicKey::{}",
-                        member.chainID, member.publicKey);
-                accountAutoRenewal(member, fee, emitter);
-            } catch (InterruptedException ignore) {
-            }
-        }
     }
 
     /**

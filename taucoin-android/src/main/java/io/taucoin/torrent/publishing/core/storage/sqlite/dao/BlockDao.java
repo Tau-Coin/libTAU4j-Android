@@ -30,7 +30,7 @@ public interface BlockDao {
             " WHERE bb.chainID = :chainID" +
             " AND miner =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND status = 1" +
-            " AND (cc.headBlock - bb.blockNumber < "+ Constants.BLOCKS_NOT_PERISHABLE +")) AS c " +
+            " AND (cc.tailBlock <= bb.blockNumber)) AS c " +
             " ON a.chainID = c.chainID" +
             " LEFT JOIN (SELECT mm.chainID, count(*) totalPeers, SUM(balance) AS totalCoin FROM Members mm" +
             " LEFT JOIN Communities cc ON mm.chainID = cc.chainID" +

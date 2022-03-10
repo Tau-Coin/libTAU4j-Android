@@ -24,7 +24,7 @@ import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
  */
 @Dao
 public interface MemberDao {
-    String WHERE_NOT_PERISHABLE = " (headBlock - blockNumber < "+ Constants.BLOCKS_NOT_PERISHABLE +")";
+    String WHERE_NOT_PERISHABLE = " (blockNumber >= tailBlock)";
     String WHERE_ON_CHAIN = " ((balance > 0 OR power > 0) AND" + WHERE_NOT_PERISHABLE + ")";
 
     String QUERY_GET_MEMBER_BY_CHAIN_ID_PK = "SELECT * FROM Members WHERE chainID = :chainID AND publicKey = :publicKey";
@@ -56,21 +56,15 @@ public interface MemberDao {
     String QUERY_DELETE_COMMUNITY_MEMBERS = "DELETE FROM Members where chainID =:chainID";
 
     // 查询当前设备可以自动更新的账户信息
-    String QUERY_AUTO_RENEWAL_ACCOUNTS = "SELECT m.*, u.seed, IFNULL(txs.count, 0) AS count" +
+    // 计算是否还有7天过期，触发auto renewal
+    // headBlock - blockNumber >= Constants.BLOCKS_NOT_PERISHABLE - Constants.AUTO_RENEWAL_MAX_BLOCKS
+    String QUERY_AUTO_RENEWAL_ACCOUNTS = "SELECT m.*, u.seed" +
             " FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
             " LEFT JOIN Users u ON m.publicKey = u.publicKey" +
-            " LEFT JOIN" +
-            " (SELECT tx.chainID, tx.senderPk, COUNT(*) AS count FROM Txs tx" +
-            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            " WHERE tx.txStatus = 0 AND tx.autoRenewal = 1" +
-            " AND m.nonce = tx.nonce" +
-            " GROUP BY tx.chainID, tx.senderPk) txs ON m.chainID = txs.chainID AND m.publicKey = txs.senderPk" +
-            " WHERE c.isBanned = 0" +
-            " AND u.seed NOT NULL AND ((balance > 0 OR power > 0)" +
-            " AND (c.headBlock - m.blockNumber < "+ Constants.BLOCKS_NOT_PERISHABLE +")" +
-            " AND (c.headBlock - m.blockNumber - IFNULL(txs.count, 0) * " +
-            Constants.AUTO_RENEWAL_PERIOD_BLOCKS + ") >= " +
+            " WHERE c.isBanned = 0 AND u.seed NOT NULL" +
+            " AND " + WHERE_ON_CHAIN +
+            " AND (c.headBlock - m.blockNumber >= " +
             (Constants.BLOCKS_NOT_PERISHABLE - Constants.AUTO_RENEWAL_MAX_BLOCKS) + ")";
 
     // 获取跟随的社区列表

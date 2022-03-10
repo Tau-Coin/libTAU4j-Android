@@ -88,4 +88,9 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     public Flowable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime) {
         return db.txQueueDao().observeAirdropHistoryOnChain(chainID, senderPk, currentTime);
     }
+
+    @Override
+    public TxQueueAndStatus getAccountRenewalTxQueue(String chainID, String senderPk) {
+        return db.txQueueDao().getAccountRenewalTxQueue(chainID, senderPk);
+    }
 }

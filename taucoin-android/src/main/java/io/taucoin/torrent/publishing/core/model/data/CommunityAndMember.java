@@ -1,6 +1,5 @@
 package io.taucoin.torrent.publishing.core.model.data;
 
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 
 /**
@@ -21,7 +20,7 @@ public class CommunityAndMember extends Community {
      * @return read only
      */
     public boolean isReadOnly() {
-        return (balance <= 0 && power <= 0) || (headBlock - blockNumber >= Constants.BLOCKS_NOT_PERISHABLE);
+        return (balance <= 0 && power <= 0) || blockNumber < tailBlock;
     }
 
     public boolean isJoined() {

@@ -232,7 +232,9 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
 
     @Override
     public void onTrustClicked(User user) {
-        showTrustDialog(user);
+        if (!isReadOnly) {
+            showTrustDialog(user);
+        }
     }
 
     @Override

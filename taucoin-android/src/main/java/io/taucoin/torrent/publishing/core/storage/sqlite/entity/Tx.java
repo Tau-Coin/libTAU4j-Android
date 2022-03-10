@@ -32,8 +32,6 @@ public class Tx implements Parcelable {
     public String receiverPk;               // 交易接收者的公钥 只针对TxType.WRING_TX类型
     public long amount;                     // 交易金额 只针对TxType.WRING_TX类型
 
-    public int autoRenewal;                 // 交易是否为账户自动更新创建的交易 0：用户创建；1：自动创建
-
     public String coinName;                 // 币名 只针对TxType.SELL_TX类型
     public String link;                     // 用户link 只针对TxType.SELL_TX类型
     public long quantity;                   // 币的数量 只针对TxType.SELL_TX类型
@@ -101,7 +99,6 @@ public class Tx implements Parcelable {
         txType = in.readInt();
         txStatus = in.readInt();
         blockNumber = in.readLong();
-        autoRenewal = in.readInt();
     }
 
     @Override
@@ -118,7 +115,6 @@ public class Tx implements Parcelable {
         dest.writeInt(txType);
         dest.writeInt(txStatus);
         dest.writeLong(blockNumber);
-        dest.writeInt(autoRenewal);
     }
 
     @Override

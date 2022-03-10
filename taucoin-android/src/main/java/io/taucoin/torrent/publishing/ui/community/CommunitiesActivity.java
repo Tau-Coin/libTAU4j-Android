@@ -111,11 +111,12 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             isReadOnly = member.isReadOnly();
             power = member.power;
             long currentTime = DateUtil.getTime();
-            long expiryDate = Constants.BLOCKS_NOT_PERISHABLE * Constants.BLOCK_IN_AVG +
-                    currentTime;
+            long expiryBlocks = member.headBlock - member.blockNumber + 1;
+            expiryBlocks = Constants.BLOCKS_NOT_PERISHABLE - expiryBlocks;
+            long expiryDate = expiryBlocks * Constants.BLOCK_IN_AVG + currentTime;
             binding.itemExpiryDate.setRightText(DateUtil.formatTime(expiryDate, DateUtil.pattern4));
 
-            long renewalDate = (Constants.BLOCKS_NOT_PERISHABLE - Constants.AUTO_RENEWAL_MAX_BLOCKS)
+            long renewalDate = (expiryBlocks - Constants.AUTO_RENEWAL_MAX_BLOCKS)
                     * Constants.BLOCK_IN_AVG + currentTime;
             binding.itemRenewalDate.setRightText(DateUtil.formatTime(renewalDate, DateUtil.pattern4));
         }
