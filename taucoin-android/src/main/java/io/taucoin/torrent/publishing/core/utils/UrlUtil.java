@@ -28,6 +28,9 @@ public class UrlUtil {
      */
     public static AirdropUrl decodeAirdropUrl(String url) {
         try {
+            if (!isTauUrl(url)) {
+                return null;
+            }
             Pattern airdrop = Pattern.compile(AIRDROP_PATTERN);
             Matcher matcher = airdrop.matcher(url);
             if (matcher.matches()) {

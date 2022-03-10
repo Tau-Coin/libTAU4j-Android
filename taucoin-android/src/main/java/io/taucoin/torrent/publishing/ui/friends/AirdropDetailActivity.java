@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 
 import androidx.databinding.DataBindingUtil;
@@ -33,7 +34,7 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 /**
  * Airdrop详情页
  */
-public class AirdropDetailActivity extends BaseActivity {
+public class AirdropDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private ActivityAirdropDetailBinding binding;
     private CommunityViewModel communityViewModel;
@@ -48,6 +49,7 @@ public class AirdropDetailActivity extends BaseActivity {
         ViewModelProvider provider = new ViewModelProvider(this);
         communityViewModel = provider.get(CommunityViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_airdrop_detail);
+        binding.setListener(this);
         initLayout();
     }
 
@@ -61,11 +63,6 @@ public class AirdropDetailActivity extends BaseActivity {
 
         communityViewModel.getAirdropResult().observe(this, result -> {
             this.finish();
-        });
-
-        binding.ivLinkCopy.setOnClickListener(v -> {
-            CopyManager.copyText(StringUtil.getText(binding.tauLink));
-            ToastUtils.showShortToast(R.string.copy_link_successfully);
         });
     }
 
@@ -159,6 +156,26 @@ public class AirdropDetailActivity extends BaseActivity {
         disposables.clear();
         if (airdropDisposable != null && !airdropDisposable.isDisposed()) {
             airdropDisposable.dispose();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        String airdropLink = StringUtil.getText(binding.tauLink);
+        if (StringUtil.isEmpty(airdropLink)) {
+            return;
+        }
+        switch (v.getId()) {
+            case R.id.iv_link_copy:
+                CopyManager.copyText(airdropLink);
+                ToastUtils.showShortToast(R.string.copy_link_successfully);
+                break;
+            case R.id.ll_share:
+                String shareTitle = getString(R.string.bot_share_airdrop_link_title);
+                String text = getString(R.string.bot_share_airdrop_link_content,
+                        Constants.APP_SHARE_URL, airdropLink);
+                ActivityUtil.shareText(this, shareTitle, text);
+                break;
         }
     }
 }

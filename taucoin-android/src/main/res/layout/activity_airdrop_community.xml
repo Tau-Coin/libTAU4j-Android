@@ -12,12 +12,42 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        android:background="@color/color_bg"
+        android:background="@color/color_white"
         android:orientation="vertical">
 
         <include
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
+
+        <LinearLayout
+            android:id="@+id/ll_paste_link"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_40"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/widget_size_22"
+            android:paddingEnd="@dimen/widget_size_22"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:layout_marginBottom="@dimen/widget_size_10"
+            android:layout_marginStart="@dimen/widget_size_10"
+            android:layout_marginEnd="@dimen/widget_size_10"
+            android:background="@drawable/search_rect_round_bg">
+
+            <ImageView
+                android:layout_width="@dimen/widget_size_22"
+                android:layout_height="@dimen/widget_size_22"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_search"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/bot_airdrop_paste_link"
+                android:textColor="@color/gray_dark"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:textAppearance="@style/TextAppearanceBody3"/>
+
+        </LinearLayout>
 
         <com.yanzhenjie.recyclerview.SwipeRecyclerView
             android:id="@+id/joined_list"
@@ -27,6 +57,7 @@
             android:clipToPadding="false"
             android:scrollbars="vertical"
             android:focusable="true"
+            android:background="@color/color_bg"
             android:scrollbarStyle="outsideOverlay" />
 
     </LinearLayout>
