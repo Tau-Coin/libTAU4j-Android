@@ -211,6 +211,7 @@ public abstract class TauDaemon {
         if (isRunning)
             return;
 
+        updateInterfacesTimer(0);
         // 设置SessionManager启动参数
         SessionParams sessionParams = SessionSettings.getSessionParamsBuilder()
                 .setAccountSeed(seed)
@@ -322,6 +323,7 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_internet_type))) {
             logger.info("SettingsChanged, internet type::{}", settingsRepo.getInternetType());
             updateListenInterfaces();
+            updateInterfacesTimer(0);
         } else if (key.equals(appContext.getString(R.string.pref_key_charging_state))) {
             logger.info("SettingsChanged, charging state::{}", settingsRepo.chargingState());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
@@ -347,23 +349,20 @@ public abstract class TauDaemon {
     }
 
     /**
-     * APP启动30s无peer触发更新libTAU的ListenInterfaces
+     * APP启动无peer触发更新libTAU的ListenInterfaces
      */
     private void updateInterfacesTimer(long nodes) {
-        if (nodes > 0) {
-            if (updateInterfacesTimer != null && !updateInterfacesTimer.isDisposed()) {
-                updateInterfacesTimer.dispose();
-            }
-        } else {
-            if (null == updateInterfacesTimer || updateInterfacesTimer.isDisposed()) {
-                updateInterfacesTimer = ObservableUtil.intervalSeconds(UPDATE_INTERFACE_THRESHOLD)
+        if (updateInterfacesTimer != null && !updateInterfacesTimer.isDisposed()) {
+            updateInterfacesTimer.dispose();
+        }
+        if (nodes <= 0) {
+            updateInterfacesTimer = ObservableUtil.intervalSeconds(UPDATE_INTERFACE_THRESHOLD)
                     .subscribeOn(Schedulers.io())
                     .subscribe( l -> {
                         logger.trace("No nodes more than {}s, updateListenInterfaces...",
                                 UPDATE_INTERFACE_THRESHOLD);
                         updateListenInterfaces();
                     });
-            }
         }
     }
 

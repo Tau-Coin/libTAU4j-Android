@@ -11,6 +11,8 @@ public class ObservableUtil {
                     if (!emitter.isDisposed()) {
                         Thread.sleep(millis);
                         emitter.onNext(System.currentTimeMillis());
+                    } else {
+                        break;
                     }
                 } catch (Exception e) {
                     break;
