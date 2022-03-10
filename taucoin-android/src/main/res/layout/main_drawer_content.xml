@@ -157,17 +157,6 @@
                         app:rightText="@string/drawer_new_community"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:visibility="visible"
-                        android:id="@+id/item_balance"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_balance"
-                        app:rightText="@string/drawer_balance"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_contacts"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

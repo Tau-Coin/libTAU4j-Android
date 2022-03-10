@@ -110,6 +110,7 @@ public class ChainStatusActivity extends BaseActivity {
         binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
         binding.itemPeersBlocks.setRightText(FmtMicrometer.fmtLong(status.peerBlocks));
         binding.itemTotalCoins.setRightText(FmtMicrometer.fmtBalance(status.totalCoin));
+        binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(status.balance));
     }
 
     /**

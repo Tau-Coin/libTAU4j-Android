@@ -67,7 +67,6 @@ import io.taucoin.torrent.publishing.service.WorkloadManager;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.chat.ChatFragment;
-import io.taucoin.torrent.publishing.ui.community.BalanceActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityFragment;
 import io.taucoin.torrent.publishing.ui.ExternalLinkActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityCreateActivity;
@@ -361,9 +360,6 @@ public class MainActivity extends ScanTriggerActivity {
             case R.id.item_airdrop_coins:
                 ActivityUtil.startActivity(this, AirdropCommunityActivity.class);
                 break;
-            case R.id.item_balance:
-                ActivityUtil.startActivity(this, BalanceActivity.class);
-                break;
         }
         if (binding != null) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
@@ -405,6 +401,9 @@ public class MainActivity extends ScanTriggerActivity {
      * 显示打开外部chain url的对话框（来自剪切板或外部链接）
      */
     private boolean showOpenExternalLinkDialog(String url) {
+        if (!UrlUtil.isTauUrl(url)) {
+            return false;
+        }
         AirdropUrl airdropUrl = UrlUtil.decodeAirdropUrl(url);
         if (airdropUrl != null) {
             if (StringUtil.isEquals(MainApplication.getInstance().getPublicKey(),

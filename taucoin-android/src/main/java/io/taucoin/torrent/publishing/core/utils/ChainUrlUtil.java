@@ -18,6 +18,9 @@ public class ChainUrlUtil {
      */
     public static ChainURL decode(String url) {
         try {
+            if (!UrlUtil.isTauUrl(url)) {
+                return null;
+            }
             if (StringUtil.isNotEmpty(url)) {
                 if (url.contains(SPACES_REPLACE)) {
                     url = url.replaceAll(SPACES_REPLACE, SPACES);

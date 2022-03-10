@@ -22,7 +22,8 @@
         <ScrollView
             android:fillViewport="true"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_weight="1"
+            android:layout_height="0dp">
 
             <LinearLayout
                 android:orientation="vertical"
@@ -63,13 +64,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
+                    android:layout_marginStart="@dimen/widget_size_22"
+                    android:layout_marginEnd="@dimen/widget_size_20"
                     android:layout_marginTop="@dimen/widget_size_15">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:text="@string/bot_airdrop_tau_link"
-                        android:layout_marginStart="@dimen/widget_size_22"
                         android:textColor="@color/gray_dark"
                         android:includeFontPadding="false"
                         android:textAppearance="@style/TextAppearanceBody1"/>
@@ -80,6 +83,7 @@
                         android:layout_height="@dimen/widget_size_16"
                         android:layout_marginStart="@dimen/widget_size_5"
                         android:contentDescription="@null"
+                        android:onClick="@{listener::onClick}"
                         android:src="@mipmap/icon_copy"/>
 
                 </LinearLayout>
@@ -97,6 +101,36 @@
             </LinearLayout>
 
         </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/ll_share"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_44"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_marginBottom="@dimen/widget_size_5"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:gravity="center_vertical|center"
+            android:onClick="@{listener::onClick}"
+            android:background="@drawable/blue_rect_round_border_radius">
+
+            <ImageView
+                android:layout_width="@dimen/widget_size_24"
+                android:layout_height="@dimen/widget_size_24"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_share_blue"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_5"
+                android:text="@string/bot_share_airdrop_link"
+                android:gravity="center_vertical|center"
+                android:textColor="@color/color_blue_link"
+                android:textAppearance="@style/TextAppearanceBody2"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 </layout>

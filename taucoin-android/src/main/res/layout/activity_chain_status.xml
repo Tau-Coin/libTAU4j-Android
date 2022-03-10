@@ -250,6 +250,12 @@
                     android:gravity="center_vertical"
                     app:lineLeftText="@string/chain_peers_blocks" />
 
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_balance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    app:lineLeftText="@string/drawer_balance" />
 
                 <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_total_coins"

@@ -106,10 +106,12 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
      */
     private void loadMemberData(CommunityAndMember member) {
         long power = 0;
+        long balance = 0;
         boolean isReadOnly = true;
         if (member != null) {
             isReadOnly = member.isReadOnly();
             power = member.power;
+            balance = member.balance;
             long currentTime = DateUtil.getTime();
             long expiryBlocks = member.headBlock - member.blockNumber + 1;
             expiryBlocks = Constants.BLOCKS_NOT_PERISHABLE - expiryBlocks;
@@ -120,6 +122,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                     * Constants.BLOCK_IN_AVG + currentTime;
             binding.itemRenewalDate.setRightText(DateUtil.formatTime(renewalDate, DateUtil.pattern4));
         }
+        binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(balance));
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
         binding.itemExpiryDate.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);
         binding.itemRenewalDate.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);

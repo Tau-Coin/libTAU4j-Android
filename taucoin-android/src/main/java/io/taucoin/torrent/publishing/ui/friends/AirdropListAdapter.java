@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.ui.friends;
 
 import android.content.res.Resources;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -19,8 +20,12 @@ import io.taucoin.torrent.publishing.databinding.ItemAirdropBinding;
  * 社区选择列表的Adapter
  */
 public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.ViewHolder> {
-    AirdropListAdapter() {
+
+    private OnClickListener listener;
+
+    AirdropListAdapter(OnClickListener listener) {
         super(diffCallback);
+        this.listener = listener;
     }
 
     @NonNull
@@ -32,7 +37,7 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
                 parent,
                 false);
 
-        return new ViewHolder(binding);
+        return new ViewHolder(binding, listener);
     }
 
     @Override
@@ -43,10 +48,12 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         private ItemAirdropBinding binding;
+        private OnClickListener listener;
 
-        ViewHolder(ItemAirdropBinding binding) {
+        ViewHolder(ItemAirdropBinding binding, OnClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
+            this.listener = listener;
         }
 
         /**
@@ -60,9 +67,18 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
             AirdropStatus status = AirdropStatus.valueOf(member.airdropStatus);
             Resources resources = binding.getRoot().getResources();
             binding.tvRight.setText(resources.getString(status.getName()));
-            binding.tvRight.setTextColor(status == AirdropStatus.ON ? resources.getColor(R.color.color_yellow) :
-                    resources.getColor(R.color.color_black));
+            binding.tvShare.setVisibility(status == AirdropStatus.ON ? View.VISIBLE : View.INVISIBLE);
+
+            binding.tvShare.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onShare(member.chainID);
+                }
+            });
         }
+    }
+
+    interface OnClickListener {
+        void onShare(String chainID);
     }
 
     private static final DiffUtil.ItemCallback<Member> diffCallback = new DiffUtil.ItemCallback<Member>() {

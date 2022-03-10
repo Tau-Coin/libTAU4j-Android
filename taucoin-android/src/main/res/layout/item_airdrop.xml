@@ -32,14 +32,26 @@
                 android:textAppearance="@style/TextAppearanceBody1" />
 
             <TextView
+                android:id="@+id/tv_share"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:includeFontPadding="false"
+                android:paddingStart="@dimen/widget_size_10"
+                android:paddingEnd="@dimen/widget_size_10"
+                android:gravity="center_vertical"
+                android:text="@string/common_share"
+                android:textColor="@color/color_blue_link"
+                android:textAppearance="@style/TextAppearanceBody2" />
+
+            <TextView
                 android:id="@+id/tv_right"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minWidth="@dimen/widget_size_60"
                 android:includeFontPadding="false"
-                android:singleLine="true"
-                android:layout_marginStart="@dimen/widget_size_15"
                 android:layout_marginEnd="@dimen/widget_size_5"
                 android:gravity="end"
+                android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody2" />
 
             <ImageView
@@ -52,7 +64,10 @@
 
         </LinearLayout>
 
-        <include layout="@layout/view_line" />
+        <View
+            android:background="@color/color_bg"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_1" />
 
     </LinearLayout>
 </layout>
