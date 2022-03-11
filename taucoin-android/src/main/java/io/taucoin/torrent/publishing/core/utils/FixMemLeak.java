@@ -59,10 +59,11 @@ public class FixMemLeak {
         try {
             if (Build.MANUFACTURER.equals("samsung") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                Object clipboardManager = context.getSystemService(Class.forName("com.samsung.android.content.clipboard.SemClipboardManager"));
+                Class<?> classZ = Class.forName("com.samsung.android.content.clipboard.SemClipboardManager");
+                Object clipboardManager = context.getSystemService(classZ);
                 Field mContext = clipboardManager.getClass().getDeclaredField("mContext");
                 mContext.setAccessible(true);
-                mContext.set(clipboardManager, null);
+                mContext.set(clipboardManager, context.getApplicationContext());
 
                 Field mCocktailBarManager = clipboardManager.getClass().getDeclaredField("mCocktailBarManager");
                 mCocktailBarManager.setAccessible(true);
