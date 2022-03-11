@@ -75,7 +75,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:gravity="end"
-                        android:text="@string/community_airdrop_free"
+                        android:text="@string/community_airdrop_fee"
                         style="@style/TextAppearanceBody2" />
 
                 </RelativeLayout>

@@ -48,6 +48,8 @@ public class MembersAddActivity extends BaseActivity {
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
+        binding.getRoot().setFocusable(true);
+        binding.getRoot().setFocusableInTouchMode(true);
     }
 
     private void loadFragment() {
@@ -90,6 +92,8 @@ public class MembersAddActivity extends BaseActivity {
         // 添加新社区处理事件
         if (item.getItemId() == R.id.menu_done) {
             // 进入社区页面
+            binding.getRoot().setFocusable(true);
+            binding.getRoot().setFocusableInTouchMode(true);
             if (currentFragment != null) {
                 currentFragment.showConfirmDialog();
             }

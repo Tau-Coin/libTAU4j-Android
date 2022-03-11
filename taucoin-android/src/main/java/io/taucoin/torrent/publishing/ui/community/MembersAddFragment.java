@@ -199,7 +199,7 @@ public class MembersAddFragment extends BaseFragment {
             binding.tvAirdropCoins.setText(getString(R.string.community_airdrop_coins,
                     FmtMicrometer.formatTwoDecimal(totalCoins)));
             double totalFree = selectedFriends * Double.parseDouble(medianFee);
-            binding.tvAirdropFree.setText(getString(R.string.community_airdrop_free,
+            binding.tvAirdropFree.setText(getString(R.string.community_airdrop_fee,
                     FmtMicrometer.formatTwoDecimal(totalFree)));
         }
     }
