@@ -77,7 +77,6 @@ import io.taucoin.torrent.publishing.ui.customviews.BadgeActionProvider;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.download.DownloadViewModel;
 import io.taucoin.torrent.publishing.ui.friends.AirdropCommunityActivity;
-import io.taucoin.torrent.publishing.ui.notify.NotificationViewModel;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.KeyQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.setting.FontSizeActivity;
@@ -99,7 +98,6 @@ public class MainActivity extends ScanTriggerActivity {
     private MainViewModel mainViewModel;
     private CommunityViewModel communityViewModel;
     private DownloadViewModel downloadViewModel;
-    private NotificationViewModel notificationViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
     private Subject<Integer> mBackClick = PublishSubject.create();
     private CommonDialog seedDialog;
@@ -107,7 +105,7 @@ public class MainActivity extends ScanTriggerActivity {
     private CommonDialog joinDialog;
     private User user;
     private BaseFragment currentFragment;
-    private BadgeActionProvider badgeProvider;
+//    private BadgeActionProvider badgeProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +115,6 @@ public class MainActivity extends ScanTriggerActivity {
         mainViewModel = provider.get(MainViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
-        notificationViewModel = provider.get(NotificationViewModel.class);
         downloadViewModel = provider.get(DownloadViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_drawer);
         mainViewModel.observeNeedStartDaemon();

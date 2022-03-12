@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
+import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -214,10 +215,23 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public void setMessagePinned(String txID, int pinned, long pinnedTime, boolean isRefresh) {
-        db.txDao().setMessagePinned(txID, pinned, pinnedTime);
+    public void setMessagePinned(String txID, long pinnedTime, boolean isRefresh) {
+        db.txDao().setMessagePinned(txID, pinnedTime);
         if (isRefresh) {
             submitDataSetChanged();
         }
+    }
+
+    @Override
+    public void setMessageFavorite(String txID, long pinnedTime, boolean isRefresh) {
+        db.txDao().setMessageFavorite(txID, pinnedTime);
+        if (isRefresh) {
+            submitDataSetChanged();
+        }
+    }
+
+    @Override
+    public DataSource.Factory<Integer, UserAndTx> queryFavorites() {
+        return db.txDao().queryFavorites();
     }
 }

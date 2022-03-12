@@ -2,56 +2,51 @@ package io.taucoin.torrent.publishing.ui.setting;
 
 import android.content.Context;
 import android.text.SpannableStringBuilder;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ViewDataBinding;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.FavoriteAndUser;
+import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
-import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.SpannableUrl;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemFavoriteBinding;
-import io.taucoin.torrent.publishing.databinding.ItemFavoriteWiringBinding;
-import io.taucoin.torrent.publishing.core.model.data.message.TxType;
+import io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView;
+import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
+import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
 
 /**
  * 收藏列表显示的Adapter
  */
-public class FavoriteListAdapter extends PagedListAdapter<FavoriteAndUser,
+public class FavoriteListAdapter extends PagedListAdapter<UserAndTx,
         FavoriteListAdapter.ViewHolder> {
+    private ClickListener listener;
 
-    FavoriteListAdapter() {
+    FavoriteListAdapter(ClickListener listener) {
         super(diffCallback);
+        this.listener = listener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ViewDataBinding binding;
-        if(viewType == TxType.WIRING_TX.getType()){
-            binding = DataBindingUtil.inflate(inflater,
-                    R.layout.item_favorite_wiring,
-                    parent,
-                    false);
-        }else {
-            binding = DataBindingUtil.inflate(inflater,
+        ItemFavoriteBinding binding = DataBindingUtil.inflate(inflater,
                     R.layout.item_favorite,
                     parent,
                     false);
-        }
-        return new ViewHolder(binding);
+        return new ViewHolder(binding, listener);
     }
 
     @Override
@@ -59,69 +54,93 @@ public class FavoriteListAdapter extends PagedListAdapter<FavoriteAndUser,
         holder.bind(holder, getItem(position));
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        FavoriteAndUser tx = getItem(position);
-        if(tx != null){
-            return (int) tx.type;
-        }
-        return -1;
-    }
-
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private ViewDataBinding binding;
+        private ItemFavoriteBinding binding;
         private Context context;
+        private ClickListener listener;
 
-        ViewHolder(ViewDataBinding binding) {
+        ViewHolder(ItemFavoriteBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.context = binding.getRoot().getContext();
             this.binding = binding;
+            this.listener = listener;
         }
 
-        void bind(ViewHolder holder, FavoriteAndUser favorite) {
-            if(null == binding || null == holder || null == favorite){
+        void bind(ViewHolder holder, UserAndTx tx) {
+            if(null == binding || null == holder || null == tx){
                 return;
             }
-            String time = DateUtil.getWeekTime(favorite.timestamp);
-            int bgColor = Utils.getGroupColor(favorite.senderPk);
-            SpannableStringBuilder memo = SpannableUrl.generateSpannableUrl(favorite.memo);
-            String userName = UsersUtil.getUserName(favorite.sender, favorite.senderPk);
-            String firstLettersName = StringUtil.getFirstLettersOfName(userName);
-            String communityName = ChainIDUtil.getName(favorite.chainID);
-            if(binding instanceof ItemFavoriteWiringBinding){
-                ItemFavoriteWiringBinding txBinding = (ItemFavoriteWiringBinding) holder.binding;
-                txBinding.roundButton.setBgColor(bgColor);
-                txBinding.roundButton.setText(firstLettersName);
-                txBinding.tvUserName.setText(userName);
-                txBinding.tvCommunityName.setText(communityName);
-                String amount = FmtMicrometer.fmtBalance(favorite.amount) + " " + ChainIDUtil.getCoinName(favorite.chainID);
-                txBinding.tvAmount.setText(amount);
-                txBinding.tvReceiver.setText(favorite.receiverPk);
-                txBinding.tvFee.setText(FmtMicrometer.fmtFeeValue(favorite.fee));
-                txBinding.tvHash.setText(favorite.ID);
-                txBinding.tvMemo.setText(memo);
-                txBinding.tvTime.setText(time);
 
-            }else{
-                ItemFavoriteBinding favoriteBinding = (ItemFavoriteBinding) holder.binding;
-                favoriteBinding.roundButton.setBgColor(bgColor);
-                favoriteBinding.roundButton.setText(firstLettersName);
-                favoriteBinding.tvUserName.setText(userName);
-                favoriteBinding.tvCommunityName.setText(communityName);
-                favoriteBinding.tvMsg.setText(memo);
-                favoriteBinding.tvTime.setText(time);
-                favoriteBinding.llReply.setVisibility(View.GONE);
-            }
+            String time = DateUtil.getWeekTime(tx.favoriteTime);
+            String communityName = ChainIDUtil.getName(tx.chainID);
+            String userName = UsersUtil.getShowName(tx.sender);
+            SpannableStringBuilder memo = TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NOTES);
+
+            ItemFavoriteBinding favoriteBinding = holder.binding;
+            favoriteBinding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
+            favoriteBinding.tvUserName.setText(userName);
+            favoriteBinding.tvCommunityName.setText(communityName);
+            favoriteBinding.tvTime.setText(time);
+
+            favoriteBinding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NOTES));
+            // 添加link解析
+            Linkify.addLinks(favoriteBinding.tvMsg, Linkify.WEB_URLS);
+            Pattern airdrop = Pattern.compile(UrlUtil.AIRDROP_PATTERN, 0);
+            Linkify.addLinks(favoriteBinding.tvMsg, airdrop, null);
+            Pattern chain = Pattern.compile(UrlUtil.CHAIN_PATTERN, 0);
+            Linkify.addLinks(favoriteBinding.tvMsg, chain, null);
+
+            favoriteBinding.ivHeadPic.setOnClickListener(view ->{
+                if (listener != null) {
+                    listener.onUserClicked(tx.senderPk);
+                }
+            });
+
+            favoriteBinding.tvMsg.setAutoLinkListener(new AutoLinkTextView.AutoLinkListener() {
+                @Override
+                public void onClick(AutoLinkTextView view) {
+
+                }
+
+                @Override
+                public void onLongClick(AutoLinkTextView view) {
+                    if (listener != null) {
+                        listener.onItemLongClicked(favoriteBinding.tvMsg, tx);
+                    }
+                }
+
+                @Override
+                public void onLinkClick(String link) {
+                    if (listener != null) {
+                        listener.onLinkClick(link);
+                    }
+                }
+            });
         }
     }
 
-    private static final DiffUtil.ItemCallback<FavoriteAndUser> diffCallback = new DiffUtil.ItemCallback<FavoriteAndUser>() {
+    public interface ClickListener {
+        void onUserClicked(String publicKey);
+        void onItemLongClicked(TextView view, UserAndTx tx);
+        void onLinkClick(String link);
+    }
+
+    private static final DiffUtil.ItemCallback<UserAndTx> diffCallback = new DiffUtil.ItemCallback<UserAndTx>() {
         @Override
-        public boolean areContentsTheSame(@NonNull FavoriteAndUser oldItem, @NonNull FavoriteAndUser newItem) {
-            return oldItem.equals(newItem);
+        public boolean areContentsTheSame(@NonNull UserAndTx oldItem, @NonNull UserAndTx newItem) {
+            boolean isSame = false;
+            if (null == oldItem.sender && null == newItem.sender) {
+                isSame = true;
+            } else if(null != oldItem.sender && null != newItem.sender) {
+                isSame =  StringUtil.isEquals(oldItem.sender.nickname, newItem.sender.nickname);
+            }
+            if (isSame && oldItem.favoriteTime != newItem.favoriteTime) {
+                isSame = false;
+            }
+            return isSame;
         }
         @Override
-        public boolean areItemsTheSame(@NonNull FavoriteAndUser oldItem, @NonNull FavoriteAndUser newItem) {
+        public boolean areItemsTheSame(@NonNull UserAndTx oldItem, @NonNull UserAndTx newItem) {
             return oldItem.equals(newItem);
         }
     };

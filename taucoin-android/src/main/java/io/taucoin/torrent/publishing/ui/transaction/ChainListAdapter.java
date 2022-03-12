@@ -118,7 +118,10 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
             if (isSame && oldItem.txStatus != newItem.txStatus) {
                 isSame = false;
             }
-            if (isSame && oldItem.pinned != newItem.pinned) {
+            if (isSame && oldItem.pinnedTime != newItem.pinnedTime) {
+                isSame = false;
+            }
+            if (isSame && oldItem.favoriteTime != newItem.favoriteTime) {
                 isSame = false;
             }
             return isSame;

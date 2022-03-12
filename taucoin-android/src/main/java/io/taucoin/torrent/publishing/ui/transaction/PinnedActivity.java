@@ -123,7 +123,7 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
         if (urls != null && urls.length > 0) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_copy_link));
         }
-        menuList.add(new OperationMenuItem(tx.pinned == 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
+        menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
         menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
 
         operationsMenu = new FloatMenu(this);

@@ -183,6 +183,10 @@
     <string name="error_coin_name_empty">Coin name cannot be empty!</string>
     <string name="error_airdrop_coins_too_greater">Airdrop coins cannot be greater than total coins!</string>
     <string name="error_telegram_id_illegal">Telegram ID is illegal!</string>
+    <string name="community_pinned_successfully">Pinned successfully</string>
+    <string name="community_unpinned_successfully">Unpinned successfully</string>
+    <string name="community_favorite_add_successfully">Add favorites successfully</string>
+    <string name="community_favorite_delete_successfully">Delete favorite successfully</string>
     <string name="community_added_successfully">Create Community Successful!</string>
     <string name="community_added_failed">Failed to add community!</string>
     <string name="community_join">Join</string>
@@ -362,6 +366,7 @@
     <string name="tx_operation_forward">Forward</string>
     <string name="tx_operation_blacklist">Blacklist</string>
     <string name="tx_operation_favorite">Favorite</string>
+    <string name="tx_operation_favorite_delete">Delete Favorite</string>
     <string name="tx_operation_msg_hash">Message Hash</string>
     <string name="tx_operation_pin">Pin</string>
     <string name="tx_operation_unpin">Unpin</string>
@@ -496,11 +501,6 @@ TAU app can also be installed from google store (taucoin).</string>
     <!-- Send text to clipboard -->
     <string name="send_text_to_clipboard">Copy</string>
     <string name="text_copied_to_clipboard">Text copied to clipboard</string>
-
-    <string name="notifications_title">Notifications</string>
-    <string name="notifications_empty">No notifications！</string>
-    <string name="notifications_join">Join</string>
-    <string name="notifications_from">From %1$s</string>
 
     <string name="app_upgrade_description">TAU downloading&#8230;</string>
 

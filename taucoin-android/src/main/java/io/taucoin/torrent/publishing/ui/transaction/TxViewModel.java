@@ -24,7 +24,11 @@ import java.util.Set;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.paging.DataSource;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
@@ -677,14 +681,42 @@ public class TxViewModel extends AndroidViewModel {
 
     public void setMessagePinned(UserAndTx tx, boolean isRefresh) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-            int pinned = tx.pinned == 0 ? 1 : 0;
-            tx.pinned = pinned;
-            tx.pinnedTime = DateUtil.getMillisTime();
-            txRepo.setMessagePinned(tx.txID, pinned, tx.pinnedTime, isRefresh);
+            tx.pinnedTime = tx.pinnedTime > 0 ? 0 : DateUtil.getMillisTime();
+            txRepo.setMessagePinned(tx.txID, tx.pinnedTime, isRefresh);
+            ToastUtils.showShortToast(tx.pinnedTime > 0 ?
+                    application.getString(R.string.community_pinned_successfully) :
+                    application.getString(R.string.community_unpinned_successfully));
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
         disposables.add(disposable);
+    }
+
+    public void setMessageFavorite(UserAndTx tx, boolean isRefresh) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            tx.favoriteTime = tx.favoriteTime > 0 ? 0 : DateUtil.getMillisTime();
+            txRepo.setMessageFavorite(tx.txID, tx.favoriteTime, isRefresh);
+            ToastUtils.showShortToast(tx.favoriteTime > 0 ?
+                    application.getString(R.string.community_favorite_add_successfully) :
+                    application.getString(R.string.community_favorite_delete_successfully));
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+        disposables.add(disposable);
+    }
+
+    /**
+     * 查询收藏
+     * @return DataSource
+     */
+    DataSource.Factory<Integer, UserAndTx> queryFavorites(){
+        return txRepo.queryFavorites();
+    }
+
+    public LiveData<PagedList<UserAndTx>> observerFavorites() {
+        return new LivePagedListBuilder<>(
+                queryFavorites(), Page.getPageListConfig()).build();
     }
 }

@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.dao;
 
 import java.util.List;
 
+import androidx.paging.DataSource;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -86,17 +87,17 @@ public interface TxDao {
 
     // SQL:查询社区里的置顶交易(所有，排除WIRING Tx)
     String QUERY_GET_NOTE_PINNED_TXS = QUERY_GET_NOTES_SELECT +
-            " AND pinned == 1" +
+            " AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里的置顶交易(MARKET交易，排除Trust Tx, 并且上链)
     String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
-            " AND (tx.txType = 3 OR tx.txType = 5)  AND pinned == 1 " +
+            " AND (tx.txType = 3 OR tx.txType = 5) AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里的置顶交易(上链)
     String QUERY_GET_CHAIN_PINNED_TXS = QUERY_GET_CHAIN_TXS_SELECT +
-            "AND (tx.txStatus = 1 OR tx.txType = 2) AND pinned == 1" +
+            "AND (tx.txStatus = 1 OR tx.txType = 2) AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里用户Trust交易(上链)
@@ -128,8 +129,17 @@ public interface TxDao {
             " WHERE chainID = :chainID AND txType = :txType AND nonce = :nonce" +
             " ORDER BY timestamp DESC LIMIT 1";
 
-    String QUERY_SET_MESSAGE_PINNED = "UPDATE Txs SET pinned = :pinned, pinnedTime = :pinnedTime" +
+    String QUERY_SET_MESSAGE_PINNED = "UPDATE Txs SET pinnedTime = :pinnedTime" +
             " WHERE txID = :txID";
+
+    String QUERY_SET_MESSAGE_FAVORITE = "UPDATE Txs SET favoriteTime = :favoriteTime" +
+            " WHERE txID = :txID";
+
+    String QUERY_GET_FAVORITE_TXS = "SELECT tx.*, 0 AS trusts" +
+            " FROM Txs AS tx" +
+            " WHERE favoriteTime > 0 " +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
+            " ORDER BY tx.favoriteTime DESC";
 
     /**
      * 添加新的交易
@@ -249,5 +259,12 @@ public interface TxDao {
     Tx getNotOnChainTx(String chainID, int txType, long nonce);
 
     @Query(QUERY_SET_MESSAGE_PINNED)
-    void setMessagePinned(String txID, int pinned, long pinnedTime);
+    void setMessagePinned(String txID, long pinnedTime);
+
+    @Query(QUERY_SET_MESSAGE_FAVORITE)
+    void setMessageFavorite(String txID, long favoriteTime);
+
+    @Transaction
+    @Query(QUERY_GET_FAVORITE_TXS)
+    DataSource.Factory<Integer, UserAndTx> queryFavorites();
 }

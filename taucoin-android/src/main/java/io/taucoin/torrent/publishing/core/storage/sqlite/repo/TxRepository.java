@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 
 import java.util.List;
 
+import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
@@ -87,7 +88,9 @@ public interface TxRepository {
      */
     Tx getNotOnChainTx(String chainID, int txType, long nonce);
 
-    void setMessagePinned(String txID, int pinned, long pinnedTime, boolean isRefresh);
+    void setMessagePinned(String txID, long pinnedTime, boolean isRefresh);
+
+    void setMessageFavorite(String txID, long pinnedTime, boolean isRefresh);
 
     Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID);
 
@@ -106,4 +109,6 @@ public interface TxRepository {
     List<UserAndTx> loadOnChainAllTxs(String chainID, int pos, int pageSize);
 
     List<UserAndTx> loadAllWiringTxs(String chainID, int pos, int pageSize);
+
+    DataSource.Factory<Integer, UserAndTx> queryFavorites();
 }

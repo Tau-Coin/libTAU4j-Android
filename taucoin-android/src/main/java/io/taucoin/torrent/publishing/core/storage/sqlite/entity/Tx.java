@@ -37,8 +37,8 @@ public class Tx implements Parcelable {
     public long quantity;                   // 币的数量 只针对TxType.SELL_TX类型
     public String location;                 // 位置信息 只针对TxType.SELL_TX类型
     public long queueID = -1;               // 交易对应的队列ID
-    public int pinned;                      // 是否置顶固定 0：未固定；1：固定
     public long pinnedTime;                 // 置顶固定时间
+    public long favoriteTime;               // 收藏时间
 
     public Tx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo){
         this.chainID = chainID;

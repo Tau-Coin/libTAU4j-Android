@@ -13,14 +13,10 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepositor
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.DeviceRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.DeviceRepositoryImpl;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FavoriteRepository;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FavoriteRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepositoryImpl;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.NotificationRepository;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.NotificationRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.StatisticRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.StatisticRepositoryImpl;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
@@ -39,8 +35,6 @@ public class RepositoryHelper {
     private static UserRepositoryImpl userRepo;
     private static TxRepositoryImpl txRepo;
     private static SettingsRepositoryImpl settingsRepo;
-    private static FavoriteRepositoryImpl favoriteRepo;
-    private static NotificationRepositoryImpl notificationRepo;
     private static FriendRepositoryImpl friendRepo;
     private static ChatRepositoryImpl chatRepo;
     private static DeviceRepositoryImpl deviceRepo;
@@ -110,32 +104,6 @@ public class RepositoryHelper {
             settingsRepo = new SettingsRepositoryImpl(appContext);
 
         return settingsRepo;
-    }
-
-    /**
-     * 获取FavoriteRepository单例
-     * @param appContext 上下文
-     * @return FavoriteRepository
-     */
-    public synchronized static FavoriteRepository getFavoriteRepository(@NonNull Context appContext) {
-        if (favoriteRepo == null)
-            favoriteRepo = new FavoriteRepositoryImpl(appContext,
-                    AppDatabase.getInstance(appContext));
-
-        return favoriteRepo;
-    }
-
-    /**
-     * 获取FavoriteRepository单例
-     * @param appContext 上下文
-     * @return NotificationRepository
-     */
-    public synchronized static NotificationRepository getNotificationRepository(@NonNull Context appContext) {
-        if (notificationRepo == null)
-            notificationRepo = new NotificationRepositoryImpl(appContext,
-                    AppDatabase.getInstance(appContext));
-
-        return notificationRepo;
     }
 
     /**

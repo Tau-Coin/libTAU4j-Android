@@ -25,9 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
@@ -50,7 +48,6 @@ import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
-import io.taucoin.torrent.publishing.ui.setting.FavoriteViewModel;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
@@ -66,7 +63,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     protected FragmentTxsTabBinding binding;
     protected TxViewModel txViewModel;
     protected UserViewModel userViewModel;
-    private FavoriteViewModel favoriteViewModel;
     protected CommunityViewModel communityViewModel;
     protected CompositeDisposable disposables = new CompositeDisposable();
     private FloatMenu operationsMenu;
@@ -101,7 +97,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         ViewModelProvider provider = new ViewModelProvider(this);
         txViewModel = provider.get(TxViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
-        favoriteViewModel = provider.get(FavoriteViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
         initParameter();
         initView();
@@ -167,7 +162,10 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
                 MainApplication.getInstance().getPublicKey())){
             menuList.add(new OperationMenuItem(R.string.tx_operation_blacklist));
         }
-        menuList.add(new OperationMenuItem(tx.pinned == 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
+        menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
+        if (tx.favoriteTime <= 0) {
+            menuList.add(new OperationMenuItem(R.string.tx_operation_favorite));
+        }
         menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
 
         operationsMenu = new FloatMenu(activity);
@@ -195,6 +193,9 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
                 case R.string.tx_operation_pin:
                 case R.string.tx_operation_unpin:
                     txViewModel.setMessagePinned(tx, false);
+                    break;
+                case R.string.tx_operation_favorite:
+                    txViewModel.setMessageFavorite(tx, false);
                     break;
                 case R.string.tx_operation_msg_hash:
                     String msgHash = tx.txID;
@@ -295,11 +296,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
                 intent.putExtra(IntentExtra.TYPE, currentTab);
                 ActivityUtil.startActivityForResult(intent, activity, PinnedActivity.class,
                         NotesTabFragment.TX_REQUEST_CODE);
-                break;
-            case R.id.favourite:
-                String txID = ViewUtils.getStringTag(v);
-                favoriteViewModel.addTxFavorite(txID);
-                ToastUtils.showShortToast(R.string.favourite_successfully);
                 break;
         }
     }
