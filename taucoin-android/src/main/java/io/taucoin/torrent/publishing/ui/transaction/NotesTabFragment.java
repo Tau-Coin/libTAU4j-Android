@@ -39,6 +39,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
         txViewModel.observerChainTxs().observe(this, txs -> {
             List<UserAndTx> currentList = new ArrayList<>(txs);
             if (currentPos == 0) {
+                initScrollToBottom();
                 adapter.submitList(currentList, handleUpdateAdapter);
             } else {
                 currentList.addAll(adapter.getCurrentList());
@@ -95,6 +96,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
 
     @Override
     public void switchView(int filterItem) {
+        super.switchView(filterItem);
         this.filterItem = filterItem;
         loadData(0);
     }
@@ -102,6 +104,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     @Override
     public void loadData(int pos) {
         super.loadData(pos);
-        txViewModel.loadNotesData(filterItem, chainID, pos);
+        txViewModel.loadNotesData(filterItem, chainID, pos, getItemCount());
     }
 }

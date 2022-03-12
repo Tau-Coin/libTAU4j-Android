@@ -481,8 +481,9 @@ public class TxViewModel extends AndroidViewModel {
      * @param filterItem 用户过滤条件
      * @param chainID 社区链ID
      * @param pos 分页位置
+     * @param initSize 刷新时第一页数据大小
      */
-    void loadNotesData(int filterItem, String chainID, int pos) {
+    void loadNotesData(int filterItem, String chainID, int pos, int initSize) {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
@@ -490,6 +491,9 @@ public class TxViewModel extends AndroidViewModel {
             List<UserAndTx> txs = new ArrayList<>();
             try {
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
                 if (filterItem == R.string.community_view_onchain_notes) {
                     txs = txRepo.loadOnChainNotesData(chainID, pos, pageSize);
                 } else if (filterItem == R.string.community_view_offchain_notes) {
@@ -517,8 +521,9 @@ public class TxViewModel extends AndroidViewModel {
      * @param filterItem 用户过滤条件
      * @param chainID 社区链ID
      * @param pos 分页位置
+     * @param initSize 刷新时第一页数据大小
      */
-    void loadMarketData(int filterItem, String chainID, int pos) {
+    void loadMarketData(int filterItem, String chainID, int pos, int initSize) {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
@@ -526,6 +531,9 @@ public class TxViewModel extends AndroidViewModel {
             List<UserAndTx> txs = new ArrayList<>();
             try {
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
                 if (filterItem == R.string.community_view_airdrop) {
                     txs = txRepo.loadAirdropMarketData(chainID, pos, pageSize);
                 } else if (filterItem == R.string.community_view_sell) {
@@ -553,8 +561,9 @@ public class TxViewModel extends AndroidViewModel {
      * @param onlyWring 仅显示转账交易
      * @param chainID 社区链ID
      * @param pos 分页位置
+     * @param initSize 刷新时第一页数据大小
      */
-    void loadChainTxsData(boolean onlyWring, String chainID, int pos) {
+    void loadChainTxsData(boolean onlyWring, String chainID, int pos, int initSize) {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
@@ -562,6 +571,9 @@ public class TxViewModel extends AndroidViewModel {
             List<UserAndTx> txs = new ArrayList<>();
             try {
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
                 if (!onlyWring) {
                     txs = txRepo.loadOnChainAllTxs(chainID, pos, pageSize);
                 } else {

@@ -752,13 +752,17 @@ public class CommunityViewModel extends AndroidViewModel {
      * 加载区块分页数据
      * @param chainID 社区链ID
      * @param pos 分页位置
+     * @param initSize 刷新时第一页数据大小
      */
-    public void loadBlocksData(String chainID, int pos) {
+    public void loadBlocksData(String chainID, int pos, int initSize) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<List<BlockInfo>>) emitter -> {
             List<BlockInfo> blocks = new ArrayList<>();
             try {
                 long startTime = System.currentTimeMillis();
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
                 blocks = blockRepo.queryCommunityBlocks(chainID, pos, pageSize);
                 long getMessagesTime = System.currentTimeMillis();
                 logger.trace("loadBlocksData pos::{}, pageSize::{}, blocks.size::{}",

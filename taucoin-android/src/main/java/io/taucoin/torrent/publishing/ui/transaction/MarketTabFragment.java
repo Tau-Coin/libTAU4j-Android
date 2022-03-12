@@ -39,6 +39,7 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
         txViewModel.observerChainTxs().observe(this, txs -> {
             List<UserAndTx> currentList = new ArrayList<>(txs);
             if (currentPos == 0) {
+                initScrollToBottom();
                 adapter.submitList(currentList, handleUpdateAdapter);
             } else {
                 currentList.addAll(adapter.getCurrentList());
@@ -76,6 +77,7 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
 
     @Override
     public void switchView(int filterItem) {
+        super.switchView(filterItem);
         this.filterItem = filterItem;
         loadData(0);
     }
@@ -83,6 +85,6 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
     @Override
     public void loadData(int pos) {
         super.loadData(pos);
-        txViewModel.loadMarketData(filterItem, chainID, pos);
+        txViewModel.loadMarketData(filterItem, chainID, pos, getItemCount());
     }
 }

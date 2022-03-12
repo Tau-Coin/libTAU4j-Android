@@ -40,6 +40,7 @@ public class ChainTabFragment extends CommunityTabFragment implements ChainListA
         txViewModel.observerChainTxs().observe(this, txs -> {
             List<UserAndTx> currentList = new ArrayList<>(txs);
             if (currentPos == 0) {
+                initScrollToBottom();
                 adapter.submitList(currentList, handleUpdateAdapter);
             } else {
                 currentList.addAll(adapter.getCurrentList());
@@ -89,6 +90,6 @@ public class ChainTabFragment extends CommunityTabFragment implements ChainListA
     @Override
     public void loadData(int pos) {
         super.loadData(pos);
-        txViewModel.loadChainTxsData(onlyWring, chainID, pos);
+        txViewModel.loadChainTxsData(onlyWring, chainID, pos, getItemCount());
     }
 }

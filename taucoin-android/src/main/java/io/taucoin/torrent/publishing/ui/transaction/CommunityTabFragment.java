@@ -72,6 +72,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     protected String chainID;
     int currentTab;
     int currentPos = 0;
+    private boolean isScrollToBottom = true;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -128,10 +129,14 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     final Runnable handleUpdateAdapter = () -> {
         LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
         if (layoutManager != null) {
-            int bottomPosition = getItemCount() - 1;
-            // 滚动到底部
-            logger.debug("handleUpdateAdapter scrollToPosition::{}", bottomPosition);
-            layoutManager.scrollToPositionWithOffset(bottomPosition, Integer.MIN_VALUE);
+            logger.debug("handleUpdateAdapter isScrollToBottom::{}", isScrollToBottom);
+            if (isScrollToBottom) {
+                isScrollToBottom = false;
+                // 滚动到底部
+                int bottomPosition = getItemCount() - 1;
+                logger.debug("handleUpdateAdapter scrollToPosition::{}", bottomPosition);
+                layoutManager.scrollToPositionWithOffset(bottomPosition, Integer.MIN_VALUE);
+            }
         }
     };
 
@@ -348,6 +353,20 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         currentPos = pos;
     }
 
+    void initScrollToBottom() {
+        if (!isScrollToBottom) {
+            LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
+            if (layoutManager != null) {
+                int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+                int bottomPosition = getItemCount() - 1;
+                this.isScrollToBottom = lastVisibleItemPosition <= bottomPosition &&
+                        lastVisibleItemPosition >= bottomPosition - 2;
+                logger.debug("handleUpdateAdapter lastVisibleItemPosition::{}, bottomPosition::{}",
+                        lastVisibleItemPosition, bottomPosition);
+            }
+        }
+    }
+
     @Override
     public void onFragmentResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onFragmentResult(requestCode, resultCode, data);
@@ -357,5 +376,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     }
 
     public void switchView(int spinnerItem) {
+        this.isScrollToBottom = true;
     }
 }

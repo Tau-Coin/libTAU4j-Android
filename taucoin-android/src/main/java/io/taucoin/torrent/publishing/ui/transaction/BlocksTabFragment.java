@@ -34,6 +34,7 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
         communityViewModel.observerChainBlocks().observe(this, txs -> {
             List<BlockInfo> currentList = new ArrayList<>(txs);
             if (currentPos == 0) {
+                initScrollToBottom();
                 adapter.submitList(currentList, handleUpdateAdapter);
             } else {
                 currentList.addAll(adapter.getCurrentList());
@@ -72,6 +73,6 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
     @Override
     public void loadData(int pos) {
         super.loadData(pos);
-        communityViewModel.loadBlocksData(chainID, currentPos);
+        communityViewModel.loadBlocksData(chainID, currentPos, getItemCount());
     }
 }
