@@ -64,7 +64,6 @@ public abstract class TauDaemon {
     private static final String TAG = TauDaemon.class.getSimpleName();
     static final Logger logger = LoggerFactory.getLogger(TAG);
     private static final int SHOW_DIALOG_THRESHOLD = 10;        // 单位s
-    private static final int REOPEN_SOCKETS_THRESHOLD = 10;     // 单位s
     static final int ALERT_QUEUE_CAPACITY = 10000;              // Alert缓存队列
     private static volatile TauDaemon instance;
 
@@ -77,7 +76,6 @@ public abstract class TauDaemon {
     private SystemServiceManager systemServiceManager;
     private TauInfoProvider tauInfoProvider;
     private LocationManagerUtil locationManager;
-    private Disposable reopenNetworkSocketsTimer;    // 更新libTAU监听接口定时任务
     private Disposable updateLocationTimer;          // 更新位置信息定时任务
     private Disposable noRemainingDataTimer;         // 触发无剩余流量的提示定时任务
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
@@ -219,7 +217,6 @@ public abstract class TauDaemon {
                 .setDhtNonReferable(true)
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)
-                .setNetworkInterface("0.0.0.0:6881")  // TODO: 没用到, 后期可删除
                 .build();
         sessionManager.start(sessionParams);
     }
@@ -240,9 +237,6 @@ public abstract class TauDaemon {
             return;
         isRunning = false;
         disposables.clear();
-        if (reopenNetworkSocketsTimer != null && !reopenNetworkSocketsTimer.isDisposed()) {
-            reopenNetworkSocketsTimer.dispose();
-        }
         if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
             noRemainingDataTimer.dispose();
         }
@@ -322,9 +316,6 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_internet_type))) {
             logger.info("SettingsChanged, internet type::{}", settingsRepo.getInternetType());
             reopenNetworkSockets();
-            if (reopenNetworkSocketsTimer != null && !reopenNetworkSocketsTimer.isDisposed()) {
-                reopenNetworkSocketsTimer.dispose();
-            }
         } else if (key.equals(appContext.getString(R.string.pref_key_charging_state))) {
             logger.info("SettingsChanged, charging state::{}", settingsRepo.chargingState());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
@@ -343,40 +334,7 @@ public abstract class TauDaemon {
             logger.info("SettingsChanged, UPnP mapped::{}", settingsRepo.isUPnpMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_main_loop_frequency))) {
             setMainLoopInterval(FrequencyUtil.getMainLoopInterval());
-        } else if (key.equals(appContext.getString(R.string.pref_key_dht_nodes))) {
-            long nodes = settingsRepo.getLongValue(key, 0);
-            updateNetworkSocketsTimer(nodes);
         }
-    }
-
-    /**
-     * APP启动无peer触发更新libTAU的ListenInterfaces
-     */
-    private void updateNetworkSocketsTimer(long nodes) {
-        if (nodes > 0) {
-            if (reopenNetworkSocketsTimer != null && !reopenNetworkSocketsTimer.isDisposed()) {
-                reopenNetworkSocketsTimer.dispose();
-            }
-        } else {
-            startNetworkSocketsTimer();
-        }
-    }
-
-    public void startNetworkSocketsTimer() {
-        if (reopenNetworkSocketsTimer != null && !reopenNetworkSocketsTimer.isDisposed()) {
-            reopenNetworkSocketsTimer.dispose();
-        }
-        reopenNetworkSocketsTimer = ObservableUtil.intervalSeconds(REOPEN_SOCKETS_THRESHOLD)
-                .subscribeOn(Schedulers.io())
-                .subscribe( l -> {
-                    if (getSessionNodes() <= 0) {
-                        logger.trace("No nodes more than {}s, reopen network sockets...",
-                                REOPEN_SOCKETS_THRESHOLD);
-                        reopenNetworkSockets();
-                    } else {
-                        reopenNetworkSocketsTimer.dispose();
-                    }
-                });
     }
 
     /**
@@ -395,6 +353,7 @@ public abstract class TauDaemon {
         } else {
             SystemServiceManager.getInstance().getNetworkAddress();
             sessionManager.reopenNetworkSockets();
+            logger.debug("Network change reopen network sockets...");
         }
     }
 
