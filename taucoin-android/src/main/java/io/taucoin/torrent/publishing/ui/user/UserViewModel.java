@@ -261,7 +261,7 @@ public class UserViewModel extends AndroidViewModel {
                 // 2、把自己当作自己的朋友
                 Friend friend = friendRepo.queryFriend(publicKey, publicKey);
                 if (null == friend) {
-                    friend = new Friend(publicKey, publicKey, FriendStatus.ADDED.getStatus());
+                    friend = new Friend(publicKey, publicKey, FriendStatus.CONNECTED.getStatus());
                     friendRepo.addFriend(friend);
                 }
                 // 3、更新本地的用户公钥

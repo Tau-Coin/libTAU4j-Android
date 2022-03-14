@@ -34,7 +34,6 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
-import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -273,7 +272,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                     updateFriendInfo(friend.user);
                     binding.llBottomInput.setVisibility(friend.status != FriendStatus.DISCOVERED.getStatus()
                             ? View.VISIBLE : View.GONE);
-                    binding.llShareQr.setVisibility(friend.status == FriendStatus.DISCOVERED.getStatus()
+                    binding.llShareQr.setVisibility(friend.status != FriendStatus.CONNECTED.getStatus()
                             ? View.VISIBLE : View.GONE);
                 }));
 
@@ -373,20 +372,15 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     }
 
     @Override
-    public void onMsgLogsClicked(ChatMsg msg) {
+    public void onMsgLogsClicked(ChatMsgAndLog msg) {
         if (logsDisposable != null) {
             disposables.remove(logsDisposable);
         }
         logsDisposable = chatViewModel.observerMsgLogs(msg.hash)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::showMsgLogsDialog);
+                .subscribe(logs -> showMsgLogsDialog(logs, msg));
         disposables.add(logsDisposable);
-    }
-
-    @Override
-    public void onResendClicked(ChatMsgAndLog msg) {
-        chatViewModel.resendMessage(msg, adapter.getCurrentList().indexOf(msg));
     }
 
     @Override
@@ -433,10 +427,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     }
 
     /**
-     * 显示消息的
-     * @param logs
+     * 显示消息的日志
      */
-    private void showMsgLogsDialog(List<ChatMsgLog> logs) {
+    private void showMsgLogsDialog(List<ChatMsgLog> logs, final ChatMsgAndLog msg) {
         if (msgLogsDialog != null && msgLogsDialog.isShowing()) {
             msgLogsDialog.submitList(logs);
             return;
@@ -445,7 +438,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                 .setMsgLogsListener(new MsgLogsDialog.MsgLogsListener() {
                     @Override
                     public void onRetry() {
-
+                        chatViewModel.resendMessage(msg, adapter.getCurrentList().indexOf(msg));
                     }
 
                     @Override

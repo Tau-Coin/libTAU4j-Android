@@ -137,7 +137,7 @@ public class SellDetailActivity extends BaseActivity implements View.OnClickList
             binding.leftView.tvBlacklist.setOnClickListener(v -> {
                 userViewModel.showBanDialog(this, sellerPk, nickName);
             });
-            binding.tvDirectTalk.setText(user.status == FriendStatus.ADDED.getStatus() ?
+            binding.tvDirectTalk.setText(user.status != FriendStatus.DISCOVERED.getStatus() ?
                     R.string.tx_sell_direct_talk : R.string.tx_sell_add_friend);
         }
         binding.tvName.setText(nickName);

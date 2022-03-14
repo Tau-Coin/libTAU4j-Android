@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 
 import org.libTAU4j.Message;
-import org.libTAU4j.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,16 +18,12 @@ import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
-import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
-import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
-import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Device;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
@@ -36,9 +31,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.DeviceRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
-import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -113,13 +106,17 @@ class MsgAlertHandler {
                 String logicMsgHash = msgContent.getLogicHash();
                 byte[] content = msgContent.getContent();
                 chatMsg = new ChatMsg(hash, senderPk, receiverPk, content, msgContent.getType(),
-                        sentTime, logicMsgHash, 1);
+                        sentTime, logicMsgHash);
                 chatRepo.addChatMsg(chatMsg);
 
                 // 标记消息未读, 更新上次交流的时间
                 Friend friend = friendRepo.queryFriend(user.publicKey, friendPkStr);
                 boolean isNeedUpdate = false;
                 if (friend != null) {
+                    if (friend.status != FriendStatus.CONNECTED.getStatus()) {
+                        friend.status = FriendStatus.CONNECTED.getStatus();
+                        isNeedUpdate = true;
+                    }
                     if (friend.msgUnread == 0) {
                         friend.msgUnread = 1;
                         isNeedUpdate = true;
@@ -198,17 +195,18 @@ class MsgAlertHandler {
                 String hash = ByteUtil.toHexString(root);
                 ChatMsg msg = chatRepo.queryChatMsg(hash);
                 String senderPk = msg != null ? msg.senderPk : null;
+                String receiverPk = msg != null ? msg.receiverPk : null;
                 if (StringUtil.isNotEquals(senderPk, userPk)) {
                     logger.debug("onReadMessageRoot MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
                     continue;
                 }
                 ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
-                        ChatMsgStatus.SYNC_CONFIRMED.getStatus());
+                        ChatMsgStatus.CONFIRMED.getStatus());
                 logger.trace("onReadMessageRoot MessageHash::{}, exist::{}", hash, msgLog != null);
                 if (null == msgLog) {
-                    msgLog = new ChatMsgLog(hash, ChatMsgStatus.SYNC_CONFIRMED.getStatus(),
+                    msgLog = new ChatMsgLog(hash, ChatMsgStatus.CONFIRMED.getStatus(),
                             timestamp.longValue());
-                   chatRepo.addChatMsgLogs(msgLog);
+                   chatRepo.addChatMsgLogs(receiverPk, msgLog);
                 }
             }
         } catch (SQLiteConstraintException ignore) {
@@ -255,7 +253,7 @@ class MsgAlertHandler {
             }
         } else {
             boolean isUpdate = false;
-            if (friend.status != FriendStatus.ADDED.getStatus()) {
+            if (friend.status == FriendStatus.DISCOVERED.getStatus()) {
                 friend.status = FriendStatus.ADDED.getStatus();
                 isUpdate = true;
             }

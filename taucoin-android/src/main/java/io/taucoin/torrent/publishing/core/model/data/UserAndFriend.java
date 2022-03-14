@@ -21,6 +21,6 @@ public class UserAndFriend extends User {
     }
 
     public boolean isAdded() {
-        return status == 1;
+        return !isDiscovered();
     }
 }

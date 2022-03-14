@@ -56,11 +56,6 @@ public class ChatRepositoryImpl implements ChatRepository{
     }
 
     @Override
-    public void updateMsgSendStatus(ChatMsg chat) {
-        db.chatDao().updateChat(chat);
-    }
-
-    @Override
     public ChatMsg queryChatMsg(String senderPk, String hash) {
         return db.chatDao().queryChatMsg(senderPk, hash);
     }
@@ -109,8 +104,16 @@ public class ChatRepositoryImpl implements ChatRepository{
      * @param msgLogs
      */
     @Override
-    public void addChatMsgLogs(ChatMsgLog... msgLogs) {
+    public void addChatMsgLogs(String friendPk, ChatMsgLog... msgLogs) {
         db.chatDao().addChatMsgLogs(msgLogs);
+        StringBuilder stringBuilder = new StringBuilder();
+        ChatMsgLog log = msgLogs[0];
+        stringBuilder.append(friendPk);
+        stringBuilder.append(log.hash);
+        stringBuilder.append(log.status);
+        stringBuilder.append(log.timestamp);
+        stringBuilder.append(DateUtil.getDateTime());
+        submitDataSetChangedDirect(stringBuilder);
     }
 
     /**

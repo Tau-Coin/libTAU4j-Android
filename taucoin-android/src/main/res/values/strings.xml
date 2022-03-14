@@ -36,6 +36,7 @@
     <string name="common_skip">Skip</string>
     <string name="common_chinese_not_supported">Sorry, Chinese is not supported!</string>
     <string name="common_close">Close</string>
+    <string name="common_resend">Resend</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>

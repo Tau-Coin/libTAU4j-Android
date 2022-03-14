@@ -6,10 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -148,7 +148,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
                 return;
             }
             this.msg = msg;
-            showStatusView(binding.ivStats, binding.tvProgress, binding.ivWarning, msg);
+            showStatusView(binding.ivWarning, msg);
             bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, isShowTime, null, myBitmap);
         }
 
@@ -213,22 +213,13 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             });
         }
 
-        private void showStatusView(ImageView ivStats, ProgressBar tvProgress, ImageView ivWarning, ChatMsgAndLog msg) {
+        private void showStatusView(ImageView ivWarning, ChatMsgAndLog msg) {
             if (null == ivWarning) {
                 return;
             }
-            ivStats.setImageResource(R.mipmap.icon_logs);
-            ivStats.setVisibility(View.VISIBLE);
-            tvProgress.setVisibility(View.GONE);
-            boolean isNeedResend = msg.unsent != 1 || isNeedResend(msg);
-            ivWarning.setVisibility(isNeedResend ? View.VISIBLE : View.GONE);
-            ivWarning.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onResendClicked(msg);
-                }
-            });
+            ivWarning.setImageResource(parseWarningReid(msg));
 
-            ivStats.setOnClickListener(v -> {
+            ivWarning.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onMsgLogsClicked(msg);
                 }
@@ -236,27 +227,29 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
         }
     }
 
-    private static boolean isNeedResend(ChatMsgAndLog msg) {
+    private static int parseWarningReid(ChatMsgAndLog msg) {
         List<ChatMsgLog> logs = msg.logs;
         if (null == logs || logs.size() <= 0) {
-            return false;
+            return R.mipmap.icon_msg_resend;
         }
-        long maxTimestamp = 0;
-        for (ChatMsgLog log : logs) {
-            if (log.status == ChatMsgStatus.SYNC_CONFIRMED.getStatus()) {
-                return false;
-            } else {
-                maxTimestamp = log.timestamp;
-            }
+        Collections.sort(msg.logs);
+        ChatMsgLog log = msg.logs.get(0);
+        if (log.status == ChatMsgStatus.CONFIRMED.getStatus()) {
+            return R.mipmap.icon_msg_comfirmed;
+        } else if (log.status == ChatMsgStatus.SEND_FAIL.getStatus()) {
+            return R.mipmap.icon_msg_resend;
         }
+        long maxTimestamp = log.timestamp;
         long currentTime = DateUtil.getMillisTime();
-        return maxTimestamp > 0 && DateUtil.timeDiffHours(maxTimestamp, currentTime) >=
-                Constants.MSG_RESEND_PERIOD;
+        if (maxTimestamp > 0 && DateUtil.timeDiffHours(maxTimestamp, currentTime) >=
+                Constants.MSG_RESEND_PERIOD) {
+            return R.mipmap.icon_msg_resend;
+        }
+        return R.mipmap.icon_msg_waitting;
     }
 
     public interface ClickListener {
-        void onMsgLogsClicked(ChatMsg msg);
-        void onResendClicked(ChatMsgAndLog msg);
+        void onMsgLogsClicked(ChatMsgAndLog msg);
         void onUserClicked(ChatMsg msg);
         void onLongClick(AutoLinkTextView view);
         void onLinkClick(String link);
@@ -267,8 +260,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
         public boolean areContentsTheSame(@NonNull ChatMsgAndLog oldItem, @NonNull ChatMsgAndLog newItem) {
             return oldItem.equals(newItem)
                     && StringUtil.isEquals(oldItem.logicMsgHash, newItem.logicMsgHash)
-                    && oldItem.unsent == newItem.unsent
-                    && isNeedResend(oldItem) == isNeedResend(newItem);
+                    && parseWarningReid(oldItem) == parseWarningReid(newItem);
         }
 
         @Override

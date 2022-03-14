@@ -5,7 +5,8 @@ package io.taucoin.torrent.publishing.core.model.data;
  */
 public enum FriendStatus {
     DISCOVERED(0, "Discovered"),
-    ADDED(1, "Added");
+    ADDED(1, "Added"),
+    CONNECTED(2, "Connected");
 
     private int status;
     private String statusInfo;

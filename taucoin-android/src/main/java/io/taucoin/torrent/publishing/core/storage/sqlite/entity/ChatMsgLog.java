@@ -6,17 +6,18 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 
 /**
  * Room: 数据库存储ChatMsgLog实体类
  * 聊天消息状态
  */
 @Entity(tableName = "ChatMsgLogs", primaryKeys = {"hash", "status", "timestamp"})
-public class ChatMsgLog implements Parcelable {
+public class ChatMsgLog implements Parcelable, Comparable<ChatMsgLog> {
     @NonNull
     public String hash;                    // 消息的Hash
     @NonNull
-    public int status;                     // 消息状态 -1: 消息构建，1: 消息同步确认
+    public int status;                     // 消息状态 -1: 消息构建，0: 1: 消息同步确认
     public long timestamp;                 // 消息状态对应的时间
 
     public ChatMsgLog(@NonNull String hash, int status, long timestamp){
@@ -64,5 +65,15 @@ public class ChatMsgLog implements Parcelable {
     @Override
     public boolean equals(Object o) {
         return o instanceof ChatMsgLog && (o == this || hash .equals (((ChatMsgLog)o).hash));
+    }
+
+    @Override
+    public int compareTo(ChatMsgLog o) {
+        if (this.timestamp > o.timestamp) {
+            return -1;
+        } else if (this.timestamp < o.timestamp) {
+            return 1;
+        }
+        return 0;
     }
 }

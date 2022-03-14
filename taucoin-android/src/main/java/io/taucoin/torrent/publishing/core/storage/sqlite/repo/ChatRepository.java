@@ -29,11 +29,6 @@ public interface ChatRepository {
     void updateChatMsg(ChatMsg chat);
 
     /**
-     * 更新Chat发送状态，不触发UI刷新
-     */
-    void updateMsgSendStatus(ChatMsg chat);
-
-    /**
      * 查询ChatMsg
      * @param senderPk
      * @param hash
@@ -64,7 +59,7 @@ public interface ChatRepository {
      * 添加消息日志
      * @param msgLogs
      */
-    void addChatMsgLogs(ChatMsgLog... msgLogs);
+    void addChatMsgLogs(String friendPk, ChatMsgLog... msgLogs);
 
     /**
      * 观察消息日志

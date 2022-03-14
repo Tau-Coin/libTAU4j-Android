@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -155,14 +156,34 @@ public class MsgLogsDialog extends Dialog {
 
                 int timePointRes;
                 String time;
-                if (log.status == ChatMsgStatus.SYNC_CONFIRMED.getStatus()) {
-                    timePointRes = R.mipmap.icon_msg_received;
+                if (log.status == ChatMsgStatus.CONFIRMED.getStatus()) {
+                    timePointRes = R.mipmap.icon_msg_comfirmed;
+                } else if (log.status == ChatMsgStatus.SEND_FAIL.getStatus()) {
+                    timePointRes = R.mipmap.icon_msg_resend;
                 } else {
-                    timePointRes = R.mipmap.icon_msg_built;
+                    timePointRes = R.mipmap.icon_msg_waitting;
                 }
                 time = DateUtil.format(log.timestamp, DateUtil.pattern9);
                 binding.tvTime.setText(time);
                 binding.timePoint.setImageResource(timePointRes);
+
+                boolean isShowResend = false;
+                if (pos == 0) {
+                    long timestamp = log.timestamp;
+                    long currentTime = DateUtil.getMillisTime();
+                    if (log.status == ChatMsgStatus.SEND_FAIL.getStatus() || (timestamp > 0 &&
+                            DateUtil.timeDiffHours(timestamp, currentTime) >= Constants.MSG_RESEND_PERIOD)) {
+                        isShowResend = true;
+                    }
+                }
+                binding.tvResend.setVisibility(isShowResend ? View.VISIBLE : View.GONE);
+                if (isShowResend) {
+                    binding.tvResend.setOnClickListener(v -> {
+                        if (listener != null) {
+                            listener.onRetry();
+                        }
+                    });
+                }
             }
         }
 

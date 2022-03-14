@@ -313,20 +313,28 @@ public class ChatViewModel extends AndroidViewModel {
                     boolean isSuccess = daemon.addNewMessage(message);
                     // 组织Message的结构，并发送到DHT和数据入库
                     ChatMsg chatMsg = new ChatMsg(hash, senderPk, friendPk, content, type,
-                            currentTime, logicMsgHash, isSuccess ? 1 : 0);
+                            currentTime, logicMsgHash);
                     messages[nonce] = chatMsg;
 
                     // 更新消息日志信息
                     // 如何是自己给自己发，直接确认接收
-                    boolean isConfirmed = isSuccess && StringUtil.isEquals(senderPk, friendPk);
-                    ChatMsgStatus status = isConfirmed ? ChatMsgStatus.SYNC_CONFIRMED : ChatMsgStatus.BUILT;
+                    ChatMsgStatus status;
+                    if (isSuccess) {
+                        if (StringUtil.isEquals(senderPk, friendPk)) {
+                            status = ChatMsgStatus.CONFIRMED;
+                        } else {
+                            status = ChatMsgStatus.SENT;
+                        }
+                    } else {
+                        status = ChatMsgStatus.SEND_FAIL;
+                    }
                     // 确认接收的时间精确到秒
                     chatMsgLogs[nonce] = new ChatMsgLog(hash,
                             status.getStatus(), currentTime);
 
                 }
                 // 批量添加到数据库
-                chatRepo.addChatMsgLogs(chatMsgLogs);
+                chatRepo.addChatMsgLogs(friendPk, chatMsgLogs);
                 chatRepo.addChatMessages(messages);
             } catch (Throwable e) {
                 logger.error("sendMessageTask error", e);
@@ -338,7 +346,6 @@ public class ChatViewModel extends AndroidViewModel {
 
     /**
      * 重发消息
-     * @param msg
      */
     void resendMessage(ChatMsgAndLog msg, int pos) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Result>) emitter -> {
@@ -362,22 +369,13 @@ public class ChatViewModel extends AndroidViewModel {
                     if (isMyself) {
                         // 如何是自己给自己发，直接确认接收
                         ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
-                                ChatMsgStatus.SYNC_CONFIRMED.getStatus(), daemon.getSessionTime());
-                        chatRepo.addChatMsgLogs(chatMsgLog);
+                                ChatMsgStatus.CONFIRMED.getStatus(), daemon.getSessionTime());
+                        chatRepo.addChatMsgLogs(chatMsg.receiverPk, chatMsgLog);
                     } else {
-                        if (msg.unsent == 1) {
-                            ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
-                                    ChatMsgStatus.RESEND.getStatus(), daemon.getSessionTime());
-                            chatRepo.addChatMsgLogs(chatMsgLog);
-                            msg.logs.add(chatMsgLog);
-                        }
-                    }
-                    if (msg.unsent == 0) {
-                        // 更新界面数据
-                        msg.unsent = 1;
-                        // 更新数据库值
-                        chatMsg.unsent = 1;
-                        chatRepo.updateMsgSendStatus(chatMsg);
+                        ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
+                                ChatMsgStatus.RESEND.getStatus(), daemon.getSessionTime());
+                        chatRepo.addChatMsgLogs(chatMsg.receiverPk, chatMsgLog);
+                        msg.logs.add(chatMsgLog);
                     }
                 } catch (SQLiteConstraintException ignore) {
                 }

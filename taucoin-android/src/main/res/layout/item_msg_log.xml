@@ -71,6 +71,21 @@
                 android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody2" />
 
+            <TextView
+                android:id="@+id/tv_resend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:background="@drawable/primary_rect_round_bg"
+                android:includeFontPadding="false"
+                android:minHeight="@dimen/widget_size_30"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/widget_size_10"
+                android:paddingEnd="@dimen/widget_size_10"
+                android:text="@string/common_resend"
+                android:textColor="@color/color_white"
+                android:textAppearance="@style/TextAppearanceBody2" />
+
         </LinearLayout>
     </LinearLayout>
 </layout>
