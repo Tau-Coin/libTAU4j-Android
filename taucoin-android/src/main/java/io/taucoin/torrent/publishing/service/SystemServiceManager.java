@@ -55,12 +55,48 @@ public class SystemServiceManager {
      * @return boolean
      */
     public int getInternetType() {
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI
-                && networkInfo.isConnected()) {
-            return networkInfo.getType();
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+            NetworkInfo newNetworkInfo = activeNetworkInfo;
+            Network[] allNetworks = connectivityManager.getAllNetworks();
+            if (allNetworks != null) {
+                for (Network network : allNetworks) {
+                    NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
+                    if (networkInfo != null) {
+                        parseNetworkAddress(networkInfo.getType(), connectivityManager.getLinkProperties(network));
+                        if (networkInfo.isConnected()) {
+                            if ( networkInfo.getType() > newNetworkInfo.getType()) {
+                                newNetworkInfo = networkInfo;
+                            }
+                        }
+                    }
+                }
+            }
+            logger.debug("network type::{}, activeNetworkInfo::{}",
+                    newNetworkInfo.getType(), newNetworkInfo);
+            return newNetworkInfo.getType();
         } else {
+            logger.debug("network type::-1");
             return -1;
+        }
+    }
+
+    private void parseNetworkAddress(int type, LinkProperties linkProperties) {
+        if (linkProperties != null) {
+            List<LinkAddress> linkAddresses = linkProperties.getLinkAddresses();
+            if (linkAddresses != null) {
+                for (LinkAddress linkAddress : linkAddresses) {
+                    InetAddress address = linkAddress.getAddress();
+                    if (address != null) {
+                        if (address instanceof Inet4Address && !address.isLoopbackAddress() &&
+                                !address.isLinkLocalAddress()) {
+                            String ipv4 = address.getHostAddress();
+                            logger.debug("parseNetworkAddress type::{} IPv4::{}", type, ipv4);
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -234,6 +270,7 @@ public class SystemServiceManager {
     /**
      * 获取当前ActiveNetworkInfo的IPv4
      */
+    @Deprecated
     public String getActiveNetworkAddress() {
         String ipv4 = "";
         Network[] networks = connectivityManager.getAllNetworks();
