@@ -74,6 +74,7 @@ import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.NOTE_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.SELL_TX;
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.TRUST_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.WIRING_TX;
 
 /**
@@ -297,10 +298,10 @@ public class TxViewModel extends AndroidViewModel {
                 ByteUtil.toByte(tx.receiverPk).length != Ed25519.PUBLIC_KEY_SIZE) {
             ToastUtils.showShortToast(R.string.tx_error_invalid_pk);
             return false;
-        } else if (tx.amount <= 0) {
+        } else if (tx.amount < 0) {
             ToastUtils.showShortToast(R.string.tx_error_invalid_amount);
             return false;
-        } else if (tx.fee <= 0) {
+        } else if (tx.fee < 0) {
             ToastUtils.showShortToast(R.string.tx_error_invalid_free);
             return false;
         } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
@@ -330,28 +331,21 @@ public class TxViewModel extends AndroidViewModel {
             } else if (tx.fee > balance) {
                 ToastUtils.showShortToast(R.string.tx_error_no_enough_coins_for_fee);
                 return false;
-            } else if (tx.fee <= 0) {
+            } else if (tx.fee < 0) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_free);
-                return false;
-            }
-        } else if (msgType == WIRING_TX.getType()) {
-            if (StringUtil.isEmpty(tx.receiverPk) ||
-                    ByteUtil.toByte(tx.receiverPk).length != Ed25519.PUBLIC_KEY_SIZE) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_pk);
-                return false;
-            } else if (tx.amount <= 0) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_amount);
-                return false;
-            } else if (tx.fee <= 0) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
-                return false;
-            } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
-                ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
                 return false;
             }
         } else if (msgType == SELL_TX.getType()) {
             if (StringUtil.isEmpty(tx.coinName)) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_coin_name);
+                return false;
+            } else if (tx.fee < 0) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
+                return false;
+            }
+        } else if (msgType == TRUST_TX.getType()) {
+            if (tx.fee < 0) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
                 return false;
             }
         }

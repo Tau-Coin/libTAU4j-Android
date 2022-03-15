@@ -40,15 +40,4 @@ public class CommunityAndFriend {
     public boolean equals(Object o) {
         return o instanceof CommunityAndFriend && (o == this || ID.equals(((CommunityAndFriend)o).ID));
     }
-
-    /**
-     * 判断社区成员是否是read only
-     * 判断条件：
-     * 1、区块余额和power都小于等于0
-     * 2、最新区块和成员状态时的区块相差Constants.BLOCKS_NOT_PERISHABLE
-     * @return read only
-     */
-    public boolean isReadOnly() {
-        return (balance <= 0 && power <= 0) || blockNumber < tailBlock;
-    }
 }

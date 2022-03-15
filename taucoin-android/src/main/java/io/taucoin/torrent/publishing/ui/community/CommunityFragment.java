@@ -55,6 +55,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private int[] spinnerItems;
     private int spinnerSelected = 0;
     private String chainID;
+    private boolean isJoined = false;
     private boolean isReadOnly = true;
     private boolean isFirstLoad = true;
 
@@ -145,19 +146,21 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private void initFabSpeedDial() {
         // 自定义点击事件
         binding.fabButton.getMainFab().setOnClickListener(v ->{
-            if (isReadOnly) {
+            if (!isJoined) {
                 return;
             }
             switch (currentTab) {
                 case ChainTabFragment.TAB_NOTES:
                     Intent intent = new Intent();
                     intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
                     ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
                             TX_REQUEST_CODE);
                     break;
                 case ChainTabFragment.TAB_MARKET:
                     intent = new Intent();
                     intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
                     ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
                             TX_REQUEST_CODE);
                     // market
@@ -166,6 +169,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     // chain
                     intent = new Intent();
                     intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
                     ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
                             TX_REQUEST_CODE);
                     break;
@@ -293,11 +297,11 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
-                    boolean isReadOnly = member.isReadOnly();
+                    isJoined = member.isJoined();
+                    isReadOnly = member.isReadOnly();
                     if (currentTabFragment != null) {
-                        currentTabFragment.handleReadOnly(isReadOnly);
-                        this.isReadOnly = isReadOnly;
-                        int color = isReadOnly ? R.color.gray_light : R.color.primary;
+                        currentTabFragment.handleReadOnly(isJoined && isReadOnly);
+                        int color = !isJoined ? R.color.gray_light : R.color.primary;
                         binding.fabButton.setMainFabClosedBackgroundColor(getResources().getColor(color));
                     }
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);

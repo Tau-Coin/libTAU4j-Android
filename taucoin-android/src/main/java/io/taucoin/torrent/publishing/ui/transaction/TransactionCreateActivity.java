@@ -45,6 +45,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
     private CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
     private TxQueue txQueue;
+    private boolean isReadOnly;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +63,10 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
      * 初始化参数
      */
     private void initParameter() {
-        if(getIntent() != null){
+        if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
             txQueue = getIntent().getParcelableExtra(IntentExtra.BEAN);
+            isReadOnly = getIntent().getBooleanExtra(IntentExtra.CHAIN_ID, true);
             if (txQueue != null) {
                 chainID = txQueue.chainID;
             }
@@ -102,6 +104,9 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
             String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
             binding.tvFee.setTag(R.id.median_fee, txFee);
 
+            if (isReadOnly) {
+                txFeeStr = "0";
+            }
             String medianFree = getString(R.string.tx_median_fee, txFeeStr,
                     ChainIDUtil.getCoinName(chainID));
             binding.tvFee.setText(Html.fromHtml(medianFree));

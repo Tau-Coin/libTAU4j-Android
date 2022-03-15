@@ -29,6 +29,7 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
     private ActivityMessageBinding binding;
     private TxViewModel txViewModel;
     private String chainID;
+    private boolean isReadOnly;
     private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
@@ -47,8 +48,9 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
      * 初始化参数
      */
     private void initParameter() {
-        if(getIntent() != null){
+        if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
+            isReadOnly = getIntent().getBooleanExtra(IntentExtra.CHAIN_ID, true);
         }
     }
 
@@ -66,6 +68,9 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
             String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
             binding.tvFee.setTag(R.id.median_fee, txFee);
 
+            if (isReadOnly) {
+                txFeeStr = "0";
+            }
             String medianFree = getString(R.string.tx_median_fee, txFeeStr,
                     ChainIDUtil.getCoinName(chainID));
             binding.tvFee.setText(Html.fromHtml(medianFree));

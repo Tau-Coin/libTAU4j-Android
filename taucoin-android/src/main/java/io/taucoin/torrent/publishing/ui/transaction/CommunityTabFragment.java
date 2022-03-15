@@ -269,11 +269,18 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         binding.tvTrustTip.setText(trustTip);
         long txFee = txViewModel.getTxFee(chainID);
         String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
+        binding.tvTrustFee.setTag(R.id.median_fee, txFee);
 
+        if (isReadOnly) {
+            txFeeStr = "0";
+        }
         String medianFree = getString(R.string.tx_median_fee, txFeeStr,
                 ChainIDUtil.getCoinName(chainID));
         binding.tvTrustFee.setText(Html.fromHtml(medianFree));
         binding.tvTrustFee.setTag(txFeeStr);
+        binding.tvTrustFee.setOnClickListener(v -> {
+            txViewModel.showEditFeeDialog(activity, binding.tvTrustFee, chainID);
+        });
 
         binding.ivClose.setOnClickListener(v -> trustDialog.closeDialog());
         binding.tvSubmit.setOnClickListener(v -> {
