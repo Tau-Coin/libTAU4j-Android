@@ -95,12 +95,16 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                     binding.tvMsgLastTime.setText(null);
                 }
                 String communityName = ChainIDUtil.getName(bean.ID);
-                binding.tvGroupName.setText(communityName);
+                binding.tvGroupName.setText(context.getString(R.string.main_community_name, communityName));
                 String firstLetters = StringUtil.getFirstLettersOfName(communityName);
                 binding.leftView.setText(firstLetters);
                 String balance = FmtMicrometer.fmtBalance(bean.balance);
-                String power = FmtMicrometer.fmtLong(bean.power);
-                binding.tvBalancePower.setText(context.getString(R.string.main_balance_power, balance, power));
+                if (bean.power > 0) {
+                    String power = FmtMicrometer.fmtLong(bean.power);
+                    binding.tvBalancePower.setText(context.getString(R.string.main_balance_power, balance, power));
+                } else {
+                    binding.tvBalancePower.setText(context.getString(R.string.main_balance_non_member, balance));
+                }
 
                 binding.tvUserMessage.setVisibility(StringUtil.isNotEmpty(bean.memo) ?
                         View.VISIBLE : View.GONE);

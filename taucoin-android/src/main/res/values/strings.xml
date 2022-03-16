@@ -46,7 +46,9 @@
     <string name="main_empty_add_friends">Add Friend</string>
     <string name="main_empty_create_communities">Create Coin Community</string>
     <string name="main_exit">Click again to exit the application!</string>
-    <string name="main_balance_power">Balance %1$s, Power %2$s</string>
+    <string name="main_community_name">%1$s community</string>
+    <string name="main_balance_power">Balance %1$s, Mining Power %2$s</string>
+    <string name="main_balance_non_member">Balance %1$s, Non Member</string>
     <string name="main_error_link">Invalid link!</string>
     <string name="main_error_link_yourself">Airdrop link published by yourself!</string>
     <string name="main_open_link">Open the link?</string>
@@ -106,7 +108,7 @@
     <string name="community_renewal_date">Renewal Date</string>
     <string name="community_info">Info</string>
     <string name="community_invite_link">Invite Link</string>
-    <string name="community_qr_code">Share Community</string>
+    <string name="community_qr_code">Share Community and QR</string>
     <string name="community_blacklist_tip" formatted="false"><Data><![CDATA[No messages from <font color="#477df9">%1$s</font> until
     removed from \"setting>privacy>blacklist\".]]></Data></string>
 
@@ -172,7 +174,7 @@
     <string name="chain_block">Block</string>
     <string name="chain_block_hash">Hash</string>
     <string name="chain_top_tab_coin">Coin</string>
-    <string name="chain_top_tab_power">Power</string>
+    <string name="chain_top_tab_power">Mining Power</string>
     <string name="chain_top_tab_consensus">Consensus</string>
     <string name="chain_top_tab_head">Head</string>
     <string name="chain_top_tab_rank">Rank</string>
@@ -197,7 +199,7 @@
     <string name="community_airdrop_coins">Coins/%1$s</string>
     <string name="community_airdrop_fee">Fee/%1$s</string>
 
-    <string name="community_sync_status">Sync Status</string>
+    <string name="community_sync_status">External Blocks Pool</string>
     <string name="community_external_head_block">External Head Block</string>
     <string name="community_head_block">Head Block</string>
     <string name="community_tail_block">Tail Block</string>
@@ -212,10 +214,10 @@
     <string name="community_block_on_chain">Onchain</string>
 
     <string name="setting_title">Settings</string>
-    <string name="setting_key_explain">Secret key is your private ID to be kept confidential, public key is your open ID for friends.</string>
-    <string name="setting_account">My Public Key</string>
+    <string name="setting_key_explain">Key is your private secret. Address is your open ID for friends.</string>
+    <string name="setting_account">Address</string>
     <string name="setting_nickname">Nickname</string>
-    <string name="setting_import_seed">Import secrete key to change public key</string>
+    <string name="setting_import_seed">Import secrete key to change address</string>
     <string name="setting_username_app">Nickname in app</string>
     <string name="setting_privacy_security">Privacy and Security</string>
     <string name="setting_community_setting">Community Setting</string>
@@ -329,7 +331,7 @@
     <string name="operation_copy">Copy</string>
     <string name="operation_select_all">Select All</string>
     <string name="copy_seed">Key copied</string>
-    <string name="copy_public_key">My Public Key copied</string>
+    <string name="copy_public_key">Address copied</string>
     <string name="copy_share_link">Share link copied</string>
     <string name="copy_message_hash">Message hash copied</string>
     <string name="copy_successfully">Copy successfully</string>
@@ -343,7 +345,7 @@
 
     <!-- Strings used for transactions -->
     <string name="tx_send">Send</string>
-    <string name="tx_public_key_hint">My Public Key</string>
+    <string name="tx_public_key_hint">Address</string>
     <string name="tx_address_hint">Address</string>
     <string name="tx_amount_hint">Amount</string>
     <string name="tx_memo_hint">Memo(optional)</string>
@@ -435,7 +437,7 @@
 
     <!-- Strings used for connected peers -->
     <string name="contacts_exchange_qr">Show QR code to add friend</string>
-    <string name="contacts_import_friend_pk">Import Public Key to add friend</string>
+    <string name="contacts_import_friend_pk">Import friend\'s address</string>
     <string name="contacts_have_added">Hello.</string>
     <string name="contacts_accepting_airdrop">Accepting airdrop.</string>
     <string name="contacts_yourself">&#160;-&#160;yourself</string>
@@ -450,7 +452,7 @@
     <string name="contacts_community">TAU</string>
     <string name="contacts_sms">SMS</string>
     <string name="contacts_chat_name_hint">Chat Name(Optional)</string>
-    <string name="contacts_public_key_hint">Friend\'s Public Key</string>
+    <string name="contacts_public_key_hint">Friend\'s Address</string>
     <string name="contacts_chatting" formatted="false"><Data><![CDATA[Chatting with <font color="#f19322">%1$s</font> now]]></Data></string>
     <string name="contacts_add_successfully">Add successfully!</string>
     <string name="contacts_friend_already_exists">Friend already exists!</string>
@@ -477,13 +479,14 @@
     <string name="bot_airdrop_tau_link">Android Link</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share android link</string>
-    <string name="bot_share_airdrop_link_content">Please download TAU app (%1$s) to receive your coins (%2$s)
-TAU app can also be installed from google store (taucoin).</string>
+    <string name="bot_share_airdrop_link_content">1. Please download TAU app to join us.\n\n%1$s\n\n
+        2. To receive your airdrop coins, copy this full message and paste to TAU app airdrop.\n\n%2$s
+    </string>
     <string name="bot_hello_world">HelloWorld</string>
 
     <!-- Strings used for QRCode -->
-    <string name="qr_code_title">My Public Key QR Code</string>
-    <string name="key_qr_code_title">My Key QR Code</string>
+    <string name="qr_code_title">Address QR Code</string>
+    <string name="key_qr_code_title">Key QR Code</string>
     <string name="qr_code_two_steps">Two steps to connect a friend</string>
     <string name="qr_code_step_one">Share QR code to friends</string>
     <string name="qr_code_step_two">Scan friend’s QR code</string>
@@ -494,8 +497,8 @@ TAU app can also be installed from google store (taucoin).</string>
     <string name="qr_code_scan_cancelled">Cancelled</string>
     <string name="qr_code_not_found">No QR code found</string>
     <string name="qr_code_not_found_continue">Tap the screen to continue scanning</string>
-    <string name="qr_code_tau_id">Public Key</string>
-    <string name="qr_code_tau_key">TAU key</string>
+    <string name="qr_code_tau_id">Address</string>
+    <string name="qr_code_tau_key">Key</string>
     <string name="qr_code_tau_key_kept_secret">Key must be kept secret.\n\n\nTap to display.</string>
 
     <!-- Send text to clipboard -->
