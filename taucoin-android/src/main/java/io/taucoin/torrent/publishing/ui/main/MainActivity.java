@@ -398,9 +398,6 @@ public class MainActivity extends ScanTriggerActivity {
      * 显示打开外部chain url的对话框（来自剪切板或外部链接）
      */
     private boolean showOpenExternalLinkDialog(String url) {
-        if (!UrlUtil.isTauUrl(url)) {
-            return false;
-        }
         AirdropUrl airdropUrl = UrlUtil.decodeAirdropUrl(url);
         if (airdropUrl != null) {
             if (StringUtil.isEquals(MainApplication.getInstance().getPublicKey(),

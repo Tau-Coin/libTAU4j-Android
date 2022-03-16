@@ -1,8 +1,7 @@
 package io.taucoin.torrent.publishing.core.utils;
 
-import org.libTAU4j.ChainURL;
-
-import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,7 +15,6 @@ public class UrlUtil {
     public static final String CHAIN_PATTERN = "tauchain:\\?(bs=[a-f0-9]{64}&)+(dn=[a-f0-9]{16}\\S{1,24})";
     public static final String AIRDROP_PATTERN = URL_SCHEME + "//[a-f0-9]{64}/airdrop/" + CHAIN_PATTERN;
     private static final String AIRDROP_URL = URL_SCHEME + "//%s/airdrop/%s";
-    public static final String HASH_PATTERN = "[a-f0-9]{64}";
 
     public static boolean isTauUrl(String url) {
         return StringUtil.isNotEmpty(url) && url.startsWith("tau");
@@ -28,21 +26,17 @@ public class UrlUtil {
      */
     public static AirdropUrl decodeAirdropUrl(String url) {
         try {
-            if (!isTauUrl(url)) {
-                return null;
-            }
             Pattern airdrop = Pattern.compile(AIRDROP_PATTERN);
             Matcher matcher = airdrop.matcher(url);
-            if (matcher.matches()) {
-                AirdropUrl airdropUrl = new AirdropUrl();
-                airdropUrl.setAirdropPeer(url.substring(6, 70));
-                airdropUrl.setChainUrl(url.substring(79));
-                ChainURL chainURL = ChainUrlUtil.decode(airdropUrl.getChainUrl());
-                if (chainURL != null) {
-                    airdropUrl.setChainID(ChainIDUtil.decode(chainURL.getChainID()));
-                    airdropUrl.setPeers(new ArrayList<>(chainURL.getPeers()));
-                    return airdropUrl;
-                }
+            Logger logger = LoggerFactory.getLogger("decodeAirdropUrl");
+            logger.debug("url::{}", url);
+            if (matcher.find()) {
+                logger.debug("group::{}", matcher.group());
+                url = matcher.group();
+            }
+            Matcher newMatcher = airdrop.matcher(url);
+            if (newMatcher.matches()) {
+                return new AirdropUrl(url);
             }
         } catch (Exception ignore) {
         }

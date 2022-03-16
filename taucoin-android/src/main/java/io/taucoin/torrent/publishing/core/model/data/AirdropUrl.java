@@ -1,6 +1,12 @@
 package io.taucoin.torrent.publishing.core.model.data;
 
+import org.libTAU4j.ChainURL;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 
 public class AirdropUrl {
 
@@ -8,36 +14,36 @@ public class AirdropUrl {
     private String chainID;
     private List<String> peers;
     private String chainUrl;
+    private String airdropUrl;
+
+    public AirdropUrl(String url) {
+        this.airdropUrl = url;
+        airdropPeer = url.substring(6, 70);
+        chainUrl = url.substring(79);
+        ChainURL chainURL = ChainUrlUtil.decode(chainUrl);
+        if (chainURL != null) {
+            chainID = ChainIDUtil.decode(chainURL.getChainID());
+            peers = new ArrayList<>(chainURL.getPeers());
+        }
+    }
 
     public String getAirdropPeer() {
         return airdropPeer;
-    }
-
-    public void setAirdropPeer(String airdropPeer) {
-        this.airdropPeer = airdropPeer;
     }
 
     public String getChainID() {
         return chainID;
     }
 
-    public void setChainID(String chainID) {
-        this.chainID = chainID;
-    }
-
     public List<String> getPeers() {
         return peers;
-    }
-
-    public void setPeers(List<String> peers) {
-        this.peers = peers;
     }
 
     public String getChainUrl() {
         return chainUrl;
     }
 
-    public void setChainUrl(String chainUrl) {
-        this.chainUrl = chainUrl;
+    public String getAirdropUrl() {
+        return airdropUrl;
     }
 }

@@ -165,9 +165,6 @@ public class AirdropCommunityActivity extends BaseActivity implements
      * 显示打开外部chain url的对话框（来自剪切板或外部链接）
      */
     private boolean showOpenExternalLinkDialog(String url) {
-        if (!UrlUtil.isTauUrl(url)) {
-            return false;
-        }
         AirdropUrl airdropUrl = UrlUtil.decodeAirdropUrl(url);
         if (airdropUrl != null) {
             if (StringUtil.isEquals(MainApplication.getInstance().getPublicKey(),
@@ -192,7 +189,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
                 if (linkDialog != null) {
                     linkDialog.closeDialog();
                 }
-                openExternalAirdropLink(url);
+                openExternalAirdropLink(airdropUrl.getAirdropUrl());
             });
             linkDialog = new CommonDialog.Builder(this)
                     .setContentView(dialogBinding.getRoot())
@@ -200,11 +197,6 @@ public class AirdropCommunityActivity extends BaseActivity implements
                     .create();
             linkDialog.show();
             return true;
-        } else {
-            if (UrlUtil.isTauUrl(url)) {
-                showErrorLinkDialog(false);
-                return true;
-            }
         }
         showErrorLinkDialog(false);
         return false;
