@@ -36,13 +36,13 @@ public interface TxDao {
             " ON tx.senderPk = t.receiverPk" +
             " WHERE tx.chainID = :chainID AND txStatus = 1" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
-            " AND (tx.txType = 3 OR tx.txType = 5)";
+            " AND (tx.txType = 3 OR tx.txType = 5 OR tx.txType = 6)";
 
     String QUERY_GET_ALL_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND (tx.txType = 3 OR tx.txType = 5)" + QUERY_GET_TXS_ORDER;
+            " AND (tx.txType = 3 OR tx.txType = 5 OR tx.txType = 6)" + QUERY_GET_TXS_ORDER;
 
     String QUERY_GET_AIRDROP_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND tx.txType = 5" + QUERY_GET_TXS_ORDER;
+            " AND (tx.txType = 5 OR tx.txType = 6)" + QUERY_GET_TXS_ORDER;
 
     String QUERY_GET_SELL_MARKET = QUERY_GET_MARKET_SELECT +
             " AND tx.txType = 3" + QUERY_GET_TXS_ORDER;

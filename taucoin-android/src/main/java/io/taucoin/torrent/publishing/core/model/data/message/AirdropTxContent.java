@@ -11,8 +11,8 @@ public class AirdropTxContent extends TxContent {
     private byte[] coinName;                // 币名
     private byte[] link;                    // link信息
 
-    public AirdropTxContent(String coinName, long quantity, String link, String location, String description) {
-        super(TxType.SELL_TX.getType(), Utils.textStringToBytes(description));
+    public AirdropTxContent(String coinName, String link, String description) {
+        super(TxType.AIRDROP_TX.getType(), Utils.textStringToBytes(description));
 
         this.coinName = Utils.textStringToBytes(coinName);
         this.link = Utils.textStringToBytes(link);
@@ -32,7 +32,7 @@ public class AirdropTxContent extends TxContent {
         RLPList messageList = (RLPList) params.get(0);
 
         this.version = RLP.decodeInteger(messageList, 0, TxVersion.VERSION1.getV());
-        this.type = RLP.decodeInteger(messageList, 1, TxType.SELL_TX.getType());
+        this.type = RLP.decodeInteger(messageList, 1, TxType.AIRDROP_TX.getType());
         this.memo = RLP.decodeElement(messageList, 2);
         this.coinName = RLP.decodeElement(messageList, 3);
         this.link = RLP.decodeElement(messageList, 4);

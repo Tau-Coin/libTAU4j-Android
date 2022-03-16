@@ -33,6 +33,8 @@ public class TxUtils {
                 return createSpanAirdropTx(tx, tab);
             case TRUST_TX:
                 return createSpanTrustTx(tx, tab);
+            case LEADER_INVITATION:
+                return createSpanLeaderTx(tx, tab);
         }
         return new SpanUtils().create();
     }
@@ -132,6 +134,31 @@ public class TxUtils {
                 .append(tx.coinName)
                 .append("\n").append("Link: ").setForegroundColor(titleColor)
                     .append(tx.link);
+        if (StringUtil.isNotEmpty(tx.memo)) {
+            msg.append("\n").append("Description: ").setForegroundColor(titleColor)
+                    .append(tx.memo);
+        }
+
+        if (tab == CommunityTabFragment.TAB_CHAIN) {
+            String coinName = ChainIDUtil.getCoinName(tx.chainID);
+            msg.append("\n").append("Fee: ").setForegroundColor(titleColor)
+                    .append(FmtMicrometer.fmtFeeValue(tx.fee))
+                    .append(" ").append(coinName)
+                    .append("\n").append("From: ").setForegroundColor(titleColor)
+                    .append(tx.senderPk);
+            if (tx.txStatus == 1) {
+                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
+                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
+            }
+        }
+        return msg.create();
+    }
+
+    private static SpannableStringBuilder createSpanLeaderTx(Tx tx, int tab) {
+        Context context = MainApplication.getInstance();
+        int titleColor = context.getResources().getColor(R.color.gray_dark);
+        SpanUtils msg = new SpanUtils()
+                .append(tx.coinName).setForegroundColor(titleColor);
         if (StringUtil.isNotEmpty(tx.memo)) {
             msg.append("\n").append("Description: ").setForegroundColor(titleColor)
                     .append(tx.memo);

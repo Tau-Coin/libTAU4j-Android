@@ -6,8 +6,6 @@ import com.google.gson.Gson;
 
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
-import org.libTAU4j.Ed25519;
-import org.libTAU4j.Pair;
 import org.libTAU4j.Transaction;
 import org.libTAU4j.Vote;
 import org.slf4j.Logger;
@@ -18,7 +16,6 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -28,6 +25,7 @@ import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.LeaderInvitationContent;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
@@ -337,6 +335,10 @@ class TauListenHandler {
             // 添加Airdrop信息
             tx.coinName = Utils.textBytesToString(sellTxContent.getCoinName());
             tx.link = Utils.textBytesToString(sellTxContent.getLink());
+        } else if (tx.txType == TxType.LEADER_INVITATION.getType()) {
+            LeaderInvitationContent sellTxContent = new LeaderInvitationContent(txMsg.getPayload());
+            // 添加社区领导者邀请信息
+            tx.coinName = Utils.textBytesToString(sellTxContent.getTitle());
         }
         txRepo.addTransaction(tx);
         logger.info("Add transaction to local, txID::{}, txType::{}", txID, tx.txType);

@@ -15,6 +15,9 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import org.libTAU4j.Account;
 import org.libTAU4j.ChainURL;
+import org.libTAU4j.Ed25519;
+import org.libTAU4j.Pair;
+import org.libTAU4j.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +41,6 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -64,6 +66,7 @@ import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
+import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
@@ -83,6 +86,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.databinding.BlacklistDialogBinding;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
@@ -292,8 +296,22 @@ public class CommunityViewModel extends AndroidViewModel {
                     accounts.put(key, account);
                 }
             }
+            // 把社区创建者添加为社区成员
+            User currentUser = userRepo.getCurrentUser();
+            byte[] senderSeed = ByteUtil.toByte(currentUser.seed);
+            Pair<byte[], byte[]> keypair = Ed25519.createKeypair(senderSeed);
+            byte[] senderPk = keypair.first;
+            byte[] secretKey = keypair.second;
+            String coinName = ChainIDUtil.getCoinName(community.chainID);
             byte[] chainID = ChainIDUtil.encode(community.chainID);
-            boolean isCreateSuccess = daemon.createNewCommunity(chainID, accounts);
+            long timestamp = DateUtil.getMillisTime();
+            SellTxContent sellTxContent = new SellTxContent(coinName, 0,
+                    null, null, null);
+            byte[] txEncoded = sellTxContent.getEncoded();
+            Transaction tx = new Transaction(chainID, 0, timestamp, senderPk, 0, txEncoded);
+            tx.sign(currentUser.publicKey, ByteUtil.toHexString(secretKey));
+
+            boolean isCreateSuccess = daemon.createNewCommunity(chainID, accounts, tx);
             if (!isCreateSuccess) {
                 result.setFailMsg(getApplication().getString(R.string.community_creation_failed));
                 return result;
@@ -301,8 +319,7 @@ public class CommunityViewModel extends AndroidViewModel {
             communityRepo.addCommunity(community);
             logger.debug("Add community to database: communityName={}, chainID={}",
                     community.communityName, community.chainID);
-            // 把社区创建者添加为社区成员
-            User currentUser = userRepo.getCurrentUser();
+
             Account account = daemon.getAccountInfo(chainID, currentUser.publicKey);
             if (account != null) {
                 Member member = new Member(community.chainID, currentUser.publicKey,
