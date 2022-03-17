@@ -54,10 +54,18 @@
 
         </LinearLayout>
 
-        <include
+        <TextView
             android:visibility="gone"
-            android:id="@+id/item_block_detail"
-            layout="@layout/item_block_detail"/>
+            android:id="@+id/tv_block_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginTop="@dimen/widget_size_0"
+            android:layout_marginBottom="@dimen/widget_size_10"
+            android:includeFontPadding="false"
+            android:textColorLink="@color/color_blue_link"
+            android:textAppearance="@style/TextAppearanceBody2"/>
 
         <include layout="@layout/view_line" />
     </LinearLayout>

@@ -1,21 +1,29 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
+import com.noober.menu.FloatMenu;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
+import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
+import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
+import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.ui.community.BlockListAdapter;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 
 /**
  * Blocks Tab页
  */
-public class BlocksTabFragment extends CommunityTabFragment implements ChainListAdapter.ClickListener {
+public class BlocksTabFragment extends CommunityTabFragment implements ChainListAdapter.ClickListener,
+    BlockListAdapter.ClickListener {
 
     private BlockListAdapter adapter;
+    private FloatMenu operationsMenu;
 
     /**
      * 初始化视图
@@ -24,15 +32,15 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
     public void initView() {
         super.initView();
         currentTab = TAB_CHAIN;
-        adapter = new BlockListAdapter();
+        adapter = new BlockListAdapter(this);
         binding.txList.setAdapter(adapter);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        communityViewModel.observerChainBlocks().observe(this, txs -> {
-            List<BlockInfo> currentList = new ArrayList<>(txs);
+        communityViewModel.observerChainBlocks().observe(this, blocks -> {
+            List<BlockAndTx> currentList = new ArrayList<>(blocks);
             if (currentPos == 0) {
                 initScrollToBottom();
                 adapter.submitList(currentList, handleUpdateAdapter);
@@ -41,9 +49,9 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
                 adapter.submitList(currentList, handlePullAdapter);
             }
             binding.refreshLayout.setRefreshing(false);
-            binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
+            binding.refreshLayout.setEnabled(blocks.size() != 0 && blocks.size() % Page.PAGE_SIZE == 0);
 
-            logger.debug("txs.size::{}", txs.size());
+            logger.debug("blocks.size::{}", blocks.size());
         });
 
         loadData(0);
@@ -63,6 +71,15 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (operationsMenu != null) {
+            operationsMenu.setOnItemClickListener(null);
+            operationsMenu.dismiss();
+        }
+    }
+
+    @Override
     int getItemCount() {
         if (adapter != null) {
             return adapter.getItemCount();
@@ -74,5 +91,36 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
     public void loadData(int pos) {
         super.loadData(pos);
         communityViewModel.loadBlocksData(chainID, currentPos, getItemCount());
+    }
+
+    @Override
+    public void onLongClick(BlockAndTx block) {
+        List<OperationMenuItem> menuList = new ArrayList<>();
+        menuList.add(new OperationMenuItem(R.string.tx_operation_copy_miner));
+        menuList.add(new OperationMenuItem(R.string.tx_operation_copy_hash));
+        if (StringUtil.isNotEmpty(block.previousBlockHash)) {
+            menuList.add(new OperationMenuItem(R.string.tx_operation_copy_previous_hash));
+        }
+        operationsMenu = new FloatMenu(activity);
+        operationsMenu.items(menuList);
+        operationsMenu.setOnItemClickListener((v, position) -> {
+            OperationMenuItem item = menuList.get(position);
+            int resId = item.getResId();
+            switch (resId) {
+                case R.string.tx_operation_copy_miner:
+                    CopyManager.copyText(block.miner);
+                    ToastUtils.showShortToast(R.string.copy_successfully);
+                    break;
+                case R.string.tx_operation_copy_hash:
+                    CopyManager.copyText(block.blockHash);
+                    ToastUtils.showShortToast(R.string.copy_successfully);
+                    break;
+                case R.string.tx_operation_copy_previous_hash:
+                    CopyManager.copyText(block.previousBlockHash);
+                    ToastUtils.showShortToast(R.string.copy_successfully);
+                    break;
+            }
+        });
+        operationsMenu.show(activity.getPoint());
     }
 }

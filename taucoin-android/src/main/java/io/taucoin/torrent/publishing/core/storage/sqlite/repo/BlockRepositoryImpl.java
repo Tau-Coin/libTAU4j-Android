@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
@@ -102,12 +103,12 @@ public class BlockRepositoryImpl implements BlockRepository{
     }
 
     @Override
-    public Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID) {
+    public Flowable<List<BlockAndTx>> observeCommunitySyncStatus(String chainID) {
         return db.blockDao().observeCommunitySyncStatus(chainID);
     }
 
     @Override
-    public List<BlockInfo> queryCommunityBlocks(String chainID, int pos, int pageSize) {
+    public List<BlockAndTx> queryCommunityBlocks(String chainID, int pos, int pageSize) {
         return db.blockDao().queryCommunityBlocks(chainID, pos, pageSize);
     }
 }

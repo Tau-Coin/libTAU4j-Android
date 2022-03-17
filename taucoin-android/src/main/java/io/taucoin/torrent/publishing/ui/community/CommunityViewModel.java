@@ -54,6 +54,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.DrawBean;
@@ -112,7 +113,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<List<Member>> joinedUnexpiredList = new MutableLiveData<>();
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
     private MutableLiveData<UserAndFriend> largestCoinHolder = new MutableLiveData<>();
-    private MutableLiveData<List<BlockInfo>> chainBlocks = new MutableLiveData<>();
+    private MutableLiveData<List<BlockAndTx>> chainBlocks = new MutableLiveData<>();
 
     public CommunityViewModel(@NonNull Application application) {
         super(application);
@@ -131,7 +132,7 @@ public class CommunityViewModel extends AndroidViewModel {
                 .subscribe((needStart) -> daemon.start()));
     }
 
-    public MutableLiveData<List<BlockInfo>> observerChainBlocks() {
+    public MutableLiveData<List<BlockAndTx>> observerChainBlocks() {
         return chainBlocks;
     }
 
@@ -761,7 +762,7 @@ public class CommunityViewModel extends AndroidViewModel {
      * 观察社区同步状态
      * @return
      */
-    public Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID) {
+    public Flowable<List<BlockAndTx>> observeCommunitySyncStatus(String chainID) {
         return blockRepo.observeCommunitySyncStatus(chainID);
     }
 
@@ -772,8 +773,8 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param initSize 刷新时第一页数据大小
      */
     public void loadBlocksData(String chainID, int pos, int initSize) {
-        Disposable disposable = Observable.create((ObservableOnSubscribe<List<BlockInfo>>) emitter -> {
-            List<BlockInfo> blocks = new ArrayList<>();
+        Disposable disposable = Observable.create((ObservableOnSubscribe<List<BlockAndTx>>) emitter -> {
+            List<BlockAndTx> blocks = new ArrayList<>();
             try {
                 long startTime = System.currentTimeMillis();
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;

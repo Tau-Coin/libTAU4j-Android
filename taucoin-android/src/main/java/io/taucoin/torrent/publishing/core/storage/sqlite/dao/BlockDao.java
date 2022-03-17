@@ -6,9 +6,11 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 
@@ -77,8 +79,10 @@ public interface BlockDao {
      * 观察链上同步状态信息
      */
     @Query(QUERY_CHAIN_SYNC_STATUS)
-    Flowable<List<BlockInfo>> observeCommunitySyncStatus(String chainID);
+    @Transaction
+    Flowable<List<BlockAndTx>> observeCommunitySyncStatus(String chainID);
 
     @Query(QUERY_COMMUNITY_BLOCKS)
-    List<BlockInfo> queryCommunityBlocks(String chainID, int startPosition, int loadSize);
+    @Transaction
+    List<BlockAndTx> queryCommunityBlocks(String chainID, int startPosition, int loadSize);
 }

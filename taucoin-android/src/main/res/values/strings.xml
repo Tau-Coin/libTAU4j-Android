@@ -204,13 +204,14 @@
     <string name="community_head_block">Head Block</string>
     <string name="community_tail_block">Tail Block</string>
     <string name="community_consensus_block">Consensus Block</string>
-    <string name="community_tip_block_txs">Transactions:</string>
-    <string name="community_tip_block_timestamp">Timestamp:</string>
-    <string name="community_tip_block_miner">Mined by:</string>
-    <string name="community_tip_block_hash">Hash:</string>
-    <string name="community_tip_block_reward">Block Reward:</string>
-    <string name="community_tip_block_difficulty">Difficulty:</string>
-    <string name="community_tip_block_size">Size:</string>
+    <string name="community_tip_block_txs">Transactions:&#160;</string>
+    <string name="community_tip_block_timestamp">Timestamp:&#160;</string>
+    <string name="community_tip_block_miner">Mined by:&#160;</string>
+    <string name="community_tip_block_hash">Hash:&#160;</string>
+    <string name="community_tip_previous_hash">Previous Hash:&#160;</string>
+    <string name="community_tip_block_reward">Block Reward:&#160;</string>
+    <string name="community_tip_block_difficulty">Difficulty:&#160;</string>
+    <string name="community_tip_block_size">Size: </string>
     <string name="community_block_on_chain">Onchain</string>
 
     <string name="setting_title">Settings</string>
@@ -363,6 +364,9 @@
     <string name="tx_description">description - optional</string>
     <string name="tx_operation_reply">Reply</string>
     <string name="tx_operation_copy">Copy</string>
+    <string name="tx_operation_copy_hash">Copy Hash</string>
+    <string name="tx_operation_copy_previous_hash">Copy Previous Hash</string>
+    <string name="tx_operation_copy_miner">Copy Miner</string>
     <string name="tx_operation_select_all">Select All</string>
     <string name="tx_operation_copy_link">Copy link</string>
     <string name="tx_operation_forward">Forward</string>

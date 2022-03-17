@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -32,6 +33,7 @@ import io.taucoin.torrent.publishing.databinding.ActivityChainStatusBinding;
 import io.taucoin.torrent.publishing.databinding.ItemBlockLayoutBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
 
 /**
  * 群组成员页面
@@ -184,8 +186,7 @@ public class ChainStatusActivity extends BaseActivity {
         });
     }
 
-    private void showBlockDetail(ItemBlockLayoutBinding binding, ImageView ivHeadDetail) {
-        View blockView = binding.getRoot();
+    private void showBlockDetail(TextView blockView, ImageView ivHeadDetail) {
         boolean isVisible = blockView.getVisibility() == View.VISIBLE;
         blockView.setVisibility(isVisible ? View.GONE : View.VISIBLE);
         ivHeadDetail.setRotation(isVisible ? 90 : -90);
@@ -194,27 +195,11 @@ public class ChainStatusActivity extends BaseActivity {
     /**
      * 加载区块详细信息
      */
-    private void loadBlockDetailData(ItemBlockLayoutBinding binding, Block block) {
+    private void loadBlockDetailData(TextView textView, Block block) {
         if (null == block) {
             return;
         }
-        Transaction tx = block.getTx();
-        byte[] payload = tx.getPayload();
-
-        binding.tvHash.setText(block.Hash());
-        boolean isHaveTx = payload != null && payload.length > 0;
-        binding.tvTxs.setText(isHaveTx ? "1" : "0");
-        binding.tvTimestamp.setText(DateUtil.formatTime(block.getTimestamp(), DateUtil.pattern6));
-        binding.tvMiner.setText(ByteUtil.toHexString(block.getMiner()));
-        String blockReward = FmtMicrometer.fmtBalance(tx.getFee());
-        if (block.getBlockNumber() <= 0) {
-            blockReward = FmtMicrometer.fmtBalance(block.getMinerBalance());
-        }
-        blockReward += " " + ChainIDUtil.getCoinName(chainID);
-        binding.tvReward.setText(blockReward);
-        String difficulty = FmtMicrometer.fmtDecimal(block.getCumulativeDifficulty().longValue());
-        binding.tvDifficulty.setText(difficulty);
-        binding.tvSize.setText(Formatter.formatFileSize(this, block.Size()));
+        textView.setText(TxUtils.createBlockSpan(block));
     }
 
     @Override

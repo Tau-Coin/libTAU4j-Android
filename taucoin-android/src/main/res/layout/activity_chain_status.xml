@@ -127,10 +127,16 @@
 
                 </LinearLayout>
 
-                <include
+                <TextView
                     android:visibility="gone"
                     android:id="@+id/head_block"
-                    layout="@layout/item_block_layout"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_20"
+                    android:layout_marginTop="@dimen/widget_size_0"
+                    android:layout_marginBottom="@dimen/widget_size_10"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
 
                 <include layout="@layout/view_line"/>
 
@@ -174,10 +180,16 @@
 
                 </LinearLayout>
 
-                <include
+                <TextView
                     android:visibility="gone"
                     android:id="@+id/tail_block"
-                    layout="@layout/item_block_layout"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_20"
+                    android:layout_marginTop="@dimen/widget_size_0"
+                    android:layout_marginBottom="@dimen/widget_size_10"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
 
                 <include layout="@layout/view_line"/>
 
@@ -221,11 +233,17 @@
                         android:contentDescription="@null" />
 
                 </LinearLayout>
-
-                <include
+                
+                <TextView
                     android:visibility="gone"
                     android:id="@+id/consensus_block"
-                    layout="@layout/item_block_layout"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_20"
+                    android:layout_marginTop="@dimen/widget_size_0"
+                    android:layout_marginBottom="@dimen/widget_size_10"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
 
                 <include layout="@layout/view_line"/>
 

@@ -3,17 +3,25 @@ package io.taucoin.torrent.publishing.ui.transaction;
 import android.content.Context;
 import android.text.SpannableStringBuilder;
 
+import org.libTAU4j.Block;
+import org.libTAU4j.Transaction;
+
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.Formatter;
 import io.taucoin.torrent.publishing.core.utils.SpanUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 public class TxUtils {
 
@@ -219,6 +227,81 @@ public class TxUtils {
                         .append(FmtMicrometer.fmtLong(tx.blockNumber));
             }
         }
+        return msg.create();
+    }
+
+    public static SpannableStringBuilder createBlockSpan(BlockAndTx block) {
+        Context context = MainApplication.getInstance();
+        int titleColor = context.getResources().getColor(R.color.gray_dark);
+        SpanUtils msg = new SpanUtils()
+                .append(context.getString(R.string.community_tip_block_txs))
+                .setForegroundColor(titleColor)
+                .append(String.valueOf(null == block.txs ? 0 : block.txs.size()))
+                .append("\n").append(context.getString(R.string.community_tip_block_timestamp))
+                .setForegroundColor(titleColor)
+                .append(DateUtil.formatTime(block.timestamp, DateUtil.pattern6))
+                .append("\n").append(context.getString(R.string.community_tip_block_miner))
+                .setForegroundColor(titleColor)
+                .append("\n").append(block.miner)
+                .append("\n").append(context.getString(R.string.community_tip_block_reward))
+                .setForegroundColor(titleColor)
+                .append(FmtMicrometer.fmtBalance(block.rewards))
+                .append(" ")
+                .append(ChainIDUtil.getCoinName(block.chainID));
+         if (StringUtil.isNotEmpty(block.previousBlockHash)) {
+             msg.append("\n").append(context.getString(R.string.community_tip_previous_hash))
+                     .setForegroundColor(titleColor)
+                     .append("\n").append(block.previousBlockHash);
+         }
+        msg.append("\n").append(context.getString(R.string.community_tip_block_hash))
+                .setForegroundColor(titleColor)
+                .append("\n").append(block.blockHash)
+                .append("\n").append(context.getString(R.string.community_tip_block_difficulty))
+                .setForegroundColor(titleColor)
+                .append(FmtMicrometer.fmtDecimal(block.difficulty));
+        return msg.create();
+    }
+
+    public static SpannableStringBuilder createBlockSpan(Block block) {
+        Transaction tx = block.getTx();
+        byte[] payload = tx.getPayload();
+
+        boolean isHaveTx = payload != null && payload.length > 0;
+        int txsSize = isHaveTx ? 1 : 0;
+        String blockReward = FmtMicrometer.fmtBalance(tx.getFee());
+        if (block.getBlockNumber() <= 0) {
+            blockReward = FmtMicrometer.fmtBalance(block.getMinerBalance());
+        }
+        String chainID = ChainIDUtil.decode(block.getChainID());
+        blockReward += " " + ChainIDUtil.getCoinName(chainID);
+
+        Context context = MainApplication.getInstance();
+        int titleColor = context.getResources().getColor(R.color.gray_dark);
+        SpanUtils msg = new SpanUtils()
+                .append(context.getString(R.string.community_tip_block_txs))
+                .setForegroundColor(titleColor)
+                .append(String.valueOf(txsSize))
+                .append("\n").append(context.getString(R.string.community_tip_block_timestamp))
+                .setForegroundColor(titleColor)
+                .append(DateUtil.formatTime(block.getTimestamp(), DateUtil.pattern6))
+                .append("\n").append(context.getString(R.string.community_tip_block_miner))
+                .setForegroundColor(titleColor)
+                .append("\n").append(ByteUtil.toHexString(block.getMiner()))
+                .append("\n").append(context.getString(R.string.community_tip_block_reward))
+                .setForegroundColor(titleColor)
+                .append(blockReward);
+        if (block.getPreviousBlockHash() != null) {
+            String previousHash = ByteUtil.toHexString(block.getPreviousBlockHash());
+            msg.append("\n").append(context.getString(R.string.community_tip_previous_hash))
+                    .setForegroundColor(titleColor)
+                    .append("\n").append(previousHash);
+        }
+        msg.append("\n").append(context.getString(R.string.community_tip_block_hash))
+                .setForegroundColor(titleColor)
+                .append("\n").append(block.Hash())
+                .append("\n").append(context.getString(R.string.community_tip_block_difficulty))
+                .setForegroundColor(titleColor)
+                .append(FmtMicrometer.fmtDecimal(block.getCumulativeDifficulty().longValue()));
         return msg.create();
     }
 }
