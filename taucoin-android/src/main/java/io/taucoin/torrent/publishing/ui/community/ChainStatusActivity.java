@@ -9,7 +9,6 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 
 import org.libTAU4j.Block;
-import org.libTAU4j.Transaction;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -23,14 +22,9 @@ import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.Formatter;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityChainStatusBinding;
-import io.taucoin.torrent.publishing.databinding.ItemBlockLayoutBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
@@ -215,7 +209,26 @@ public class ChainStatusActivity extends BaseActivity {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::loadCommunityData));
+
+            disposables.add(communityViewModel.observerCommunityMiningTime(chainID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::loadMiningTime));
         }
+    }
+
+    private void loadMiningTime(long time) {
+        if (time >= 0) {
+            long minutes = time / 60;
+            long seconds = time % 60;
+            if (minutes > 0) {
+                binding.itemMiningTime.setRightText(getString(R.string.chain_mining_time_min_seconds,
+                        minutes, seconds));
+            } else {
+                binding.itemMiningTime.setRightText(getString(R.string.chain_mining_time_seconds, seconds));
+            }
+        }
+        binding.itemMiningTime.setVisibility(time >= 0 ? View.VISIBLE : View.GONE);
     }
 
     @Override

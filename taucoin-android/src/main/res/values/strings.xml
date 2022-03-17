@@ -162,6 +162,9 @@
     <string name="community_view_onchain_txs">View Onchain Transactions</string>
     <string name="community_view_wiring_txs">View Wiring Transactions</string>
 
+    <string name="chain_mining_time">Mining Time</string>
+    <string name="chain_mining_time_min_seconds">%1$dmin%2$ds</string>
+    <string name="chain_mining_time_seconds">%1$ds</string>
     <string name="chain_difficulty">Difficulty</string>
     <string name="chain_total_peers">Total Peers</string>
     <string name="chain_peers_blocks">Blocks Self-mined</string>

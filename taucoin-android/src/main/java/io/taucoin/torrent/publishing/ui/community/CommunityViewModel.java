@@ -68,7 +68,6 @@ import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
@@ -804,5 +803,21 @@ public class CommunityViewModel extends AndroidViewModel {
 
     public Observable<DataChanged> observeBlocksSetChanged() {
         return blockRepo.observeDataSetChanged();
+    }
+
+    Observable<Long> observerCommunityMiningTime(String chainID) {
+        return Observable.create(emitter -> {
+            while (!emitter.isDisposed()) {
+                long time = daemon.getMiningTime(ChainIDUtil.encode(chainID));
+                logger.debug("Mining Time::{}, chainID::{}", time, chainID);
+                emitter.onNext(time);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+            emitter.onComplete();
+        });
     }
 }

@@ -534,6 +534,17 @@ public abstract class TauDaemon {
     }
 
     /**
+     * 获取挖矿时间
+     * 返回-1：代表出不了块
+     */
+    public long getMiningTime(byte[] chainID) {
+        if (isRunning) {
+            return sessionManager.getMiningTime(chainID);
+        }
+        return -1;
+    }
+
+    /**
      * 账户自动更新
      */
     public void accountAutoRenewal() {
