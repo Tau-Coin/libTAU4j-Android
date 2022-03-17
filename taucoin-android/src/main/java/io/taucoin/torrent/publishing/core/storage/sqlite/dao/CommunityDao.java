@@ -111,7 +111,13 @@ public interface CommunityDao {
     String QUERY_GET_COMMUNITIES_IN_BLACKLIST = "SELECT * FROM Communities WHERE isBanned = 1";
     String QUERY_GET_COMMUNITY_BY_CHAIN_ID = "SELECT * FROM Communities WHERE chainID = :chainID";
     String QUERY_ADD_COMMUNITY_BLACKLIST = "Update Communities set isBanned =:isBanned WHERE chainID = :chainID";
-    String QUERY_JOINED_COMMUNITY = "SELECT * FROM Communities WHERE isBanned = 0";
+    String QUERY_JOINED_COMMUNITY = "SELECT c.*, m.balance, m.balance, m.power, m.nonce, m.blockNumber," +
+            " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
+            " FROM Communities c" +
+            " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" +
+            UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " WHERE isBanned = 0";
+
     String QUERY_CLEAR_COMMUNITY_STATE = "UPDATE Communities SET headBlock = 0, tailBlock = 0" +
             " WHERE chainID = :chainID";
 
@@ -186,7 +192,7 @@ public interface CommunityDao {
      * 获取用户加入的社区列表
      */
     @Query(QUERY_JOINED_COMMUNITY)
-    List<Community> getJoinedCommunityList();
+    List<CommunityAndMember> getJoinedCommunityList();
 
     /**
      * 根据chainID查询社区

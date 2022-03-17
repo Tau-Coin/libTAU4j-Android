@@ -29,55 +29,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <RelativeLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_20"
-                    android:layout_marginEnd="@dimen/widget_size_10"
-                    android:minHeight="@dimen/widget_size_44">
-
-                    <TextView
-                        android:id="@+id/tv_community_name_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:lineSpacingExtra="0dp"
-                        android:lineSpacingMultiplier="0.7"
-                        android:includeFontPadding="false"
-                        android:layout_centerVertical="true"
-                        android:text="@string/community_name"
-                        android:textColor="@color/gray_dark"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    <TextView
-                        android:layout_toEndOf="@+id/tv_community_name_title"
-                        android:layout_toStartOf="@+id/iv_arrow"
-                        android:id="@+id/tv_community_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="@dimen/widget_size_10"
-                        android:paddingEnd="@dimen/widget_size_10"
-                        android:gravity="end"
-                        android:onClick="@{listener::onClick}"
-                        android:singleLine="true"
-                        android:ellipsize="middle"
-                        android:includeFontPadding="false"
-                        android:layout_centerVertical="true"
-                        android:textColor="@color/color_yellow"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    <ImageView
-                        android:id="@+id/iv_arrow"
-                        android:layout_width="@dimen/widget_size_16"
-                        android:layout_height="@dimen/widget_size_16"
-                        android:layout_centerVertical="true"
-                        android:onClick="@{listener::onClick}"
-                        android:src="@mipmap/icon_arrow"
-                        android:layout_alignParentEnd="true"/>
-                </RelativeLayout>
-
-                <include layout="@layout/view_line" />
-
                 <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_balance"
                     android:layout_width="match_parent"

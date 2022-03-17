@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.databinding.ItemCoinChooseBinding;
 import io.taucoin.torrent.publishing.databinding.ItemCommunityChooseBinding;
 
 /**
@@ -27,8 +27,8 @@ public class ChooseListAdapter extends ListAdapter<String, ChooseListAdapter.Vie
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ItemCommunityChooseBinding binding = DataBindingUtil.inflate(inflater,
-                R.layout.item_community_choose,
+        ItemCoinChooseBinding binding = DataBindingUtil.inflate(inflater,
+                R.layout.item_coin_choose,
                 parent,
                 false);
 
@@ -42,10 +42,10 @@ public class ChooseListAdapter extends ListAdapter<String, ChooseListAdapter.Vie
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private ItemCommunityChooseBinding binding;
+        private ItemCoinChooseBinding binding;
         private String coin;
 
-        ViewHolder(ItemCommunityChooseBinding binding, String coin) {
+        ViewHolder(ItemCoinChooseBinding binding, String coin) {
             super(binding.getRoot());
             this.binding = binding;
             this.coin = coin;

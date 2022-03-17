@@ -135,7 +135,6 @@
     <string name="community_transaction">Wiring Transaction</string>
     <string name="community_transaction_queue">Wiring Transaction Queue</string>
     <string name="community_nickname">Community Nickname</string>
-    <string name="community_choose_community">Chains</string>
     <string name="community_choose_coin">Choose Coin</string>
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>

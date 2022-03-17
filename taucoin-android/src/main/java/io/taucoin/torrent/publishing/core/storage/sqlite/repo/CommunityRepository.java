@@ -50,7 +50,7 @@ public interface CommunityRepository {
     /**
      * 获取用户加入的社区列表
      */
-    List<Community> getJoinedCommunityList();
+    List<CommunityAndMember> getJoinedCommunityList();
 
     /**
      * 根据chainID查询社区

@@ -9,18 +9,16 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.databinding.ItemCommunityChooseBinding;
 
 /**
  * 社区选择列表的Adapter
  */
-public class ChooseListAdapter extends ListAdapter<Community, ChooseListAdapter.ViewHolder> {
-    private String chainID;
-    ChooseListAdapter(String chainID) {
+public class ChooseListAdapter extends ListAdapter<CommunityAndMember, ChooseListAdapter.ViewHolder> {
+    ChooseListAdapter() {
         super(diffCallback);
-        this.chainID = chainID;
     }
 
     @NonNull
@@ -32,48 +30,43 @@ public class ChooseListAdapter extends ListAdapter<Community, ChooseListAdapter.
                 parent,
                 false);
 
-        return new ViewHolder(binding, chainID);
+        return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ChooseListAdapter.ViewHolder holder, int position) {
-        Community community = getItem(position);
+        CommunityAndMember community = getItem(position);
         holder.bindCommunity(community);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         private ItemCommunityChooseBinding binding;
-        private String chainID;
 
-        ViewHolder(ItemCommunityChooseBinding binding, String chainID) {
+        ViewHolder(ItemCommunityChooseBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            this.chainID = chainID;
         }
 
         /**
          * 绑定社区数据
          */
-        void bindCommunity(Community community) {
+        void bindCommunity(CommunityAndMember community) {
             if(null == community){
                 return;
             }
             binding.tvName.setText(community.communityName);
-            boolean isChoose = StringUtil.isEquals(chainID, community.chainID);
-            int colorRes = binding.getRoot().getResources().getColor(isChoose ? R.color.color_yellow :
-                    R.color.color_black);
-            binding.tvName.setTextColor(colorRes);
+            binding.tvBalance.setText(FmtMicrometer.fmtBalance(community.balance));
         }
     }
 
-    private static final DiffUtil.ItemCallback<Community> diffCallback = new DiffUtil.ItemCallback<Community>() {
+    private static final DiffUtil.ItemCallback<CommunityAndMember> diffCallback = new DiffUtil.ItemCallback<CommunityAndMember>() {
         @Override
-        public boolean areContentsTheSame(@NonNull Community oldItem, @NonNull Community newItem) {
+        public boolean areContentsTheSame(@NonNull CommunityAndMember oldItem, @NonNull CommunityAndMember newItem) {
             return oldItem.equals(newItem);
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull Community oldItem, @NonNull Community newItem) {
+        public boolean areItemsTheSame(@NonNull CommunityAndMember oldItem, @NonNull CommunityAndMember newItem) {
             return oldItem.equals(newItem);
         }
     };

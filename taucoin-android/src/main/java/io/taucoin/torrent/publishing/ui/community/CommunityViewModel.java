@@ -109,7 +109,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> setBlacklistState = new MutableLiveData<>();
     private MutableLiveData<Boolean> airdropResult = new MutableLiveData<>();
     private MutableLiveData<List<Community>> blackList = new MutableLiveData<>();
-    private MutableLiveData<List<Community>> joinedList = new MutableLiveData<>();
+    private MutableLiveData<List<CommunityAndMember>> joinedList = new MutableLiveData<>();
     private MutableLiveData<List<Member>> joinedUnexpiredList = new MutableLiveData<>();
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
     private MutableLiveData<UserAndFriend> largestCoinHolder = new MutableLiveData<>();
@@ -140,7 +140,7 @@ public class CommunityViewModel extends AndroidViewModel {
         return airdropResult;
     }
 
-    MutableLiveData<List<Community>> getJoinedList() {
+    MutableLiveData<List<CommunityAndMember>> getJoinedList() {
         return joinedList;
     }
 
@@ -450,8 +450,8 @@ public class CommunityViewModel extends AndroidViewModel {
      * 获取用户加入的社区列表
      */
     void getJoinedCommunityList() {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<List<Community>>) emitter -> {
-            List<Community> list = communityRepo.getJoinedCommunityList();
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<List<CommunityAndMember>>) emitter -> {
+            List<CommunityAndMember> list = communityRepo.getJoinedCommunityList();
             emitter.onNext(list);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)

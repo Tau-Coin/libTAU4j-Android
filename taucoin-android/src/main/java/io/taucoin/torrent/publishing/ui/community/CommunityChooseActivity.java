@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityCommunityChooseBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
@@ -21,7 +21,6 @@ public class CommunityChooseActivity extends BaseActivity {
     private ActivityCommunityChooseBinding binding;
     private CommunityViewModel communityViewModel;
     private ChooseListAdapter adapter;
-    private String chainID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,18 +28,8 @@ public class CommunityChooseActivity extends BaseActivity {
         ViewModelProvider provider = new ViewModelProvider(this);
         communityViewModel = provider.get(CommunityViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_community_choose);
-        initParameter();
         initLayout();
         observeJoinedList();
-    }
-
-    /**
-     * 初始化参数
-     */
-    private void initParameter() {
-        if (getIntent() != null) {
-            chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-        }
     }
 
     /**
@@ -48,11 +37,11 @@ public class CommunityChooseActivity extends BaseActivity {
      */
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.community_choose_community);
+        binding.toolbarInclude.toolbar.setTitle(R.string.drawer_communities);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        adapter = new ChooseListAdapter(chainID);
+        adapter = new ChooseListAdapter();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.joinedList.setLayoutManager(layoutManager);
         binding.joinedList.setOnItemClickListener((view, adapterPosition) -> {
@@ -60,8 +49,7 @@ public class CommunityChooseActivity extends BaseActivity {
             Community community = adapter.getCurrentList().get(adapterPosition);
             Intent intent = new Intent();
             intent.putExtra(IntentExtra.CHAIN_ID, community.chainID);
-            CommunityChooseActivity.this.setResult(RESULT_OK, intent);
-            CommunityChooseActivity.this.finish();
+            ActivityUtil.startActivity(intent, this, CommunitiesActivity.class);
         });
         binding.joinedList.setAdapter(adapter);
     }
