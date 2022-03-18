@@ -31,6 +31,15 @@
                 android:layout_height="wrap_content">
 
                 <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:visibility="gone"
+                    android:id="@+id/item_reload_chain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:onClick="onClick"
+                    app:lineLeftText="@string/community_reload_chain"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_sync_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

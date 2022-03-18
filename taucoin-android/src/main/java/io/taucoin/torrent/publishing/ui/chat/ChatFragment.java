@@ -206,6 +206,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void onStart() {
         super.onStart();
+        showProgressDialog();
         loadData(0);
         subscribeChatViewModel();
     }
@@ -303,6 +304,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
 
             userViewModel.clearMsgUnread(friendPK);
             logger.debug("messages.size::{}", messages.size());
+            closeProgressDialog();
         });
 
         chatViewModel.getChatResult().observe(this, result -> {

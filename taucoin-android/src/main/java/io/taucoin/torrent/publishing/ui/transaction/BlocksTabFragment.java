@@ -51,9 +51,9 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
             binding.refreshLayout.setRefreshing(false);
             binding.refreshLayout.setEnabled(blocks.size() != 0 && blocks.size() % Page.PAGE_SIZE == 0);
 
-            logger.debug("blocks.size::{}", blocks.size());
+            closeProgressDialog();
         });
-
+        showProgressDialog(false);
         loadData(0);
 
         disposables.add(communityViewModel.observeBlocksSetChanged()

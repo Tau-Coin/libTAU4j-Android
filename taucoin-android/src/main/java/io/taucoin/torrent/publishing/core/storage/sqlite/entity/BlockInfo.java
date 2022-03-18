@@ -7,11 +7,13 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Index;
 
 /**
  * 数据库存储区块的实体类
  */
-@Entity(tableName = "Blocks", primaryKeys = {"chainID", "blockHash"})
+@Entity(tableName = "Blocks", primaryKeys = {"chainID", "blockHash"},
+        indices = {@Index(value = {"chainID", "blockNumber"})})
 public class BlockInfo implements Parcelable {
     @NonNull
     public String chainID;             // 区块所属的链ID

@@ -49,8 +49,9 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
             binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
 
             logger.debug("txs.size::{}", txs.size());
+            closeProgressDialog();
         });
-
+        showProgressDialog();
         loadData(0);
 
         disposables.add(txViewModel.observeDataSetChanged()

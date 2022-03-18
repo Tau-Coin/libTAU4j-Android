@@ -9,20 +9,31 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 
 import org.libTAU4j.Block;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
+import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.HashUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityChainStatusBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
@@ -158,7 +169,40 @@ public class ChainStatusActivity extends BaseActivity {
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, SyncStatusActivity.class);
                 break;
+            case R.id.item_reload_chain:
+                reloadChain();
+                break;
         }
+    }
+
+    Disposable disposable;
+    private void reloadChain() {
+        BlockRepository blockRepo = RepositoryHelper.getBlockRepository(this);
+        if (disposable != null && !disposable.isDisposed()) {
+            return;
+        }
+        disposable = Observable.create(new ObservableOnSubscribe<Long>() {
+            @Override
+            public void subscribe(ObservableEmitter<Long> emitter) throws Exception {
+
+                String previousBlockHash = null;
+                Logger logger = LoggerFactory.getLogger("reloadChain");
+                for (int i = 0; i < 10000; i++) {
+                    long millisTime = DateUtil.getMillisTime();
+                    String blockHash =  HashUtil.makeSha256Hash(i + String.valueOf(millisTime));
+                    String miner =  MainApplication.getInstance().getPublicKey();
+
+                    assert blockHash != null;
+                    BlockInfo blockInfo = new BlockInfo(chainID, blockHash, i, miner, 0,
+                            0, 0, millisTime, previousBlockHash);
+                    blockRepo.addBlock(blockInfo);
+                    previousBlockHash = blockHash;
+                    logger.debug("number::{}, blockHash::{}", i, blockHash);
+                }
+                emitter.onComplete();
+            }
+        }).subscribeOn(Schedulers.io())
+            .subscribe();
     }
 
     /**
@@ -236,5 +280,8 @@ public class ChainStatusActivity extends BaseActivity {
         super.onStop();
         disposables.clear();
         blockDisposables.clear();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
     }
 }
