@@ -48,7 +48,7 @@
     <string name="main_exit">Click again to exit the application!</string>
     <string name="main_community_name">%1$s community</string>
     <string name="main_balance_power">Balance %1$s, Mining Power %2$s</string>
-    <string name="main_balance_non_member">Balance %1$s, Non Member</string>
+    <string name="main_balance_non_member">Non Member</string>
     <string name="main_error_link">Invalid link!</string>
     <string name="main_error_link_yourself">Airdrop link published by yourself!</string>
     <string name="main_open_link">Open the link?</string>
@@ -354,6 +354,7 @@
     <string name="tx_address_hint">Address</string>
     <string name="tx_amount_hint">Amount</string>
     <string name="tx_memo_hint">Memo(optional)</string>
+    <string name="tx_set_note_tips">*Send notes with 0 fee to join the community. </string>
     <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction fee:<font color="#477df9"><u> %1$s </u></font>%2$s]]></Data></string>
     <string name="tx_new_name">Nick Name(required)</string>
     <string name="tx_personal_profile">Personal profile(Optional)</string>

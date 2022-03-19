@@ -66,7 +66,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
             txQueue = getIntent().getParcelableExtra(IntentExtra.BEAN);
-            isReadOnly = getIntent().getBooleanExtra(IntentExtra.CHAIN_ID, true);
+            isReadOnly = getIntent().getBooleanExtra(IntentExtra.READ_ONLY, true);
             if (txQueue != null) {
                 chainID = txQueue.chainID;
             }

@@ -1,6 +1,7 @@
 package io.taucoin.torrent.publishing.ui.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,12 +24,17 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
+import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
+import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.transaction.NoteCreateActivity;
+
+import static io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment.TX_REQUEST_CODE;
 
 /**
  * 群组列表页面
@@ -40,6 +46,7 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     private MainListAdapter adapter;
     private FragmentMainBinding binding;
     private MainViewModel viewModel;
+    private CommunityViewModel communityViewModel;
     private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
 
@@ -57,6 +64,7 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         activity = (MainActivity) getActivity();
         ViewModelProvider provider = new ViewModelProvider(activity);
         viewModel = provider.get(MainViewModel.class);
+        communityViewModel = provider.get(CommunityViewModel.class);
         settingsRepo = RepositoryHelper.getSettingsRepository(MainApplication.getInstance());
         initView();
     }
@@ -78,6 +86,17 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         binding.groupList.setLayoutManager(layoutManager);
         binding.groupList.setItemAnimator(animator);
         binding.groupList.setAdapter(adapter);
+
+        communityViewModel.getJoinedResult().observe(getViewLifecycleOwner(), result -> {
+            if (result.isSuccess()) {
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, result.getMsg());
+                intent.putExtra(IntentExtra.READ_ONLY, true);
+                intent.putExtra(IntentExtra.OPEN_COMMUNITY, true);
+                ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
+                        TX_REQUEST_CODE);
+            }
+        });
     }
 
     private void subscribeMainViewModel() {
@@ -159,5 +178,10 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         bundle.putInt(IntentExtra.TYPE, item.type);
         bundle.putString(IntentExtra.ID, item.ID);
         activity.updateMainRightFragment(bundle);
+    }
+
+    @Override
+    public void onCommunityJoined(String chainID) {
+        communityViewModel.joinCommunity(chainID);
     }
 }

@@ -57,7 +57,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     private void initParameter() {
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            isReadOnly = getIntent().getBooleanExtra(IntentExtra.CHAIN_ID, true);
+            isReadOnly = getIntent().getBooleanExtra(IntentExtra.READ_ONLY, true);
         }
     }
 

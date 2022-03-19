@@ -1,5 +1,6 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -20,6 +22,7 @@ import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityMessageBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
 /**
  * Chain note页面
@@ -30,6 +33,7 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
     private TxViewModel txViewModel;
     private String chainID;
     private boolean isReadOnly;
+    private boolean isOpenCommunity;
     private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
@@ -50,7 +54,8 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
     private void initParameter() {
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            isReadOnly = getIntent().getBooleanExtra(IntentExtra.CHAIN_ID, true);
+            isReadOnly = getIntent().getBooleanExtra(IntentExtra.READ_ONLY, true);
+            isOpenCommunity = getIntent().getBooleanExtra(IntentExtra.OPEN_COMMUNITY, false);
         }
     }
 
@@ -62,6 +67,8 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
         binding.toolbarInclude.toolbar.setTitle(R.string.community_chain_note_title);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        binding.tvFeeTips.setVisibility(isReadOnly ? View.VISIBLE : View.INVISIBLE);
 
         if (StringUtil.isNotEmpty(chainID)) {
             long txFee = txViewModel.getTxFee(chainID);
@@ -85,10 +92,26 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
             if (StringUtil.isNotEmpty(result)) {
                 ToastUtils.showShortToast(result);
             } else {
-                setResult(RESULT_OK);
-                onBackPressed();
+                if (isOpenCommunity) {
+                    openCommunityActivity(chainID);
+                } else {
+                    setResult(RESULT_OK);
+                    onBackPressed();
+                }
             }
         });
+    }
+
+    /**
+     * 打开社区页面
+     * @param chainID
+     */
+    private void openCommunityActivity(String chainID){
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(IntentExtra.TYPE, 0);
+        ActivityUtil.startActivity(intent, this, MainActivity.class);
     }
 
     @Override

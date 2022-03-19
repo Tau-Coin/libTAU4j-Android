@@ -107,6 +107,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<Result> addCommunityState = new MutableLiveData<>();
     private MutableLiveData<Boolean> setBlacklistState = new MutableLiveData<>();
     private MutableLiveData<Boolean> airdropResult = new MutableLiveData<>();
+    private MutableLiveData<Result> joinedResult = new MutableLiveData<>();
     private MutableLiveData<List<Community>> blackList = new MutableLiveData<>();
     private MutableLiveData<List<CommunityAndMember>> joinedList = new MutableLiveData<>();
     private MutableLiveData<List<Member>> joinedUnexpiredList = new MutableLiveData<>();
@@ -161,6 +162,10 @@ public class CommunityViewModel extends AndroidViewModel {
      */
     LiveData<Boolean> getSetBlacklistState() {
         return setBlacklistState;
+    }
+
+    public LiveData<Result> getJoinedResult() {
+        return joinedResult;
     }
 
     /**
@@ -661,20 +666,30 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param chainID 链ID
      */
     public void joinCommunity(String chainID) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
-            List<String> list = queryCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT);
-            Set<String> peers = new HashSet<>(list);
-            boolean success = daemon.followChain(chainID, peers);
-            if (success) {
-                String publicKey = MainApplication.getInstance().getPublicKey();
-                addMemberInfoToLocal(chainID, publicKey);
-                daemon.requestChainState(chainID);
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
+            Result result = new Result();
+            result.setMsg(chainID);
+
+            String publicKey = MainApplication.getInstance().getPublicKey();
+            Member member = memberRepo.getMemberByChainIDAndPk(chainID, publicKey);
+            if (null == member) {
+                List<String> list = queryCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT);
+                Set<String> peers = new HashSet<>(list);
+                boolean success = daemon.followChain(chainID, peers);
+                if (success) {
+                    addMemberInfoToLocal(chainID, publicKey);
+                    daemon.requestChainState(chainID);
+                }
+                result.setSuccess(success);
+            } else {
+                result.setSuccess(true);
             }
+            emitter.onNext(result);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(result -> joinedResult.postValue(result));
         disposables.add(disposable);
     }
 

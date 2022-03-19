@@ -21,4 +21,5 @@ public class IntentExtra {
     public static final String AIRDROP_COIN = "airdropCoin";
     public static final String TIMESTAMP = "timestamp";
     public static final String ONLY_WIRING = "onlyWiring";
+    public static final String OPEN_COMMUNITY = "openCommunity";
 }

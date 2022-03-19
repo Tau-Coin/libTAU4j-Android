@@ -40,4 +40,8 @@ public class CommunityAndFriend {
     public boolean equals(Object o) {
         return o instanceof CommunityAndFriend && (o == this || ID.equals(((CommunityAndFriend)o).ID));
     }
+
+    public boolean isReadOnly() {
+        return power <=0 || blockNumber < tailBlock;
+    }
 }

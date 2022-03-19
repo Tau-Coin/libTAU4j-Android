@@ -99,12 +99,14 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 String firstLetters = StringUtil.getFirstLettersOfName(communityName);
                 binding.leftView.setText(firstLetters);
                 String balance = FmtMicrometer.fmtBalance(bean.balance);
-                if (bean.power > 0) {
+                boolean readOnly = bean.isReadOnly();
+                if (readOnly) {
+                    binding.tvBalancePower.setText(context.getString(R.string.main_balance_non_member));
+                } else {
                     String power = FmtMicrometer.fmtLong(bean.power);
                     binding.tvBalancePower.setText(context.getString(R.string.main_balance_power, balance, power));
-                } else {
-                    binding.tvBalancePower.setText(context.getString(R.string.main_balance_non_member, balance));
                 }
+                binding.tvJoin.setVisibility(readOnly ? View.VISIBLE : View.INVISIBLE);
 
                 binding.tvUserMessage.setVisibility(StringUtil.isNotEmpty(bean.memo) ?
                         View.VISIBLE : View.GONE);
@@ -112,6 +114,14 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
 
                 int bgColor = Utils.getGroupColor(bean.ID);
                 binding.leftView.setBgColor(bgColor);
+
+                if (readOnly) {
+                    binding.tvJoin.setOnClickListener(v -> {
+                        if (listener != null) {
+                            listener.onCommunityJoined(bean.ID);
+                        }
+                    });
+                }
             } else if (holder.binding instanceof ItemChatListBinding) {
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;
                 String friendNickName = UsersUtil.getShowNameWithYourself(bean.friend, bean.ID);
@@ -149,6 +159,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
     }
 
     public interface ClickListener {
+        void onCommunityJoined(String chainID);
         void onItemClicked(CommunityAndFriend item);
     }
 
