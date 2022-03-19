@@ -484,6 +484,7 @@ public class TxViewModel extends AndroidViewModel {
         loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
             List<UserAndTx> txs = new ArrayList<>();
             try {
+                long startTime = System.currentTimeMillis();
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
                 if (pos == 0 && initSize > pageSize) {
                     pageSize = initSize;
@@ -495,8 +496,10 @@ public class TxViewModel extends AndroidViewModel {
                 } else {
                     txs = txRepo.loadAllNotesData(chainID, pos, pageSize);
                 }
+                long getMessagesTime = System.currentTimeMillis();
                 logger.trace("loadNotesData filterItem::{}, pos::{}, pageSize::{}, messages.size::{}",
                         application.getString(filterItem), pos, pageSize, txs.size());
+                logger.trace("loadNotesData getMessagesTime::{}", getMessagesTime - startTime);
                 Collections.reverse(txs);
             } catch (Exception e) {
                 logger.error("loadNotesData error::", e);

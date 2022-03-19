@@ -75,6 +75,7 @@ public interface UserDao {
             " where u.publicKey = :publicKey";
 
     String QUERY_GET_USER_PKS_IN_BAN_LIST = " (SELECT publicKey FROM Users WHERE isBanned == 1 and isCurrentUser != 1) ";
+    String QUERY_GET_USER_PKS_IN_WHITE_LIST = " (SELECT publicKey FROM Users WHERE isBanned == 0 OR isCurrentUser = 1) ";
 
     String QUERY_FRIEND_BY_PUBLIC_KEY = "SELECT * FROM Friends" +
             " where friendPk =:friendPk and userPK = (" + QUERY_GET_CURRENT_USER_PK + ")";

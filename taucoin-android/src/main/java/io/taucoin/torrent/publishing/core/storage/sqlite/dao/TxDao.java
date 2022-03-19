@@ -26,35 +26,34 @@ public interface TxDao {
             " ON tx.senderPk = t.receiverPk" +
             " WHERE tx.chainID = :chainID AND tx.txID = :txID";
 
-    String QUERY_GET_TXS_ORDER = " ORDER BY tx.timestamp DESC limit :loadSize offset :startPosition";
+    String QUERY_GET_TXS_ORDER =
+            " AND tx.senderPk IN " + UserDao.QUERY_GET_USER_PKS_IN_WHITE_LIST +
+            " ORDER BY tx.timestamp DESC" +
+            " limit :loadSize offset :startPosition";
 
     // SQL:查询社区里的交易(MARKET交易，排除Trust Tx, 并且上链)
     String QUERY_GET_MARKET_SELECT = "SELECT tx.*, t.trusts" +
             " FROM Txs AS tx" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
-            " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
+            " WHERE chainID = :chainID AND txStatus = 1 AND txType = 4 " +
+            " GROUP BY receiverPk" +
+            ") t" +
             " ON tx.senderPk = t.receiverPk" +
-            " WHERE tx.chainID = :chainID AND txStatus = 1" +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
-            " AND (tx.txType = 3 OR tx.txType = 5 OR tx.txType = 6)";
+            " WHERE tx.chainID = :chainID AND txStatus = 1";
 
     String QUERY_GET_ALL_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND (tx.txType = 3 OR tx.txType = 5 OR tx.txType = 6)" + QUERY_GET_TXS_ORDER;
+            " AND tx.txType IN (3, 5, 6)" + QUERY_GET_TXS_ORDER;
 
     String QUERY_GET_AIRDROP_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND (tx.txType = 5 OR tx.txType = 6)" + QUERY_GET_TXS_ORDER;
+            " AND tx.txType IN (5, 6)" + QUERY_GET_TXS_ORDER;
 
     String QUERY_GET_SELL_MARKET = QUERY_GET_MARKET_SELECT +
             " AND tx.txType = 3" + QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区里的交易(所有，排除WIRING Tx)
-    String QUERY_GET_NOTES_SELECT = "SELECT tx.*, t.trusts" +
+    String QUERY_GET_NOTES_SELECT = "SELECT tx.*, 0 AS trusts" +
             " FROM Txs AS tx" +
-            " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
-            " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
-            " ON tx.senderPk = t.receiverPk" +
-            " WHERE tx.chainID = :chainID AND txType != 2" +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST;
+            " WHERE tx.chainID = :chainID AND txType IN (1, 3, 4, 5, 6) ";
 
     String QUERY_GET_ALL_NOTES = QUERY_GET_NOTES_SELECT +
             QUERY_GET_TXS_ORDER;
@@ -68,13 +67,9 @@ public interface TxDao {
             QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区里的交易(上链)
-    String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, t.trusts" +
+    String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, 0 AS trusts" +
             " FROM Txs AS tx" +
-            " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
-            " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
-            " ON tx.senderPk = t.receiverPk" +
-            " WHERE tx.chainID = :chainID" +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST;
+            " WHERE tx.chainID = :chainID";
 
     // SQL:查询社区里的交易(上链)
     String QUERY_GET_ON_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT +
@@ -87,16 +82,19 @@ public interface TxDao {
 
     // SQL:查询社区里的置顶交易(所有，排除WIRING Tx)
     String QUERY_GET_NOTE_PINNED_TXS = QUERY_GET_NOTES_SELECT +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
             " AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里的置顶交易(MARKET交易，排除Trust Tx, 并且上链)
     String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
             " AND (tx.txType = 3 OR tx.txType = 5) AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里的置顶交易(上链)
     String QUERY_GET_CHAIN_PINNED_TXS = QUERY_GET_CHAIN_TXS_SELECT +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
             "AND (tx.txStatus = 1 OR tx.txType = 2) AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 

@@ -6,12 +6,14 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 /**
  * Room: 数据库存储Transaction实体类
  */
-@Entity(tableName = "Txs")
+@Entity(tableName = "Txs", indices = {
+        @Index(value = {"chainID", "timestamp"})})
 public class Tx implements Parcelable {
     @NonNull
     @PrimaryKey
