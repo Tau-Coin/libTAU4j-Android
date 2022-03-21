@@ -88,7 +88,6 @@
                         android:textColor="@color/colorPrimary"
                         android:onClick="@{listener::onClick}"
                         android:includeFontPadding="false"
-                        android:textStyle="bold"
                         android:textAppearance="@style/TextAppearanceBody1"/>
 
                     <TextView
@@ -102,7 +101,6 @@
                         android:gravity="center_vertical|center"
                         android:onClick="@{listener::onClick}"
                         android:includeFontPadding="false"
-                        android:textStyle="bold"
                         android:textAppearance="@style/TextAppearanceBody1"/>
 
                 </LinearLayout>

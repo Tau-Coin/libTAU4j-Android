@@ -393,6 +393,13 @@ public class NetworkSetting {
     public static void calculateMainLoopInterval() {
         boolean isForegroundRunning = isForegroundRunning();
         if (isForegroundRunning()) {
+            if (!isHaveAvailableData()) {
+                int timeInterval = Interval.MAIN_LOOP_NO_DATA.getInterval();
+                FrequencyUtil.updateMainLoopInterval(timeInterval);
+                logger.debug("updateMainLoopInterval isForegroundRunning::true, no data, timeInterval::{}ms",
+                        timeInterval);
+                return;
+            }
             float frequency;
             boolean isMetered = isMeteredNetwork();
             if (isMetered) {
@@ -401,7 +408,8 @@ public class NetworkSetting {
                 frequency = FrequencyUtil.getWifiFixedFrequency();
             }
             FrequencyUtil.setMainLoopFrequency(frequency);
-            logger.debug("calculateMainLoopInterval fixedFrequency::{}, meteredNetwork::{}",
+            logger.debug("calculateMainLoopInterval isForegroundRunning::true, fixedFrequency::{}, " +
+                            "meteredNetwork::{}",
                     frequency, isMetered);
             return;
         }

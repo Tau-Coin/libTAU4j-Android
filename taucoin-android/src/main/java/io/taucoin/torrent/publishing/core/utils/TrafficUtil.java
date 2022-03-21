@@ -40,19 +40,16 @@ public class TrafficUtil {
     public static void saveTrafficTotal(@NonNull SessionStatistics statistics) {
         long incrementalDown = saveTrafficTotal(TRAFFIC_DOWN, statistics.getTotalDownload());
         long incrementalUp = saveTrafficTotal(TRAFFIC_UP, statistics.getTotalUpload());
-        // 如果是计费网络，统计当天计费网络使用总量
-        if (!NetworkSetting.isForegroundRunning()) {
-            if (NetworkSetting.isMeteredNetwork()) {
-                long total = getMeteredTrafficTotal();
-                total += incrementalDown + incrementalUp;
-                settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, total);
-                logger.debug("Save metered traffic::{}", total);
-            } else {
-                long total = getWifiTrafficTotal();
-                total += incrementalDown + incrementalUp;
-                settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI, total);
-                logger.debug("Save wifi traffic::::{}", total);
-            }
+        if (NetworkSetting.isMeteredNetwork()) {
+            long total = getMeteredTrafficTotal();
+            total += incrementalDown + incrementalUp;
+            settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, total);
+            logger.debug("Save metered traffic::{}", total);
+        } else {
+            long total = getWifiTrafficTotal();
+            total += incrementalDown + incrementalUp;
+            settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI, total);
+            logger.debug("Save wifi traffic::::{}", total);
         }
     }
 

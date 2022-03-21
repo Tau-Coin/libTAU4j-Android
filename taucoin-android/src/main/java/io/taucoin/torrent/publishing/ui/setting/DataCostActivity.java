@@ -253,13 +253,16 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
 
     private void changeTabView(int id) {
         boolean isForeground = id == R.id.tab_foreground;
-        int colorSelected = getResources().getColor(R.color.color_white);
-        int colorDefault = getResources().getColor(R.color.colorPrimary);
+        int bgSelected = R.drawable.yellow_rect_round_border_small_radius;
+        int bgDefault = R.drawable.white_rect_round_bg_no_border;
 
-        binding.tabForeground.setBackgroundColor(isForeground ? colorSelected : colorDefault);
-        binding.tabForeground.setTextColor(!isForeground ? colorSelected : colorDefault);
-        binding.tabBackground.setBackgroundColor(!isForeground ? colorSelected : colorDefault);
-        binding.tabBackground.setTextColor(isForeground ? colorSelected : colorDefault);
+        int colorSelected = getResources().getColor(R.color.color_yellow);
+        int colorDefault = getResources().getColor(R.color.gray_dark);
+
+        binding.tabForeground.setBackgroundResource(isForeground ? bgSelected : bgDefault);
+        binding.tabForeground.setTextColor(isForeground ? colorSelected : colorDefault);
+        binding.tabBackground.setBackgroundResource(!isForeground ? bgSelected : bgDefault);
+        binding.tabBackground.setTextColor(!isForeground ? colorSelected : colorDefault);
 
         showDataDetailView(binding.llMetered, isForeground);
         showDataDetailView(binding.llWifi, isForeground);
@@ -267,9 +270,9 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
 
     private void showDataDetailView(LinearLayout groupView, boolean isForeground) {
         int childCount = groupView.getChildCount();
-        for (int i = 1; i < childCount - 1; i++) {
+        for (int i = 5; i < childCount - 1; i++) {
             View child = groupView.getChildAt(i);
-            if (i >= childCount - 3 ) {
+            if (i >= childCount - 3) {
                 // Fixed Frequency
                 child.setVisibility(!isForeground ? View.GONE : View.VISIBLE);
             } else {
