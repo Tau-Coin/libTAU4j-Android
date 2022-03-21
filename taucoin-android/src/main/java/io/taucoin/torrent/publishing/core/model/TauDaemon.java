@@ -216,7 +216,7 @@ public abstract class TauDaemon {
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
                 .setDhtNonReferable(true)
                 .setDhtPingInterval(3600)
-                .setDhtBootstrapInterval(10)
+                .setDhtBootstrapInterval(60)
                 .build();
         sessionManager.start(sessionParams);
     }
@@ -323,11 +323,6 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_foreground_running))) {
             boolean isForeground = settingsRepo.getBooleanValue(key);
             logger.info("foreground running::{}", isForeground);
-            if (isRunning && sessionManager != null) {
-                int interval = isForeground ? 10 : 15;
-                sessionManager.updateBootstrapIntervel(interval);
-                logger.info("update bootstrap interval::{}", interval);
-            }
         } else if (key.equals(appContext.getString(R.string.pref_key_nat_pmp_mapped))) {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
