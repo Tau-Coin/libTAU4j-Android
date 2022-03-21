@@ -92,6 +92,11 @@ public class BlockRepositoryImpl implements BlockRepository{
         return db.blockDao().getBlock(chainID, blockHash);
     }
 
+    @Override
+    public List<BlockInfo> getBlocks(String chainID, long blockNumber) {
+        return db.blockDao().getBlocks(chainID, blockNumber);
+    }
+
     /**
      * 观察链上状态信息
      * @param chainID 链ID

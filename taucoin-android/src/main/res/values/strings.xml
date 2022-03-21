@@ -205,6 +205,7 @@
     <string name="community_sync_status">External Blocks Pool</string>
     <string name="community_external_head_block">External Head Block</string>
     <string name="community_reload_chain">Reload Chain</string>
+    <string name="community_reloading">Reloading&#8230;</string>
     <string name="community_head_block">Head Block</string>
     <string name="community_tail_block">Tail Block</string>
     <string name="community_consensus_block">Consensus Block</string>

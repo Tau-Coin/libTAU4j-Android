@@ -43,6 +43,14 @@ public interface BlockRepository {
     BlockInfo getBlock(String chainID, String blockHash);
 
     /**
+     * 查询区块Blocks
+     * @param chainID 链ID
+     * @param blockNumber 区块哈希
+     * @return Block
+     */
+    List<BlockInfo> getBlocks(String chainID, long blockNumber);
+
+    /**
      * 观察链上状态信息
      * @param chainID 链ID
      * @return Flowable<ChainStatus>

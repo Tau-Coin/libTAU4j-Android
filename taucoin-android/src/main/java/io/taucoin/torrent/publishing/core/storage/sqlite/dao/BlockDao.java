@@ -23,6 +23,9 @@ public interface BlockDao {
     String QUERY_BLOCK = "SELECT * FROM Blocks " +
             " WHERE chainID = :chainID and blockHash= :blockHash";
 
+    String QUERY_BLOCKS = "SELECT * FROM Blocks " +
+            " WHERE chainID = :chainID and blockNumber= :blockNumber";
+
     String QUERY_CHAIN_STATUS = "SELECT a.syncingHeadBlock, a.headBlock, a.tailBlock, a.consensusBlock, a.difficulty," +
             " c.peerBlocks, c.totalRewards, d.totalPeers, d.totalCoin, e.balance" +
             " FROM Communities a" +
@@ -68,6 +71,9 @@ public interface BlockDao {
      */
     @Query(QUERY_BLOCK)
     BlockInfo getBlock(String chainID, String blockHash);
+
+    @Query(QUERY_BLOCKS)
+    List<BlockInfo> getBlocks(String chainID, long blockNumber);
 
     /**
      * 观察链上状态信息

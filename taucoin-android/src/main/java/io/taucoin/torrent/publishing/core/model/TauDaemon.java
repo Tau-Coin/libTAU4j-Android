@@ -552,6 +552,14 @@ public abstract class TauDaemon {
     }
 
     /**
+     * reload chain
+     * 处理区块数据
+     */
+    public void handleBlockData(Block block, TauListenHandler.BlockStatus status) {
+        tauDaemonAlertHandler.handleBlockData(block, status);
+    }
+
+    /**
      * 开始定位
      */
     public void startLocation() {

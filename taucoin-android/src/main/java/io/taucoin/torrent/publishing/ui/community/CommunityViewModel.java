@@ -14,6 +14,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import org.libTAU4j.Account;
+import org.libTAU4j.Block;
 import org.libTAU4j.ChainURL;
 import org.libTAU4j.Ed25519;
 import org.libTAU4j.Pair;
@@ -54,6 +55,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.TauListenHandler;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
@@ -68,10 +70,12 @@ import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
@@ -100,6 +104,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private CommunityRepository communityRepo;
     private MemberRepository memberRepo;
     private BlockRepository blockRepo;
+    private TxRepository txRepo;
     private TxQueueRepository txQueueRepo;
     private UserRepository userRepo;
     private TauDaemon daemon;
@@ -122,6 +127,7 @@ public class CommunityViewModel extends AndroidViewModel {
         userRepo = RepositoryHelper.getUserRepository(getApplication());
         txQueueRepo = RepositoryHelper.getTxQueueRepository(getApplication());
         blockRepo = RepositoryHelper.getBlockRepository(getApplication());
+        txRepo = RepositoryHelper.getTxRepository(getApplication());
         daemon = TauDaemon.getInstance(getApplication());
     }
 
@@ -834,5 +840,56 @@ public class CommunityViewModel extends AndroidViewModel {
             }
             emitter.onComplete();
         });
+    }
+
+    Flowable<Float> reloadChain(String chainID) {
+        return Flowable.create(emitter -> {
+            Community community = communityRepo.getCommunityByChainID(chainID);
+            if (community != null) {
+                long headBlock = community.headBlock;
+                long tailBlock = community.tailBlock;
+                logger.debug("reloadChain chainID::{}, tailBlock::{}, headBlock::{}",
+                        chainID, tailBlock, headBlock);
+                Block block;
+                for (long i = headBlock; i >= tailBlock; i--) {
+                    if (emitter.isCancelled()) {
+                        break;
+                    }
+                    block = daemon.getBlockByNumber(chainID, i);
+                    if (null == block) {
+                        break;
+                    }
+                    String blockHash = block.Hash();
+                    List<BlockInfo> localBlocks = blockRepo.getBlocks(chainID, i);
+                    if (localBlocks != null && localBlocks.size() > 0) {
+                        for (BlockInfo localBlock : localBlocks) {
+                            if (StringUtil.isEquals(blockHash, localBlock.blockHash)) {
+                                if (localBlock.status != 1) {
+                                    daemon.handleBlockData(block, TauListenHandler.BlockStatus.ON_CHAIN);
+                                }
+                            } else {
+                                if (localBlock.status == 1) {
+                                    localBlock.status = 0;
+                                    blockRepo.updateBlock(localBlock);
+                                    // TODO: 交易处理问题
+                                }
+                            }
+                        }
+                    } else {
+                        daemon.handleBlockData(block, TauListenHandler.BlockStatus.ON_CHAIN);
+                    }
+                    if (headBlock > tailBlock && !emitter.isCancelled()) {
+                        float progress = (headBlock - i) * 100f / (headBlock - tailBlock);
+                        emitter.onNext(progress);
+                        logger.debug("reloadChain chainID::{}, blockNumber::{}, localBlocks size::{}, progress::{}",
+                                chainID, i, null == localBlocks ? 0 : localBlocks.size(), progress);
+                    }
+                }
+            }
+            if (!emitter.isCancelled()) {
+                emitter.onNext(100f);
+            }
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST);
     }
 }

@@ -386,6 +386,10 @@ class TauDaemonAlertHandler {
         tauListenHandler.accountAutoRenewal();
     }
 
+    void handleBlockData(Block block, TauListenHandler.BlockStatus status) {
+        tauListenHandler.handleBlockData(block, status);
+    }
+
     public void onCleared() {
         tauListenHandler.onCleared();
     }

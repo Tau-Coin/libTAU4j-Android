@@ -54,7 +54,7 @@ import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 /**
  * TauListener处理程序
  */
-class TauListenHandler {
+public class TauListenHandler {
     private static final Logger logger = LoggerFactory.getLogger("TauListenHandler");
     private UserRepository userRepo;
     private MemberRepository memberRepo;
@@ -185,7 +185,7 @@ class TauListenHandler {
      * @param block 链上区块
      * @param status 状态
      */
-    private void handleBlockData(Block block, BlockStatus status) {
+    protected void handleBlockData(Block block, BlockStatus status) {
         String chainID = ChainIDUtil.decode(block.getChainID());
         logger.debug("handleBlockData:: chainID::{}，blockNum::{}, blockHash::{}", chainID,
                 block.getBlockNumber(), block.Hash());
