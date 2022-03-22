@@ -64,7 +64,7 @@ public class ProgressManager {
                 progress.setCanceledOnTouchOutside(isCanCancel);
                 progress.setCancelable(isCanCancel);
                 mDialog = progress;
-                if(!activity.isFinishing()){
+                if(!activity.isFinishing() || activity.isImmersive()){
                     progress.show();
                     progress.setContentView(R.layout.dialog_waiting);
                     // 背景透明
@@ -100,6 +100,6 @@ public class ProgressManager {
     }
 
     private boolean isShowing(){
-        return mDialog != null && mDialog.isShowing();
+        return mDialog != null;
     }
 }

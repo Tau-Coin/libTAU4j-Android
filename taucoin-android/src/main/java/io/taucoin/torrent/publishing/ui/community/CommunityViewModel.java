@@ -906,29 +906,29 @@ public class CommunityViewModel extends AndroidViewModel {
     }
 
     /**
-     * 正在关注的社区
+     * 设置优先级链（用户正在查看的链）
      * @param chainID 链ID
      */
-    public void startVisitCommunity(String chainID) {
+    public void setVisitChain(String chainID) {
         if (StringUtil.isEmpty(chainID)) {
             return;
         }
         if (null == visitDisposable) {
-            daemon.focusOnChain(chainID);
+            daemon.setPriorityChain(chainID);
         }
         visitDisposable = ObservableUtil.intervalSeconds(1)
             .subscribeOn(Schedulers.io())
-            .subscribe(l -> daemon.focusOnChain(chainID));
+            .subscribe(l -> daemon.setPriorityChain(chainID));
     }
 
     /**
-     * 取消正在关注的社区
+     * 取消设置优先级链（用户正在查看的链）
      */
-    public void stopVisitCommunity(String chainID) {
+    public void unsetVisitChain(String chainID) {
         if (visitDisposable != null && !visitDisposable.isDisposed()) {
             visitDisposable.dispose();
         }
-        daemon.cancelFocusOnChain(chainID);
+        daemon.unsetPriorityChain(chainID);
     }
 
     public void batchAddCommunities(String name, int num) {

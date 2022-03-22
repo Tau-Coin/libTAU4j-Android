@@ -540,11 +540,21 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 当前焦点链（用户正在查看的链）
+     * 设置优先级链（用户正在查看的链）
      */
-    public void focusOnChain(String chainID) {
+    public void setPriorityChain(String chainID) {
         if (isRunning) {
-            sessionManager.focusOnChain(ChainIDUtil.encode(chainID));
+            sessionManager.setPriorityChain(ChainIDUtil.encode(chainID));
+            logger.debug("focusOnChain::{}", chainID);
+        }
+    }
+
+    /**
+     * 取消设置优先级链（用户正在查看的链）
+     */
+    public void unsetPriorityChain(String chainID) {
+        if (isRunning) {
+            sessionManager.unsetPriorityChain();
             logger.debug("focusOnChain::{}", chainID);
         }
     }

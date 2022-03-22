@@ -97,6 +97,7 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
                         TX_REQUEST_CODE);
             }
         });
+        showProgressDialog();
     }
 
     private void subscribeMainViewModel() {
@@ -156,7 +157,6 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     @Override
     public void onStart() {
         super.onStart();
-        showProgressDialog();
         subscribeMainViewModel();
     }
 
