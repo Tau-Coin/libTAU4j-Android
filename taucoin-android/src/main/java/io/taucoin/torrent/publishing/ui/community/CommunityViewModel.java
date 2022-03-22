@@ -71,6 +71,7 @@ import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
@@ -83,6 +84,7 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
@@ -119,6 +121,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
     private MutableLiveData<UserAndFriend> largestCoinHolder = new MutableLiveData<>();
     private MutableLiveData<List<BlockAndTx>> chainBlocks = new MutableLiveData<>();
+    private Disposable visitDisposable;
 
     public CommunityViewModel(@NonNull Application application) {
         super(application);
@@ -348,6 +351,9 @@ public class CommunityViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
         disposables.clear();
+        if (visitDisposable != null && !visitDisposable.isDisposed()) {
+            visitDisposable.dispose();
+        }
     }
 
     /**
@@ -869,9 +875,15 @@ public class CommunityViewModel extends AndroidViewModel {
                                 }
                             } else {
                                 if (localBlock.status == 1) {
+                                    List<Tx> txList = txRepo.getOnChainTxsByBlockHash(localBlock.blockHash);
+                                    if (txList != null && txList.size() > 0) {
+                                        for (Tx tx : txList) {
+                                            tx.txStatus = 0;
+                                            txRepo.updateTransaction(tx);
+                                        }
+                                    }
                                     localBlock.status = 0;
                                     blockRepo.updateBlock(localBlock);
-                                    // TODO: 交易处理问题
                                 }
                             }
                         }
@@ -891,5 +903,31 @@ public class CommunityViewModel extends AndroidViewModel {
             }
             emitter.onComplete();
         }, BackpressureStrategy.LATEST);
+    }
+
+    /**
+     * 正在关注的社区
+     * @param chainID 链ID
+     */
+    public void startVisitCommunity(String chainID) {
+        if (StringUtil.isEmpty(chainID)) {
+            return;
+        }
+        if (null == visitDisposable) {
+            daemon.focusOnChain(chainID);
+        }
+        visitDisposable = ObservableUtil.intervalSeconds(1)
+            .subscribeOn(Schedulers.io())
+            .subscribe(l -> daemon.focusOnChain(chainID));
+    }
+
+    /**
+     * 取消正在关注的社区
+     */
+    public void stopVisitCommunity(String chainID) {
+        if (visitDisposable != null && !visitDisposable.isDisposed()) {
+            visitDisposable.dispose();
+        }
+        daemon.cancelFocusOnChain(chainID);
     }
 }

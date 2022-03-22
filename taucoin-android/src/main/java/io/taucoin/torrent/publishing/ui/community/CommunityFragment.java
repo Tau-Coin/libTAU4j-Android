@@ -262,12 +262,14 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     public void onStart() {
         super.onStart();
         subscribeCommunityViewModel();
+        communityViewModel.startVisitCommunity(chainID);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         disposables.clear();
+        communityViewModel.stopVisitCommunity(chainID);
     }
 
     @Override

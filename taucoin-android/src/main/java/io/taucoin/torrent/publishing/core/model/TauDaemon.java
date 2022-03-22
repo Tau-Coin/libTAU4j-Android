@@ -540,6 +540,25 @@ public abstract class TauDaemon {
     }
 
     /**
+     * 当前焦点链（用户正在查看的链）
+     */
+    public void focusOnChain(String chainID) {
+        if (isRunning) {
+            sessionManager.focusOnChain(ChainIDUtil.encode(chainID));
+            logger.debug("focusOnChain::{}", chainID);
+        }
+    }
+
+    /**
+     * 取消当前焦点链（用户正在查看的链）
+     */
+    public void cancelFocusOnChain(String chainID) {
+        if (isRunning) {
+            logger.debug("cancelFocusOnChain::{}", chainID);
+        }
+    }
+
+    /**
      * 账户自动更新
      */
     public void accountAutoRenewal() {

@@ -111,4 +111,6 @@ public interface TxRepository {
     List<UserAndTx> loadAllWiringTxs(String chainID, int pos, int pageSize);
 
     DataSource.Factory<Integer, UserAndTx> queryFavorites();
+
+    List<Tx> getOnChainTxsByBlockHash(String blockHash);
 }

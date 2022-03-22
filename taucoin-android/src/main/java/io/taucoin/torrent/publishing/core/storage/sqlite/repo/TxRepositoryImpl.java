@@ -234,4 +234,9 @@ public class TxRepositoryImpl implements TxRepository{
     public DataSource.Factory<Integer, UserAndTx> queryFavorites() {
         return db.txDao().queryFavorites();
     }
+
+    @Override
+    public List<Tx> getOnChainTxsByBlockHash(String blockHash) {
+        return db.txDao().getOnChainTxsByBlockHash(blockHash);
+    }
 }

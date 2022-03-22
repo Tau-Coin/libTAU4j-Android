@@ -139,6 +139,9 @@ public interface TxDao {
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
             " ORDER BY tx.favoriteTime DESC";
 
+    String QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH = "SELECT * FROM Txs" +
+            " WHERE txStatus = 1 AND blockHash = :blockHash";
+
     /**
      * 添加新的交易
      */
@@ -265,4 +268,7 @@ public interface TxDao {
     @Transaction
     @Query(QUERY_GET_FAVORITE_TXS)
     DataSource.Factory<Integer, UserAndTx> queryFavorites();
+
+    @Query(QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH)
+    List<Tx> getOnChainTxsByBlockHash(String blockHash);
 }
