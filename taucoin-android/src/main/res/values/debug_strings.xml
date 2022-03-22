@@ -8,8 +8,11 @@
     <string name="debug_test">Batch Test</string>
     <string name="debug_test_hint">Friend name prefix</string>
     <string name="debug_test_num">100</string>
+    <string name="debug_test_community_hint">Community name prefix</string>
+    <string name="debug_test_community_num">10</string>
     <string name="debug_test_num_hint">Number of friends to add</string>
     <string name="debug_test_add_friends">Add Friends</string>
+    <string name="debug_test_add_communities">Add Communities</string>
 
     <string name="debug_session_params">Session Params</string>
     <string name="debug_bootstrap_interval_value">60</string>

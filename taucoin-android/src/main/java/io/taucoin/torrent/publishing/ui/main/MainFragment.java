@@ -140,6 +140,7 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     }
 
     private void showCommunityList(List<CommunityAndFriend> communities) {
+        closeProgressDialog();
         if(communities != null){
             adapter.submitList(communities);
         }
@@ -155,6 +156,7 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     @Override
     public void onStart() {
         super.onStart();
+        showProgressDialog();
         subscribeMainViewModel();
     }
 

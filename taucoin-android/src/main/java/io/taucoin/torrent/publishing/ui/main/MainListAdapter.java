@@ -130,7 +130,8 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
 
                 byte[] msg = bean.msg;
                 if (msg != null) {
-                    binding.tvUserMessage.setTextContent(bean.msg, bean.senderPk, bean.receiverPk);
+                    String messageStr = Utils.textBytesToString(bean.msg);
+                    binding.tvUserMessage.setText(messageStr);
                 } else {
                     binding.tvUserMessage.setText(context.getString(R.string.main_no_messages));
                 }

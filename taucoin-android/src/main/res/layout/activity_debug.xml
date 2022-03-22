@@ -108,6 +108,71 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="@string/debug_test"
+                        android:textAppearance="@style/TextAppearanceBody1"
+                        android:textColor="@color/primary_light"
+                        android:includeFontPadding="false"
+                        android:textStyle="bold" />
+
+                    <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+                        android:id="@+id/tv_community_name"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:layout_height="wrap_content"
+                        android:text="@string/debug_test"
+                        android:gravity="center_horizontal"
+                        android:inputType="text"
+                        android:textAppearance="@style/TextAppearanceBody1"
+                        android:hint="@string/debug_test_community_hint"
+                        android:autofillHints="Friend name prefix" />
+
+                    <EditText
+                        android:id="@+id/tv_community_num"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:text="@string/debug_test_community_num"
+                        android:gravity="center_horizontal"
+                        android:inputType="number"
+                        android:textAppearance="@style/TextAppearanceBody1"
+                        android:hint="@string/debug_test_num_hint"
+                        android:autofillHints="@string/debug_test_num_hint" />
+
+                    <TextView
+                        android:id="@+id/tv_batch_add_community"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:layout_gravity="center_vertical"
+                        android:onClick="@{listener::onClick}"
+                        android:text="@string/debug_test_add_communities"
+                        android:gravity="center_vertical|center"
+                        android:layout_marginEnd="@dimen/widget_size_20"
+                        android:layout_marginTop="@dimen/widget_size_20"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:textColor="@color/color_white"
+                        android:background="@drawable/primary_rect_round_bg"
+                        android:textAppearance="@style/TextAppearanceBody1"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/color_white"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:paddingTop="@dimen/widget_size_20"
+                    android:paddingBottom="@dimen/widget_size_20"
+                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingEnd="@dimen/widget_size_20">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@string/debug_session_params"
                         android:textAppearance="@style/TextAppearanceBody1"
                         android:textColor="@color/primary_light"

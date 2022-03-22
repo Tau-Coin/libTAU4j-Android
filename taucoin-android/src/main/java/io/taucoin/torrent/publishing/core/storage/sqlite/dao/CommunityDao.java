@@ -21,7 +21,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 @Dao
 public interface CommunityDao {
     String QUERY_GET_CURRENT_USER_PK = " (SELECT publicKey FROM Users WHERE isCurrentUser = 1 limit 1) ";
-    String QUERY_GET_BANNED_USER_PK = " (SELECT publicKey FROM Users WHERE isBanned == 1 and isCurrentUser != 1) ";
     String QUERY_NEWEST_MSG_DESC = " (SELECT * FROM (SELECT * FROM (" +
             " SELECT timestamp, content, contentType, logicMsgHash, senderPk, receiverPk, receiverPk AS receiverPkTemp" +
             " FROM (SELECT rowid, * FROM ChatMessages" +
@@ -58,7 +57,7 @@ public interface CommunityDao {
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
             " LEFT JOIN (SELECT timestamp, memo, chainID FROM (SELECT timestamp, memo, chainID FROM Txs" +
-            " WHERE senderPk NOT IN " + QUERY_GET_BANNED_USER_PK +
+            " WHERE senderPk IN " + UserDao.QUERY_GET_USER_PKS_IN_WHITE_LIST +
             " ORDER BY timestamp) GROUP BY chainID) AS c" +
             " ON a.chainID = c.chainID" +
             " WHERE isBanned == 0";
@@ -71,7 +70,7 @@ public interface CommunityDao {
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
             " LEFT JOIN (SELECT timestamp, memo, chainID FROM (SELECT timestamp, memo, chainID FROM Txs" +
-            " WHERE senderPk NOT IN " + QUERY_GET_BANNED_USER_PK +
+            " WHERE senderPk IN " + UserDao.QUERY_GET_USER_PKS_IN_WHITE_LIST +
             " ORDER BY timestamp DESC) GROUP BY chainID) AS c" +
             " ON a.chainID = c.chainID" +
             " WHERE isBanned == 0";
@@ -86,7 +85,7 @@ public interface CommunityDao {
             " ON (f.userPK = cm.senderPk AND f.friendPK = cm.receiverPk)" +
             " OR (f.userPK = cm.receiverPk AND f.friendPK = cm.senderPk)" +
             " WHERE f.userPk = " + QUERY_GET_CURRENT_USER_PK +
-            " AND f.friendPK NOT IN " + QUERY_GET_BANNED_USER_PK;
+            " AND f.friendPK IN " + UserDao.QUERY_GET_USER_PKS_IN_WHITE_LIST;
 
     String QUERY_FRIENDS_DESC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS tailBlock, 0 AS balance," +
             " 0 AS power, 0 AS blockNumber, 0 AS joined, 1 AS type," +
@@ -98,11 +97,10 @@ public interface CommunityDao {
             " ON (f.userPK = cm.senderPk AND f.friendPK = cm.receiverPk)" +
             " OR (f.userPK = cm.receiverPk AND f.friendPK = cm.senderPk)" +
             " WHERE f.userPk = " + QUERY_GET_CURRENT_USER_PK +
-            " AND f.friendPK NOT IN " + QUERY_GET_BANNED_USER_PK;
+            " AND f.friendPK IN " + UserDao.QUERY_GET_USER_PKS_IN_WHITE_LIST;
 
     String QUERY_COMMUNITIES_AND_FRIENDS_DESC = "SELECT * FROM (" + QUERY_FRIENDS_DESC +
-            " UNION ALL " + QUERY_COMMUNITIES_DESC + ")" +
-            " ORDER BY timestamp DESC";
+            " UNION ALL " + QUERY_COMMUNITIES_DESC + ") ORDER BY timestamp DESC";
 
     String QUERY_COMMUNITIES_AND_FRIENDS_ASC = "SELECT * FROM (" + QUERY_FRIENDS_ASC +
             " UNION ALL " + QUERY_COMMUNITIES_ASC + ")" +
