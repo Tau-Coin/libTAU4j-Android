@@ -167,12 +167,20 @@ public interface CommunityDao {
     @Transaction
     Flowable<List<CommunityAndFriend>> observeCommunitiesAndFriendsDESC();
 
+    @Query(QUERY_COMMUNITIES_AND_FRIENDS_DESC)
+    @Transaction
+    List<CommunityAndFriend> queryCommunitiesAndFriendsDESC();
+
     /**
      * 查询不在黑名单中的社区列表（正序）
      */
     @Query(QUERY_COMMUNITIES_AND_FRIENDS_ASC)
     @Transaction
     Flowable<List<CommunityAndFriend>> observeCommunitiesAndFriendsASC();
+
+    @Query(QUERY_COMMUNITIES_AND_FRIENDS_ASC)
+    @Transaction
+    List<CommunityAndFriend> queryCommunitiesAndFriendsASC();
 
     /**
      * 获取在黑名单的社区列表

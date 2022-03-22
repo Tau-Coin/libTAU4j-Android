@@ -34,6 +34,8 @@ public interface CommunityRepository {
      */
     Flowable<List<CommunityAndFriend>> observeCommunitiesAndFriends();
 
+    List<CommunityAndFriend> queryCommunitiesAndFriends();
+
     /**
      * 获取在黑名单的社区列表
      * @return List<Community>

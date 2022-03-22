@@ -72,6 +72,17 @@ public class CommunityRepositoryImpl implements CommunityRepository{
         }
     }
 
+    @Override
+    public List<CommunityAndFriend> queryCommunitiesAndFriends() {
+        int sdkVersion = Build.VERSION.SDK_INT;
+        // android11中SQLite版本为3.28.0, group by取第一条记录，低版本取最后一条记录
+        if (sdkVersion >= 30) {
+            return db.communityDao().queryCommunitiesAndFriendsDESC();
+        } else {
+            return db.communityDao().queryCommunitiesAndFriendsASC();
+        }
+    }
+
     /**
      * 获取在黑名单的社区列表
      * @return List<Community>

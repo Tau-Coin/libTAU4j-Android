@@ -103,6 +103,11 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     }
 
     private void subscribeMainViewModel() {
+        disposables.add(viewModel.queryCommunitiesAndFriends()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::showCommunityList));
+
         disposables.add(viewModel.observeCommunitiesAndFriends()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
