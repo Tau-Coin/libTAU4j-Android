@@ -18,7 +18,9 @@ package io.taucoin.torrent.publishing.ui.customviews;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.view.Window;
+import android.view.WindowManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,13 +61,22 @@ public class ProgressManager {
             if(activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) != null){
                 Dialog progress = new Dialog(activity, R.style.dialog_translucent);
                 progress.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                progress.setContentView(R.layout.dialog_waiting);
                 progress.setCanceledOnTouchOutside(isCanCancel);
                 progress.setCancelable(isCanCancel);
                 mDialog = progress;
                 if(!activity.isFinishing()){
                     progress.show();
-                }else{
+                    progress.setContentView(R.layout.dialog_waiting);
+                    // 背景透明
+                    Window window = progress.getWindow();
+                    if (window != null) {
+                        window.setBackgroundDrawable(new ColorDrawable(0));
+                        window.setDimAmount(0f);
+                        WindowManager.LayoutParams layout = window.getAttributes();
+                        layout.alpha = 0.7f;
+                        window.setAttributes(layout);
+                    }
+                } else {
                     closeProgressDialog();
                 }
                 mDialog.setOnCancelListener(ProgressManager::closeProgressDialog);
@@ -76,14 +87,14 @@ public class ProgressManager {
     }
 
     public void closeProgressDialog(){
-        if(isShowing()){
+        if (isShowing()) {
             mDialog.dismiss();
         }
         mDialog = null;
     }
 
     private static void closeProgressDialog(DialogInterface dialog){
-        if(dialog != null){
+        if (dialog != null) {
             dialog.dismiss();
         }
     }
