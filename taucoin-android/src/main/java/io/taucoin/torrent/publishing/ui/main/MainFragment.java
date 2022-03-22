@@ -82,6 +82,8 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
                 return true;
             }
         };
+        binding.refreshLayout.setRefreshing(false);
+        binding.refreshLayout.setEnabled(false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         binding.groupList.setLayoutManager(layoutManager);
         binding.groupList.setItemAnimator(animator);
@@ -102,12 +104,13 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
 
     private void subscribeMainViewModel() {
         disposables.add(viewModel.observeCommunitiesAndFriends()
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::showCommunityList));
 
         handleWarningView();
         disposables.add(settingsRepo.observeSettingsChanged()
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleSettingsChanged));
     }

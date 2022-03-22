@@ -273,7 +273,7 @@ public class MainActivity extends ScanTriggerActivity {
 
         handleSettingsChanged(getString(R.string.pref_key_dht_nodes));
         disposables.add(settingsRepo.observeSettingsChanged()
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleSettingsChanged));
     }
@@ -619,7 +619,7 @@ public class MainActivity extends ScanTriggerActivity {
         if (decode != null) {
             String chainID = ChainIDUtil.decode(decode.getChainID());
             disposables.add(communityViewModel.getCommunityByChainIDSingle(chainID)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(community -> {
                         updateCommunityFragment(chainID);
