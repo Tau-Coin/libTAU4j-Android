@@ -41,6 +41,8 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
+import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
@@ -105,6 +107,7 @@ public class MainActivity extends ScanTriggerActivity {
     private CommonDialog joinDialog;
     private User user;
     private BaseFragment currentFragment;
+    private SettingsRepository settingsRepo;
 //    private BadgeActionProvider badgeProvider;
 
     @Override
@@ -118,6 +121,7 @@ public class MainActivity extends ScanTriggerActivity {
         downloadViewModel = provider.get(DownloadViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_drawer);
         mainViewModel.observeNeedStartDaemon();
+        settingsRepo = RepositoryHelper.getSettingsRepository(getApplicationContext());
         initLayout();
         checkCurrentUser();
         initExitApp();
@@ -266,6 +270,22 @@ public class MainActivity extends ScanTriggerActivity {
         super.onStart();
         subscribeCurrentUser();
 //        downloadViewModel.checkAppVersion(this);
+
+        handleSettingsChanged(getString(R.string.pref_key_dht_nodes));
+        disposables.add(settingsRepo.observeSettingsChanged()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleSettingsChanged));
+    }
+
+    private void handleSettingsChanged(String key) {
+        if (StringUtil.isEquals(key, getString(R.string.pref_key_internet_state)) ||
+                StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
+            long nodes = settingsRepo.getLongValue(getString(R.string.pref_key_dht_nodes), 0L);
+            boolean isConnecting = settingsRepo.internetState() && nodes <= 0;
+            binding.toolbarInclude.toolbar.setTitle(isConnecting ? R.string.main_connecting :
+                    R.string.main_title);
+        }
     }
 
     private void handleClipboardContent() {
