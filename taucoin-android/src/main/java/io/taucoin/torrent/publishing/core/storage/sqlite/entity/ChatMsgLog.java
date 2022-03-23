@@ -69,9 +69,9 @@ public class ChatMsgLog implements Parcelable, Comparable<ChatMsgLog> {
 
     @Override
     public int compareTo(ChatMsgLog o) {
-        if (this.timestamp > o.timestamp) {
+        if (this.status > o.status) {
             return -1;
-        } else if (this.timestamp < o.timestamp) {
+        } else if (this.status < o.status) {
             return 1;
         }
         return 0;
