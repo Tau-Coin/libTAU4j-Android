@@ -30,7 +30,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
-                android:textAppearance="@style/TextAppearanceBody1" />
+                android:textAppearance="@style/TextAppearanceBody2" />
 
             <ImageView
                 android:id="@+id/iv_delete"

@@ -400,8 +400,8 @@
     <string name="tx_error_send_failed">Transaction sending failed, please try again later!</string>
     <string name="tx_error_invalid_coin_name">Invalid coin name</string>
 
-    <string name="tx_result_status_waiting">Waiting...</string>
-    <string name="tx_result_status_processing">Processing...</string>
+    <string name="tx_result_status_waiting">Waiting&#8230;</string>
+    <string name="tx_result_status_processing">Competing &#038; waiting next mining block</string>
     <string name="tx_result_successfully">Successfully</string>
     <string name="tx_result_processing">In processing,expected to confirm</string>
     <string name="tx_result_failed">Failed</string>
