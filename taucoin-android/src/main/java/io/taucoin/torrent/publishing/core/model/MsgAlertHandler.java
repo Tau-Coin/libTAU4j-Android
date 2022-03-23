@@ -129,6 +129,24 @@ class MsgAlertHandler {
                     if (isNeedUpdate) {
                         friendRepo.updateFriend(friend);
                     }
+                } else {
+                    // 更新libTAU朋友信息
+                    boolean isSuccess = daemon.updateFriendInfo(user);
+                    if (isSuccess) {
+                        // 发送默认消息
+                        String msg = appContext.getString(R.string.contacts_have_added);
+                        logger.debug("AddFriendsLocally, syncSendMessageTask userPk::{}, friendPk::{}, msg::{}",
+                                userPk, friendPkStr, msg);
+                        ChatViewModel.syncSendMessageTask(appContext, userPk, friendPkStr, msg, MessageType.TEXT.getType());
+                        // 更新本地朋友关系
+                        friend = new Friend(userPk, friendPkStr);
+                        friend.status = FriendStatus.CONNECTED.getStatus();
+                        friend.msgUnread = 1;
+                        friend.lastCommTime = sentTime;
+                        friendRepo.addFriend(friend);
+                        // 更新朋友信息
+                        daemon.requestFriendInfo(friendPkStr);
+                    }
                 }
 
                 // 如果是Airdrop, 则给此消息的发送者airdrop coins
