@@ -309,6 +309,7 @@
     <string name="user_export_seed">Export Key</string>
     <string name="user_seeds_history">History</string>
     <string name="user_nickname">Nickname (optional)</string>
+    <string name="user_remark_hints">Remark (optional)</string>
     <string name="user_seed_import_hint">Secrete Key (required)</string>
     <string name="user_seed_import">Import</string>
     <string name="user_seed_generate">Generate New Key</string>

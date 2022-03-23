@@ -52,7 +52,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginStart="@dimen/widget_size_50"
             android:layout_marginEnd="@dimen/widget_size_50"
-            android:textAllCaps="true"
+            android:textAllCaps="false"
             android:gravity="center_horizontal|center"
             android:background="@drawable/grey_dark_rect_round_bg"
             android:text="@string/common_close"

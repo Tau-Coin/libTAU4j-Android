@@ -638,7 +638,7 @@ public class UserViewModel extends AndroidViewModel {
      * @param airdropChain
      */
     public void addAirdropFriend(String publicKey, String airdropChain) {
-        addFriend(publicKey, null, airdropChain);
+        addFriend(publicKey, null, null, airdropChain);
     }
 
     /**
@@ -648,11 +648,15 @@ public class UserViewModel extends AndroidViewModel {
      * @param nickname
      */
     public void addFriend(String publicKey, String nickname) {
-        addFriend(publicKey, nickname, null);
+        addFriend(publicKey, nickname, null, null);
     }
-    public void addFriend(String publicKey, String nickname, String airdropChain) {
+
+    public void addFriendFromLocal(String publicKey, String remark) {
+        addFriend(publicKey, null, remark, null);
+    }
+    public void addFriend(String publicKey, String nickname, String remark,  String airdropChain) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
-            Result result = addFriendTask(publicKey, nickname, airdropChain);
+            Result result = addFriendTask(publicKey, nickname, remark, airdropChain);
 
             result.setSuccess(result.isExist());
             emitter.onNext(result);
@@ -664,7 +668,7 @@ public class UserViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private Result addFriendTask(String publicKey, String nickname, String airdropChain) {
+    private Result addFriendTask(String publicKey, String nickname, String remark, String airdropChain) {
         logger.debug("AddFriendsLocally, publicKey::{}, nickname::{}", publicKey, nickname);
         Result result = new Result();
         result.setKey(publicKey);
@@ -676,12 +680,23 @@ public class UserViewModel extends AndroidViewModel {
                 user.nickname = nickname;
                 user.updateNNTime = daemon.getSessionTime() / 1000;
             }
+            if (StringUtil.isNotEmpty(remark)) {
+                user.remark = remark;
+            }
             userRepo.addUser(user);
         } else {
             logger.debug("AddFriendsLocally, user exist");
+            boolean isUpdate = false;
             if (StringUtil.isEmpty(user.nickname) && StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
                 user.updateNNTime = daemon.getSessionTime() / 1000;
+                isUpdate = true;
+            }
+            if (StringUtil.isNotEmpty(remark)) {
+                user.remark = remark;
+                isUpdate = true;
+            }
+            if (isUpdate) {
                 userRepo.updateUser(user);
             }
         }
@@ -834,15 +849,8 @@ public class UserViewModel extends AndroidViewModel {
             try {
                 if (StringUtil.isNotEmpty(publicKey) &&
                         ByteUtil.toByte(publicKey).length == Ed25519.PUBLIC_KEY_SIZE) {
-                    String nickName = StringUtil.getText(binding.etNickname);
-                    if (StringUtil.isNotEmpty(nickName)) {
-                        int nicknameLength = Utils.textStringToBytes(nickName).length;
-                        if (nicknameLength > Constants.NICKNAME_LENGTH) {
-                            ToastUtils.showShortToast(R.string.user_new_name_too_long);
-                            return;
-                        }
-                    }
-                    addFriend(publicKey, nickName);
+                    String remark = StringUtil.getText(binding.etRemark);
+                    addFriendFromLocal(publicKey, remark);
                     return;
                 }
             } catch (Exception ignore) { }

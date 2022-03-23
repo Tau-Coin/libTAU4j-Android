@@ -43,7 +43,7 @@
             android:gravity="center_horizontal|center"
             android:background="@drawable/primary_rect_round_bg"
             android:text="@string/common_join"
-            android:textAllCaps="true"
+            android:textAllCaps="false"
             android:textColor="@color/color_white"
             android:textAppearance="@style/TextAppearanceBody1"/>
 
@@ -56,7 +56,7 @@
             android:layout_centerHorizontal="true"
             android:gravity="center_horizontal|center"
             android:text="@string/common_skip"
-            android:textAllCaps="true"
+            android:textAllCaps="false"
             android:textColor="@color/gray_dark"
             android:textAppearance="@style/TextAppearanceBody2"/>
 

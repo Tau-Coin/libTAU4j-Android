@@ -117,7 +117,6 @@ public class MainActivity extends ScanTriggerActivity {
         userViewModel = provider.get(UserViewModel.class);
         mainViewModel = provider.get(MainViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
-        communityViewModel = provider.get(CommunityViewModel.class);
         downloadViewModel = provider.get(DownloadViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_drawer);
         mainViewModel.observeNeedStartDaemon();

@@ -41,7 +41,7 @@
             android:text="@string/common_submit"
             android:layout_marginTop="@dimen/widget_size_25"
             android:layout_marginBottom="@dimen/widget_size_10"
-            android:textAllCaps="true"
+            android:textAllCaps="false"
             android:gravity="center_horizontal|center"
             android:textColor="@color/color_white"
             android:textAppearance="@style/TextAppearanceBody1"

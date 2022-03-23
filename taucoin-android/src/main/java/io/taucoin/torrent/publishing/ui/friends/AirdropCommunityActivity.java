@@ -158,6 +158,8 @@ public class AirdropCommunityActivity extends BaseActivity implements
             if (isShowLinkDialog) {
                 CopyManager.clearClipboardContent();
             }
+        } else {
+            showErrorLinkDialog(false);
         }
     }
 

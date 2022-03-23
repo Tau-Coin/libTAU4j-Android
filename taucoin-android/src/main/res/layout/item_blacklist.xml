@@ -22,7 +22,7 @@
             android:layout_marginStart="@dimen/widget_size_7"
             android:layout_centerVertical="true"
             android:gravity="center"
-            android:textAllCaps="true"
+            android:textAllCaps="false"
             android:textColor="@color/color_white"
             android:textStyle="bold"
             app:btnStrokeColor="@color/primary_light"

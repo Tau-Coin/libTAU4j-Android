@@ -25,7 +25,7 @@
             android:background="@drawable/red_rect_round_bg_border"
             android:text="@string/user_ban"
             android:textColor="@color/color_red"
-            android:textAllCaps="true"
+            android:textAllCaps="false"
             android:layout_marginTop="@dimen/widget_size_2"
             android:paddingStart="@dimen/widget_size_10"
             android:paddingEnd="@dimen/widget_size_10"

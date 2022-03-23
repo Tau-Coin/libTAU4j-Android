@@ -71,7 +71,7 @@
             android:layout_centerHorizontal="true"
             android:text="@string/common_submit"
             android:layout_marginTop="@dimen/widget_size_35"
-            android:textAllCaps="true"
+            android:textAllCaps="false"
             android:gravity="center_horizontal|center"
             android:textColor="@color/color_white"
             android:textAppearance="@style/TextAppearanceBody1"

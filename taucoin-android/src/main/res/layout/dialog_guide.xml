@@ -22,7 +22,7 @@
                 android:textColor="@color/gray_dark"
                 android:text="@string/common_skip"
                 android:layout_gravity="end"
-                android:textAllCaps="true"
+                android:textAllCaps="false"
                 android:padding="@dimen/widget_size_15"
                 android:layout_marginTop="@dimen/widget_size_0"
                 android:layout_marginEnd="@dimen/widget_size_5"

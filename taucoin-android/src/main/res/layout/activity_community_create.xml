@@ -44,7 +44,7 @@
                         android:layout_marginTop="@dimen/widget_size_25"
                         android:gravity="center"
                         android:textSize="@dimen/font_size_18"
-                        android:textAllCaps="true"
+                        android:textAllCaps="false"
                         android:textColor="@color/color_white"
                         app:btnStrokeColor="@color/primary_light"
                         app:btnStrokeWidth="0dp"

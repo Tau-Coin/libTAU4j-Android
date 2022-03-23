@@ -36,7 +36,7 @@
                 android:layout_marginEnd="@dimen/widget_size_7"
                 android:layout_centerVertical="true"
                 android:gravity="center"
-                android:textAllCaps="true"
+                android:textAllCaps="false"
                 android:textColor="@color/color_white"
                 android:textAppearance="@style/TextAppearanceHeadline6"
                 app:btnStrokeColor="@color/primary_light"
