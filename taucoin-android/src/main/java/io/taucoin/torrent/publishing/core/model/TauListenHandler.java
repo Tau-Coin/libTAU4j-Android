@@ -27,6 +27,7 @@ import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.LeaderInvitationContent;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -270,6 +271,11 @@ public class TauListenHandler {
         logger.debug("handleTransactionData txID::{}, timestamp::{}, nonce::{}, exist::{}, transaction empty::{}", txID,
                 txMsg.getTimestamp(), txMsg.getNonce(), tx != null, isEmpty);
         if (!isEmpty) {
+            // 处理用户信息
+            handleUserInfo(txMsg);
+            // 处理社区成员信息
+            handleMemberInfo(txMsg);
+
             // 本地存在此交易, 更新交易状态值
             if (tx != null) {
                 // 由于第一次同步共识区块
@@ -288,10 +294,6 @@ public class TauListenHandler {
                 handleTransactionData(block.getBlockNumber(), block.Hash(), txMsg,
                         blockStatus == BlockStatus.ON_CHAIN);
             }
-            // 处理用户信息
-            handleUserInfo(txMsg);
-            // 处理社区成员信息
-            handleMemberInfo(txMsg);
         }
     }
 
@@ -323,7 +325,11 @@ public class TauListenHandler {
         tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
         tx.amount = txMsg.getAmount();
 
-        if (tx.txType == TxType.SELL_TX.getType()) {
+        if (tx.txType == TxType.TRUST_TX.getType()) {
+            TrustContent trustContent = new TrustContent(txMsg.getPayload());
+            // 添加Trust信息
+            tx.receiverPk = trustContent.getTrustedPkStr();
+        } else if (tx.txType == TxType.SELL_TX.getType()) {
             SellTxContent sellTxContent = new SellTxContent(txMsg.getPayload());
             // 添加Sell信息
             tx.coinName = Utils.textBytesToString(sellTxContent.getCoinName());
@@ -355,11 +361,13 @@ public class TauListenHandler {
         }
         TxContent txContent = new TxContent(txMsg.getPayload());
         int txType = txContent.getType();
-        if (txType == TxType.NOTE_TX.getType()) {
-            saveUserInfo(txMsg.getSender());
-        } else if (txType == TxType.WIRING_TX.getType()) {
-            saveUserInfo(txMsg.getSender());
+        saveUserInfo(txMsg.getSender());
+
+        if (txType == TxType.WIRING_TX.getType()) {
             saveUserInfo(txMsg.getReceiver());
+        } else if (txType == TxType.TRUST_TX.getType()) {
+            TrustContent trustContent = new TrustContent(txMsg.getPayload());
+            saveUserInfo(trustContent.getTrustedPk());
         }
     }
 
@@ -373,12 +381,13 @@ public class TauListenHandler {
             return;
         }
         TxContent txContent = new TxContent(txMsg.getPayload());
+        addMemberInfo(txMsg.getChainID(), txMsg.getSender());
         int txType = txContent.getType();
-        if (txType == TxType.NOTE_TX.getType()) {
-            addMemberInfo(txMsg.getChainID(), txMsg.getSender());
-        } else if (txType == TxType.WIRING_TX.getType()) {
-            addMemberInfo(txMsg.getChainID(), txMsg.getSender());
+        if (txType == TxType.WIRING_TX.getType()) {
             addMemberInfo(txMsg.getChainID(), txMsg.getReceiver());
+        } else if (txType == TxType.TRUST_TX.getType()) {
+            TrustContent trustContent = new TrustContent(txMsg.getPayload());
+            addMemberInfo(txMsg.getChainID(), trustContent.getTrustedPk());
         }
     }
 
@@ -493,6 +502,7 @@ public class TauListenHandler {
         logger.debug("handleNewTransaction txID::{}, timestamp::{}, nonce::{}, exist::{}, transaction empty::{}",
                 txID, txMsg.getTimestamp(), txMsg.getNonce(), tx != null, isTransactionEmpty(txMsg));
         if (null == tx) {
+            handleUserInfo(txMsg);
             handleTransactionData(0, null, txMsg, false);
         }
     }

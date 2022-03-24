@@ -168,6 +168,9 @@ public class MarketListAdapter extends ListAdapter<UserAndTx, MarketListAdapter.
                 isSame = true;
             } else if(null != oldItem.sender && null != newItem.sender) {
                 isSame =  StringUtil.isEquals(oldItem.sender.nickname, newItem.sender.nickname);
+                if (isSame) {
+                    isSame = StringUtil.isEquals(oldItem.sender.remark, newItem.sender.remark);
+                }
             }
             if (isSame && oldItem.trusts != newItem.trusts) {
                 isSame = false;

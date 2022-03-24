@@ -74,6 +74,9 @@ public class UsersUtil {
      * @return 显示名字
      */
     public static String getShowName(@NonNull User user) {
+        if (null == user) {
+            return null;
+        }
         if (StringUtil.isNotEmpty(user.remark)) {
             return user.remark;
         } else if (StringUtil.isNotEmpty(user.nickname)) {

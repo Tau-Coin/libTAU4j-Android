@@ -208,7 +208,7 @@ public class TxUtils {
     private static SpannableStringBuilder createSpanTrustTx(UserAndTx tx, int tab) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
-        String receiverName = UsersUtil.getShowName(tx.receiver);
+//        String receiverName = UsersUtil.getShowName(tx.receiver);
         SpanUtils msg = new SpanUtils()
                 .append("Trust: ")
                 .setForegroundColor(titleColor)

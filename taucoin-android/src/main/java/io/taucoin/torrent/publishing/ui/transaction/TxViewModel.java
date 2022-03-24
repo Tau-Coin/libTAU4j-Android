@@ -42,6 +42,7 @@ import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
@@ -213,9 +214,12 @@ public class TxViewModel extends AndroidViewModel {
             switch (TxType.valueOf(tx.txType)) {
                 case NOTE_TX:
                 case WIRING_TX:
-                case TRUST_TX:
                     TxContent txContent = new TxContent(tx.txType, memo);
                     txEncoded = txContent.getEncoded();
+                    break;
+                case TRUST_TX:
+                    TrustContent trustContent = new TrustContent(memo, tx.receiverPk);
+                    txEncoded = trustContent.getEncoded();
                     break;
                 case SELL_TX:
                     SellTxContent sellTxContent = new SellTxContent(tx.coinName, tx.quantity,

@@ -203,7 +203,10 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
             if (null == oldItem.sender && null == newItem.sender) {
                 isSame = true;
             } else if(null != oldItem.sender && null != newItem.sender) {
-                isSame =  StringUtil.isEquals(oldItem.sender.nickname, newItem.sender.nickname);
+                isSame = StringUtil.isEquals(oldItem.sender.nickname, newItem.sender.nickname);
+                if (isSame) {
+                    isSame = StringUtil.isEquals(oldItem.sender.remark, newItem.sender.remark);
+                }
             }
             if (isSame && oldItem.txStatus != newItem.txStatus) {
                 isSame = false;

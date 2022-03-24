@@ -48,6 +48,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
         RIGHT_TEXT
     }
     private ClickListener listener;
+    private String showName;
     private byte[] headPic;
     private byte[] myHeadPic;
     private Bitmap bitmap;
@@ -60,7 +61,8 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
 
     public void setFriend(User friend) {
         if (friend != null) {
-            if (null == bitmap || bitmap.isRecycled() || !Arrays.equals(headPic, friend.headPic)) {
+            if (null == bitmap || bitmap.isRecycled() || !Arrays.equals(headPic, friend.headPic) ||
+                StringUtil.isNotEquals(showName, UsersUtil.getShowName(friend))) {
                 headPic = friend.headPic;
                 this.bitmap = UsersUtil.getHeadPic(friend);
                 notifyDataSetChanged();
