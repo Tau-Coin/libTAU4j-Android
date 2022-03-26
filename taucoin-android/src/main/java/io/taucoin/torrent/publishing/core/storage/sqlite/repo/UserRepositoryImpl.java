@@ -89,11 +89,6 @@ public class UserRepositoryImpl implements UserRepository{
         return db.userDao().observeCurrentUser();
     }
 
-    @Override
-    public Flowable<String> observeCurrentUserSeed() {
-        return db.userDao().observeCurrentUserSeed();
-    }
-
     /**
      * 设置当前用户是否是当前用户
      * @param isCurrentUser 是否是当前用户

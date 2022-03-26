@@ -266,6 +266,7 @@ public class UserViewModel extends AndroidViewModel {
                 }
                 // 3、更新本地的用户公钥
                 MainApplication.getInstance().setCurrentUser(newUser);
+                logger.info("Update userPk::{}", newUser.publicKey);
                 // 4、更新本地的用户公钥
                 daemon.updateSeed(seed);
 
@@ -506,6 +507,7 @@ public class UserViewModel extends AndroidViewModel {
                 generateSeed(null);
             } else {
                 MainApplication.getInstance().setCurrentUser(user);
+                logger.info("Update userPk::{}", user.publicKey);
             }
             emitter.onNext(true);
             emitter.onComplete();

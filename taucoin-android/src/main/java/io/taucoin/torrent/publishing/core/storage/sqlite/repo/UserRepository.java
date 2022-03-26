@@ -44,12 +44,6 @@ public interface UserRepository {
     Flowable<User> observeCurrentUser();
 
     /**
-     * 观察当前用户Seed变化
-     * @return seed
-     */
-    Flowable<String> observeCurrentUserSeed();
-
-    /**
      * 设置当前用户是否是当前用户
      * @param isCurrentUser 是否是当前用户
      */

@@ -17,6 +17,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
@@ -83,18 +84,21 @@ public class TauService extends Service {
      */
     private void subscribeCurrentUser() {
         final AtomicBoolean isAlreadyInit = new AtomicBoolean(false);
-        disposables.add(userRepo.observeCurrentUserSeed()
+        disposables.add(userRepo.observeCurrentUser()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(seed -> {
-                    if(StringUtil.isEmpty(seed)){
+                .subscribe(user -> {
+                    if (null == user) {
                         return;
                     }
+                    // 更新内存中用户信息
+                    MainApplication.getInstance().setCurrentUser(user);
+                    logger.info("Update userPk::{}", user.publicKey);
                     logger.info("Update user seed");
                     if(isAlreadyInit.compareAndSet(false, true)){
                         // 更新设置用户seed
-                        daemon.updateSeed(seed);
-                        initAndStart(seed);
+                        daemon.updateSeed(user.seed);
+                        initAndStart(user.seed);
                     }
                 }));
     }

@@ -254,6 +254,7 @@ public class MainActivity extends ScanTriggerActivity {
             return;
         }
         MainApplication.getInstance().setCurrentUser(user);
+        logger.info("Update userPk::{}", user.publicKey);
         this.user = user;
         binding.drawer.tvPublicKey.setText(UsersUtil.getMidHideName(user.publicKey));
         binding.drawer.tvPublicKey.setTag(user.publicKey);
