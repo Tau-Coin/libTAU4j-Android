@@ -30,7 +30,7 @@ public class ChainTabFragment extends CommunityTabFragment implements ChainListA
             onlyWring = getArguments().getBoolean(IntentExtra.ONLY_WIRING, true);
         }
         currentTab = TAB_CHAIN;
-        adapter = new ChainListAdapter(this, chainID);
+        adapter = new ChainListAdapter(this, chainID, onlyWring);
         binding.txList.setAdapter(adapter);
     }
 

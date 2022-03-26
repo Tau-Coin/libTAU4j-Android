@@ -18,6 +18,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.dao.DeviceDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.dao.FriendDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.dao.MemberDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.dao.StatisticDao;
+import io.taucoin.torrent.publishing.core.storage.sqlite.dao.TxConfirmDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.dao.TxDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.dao.TxQueueDao;
 import io.taucoin.torrent.publishing.core.storage.sqlite.dao.UserDao;
@@ -30,6 +31,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Statistic;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 
@@ -38,6 +40,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
         User.class,
         Tx.class,
         TxQueue.class,
+        TxConfirm.class,
         BlockInfo.class,
         Friend.class,
         ChatMsg.class,
@@ -61,6 +64,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract StatisticDao statisticDao();
     public abstract BlockDao blockDao();
     public abstract TxQueueDao txQueueDao();
+    public abstract TxConfirmDao txConfirmDao();
 
     /**
      * 获取数据库实例

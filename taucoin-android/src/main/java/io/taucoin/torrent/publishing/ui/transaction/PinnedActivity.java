@@ -181,6 +181,11 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
     }
 
     @Override
+    public void onResendClick(String txID) {
+
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         closeAllDialog();

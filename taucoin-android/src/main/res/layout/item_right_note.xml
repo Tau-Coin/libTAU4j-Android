@@ -27,28 +27,54 @@
             android:layout_toStartOf="@+id/left_view"
             android:layout_below="@+id/tv_time"
             android:orientation="horizontal"
-            android:id="@+id/middle_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@mipmap/icon_tx_right"
-            android:layout_marginTop="@dimen/widget_size_1"
-            android:layout_marginBottom="@dimen/widget_size_3"
-            android:paddingStart="@dimen/widget_size_10"
-            android:paddingEnd="@dimen/widget_size_20"
-            android:paddingTop="@dimen/widget_size_10"
-            android:paddingBottom="@dimen/widget_size_10">
+            android:layout_gravity="end"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:gravity="top">
 
-            <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
-                android:id="@+id/tv_msg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/widget_size_2"
-                android:layout_marginBottom="@dimen/widget_size_2"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <ImageView
+                android:id="@+id/iv_resend"
+                android:layout_width="@dimen/widget_size_20"
+                android:layout_height="@dimen/widget_size_20"
+                android:gravity="center_vertical"
                 android:includeFontPadding="false"
-                android:lineSpacingExtra="@dimen/widget_size_5"
-                android:textColorLink="@color/color_blue_link"
-                android:textAppearance="@style/TextAppearanceBody3" />
+                android:layout_marginEnd="@dimen/widget_size_5"
+                android:layout_gravity="center_vertical"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_resend"/>
 
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/middle_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/icon_tx_right"
+                android:layout_marginTop="@dimen/widget_size_1"
+                android:layout_marginBottom="@dimen/widget_size_3"
+                android:paddingStart="@dimen/widget_size_10"
+                android:paddingEnd="@dimen/widget_size_20"
+                android:paddingTop="@dimen/widget_size_10"
+                android:paddingBottom="@dimen/widget_size_10">
+
+                <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
+                    android:id="@+id/tv_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="@dimen/widget_size_220"
+                    android:layout_marginTop="@dimen/widget_size_2"
+                    android:layout_marginBottom="@dimen/widget_size_2"
+                    android:includeFontPadding="false"
+                    android:lineSpacingExtra="@dimen/widget_size_5"
+                    android:textColorLink="@color/color_blue_link"
+                    android:textAppearance="@style/TextAppearanceBody3" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <include

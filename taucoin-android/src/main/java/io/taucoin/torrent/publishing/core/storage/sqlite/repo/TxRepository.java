@@ -8,6 +8,7 @@ import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 
 /**
  * 提供外部操作User数据的接口
@@ -113,4 +114,10 @@ public interface TxRepository {
     DataSource.Factory<Integer, UserAndTx> queryFavorites();
 
     List<Tx> getOnChainTxsByBlockHash(String blockHash);
+
+    void addTxConfirm(TxConfirm txConfirm);
+
+    TxConfirm getTxConfirm(String txID, String peer);
+
+    Observable<List<TxConfirm>> observerTxConfirms(String txID);
 }

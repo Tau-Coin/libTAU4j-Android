@@ -42,6 +42,7 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -72,6 +73,7 @@ import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
@@ -947,5 +949,12 @@ public class CommunityViewModel extends AndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
         disposables.add(disposable);
+    }
+
+    /**
+     * 观察交易确认信息
+     */
+    public Observable<List<TxConfirm>> observerTxConfirms(String txID) {
+        return txRepo.observerTxConfirms(txID);
     }
 }

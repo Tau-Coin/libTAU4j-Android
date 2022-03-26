@@ -34,6 +34,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
@@ -627,13 +628,28 @@ public class TauListenHandler {
                 chainID, userPk, null == account);
         if (account != null) {
             Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-            if (member != null && account.getBlockNumber() > member.blockNumber) {
+            if (member != null && account.getBlockNumber() >= member.blockNumber) {
                 member.blockNumber = account.getBlockNumber();
                 member.balance = account.getBalance();
                 member.power = account.getEffectivePower();
                 member.nonce = account.getNonce();
                 memberRepo.updateMember(member);
             }
+        }
+    }
+
+    /**
+     * 交易确认
+     * @param txHash 交易Hash
+     * @param peer peerID
+     */
+    void onTxConfirmed(byte[] txHash, String peer) {
+        String txID = ByteUtil.toHexString(txHash);
+        TxConfirm txConfirm = txRepo.getTxConfirm(txID, peer);
+        logger.trace("onTxConfirmed txID::{}, exist::{}", txID, txConfirm != null);
+        if (null == txConfirm) {
+            txConfirm = new TxConfirm(txID, peer, DateUtil.getMillisTime());
+            txRepo.addTxConfirm(txConfirm);
         }
     }
 

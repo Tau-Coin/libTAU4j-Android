@@ -1,9 +1,12 @@
 package io.taucoin.torrent.publishing.core.model.data;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.room.Ignore;
 import androidx.room.Relation;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 
 /**
@@ -19,6 +22,10 @@ public class UserAndTx extends Tx {
     public User receiver;                   // 交易接受者对应的用户信息
 
     public int trusts;
+
+    @Relation(parentColumn = "txID",
+            entityColumn = "txID")
+    public List<TxConfirm> confirms;
 
     public UserAndTx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo) {
         super(chainID, receiverPk, amount, fee, txType, memo);

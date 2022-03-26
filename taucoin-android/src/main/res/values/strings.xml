@@ -426,6 +426,11 @@
     <string name="tx_sell_add_friend">Add\nFriend</string>
     <string name="tx_unknown">Unknown Transaction</string>
 
+    <string name="tx_confirmed_low">Low</string>
+    <string name="tx_confirmed_middle">Middle</string>
+    <string name="tx_confirmed_high">High</string>
+    <string name="tx_confirmed" formatted="false"><Data><![CDATA[<font color="#f19322">[%1$s]</font>: Received by <font color="#f19322">%2$d</font> peers]]></Data></string>
+
     <string name="escrow_now">Escrow Now</string>
     <string name="escrow_tip">Need a escrow services?\nTalk width the community\'s largest coinholder.</string>
     <string name="escrow_secure_tip">Making your transactions more secure.</string>
@@ -567,6 +572,7 @@
     <!-- Send text to clipboard -->
     <string name="chatting_resend_failed">Resend failed, please try again later!</string>
     <string name="tx_resend_failed">Resend failed, please try again later!</string>
+    <string name="tx_resend_successful">Resend successful</string>
 
     <string name="home_guide1" formatted="false"><Data><![CDATA[Create coins and trade community for <font color="#f19322">Free</font>]]></Data></string>
     <string name="home_guide2" formatted="false"><Data><![CDATA[Airdrop coins to contacts and emails for <font color="#f19322">Free</font> to expand community.]]></Data></string>

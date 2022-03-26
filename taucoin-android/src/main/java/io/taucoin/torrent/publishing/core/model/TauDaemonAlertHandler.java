@@ -21,6 +21,7 @@ import org.libTAU4j.alerts.BlockChainStateAlert;
 import org.libTAU4j.alerts.BlockChainSyncingBlockAlert;
 import org.libTAU4j.alerts.BlockChainSyncingHeadBlockAlert;
 import org.libTAU4j.alerts.BlockChainTopThreeVotesAlert;
+import org.libTAU4j.alerts.BlockChainTxConfirmAlert;
 import org.libTAU4j.alerts.CommConfirmRootAlert;
 import org.libTAU4j.alerts.CommFriendInfoAlert;
 import org.libTAU4j.alerts.CommLastSeenAlert;
@@ -130,6 +131,9 @@ class TauDaemonAlertHandler {
                 break;
             case BLOCK_CHAIN_STATE:
                 onAccountState(alert, alertAndUser.getUserPk());
+                break;
+            case BLOCK_CHAIN_TX_CONFIRM:
+                onTxConfirmed(alert);
                 break;
             default:
                 logger.info("Unknown alert");
@@ -377,6 +381,18 @@ class TauDaemonAlertHandler {
         Account account = a.get_account();
         byte[] chainID = a.get_chain_id();
         tauListenHandler.onAccountState(chainID, userPk, account);
+    }
+
+    /**
+     * 交易确认
+     * @param alert libTAU上报
+     */
+    private void onTxConfirmed(Alert alert) {
+        BlockChainTxConfirmAlert a = (BlockChainTxConfirmAlert) alert;
+        logger.info(a.get_message());
+        byte[] txID = a.getHash();
+        String peer = a.get_peer();
+        tauListenHandler.onTxConfirmed(txID, peer);
     }
 
     /**

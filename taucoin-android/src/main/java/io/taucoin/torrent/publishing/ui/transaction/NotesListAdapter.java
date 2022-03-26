@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UrlUtil;
@@ -114,6 +116,15 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
                 tvTime = rightBinding.tvTime;
                 headView = rightBinding.leftView;
                 rightBinding.leftView.tvBlacklist.setVisibility(View.GONE);
+                rightBinding.ivResend.setVisibility(isShowBan ? View.VISIBLE : View.GONE);
+                if (isShowBan) {
+                    rightBinding.ivResend.setOnClickListener(v -> {
+                        if (listener != null) {
+                            listener.onResendClick(tx.txID);
+                        }
+                    });
+                }
+
             } else {
                 ItemLeftNoteBinding leftBinding = (ItemLeftNoteBinding) holder.binding;
                 tvMsg = leftBinding.tvMsg;
@@ -194,6 +205,17 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
         void onBanClicked(UserAndTx tx);
         void onItemLongClicked(TextView view, UserAndTx tx);
         void onLinkClick(String link);
+        void onResendClick(String txID);
+    }
+
+    private static boolean isSameConfirms(List<TxConfirm> oldList, List<TxConfirm> newList) {
+        if (null == oldList && null == newList) {
+            return true;
+        } else if ((null == oldList) || (null == newList) ) {
+            return false;
+        } else {
+           return oldList.size() == newList.size();
+        }
     }
 
     private static final DiffUtil.ItemCallback<UserAndTx> diffCallback = new DiffUtil.ItemCallback<UserAndTx>() {
@@ -215,6 +237,9 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
                 isSame = false;
             }
             if (isSame && oldItem.favoriteTime != newItem.favoriteTime) {
+                isSame = false;
+            }
+            if (isSame && !isSameConfirms(oldItem.confirms, newItem.confirms)) {
                 isSame = false;
             }
             return isSame;

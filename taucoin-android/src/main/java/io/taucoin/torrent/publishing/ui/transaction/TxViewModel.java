@@ -182,7 +182,7 @@ public class TxViewModel extends AndroidViewModel {
      */
     void addTransaction(Tx tx) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<String>) emitter -> {
-            String result = createTransaction(tx);
+            String result = createTransaction(tx, false);
             emitter.onNext(result);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
@@ -192,7 +192,7 @@ public class TxViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private String createTransaction(Tx tx) {
+    private String createTransaction(Tx tx, boolean isResend) {
         // 获取当前用户的Seed, 获取公私钥
         User currentUser = userRepo.getCurrentUser();
         byte[] senderSeed = ByteUtil.toByte(currentUser.seed);
@@ -208,7 +208,7 @@ public class TxViewModel extends AndroidViewModel {
                 result = getApplication().getString(R.string.tx_error_send_failed);
                 return result;
             }
-            long timestamp = daemon.getSessionTime();
+            long timestamp = isResend ? tx.timestamp : daemon.getSessionTime();
             byte[] memo = Utils.textStringToBytes(tx.memo);
             byte[] txEncoded = null;
             switch (TxType.valueOf(tx.txType)) {
@@ -232,23 +232,36 @@ public class TxViewModel extends AndroidViewModel {
             if (null == txEncoded) {
                 return result;
             }
-            Transaction transaction = new Transaction(chainID, 0, timestamp, senderPk, tx.fee, txEncoded);
+            Transaction transaction;
+            if (tx.txType == WIRING_TX.getType()) {
+                byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
+                transaction = new Transaction(chainID, 0, timestamp, senderPk, receiverPk,
+                        tx.nonce, tx.amount, tx.fee, txEncoded);
+            } else {
+                transaction = new Transaction(chainID, 0, timestamp, senderPk, tx.fee, txEncoded);
+            }
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
             boolean isSubmitSuccess = daemon.submitTransaction(transaction);
             if (!isSubmitSuccess) {
-                result = getApplication().getString(R.string.tx_error_send_failed);
+                result = isResend ? getApplication().getString(R.string.tx_resend_failed) :
+                        getApplication().getString(R.string.tx_error_send_failed);
                 return result;
             }
-            // 保存交易数据到本地数据库
-            tx.txID = transaction.getTxID().to_hex();
-            tx.timestamp = timestamp;
-            tx.senderPk = currentUser.publicKey;
-            txRepo.addTransaction(tx);
-            logger.debug("createTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
-                    tx.txID, tx.senderPk, tx.receiverPk, tx.memo);
-            addUserInfoToLocal(tx);
-            addMemberInfoToLocal(tx);
-            settingsRepo.lastTxFee(tx.chainID, tx.fee);
+            if (!isResend) {
+                // 保存交易数据到本地数据库
+                tx.txID = transaction.getTxID().to_hex();
+                tx.timestamp = timestamp;
+                tx.senderPk = currentUser.publicKey;
+                txRepo.addTransaction(tx);
+                logger.debug("createTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
+                        tx.txID, tx.senderPk, tx.receiverPk, tx.memo);
+                addUserInfoToLocal(tx);
+                addMemberInfoToLocal(tx);
+                settingsRepo.lastTxFee(tx.chainID, tx.fee);
+            } else {
+                logger.debug("resendTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
+                        transaction.getTxID().to_hex(), tx.senderPk, tx.receiverPk, tx.memo);
+            }
         } catch (Exception e) {
             result = e.getMessage();
             logger.debug("Error adding transaction::{}", result);
@@ -731,5 +744,24 @@ public class TxViewModel extends AndroidViewModel {
     public LiveData<PagedList<UserAndTx>> observerFavorites() {
         return new LivePagedListBuilder<>(
                 queryFavorites(), Page.getPageListConfig()).build();
+    }
+
+    void resendTransaction(String txID) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<String>) emitter -> {
+            logger.debug("resendTransaction txID::{}", txID);
+            Tx tx = txRepo.getTxByTxID(txID);
+            if (tx != null) {
+                String result = createTransaction(tx, true);
+                if (StringUtil.isNotEmpty(result)) {
+                    ToastUtils.showShortToast(result);
+                } else {
+                    ToastUtils.showShortToast(R.string.tx_resend_successful);
+                }
+            }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+        disposables.add(disposable);
     }
 }

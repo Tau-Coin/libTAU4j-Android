@@ -10,6 +10,7 @@ import android.text.style.URLSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
 
 import com.noober.menu.FloatMenu;
@@ -25,13 +26,17 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
@@ -43,6 +48,7 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.DialogTrustBinding;
 import io.taucoin.torrent.publishing.databinding.FragmentTxsTabBinding;
+import io.taucoin.torrent.publishing.databinding.TxConfirmDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
@@ -67,6 +73,8 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     protected CompositeDisposable disposables = new CompositeDisposable();
     private FloatMenu operationsMenu;
     private CommonDialog trustDialog;
+    private CommonDialog confirmsDialog;
+    private Disposable confirmDisposable;
 
     protected boolean isReadOnly;
     protected String chainID;
@@ -255,6 +263,67 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     @Override
     public void onLinkClick(String link) {
         ActivityUtil.openUri(activity, link);
+    }
+
+    @Override
+    public void onResendClick(String txID) {
+        if (confirmDisposable != null) {
+            disposables.remove(confirmDisposable);
+        }
+        confirmDisposable = communityViewModel.observerTxConfirms(txID)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(confirms -> {
+                    showTxConfirmsDialog(txID, confirms);
+                });
+        disposables.add(confirmDisposable);
+    }
+
+    /**
+     * 显示交易确认的对话框
+     */
+    private void showTxConfirmsDialog(String txID, List<TxConfirm> confirms) {
+        int count = null == confirms ? 0 : confirms.size();
+        View confirmRoot = null;
+        if (null == confirmsDialog || !confirmsDialog.isShowing()) {
+            TxConfirmDialogBinding txConfirmBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
+                    R.layout.tx_confirm_dialog, null, false);
+            txConfirmBinding.ivClose.setOnClickListener(v -> {
+                confirmsDialog.closeDialog();
+                if (confirmDisposable != null) {
+                    disposables.remove(confirmDisposable);
+                }
+            });
+            confirmRoot = txConfirmBinding.getRoot();
+            confirmsDialog = new CommonDialog.Builder(activity)
+                    .setContentView(confirmRoot)
+                    .setPositiveButton(R.string.common_resend, (dialog, which) -> {
+                        dialog.cancel();
+                        txViewModel.resendTransaction(txID);
+                        if (confirmDisposable != null) {
+                            disposables.remove(confirmDisposable);
+                        }
+                    }).create();
+            confirmsDialog.show();
+        } else {
+            Window window = confirmsDialog.getWindow();
+            if (window != null) {
+                confirmRoot = window.getDecorView();
+            }
+        }
+        if (confirmRoot != null) {
+            TextView tvStatus = confirmRoot.findViewById(R.id.tv_status);
+            String status;
+            if (count >= 5) {
+                status = getString(R.string.tx_confirmed_high);
+            } else if (count >= 3) {
+                status = getString(R.string.tx_confirmed_middle);
+            } else {
+                status = getString(R.string.tx_confirmed_low);
+            }
+            status = getString(R.string.tx_confirmed, status, count);
+            tvStatus.setText(Html.fromHtml(status));
+        }
     }
 
     /**

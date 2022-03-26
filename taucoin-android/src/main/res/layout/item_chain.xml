@@ -6,27 +6,46 @@
 
     </data>
 
-    <FrameLayout
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/widget_size_15"
-        android:layout_marginStart="@dimen/widget_size_15"
+        android:gravity="center_vertical"
         android:layout_marginTop="@dimen/widget_size_7"
-        android:background="@drawable/white_rect_round_bg_middle_radius">
+        android:layout_marginStart="@dimen/widget_size_15">
 
-        <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
-            android:id="@+id/tv_msg"
+        <ImageView
+            android:id="@+id/iv_resend"
+            android:layout_width="@dimen/widget_size_20"
+            android:layout_height="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_5"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@null"
+            android:src="@mipmap/icon_resend"/>
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:includeFontPadding="false"
-            android:paddingStart="@dimen/widget_size_10"
-            android:paddingEnd="@dimen/widget_size_10"
-            android:paddingTop="@dimen/widget_size_10"
-            android:paddingBottom="@dimen/widget_size_10"
-            tool:text="@string/tx_unknown"
-            android:textColorLink="@color/color_blue_link"
-            android:textAppearance="@style/TextAppearanceBody3"/>
+            android:layout_marginEnd="@dimen/widget_size_15"
+            android:background="@drawable/white_rect_round_bg_middle_radius">
 
-    </FrameLayout>
+            <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
+                android:id="@+id/tv_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:paddingStart="@dimen/widget_size_10"
+                android:paddingEnd="@dimen/widget_size_10"
+                android:paddingTop="@dimen/widget_size_10"
+                android:paddingBottom="@dimen/widget_size_10"
+                tool:text="@string/tx_unknown"
+                android:textColorLink="@color/color_blue_link"
+                android:textAppearance="@style/TextAppearanceBody3"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
 
 </layout>

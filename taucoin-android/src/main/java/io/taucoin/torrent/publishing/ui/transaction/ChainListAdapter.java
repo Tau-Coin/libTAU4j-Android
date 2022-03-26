@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.ui.transaction;
 
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -26,11 +28,13 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
 
     private ClickListener listener;
     private String chainID;
+    private boolean onlyWring;
 
-    ChainListAdapter(ClickListener listener, String chainID) {
+    ChainListAdapter(ClickListener listener, String chainID, boolean onlyWring) {
         super(diffCallback);
         this.listener = listener;
         this.chainID = chainID;
+        this.onlyWring = onlyWring;
     }
 
     @NonNull
@@ -39,7 +43,7 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ItemChainBinding binding = DataBindingUtil.inflate(inflater,
                     R.layout.item_chain, parent, false);
-        return new ViewHolder(binding, listener, chainID);
+        return new ViewHolder(binding, listener, chainID, onlyWring);
     }
 
     @Override
@@ -51,12 +55,14 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
         private ItemChainBinding binding;
         private ClickListener listener;
         private String chainID;
+        private boolean onlyWring;
 
-        ViewHolder(ItemChainBinding binding, ClickListener listener, String chainID) {
+        ViewHolder(ItemChainBinding binding, ClickListener listener, String chainID, boolean onlyWring) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
             this.chainID = chainID;
+            this.onlyWring = onlyWring;
         }
 
         void bind(ViewHolder holder, UserAndTx tx) {
@@ -74,6 +80,16 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
 //            Linkify.addLinks(binding.tvMsg, hash, null);
 
             setClickListener(binding.tvMsg, tx);
+
+            boolean isResend = onlyWring && StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
+            binding.ivResend.setVisibility(isResend ? View.VISIBLE : View.GONE);
+            if (isResend) {
+                binding.ivResend.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onResendClick(tx.txID);
+                    }
+                });
+            }
         }
 
         private void setClickListener(AutoLinkTextView tvMsg, UserAndTx tx) {
@@ -104,6 +120,7 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
         void onItemLongClicked(TextView view, UserAndTx tx);
         void onItemClicked(UserAndTx tx);
         void onLinkClick(String link);
+        void onResendClick(String txID);
     }
 
     private static final DiffUtil.ItemCallback<UserAndTx> diffCallback = new DiffUtil.ItemCallback<UserAndTx>() {
