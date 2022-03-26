@@ -409,6 +409,11 @@ public class ChatViewModel extends AndroidViewModel {
                         pos, pageSize, messages.size());
                 logger.trace("loadMessagesData getMessagesTime::{}", getMessagesTime - startTime);
                 Collections.reverse(messages);
+                for (ChatMsgAndLog msg : messages) {
+                    if (msg.logs != null && msg.logs.size() > 0) {
+                        Collections.sort(msg.logs);
+                    }
+                }
                 long endTime = System.currentTimeMillis();
                 logger.trace("loadMessagesData reverseTime Time::{}", endTime - getMessagesTime);
             } catch (Exception e) {
