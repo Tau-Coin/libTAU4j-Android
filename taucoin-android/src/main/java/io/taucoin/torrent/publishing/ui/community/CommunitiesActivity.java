@@ -95,9 +95,9 @@ public class CommunitiesActivity extends BaseActivity {
     private void loadMemberData(CommunityAndMember member) {
         long power = 0;
         long balance = 0;
-        boolean isReadOnly = true;
+        boolean onChain = false;
         if (member != null) {
-            isReadOnly = member.isReadOnly();
+            onChain = member.onChain();
             power = member.power;
             balance = member.balance;
             long currentTime = DateUtil.getTime();
@@ -112,8 +112,8 @@ public class CommunitiesActivity extends BaseActivity {
         }
         binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(balance));
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
-        binding.itemExpiryDate.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);
-        binding.itemRenewalDate.setVisibility(!isReadOnly ? View.VISIBLE : View.GONE);
+        binding.itemExpiryDate.setVisibility(onChain ? View.VISIBLE : View.GONE);
+        binding.itemRenewalDate.setVisibility(onChain ? View.VISIBLE : View.GONE);
     }
 
     @Override

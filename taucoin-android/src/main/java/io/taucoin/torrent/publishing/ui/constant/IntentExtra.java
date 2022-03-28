@@ -11,13 +11,14 @@ public class IntentExtra {
     public static final String LINK = "link";
     public static final String PUBLIC_KEY = "publicKey";
     public static final String ON_CHAIN = "onChain";
+    public static final String NO_BALANCE = "noBalance";
+    public static final String IS_JOINED = "isJoined";
     public static final String IMMEDIATE_EXECUTION = "immediateExecution";
     public static final String NICK_NAME = "nickname";
     public static final String COIN_NAME = "coinName";
     public static final String CRYPTO_KEY = "cryptoKey";
     public static final String DATA = "data";
     public static final String SCAN_KEY_ONLY = "scanKeyOnly";
-    public static final String READ_ONLY = "readOnly";
     public static final String AIRDROP_COIN = "airdropCoin";
     public static final String TIMESTAMP = "timestamp";
     public static final String ONLY_WIRING = "onlyWiring";

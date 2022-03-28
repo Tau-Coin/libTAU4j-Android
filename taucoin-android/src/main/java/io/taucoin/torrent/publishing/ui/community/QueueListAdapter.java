@@ -23,16 +23,9 @@ import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
  */
 public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAdapter.ViewHolder> {
     private ClickListener listener;
-    private boolean isReadOnly;
     private Account account;
 
-    public QueueListAdapter(ClickListener listener, boolean isReadOnly) {
-        super(diffCallback);
-        this.listener = listener;
-        this.isReadOnly = isReadOnly;
-    }
-
-    QueueListAdapter(ClickListener listener) {
+    public QueueListAdapter(ClickListener listener) {
         super(diffCallback);
         this.listener = listener;
     }
@@ -52,14 +45,7 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
     @Override
     public void onBindViewHolder(@NonNull QueueListAdapter.ViewHolder holder, int position) {
         TxQueueAndStatus tx = getItem(position);
-        holder.bindTransaction(tx, isReadOnly, account, position);
-    }
-
-    public void setReadOnly(boolean isReadOnly) {
-        if (this.isReadOnly != isReadOnly) {
-            this.isReadOnly = isReadOnly;
-            notifyDataSetChanged();
-        }
+        holder.bindTransaction(tx, account, position);
     }
 
     public void setAccount(Account account) {
@@ -88,7 +74,7 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
         /**
          * 绑定交易数据
          */
-        void bindTransaction(TxQueueAndStatus tx, boolean isReadOnly, Account account, int pos) {
+        void bindTransaction(TxQueueAndStatus tx, Account account, int pos) {
             if (null == tx) {
                 return;
             }
@@ -99,13 +85,12 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
             binding.tvProgress.setText(resources.getString(progressText));
             binding.tvProgress.setTextColor(resources.getColor(progressColor));
             binding.tvContent.setText(TxUtils.createSpanTxQueue(tx));
-            binding.ivDelete.setVisibility(isReadOnly || tx.isProcessing() ? View.GONE : View.VISIBLE);
+            binding.ivDelete.setVisibility(tx.isProcessing() ? View.GONE : View.VISIBLE);
             binding.ivDelete.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onDeleteClicked(tx);
                 }
             });
-            binding.ivEdit.setVisibility(isReadOnly ? View.GONE : View.VISIBLE);
             binding.ivEdit.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onEditClicked(tx);
@@ -119,7 +104,7 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
                     errorMsg = resources.getString(R.string.tx_error_nonce_conflict);
                 }
             }
-            binding.tvError.setVisibility((!isReadOnly && StringUtil.isNotEmpty(errorMsg))
+            binding.tvError.setVisibility((StringUtil.isNotEmpty(errorMsg))
                     ? View.VISIBLE : View.GONE);
             binding.tvError.setText(errorMsg);
         }

@@ -7,23 +7,18 @@ import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.MainApplication;
-import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
-import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -45,7 +40,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
     private CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
     private TxQueue txQueue;
-    private boolean isReadOnly;
+    private boolean noBalance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +61,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
             txQueue = getIntent().getParcelableExtra(IntentExtra.BEAN);
-            isReadOnly = getIntent().getBooleanExtra(IntentExtra.READ_ONLY, true);
+            noBalance = getIntent().getBooleanExtra(IntentExtra.NO_BALANCE, true);
             if (txQueue != null) {
                 chainID = txQueue.chainID;
             }
@@ -104,7 +99,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
             String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
             binding.tvFee.setTag(R.id.median_fee, txFee);
 
-            if (isReadOnly) {
+            if (noBalance) {
                 txFeeStr = "0";
             }
             String medianFree = getString(R.string.tx_median_fee, txFeeStr,

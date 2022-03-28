@@ -93,7 +93,7 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
             if (result.isSuccess()) {
                 Intent intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, result.getMsg());
-                intent.putExtra(IntentExtra.READ_ONLY, true);
+                intent.putExtra(IntentExtra.ON_CHAIN, false);
                 intent.putExtra(IntentExtra.OPEN_COMMUNITY, true);
                 ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
                         TX_REQUEST_CODE);

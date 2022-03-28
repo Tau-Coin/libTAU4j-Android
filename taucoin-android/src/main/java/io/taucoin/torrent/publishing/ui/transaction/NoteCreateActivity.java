@@ -32,7 +32,8 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
     private ActivityMessageBinding binding;
     private TxViewModel txViewModel;
     private String chainID;
-    private boolean isReadOnly;
+    private boolean onChain;
+    private boolean noBalance;
     private boolean isOpenCommunity;
     private CompositeDisposable disposables = new CompositeDisposable();
 
@@ -54,7 +55,8 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
     private void initParameter() {
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            isReadOnly = getIntent().getBooleanExtra(IntentExtra.READ_ONLY, true);
+            noBalance = getIntent().getBooleanExtra(IntentExtra.NO_BALANCE, true);
+            onChain = getIntent().getBooleanExtra(IntentExtra.ON_CHAIN, false);
             isOpenCommunity = getIntent().getBooleanExtra(IntentExtra.OPEN_COMMUNITY, false);
         }
     }
@@ -68,14 +70,14 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        binding.tvFeeTips.setVisibility(isReadOnly ? View.VISIBLE : View.INVISIBLE);
+        binding.tvFeeTips.setVisibility(!onChain ? View.VISIBLE : View.INVISIBLE);
 
         if (StringUtil.isNotEmpty(chainID)) {
             long txFee = txViewModel.getTxFee(chainID);
             String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
             binding.tvFee.setTag(R.id.median_fee, txFee);
 
-            if (isReadOnly) {
+            if (!onChain || noBalance) {
                 txFeeStr = "0";
             }
             String medianFree = getString(R.string.tx_median_fee, txFeeStr,

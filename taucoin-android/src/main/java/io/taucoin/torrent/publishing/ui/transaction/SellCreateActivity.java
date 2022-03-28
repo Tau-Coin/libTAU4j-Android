@@ -36,7 +36,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     private ActivitySellBinding binding;
     private TxViewModel txViewModel;
     private String chainID;
-    private boolean isReadOnly;
+    private boolean noBalance;
     private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
@@ -57,7 +57,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     private void initParameter() {
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            isReadOnly = getIntent().getBooleanExtra(IntentExtra.READ_ONLY, true);
+            noBalance = getIntent().getBooleanExtra(IntentExtra.NO_BALANCE, true);
         }
     }
 
@@ -79,7 +79,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
             String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
             binding.tvFee.setTag(R.id.median_fee, txFee);
 
-            if (isReadOnly) {
+            if (noBalance) {
                 txFeeStr = "0";
             }
             String medianFree = getString(R.string.tx_median_fee, txFeeStr,

@@ -32,7 +32,7 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
         binding.refreshLayout.setRefreshing(false);
         binding.refreshLayout.setEnabled(false);
 
-        adapter = new QueueListAdapter(this, isReadOnly);
+        adapter = new QueueListAdapter(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         binding.txList.setLayoutManager(layoutManager);
         binding.txList.setAdapter(adapter);
@@ -78,7 +78,7 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
     public void onEditClicked(TxQueueAndStatus tx) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.BEAN, tx);
-        intent.putExtra(IntentExtra.READ_ONLY, false);
+        intent.putExtra(IntentExtra.NO_BALANCE, onBalance);
         ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
     }
 

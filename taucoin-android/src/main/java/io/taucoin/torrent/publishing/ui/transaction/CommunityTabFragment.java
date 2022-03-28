@@ -32,6 +32,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
@@ -76,7 +77,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     private CommonDialog confirmsDialog;
     private Disposable confirmDisposable;
 
-    protected boolean isReadOnly;
+    boolean onBalance = true;
     protected String chainID;
     int currentTab;
     int currentPos = 0;
@@ -109,7 +110,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         communityViewModel = provider.get(CommunityViewModel.class);
         initParameter();
         initView();
-        handleReadOnly(isReadOnly);
     }
 
     /**
@@ -118,7 +118,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     private void initParameter() {
         if(getArguments() != null){
             chainID = getArguments().getString(IntentExtra.CHAIN_ID);
-            isReadOnly = getArguments().getBoolean(IntentExtra.READ_ONLY, false);
+            onBalance = getArguments().getBoolean(IntentExtra.NO_BALANCE, true);
         }
     }
 
@@ -246,9 +246,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
 
     @Override
     public void onTrustClicked(User user) {
-        if (!isReadOnly) {
-            showTrustDialog(user);
-        }
+        showTrustDialog(user);
     }
 
     @Override
@@ -340,7 +338,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
         binding.tvTrustFee.setTag(R.id.median_fee, txFee);
 
-        if (isReadOnly) {
+        if (onBalance) {
             txFeeStr = "0";
         }
         String medianFree = getString(R.string.tx_median_fee, txFeeStr,
@@ -409,11 +407,12 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         }
     }
 
-    public void handleReadOnly(boolean isReadOnly) {
+    public void handleMember(CommunityAndMember member) {
         if (null == binding) {
             return;
         }
-        this.isReadOnly = isReadOnly;
+        onBalance = !member.onChain() || member.noBalance();
+        onBalance = !member.onChain() || member.noBalance();
     }
 
     @Override

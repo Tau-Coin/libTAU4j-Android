@@ -39,7 +39,8 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
     private MemberListAdapter adapter;
     private String chainID;
     private CommonDialog blacklistDialog;
-    private boolean isReadOnly;
+    private boolean isJoined;
+    private boolean noBalance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,8 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
     private void initParameter() {
         if(getIntent() != null){
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            isReadOnly = getIntent().getBooleanExtra(IntentExtra.READ_ONLY, true);
+            isJoined = getIntent().getBooleanExtra(IntentExtra.IS_JOINED, false);
+            noBalance = getIntent().getBooleanExtra(IntentExtra.NO_BALANCE, true);
         }
     }
 
@@ -75,7 +77,7 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        if (isReadOnly) {
+        if (!isJoined || noBalance) {
             binding.itemAddMember.setVisibility(View.GONE);
         }
 

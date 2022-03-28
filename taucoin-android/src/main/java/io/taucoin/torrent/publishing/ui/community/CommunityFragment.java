@@ -56,7 +56,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private int spinnerSelected = 0;
     private String chainID;
     private boolean isJoined = false;
-    private boolean isReadOnly = true;
+    private boolean isOnChain = false;
+    private boolean isNoBalance = true;
     private boolean isFirstLoad = true;
 
     @Nullable
@@ -111,7 +112,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             }
             Intent intent = new Intent();
             intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
+            intent.putExtra(IntentExtra.IS_JOINED, isJoined);
+            intent.putExtra(IntentExtra.NO_BALANCE, isNoBalance);
             ActivityUtil.startActivityForResult(intent, activity, CommunityDetailActivity.class, MEMBERS_REQUEST_CODE);
         });
 
@@ -149,27 +151,22 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             if (!isJoined) {
                 return;
             }
+            Intent intent = new Intent();
+            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+            intent.putExtra(IntentExtra.ON_CHAIN, isOnChain);
+            intent.putExtra(IntentExtra.NO_BALANCE, !isOnChain || isNoBalance);
             switch (currentTab) {
                 case ChainTabFragment.TAB_NOTES:
-                    Intent intent = new Intent();
-                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                    intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
                     ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
                             TX_REQUEST_CODE);
                     break;
                 case ChainTabFragment.TAB_MARKET:
-                    intent = new Intent();
-                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                    intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
                     ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
                             TX_REQUEST_CODE);
                     // market
                     break;
                 case ChainTabFragment.TAB_CHAIN:
                     // chain
-                    intent = new Intent();
-                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                    intent.putExtra(IntentExtra.READ_ONLY, isReadOnly);
                     ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
                             TX_REQUEST_CODE);
                     break;
@@ -193,7 +190,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private void loadTabView(View view) {
         Bundle bundle = new Bundle();
         bundle.putString(IntentExtra.CHAIN_ID, chainID);
-        bundle.putBoolean(IntentExtra.READ_ONLY, isReadOnly);
+        bundle.putBoolean(IntentExtra.ON_CHAIN, isOnChain);
+        bundle.putBoolean(IntentExtra.IS_JOINED, isJoined);
 
         switch (view.getId()) {
             case R.id.tv_notes:
@@ -300,9 +298,10 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
                     isJoined = member.isJoined();
-                    isReadOnly = member.isReadOnly();
+                    isOnChain = member.onChain();
+                    isNoBalance = member.noBalance();
                     if (currentTabFragment != null) {
-                        currentTabFragment.handleReadOnly(isJoined && isReadOnly);
+                        currentTabFragment.handleMember(member);
                         int color = !isJoined ? R.color.gray_light : R.color.primary;
                         binding.fabButton.setMainFabClosedBackgroundColor(getResources().getColor(color));
                     }

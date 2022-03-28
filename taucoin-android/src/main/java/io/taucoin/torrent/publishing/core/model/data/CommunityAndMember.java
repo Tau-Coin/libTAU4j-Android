@@ -19,8 +19,12 @@ public class CommunityAndMember extends Community {
      * 2、最新区块和成员状态时的区块相差Constants.BLOCKS_NOT_PERISHABLE
      * @return read only
      */
-    public boolean isReadOnly() {
-        return (balance <= 0 && power <= 0) || blockNumber < tailBlock;
+    public boolean onChain() {
+        return power > 0 && blockNumber >= tailBlock;
+    }
+
+    public boolean noBalance() {
+        return balance <= 0;
     }
 
     public boolean isJoined() {
