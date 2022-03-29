@@ -933,22 +933,19 @@ public class CommunityViewModel extends AndroidViewModel {
         daemon.unsetPriorityChain(chainID);
     }
 
-    public void batchAddCommunities(String name, int num) {
-        Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+    public Observable<Integer> batchAddCommunities(String name, int num) {
+        return Observable.create(emitter -> {
             if (num > 0) {
                 for (int i = 0; i < num; i++) {
                     String communityName = name + (i + 1);
                     String chainID = daemon.createNewChainID(communityName);
                     Community community = new Community(chainID, communityName);
                     createCommunity(community, null);
+                    emitter.onNext(i + 1);
                 }
             }
-            ToastUtils.showShortToast(R.string.contacts_add_successfully);
             emitter.onComplete();
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
-        disposables.add(disposable);
+        });
     }
 
     /**

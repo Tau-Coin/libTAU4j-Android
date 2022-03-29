@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:background="@color/color_white">
+
+        <io.taucoin.torrent.publishing.ui.customviews.CompletedView
+            android:id="@+id/cv_progress"
+            android:layout_width="@dimen/widget_size_90"
+            android:layout_height="@dimen/widget_size_90"
+            app:radius="@dimen/widget_size_40"
+            app:strokeWidth="@dimen/widget_size_5"
+            app:ringTextSize="@dimen/widget_size_20"
+            app:ringBgColor="@color/gray_light"
+            app:ringColor="@color/color_yellow"
+            app:circleColor="@color/color_white"/>
+
+        <TextView
+            android:id="@+id/tv_num"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:includeFontPadding="false"
+            android:gravity="center_horizontal|center"
+            android:textColor="@color/gray_light"
+            android:textAppearance="@style/TextAppearanceBody3"/>
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:layout_marginTop="@dimen/widget_size_30"
+            android:includeFontPadding="false"
+            android:gravity="center_horizontal|center"
+            android:textColor="@color/color_red"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+    </LinearLayout>
+</layout>

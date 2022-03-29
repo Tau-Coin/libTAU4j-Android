@@ -1091,8 +1091,8 @@ public class UserViewModel extends AndroidViewModel {
         return friendRepo.observeDataSetChanged();
     }
 
-    public void batchAddFriends(String name, int num) {
-        Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+    public Observable<Integer> batchAddFriends(String name, int num) {
+        return Observable.create(emitter -> {
             if (num > 0) {
                 for (int i = 0; i < num; i++) {
                     String friendName = name + (i + 1);
@@ -1100,14 +1100,11 @@ public class UserViewModel extends AndroidViewModel {
                     Pair<byte[], byte[]> keypair = Ed25519.createKeypair(seedBytes);
                     String friendPk = ByteUtil.toHexString(keypair.first);
                     addFriend(friendPk, friendName);
+                    emitter.onNext(i + 1);
                 }
             }
-            ToastUtils.showShortToast(R.string.contacts_add_successfully);
             emitter.onComplete();
-        }).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe();
-        disposables.add(disposable);
+        });
     }
 
     /**
