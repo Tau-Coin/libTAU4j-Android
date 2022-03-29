@@ -22,7 +22,7 @@ public class AirdropUrl {
         chainUrl = url.substring(79);
         ChainURL chainURL = ChainUrlUtil.decode(chainUrl);
         if (chainURL != null) {
-            chainID = ChainIDUtil.decode(chainURL.getChainID());
+            chainID = chainURL.getChainID();
             peers = new ArrayList<>(chainURL.getPeers());
         }
     }

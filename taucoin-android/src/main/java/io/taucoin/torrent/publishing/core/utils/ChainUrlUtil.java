@@ -38,12 +38,11 @@ public class ChainUrlUtil {
      * @return 链URL
      */
     public static String encode(@NonNull String chainID, @NonNull List<String> peers) {
-        byte[] chainIDBytes = ChainIDUtil.encode(chainID);
         Set<String> peersSet = new HashSet<>(peers);
-        ChainURL chainURL = new ChainURL(chainIDBytes, peersSet);
-        byte[] url = chainURL.getURL();
+        ChainURL chainURL = new ChainURL(chainID, peersSet);
 
-        String chainUrl = ChainURL.chainURLBytesToString(url);
+        String chainUrl = chainURL.getStringURL();
+
         if (StringUtil.isNotEmpty(chainUrl)) {
             if (chainUrl.contains(SPACES)) {
                 chainUrl = chainUrl.replaceAll(SPACES, SPACES_REPLACE);

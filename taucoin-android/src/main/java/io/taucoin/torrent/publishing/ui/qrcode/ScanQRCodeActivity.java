@@ -271,7 +271,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
                 logger.debug("scanResult::{}", scanResult);
                 ChainURL decode = ChainUrlUtil.decode(scanResult);
                 if (decode != null) {
-                    String chainID = ChainIDUtil.decode(decode.getChainID());
+                    String chainID = decode.getChainID();
                     openChainLink(chainID, scanResult);
                     return;
                 }

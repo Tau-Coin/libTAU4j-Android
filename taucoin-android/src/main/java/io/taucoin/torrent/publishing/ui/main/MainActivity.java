@@ -452,7 +452,7 @@ public class MainActivity extends ScanTriggerActivity {
         }
         ChainURL decode = ChainUrlUtil.decode(url);
         if (decode != null) {
-            String chainID = ChainIDUtil.decode(decode.getChainID());
+            String chainID = decode.getChainID();
             ExternalLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
                     R.layout.external_link_dialog, null, false);
             dialogBinding.tvName.setText(ChainIDUtil.getName(chainID));
@@ -617,7 +617,7 @@ public class MainActivity extends ScanTriggerActivity {
     private void openExternalChainLink(String link) {
         ChainURL decode = ChainUrlUtil.decode(link);
         if (decode != null) {
-            String chainID = ChainIDUtil.decode(decode.getChainID());
+            String chainID = decode.getChainID();
             disposables.add(communityViewModel.getCommunityByChainIDSingle(chainID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

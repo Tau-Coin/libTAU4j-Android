@@ -246,7 +246,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private void openExternalChainLink(String link) {
         ChainURL decode = ChainUrlUtil.decode(link);
         if (decode != null) {
-            String chainID = ChainIDUtil.decode(decode.getChainID());
+            String chainID = decode.getChainID();
             disposables.add(communityViewModel.getCommunityByChainIDSingle(chainID)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
