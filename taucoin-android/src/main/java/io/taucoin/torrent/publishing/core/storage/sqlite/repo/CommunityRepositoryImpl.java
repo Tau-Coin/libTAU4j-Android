@@ -6,8 +6,8 @@ import android.os.Build;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.room.RxRoom;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
@@ -70,6 +70,15 @@ public class CommunityRepositoryImpl implements CommunityRepository{
         } else {
             return db.communityDao().observeCommunitiesAndFriendsASC();
         }
+    }
+
+    /**
+     * 观察首页数据是否变化
+     * @return Flowable<Object>
+     */
+    public Flowable<Object> observeHomeChanged() {
+        String[] tables = new String[]{"Users","Friends","ChatMessages","Communities","Members","Txs"};
+        return RxRoom.createFlowable(db, tables);
     }
 
     @Override

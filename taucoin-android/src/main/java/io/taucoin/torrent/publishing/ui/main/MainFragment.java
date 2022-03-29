@@ -27,6 +27,7 @@ import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
+import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
@@ -49,6 +50,7 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     private CommunityViewModel communityViewModel;
     private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private boolean dataChanged = false;
 
     @Nullable
     @Override
@@ -100,18 +102,24 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
             }
         });
         showProgressDialog();
+        viewModel.getHomeData().observe(getViewLifecycleOwner(), this::showCommunityList);
     }
 
     private void subscribeMainViewModel() {
-        disposables.add(viewModel.queryCommunitiesAndFriends()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::showCommunityList));
+        viewModel.queryHomeData();
 
-        disposables.add(viewModel.observeCommunitiesAndFriends()
+        disposables.add(viewModel.observeHomeChanged()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::showCommunityList));
+                .subscribe(o -> dataChanged = true));
+
+        disposables.add(ObservableUtil.interval(500)
+                .subscribeOn(Schedulers.io())
+                .subscribe(o -> {
+                    if (dataChanged) {
+                        viewModel.queryHomeData();
+                        dataChanged = false;
+                    }
+                }));
 
         handleWarningView();
         disposables.add(settingsRepo.observeSettingsChanged()
@@ -150,7 +158,7 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
 
     private void showCommunityList(List<CommunityAndFriend> communities) {
         closeProgressDialog();
-        if(communities != null){
+        if (communities != null) {
             adapter.submitList(communities);
         }
     }

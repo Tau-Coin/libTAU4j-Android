@@ -34,6 +34,12 @@ public interface CommunityRepository {
      */
     Flowable<List<CommunityAndFriend>> observeCommunitiesAndFriends();
 
+    /**
+     * 观察首页数据是否变化
+     * @return Flowable<Object>
+     */
+    Flowable<Object> observeHomeChanged();
+
     List<CommunityAndFriend> queryCommunitiesAndFriends();
 
     /**

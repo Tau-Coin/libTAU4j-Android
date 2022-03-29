@@ -412,7 +412,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
             return;
         }
         onBalance = !member.onChain() || member.noBalance();
-        onBalance = !member.onChain() || member.noBalance();
     }
 
     @Override

@@ -10,9 +10,12 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
@@ -28,7 +31,9 @@ public class MainViewModel extends AndroidViewModel {
     private final static Logger logger = LoggerFactory.getLogger("MainViewModel");
     private CommunityRepository communityRepo;
     private TauDaemon daemon;
+    private MutableLiveData<List<CommunityAndFriend>> homeData = new MutableLiveData<>();
     private CompositeDisposable disposables = new CompositeDisposable();
+    private Disposable homeDisposable;
     public MainViewModel(@NonNull Application application) {
         super(application);
         communityRepo = RepositoryHelper.getCommunityRepository(getApplication());
@@ -43,24 +48,44 @@ public class MainViewModel extends AndroidViewModel {
         return communityRepo.observeCommunitiesAndFriends();
     }
 
-    Observable<List<CommunityAndFriend>> queryCommunitiesAndFriends(){
-        return Observable.create(emitter -> {
+    Flowable<Object> observeHomeChanged() {
+        return communityRepo.observeHomeChanged();
+    }
+
+    public MutableLiveData<List<CommunityAndFriend>> getHomeData() {
+        return homeData;
+    }
+
+    /**
+     * 查询首页数据
+     * homeDisposable、observeHomeChanged和intervalSeconds防止多次查询数据
+     */
+    void queryHomeData() {
+        if (homeDisposable != null && !homeDisposable.isDisposed()) {
+            return;
+        }
+        homeDisposable = Observable.create((ObservableOnSubscribe<List<CommunityAndFriend>>)
+                 emitter -> {
             long start = DateUtil.getMillisTime();
             List<CommunityAndFriend> list = communityRepo.queryCommunitiesAndFriends();
             if (null == list) {
                 list = new ArrayList<>();
             }
             long end = DateUtil.getMillisTime();
-            logger.debug("queryCommunitiesAndFriends time::{}, list::{}", end - start, list.size());
+            logger.debug("queryHomeData time::{}, list::{}", end - start, list.size());
             emitter.onNext(list);
             emitter.onComplete();
-        });
+        }).subscribeOn(Schedulers.io())
+                 .subscribe(list -> homeData.postValue(list));
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
         disposables.clear();
+        if (homeDisposable != null && !homeDisposable.isDisposed()) {
+            homeDisposable.dispose();
+        }
     }
 
     /**
