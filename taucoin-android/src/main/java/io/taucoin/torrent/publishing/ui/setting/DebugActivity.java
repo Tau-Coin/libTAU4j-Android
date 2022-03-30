@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.Observable;
@@ -17,7 +18,6 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityDebugBinding;
 import io.taucoin.torrent.publishing.databinding.DebugDialogBinding;
-import io.taucoin.torrent.publishing.databinding.ReloadChainDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
@@ -35,6 +35,12 @@ public class DebugActivity extends BaseActivity implements View.OnClickListener 
     private TauDaemon tauDaemon;
     private CommonDialog debugDialog;
     private Disposable debugDisposable;
+    private static boolean NON_REFERABLE = true;
+
+    @Override
+    public void triggerSearch(String query, @Nullable Bundle appSearchData) {
+        super.triggerSearch(query, appSearchData);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +61,7 @@ public class DebugActivity extends BaseActivity implements View.OnClickListener 
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(R.string.debug_title);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        binding.tvNonReferable.setText(getString(R.string.debug_set_non_referable, !NON_REFERABLE));
     }
     @Override
     public void onStart() {
@@ -90,6 +97,12 @@ public class DebugActivity extends BaseActivity implements View.OnClickListener 
                     ToastUtils.showShortToast(getString(R.string.debug_update_bootstrap_interval_toast,
                             interval, isSuccess));
                 }
+                break;
+            case R.id.tv_non_referable:
+                NON_REFERABLE = !NON_REFERABLE;
+                tauDaemon.setNonReferable(NON_REFERABLE);
+                binding.tvNonReferable.setText(getString(R.string.debug_set_non_referable, !NON_REFERABLE));
+                ToastUtils.showShortToast(getString(R.string.debug_update_non_referable_toast, NON_REFERABLE));
                 break;
         }
     }

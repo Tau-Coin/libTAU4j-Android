@@ -18,5 +18,7 @@
     <string name="debug_bootstrap_interval_value">60</string>
     <string name="debug_update_bootstrap_interval">Update Bootstrap interval</string>
     <string name="debug_update_bootstrap_interval_toast">Update bootstrap interval::%ds, success::%b</string>
+    <string name="debug_set_non_referable">Set Non Referable = %b</string>
+    <string name="debug_update_non_referable_toast">Non Referable = %b</string>
 
 </resources>

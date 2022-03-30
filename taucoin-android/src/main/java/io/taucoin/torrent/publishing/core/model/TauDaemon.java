@@ -6,6 +6,7 @@ import android.content.Intent;
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
 import org.libTAU4j.Message;
+import org.libTAU4j.SessionHandle;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.Transaction;
@@ -511,6 +512,18 @@ public abstract class TauDaemon {
             if (StringUtil.isNotEmpty(friendPk)) {
                 sessionManager.requestFriendInfo(friendPk);
                 logger.debug("requestFriendInfo::{}", friendPk);
+            }
+        }
+    }
+
+    /**
+     *  设置libTAU Non Referable
+     */
+    public void setNonReferable(boolean nonReferable) {
+        if (isRunning) {
+            if (this.sessionManager != null) {
+                (new SessionHandle(sessionManager.swig())).setNonReferrable(nonReferable);
+                logger.debug("setNonReferable::{}", nonReferable);
             }
         }
     }

@@ -34,9 +34,9 @@
                     android:background="@color/color_white"
                     android:focusableInTouchMode="true"
                     android:focusable="true"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:paddingTop="@dimen/widget_size_20"
-                    android:paddingBottom="@dimen/widget_size_20"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:paddingTop="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_10"
                     android:paddingStart="@dimen/widget_size_20"
                     android:paddingEnd="@dimen/widget_size_20">
 
@@ -59,6 +59,7 @@
                         android:inputType="text"
                         android:textAppearance="@style/TextAppearanceBody1"
                         android:hint="@string/debug_test_hint"
+                        android:textSize="@dimen/font_size_14"
                         android:autofillHints="Friend name prefix" />
 
                     <EditText
@@ -70,6 +71,7 @@
                         android:text="@string/debug_test_num"
                         android:gravity="center_horizontal"
                         android:inputType="number"
+                        android:textSize="@dimen/font_size_14"
                         android:textAppearance="@style/TextAppearanceBody1"
                         android:hint="@string/debug_test_num_hint"
                         android:autofillHints="@string/debug_test_num_hint" />
@@ -83,12 +85,11 @@
                         android:onClick="@{listener::onClick}"
                         android:text="@string/debug_test_add_friends"
                         android:gravity="center_vertical|center"
-                        android:layout_marginEnd="@dimen/widget_size_20"
-                        android:layout_marginTop="@dimen/widget_size_20"
-                        android:minHeight="@dimen/widget_size_44"
+                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:minHeight="@dimen/widget_size_40"
                         android:textColor="@color/color_white"
                         android:background="@drawable/primary_rect_round_bg"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
+                        android:textAppearance="@style/TextAppearanceBody2"/>
 
                 </LinearLayout>
 
@@ -100,8 +101,8 @@
                     android:focusableInTouchMode="true"
                     android:focusable="true"
                     android:layout_marginTop="@dimen/widget_size_10"
-                    android:paddingTop="@dimen/widget_size_20"
-                    android:paddingBottom="@dimen/widget_size_20"
+                    android:paddingTop="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_10"
                     android:paddingStart="@dimen/widget_size_20"
                     android:paddingEnd="@dimen/widget_size_20">
 
@@ -122,6 +123,7 @@
                         android:text="@string/debug_test"
                         android:gravity="center_horizontal"
                         android:inputType="text"
+                        android:textSize="@dimen/font_size_14"
                         android:textAppearance="@style/TextAppearanceBody1"
                         android:hint="@string/debug_test_community_hint"
                         android:autofillHints="Friend name prefix" />
@@ -135,6 +137,7 @@
                         android:text="@string/debug_test_community_num"
                         android:gravity="center_horizontal"
                         android:inputType="number"
+                        android:textSize="@dimen/font_size_14"
                         android:textAppearance="@style/TextAppearanceBody1"
                         android:hint="@string/debug_test_num_hint"
                         android:autofillHints="@string/debug_test_num_hint" />
@@ -148,12 +151,11 @@
                         android:onClick="@{listener::onClick}"
                         android:text="@string/debug_test_add_communities"
                         android:gravity="center_vertical|center"
-                        android:layout_marginEnd="@dimen/widget_size_20"
-                        android:layout_marginTop="@dimen/widget_size_20"
-                        android:minHeight="@dimen/widget_size_44"
+                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:minHeight="@dimen/widget_size_40"
                         android:textColor="@color/color_white"
                         android:background="@drawable/primary_rect_round_bg"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
+                        android:textAppearance="@style/TextAppearanceBody2"/>
 
                 </LinearLayout>
 
@@ -165,8 +167,8 @@
                     android:focusableInTouchMode="true"
                     android:focusable="true"
                     android:layout_marginTop="@dimen/widget_size_10"
-                    android:paddingTop="@dimen/widget_size_20"
-                    android:paddingBottom="@dimen/widget_size_20"
+                    android:paddingTop="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_10"
                     android:paddingStart="@dimen/widget_size_20"
                     android:paddingEnd="@dimen/widget_size_20">
 
@@ -186,6 +188,7 @@
                         android:layout_gravity="center_vertical"
                         android:gravity="center_horizontal"
                         android:inputType="number"
+                        android:textSize="@dimen/font_size_14"
                         android:text="@string/debug_bootstrap_interval_value"
                         android:textAppearance="@style/TextAppearanceBody1" />
 
@@ -199,11 +202,27 @@
                         android:text="@string/debug_update_bootstrap_interval"
                         android:gravity="center_vertical|center"
                         android:layout_marginEnd="@dimen/widget_size_20"
+                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:textColor="@color/color_white"
+                        android:background="@drawable/primary_rect_round_bg"
+                        android:textAppearance="@style/TextAppearanceBody2"/>
+
+                    <TextView
+                        android:id="@+id/tv_non_referable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:layout_gravity="center_vertical"
+                        android:onClick="@{listener::onClick}"
+                        android:text="@string/debug_set_non_referable"
+                        android:gravity="center_vertical|center"
+                        android:layout_marginEnd="@dimen/widget_size_20"
                         android:layout_marginTop="@dimen/widget_size_20"
                         android:minHeight="@dimen/widget_size_44"
                         android:textColor="@color/color_white"
                         android:background="@drawable/primary_rect_round_bg"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
+                        android:textAppearance="@style/TextAppearanceBody2"/>
 
                 </LinearLayout>
 
