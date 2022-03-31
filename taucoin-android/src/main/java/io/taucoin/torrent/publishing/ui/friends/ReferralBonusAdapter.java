@@ -3,7 +3,6 @@ package io.taucoin.torrent.publishing.ui.friends;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -65,11 +64,13 @@ public class ReferralBonusAdapter extends ListAdapter<Integer, ReferralBonusAdap
                 return;
             }
             Resources resources = binding.getRoot().getContext().getResources();
-            holder.binding.radioButton.setText(resources.getString(R.string.common_percent,
+            holder.binding.tvData.setText(resources.getString(R.string.common_percent,
                     adapter.bonuses[pos]));
-            holder.binding.radioButton.setChecked(adapter.selected == pos);
-            holder.binding.radioButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
+            boolean isSelected = adapter.selected == pos;
+            holder.binding.ivSelector.setImageResource(isSelected ? R.mipmap.icon_radio_button_on :
+                    R.mipmap.icon_radio_button_off);
+            holder.binding.getRoot().setOnClickListener(v -> {
+                if (!isSelected) {
                     adapter.selected = pos;
                     adapter.notifyDataSetChanged();
                 }

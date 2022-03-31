@@ -72,14 +72,17 @@ public class DailyQuotaAdapter extends ListAdapter<Integer, DailyQuotaAdapter.Vi
             } else {
                 limitStr = context.getString(R.string.setting_daily_quota_unit_m, limit);
             }
-            holder.binding.radioButton.setOnCheckedChangeListener(null);
-            holder.binding.radioButton.setText(limitStr);
-            holder.binding.radioButton.setChecked(adapter.selectLimit == limit);
-            holder.binding.radioButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
+            holder.binding.tvData.setText(limitStr);
+            boolean isSelected = adapter.selectLimit == limit;
+            holder.binding.ivSelector.setImageResource(isSelected ? R.mipmap.icon_radio_button_on :
+                    R.mipmap.icon_radio_button_off);
+            holder.binding.getRoot().setOnClickListener(v -> {
+                if (!isSelected) {
                     if (adapter.listener != null) {
                         adapter.listener.onCheckedChanged(adapter.type, limit);
                     }
+                    adapter.selectLimit = limit;
+                    adapter.notifyDataSetChanged();
                 }
             });
         }

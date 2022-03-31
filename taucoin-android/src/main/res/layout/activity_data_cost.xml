@@ -339,16 +339,11 @@
                             android:text="@string/setting_daily_quota"
                             android:textAppearance="@style/TextAppearanceBody1"/>
 
-                        <RadioGroup
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rv_wifi_daily_quota"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"/>
 
-                        </RadioGroup>
                     </LinearLayout>
 
                     <include layout="@layout/view_line"/>
