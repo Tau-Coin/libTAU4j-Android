@@ -13,9 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -73,22 +71,11 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
 
     private void initView() {
         adapter = new MainListAdapter(this);
-//        /*
-//         * A RecyclerView by default creates another copy of the ViewHolder in order to
-//         * fade the views into each other. This causes the problem because the old ViewHolder gets
-//         * the payload but then the new one doesn't. So needs to explicitly tell it to reuse the old one.
-//         */
-        DefaultItemAnimator animator = new DefaultItemAnimator() {
-            @Override
-            public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
-                return true;
-            }
-        };
         binding.refreshLayout.setRefreshing(false);
         binding.refreshLayout.setEnabled(false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         binding.groupList.setLayoutManager(layoutManager);
-        binding.groupList.setItemAnimator(animator);
+        binding.groupList.setItemAnimator(null);
         binding.groupList.setAdapter(adapter);
 
         communityViewModel.getJoinedResult().observe(getViewLifecycleOwner(), result -> {

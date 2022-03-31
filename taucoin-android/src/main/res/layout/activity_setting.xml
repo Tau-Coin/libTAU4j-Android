@@ -97,30 +97,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/widget_size_15"
-                    android:layout_marginEnd="@dimen/widget_size_15"
                     android:layout_marginTop="@dimen/widget_size_7"
                     android:layout_marginBottom="@dimen/widget_size_7"
                     android:includeFontPadding="false"
-                    android:text="@string/setting_key_explain"
+                    android:text="@string/setting_account"
                     android:textColor="@color/gray_dark"
-                    android:textAppearance="@style/TextAppearanceBody2"/>
+                    android:textAppearance="@style/TextAppearanceBody1"/>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/color_white"
-                    android:paddingTop="@dimen/widget_size_10"
-                    android:paddingBottom="@dimen/widget_size_5"
-                    android:paddingStart="@dimen/widget_size_20"
-                    android:paddingEnd="@dimen/widget_size_20">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/primary"
-                        android:text="@string/setting_account"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
+                    android:paddingTop="@dimen/widget_size_0"
+                    android:paddingBottom="@dimen/widget_size_0">
 
                     <TextView
                         android:id="@+id/tv_public_key"
@@ -129,96 +119,92 @@
                         android:layout_marginTop="@dimen/widget_size_10"
                         android:includeFontPadding="false"
                         android:layout_marginBottom="@dimen/widget_size_10"
+                        android:paddingStart="@dimen/widget_size_20"
+                        android:paddingEnd="@dimen/widget_size_20"
                         android:textAppearance="@style/TextAppearanceBody1"/>
 
                     <include
                         layout="@layout/view_line"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/widget_size_1" />
+                        android:layout_height="@dimen/widget_size_1"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginEnd="@dimen/widget_size_20"/>
 
-                    <TextView
+                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/tv_import_new_key"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/color_white"
-                        android:onClick="onClick"
-                        android:paddingStart="@dimen/widget_size_0"
-                        android:paddingEnd="@dimen/widget_size_10"
-                        android:paddingTop="@dimen/widget_size_10"
-                        android:paddingBottom="@dimen/widget_size_10"
-                        android:text="@string/setting_import_seed"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:background="@color/color_white"
-                    android:paddingStart="@dimen/widget_size_20"
-                    android:paddingEnd="@dimen/widget_size_20"
-                    android:paddingTop="@dimen/widget_size_10"
-                    android:paddingBottom="@dimen/widget_size_5">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/setting_community"
-                        android:textAppearance="@style/TextAppearanceBody1"
-                        android:textColor="@color/primary_light"
-                        android:includeFontPadding="false"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:id="@+id/ll_favorites"
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingTop="@dimen/widget_size_7"
                         android:paddingBottom="@dimen/widget_size_7"
+                        android:gravity="center_vertical"
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        android:gravity="center_vertical">
+                        app:leftImage="@mipmap/icon_import"
+                        app:rightText="@string/setting_import_seed"/>
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_favorites"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <ImageView
-                            android:layout_width="@dimen/widget_size_16"
-                            android:layout_height="@dimen/widget_size_16"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/icon_arrow"/>
-
-                    </LinearLayout>
                 </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_15"
+                    android:layout_marginEnd="@dimen/widget_size_15"
+                    android:layout_marginTop="@dimen/widget_size_2"
+                    android:layout_marginBottom="@dimen/widget_size_0"
+                    android:includeFontPadding="false"
+                    android:text="@string/setting_key_explain"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody3"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_15"
+                    android:layout_marginTop="@dimen/widget_size_7"
+                    android:layout_marginBottom="@dimen/widget_size_7"
+                    android:includeFontPadding="false"
+                    android:text="@string/setting_community"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/color_white"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:paddingTop="@dimen/widget_size_10"
-                    android:paddingBottom="@dimen/widget_size_10">
+                    android:paddingTop="@dimen/widget_size_0"
+                    android:paddingBottom="@dimen/widget_size_0">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/ll_favorites"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/setting_title"
-                        android:textAppearance="@style/TextAppearanceBody1"
-                        android:textColor="@color/primary_light"
-                        android:layout_marginStart="@dimen/widget_size_20"
-                        android:layout_marginTop="@dimen/widget_size_0"
-                        android:includeFontPadding="false"
-                        android:textStyle="bold" />
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        android:onClick="onClick"
+                        app:lineRightImage="@mipmap/icon_arrow"
+                        app:lineLeftText="@string/setting_favorites"
+                        app:lineVisibility="false"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_15"
+                    android:layout_marginTop="@dimen/widget_size_7"
+                    android:layout_marginBottom="@dimen/widget_size_7"
+                    android:includeFontPadding="false"
+                    android:text="@string/setting_title"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/color_white"
+                    android:paddingTop="@dimen/widget_size_0"
+                    android:paddingBottom="@dimen/widget_size_0">
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_privacy_security"
@@ -228,16 +214,17 @@
                         android:paddingBottom="@dimen/widget_size_7"
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/widget_size_44"
-                        android:layout_marginTop="@dimen/widget_size_10"
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_privacy_security"
+                        app:rightImage="@mipmap/icon_arrow"
                         app:rightText="@string/setting_privacy_security"/>
 
                     <include
-                        android:layout_marginStart="@dimen/widget_size_55"
-                        layout="@layout/view_line"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/widget_size_1" />
+                        android:layout_height="@dimen/widget_size_1"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        layout="@layout/view_line"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_data_cost"
@@ -249,13 +236,15 @@
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_dashboard"
+                        app:rightImage="@mipmap/icon_arrow"
                         app:rightText="@string/drawer_data_cost"/>
 
                     <include
-                        android:layout_marginStart="@dimen/widget_size_55"
-                        layout="@layout/view_line"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/widget_size_1" />
+                        android:layout_height="@dimen/widget_size_1"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        layout="@layout/view_line"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_font_size"
@@ -267,13 +256,15 @@
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_font_size"
+                        app:rightImage="@mipmap/icon_arrow"
                         app:rightText="@string/setting_font_size"/>
 
                     <include
-                        android:layout_marginStart="@dimen/widget_size_55"
-                        layout="@layout/view_line"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/widget_size_1" />
+                        android:layout_height="@dimen/widget_size_1"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        layout="@layout/view_line"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_help"
@@ -285,6 +276,7 @@
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_help"
+                        app:rightImage="@mipmap/icon_arrow"
                         app:rightText="@string/setting_help"/>
 
                     <LinearLayout
@@ -294,10 +286,11 @@
                         android:layout_height="wrap_content">
 
                         <include
-                            android:layout_marginStart="@dimen/widget_size_55"
-                            layout="@layout/view_line"
                             android:layout_width="match_parent"
-                            android:layout_height="@dimen/widget_size_1" />
+                            android:layout_height="@dimen/widget_size_1"
+                            android:layout_marginStart="@dimen/widget_size_20"
+                            android:layout_marginEnd="@dimen/widget_size_10"
+                            layout="@layout/view_line"/>
 
                         <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                             android:id="@+id/item_debug"
@@ -309,12 +302,13 @@
                             android:minHeight="@dimen/widget_size_44"
                             android:onClick="onClick"
                             app:leftImage="@mipmap/icon_debug"
+                            app:rightImage="@mipmap/icon_arrow"
                             app:rightText="@string/debug_title"/>
 
                     </LinearLayout>
 
                 </LinearLayout>
-                
+
             </LinearLayout>
 
         </ScrollView>

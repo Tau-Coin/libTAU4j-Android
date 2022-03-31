@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/widget_size_0"
-        android:paddingEnd="0dp"
+        android:paddingEnd="@dimen/widget_size_0"
         android:paddingBottom="0dp"
         android:background="@color/color_white">
 
@@ -18,17 +18,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/main_chain_join_success"
-            android:textAppearance="@style/TextAppearanceBody1"/>
-
-        <TextView
-            android:layout_below="@+id/tv_title"
-            android:id="@+id/tv_content"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_15"
             android:textColor="@color/gray_dark"
-            android:text="@string/main_airdrop_link_community"
-            android:textAppearance="@style/TextAppearanceBody2"/>
+            android:layout_marginStart="@dimen/widget_size_15"
+            android:layout_marginEnd="@dimen/widget_size_15"
+            android:lineSpacingExtra="@dimen/widget_size_5"
+            android:textAppearance="@style/TextAppearanceBody1"/>
 
     </RelativeLayout>
 </layout>

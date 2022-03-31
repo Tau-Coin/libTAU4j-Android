@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.ui.setting;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.io.File;
@@ -40,7 +41,7 @@ public class JournalAdapter extends ListAdapter<File, JournalAdapter.ViewHolder>
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(holder, getItem(position));
+        holder.bind(holder, getItem(position), position != getItemCount() - 1);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -55,13 +56,15 @@ public class JournalAdapter extends ListAdapter<File, JournalAdapter.ViewHolder>
             this.listener = listener;
         }
 
-        void bind(ViewHolder holder, File file) {
+        void bind(ViewHolder holder, File file, boolean isShowLine) {
             if(null == holder || null == file){
                 return;
             }
             binding.tvFileName.setText(file.getName());
             String fileSize = Formatter.formatFileSize(context, file.length());
             binding.tvFileSize.setText(fileSize.toUpperCase());
+
+            binding.lineView.setVisibility(isShowLine ? View.VISIBLE : View.INVISIBLE);
 
             binding.ivShare.setOnClickListener(v -> {
                 if(listener != null){

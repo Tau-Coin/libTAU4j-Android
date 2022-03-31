@@ -17,22 +17,16 @@
             android:id="@+id/tv_peer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_0"
+            android:layout_marginStart="@dimen/widget_size_15"
+            android:layout_marginEnd="@dimen/widget_size_15"
             android:textColor="@color/gray_dark"
+            android:lineSpacingExtra="@dimen/widget_size_5"
             android:text="@string/main_airdrop_link_peer"
-            android:textAppearance="@style/TextAppearanceBody2"/>
-
-        <TextView
-            android:layout_below="@+id/tv_peer"
-            android:id="@+id/tv_community"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_15"
-            android:textColor="@color/gray_dark"
-            android:text="@string/main_airdrop_link_community"
             android:textAppearance="@style/TextAppearanceBody1"/>
 
         <TextView
-            android:layout_below="@+id/tv_community"
+            android:layout_below="@+id/tv_peer"
             android:id="@+id/tv_join"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_44"

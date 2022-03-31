@@ -387,7 +387,7 @@ public class TxViewModel extends AndroidViewModel {
         editFeeBinding.etFee.setText(fee);
         editFeeBinding.etFee.setFilters(new InputFilter[]{new MoneyValueFilter()});
         editFeeBinding.tvMedianFee.setText(activity.getString(R.string.tx_median_fee_tips,
-                FmtMicrometer.fmtFeeValue(medianFee)));
+                FmtMicrometer.fmtFeeValue(medianFee), ChainIDUtil.getCoinName(chainID)));
         editFeeDialog = new CommonDialog.Builder(activity)
                 .setContentView(editFeeBinding.getRoot())
                 .setPositiveButton(R.string.common_submit, (dialog, which) -> {

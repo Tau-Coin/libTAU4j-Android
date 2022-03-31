@@ -125,7 +125,6 @@
             android:onClick="@{listener::onClick}"
             android:gravity="center_horizontal|center"
             android:textColor="@color/color_white"
-            android:text="@string/setting_share_journal"
             android:textAppearance="@style/TextAppearanceBody1"
             android:background="@drawable/primary_rect_round_bg"/>
 

@@ -126,10 +126,9 @@
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/primary_light"
+                            android:textColor="@color/gray_dark"
                             android:text="@string/setting_metered_network_title"
                             android:includeFontPadding="false"
-                            android:textStyle="bold"
                             android:textAppearance="@style/TextAppearanceBody1"/>
 
                         <ImageView
@@ -139,7 +138,7 @@
                             android:layout_height="@dimen/widget_size_18"
                             android:layout_marginEnd="@dimen/widget_size_20"
                             android:contentDescription="@null"
-                            android:src="@mipmap/icon_star_yellow"/>
+                            android:src="@mipmap/icon_star"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -310,10 +309,9 @@
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/primary_light"
+                            android:textColor="@color/gray_dark"
                             android:text="@string/setting_wifi_network_title"
                             android:includeFontPadding="false"
-                            android:textStyle="bold"
                             android:textAppearance="@style/TextAppearanceBody1"/>
 
                         <ImageView
@@ -323,7 +321,7 @@
                             android:layout_height="@dimen/widget_size_18"
                             android:layout_marginEnd="@dimen/widget_size_20"
                             android:contentDescription="@null"
-                            android:src="@mipmap/icon_star_yellow"/>
+                            android:src="@mipmap/icon_star"/>
                     </LinearLayout>
 
                     <LinearLayout

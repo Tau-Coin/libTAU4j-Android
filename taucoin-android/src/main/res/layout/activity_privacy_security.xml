@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
@@ -28,132 +29,100 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_15"
+                    android:layout_marginTop="@dimen/widget_size_7"
+                    android:layout_marginBottom="@dimen/widget_size_7"
+                    android:includeFontPadding="false"
+                    android:text="@string/setting_privacy"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/color_white"
-                    android:paddingTop="@dimen/widget_size_20"
-                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingStart="@dimen/widget_size_0"
                     android:paddingEnd="0dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/setting_privacy"
-                        android:textAppearance="@style/TextAppearanceBody1"
-                        android:textColor="@color/primary_light"
-                        android:includeFontPadding="false"
-                        android:textStyle="bold" />
-
-                    <TextView
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_blacklist_users"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_50"
-                        android:includeFontPadding="false"
-                        android:onClick="@{listener::onClick}"
-                        android:layout_marginTop="@dimen/widget_size_10"
-                        android:gravity="center_vertical"
-                        android:text="@string/setting_blacklist_users"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
-
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        android:onClick="onClick"
+                        app:lineRightImage="@mipmap/icon_arrow"
+                        app:lineLeftText="@string/setting_blacklist_users"
+                        app:lineVisibility="false"/>
 
                     <include
-                        android:visibility="gone"
-                        layout="@layout/view_line"/>
+                        layout="@layout/view_line"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/widget_size_1"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginEnd="@dimen/widget_size_20"/>
 
-                    <TextView
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_blacklist_communities"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/widget_size_50"
-                        android:includeFontPadding="false"
-                        android:onClick="@{listener::onClick}"
-                        android:gravity="center_vertical"
-                        android:text="@string/setting_blacklist_communities"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        android:onClick="onClick"
+                        app:lineRightImage="@mipmap/icon_arrow"
+                        app:lineLeftText="@string/setting_blacklist_communities"
+                        app:lineVisibility="false"/>
 
                 </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_15"
+                    android:layout_marginTop="@dimen/widget_size_7"
+                    android:layout_marginBottom="@dimen/widget_size_7"
+                    android:includeFontPadding="false"
+                    android:text="@string/setting_security"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/widget_size_15"
                     android:background="@color/color_white"
-                    android:paddingStart="@dimen/widget_size_20"
-                    android:paddingEnd="@dimen/widget_size_20"
-                    android:paddingTop="@dimen/widget_size_20"
-                    android:paddingBottom="@dimen/widget_size_5">
+                    android:paddingStart="@dimen/widget_size_0"
+                    android:paddingEnd="0dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/setting_security"
-                        android:textAppearance="@style/TextAppearanceBody1"
-                        android:textColor="@color/primary_light"
-                        android:includeFontPadding="false"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/ll_seeds"
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_50"
-                        android:onClick="@{listener::onClick}"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        android:gravity="center_vertical">
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        android:onClick="onClick"
+                        app:lineRightImage="@mipmap/icon_arrow"
+                        app:lineLeftText="@string/setting_seeds"
+                        app:lineVisibility="false"/>
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_seeds"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
+                    <include
+                        layout="@layout/view_line"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/widget_size_1"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginEnd="@dimen/widget_size_20"/>
 
-                        <ImageView
-                            android:layout_width="@dimen/widget_size_16"
-                            android:layout_height="@dimen/widget_size_16"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/icon_arrow"/>
-
-                    </LinearLayout>
-
-                    <include layout="@layout/view_line"/>
-
-                    <LinearLayout
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/ll_devices"
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_50"
-                        android:onClick="@{listener::onClick}"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        android:gravity="center_vertical">
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        android:onClick="onClick"
+                        app:lineRightImage="@mipmap/icon_arrow"
+                        app:lineLeftText="@string/setting_login_devices"
+                        app:lineVisibility="false"/>
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_login_devices"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <ImageView
-                            android:layout_width="@dimen/widget_size_16"
-                            android:layout_height="@dimen/widget_size_16"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/icon_arrow"/>
-
-                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>

@@ -55,7 +55,6 @@ public class JournalActivity extends BaseActivity implements View.OnClickListene
         String path = LogConfigurator.getLogDir() + File.separator;
         fileObserver = new JournalFileObserver(path);
         binding.tvJournalDirectory.setText(path);
-        binding.tvShareAll.setVisibility(View.GONE);
 
         adapter = new JournalAdapter(this);
         DefaultItemAnimator animator = new DefaultItemAnimator() {

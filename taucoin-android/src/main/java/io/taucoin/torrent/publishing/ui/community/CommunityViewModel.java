@@ -71,6 +71,7 @@ import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
@@ -321,17 +322,25 @@ public class CommunityViewModel extends AndroidViewModel {
             String coinName = ChainIDUtil.getCoinName(community.chainID);
             byte[] chainID = ChainIDUtil.encode(community.chainID);
             long timestamp = DateUtil.getMillisTime();
+            String description = getApplication().getString(R.string.tx_community_creator_selling, coinName);
             SellTxContent sellTxContent = new SellTxContent(coinName, 0,
-                    null, null, null);
+                    null, null, description);
             byte[] txEncoded = sellTxContent.getEncoded();
-            Transaction tx = new Transaction(chainID, 0, timestamp, senderPk, 0, txEncoded);
-            tx.sign(currentUser.publicKey, ByteUtil.toHexString(secretKey));
+            Transaction transaction = new Transaction(chainID, 0, timestamp, senderPk, 0, txEncoded);
+            transaction.sign(currentUser.publicKey, ByteUtil.toHexString(secretKey));
 
-            boolean isCreateSuccess = daemon.createNewCommunity(chainID, accounts, tx);
+            boolean isCreateSuccess = daemon.createNewCommunity(chainID, accounts, transaction);
             if (!isCreateSuccess) {
                 result.setFailMsg(getApplication().getString(R.string.community_creation_failed));
                 return result;
             }
+            Tx tx = new Tx(community.chainID, 0, TxType.SELL_TX.getType(), coinName,
+                    0, null, null, description);
+            tx.txID = transaction.getTxID().to_hex();
+            tx.timestamp = timestamp;
+            tx.senderPk = currentUser.publicKey;
+            txRepo.addTransaction(tx);
+
             communityRepo.addCommunity(community);
             logger.debug("Add community to database: communityName={}, chainID={}",
                     community.communityName, community.chainID);

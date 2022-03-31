@@ -30,7 +30,6 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityAirdropCommunityBinding;
 import io.taucoin.torrent.publishing.databinding.ExternalAirdropLinkDialogBinding;
 import io.taucoin.torrent.publishing.databinding.ExternalErrorLinkDialogBinding;
-import io.taucoin.torrent.publishing.databinding.ExternalLinkDialogBinding;
 import io.taucoin.torrent.publishing.databinding.PromptDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
@@ -95,7 +94,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
             }
         });
 
-        binding.llPasteLink.setOnClickListener(v -> {
+        binding.pasteLink.setOnClickListener(v -> {
             handleClipboardContent();
         });
     }
@@ -179,9 +178,6 @@ public class AirdropCommunityActivity extends BaseActivity implements
             String airdropPeerName = UsersUtil.getShowName(null, airdropUrl.getAirdropPeer());
             String airdropPeerTip = getString(R.string.main_airdrop_link_peer, airdropPeerName);
             dialogBinding.tvPeer.setText(Html.fromHtml(airdropPeerTip));
-            String communityName = ChainIDUtil.getName(airdropUrl.getChainID());
-            String communityNameTip = getString(R.string.main_airdrop_link_community, communityName);
-            dialogBinding.tvCommunity.setText(Html.fromHtml(communityNameTip));
             dialogBinding.tvSkip.setOnClickListener(v -> {
                 if (linkDialog != null) {
                     linkDialog.closeDialog();
@@ -277,8 +273,8 @@ public class AirdropCommunityActivity extends BaseActivity implements
         PromptDialogBinding joinBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
                 R.layout.prompt_dialog, null, false);
         String airdropPeerName = UsersUtil.getShowName(null, airdropPeer);
-        String joinSuccess = getString(R.string.main_chain_join_success_tips, airdropPeerName);
-        joinBinding.tvContent.setText(Html.fromHtml(joinSuccess));
+        String joinSuccess = getString(R.string.main_chain_join_success, airdropPeerName);
+        joinBinding.tvTitle.setText(Html.fromHtml(joinSuccess));
         joinDialog = new CommonDialog.Builder(this)
                 .setContentView(joinBinding.getRoot())
                 .setCanceledOnTouchOutside(true)

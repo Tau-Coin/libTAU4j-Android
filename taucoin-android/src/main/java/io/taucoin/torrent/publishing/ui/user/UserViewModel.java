@@ -794,6 +794,9 @@ public class UserViewModel extends AndroidViewModel {
                 ToastUtils.showShortToast(R.string.user_invalid_new_name);
             }
         });
+        if (editNameDialog != null && editNameDialog.isShowing()) {
+            editNameDialog.closeDialog();
+        }
         editNameDialog = new CommonDialog.Builder(activity)
                 .setContentView(binding.getRoot())
                 .setCanceledOnTouchOutside(false)
@@ -968,8 +971,12 @@ public class UserViewModel extends AndroidViewModel {
                 logger.trace("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
                 if (StringUtil.isEquals(showName, defaultName)) {
                     showEditNameDialog(activity, user.publicKey);
+                    showEditNameDialog(activity, user.publicKey);
                 }
             });
+            if (guideDialog != null && guideDialog.isShowing()) {
+                guideDialog.closeDialog();
+            }
             guideDialog = builder.create();
             guideDialog.show();
         }

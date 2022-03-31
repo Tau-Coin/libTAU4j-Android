@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.ui.user;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class HistoryListAdapter extends ListAdapter<User, HistoryListAdapter.Vie
     @Override
     public void onBindViewHolder(@NonNull HistoryListAdapter.ViewHolder holder, int position) {
         User user = getItemKey(position);
-        holder.bindUser(user);
+        holder.bindUser(user, position != getItemCount() - 1);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class HistoryListAdapter extends ListAdapter<User, HistoryListAdapter.Vie
         /**
          * 绑定用户数据
          */
-        void bindUser(User user) {
+        void bindUser(User user, boolean isShowLine) {
             if(null == user){
                 return;
             }
@@ -104,6 +105,7 @@ public class HistoryListAdapter extends ListAdapter<User, HistoryListAdapter.Vie
             Context context = binding.getRoot().getContext();
             binding.tvName.setTextColor(context.getResources().getColor(nameColor));
             binding.tvSeed.setTextColor(context.getResources().getColor(pkColor));
+            binding.lineView.setVisibility(isShowLine ? View.VISIBLE : View.INVISIBLE);
             binding.getRoot().setOnClickListener(view->{
                 if(listener != null && !user.isCurrentUser){
                     listener.onItemClicked(user);

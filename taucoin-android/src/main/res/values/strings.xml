@@ -52,10 +52,8 @@
     <string name="main_error_link">Invalid link!</string>
     <string name="main_error_link_yourself">Airdrop link published by yourself!</string>
     <string name="main_open_link">Open the link?</string>
-    <string name="main_airdrop_link_peer" formatted="false"><Data><![CDATA[<font color="#000000">%1$s</font> send you an airdrop link]]></Data></string>
-    <string name="main_airdrop_link_community" formatted="false"><Data><![CDATA[Welcome to <font color="#000000">%1$s</font>! Check airdrop for fee coins.]]></Data></string>
-    <string name="main_chain_join_success">Happy you join us!</string>
-    <string name="main_chain_join_success_tips" formatted="false"><Data><![CDATA[I\'m <font color="#000000">%1$s</font>, the creator of this community. We are friends now.]]></Data></string>
+    <string name="main_airdrop_link_peer" formatted="false"><Data><![CDATA[<font color="#000000">%1$s</font> sends you an airdrop link to receive free coins.]]></Data></string>
+    <string name="main_chain_join_success" formatted="false"><Data><![CDATA[Welcome to join us. I\'m <font color="#000000">%1$s</font>, the creator of this community.]]></Data></string>
     <string name="main_airdrop_link_share">Share link to airdrop to friends.</string>
 
     <string name="main_publish_video">Publish Video</string>
@@ -71,11 +69,11 @@
 
     <!-- Strings used for main drawer content -->
     <string name="drawer_new_community">New Community</string>
-    <string name="drawer_airdrop_links">Airdrop Links</string>
+    <string name="drawer_airdrop_links">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Friends</string>
-    <string name="drawer_communities">Communities</string>
+    <string name="drawer_communities">Community Coins</string>
     <string name="drawer_setting">Settings</string>
     <string name="drawer_data_cost">Data Cost</string>
     <string name="drawer_working_condition">Working Condition</string>
@@ -97,7 +95,7 @@
     <string name="menu_community_info">Community Info</string>
 
     <string name="community_settings">Settings</string>
-    <string name="community_chain_status">Chain Status</string>
+    <string name="community_chain_status">Blockchain Status</string>
     <string name="community_blacklist">Ban This Community</string>
     <string name="community_members">Members</string>
     <string name="community_sync_rate">Sync Rate</string>
@@ -162,7 +160,7 @@
     <string name="community_view_onchain_txs">View Onchain Transactions</string>
     <string name="community_view_wiring_txs">View Wiring Transactions</string>
 
-    <string name="chain_mining_time">Mining Time</string>
+    <string name="chain_mining_time">Success Mining Remaining Time</string>
     <string name="chain_mining_time_min_seconds">%1$dmin%2$ds</string>
     <string name="chain_mining_time_seconds">%1$ds</string>
     <string name="chain_difficulty">Difficulty</string>
@@ -202,14 +200,15 @@
     <string name="community_airdrop_coins">Coins/%1$s</string>
     <string name="community_airdrop_fee">Fee/%1$s</string>
 
-    <string name="community_sync_status">External Blocks Pool</string>
+    <string name="community_sync_status">Off-Chain Pool</string>
     <string name="community_external_head_block">External Head Block</string>
     <string name="community_reload_chain">Reload Chain</string>
     <string name="community_reloading">Reloading&#8230;</string>
     <string name="community_head_block">Head Block</string>
     <string name="community_tail_block">Tail Block</string>
     <string name="community_consensus_block">Consensus Block</string>
-    <string name="community_tip_block_txs">Transactions:&#160;</string>
+    <string name="community_tip_block_txs">Transaction:&#160;</string>
+    <string name="community_tip_block_txs_nothing">nothing</string>
     <string name="community_tip_block_timestamp">Timestamp:&#160;</string>
     <string name="community_tip_block_miner">Mined by:&#160;</string>
     <string name="community_tip_block_hash">Hash:&#160;</string>
@@ -223,7 +222,7 @@
     <string name="setting_key_explain">Key is your private secret. Address is your open ID for friends.</string>
     <string name="setting_account">Address</string>
     <string name="setting_nickname">Nickname</string>
-    <string name="setting_import_seed">Import secrete key to change address</string>
+    <string name="setting_import_seed">Import secret key to change address</string>
     <string name="setting_username_app">Nickname in app</string>
     <string name="setting_privacy_security">Privacy and Security</string>
     <string name="setting_community_setting">Community Setting</string>
@@ -246,7 +245,6 @@
     <string name="setting_peers_statistics">24h Peers</string>
     <string name="setting_invoked_requests">24h Invoked Requests</string>
     <string name="setting_journal_path">Journal storage path</string>
-    <string name="setting_share_journal">Share All Journal</string>
     <string name="setting_wifi">WiFi</string>
     <string name="setting_metered">Metered</string>
     <string name="setting_wifi_network_title">WiFi - likely free internet</string>
@@ -270,7 +268,7 @@
     <string name="setting_network_current_speed">Speed</string>
     <string name="setting_fixed_frequency">Frequency</string>
     <string name="setting_fixed_frequency_hint">Please enter a fixed frequency</string>
-    <string name="setting_average_speed">Target Speed </string>
+    <string name="setting_average_speed">Speed Limit</string>
     <string name="setting_network_average_speed">Average Speed</string>
     <string name="setting_network_available_data">Today Remaining Data</string>
     <string name="setting_metered_network_limit_speed">%1$s/s</string>
@@ -296,8 +294,8 @@
 
     <!-- Strings used for privacy and security -->
     <string name="setting_privacy">Privacy</string>
-    <string name="setting_blacklist_users">Banlist Users</string>
-    <string name="setting_blacklist_communities">Banlist Communities</string>
+    <string name="setting_blacklist_users">Banned Users</string>
+    <string name="setting_blacklist_communities">Banned Communities</string>
     <string name="setting_Unblock">&#160;Unblock&#160;</string>
     <string name="setting_security">Security</string>
     <string name="setting_seeds">Keys</string>
@@ -310,7 +308,7 @@
     <string name="user_seeds_history">History</string>
     <string name="user_nickname">Nickname (optional)</string>
     <string name="user_remark_hints">Remark (optional)</string>
-    <string name="user_seed_import_hint">Secrete Key (required)</string>
+    <string name="user_seed_import_hint">Secret Key (required)</string>
     <string name="user_seed_import">Import</string>
     <string name="user_seed_generate">Generate New Key</string>
     <string name="user_seed_empty">Key cannot be empty!</string>
@@ -374,6 +372,7 @@
     <string name="tx_operation_copy_hash">Copy Hash</string>
     <string name="tx_operation_copy_previous_hash">Copy Previous Hash</string>
     <string name="tx_operation_copy_miner">Copy Miner</string>
+    <string name="tx_operation_copy_transaction_hash">Copy Transaction Hash</string>
     <string name="tx_operation_select_all">Select All</string>
     <string name="tx_operation_copy_link">Copy link</string>
     <string name="tx_operation_forward">Forward</string>
@@ -386,7 +385,7 @@
     <string name="tx_error_type">No such transaction type!</string>
     <string name="tx_on_chain_msg">On-Chain Message</string>
     <string name="tx_fee_hint">Fee</string>
-    <string name="tx_median_fee_tips">Median fee:%1$s</string>
+    <string name="tx_median_fee_tips">Median fee:%1$s %2$s</string>
     <string name="tx_fee_tips">*The higher fee, the faster the note will be accepted by community.</string>
     <string name="tx_error_invalid_pk">Invalid receiver\'s Public Key!</string>
     <string name="tx_error_invalid_amount">Invalid Transaction amount</string>
@@ -425,6 +424,7 @@
     <string name="tx_sell_direct_talk">Connect</string>
     <string name="tx_sell_add_friend">Add\nFriend</string>
     <string name="tx_unknown">Unknown Transaction</string>
+    <string name="tx_community_creator_selling">This is community creator selling coins anchor. Contact me for %s matter. </string>
 
     <string name="tx_confirmed_low">Low</string>
     <string name="tx_confirmed_middle">Middle</string>
@@ -432,7 +432,7 @@
     <string name="tx_confirmed" formatted="false"><Data><![CDATA[<font color="#f19322">[%1$s]</font>: Received by <font color="#f19322">%2$d</font> peers]]></Data></string>
 
     <string name="escrow_now">Escrow Now</string>
-    <string name="escrow_tip">Need a escrow services?\nTalk width the community\'s largest coinholder.</string>
+    <string name="escrow_tip">Need an escrow service for p2p trading?\nConnect to the largest holder.</string>
     <string name="escrow_secure_tip">Making your transactions more secure.</string>
     <string name="escrow_fee_tip">*The guarantee fee is agreed between the guarantor parties and TAU does not derive any fees from it.</string>
     <string name="escrow_service">Escrow Service</string>
@@ -480,7 +480,7 @@
     <string name="bot_yourself">Yourself</string>
     <string name="bot_title">Bot</string>
     <string name="bot_airdrop">Airdrop</string>
-    <string name="bot_airdrop_paste_link">Paste Third Party Airdrop Link</string>
+    <string name="bot_airdrop_paste_link">Paste Airdrop Link</string>
     <string name="bot_airdrop_history">Airdrop History</string>
     <string name="bot_airdrop_members">Members</string>
     <string name="bot_airdrop_members_error">Members invalid</string>
@@ -508,7 +508,7 @@
     <string name="qr_code_step_two">Scan friend’s QR code</string>
     <string name="qr_code_scan_friend_qr">Scan Friend\'s QR Code</string>
     <string name="qr_code_scan_community_qr">Scan QR Code</string>
-    <string name="qr_code_scan_key_qr">Scan secrete key QR code</string>
+    <string name="qr_code_scan_key_qr">Scan secret key QR code</string>
     <string name="qr_code_scan_qr">Scan QR</string>
     <string name="qr_code_scan_cancelled">Cancelled</string>
     <string name="qr_code_not_found">No QR code found</string>
@@ -575,5 +575,5 @@
     <string name="tx_resend_successful">Resend successful</string>
 
     <string name="home_guide1" formatted="false"><Data><![CDATA[Create coins and trade community for <font color="#f19322">Free</font>]]></Data></string>
-    <string name="home_guide2" formatted="false"><Data><![CDATA[Airdrop coins to contacts and emails for <font color="#f19322">Free</font> to expand community.]]></Data></string>
+    <string name="home_guide2" formatted="false"><Data><![CDATA[Airdrop coins to <font color="#f19322">contacts</font> and emails for <font color="#f19322">Free</font> to expand community.]]></Data></string>
 </resources>

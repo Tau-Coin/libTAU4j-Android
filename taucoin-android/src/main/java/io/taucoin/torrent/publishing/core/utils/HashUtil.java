@@ -105,4 +105,16 @@ public class HashUtil {
         }
         return null;
     }
+
+    public static String hashMiddleHide(String hash) {
+        int startNum = 3;
+        int lastNum = 6;
+        if(StringUtil.isNotEmpty(hash) && hash.length() > startNum + lastNum){
+            String middleHide = hash.substring(0, startNum);
+            middleHide += "***";
+            middleHide += hash.substring(hash.length() - lastNum);
+            return middleHide;
+        }
+        return hash;
+    }
 }

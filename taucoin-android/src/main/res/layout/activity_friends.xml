@@ -19,23 +19,40 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-            android:id="@+id/ll_exchange_qr"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="@{listener::onClick}"
-            app:lineLeftImage="@mipmap/icon_qr_code"
-            app:lineLeftTextStartMargin="@dimen/widget_size_10"
-            app:lineLeftText="@string/contacts_exchange_qr"/>
+            android:background="@color/color_white">
 
-        <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-            android:id="@+id/ll_add_friend"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="@{listener::onClick}"
-            app:lineLeftImage="@mipmap/icon_invite_friends"
-            app:lineLeftTextStartMargin="@dimen/widget_size_10"
-            app:lineLeftText="@string/contacts_import_friend_pk"/>
+            <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                android:id="@+id/ll_exchange_qr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="@{listener::onClick}"
+                app:lineLeftImage="@mipmap/icon_qr_code"
+                app:lineVisibility="false"
+                app:lineLeftTextStartMargin="@dimen/widget_size_10"
+                app:lineLeftText="@string/contacts_exchange_qr"/>
+
+            <include
+                layout="@layout/view_line"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/widget_size_1"
+                android:layout_marginStart="@dimen/widget_size_20"
+                android:layout_marginEnd="@dimen/widget_size_20"/>
+
+            <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                android:id="@+id/ll_add_friend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="@{listener::onClick}"
+                app:lineLeftImage="@mipmap/icon_invite_friends"
+                app:lineVisibility="false"
+                app:lineLeftTextStartMargin="@dimen/widget_size_10"
+                app:lineLeftText="@string/contacts_import_friend_pk"/>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_yourself_tip"

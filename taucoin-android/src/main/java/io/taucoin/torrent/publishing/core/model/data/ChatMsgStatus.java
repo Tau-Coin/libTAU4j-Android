@@ -5,8 +5,8 @@ package io.taucoin.torrent.publishing.core.model.data;
  */
 public enum ChatMsgStatus {
     SEND_FAIL(0, "Send failure"),
-    SENT(1, "Sent, waiting response"),
-    RESEND(2, "Resend, waiting response"),
+    SENT(1, "Sent and waiting for response"),
+    RESEND(2, "Resend and waiting response"),
     CONFIRMED(3, "Received");
 
     private int status;

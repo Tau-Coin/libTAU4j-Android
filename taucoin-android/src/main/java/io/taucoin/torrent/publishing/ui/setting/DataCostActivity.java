@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.ui.setting;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
@@ -90,6 +91,20 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
 
         binding.wifiFixedFrequency.setOnItemSelectedListener(this);
         binding.meteredFixedFrequency.setOnItemSelectedListener(this);
+
+        // 设置Spinner样式
+        ArrayAdapter wifiAdapter = new ArrayAdapter<>(this, R.layout.item_frequency_spinner,
+                getResources().getStringArray(R.array.fixed_frequency));
+        // 设置Spinner弹框样式
+        wifiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.wifiFixedFrequency.setAdapter(wifiAdapter);
+
+        // 设置Spinner样式
+        ArrayAdapter meteredAdapter = new ArrayAdapter<>(this, R.layout.item_frequency_spinner,
+                getResources().getStringArray(R.array.fixed_frequency));
+        // 设置Spinner弹框样式
+        meteredAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.meteredFixedFrequency.setAdapter(meteredAdapter);
     }
 
     private void refreshAllData() {

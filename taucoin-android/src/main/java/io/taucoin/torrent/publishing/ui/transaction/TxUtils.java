@@ -12,15 +12,13 @@ import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.Formatter;
+import io.taucoin.torrent.publishing.core.utils.HashUtil;
 import io.taucoin.torrent.publishing.core.utils.SpanUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 public class TxUtils {
@@ -59,7 +57,7 @@ public class TxUtils {
                     .append(FmtMicrometer.fmtFeeValue(tx.fee))
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
-                    .append(tx.senderPk);
+                    .append(HashUtil.hashMiddleHide(tx.senderPk));
             if (tx.txStatus == 1) {
                 msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                         .append(FmtMicrometer.fmtLong(tx.blockNumber));
@@ -82,11 +80,11 @@ public class TxUtils {
                 .append(FmtMicrometer.fmtFeeValue(tx.fee))
                 .append(" ").append(coinName)
                 .append("\n").append("From: ").setForegroundColor(titleColor)
-                .append(tx.senderPk)
+                .append(HashUtil.hashMiddleHide(tx.senderPk))
                 .append("\n").append("To: ").setForegroundColor(titleColor)
-                .append(tx.receiverPk)
+                .append(HashUtil.hashMiddleHide(tx.receiverPk))
                 .append("\n").append("Hash: ").setForegroundColor(titleColor)
-                .append(tx.txID);
+                .append(HashUtil.hashMiddleHide(tx.txID));
         if (tx.txStatus == 1) {
             msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtLong(tx.blockNumber));
@@ -102,19 +100,23 @@ public class TxUtils {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils()
-                .append("Sell: ").setForegroundColor(titleColor)
-                .append("\n").append(tx.coinName).setFontSize(16, true)
-                .append("\n").append("Quantity: ").setForegroundColor(titleColor)
-                .append(FmtMicrometer.fmtBalance(tx.quantity));
+                .append("Selling: ").setForegroundColor(titleColor)
+                .append(tx.coinName)
+                .append("\n").append("Quantity: ").setForegroundColor(titleColor);
+        if (tx.quantity > 0) {
+            msg.append(FmtMicrometer.fmtBalance(tx.quantity));
+        } else {
+            msg.append("TBD");
+        }
         if (StringUtil.isNotEmpty(tx.link) && tab != CommunityTabFragment.TAB_MARKET) {
             msg.append("\n").append("Link: ").setForegroundColor(titleColor)
                     .append(tx.link);
         }
-        if (StringUtil.isNotEmpty(tx.location)) {
+        if (StringUtil.isNotEmpty(tx.location) && tab != CommunityTabFragment.TAB_MARKET) {
             msg.append("\n").append("Location: ").setForegroundColor(titleColor)
                     .append(tx.location);
         }
-        if (StringUtil.isNotEmpty(tx.memo) && tab != CommunityTabFragment.TAB_MARKET) {
+        if (StringUtil.isNotEmpty(tx.memo)) {
             msg.append("\n").append("Description: ").setForegroundColor(titleColor)
                     .append(tx.memo);
         }
@@ -125,7 +127,7 @@ public class TxUtils {
                     .append(FmtMicrometer.fmtFeeValue(tx.fee))
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
-                    .append(tx.senderPk);
+                    .append(HashUtil.hashMiddleHide(tx.senderPk));
             if (tx.txStatus == 1) {
                 msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                         .append(FmtMicrometer.fmtLong(tx.blockNumber));
@@ -153,7 +155,7 @@ public class TxUtils {
                     .append(FmtMicrometer.fmtFeeValue(tx.fee))
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
-                    .append(tx.senderPk);
+                    .append(HashUtil.hashMiddleHide(tx.senderPk));
             if (tx.txStatus == 1) {
                 msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                         .append(FmtMicrometer.fmtLong(tx.blockNumber));
@@ -178,7 +180,7 @@ public class TxUtils {
                     .append(FmtMicrometer.fmtFeeValue(tx.fee))
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
-                    .append(tx.senderPk);
+                    .append(HashUtil.hashMiddleHide(tx.senderPk));
             if (tx.txStatus == 1) {
                 msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                         .append(FmtMicrometer.fmtLong(tx.blockNumber));
@@ -197,7 +199,7 @@ public class TxUtils {
                 .append(" ")
                 .append(coinName)
                 .append("\n").append("To: ")
-                .append(tx.receiverPk);
+                .append(HashUtil.hashMiddleHide(tx.receiverPk));
         if (tx.nonce > 0) {
             msg.append("\n").append("Nonce: ").append(FmtMicrometer.fmtLong(tx.nonce));
         }
@@ -213,7 +215,7 @@ public class TxUtils {
                 .append("Trust: ")
                 .setForegroundColor(titleColor)
 //                .append(receiverName)
-                .append(tx.receiverPk);
+                .append(HashUtil.hashMiddleHide(tx.receiverPk));
 //                .append(")");
         if (tab == CommunityTabFragment.TAB_CHAIN) {
             String coinName = ChainIDUtil.getCoinName(tx.chainID);
@@ -221,7 +223,7 @@ public class TxUtils {
                     .append(FmtMicrometer.fmtFeeValue(tx.fee))
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
-                    .append(tx.senderPk);
+                    .append(HashUtil.hashMiddleHide(tx.senderPk));
             if (tx.txStatus == 1) {
                 msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                         .append(FmtMicrometer.fmtLong(tx.blockNumber));
@@ -235,14 +237,18 @@ public class TxUtils {
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils()
                 .append(context.getString(R.string.community_tip_block_txs))
-                .setForegroundColor(titleColor)
-                .append(String.valueOf(null == block.txs ? 0 : block.txs.size()))
-                .append("\n").append(context.getString(R.string.community_tip_block_timestamp))
+                .setForegroundColor(titleColor);
+        if (block.txs != null && block.txs.size() > 0) {
+            msg.append(HashUtil.hashMiddleHide(block.txs.get(0).txID));
+        } else {
+            msg.append(context.getString(R.string.community_tip_block_txs_nothing));
+        }
+        msg.append("\n").append(context.getString(R.string.community_tip_block_timestamp))
                 .setForegroundColor(titleColor)
                 .append(DateUtil.formatTime(block.timestamp, DateUtil.pattern6))
                 .append("\n").append(context.getString(R.string.community_tip_block_miner))
                 .setForegroundColor(titleColor)
-                .append("\n").append(block.miner)
+                .append(HashUtil.hashMiddleHide(block.miner))
                 .append("\n").append(context.getString(R.string.community_tip_block_reward))
                 .setForegroundColor(titleColor)
                 .append(FmtMicrometer.fmtBalance(block.rewards))
@@ -251,11 +257,11 @@ public class TxUtils {
          if (StringUtil.isNotEmpty(block.previousBlockHash)) {
              msg.append("\n").append(context.getString(R.string.community_tip_previous_hash))
                      .setForegroundColor(titleColor)
-                     .append("\n").append(block.previousBlockHash);
+                     .append(HashUtil.hashMiddleHide(block.previousBlockHash));
          }
         msg.append("\n").append(context.getString(R.string.community_tip_block_hash))
                 .setForegroundColor(titleColor)
-                .append("\n").append(block.blockHash)
+                .append(HashUtil.hashMiddleHide(block.blockHash))
                 .append("\n").append(context.getString(R.string.community_tip_block_difficulty))
                 .setForegroundColor(titleColor)
                 .append(FmtMicrometer.fmtDecimal(block.difficulty));
@@ -267,7 +273,6 @@ public class TxUtils {
         byte[] payload = tx.getPayload();
 
         boolean isHaveTx = payload != null && payload.length > 0;
-        int txsSize = isHaveTx ? 1 : 0;
         String blockReward = FmtMicrometer.fmtBalance(tx.getFee());
         if (block.getBlockNumber() <= 0) {
             blockReward = FmtMicrometer.fmtBalance(block.getMinerBalance());
@@ -279,14 +284,18 @@ public class TxUtils {
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils()
                 .append(context.getString(R.string.community_tip_block_txs))
-                .setForegroundColor(titleColor)
-                .append(String.valueOf(txsSize))
-                .append("\n").append(context.getString(R.string.community_tip_block_timestamp))
+                .setForegroundColor(titleColor);
+        if (isHaveTx) {
+            msg.append(HashUtil.hashMiddleHide(tx.getTxID().to_hex()));
+        } else {
+            msg.append(context.getString(R.string.community_tip_block_txs_nothing));
+        }
+        msg.append("\n").append(context.getString(R.string.community_tip_block_timestamp))
                 .setForegroundColor(titleColor)
                 .append(DateUtil.formatTime(block.getTimestamp(), DateUtil.pattern6))
                 .append("\n").append(context.getString(R.string.community_tip_block_miner))
                 .setForegroundColor(titleColor)
-                .append("\n").append(ByteUtil.toHexString(block.getMiner()))
+                .append(HashUtil.hashMiddleHide(ByteUtil.toHexString(block.getMiner())))
                 .append("\n").append(context.getString(R.string.community_tip_block_reward))
                 .setForegroundColor(titleColor)
                 .append(blockReward);
@@ -294,11 +303,11 @@ public class TxUtils {
             String previousHash = ByteUtil.toHexString(block.getPreviousBlockHash());
             msg.append("\n").append(context.getString(R.string.community_tip_previous_hash))
                     .setForegroundColor(titleColor)
-                    .append("\n").append(previousHash);
+                    .append(HashUtil.hashMiddleHide(previousHash));
         }
         msg.append("\n").append(context.getString(R.string.community_tip_block_hash))
                 .setForegroundColor(titleColor)
-                .append("\n").append(block.Hash())
+                .append(HashUtil.hashMiddleHide(block.Hash()))
                 .append("\n").append(context.getString(R.string.community_tip_block_difficulty))
                 .setForegroundColor(titleColor)
                 .append(FmtMicrometer.fmtDecimal(block.getCumulativeDifficulty().longValue()));

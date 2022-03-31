@@ -50,8 +50,11 @@
             android:src="@mipmap/icon_share" />
 
         <include
+            android:id="@+id/line_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_1"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
             android:layout_alignParentBottom="true"
             layout="@layout/view_line"/>
     </RelativeLayout>

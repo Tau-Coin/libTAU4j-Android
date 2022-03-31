@@ -23,20 +23,35 @@
 
         <ImageView
             android:id="@+id/iv_left"
-            android:layout_width="@dimen/widget_size_22"
-            android:layout_height="@dimen/widget_size_22"
+            android:layout_width="@dimen/widget_size_20"
+            android:layout_height="@dimen/widget_size_20"
             android:layout_centerVertical="true"
             android:layout_marginStart="@dimen/widget_size_20"
             android:contentDescription="@null" />
 
-        <TextView
-            android:id="@+id/tv_right"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:includeFontPadding="false"
             android:layout_marginStart="@dimen/widget_size_10"
-            android:textAppearance="@style/TextAppearanceBody1"
-            android:layout_toEndOf="@+id/iv_left" />
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/iv_left" >
+
+            <TextView
+                android:id="@+id/tv_right"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:textAppearance="@style/TextAppearanceBody1" />
+
+            <ImageView
+                android:id="@+id/iv_right"
+                android:layout_width="@dimen/widget_size_16"
+                android:layout_height="@dimen/widget_size_16"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="@null"/>
+        </RelativeLayout>
     </RelativeLayout>
 </layout>
