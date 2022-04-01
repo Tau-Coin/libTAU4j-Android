@@ -107,9 +107,7 @@ public interface TxRepository {
 
     List<UserAndTx> loadAllMarketData(String chainID, int pos, int pageSize);
 
-    List<UserAndTx> loadOnChainAllTxs(String chainID, int pos, int pageSize);
-
-    List<UserAndTx> loadAllWiringTxs(String chainID, int pos, int pageSize);
+    List<UserAndTx> loadChainTxsData(String chainID, int pos, int pageSize);
 
     DataSource.Factory<Integer, UserAndTx> queryFavorites();
 

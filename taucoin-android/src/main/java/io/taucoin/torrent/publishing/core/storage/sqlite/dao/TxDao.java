@@ -72,12 +72,7 @@ public interface TxDao {
             " WHERE tx.chainID = :chainID";
 
     // SQL:查询社区里的交易(上链)
-    String QUERY_GET_ON_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT +
-            " AND tx.txStatus = 1" +
-            QUERY_GET_TXS_ORDER;
-
-    String QUERY_GET_CHAIN_WIRING_TXS = QUERY_GET_CHAIN_TXS_SELECT +
-            " AND tx.txType = 2" +
+    String QUERY_GET_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT +
             QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区里的置顶交易(所有，排除WIRING Tx)
@@ -159,12 +154,8 @@ public interface TxDao {
      * @param chainID 社区链id
      */
     @Transaction
-    @Query(QUERY_GET_ON_CHAIN_ALL_TXS)
-    List<UserAndTx> loadOnChainAllTxs(String chainID, int startPosition, int loadSize);
-
-    @Transaction
-    @Query(QUERY_GET_CHAIN_WIRING_TXS)
-    List<UserAndTx> loadAllWiringTxs(String chainID, int startPosition, int loadSize);
+    @Query(QUERY_GET_CHAIN_ALL_TXS)
+    List<UserAndTx> loadChainTxsData(String chainID, int startPosition, int loadSize);
 
     @Transaction
     @Query(QUERY_GET_AIRDROP_MARKET)

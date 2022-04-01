@@ -18,7 +18,6 @@ import io.taucoin.torrent.publishing.ui.constant.Page;
 public class ChainTabFragment extends CommunityTabFragment implements ChainListAdapter.ClickListener {
 
     private ChainListAdapter adapter;
-    private boolean onlyWring = true;
 
     /**
      * 初始化视图
@@ -26,11 +25,8 @@ public class ChainTabFragment extends CommunityTabFragment implements ChainListA
     @Override
     public void initView() {
         super.initView();
-        if (getArguments() != null) {
-            onlyWring = getArguments().getBoolean(IntentExtra.ONLY_WIRING, true);
-        }
         currentTab = TAB_CHAIN;
-        adapter = new ChainListAdapter(this, chainID, onlyWring);
+        adapter = new ChainListAdapter(this, chainID);
         binding.txList.setAdapter(adapter);
     }
 
@@ -92,6 +88,6 @@ public class ChainTabFragment extends CommunityTabFragment implements ChainListA
     @Override
     public void loadData(int pos) {
         super.loadData(pos);
-        txViewModel.loadChainTxsData(onlyWring, chainID, pos, getItemCount());
+        txViewModel.loadChainTxsData(chainID, pos, getItemCount());
     }
 }

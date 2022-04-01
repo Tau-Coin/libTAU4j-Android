@@ -213,17 +213,14 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             case R.id.tv_chain:
                 // chain
                 spinnerItems = new int[] {R.string.community_view_blocks,
-                        R.string.community_view_queue,
-                        R.string.community_view_onchain_txs,
-                        R.string.community_view_wiring_txs};
-                if (spinnerItems[spinnerSelected] == R.string.community_view_queue) {
+                        R.string.community_view_own_txs,
+                        R.string.community_view_mining_pool};
+                if (spinnerItems[spinnerSelected] == R.string.community_view_own_txs) {
                     currentTabFragment = new QueueTabFragment();
                 } else if (spinnerItems[spinnerSelected] == R.string.community_view_blocks) {
                     currentTabFragment = new BlocksTabFragment();
                 } else {
                     currentTabFragment = new ChainTabFragment();
-                    boolean onlyWiring = spinnerItems[spinnerSelected] == R.string.community_view_wiring_txs;
-                    bundle.putBoolean(IntentExtra.ONLY_WIRING, onlyWiring);
                 }
                 currentTab = CommunityTabFragment.TAB_CHAIN;
                 break;

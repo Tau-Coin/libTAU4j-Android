@@ -51,6 +51,11 @@ public class TxUtils {
             Context context = MainApplication.getInstance();
             int titleColor = context.getResources().getColor(R.color.gray_dark);
             String coinName = ChainIDUtil.getCoinName(tx.chainID);
+            if (tx.txStatus == 1) {
+                msg.append("Status: ").setForegroundColor(titleColor)
+                    .append(context.getString(R.string.community_block_on_chain))
+                    .append("\n");
+            }
             msg.append("Message: ").setForegroundColor(titleColor)
                     .append(tx.memo)
                     .append("\n").append("Fee: ").setForegroundColor(titleColor)
@@ -72,8 +77,13 @@ public class TxUtils {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         String coinName = ChainIDUtil.getCoinName(tx.chainID);
-        SpanUtils msg = new SpanUtils()
-                .append("Amount: ").setForegroundColor(titleColor)
+        SpanUtils msg = new SpanUtils();
+        if (tx.txStatus == 1) {
+            msg.append("Status: ").setForegroundColor(titleColor)
+                    .append(context.getString(R.string.community_block_on_chain))
+                    .append("\n");
+        }
+        msg.append("Amount: ").setForegroundColor(titleColor)
                 .append(FmtMicrometer.fmtBalance(tx.amount))
                 .append(" ").append(coinName)
                 .append("\n").append("Fee: ").setForegroundColor(titleColor)
@@ -99,8 +109,13 @@ public class TxUtils {
     private static SpannableStringBuilder createSpanSellTx(Tx tx, int tab) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
-        SpanUtils msg = new SpanUtils()
-                .append("Selling: ").setForegroundColor(titleColor)
+        SpanUtils msg = new SpanUtils();
+        if (tab == CommunityTabFragment.TAB_CHAIN && tx.txStatus == 1) {
+            msg.append("Status: ").setForegroundColor(titleColor)
+                    .append(context.getString(R.string.community_block_on_chain))
+                    .append("\n");
+        }
+        msg.append("Selling: ").setForegroundColor(titleColor)
                 .append(tx.coinName)
                 .append("\n").append("Quantity: ").setForegroundColor(titleColor);
         if (tx.quantity > 0) {
@@ -139,8 +154,13 @@ public class TxUtils {
     private static SpannableStringBuilder createSpanAirdropTx(Tx tx, int tab) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
-        SpanUtils msg = new SpanUtils()
-                .append("Airdrop: ").setForegroundColor(titleColor)
+        SpanUtils msg = new SpanUtils();
+        if (tab == CommunityTabFragment.TAB_CHAIN && tx.txStatus == 1) {
+            msg.append("Status: ").setForegroundColor(titleColor)
+                    .append(context.getString(R.string.community_block_on_chain))
+                    .append("\n");
+        }
+        msg.append("Airdrop: ").setForegroundColor(titleColor)
                 .append(tx.coinName)
                 .append("\n").append("Link: ").setForegroundColor(titleColor)
                     .append(tx.link);
@@ -167,8 +187,13 @@ public class TxUtils {
     private static SpannableStringBuilder createSpanLeaderTx(Tx tx, int tab) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
-        SpanUtils msg = new SpanUtils()
-                .append(tx.coinName).setForegroundColor(titleColor);
+        SpanUtils msg = new SpanUtils();
+        if (tab == CommunityTabFragment.TAB_CHAIN && tx.txStatus == 1) {
+            msg.append("Status: ").setForegroundColor(titleColor)
+                    .append(context.getString(R.string.community_block_on_chain))
+                    .append("\n");
+        }
+        msg.append(tx.coinName).setForegroundColor(titleColor);
         if (StringUtil.isNotEmpty(tx.memo)) {
             msg.append("\n").append("Description: ").setForegroundColor(titleColor)
                     .append(tx.memo);
@@ -210,13 +235,15 @@ public class TxUtils {
     private static SpannableStringBuilder createSpanTrustTx(UserAndTx tx, int tab) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
-//        String receiverName = UsersUtil.getShowName(tx.receiver);
-        SpanUtils msg = new SpanUtils()
-                .append("Trust: ")
+        SpanUtils msg = new SpanUtils();
+        if (tab == CommunityTabFragment.TAB_CHAIN && tx.txStatus == 1) {
+            msg.append("Status: ").setForegroundColor(titleColor)
+                    .append(context.getString(R.string.community_block_on_chain))
+                    .append("\n");
+        }
+        msg.append("Trust: ")
                 .setForegroundColor(titleColor)
-//                .append(receiverName)
                 .append(HashUtil.hashMiddleHide(tx.receiverPk));
-//                .append(")");
         if (tab == CommunityTabFragment.TAB_CHAIN) {
             String coinName = ChainIDUtil.getCoinName(tx.chainID);
             msg.append("\n").append("Fee: ").setForegroundColor(titleColor)

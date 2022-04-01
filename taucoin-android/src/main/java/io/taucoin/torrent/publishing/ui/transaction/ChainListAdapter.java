@@ -28,13 +28,11 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
 
     private ClickListener listener;
     private String chainID;
-    private boolean onlyWring;
 
-    ChainListAdapter(ClickListener listener, String chainID, boolean onlyWring) {
+    ChainListAdapter(ClickListener listener, String chainID) {
         super(diffCallback);
         this.listener = listener;
         this.chainID = chainID;
-        this.onlyWring = onlyWring;
     }
 
     @NonNull
@@ -43,7 +41,7 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ItemChainBinding binding = DataBindingUtil.inflate(inflater,
                     R.layout.item_chain, parent, false);
-        return new ViewHolder(binding, listener, chainID, onlyWring);
+        return new ViewHolder(binding, listener, chainID);
     }
 
     @Override
@@ -55,14 +53,12 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
         private ItemChainBinding binding;
         private ClickListener listener;
         private String chainID;
-        private boolean onlyWring;
 
-        ViewHolder(ItemChainBinding binding, ClickListener listener, String chainID, boolean onlyWring) {
+        ViewHolder(ItemChainBinding binding, ClickListener listener, String chainID) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
             this.chainID = chainID;
-            this.onlyWring = onlyWring;
         }
 
         void bind(ViewHolder holder, UserAndTx tx) {
@@ -81,7 +77,7 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
 
             setClickListener(binding.tvMsg, tx);
 
-            boolean isResend = onlyWring && StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
+            boolean isResend = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
             binding.ivResend.setVisibility(isResend ? View.VISIBLE : View.GONE);
             if (isResend) {
                 binding.ivResend.setOnClickListener(v -> {

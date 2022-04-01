@@ -572,12 +572,11 @@ public class TxViewModel extends AndroidViewModel {
 
     /**
      * 加载转账交易分页数据
-     * @param onlyWring 仅显示转账交易
      * @param chainID 社区链ID
      * @param pos 分页位置
      * @param initSize 刷新时第一页数据大小
      */
-    void loadChainTxsData(boolean onlyWring, String chainID, int pos, int initSize) {
+    void loadChainTxsData(String chainID, int pos, int initSize) {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
@@ -588,13 +587,9 @@ public class TxViewModel extends AndroidViewModel {
                 if (pos == 0 && initSize > pageSize) {
                     pageSize = initSize;
                 }
-                if (!onlyWring) {
-                    txs = txRepo.loadOnChainAllTxs(chainID, pos, pageSize);
-                } else {
-                    txs = txRepo.loadAllWiringTxs(chainID, pos, pageSize);
-                }
-                logger.trace("loadChainTxsData onlyWring::{}, pos::{}, pageSize::{}, messages.size::{}",
-                        onlyWring, pos, pageSize, txs.size());
+                txs = txRepo.loadChainTxsData(chainID, pos, pageSize);
+                logger.trace("loadChainTxsData, pos::{}, pageSize::{}, messages.size::{}",
+                        pos, pageSize, txs.size());
                 Collections.reverse(txs);
             } catch (Exception e) {
                 logger.error("loadChainTxsData error::", e);

@@ -155,10 +155,9 @@
     <string name="community_view_offchain_notes">View Offchain Notes</string>
     <string name="community_view_airdrop">View Airdrop</string>
     <string name="community_view_sell">View Sell</string>
-    <string name="community_view_queue">View Queue</string>
-    <string name="community_view_blocks">View Blocks</string>
-    <string name="community_view_onchain_txs">View Onchain Transactions</string>
-    <string name="community_view_wiring_txs">View Wiring Transactions</string>
+    <string name="community_view_blocks">Blocks Explorer</string>
+    <string name="community_view_own_txs">Own Transactions</string>
+    <string name="community_view_mining_pool">Mining Pool</string>
 
     <string name="chain_mining_time">Success Mining Remaining Time</string>
     <string name="chain_mining_time_min_seconds">%1$dmin%2$ds</string>

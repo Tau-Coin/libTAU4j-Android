@@ -101,13 +101,8 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public List<UserAndTx> loadOnChainAllTxs(String chainID, int startPos, int loadSize) {
-        return db.txDao().loadOnChainAllTxs(chainID, startPos, loadSize);
-    }
-
-    @Override
-    public List<UserAndTx> loadAllWiringTxs(String chainID, int startPos, int loadSize) {
-        return db.txDao().loadAllWiringTxs(chainID, startPos, loadSize);
+    public List<UserAndTx> loadChainTxsData(String chainID, int startPos, int loadSize) {
+        return db.txDao().loadChainTxsData(chainID, startPos, loadSize);
     }
 
     /**
