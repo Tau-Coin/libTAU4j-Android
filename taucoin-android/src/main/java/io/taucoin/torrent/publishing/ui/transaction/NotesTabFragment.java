@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -58,6 +57,15 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
         binding.etMessage.setOnFocusChangeListener((v, hasFocus) -> {
             isScrollToBottom = true;
             handler.postDelayed(handleUpdateAdapter, 200);
+        });
+
+        binding.etMessage.setOnClickListener(v -> {
+            boolean isVisible = KeyboardUtils.isSoftInputVisible(activity);
+            logger.debug("onSoftInputChanged2::{}", isVisible);
+            if (!isVisible) {
+                isScrollToBottom = true;
+                handler.postDelayed(handleUpdateAdapter, 200);
+            }
         });
 
         showBottomView();

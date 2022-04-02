@@ -54,31 +54,23 @@
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody3"/>
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:id="@+id/middle_view"
+
+                <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
+                    android:id="@+id/tv_msg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@mipmap/icon_chat_left"
                     android:layout_marginTop="@dimen/widget_size_1"
                     android:layout_marginBottom="@dimen/widget_size_3"
                     android:paddingStart="@dimen/widget_size_20"
                     android:paddingEnd="@dimen/widget_size_10"
                     android:paddingTop="@dimen/widget_size_10"
-                    android:paddingBottom="@dimen/widget_size_10">
+                    android:paddingBottom="@dimen/widget_size_10"
+                    android:background="@mipmap/icon_chat_left"
+                    android:includeFontPadding="false"
+                    android:lineSpacingExtra="@dimen/widget_size_5"
+                    android:textColorLink="@color/color_blue_link"
+                    android:textAppearance="@style/TextAppearanceBody3" />
 
-                    <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
-                        android:id="@+id/tv_msg"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:includeFontPadding="false"
-                        android:layout_marginTop="@dimen/widget_size_2"
-                        android:layout_marginBottom="@dimen/widget_size_2"
-                        android:lineSpacingExtra="@dimen/widget_size_5"
-                        android:textColorLink="@color/color_blue_link"
-                        android:textAppearance="@style/TextAppearanceBody3" />
-
-                </LinearLayout>
 
             </LinearLayout>
 

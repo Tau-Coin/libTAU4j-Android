@@ -196,7 +196,9 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
 
                 @Override
                 public void onClick(AutoLinkTextView view) {
-
+                    if (listener != null) {
+                        listener.onItemClicked(msg);
+                    }
                 }
 
                 @Override
@@ -250,6 +252,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
     }
 
     public interface ClickListener {
+        void onItemClicked(ChatMsg msg);
         void onMsgLogsClicked(ChatMsgAndLog msg);
         void onUserClicked(ChatMsg msg);
         void onLongClick(AutoLinkTextView view);

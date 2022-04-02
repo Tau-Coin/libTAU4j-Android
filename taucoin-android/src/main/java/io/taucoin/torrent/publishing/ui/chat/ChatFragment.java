@@ -63,7 +63,7 @@ import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
  * 单个朋友聊天页面
  */
 public class ChatFragment extends BaseFragment implements View.OnClickListener,
-    ChatListAdapter.ClickListener{
+    ChatListAdapter.ClickListener {
 
     private MainActivity activity;
     private static final Logger logger = LoggerFactory.getLogger("ChatFragment");
@@ -374,7 +374,13 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     }
 
     @Override
+    public void onItemClicked(ChatMsg msg) {
+        KeyboardUtils.hideSoftInput(activity);
+    }
+
+    @Override
     public void onMsgLogsClicked(ChatMsgAndLog msg) {
+        KeyboardUtils.hideSoftInput(activity);
         if (logsDisposable != null) {
             disposables.remove(logsDisposable);
         }
@@ -387,6 +393,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
 
     @Override
     public void onUserClicked(ChatMsg msg) {
+        KeyboardUtils.hideSoftInput(activity);
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.PUBLIC_KEY, msg.senderPk);
         intent.putExtra(IntentExtra.TYPE, UserDetailActivity.TYPE_CHAT_PAGE);
@@ -395,6 +402,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
 
     @Override
     public void onLongClick(AutoLinkTextView view) {
+        KeyboardUtils.hideSoftInput(activity);
         List<OperationMenuItem> menuList = new ArrayList<>();
         menuList.add(new OperationMenuItem(R.string.tx_operation_copy));
         final URLSpan[] urls = view.getUrls();
@@ -425,6 +433,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
 
     @Override
     public void onLinkClick(String link) {
+        KeyboardUtils.hideSoftInput(activity);
         ActivityUtil.openUri(activity, link);
     }
 

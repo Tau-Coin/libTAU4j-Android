@@ -169,6 +169,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
      */
     @Override
     public void onItemLongClicked(TextView view, UserAndTx tx) {
+        KeyboardUtils.hideSoftInput(activity);
         List<OperationMenuItem> menuList = new ArrayList<>();
         menuList.add(new OperationMenuItem(R.string.tx_operation_copy));
         final URLSpan[] urls = view.getUrls();
@@ -233,6 +234,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
 
     @Override
     public void onUserClicked(String senderPk) {
+        KeyboardUtils.hideSoftInput(activity);
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.PUBLIC_KEY, senderPk);
         ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
@@ -240,6 +242,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
 
     @Override
     public void onEditNameClicked(String senderPk){
+        KeyboardUtils.hideSoftInput(activity);
         String userPk = MainApplication.getInstance().getPublicKey();
         if (StringUtil.isEquals(userPk, senderPk)) {
             userViewModel.showEditNameDialog(activity, senderPk);
@@ -250,17 +253,20 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
 
     @Override
     public void onBanClicked(UserAndTx tx){
+        KeyboardUtils.hideSoftInput(activity);
         String showName = UsersUtil.getShowName(tx.sender, tx.senderPk);
         userViewModel.showBanDialog(activity, tx.senderPk, showName);
     }
 
     @Override
     public void onTrustClicked(User user) {
+        KeyboardUtils.hideSoftInput(activity);
         showTrustDialog(user);
     }
 
     @Override
     public void onItemClicked(UserAndTx tx) {
+        KeyboardUtils.hideSoftInput(activity);
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.ID, tx.txID);
         intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
@@ -270,11 +276,13 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
 
     @Override
     public void onLinkClick(String link) {
+        KeyboardUtils.hideSoftInput(activity);
         ActivityUtil.openUri(activity, link);
     }
 
     @Override
     public void onResendClick(String txID) {
+        KeyboardUtils.hideSoftInput(activity);
         if (confirmDisposable != null) {
             disposables.remove(confirmDisposable);
         }

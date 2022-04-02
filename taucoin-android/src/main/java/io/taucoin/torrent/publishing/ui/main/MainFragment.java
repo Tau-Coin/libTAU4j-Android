@@ -1,7 +1,6 @@
 package io.taucoin.torrent.publishing.ui.main;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +21,6 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
-import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
@@ -31,9 +29,6 @@ import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.transaction.NoteCreateActivity;
-
-import static io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment.TX_REQUEST_CODE;
 
 /**
  * 群组列表页面
@@ -80,12 +75,10 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
 
         communityViewModel.getJoinedResult().observe(getViewLifecycleOwner(), result -> {
             if (result.isSuccess()) {
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, result.getMsg());
-                intent.putExtra(IntentExtra.ON_CHAIN, false);
-                intent.putExtra(IntentExtra.OPEN_COMMUNITY, true);
-                ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
-                        TX_REQUEST_CODE);
+                Bundle bundle = new Bundle();
+                bundle.putInt(IntentExtra.TYPE, 0);
+                bundle.putString(IntentExtra.ID, result.getMsg());
+                activity.updateMainRightFragment(bundle);
             }
         });
         showProgressDialog();

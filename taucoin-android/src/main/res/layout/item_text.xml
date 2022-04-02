@@ -39,8 +39,8 @@
                 android:layout_height="@dimen/widget_size_40"
                 android:scaleType="centerCrop"/>
 
-            <LinearLayout
-                android:id="@+id/middle_view"
+            <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
+                android:id="@+id/tv_msg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@mipmap/icon_chat_left"
@@ -50,18 +50,11 @@
                 android:paddingEnd="@dimen/widget_size_15"
                 android:paddingTop="@dimen/widget_size_10"
                 android:paddingBottom="@dimen/widget_size_10"
-                android:orientation="vertical">
+                android:gravity="start"
+                android:maxWidth="@dimen/widget_size_220"
+                android:textColorLink="@color/color_blue_link"
+                android:textAppearance="@style/TextAppearanceBody2" />
 
-                <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
-                    android:id="@+id/tv_msg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="start"
-                    android:maxWidth="@dimen/widget_size_220"
-                    android:textColorLink="@color/color_blue_link"
-                    android:textAppearance="@style/TextAppearanceBody2" />
-
-            </LinearLayout>
 
         </LinearLayout>
 
