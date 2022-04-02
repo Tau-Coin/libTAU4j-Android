@@ -12,7 +12,6 @@ import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.databinding.ActivityFontSizeBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
-import io.taucoin.torrent.publishing.core.Constants;
 
 /**
  * 字体大小设置页面
@@ -53,7 +52,8 @@ public class FontSizeActivity extends BaseActivity {
         binding.seekBar.setFontScaleSizes(scaleSizes);
         binding.seekBar.setFontScaleTitles(scaleTitles);
 
-        float fontScaleSize = settingsRepo.getFloatValue(Constants.PREF_KEY_FONT_SCALE_SIZE, 1.0f);
+        String fontKey = getString(R.string.pref_key_font_scale_size);
+        float fontScaleSize = settingsRepo.getFloatValue(fontKey, 1.0f);
         binding.seekBar.setFontScaleSize(fontScaleSize);
         binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override

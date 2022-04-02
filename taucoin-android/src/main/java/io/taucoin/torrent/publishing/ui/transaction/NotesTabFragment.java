@@ -32,7 +32,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
 
     private Handler handler = new Handler();
     private NotesListAdapter adapter;
-    private int filterItem;
     private boolean isUpdateFee = true;
 
     /**
@@ -43,7 +42,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     public void initView() {
         super.initView();
         currentTab = TAB_NOTES;
-        filterItem = R.string.community_view_all;
+        binding.llOnChainCheckBox.setVisibility(View.VISIBLE);
         adapter = new NotesListAdapter(this, chainID, true);
         binding.txList.setAdapter(adapter);
 
@@ -66,6 +65,11 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
                 isScrollToBottom = true;
                 handler.postDelayed(handleUpdateAdapter, 200);
             }
+        });
+
+        binding.cbOnChain.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            isScrollToBottom = true;
+            loadData(0);
         });
 
         showBottomView();
@@ -119,6 +123,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
                 txViewModel.addTransaction(tx);
             }
         } else if (v.getId() == R.id.tv_fee) {
+            KeyboardUtils.hideSoftInput(activity);
             txViewModel.showEditFeeDialog(activity, binding.tvFee, chainID);
         }
     }
@@ -147,6 +152,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
             if (StringUtil.isNotEmpty(result)) {
                 ToastUtils.showShortToast(result);
             } else {
+                binding.cbOnChain.setChecked(false);
                 binding.etMessage.getText().clear();
             }
         });
@@ -219,13 +225,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     }
 
     @Override
-    public void switchView(int filterItem) {
-        super.switchView(filterItem);
-        this.filterItem = filterItem;
-        loadData(0);
-    }
-
-    @Override
     public void handleMember(CommunityAndMember member) {
         super.handleMember(member);
         showBottomView();
@@ -235,7 +234,8 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     @Override
     public void loadData(int pos) {
         super.loadData(pos);
-        txViewModel.loadNotesData(filterItem, chainID, pos, getItemCount());
+        boolean onChain = binding.cbOnChain.isChecked();
+        txViewModel.loadNotesData(onChain, chainID, pos, getItemCount());
     }
 
     @Override

@@ -9,10 +9,10 @@ import android.view.MotionEvent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.Utils;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.ui.customviews.ProgressManager;
 
 public abstract class BaseActivity extends AppCompatActivity implements
@@ -88,7 +88,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         Resources resources = super.getResources();
         DisplayMetrics dm = resources.getDisplayMetrics();
         SettingsRepository settingsRepo = RepositoryHelper.getSettingsRepository(this);
-        float fontScaleSize = settingsRepo.getFloatValue(Constants.PREF_KEY_FONT_SCALE_SIZE, 1.0f);
+        String fontKey = resources.getString(R.string.pref_key_font_scale_size);
+        float fontScaleSize = settingsRepo.getFloatValue(fontKey, 1.0f);
         Configuration configuration = resources.getConfiguration();
         if (fontScaleSize > 0) {
             configuration.fontScale = fontScaleSize;

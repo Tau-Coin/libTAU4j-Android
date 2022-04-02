@@ -22,7 +22,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.CrashHandler;
 import io.taucoin.torrent.publishing.core.utils.FixMemLeak;
 import io.taucoin.torrent.publishing.ui.TauNotifier;
-import io.taucoin.torrent.publishing.core.Constants;
 
 public class MainApplication extends MultiDexApplication {
     static {
@@ -159,7 +158,8 @@ public class MainApplication extends MultiDexApplication {
         Resources resources = super.getResources();
         DisplayMetrics dm = resources.getDisplayMetrics();
         settingsRepo = RepositoryHelper.getSettingsRepository(this);
-        float fontScaleSize = settingsRepo.getFloatValue(Constants.PREF_KEY_FONT_SCALE_SIZE, 1.0f);
+        String fontKey = resources.getString(R.string.pref_key_font_scale_size);
+        float fontScaleSize = settingsRepo.getFloatValue(fontKey, 1.0f);
         android.content.res.Configuration configuration = resources.getConfiguration();
         if (fontScaleSize > 0) {
             configuration.fontScale = fontScaleSize;

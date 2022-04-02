@@ -49,4 +49,6 @@
     <string name="pref_key_community_filters_selected" translatable="false">pref_key_community_filters_selected</string>
 
     <string name="pref_key_battery_level" translatable="false">pref_key_battery_level</string>
+
+    <string name="pref_key_font_scale_size" translatable="false">pref_key_font_scale_size</string>
 </resources>

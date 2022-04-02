@@ -106,15 +106,49 @@
 
                 </RelativeLayout>
 
-                <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
-                    android:id="@+id/tx_list"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/widget_size_0"
-                    android:clipToPadding="false"
-                    android:scrollbars="vertical"
-                    android:focusable="true"
-                    android:scrollbarStyle="outsideOverlay" />
+                    android:layout_height="match_parent">
+
+                    <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                        android:id="@+id/tx_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/widget_size_0"
+                        android:clipToPadding="false"
+                        android:scrollbars="vertical"
+                        android:focusable="true"
+                        android:scrollbarStyle="outsideOverlay" />
+
+                    <LinearLayout
+                        android:visibility="gone"
+                        android:id="@+id/ll_on_chain_check_box"
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/widget_size_2"
+                        android:layout_marginEnd="@dimen/widget_size_5"
+                        android:layout_marginStart="@dimen/widget_size_5"
+                        android:background="@drawable/white_rect_round_bg_no_border">
+
+                        <CheckBox
+                            android:id="@+id/cb_on_chain"
+                            android:layout_width="@dimen/widget_size_26"
+                            android:layout_height="@dimen/widget_size_26"
+                            android:textAppearance="@style/TextAppearanceBody2"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/widget_size_2"
+                            android:layout_marginEnd="@dimen/widget_size_5"
+                            android:text="@string/community_view_onchain_notes"
+                            android:textColor="@color/gray_dark"
+                            android:textAppearance="@style/TextAppearanceBody2"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
 
             </LinearLayout>
 

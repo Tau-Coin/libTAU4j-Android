@@ -494,12 +494,12 @@ public class TxViewModel extends AndroidViewModel {
 
     /**
      * 加载交易Notes分页数据
-     * @param filterItem 用户过滤条件
+     * @param onChain 上链查询条件
      * @param chainID 社区链ID
      * @param pos 分页位置
      * @param initSize 刷新时第一页数据大小
      */
-    void loadNotesData(int filterItem, String chainID, int pos, int initSize) {
+    void loadNotesData(boolean onChain, String chainID, int pos, int initSize) {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
@@ -511,14 +511,14 @@ public class TxViewModel extends AndroidViewModel {
                 if (pos == 0 && initSize > pageSize) {
                     pageSize = initSize;
                 }
-                if (filterItem == R.string.community_view_onchain_notes) {
+                if (onChain) {
                     txs = txRepo.loadOnChainNotesData(chainID, pos, pageSize);
                 } else {
                     txs = txRepo.loadAllNotesData(chainID, pos, pageSize);
                 }
                 long getMessagesTime = System.currentTimeMillis();
-                logger.trace("loadNotesData filterItem::{}, pos::{}, pageSize::{}, messages.size::{}",
-                        application.getString(filterItem), pos, pageSize, txs.size());
+                logger.trace("loadNotesData onChain::{}, pos::{}, pageSize::{}, messages.size::{}",
+                        onChain, pos, pageSize, txs.size());
                 logger.trace("loadNotesData getMessagesTime::{}", getMessagesTime - startTime);
                 Collections.reverse(txs);
             } catch (Exception e) {
