@@ -43,6 +43,7 @@ import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
@@ -77,11 +78,13 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     private CommonDialog confirmsDialog;
     private Disposable confirmDisposable;
 
-    boolean onBalance = true;
+    boolean noBalance = true;
+    boolean isJoined = false;
+    boolean onChain = false;
     protected String chainID;
     int currentTab;
     int currentPos = 0;
-    private boolean isScrollToBottom = true;
+    boolean isScrollToBottom = true;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -118,7 +121,9 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     private void initParameter() {
         if(getArguments() != null){
             chainID = getArguments().getString(IntentExtra.CHAIN_ID);
-            onBalance = getArguments().getBoolean(IntentExtra.NO_BALANCE, true);
+            noBalance = getArguments().getBoolean(IntentExtra.NO_BALANCE, true);
+            isJoined = getArguments().getBoolean(IntentExtra.IS_JOINED, false);
+            onChain = getArguments().getBoolean(IntentExtra.ON_CHAIN, false);
         }
     }
 
@@ -219,6 +224,11 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
             }
         });
         operationsMenu.show(activity.getPoint());
+    }
+
+    @Override
+    public void onItemClicked(TextView view, UserAndTx tx) {
+        KeyboardUtils.hideSoftInput(activity);
     }
 
     @Override
@@ -338,7 +348,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
         binding.tvTrustFee.setTag(R.id.median_fee, txFee);
 
-        if (onBalance) {
+        if (noBalance) {
             txFeeStr = "0";
         }
         String medianFree = getString(R.string.tx_median_fee, txFeeStr,
@@ -411,7 +421,9 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         if (null == binding) {
             return;
         }
-        onBalance = !member.onChain() || member.noBalance();
+        noBalance = !member.onChain() || member.noBalance();
+        onChain = member.onChain();
+        isJoined = member.isJoined();
     }
 
     @Override
@@ -452,4 +464,9 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     public void switchView(int spinnerItem) {
         this.isScrollToBottom = true;
     }
+
+    /**
+     * 消除子fragment和父fragment渲染速度不一致，造成的视觉效果
+     */
+    public void hideView() { }
 }

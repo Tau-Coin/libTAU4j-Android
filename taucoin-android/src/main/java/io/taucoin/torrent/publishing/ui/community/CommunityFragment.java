@@ -3,11 +3,15 @@ package io.taucoin.torrent.publishing.ui.community;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +25,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
@@ -102,7 +107,10 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             binding.toolbarInclude.tvTitle.setText(Html.fromHtml(communityName));
             binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats, 0));
         }
-        binding.toolbarInclude.ivBack.setOnClickListener(v -> activity.goBack());
+        binding.toolbarInclude.ivBack.setOnClickListener(v -> {
+            KeyboardUtils.hideSoftInput(activity);
+            activity.goBack();
+        });
         binding.toolbarInclude.tvSubtitle.setVisibility(View.VISIBLE);
         binding.toolbarInclude.ivAction.setVisibility(View.VISIBLE);
         binding.toolbarInclude.ivAction.setImageResource(R.mipmap.icon_community_detail);
@@ -146,8 +154,13 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
      * 初始化右下角悬浮按钮组件
      */
     private void initFabSpeedDial() {
+        FloatingActionButton mainFab = binding.fabButton.getMainFab();
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mainFab.getLayoutParams();
+        layoutParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL;
+        mainFab.setLayoutParams(layoutParams);
+        mainFab.setCustomSize(getResources().getDimensionPixelSize(R.dimen.widget_size_50));
         // 自定义点击事件
-        binding.fabButton.getMainFab().setOnClickListener(v ->{
+        binding.fabButton.getMainFab().setOnClickListener(v -> {
             if (!isJoined) {
                 return;
             }
@@ -188,17 +201,23 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
      * 加载Tab视图
      */
     private void loadTabView(View view) {
+        KeyboardUtils.hideSoftInput(activity);
+
         Bundle bundle = new Bundle();
         bundle.putString(IntentExtra.CHAIN_ID, chainID);
+        bundle.putBoolean(IntentExtra.NO_BALANCE, isNoBalance);
         bundle.putBoolean(IntentExtra.ON_CHAIN, isOnChain);
         bundle.putBoolean(IntentExtra.IS_JOINED, isJoined);
+
+        if (currentTabFragment != null) {
+            currentTabFragment.hideView();
+        }
 
         switch (view.getId()) {
             case R.id.tv_notes:
                 // note
                 spinnerItems = new int[] {R.string.community_view_all,
-                        R.string.community_view_onchain_notes,
-                        R.string.community_view_offchain_notes};
+                        R.string.community_view_onchain_notes};
                 currentTabFragment = new NotesTabFragment();
                 currentTab = CommunityTabFragment.TAB_NOTES;
                 break;
@@ -310,28 +329,37 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_notes:
+                onTabClick(v, false);
+                break;
             case R.id.tv_market:
             case R.id.tv_chain:
-                // 避免同一页面多次刷新
-                if (this.selectedView != null && selectedView.getId() == v.getId()) {
-                    return;
-                }
-                if (this.selectedView != null) {
-                    this.selectedView.setBackgroundResource(R.drawable.white_rect_round_bg_no_border);
-                    this.selectedView.setTextColor(getResources().getColor(R.color.gray_dark));
-                }
-                TextView selectedView = (TextView) v;
-                selectedView.setBackgroundResource(R.drawable.yellow_rect_round_border_small_radius);
-                selectedView.setTextColor(getResources().getColor(R.color.color_yellow));
-                this.selectedView = selectedView;
-                this.spinnerSelected = 0;
-                loadTabView(selectedView);
-                refreshSpinnerView();
+                onTabClick(v, true);
                 break;
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
                 break;
         }
+    }
+
+    private void onTabClick(View v, boolean isShow) {
+        // 避免同一页面多次刷新
+        if (this.selectedView != null && selectedView.getId() == v.getId()) {
+            return;
+        }
+        binding.fabButton.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        binding.rlBottom.setVisibility(isShow ? View.VISIBLE : View.GONE);
+
+        if (this.selectedView != null) {
+            this.selectedView.setBackgroundResource(R.drawable.white_rect_round_bg_no_border);
+            this.selectedView.setTextColor(getResources().getColor(R.color.gray_dark));
+        }
+        TextView selectedView = (TextView) v;
+        selectedView.setBackgroundResource(R.drawable.yellow_rect_round_border_small_radius);
+        selectedView.setTextColor(getResources().getColor(R.color.color_yellow));
+        this.selectedView = selectedView;
+        this.spinnerSelected = 0;
+        loadTabView(selectedView);
+        refreshSpinnerView();
     }
 
     @Override

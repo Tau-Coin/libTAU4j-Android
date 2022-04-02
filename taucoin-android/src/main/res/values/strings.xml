@@ -151,8 +151,7 @@
     as much as possible for community data exchange.]]></Data></string>
 
     <string name="community_view_all">View All</string>
-    <string name="community_view_onchain_notes">View Onchain Notes</string>
-    <string name="community_view_offchain_notes">View Offchain Notes</string>
+    <string name="community_view_onchain_notes">Onchain</string>
     <string name="community_view_airdrop">View Airdrop</string>
     <string name="community_view_sell">View Sell</string>
     <string name="community_view_blocks">Blocks Explorer</string>
@@ -351,7 +350,7 @@
     <string name="tx_amount_hint">Amount</string>
     <string name="tx_memo_hint">Memo(optional)</string>
     <string name="tx_set_note_tips">*Send notes with 0 fee to join the community. </string>
-    <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction fee:<font color="#477df9"><u> %1$s </u></font>%2$s]]></Data></string>
+    <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction fee:<font color="#1379D6"><u>&nbsp;&nbsp;%1$s&nbsp;&nbsp;</u></font>%2$s]]></Data></string>
     <string name="tx_new_name">Nick Name(required)</string>
     <string name="tx_personal_profile">Personal profile(Optional)</string>
     <string name="tx_message">Message(required)</string>

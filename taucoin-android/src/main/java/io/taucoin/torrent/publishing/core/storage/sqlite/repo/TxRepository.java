@@ -97,8 +97,6 @@ public interface TxRepository {
 
     List<UserAndTx> loadOnChainNotesData(String chainID, int pos, int pageSize);
 
-    List<UserAndTx> loadOffChainNotesData(String chainID, int pos, int pageSize);
-
     List<UserAndTx> loadAllNotesData(String chainID, int pos, int pageSize);
 
     List<UserAndTx> loadAirdropMarketData(String chainID, int pos, int pageSize);

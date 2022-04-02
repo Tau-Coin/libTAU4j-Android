@@ -190,7 +190,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         User currentUser = MainApplication.getInstance().getCurrentUser();
         String distance = null;
         if (currentUser != null) {
-            if (friend.longitude != 0 && friend.latitude != 0 &&
+            if (friend != null && friend.longitude != 0 && friend.latitude != 0 &&
                     currentUser.longitude != 0 && currentUser.latitude != 0) {
                 distance = GeoUtils.getDistanceStr(friend.longitude, friend.latitude,
                         currentUser.longitude, currentUser.latitude);

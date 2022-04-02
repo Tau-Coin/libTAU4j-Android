@@ -78,7 +78,7 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
     public void onEditClicked(TxQueueAndStatus tx) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.BEAN, tx);
-        intent.putExtra(IntentExtra.NO_BALANCE, onBalance);
+        intent.putExtra(IntentExtra.NO_BALANCE, noBalance);
         ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
     }
 

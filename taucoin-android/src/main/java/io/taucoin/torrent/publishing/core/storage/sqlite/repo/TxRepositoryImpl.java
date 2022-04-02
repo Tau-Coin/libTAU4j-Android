@@ -76,11 +76,6 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public List<UserAndTx> loadOffChainNotesData(String chainID, int startPos, int loadSize) {
-        return db.txDao().loadOffChainNotesData(chainID, startPos, loadSize);
-    }
-
-    @Override
     public List<UserAndTx> loadAllNotesData(String chainID, int startPos, int loadSize) {
         return db.txDao().loadAllNotesData(chainID, startPos, loadSize);
     }

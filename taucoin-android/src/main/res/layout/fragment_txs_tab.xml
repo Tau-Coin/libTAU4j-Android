@@ -7,13 +7,15 @@
             type="android.view.View.OnClickListener" />
     </data>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/refresh_layout"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_width="match_parent">
 
             <LinearLayout
@@ -108,7 +110,7 @@
                     android:id="@+id/tx_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_0"
                     android:clipToPadding="false"
                     android:scrollbars="vertical"
                     android:focusable="true"
@@ -118,5 +120,108 @@
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    </RelativeLayout>
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ll_bottom_input"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/widget_size_5">
+
+            <include
+                android:id="@+id/top_line"
+                layout="@layout/view_line"/>
+
+            <TextView
+                android:id="@+id/tv_fee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/tx_median_fee"
+                android:textColor="@color/gray_dark"
+                android:includeFontPadding="false"
+                android:gravity="start"
+                android:onClick="@{listener::onClick}"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:layout_marginStart="@dimen/widget_size_12"
+                android:layout_marginEnd="@dimen/widget_size_10"
+                android:textAppearance="@style/TextAppearanceBody3"/>
+
+            <TextView
+                android:id="@+id/tv_fee_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tx_set_note_tips"
+                android:textColor="@color/color_blue_link"
+                android:includeFontPadding="false"
+                android:gravity="start"
+                android:onClick="@{listener::onClick}"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:layout_marginStart="@dimen/widget_size_12"
+                android:layout_marginEnd="@dimen/widget_size_10"
+                android:textAppearance="@style/TextAppearanceBody3"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/widget_size_10"
+                android:paddingEnd="@dimen/widget_size_10"
+                android:layout_marginTop="@dimen/widget_size_2"
+                android:background="@color/color_chat_pop"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+                    android:id="@+id/et_message"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:layout_weight="1"
+                    android:paddingStart="@dimen/widget_size_10"
+                    android:paddingEnd="@dimen/widget_size_10"
+                    android:paddingTop="@dimen/widget_size_5"
+                    android:paddingBottom="@dimen/widget_size_5"
+                    android:hint="@string/community_input_hint"
+                    android:maxLines="4"
+                    android:inputType="textMultiLine"
+                    android:autofillHints="@string/community_input_hint"
+                    android:textSize="@dimen/font_size_16"
+                    android:background="@drawable/white_rect_round_bg"/>
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/tv_send"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="false"
+                    android:onClick="@{listener::onClick}"
+                    android:layout_gravity="bottom|center"
+                    android:gravity="center_vertical|center"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:layout_marginBottom="@dimen/widget_size_1"
+                    android:includeFontPadding="false"
+                    android:paddingStart="@dimen/widget_size_7"
+                    android:paddingEnd="@dimen/widget_size_7"
+                    android:paddingTop="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_10"
+                    android:text="@string/tx_send"
+                    android:background="@drawable/primary_rect_round_bg"
+                    android:textColor="@color/color_white"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+                <ImageView
+                    android:visibility="gone"
+                    android:id="@+id/iv_add"
+                    android:layout_width="@dimen/widget_size_28"
+                    android:layout_height="@dimen/widget_size_28"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:layout_gravity="bottom|center"
+                    android:layout_marginBottom="@dimen/widget_size_7"
+                    android:src="@mipmap/icon_add"
+                    android:onClick="@{listener::onClick}"
+                    android:contentDescription="@null"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
 </layout>

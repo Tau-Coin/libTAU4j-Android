@@ -62,10 +62,6 @@ public interface TxDao {
             " AND txStatus = 1" +
             QUERY_GET_TXS_ORDER;
 
-    String QUERY_GET_OFF_CHAIN_NOTES = QUERY_GET_NOTES_SELECT +
-            " AND txStatus = 0" +
-            QUERY_GET_TXS_ORDER;
-
     // SQL:查询社区里的交易(上链)
     String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, 0 AS trusts" +
             " FROM Txs AS tx" +
@@ -172,10 +168,6 @@ public interface TxDao {
     @Transaction
     @Query(QUERY_GET_ON_CHAIN_NOTES)
     List<UserAndTx> loadOnChainNotesData(String chainID, int startPosition, int loadSize);
-
-    @Transaction
-    @Query(QUERY_GET_OFF_CHAIN_NOTES)
-    List<UserAndTx> loadOffChainNotesData(String chainID, int startPosition, int loadSize);
 
     @Transaction
     @Query(QUERY_GET_ALL_NOTES)

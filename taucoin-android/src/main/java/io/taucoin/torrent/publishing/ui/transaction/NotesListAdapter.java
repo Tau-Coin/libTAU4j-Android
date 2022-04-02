@@ -20,6 +20,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
@@ -152,6 +153,12 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
 
             setClickListener(tvMsg, tx);
             setLeftViewClickListener(headView, tx);
+
+            binding.getRoot().setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onItemClicked(tvMsg, tx);
+                }
+            });
         }
 
         private void setLeftViewClickListener(TxLeftViewBinding binding, UserAndTx tx) {
@@ -179,7 +186,9 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
             tvMsg.setAutoLinkListener(new AutoLinkTextView.AutoLinkListener() {
                 @Override
                 public void onClick(AutoLinkTextView view) {
-
+                    if (listener != null) {
+                        listener.onItemClicked(tvMsg, tx);
+                    }
                 }
 
                 @Override
@@ -200,6 +209,7 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
     }
 
     public interface ClickListener {
+        void onItemClicked(TextView view, UserAndTx tx);
         void onUserClicked(String publicKey);
         void onEditNameClicked(String publicKey);
         void onBanClicked(UserAndTx tx);

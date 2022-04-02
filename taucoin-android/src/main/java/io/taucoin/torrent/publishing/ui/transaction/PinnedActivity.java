@@ -159,6 +159,11 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
     }
 
     @Override
+    public void onItemClicked(TextView view, UserAndTx tx) {
+
+    }
+
+    @Override
     public void onUserClicked(String senderPk) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.PUBLIC_KEY, senderPk);

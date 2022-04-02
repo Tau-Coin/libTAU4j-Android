@@ -93,6 +93,7 @@ public class TxViewModel extends AndroidViewModel {
     private TauDaemon daemon;
     private CompositeDisposable disposables = new CompositeDisposable();
     private Disposable loadViewDisposable;
+    private Disposable addTxDisposable;
     private MutableLiveData<List<UserAndTx>> chainTxs = new MutableLiveData<>();
     private MutableLiveData<List<Tx>> trustTxs = new MutableLiveData<>();
     private MutableLiveData<Result> airdropState = new MutableLiveData<>();
@@ -142,6 +143,9 @@ public class TxViewModel extends AndroidViewModel {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
+        if (addTxDisposable != null && !addTxDisposable.isDisposed()) {
+            addTxDisposable.dispose();
+        }
     }
 
     public MutableLiveData<Result> getAirdropState(){
@@ -181,15 +185,16 @@ public class TxViewModel extends AndroidViewModel {
      * @param tx 根据用户输入构建的用户数据
      */
     void addTransaction(Tx tx) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<String>) emitter -> {
+        if (addTxDisposable != null && !addTxDisposable.isDisposed()) {
+            return;
+        }
+        addTxDisposable = Observable.create((ObservableOnSubscribe<String>) emitter -> {
             String result = createTransaction(tx, false);
             emitter.onNext(result);
             emitter.onComplete();
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(state -> addState.postValue(state));
-        disposables.add(disposable);
+        }).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(state -> addState.postValue(state));
     }
 
     private String createTransaction(Tx tx, boolean isResend) {
@@ -508,8 +513,6 @@ public class TxViewModel extends AndroidViewModel {
                 }
                 if (filterItem == R.string.community_view_onchain_notes) {
                     txs = txRepo.loadOnChainNotesData(chainID, pos, pageSize);
-                } else if (filterItem == R.string.community_view_offchain_notes) {
-                    txs = txRepo.loadOffChainNotesData(chainID, pos, pageSize);
                 } else {
                     txs = txRepo.loadAllNotesData(chainID, pos, pageSize);
                 }
