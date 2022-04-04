@@ -38,9 +38,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
+import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.LeaderInvitationContent;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
@@ -50,6 +53,7 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
+import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.MainApplication;
@@ -73,6 +77,8 @@ import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.AIRDROP_TX;
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.LEADER_INVITATION;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.NOTE_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.SELL_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.TRUST_TX;
@@ -231,6 +237,14 @@ public class TxViewModel extends AndroidViewModel {
                             tx.link, tx.location, tx.memo);
                     txEncoded = sellTxContent.getEncoded();
                     break;
+                case AIRDROP_TX:
+                    AirdropTxContent airdropContent = new AirdropTxContent(tx.coinName, tx.link, tx.memo);
+                    txEncoded = airdropContent.getEncoded();
+                    break;
+                case LEADER_INVITATION:
+                    LeaderInvitationContent invitationContent = new LeaderInvitationContent(tx.coinName, tx.memo);
+                    txEncoded = invitationContent.getEncoded();
+                    break;
                 default:
                     break;
             }
@@ -360,6 +374,25 @@ public class TxViewModel extends AndroidViewModel {
         } else if (msgType == SELL_TX.getType()) {
             if (StringUtil.isEmpty(tx.coinName)) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_coin_name);
+                return false;
+            } else if (tx.fee < 0) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
+                return false;
+            }
+        } else if (msgType == AIRDROP_TX.getType()) {
+            if (StringUtil.isEmpty(tx.coinName)) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_coin_name);
+                return false;
+            } else if (StringUtil.isEmpty(tx.link) || null == UrlUtil.decodeAirdropUrl(tx.link)) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_airdrop_link);
+                return false;
+            } else if (tx.fee < 0) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
+                return false;
+            }
+        } else if (msgType == LEADER_INVITATION.getType()) {
+            if (StringUtil.isEmpty(tx.coinName)) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_title);
                 return false;
             } else if (tx.fee < 0) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_free);

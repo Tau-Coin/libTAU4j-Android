@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.leinardi.android.speeddial.SpeedDialActionItem;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,13 +30,14 @@ import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
+import io.taucoin.torrent.publishing.ui.transaction.AirdropCreateActivity;
 import io.taucoin.torrent.publishing.ui.transaction.BlocksTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.transaction.ChainTabFragment;
+import io.taucoin.torrent.publishing.ui.transaction.LeaderInvitationCreateActivity;
 import io.taucoin.torrent.publishing.ui.transaction.MarketTabFragment;
-import io.taucoin.torrent.publishing.ui.transaction.NoteCreateActivity;
 import io.taucoin.torrent.publishing.ui.transaction.NotesTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.QueueTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.SellCreateActivity;
@@ -156,35 +158,89 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private void initFabSpeedDial() {
         FloatingActionButton mainFab = binding.fabButton.getMainFab();
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mainFab.getLayoutParams();
-        layoutParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL;
+        layoutParams.gravity = Gravity.END | Gravity.BOTTOM;
         mainFab.setLayoutParams(layoutParams);
         mainFab.setCustomSize(getResources().getDimensionPixelSize(R.dimen.widget_size_50));
-        // 自定义点击事件
-        binding.fabButton.getMainFab().setOnClickListener(v -> {
-            if (!isJoined) {
-                return;
-            }
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            intent.putExtra(IntentExtra.ON_CHAIN, isOnChain);
-            intent.putExtra(IntentExtra.NO_BALANCE, !isOnChain || isNoBalance);
-            switch (currentTab) {
-                case ChainTabFragment.TAB_NOTES:
-                    ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
-                            TX_REQUEST_CODE);
-                    break;
-                case ChainTabFragment.TAB_MARKET:
-                    ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
-                            TX_REQUEST_CODE);
-                    // market
-                    break;
-                case ChainTabFragment.TAB_CHAIN:
-                    // chain
-                    ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
-                            TX_REQUEST_CODE);
-                    break;
-            }
-        });
+    }
+
+    /**
+     * 更新右下角悬浮按钮组件
+     */
+    private void updateFabSpeedDial(int currentTab) {
+        if (currentTab == CommunityTabFragment.TAB_NOTES) {
+            return;
+        }
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+        intent.putExtra(IntentExtra.ON_CHAIN, isOnChain);
+        intent.putExtra(IntentExtra.NO_BALANCE, !isOnChain || isNoBalance);
+
+        if (currentTab == CommunityTabFragment.TAB_MARKET) {
+            binding.fabButton.setMainFabAnimationRotateAngle(45);
+            SpeedDialActionItem invitationItem = new SpeedDialActionItem.Builder(R.id.community_create_invitation,
+                    R.drawable.ic_add_36dp)
+                    .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_20))
+                    .setLabel(getString(R.string.community_leader_invitation))
+                    .setLabelColor(getResources().getColor(R.color.color_yellow))
+                    .create();
+            binding.fabButton.addActionItem(invitationItem);
+
+            SpeedDialActionItem airdropItem = new SpeedDialActionItem.Builder(R.id.community_create_airdrop,
+                    R.drawable.ic_add_36dp)
+                    .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_14))
+                    .setLabel(getString(R.string.drawer_airdrop_links))
+                    .setLabelColor(getResources().getColor(R.color.color_yellow))
+                    .create();
+            binding.fabButton.addActionItem(airdropItem);
+
+            SpeedDialActionItem sellItem = new SpeedDialActionItem.Builder(R.id.community_create_sell,
+                    R.drawable.ic_add_36dp)
+                    .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_30))
+                    .setLabel(getString(R.string.community_sell_coins))
+                    .setLabelColor(getResources().getColor(R.color.color_yellow))
+                    .create();
+            binding.fabButton.addActionItem(sellItem);
+
+            binding.fabButton.getMainFab().setOnClickListener(v -> {
+                if (binding.fabButton.isOpen()) {
+                    binding.fabButton.close();
+                } else {
+                    binding.fabButton.open();
+                }
+            });
+            binding.fabButton.setOnActionSelectedListener(actionItem -> {
+                if (!isJoined) {
+                    return false;
+                }
+                switch (actionItem.getId()) {
+                    case R.id.community_create_sell:
+                        ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
+                                TX_REQUEST_CODE);
+                        break;
+                    case R.id.community_create_airdrop:
+                        ActivityUtil.startActivityForResult(intent, activity, AirdropCreateActivity.class,
+                                TX_REQUEST_CODE);
+                        break;
+                    case R.id.community_create_invitation:
+                        ActivityUtil.startActivityForResult(intent, activity, LeaderInvitationCreateActivity.class,
+                                TX_REQUEST_CODE);
+                        break;
+                }
+                return false;
+            });
+        } else {
+            binding.fabButton.clearActionItems();
+            binding.fabButton.setMainFabAnimationRotateAngle(0);
+            // 自定义点击事件
+            binding.fabButton.getMainFab().setOnClickListener(v -> {
+                if (!isJoined) {
+                    return;
+                }
+                // chain
+                ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
+                        TX_REQUEST_CODE);
+            });
+        }
     }
 
     private void refreshSpinnerView() {
@@ -329,11 +385,13 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_notes:
-                onTabClick(v, false);
+                onTabClick(v, CommunityTabFragment.TAB_NOTES);
                 break;
             case R.id.tv_market:
+                onTabClick(v, CommunityTabFragment.TAB_MARKET);
+                break;
             case R.id.tv_chain:
-                onTabClick(v, true);
+                onTabClick(v, CommunityTabFragment.TAB_CHAIN);
                 break;
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
@@ -341,13 +399,16 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         }
     }
 
-    private void onTabClick(View v, boolean isShow) {
+    private void onTabClick(View v, int currentTab) {
         // 避免同一页面多次刷新
         if (this.selectedView != null && selectedView.getId() == v.getId()) {
             return;
         }
+        boolean isShow = currentTab != CommunityTabFragment.TAB_NOTES;
         binding.fabButton.setVisibility(isShow ? View.VISIBLE : View.GONE);
         binding.rlBottom.setVisibility(isShow ? View.VISIBLE : View.GONE);
+
+        updateFabSpeedDial(currentTab);
 
         if (this.selectedView != null) {
             this.selectedView.setBackgroundResource(R.drawable.white_rect_round_bg_no_border);

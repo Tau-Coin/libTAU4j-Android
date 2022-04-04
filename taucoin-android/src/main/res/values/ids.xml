@@ -10,6 +10,10 @@
     <item name="member_ban" type="id" />
     <item name="member_add" type="id" />
 
+    <item name="community_create_sell" type="id" />
+    <item name="community_create_airdrop" type="id" />
+    <item name="community_create_invitation" type="id" />
+
     <item name="median_fee" type="id" />
 
     <item name="tvContent" type="id" />

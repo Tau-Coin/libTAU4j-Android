@@ -99,15 +99,24 @@
                 android:layout_height="match_parent"
                 android:background="@color/color_chat_bg"/>
 
+            <io.taucoin.torrent.publishing.ui.customviews.ThemedSpeedDialView
+                android:id="@+id/fab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:gravity="center_horizontal|center"
+                app:sdMainFabClosedSrc="@drawable/ic_add_36dp"
+                app:sdMainFabAnimationRotateAngle="45" />
+
             <RelativeLayout
                 android:id="@+id/rl_bottom"
-                android:layout_toStartOf="@+id/fab_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/widget_size_10"
                 android:layout_marginBottom="@dimen/widget_size_10"
                 android:layout_marginStart="@dimen/widget_size_10"
-                android:layout_marginEnd="@dimen/widget_size_0"
+                android:layout_marginEnd="@dimen/widget_size_80"
                 android:background="@drawable/white_rect_round_bg_big_radius"
                 android:layout_alignParentBottom="true">
 
@@ -129,16 +138,6 @@
                     android:spinnerMode="dropdown"/>
 
             </RelativeLayout>
-
-            <io.taucoin.torrent.publishing.ui.customviews.ThemedSpeedDialView
-                android:id="@+id/fab_button"
-                android:layout_width="@dimen/widget_size_70"
-                android:layout_height="@dimen/widget_size_70"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:gravity="center_horizontal|center"
-                app:sdMainFabClosedSrc="@drawable/ic_add_36dp"
-                app:sdMainFabAnimationRotateAngle="0" />
 
         </RelativeLayout>
 

@@ -129,6 +129,7 @@
                         android:layout_marginTop="@dimen/widget_size_2"
                         android:layout_marginEnd="@dimen/widget_size_5"
                         android:layout_marginStart="@dimen/widget_size_5"
+                        android:elevation="@dimen/widget_size_5"
                         android:background="@drawable/white_rect_round_bg_no_border">
 
                         <CheckBox
@@ -199,7 +200,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/widget_size_10"
                 android:paddingEnd="@dimen/widget_size_10"
-                android:layout_marginTop="@dimen/widget_size_2"
+                android:layout_marginTop="@dimen/widget_size_5"
                 android:background="@color/color_chat_pop"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">

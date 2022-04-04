@@ -145,6 +145,7 @@
     <string name="community_pinned_message">Pinned Message</string>
     <string name="community_chain_note_title">Note Transaction</string>
     <string name="community_sell_coins">Sell Coins</string>
+    <string name="community_leader_invitation">Leader Invitation</string>
     <string name="community_sell_detail">Sell Detail</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
     <string name="community_create_success" formatted="false"><Data><![CDATA[Creator shall keep phone in <strong>wifi</strong> and <strong>power charging</strong>
@@ -358,10 +359,12 @@
     <string name="tx_bootstrap_node">Bootstrap node(required)</string>
     <string name="tx_comment">Comment(required)</string>
     <string name="tx_coin_name">Coin Name</string>
-    <string name="tx_link">link - optional</string>
-    <string name="tx_quantity">quantity - optional</string>
-    <string name="tx_location">location - optional</string>
-    <string name="tx_description">description - optional</string>
+    <string name="tx_link">Link - optional</string>
+    <string name="tx_airdrop_link">Airdrop Link</string>
+    <string name="tx_quantity">Quantity - optional</string>
+    <string name="tx_location">Location - optional</string>
+    <string name="tx_description">Description - optional</string>
+    <string name="tx_invitation_title">Title</string>
     <string name="tx_operation_reply">Reply</string>
     <string name="tx_operation_copy">Copy</string>
     <string name="tx_operation_copy_hash">Copy Hash</string>
@@ -384,6 +387,7 @@
     <string name="tx_fee_tips">*The higher fee, the faster the note will be accepted by community.</string>
     <string name="tx_error_invalid_pk">Invalid receiver\'s Public Key!</string>
     <string name="tx_error_invalid_amount">Invalid Transaction amount</string>
+    <string name="tx_error_invalid_airdrop_link">Invalid airdrop link</string>
     <string name="tx_error_invalid_free">Invalid Transaction free</string>
     <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Balance</string>
     <string name="tx_error_no_enough_coins_for_fee">Insufficient Balance :\nTransaction Fee > Balance</string>
@@ -394,6 +398,7 @@
     <string name="tx_error_invalid_comment">Invalid Comment</string>
     <string name="tx_error_send_failed">Transaction sending failed, please try again later!</string>
     <string name="tx_error_invalid_coin_name">Invalid coin name</string>
+    <string name="tx_error_invalid_title">Invalid title</string>
 
     <string name="tx_result_status_waiting">Waiting&#8230;</string>
     <string name="tx_result_status_processing">Competing &#038; waiting next mining block</string>

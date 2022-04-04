@@ -81,6 +81,25 @@ public class Tx implements Parcelable {
     }
 
     @Ignore
+    public Tx(@NonNull String chainID, long fee, int txType, String coinName, String link, String memo){
+        this.chainID = chainID;
+        this.fee = fee;
+        this.txType = txType;
+        this.coinName = coinName;
+        this.link = link;
+        this.memo = memo;
+    }
+
+    @Ignore
+    public Tx(@NonNull String chainID, long fee, int txType, String coinName, String memo){
+        this.chainID = chainID;
+        this.fee = fee;
+        this.txType = txType;
+        this.coinName = coinName;
+        this.memo = memo;
+    }
+
+    @Ignore
     public Tx( @NonNull String txID, @NonNull String chainID, long fee){
         this.txID = txID;
         this.chainID = chainID;

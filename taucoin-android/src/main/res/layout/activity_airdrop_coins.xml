@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+            android:id="@+id/et_coin_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginTop="@dimen/widget_size_35"
+            android:minHeight="@dimen/widget_size_50"
+            android:hint="@string/tx_coin_name"
+            android:inputType="textMultiLine"
+            android:textAppearance="@style/TextAppearanceBody1"
+            android:autofillHints="@string/tx_coin_name" />
+
+        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+            android:id="@+id/et_link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_50"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:hint="@string/tx_airdrop_link"
+            android:inputType="textMultiLine"
+            android:textAppearance="@style/TextAppearanceBody1"
+            android:autofillHints="@string/tx_link" />
+
+        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+            android:id="@+id/et_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_50"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:hint="@string/tx_description"
+            android:inputType="textMultiLine"
+            android:textAppearance="@style/TextAppearanceBody1"
+            android:autofillHints="@string/tx_description" />
+
+        <TextView
+            android:id="@+id/tv_fee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tx_median_fee"
+            android:layout_gravity="end"
+            android:onClick="@{listener::onClick}"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:textAppearance="@style/TextAppearanceBody2"/>
+
+    </LinearLayout>
+</layout>
