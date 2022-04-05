@@ -116,9 +116,11 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
                 tvTime = rightBinding.tvTime;
                 headView = rightBinding.leftView;
                 rightBinding.leftView.tvBlacklist.setVisibility(View.GONE);
-                rightBinding.ivResend.setVisibility(isShowBan ? View.VISIBLE : View.GONE);
+                rightBinding.tvResend.setVisibility(isShowBan ? View.VISIBLE : View.GONE);
                 if (isShowBan) {
-                    rightBinding.ivResend.setOnClickListener(v -> {
+                    int size = null == tx.confirms ? 0 : tx.confirms.size();
+                    rightBinding.tvResend.setText(size <= 99 ? String.valueOf(size) : "···");
+                    rightBinding.tvResend.setOnClickListener(v -> {
                         if (listener != null) {
                             listener.onResendClick(tx.txID);
                         }

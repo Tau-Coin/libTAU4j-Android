@@ -78,9 +78,11 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
             setClickListener(binding.tvMsg, tx);
 
             boolean isResend = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
-            binding.ivResend.setVisibility(isResend ? View.VISIBLE : View.GONE);
+            binding.tvResend.setVisibility(isResend ? View.VISIBLE : View.GONE);
             if (isResend) {
-                binding.ivResend.setOnClickListener(v -> {
+                int size = null == tx.confirms ? 0 : tx.confirms.size();
+                binding.tvResend.setText(size <= 99 ? String.valueOf(size) : "···");
+                binding.tvResend.setOnClickListener(v -> {
                     if (listener != null) {
                         listener.onResendClick(tx.txID);
                     }

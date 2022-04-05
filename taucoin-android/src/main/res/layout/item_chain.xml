@@ -14,16 +14,18 @@
         android:layout_marginTop="@dimen/widget_size_7"
         android:layout_marginStart="@dimen/widget_size_15">
 
-        <ImageView
-            android:id="@+id/iv_resend"
+        <TextView
+            android:id="@+id/tv_resend"
             android:layout_width="@dimen/widget_size_20"
             android:layout_height="@dimen/widget_size_20"
-            android:layout_marginEnd="@dimen/widget_size_5"
-            android:gravity="center_vertical"
-            android:includeFontPadding="false"
             android:layout_gravity="center_vertical"
-            android:contentDescription="@null"
-            android:src="@mipmap/icon_resend"/>
+            android:layout_marginEnd="@dimen/widget_size_5"
+            android:background="@drawable/circle_blue"
+            android:gravity="center_vertical|center_horizontal"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearanceBody3"
+            android:textColor="@color/color_white" />
 
         <FrameLayout
             android:layout_width="match_parent"
