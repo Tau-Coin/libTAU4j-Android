@@ -77,6 +77,7 @@ public abstract class TauDaemon {
     private SystemServiceManager systemServiceManager;
     private TauInfoProvider tauInfoProvider;
     private LocationManagerUtil locationManager;
+    private Disposable updateBootstrapIntervalTimer; // 更新BootstrapInterval定时任务
     private Disposable updateLocationTimer;          // 更新位置信息定时任务
     private Disposable noRemainingDataTimer;         // 触发无剩余流量的提示定时任务
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
@@ -217,7 +218,7 @@ public abstract class TauDaemon {
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
                 .setDhtNonReferable(true)
                 .setDhtPingInterval(3600)
-                .setDhtBootstrapInterval(60)
+                .setDhtBootstrapInterval(10)
                 .build();
         sessionManager.start(sessionParams);
     }
@@ -243,6 +244,9 @@ public abstract class TauDaemon {
         }
         if (updateLocationTimer != null && !updateLocationTimer.isDisposed()) {
             updateLocationTimer.dispose();
+        }
+        if (updateBootstrapIntervalTimer != null && !updateBootstrapIntervalTimer.isDisposed()) {
+            updateBootstrapIntervalTimer.dispose();
         }
         locationManager.stopLocation();
         appContext.unregisterReceiver(powerReceiver);
@@ -526,6 +530,18 @@ public abstract class TauDaemon {
                 logger.debug("setNonReferable::{}", nonReferable);
             }
         }
+    }
+
+    /**
+     * 每次更新网络接口监听成功，定时一分钟 更新libTAU Bootstrap Interval为600s
+     */
+    void updateBootstrapInterval() {
+        if (updateBootstrapIntervalTimer != null && !updateBootstrapIntervalTimer.isDisposed()) {
+            updateBootstrapIntervalTimer.dispose();
+        }
+        updateBootstrapIntervalTimer = ObservableUtil.intervalSeconds(60)
+                .subscribeOn(Schedulers.io())
+                .subscribe(l -> updateBootstrapInterval(600));
     }
 
     /**

@@ -55,9 +55,11 @@ class TauDaemonAlertHandler {
     private TauListenHandler tauListenHandler;
     private SettingsRepository settingsRepo;
     private Context appContext;
+    private TauDaemon daemon;
 
     TauDaemonAlertHandler(Context appContext, TauDaemon daemon){
         this.appContext = appContext;
+        this.daemon = daemon;
         this.msgListenHandler = new MsgAlertHandler(appContext, daemon);
         this.tauListenHandler = new TauListenHandler(appContext, daemon);
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
@@ -244,6 +246,7 @@ class TauDaemonAlertHandler {
      * @param alert libTAU上报
      */
     private void onListenSucceeded(Alert alert) {
+        daemon.updateBootstrapInterval();
         ListenSucceededAlert a = (ListenSucceededAlert) alert;
         String interfaces = a.address().toString() + ":" + a.port();
         logger.info("onListenSucceeded IP::{}", interfaces);

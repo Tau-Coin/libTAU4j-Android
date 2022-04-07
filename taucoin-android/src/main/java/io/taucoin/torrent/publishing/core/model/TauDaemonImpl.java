@@ -9,7 +9,6 @@ import org.libTAU4j.Transaction;
 import org.libTAU4j.alerts.Alert;
 import org.libTAU4j.alerts.AlertType;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,14 +22,11 @@ import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.core.model.data.FriendInfo;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
-import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
@@ -40,12 +36,10 @@ import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 public class TauDaemonImpl extends TauDaemon {
     // libTAU上报的Alert消费者发射器
     private ObservableEmitter alertConsumerEmitter;
-    private FriendRepository friendRepo;
 
     TauDaemonImpl(@NonNull Context appContext) {
         super(appContext);
         tauDaemonAlertHandler = new TauDaemonAlertHandler(appContext, this);
-        friendRepo = RepositoryHelper.getFriendsRepository(appContext);
     }
 
     /**
