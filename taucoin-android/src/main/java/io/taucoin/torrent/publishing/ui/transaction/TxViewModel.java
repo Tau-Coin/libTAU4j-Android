@@ -38,7 +38,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
@@ -163,12 +162,15 @@ public class TxViewModel extends AndroidViewModel {
      * @param tx 根据用户输入构建的用户数据
      */
     void addWringTransaction(TxQueue tx, boolean isAdd) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<String>) emitter -> {
-            String result = addWringTransactionTask(tx, isAdd);
+        Disposable disposable = Observable.create((ObservableOnSubscribe<String>) emitter -> {
+            // 需要验证交易内容是否超出限制
+            String result = validateWiringSize(tx);
+            if (StringUtil.isEmpty(result)) {
+                result = addWringTransactionTask(tx, isAdd);
+            }
             emitter.onNext(result);
             emitter.onComplete();
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(Schedulers.io())
+        }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(state -> addState.postValue(state));
         disposables.add(disposable);
@@ -260,6 +262,12 @@ public class TxViewModel extends AndroidViewModel {
                 transaction = new Transaction(chainID, 0, timestamp, senderPk, tx.fee, txEncoded);
             }
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
+            logger.debug("createTransaction txID::{}, limit::{}, transaction::{}",
+                    transaction.getTxID().to_hex(), Constants.TX_MAX_BYTE_SIZE, transaction.Size());
+            // 判断交易大小是否超出限制
+            if (transaction.Size() > Constants.TX_MAX_BYTE_SIZE) {
+                return getApplication().getString(R.string.tx_error_memo_too_large);
+            }
             boolean isSubmitSuccess = daemon.submitTransaction(transaction);
             if (!isSubmitSuccess) {
                 result = isResend ? getApplication().getString(R.string.tx_resend_failed) :
@@ -323,6 +331,35 @@ public class TxViewModel extends AndroidViewModel {
                 logger.info("addMemberInfoToLocal, receiverPk::{}", tx.receiverPk);
             }
         }
+    }
+
+    String validateWiringSize(TxQueue tx) {
+        User user = userRepo.getUserByPublicKey(tx.senderPk);
+        byte[] chainIDBytes = ChainIDUtil.encode(tx.chainID);
+        Account account = daemon.getAccountInfo(chainIDBytes, user.publicKey);
+        if (null == account) {
+            return getApplication().getString(R.string.tx_error_send_failed);
+        }
+        byte[] senderSeed = ByteUtil.toByte(user.seed);
+        Pair<byte[], byte[]> keypair = Ed25519.createKeypair(senderSeed);
+        byte[] senderPk = keypair.first;
+        byte[] secretKey = keypair.second;
+        byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
+        long timestamp = daemon.getSessionTime();
+        byte[] memo = Utils.textStringToBytes(tx.memo);
+        TxContent txContent = new TxContent(WIRING_TX.getType(), memo);
+        byte[] txEncoded = txContent.getEncoded();
+        long nonce = account.getNonce() + 1;
+        Transaction transaction = new Transaction(chainIDBytes, 0, timestamp, senderPk, receiverPk,
+                nonce, tx.amount, tx.fee, txEncoded);
+        transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
+        logger.debug("createTransaction txID::{}, limit::{}, transaction::{}",
+                transaction.getTxID().to_hex(), Constants.TX_MAX_BYTE_SIZE, transaction.Size());
+        // 判断交易大小是否超出限制
+        if (transaction.Size() > Constants.TX_MAX_BYTE_SIZE) {
+            return getApplication().getString(R.string.tx_error_memo_too_large);
+        }
+        return "";
     }
 
     boolean validateTx(TxQueue tx) {

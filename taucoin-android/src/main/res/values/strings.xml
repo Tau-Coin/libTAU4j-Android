@@ -397,6 +397,7 @@
     <string name="tx_error_invalid_message">Invalid Message</string>
     <string name="tx_error_invalid_comment">Invalid Comment</string>
     <string name="tx_error_send_failed">Transaction sending failed, please try again later!</string>
+    <string name="tx_error_memo_too_large">The transaction content is too large!</string>
     <string name="tx_error_invalid_coin_name">Invalid coin name</string>
     <string name="tx_error_invalid_title">Invalid title</string>
 

@@ -56,4 +56,10 @@ public class Constants {
     // 统计显示周期，单位：秒
     public static final int STATISTICS_DISPLAY_PERIOD = 60;
 
+    // 交易最大字节大小
+    public static final int TX_MAX_BYTE_SIZE = 600;
+
+    // 消息最大字节大小
+    public static final int MSG_MAX_BYTE_SIZE = 821;
+
 }

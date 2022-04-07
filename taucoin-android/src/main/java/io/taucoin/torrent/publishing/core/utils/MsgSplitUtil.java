@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.service.LibJpegManager;
 
 /**
@@ -17,7 +18,6 @@ import io.taucoin.torrent.publishing.service.LibJpegManager;
  */
 public class MsgSplitUtil {
     private static final Logger logger = LoggerFactory.getLogger("MsgSplit");
-    private static final int BYTE_LIMIT = 821;
 
     /**
      * 拆分文本消息
@@ -36,13 +36,13 @@ public class MsgSplitUtil {
             }
             String fragment = textMsg.substring(statPos, endPos);
             byte[] fragmentBytes = fragment.getBytes(StandardCharsets.UTF_8);
-            if (fragmentBytes.length > BYTE_LIMIT) {
+            if (fragmentBytes.length > Constants.MSG_MAX_BYTE_SIZE) {
                 // 切片字节大于限制，上一次的切片作为最新切片
                 statPos = endPos - 1;
                 if (lastFragmentBytes != null) {
                     list.add(lastFragmentBytes);
                 }
-            } else if (fragmentBytes.length == BYTE_LIMIT || endPos == msgSize) {
+            } else if (fragmentBytes.length == Constants.MSG_MAX_BYTE_SIZE || endPos == msgSize) {
                 // 切片字节等于限制或者消息结束，当前切片为最新切片
                 statPos = endPos;
                 list.add(fragmentBytes);
@@ -80,7 +80,7 @@ public class MsgSplitUtil {
         long startTime = System.currentTimeMillis();
         File file = new File(progressivePath);
         FileInputStream fis = new FileInputStream(file);
-        byte[] buffer = new byte[BYTE_LIMIT];
+        byte[] buffer = new byte[Constants.MSG_MAX_BYTE_SIZE];
         int num;
         byte[] msg;
         while (true) {
