@@ -27,12 +27,26 @@ public class TxUtils {
         return createTxSpan(tx, CommunityTabFragment.TAB_NOTES);
     }
 
-    public static SpannableStringBuilder createTxSpan(UserAndTx tx, int tab) {
+    /**
+     * 从区块里解析展示交易
+     */
+    public static SpannableStringBuilder createBlockTxSpan(Tx tx) {
+        Context context = MainApplication.getInstance();
+        int titleColor = context.getResources().getColor(R.color.gray_dark);
+        SpanUtils msg = new SpanUtils()
+            .append(context.getString(R.string.community_tip_block_hash))
+                .setForegroundColor(titleColor)
+                .append(HashUtil.hashMiddleHide(tx.txID))
+                .append("\n");
+        return msg.create().append(createTxSpan(tx, CommunityTabFragment.TAB_NOTES));
+    }
+
+    public static SpannableStringBuilder createTxSpan(Tx tx, int tab) {
         switch (TxType.valueOf(tx.txType)) {
             case NOTE_TX:
                 return createSpanNoteTx(tx, tab);
             case WIRING_TX:
-                return createSpanWiringTx(tx, true);
+                return createSpanWiringTx(tx, tab == CommunityTabFragment.TAB_CHAIN);
             case SELL_TX:
                 return createSpanSellTx(tx, tab);
             case AIRDROP_TX:
@@ -45,7 +59,7 @@ public class TxUtils {
         return new SpanUtils().create();
     }
 
-    private static SpannableStringBuilder createSpanNoteTx(UserAndTx tx, int tab) {
+    private static SpannableStringBuilder createSpanNoteTx(Tx tx, int tab) {
         SpanUtils msg = new SpanUtils();
         if (tab == CommunityTabFragment.TAB_CHAIN) {
             Context context = MainApplication.getInstance();
@@ -243,7 +257,7 @@ public class TxUtils {
         return msg.create();
     }
 
-    private static SpannableStringBuilder createSpanTrustTx(UserAndTx tx, int tab) {
+    private static SpannableStringBuilder createSpanTrustTx(Tx tx, int tab) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
@@ -270,18 +284,21 @@ public class TxUtils {
         return msg.create();
     }
 
-    public static SpannableStringBuilder createBlockSpan(BlockAndTx block) {
+    public static SpannableStringBuilder createBlockSpan(BlockAndTx block, boolean isShowTx) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
-        SpanUtils msg = new SpanUtils()
-                .append(context.getString(R.string.community_tip_block_txs))
+        SpanUtils msg = new SpanUtils();
+        if (isShowTx) {
+            msg.append(context.getString(R.string.community_tip_block_txs))
                 .setForegroundColor(titleColor);
-        if (block.tx != null) {
-            msg.append(HashUtil.hashMiddleHide(block.tx.txID));
-        } else {
-            msg.append(context.getString(R.string.community_tip_block_txs_nothing));
+            if (block.tx != null) {
+                msg.append(HashUtil.hashMiddleHide(block.tx.txID));
+            } else {
+                msg.append(context.getString(R.string.community_tip_block_txs_nothing));
+            }
+            msg.append("\n");
         }
-        msg.append("\n").append(context.getString(R.string.community_tip_block_timestamp))
+        msg.append(context.getString(R.string.community_tip_block_timestamp))
                 .setForegroundColor(titleColor)
                 .append(DateUtil.formatTime(block.timestamp, DateUtil.pattern6))
                 .append("\n").append(context.getString(R.string.community_tip_block_miner))

@@ -54,19 +54,50 @@
 
         </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:visibility="gone"
-            android:id="@+id/tv_block_detail"
+            android:id="@+id/ll_block_detail"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/widget_size_20"
-            android:layout_marginEnd="@dimen/widget_size_20"
-            android:layout_marginTop="@dimen/widget_size_0"
-            android:layout_marginBottom="@dimen/widget_size_10"
-            android:includeFontPadding="false"
-            android:textColorLink="@color/color_blue_link"
-            android:textAppearance="@style/TextAppearanceBody2"/>
+            android:layout_marginStart="@dimen/widget_size_10"
+            android:layout_marginEnd="@dimen/widget_size_10">
 
+            <TextView
+                android:visibility="visible"
+                android:id="@+id/tv_block_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/widget_size_10"
+                android:includeFontPadding="false"
+                android:background="@drawable/white_rect_round_bg_translucent"
+                android:textColorLink="@color/color_blue_link"
+                android:textAppearance="@style/TextAppearanceBody3"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:layout_marginBottom="@dimen/widget_size_5"
+                android:includeFontPadding="false"
+                android:text="Transaction"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody3"/>
+
+            <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
+                android:id="@+id/tv_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:background="@drawable/white_rect_round_bg_translucent"
+                android:layout_marginTop="@dimen/widget_size_0"
+                android:layout_marginBottom="@dimen/widget_size_10"
+                android:padding="@dimen/widget_size_10"
+                android:textColorLink="@color/color_blue_link"
+                android:textAppearance="@style/TextAppearanceBody3"/>
+
+        </LinearLayout>
         <include layout="@layout/view_line" />
     </LinearLayout>
 </layout>

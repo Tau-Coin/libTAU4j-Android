@@ -1,5 +1,8 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
+import android.text.style.URLSpan;
+import android.widget.TextView;
+
 import com.noober.menu.FloatMenu;
 
 import java.util.ArrayList;
@@ -10,6 +13,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
@@ -95,10 +99,10 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
 
     @Override
     public void onLongClick(BlockAndTx block) {
-        List<OperationMenuItem> menuList = new ArrayList<>();
-        if (block.tx != null) {
-            menuList.add(new OperationMenuItem(R.string.tx_operation_copy_transaction_hash));
+        if (operationsMenu != null && operationsMenu.isShowing()) {
+            operationsMenu.dismiss();
         }
+        List<OperationMenuItem> menuList = new ArrayList<>();
         menuList.add(new OperationMenuItem(R.string.tx_operation_copy_miner));
         menuList.add(new OperationMenuItem(R.string.tx_operation_copy_hash));
         if (StringUtil.isNotEmpty(block.previousBlockHash)) {
@@ -122,10 +126,43 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
                     CopyManager.copyText(block.previousBlockHash);
                     ToastUtils.showShortToast(R.string.copy_successfully);
                     break;
-                case R.string.tx_operation_copy_transaction_hash:
-                    CopyManager.copyText(block.tx.txID);
+            }
+        });
+        operationsMenu.show(activity.getPoint());
+    }
+
+    @Override
+    public void onLongClick(Tx tx, TextView view) {
+        if (operationsMenu != null && operationsMenu.isShowing()) {
+            operationsMenu.dismiss();
+        }
+        List<OperationMenuItem> menuList = new ArrayList<>();
+        menuList.add(new OperationMenuItem(R.string.tx_operation_copy));
+        final URLSpan[] urls = view.getUrls();
+        if (urls != null && urls.length > 0) {
+            menuList.add(new OperationMenuItem(R.string.tx_operation_copy_link));
+        }
+        menuList.add(new OperationMenuItem(R.string.tx_operation_copy_transaction_hash));
+        operationsMenu = new FloatMenu(activity);
+        operationsMenu.items(menuList);
+        operationsMenu.setOnItemClickListener((v, position) -> {
+            OperationMenuItem item = menuList.get(position);
+            int resId = item.getResId();
+            switch (resId) {
+                case R.string.tx_operation_copy:
+                    CopyManager.copyText(view.getText());
                     ToastUtils.showShortToast(R.string.copy_successfully);
                     break;
+                case R.string.tx_operation_copy_link:
+                    if (urls != null && urls.length > 0) {
+                        String link = urls[0].getURL();
+                        CopyManager.copyText(link);
+                        ToastUtils.showShortToast(R.string.copy_link_successfully);
+                    }
+                    break;
+                case R.string.tx_operation_copy_transaction_hash:
+                    CopyManager.copyText(tx.txID);
+                    ToastUtils.showShortToast(R.string.copy_successfully);
             }
         });
         operationsMenu.show(activity.getPoint());
