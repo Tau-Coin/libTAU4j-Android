@@ -6,6 +6,7 @@ import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.widget.EditText;
 
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.core.utils.ChineseFilter;
 
 /**
@@ -34,6 +35,9 @@ public class FilterEditText extends EditText {
     }
 
     private void initFilters() {
+        if (BuildConfig.DEBUG) {
+            return;
+        }
         setFilters(new InputFilter[]{new ChineseFilter()});
     }
 }

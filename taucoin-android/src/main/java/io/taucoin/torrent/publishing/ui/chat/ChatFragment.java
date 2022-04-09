@@ -31,6 +31,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
@@ -121,7 +122,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             boolean isEmpty = StringUtil.isEmpty(s);
             binding.tvSend.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
-            binding.ivAdd.setVisibility(!isEmpty ? View.GONE : View.VISIBLE);
+            if (BuildConfig.DEBUG) {
+                binding.ivAdd.setVisibility(!isEmpty ? View.GONE : View.VISIBLE);
+            }
         }
 
         @Override
@@ -140,6 +143,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             activity.goBack();
         });
         binding.toolbarInclude.ivAction.setVisibility(View.INVISIBLE);
+        binding.ivAdd.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
         binding.etMessage.addTextChangedListener(textWatcher);
         binding.etMessage.setOnFocusChangeListener((v, hasFocus) -> {
             showOrHideChatAddView(false);
