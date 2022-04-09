@@ -32,7 +32,7 @@ public class TxUtils {
             case NOTE_TX:
                 return createSpanNoteTx(tx, tab);
             case WIRING_TX:
-                return createSpanWiringTx(tx);
+                return createSpanWiringTx(tx, true);
             case SELL_TX:
                 return createSpanSellTx(tx, tab);
             case AIRDROP_TX:
@@ -73,12 +73,12 @@ public class TxUtils {
         return msg.create();
     }
 
-    private static SpannableStringBuilder createSpanWiringTx(Tx tx) {
+    private static SpannableStringBuilder createSpanWiringTx(Tx tx, boolean showStatus) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         String coinName = ChainIDUtil.getCoinName(tx.chainID);
         SpanUtils msg = new SpanUtils();
-        if (tx.txStatus == 1) {
+        if (tx.txStatus == 1 && showStatus) {
             msg.append("Status: ").setForegroundColor(titleColor)
                     .append(context.getString(R.string.community_block_on_chain))
                     .append("\n");
@@ -95,7 +95,7 @@ public class TxUtils {
                 .append(HashUtil.hashMiddleHide(tx.receiverPk))
                 .append("\n").append("Hash: ").setForegroundColor(titleColor)
                 .append(HashUtil.hashMiddleHide(tx.txID));
-        if (tx.txStatus == 1) {
+        if (tx.txStatus == 1 && showStatus) {
             msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtLong(tx.blockNumber));
         }
@@ -113,6 +113,10 @@ public class TxUtils {
         if (tab == CommunityTabFragment.TAB_CHAIN && tx.txStatus == 1) {
             msg.append("Status: ").setForegroundColor(titleColor)
                     .append(context.getString(R.string.community_block_on_chain))
+                    .append("\n");
+        } else if (tab == CommunityTabFragment.TAB_MARKET && tx.txStatus == 0) {
+            msg.append("Status: ").setForegroundColor(titleColor)
+                    .append(context.getString(R.string.tx_result_status_processing))
                     .append("\n");
         }
         msg.append("Selling: ").setForegroundColor(titleColor)
@@ -159,10 +163,12 @@ public class TxUtils {
             msg.append("Status: ").setForegroundColor(titleColor)
                     .append(context.getString(R.string.community_block_on_chain))
                     .append("\n");
+        } else if (tab == CommunityTabFragment.TAB_MARKET && tx.txStatus == 0) {
+            msg.append("Status: ").setForegroundColor(titleColor)
+                    .append(context.getString(R.string.tx_result_status_processing))
+                    .append("\n");
         }
-        msg.append("Airdrop: ").setForegroundColor(titleColor)
-                .append(tx.coinName)
-                .append("\n").append("Link: ").setForegroundColor(titleColor)
+        msg.append("Link: ").setForegroundColor(titleColor)
                     .append(tx.link);
         if (StringUtil.isNotEmpty(tx.memo)) {
             msg.append("\n").append("Description: ").setForegroundColor(titleColor)
@@ -192,8 +198,13 @@ public class TxUtils {
             msg.append("Status: ").setForegroundColor(titleColor)
                     .append(context.getString(R.string.community_block_on_chain))
                     .append("\n");
+        } else if (tab == CommunityTabFragment.TAB_MARKET && tx.txStatus == 0) {
+            msg.append("Status: ").setForegroundColor(titleColor)
+                    .append(context.getString(R.string.tx_result_status_processing))
+                    .append("\n");
         }
-        msg.append(tx.coinName).setForegroundColor(titleColor);
+        msg.append("Title: ").setForegroundColor(titleColor)
+            .append(tx.coinName).setForegroundColor(titleColor);
         if (StringUtil.isNotEmpty(tx.memo)) {
             msg.append("\n").append("Description: ").setForegroundColor(titleColor)
                     .append(tx.memo);
@@ -265,8 +276,8 @@ public class TxUtils {
         SpanUtils msg = new SpanUtils()
                 .append(context.getString(R.string.community_tip_block_txs))
                 .setForegroundColor(titleColor);
-        if (block.txs != null && block.txs.size() > 0) {
-            msg.append(HashUtil.hashMiddleHide(block.txs.get(0).txID));
+        if (block.tx != null) {
+            msg.append(HashUtil.hashMiddleHide(block.tx.txID));
         } else {
             msg.append(context.getString(R.string.community_tip_block_txs_nothing));
         }

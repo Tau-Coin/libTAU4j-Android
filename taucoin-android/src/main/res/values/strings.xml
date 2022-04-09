@@ -37,6 +37,7 @@
     <string name="common_chinese_not_supported">Sorry, Chinese is not supported!</string>
     <string name="common_close">Close</string>
     <string name="common_resend">Resend</string>
+    <string name="common_done">Done</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
@@ -138,29 +139,32 @@
     <string name="community_mining_online">Mining online</string>
     <string name="community_mining_income">Mining Income</string>
     <string name="community_filter_all">All</string>
-    <string name="community_chain_note">Notes</string>
-    <string name="community_chain_market">Market</string>
-    <string name="community_on_chain">Chain</string>
+    <string name="community_chain_note">Chat</string>
+    <string name="community_chain_market">News</string>
+    <string name="community_on_chain">Transactions</string>
     <string name="community_escrow_service_enter">Escrow Service</string>
     <string name="community_pinned_message">Pinned Message</string>
     <string name="community_chain_note_title">Note Transaction</string>
-    <string name="community_sell_coins">Sell Coins</string>
-    <string name="community_leader_invitation">Leader Invitation</string>
+    <string name="community_sell_coins">Sale</string>
+    <string name="community_airdrop">Airdrop</string>
+    <string name="community_leader_invitation">Announcement</string>
     <string name="community_sell_detail">Sell Detail</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
     <string name="community_create_success" formatted="false"><Data><![CDATA[Creator shall keep phone in <strong>wifi</strong> and <strong>power charging</strong>
     as much as possible for community data exchange.]]></Data></string>
 
-    <string name="community_view_all">View All</string>
-    <string name="community_view_onchain_notes">Onchain</string>
-    <string name="community_view_airdrop">View Airdrop</string>
-    <string name="community_view_sell">View Sell</string>
+    <string name="community_view_all">All</string>
+    <string name="community_view_on_chain_only">On Chain Only</string>
+    <string name="community_view_airdrop">Airdrop</string>
+    <string name="community_view_sell">Sale</string>
+    <string name="community_view_announcement">Announcement</string>
     <string name="community_view_blocks">Blocks Explorer</string>
-    <string name="community_view_own_txs">Own Transactions</string>
+    <string name="community_view_own_txs">Own Wiring Transactions</string>
     <string name="community_view_mining_pool">Mining Pool</string>
 
-    <string name="chain_mining_time">Success Mining Remaining Time</string>
-    <string name="chain_mining_time_min_seconds">%1$dmin%2$ds</string>
+    <string name="chain_mining_time">Mining Time</string>
+    <string name="chain_mining_time_tips">Your remaining time to win the current mining slot.</string>
+    <string name="chain_mining_time_min_seconds">%1$dmin&#160;%2$ds</string>
     <string name="chain_mining_time_seconds">%1$ds</string>
     <string name="chain_difficulty">Difficulty</string>
     <string name="chain_total_peers">Total Peers</string>
@@ -168,7 +172,7 @@
     <string name="chain_total_coins">Total Coins</string>
     <string name="chain_top_peers">Top 10 peers</string>
     <string name="chain_votes">Votes</string>
-    <string name="chain_current_fork">Current Fork</string>
+    <string name="chain_current_fork">Recent Fork Out</string>
     <string name="chain_block_number">Block Number</string>
     <string name="chain_block">Block</string>
     <string name="chain_block_and_number">Block %1$s</string>
@@ -361,6 +365,8 @@
     <string name="tx_coin_name">Coin Name</string>
     <string name="tx_link">Link - optional</string>
     <string name="tx_airdrop_link">Airdrop Link</string>
+    <string name="tx_airdrop_select">Please select an airdrop community first!</string>
+    <string name="tx_airdrop_setup">Please set up airdrop first!</string>
     <string name="tx_quantity">Quantity - optional</string>
     <string name="tx_location">Location - optional</string>
     <string name="tx_description">Description - optional</string>

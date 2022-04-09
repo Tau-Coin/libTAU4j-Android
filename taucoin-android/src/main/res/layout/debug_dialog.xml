@@ -25,13 +25,14 @@
             app:circleColor="@color/color_white"/>
 
         <TextView
-            android:id="@+id/tv_num"
+            android:id="@+id/tv_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/widget_size_10"
             android:includeFontPadding="false"
             android:gravity="center_horizontal|center"
             android:textColor="@color/gray_light"
+            android:text="@string/common_loading"
             android:textAppearance="@style/TextAppearanceBody3"/>
 
         <TextView

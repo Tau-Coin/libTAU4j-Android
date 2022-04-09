@@ -103,6 +103,8 @@ public interface TxRepository {
 
     List<UserAndTx> loadSellMarketData(String chainID, int pos, int pageSize);
 
+    List<UserAndTx> loadAnnouncementMarketData(String chainID, int pos, int pageSize);
+
     List<UserAndTx> loadAllMarketData(String chainID, int pos, int pageSize);
 
     List<UserAndTx> loadChainTxsData(String chainID, int pos, int pageSize);

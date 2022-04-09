@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import org.libTAU4j.ChainURL;
 
@@ -25,6 +28,7 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityAirdropCommunityBinding;
@@ -52,6 +56,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private CommonDialog linkDialog;
     private CommonDialog joinDialog;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private boolean linksSelector = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +65,14 @@ public class AirdropCommunityActivity extends BaseActivity implements
         communityViewModel = provider.get(CommunityViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_airdrop_community);
+        initParam();
         initLayout();
+    }
+
+    private void initParam() {
+        if (getIntent() != null) {
+            linksSelector = getIntent().getBooleanExtra(IntentExtra.LINKS_SELECTOR, false);
+        }
     }
 
     /**
@@ -71,8 +83,11 @@ public class AirdropCommunityActivity extends BaseActivity implements
         binding.toolbarInclude.toolbar.setTitle(R.string.drawer_airdrop_links);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        if (linksSelector) {
+            binding.pasteLink.setVisibility(View.GONE);
+        }
 
-        adapter = new AirdropListAdapter(this);
+        adapter = new AirdropListAdapter(this, linksSelector);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.joinedList.setLayoutManager(layoutManager);
         binding.joinedList.setOnItemClickListener((view, adapterPosition) -> {
@@ -97,6 +112,57 @@ public class AirdropCommunityActivity extends BaseActivity implements
         binding.pasteLink.setOnClickListener(v -> {
             handleClipboardContent();
         });
+    }
+
+    /**
+     *  创建右上角Menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_done, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem menuItem = menu.findItem(R.id.menu_done);
+        menuItem.setVisible(linksSelector);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    /**
+     * 右上角Menu选项选择事件
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_done) {
+            Member member = adapter.getMember();
+            if (member != null) {
+                AirdropStatus status = AirdropStatus.valueOf(member.airdropStatus);
+                if (status == AirdropStatus.ON) {
+                    if (linkDisposable != null && !linkDisposable.isDisposed()) {
+                        linkDisposable.dispose();
+                    }
+                    String chainID = member.chainID;
+                    linkDisposable = communityViewModel.getCommunityMembersLimit(member.chainID,
+                            Constants.AIRDROP_LINK_BS_LIMIT)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
+                        String airdropPeer = MainApplication.getInstance().getPublicKey();
+                        String airdropLink = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, list);
+                        Intent intent = new Intent();
+                        intent.putExtra(IntentExtra.AIRDROP_LINK, airdropLink);
+                        setResult(RESULT_OK, intent);
+                        this.finish();
+                    });
+                } else {
+                    ToastUtils.showShortToast(R.string.tx_airdrop_setup);
+                }
+            } else {
+                ToastUtils.showShortToast(R.string.tx_airdrop_select);
+            }
+        }
+        return true;
     }
 
     @Override

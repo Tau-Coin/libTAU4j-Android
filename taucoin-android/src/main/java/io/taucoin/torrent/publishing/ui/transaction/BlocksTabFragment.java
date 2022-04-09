@@ -96,7 +96,7 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
     @Override
     public void onLongClick(BlockAndTx block) {
         List<OperationMenuItem> menuList = new ArrayList<>();
-        if (block.txs != null && block.txs.size() > 0) {
+        if (block.tx != null) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_copy_transaction_hash));
         }
         menuList.add(new OperationMenuItem(R.string.tx_operation_copy_miner));
@@ -123,7 +123,7 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
                     ToastUtils.showShortToast(R.string.copy_successfully);
                     break;
                 case R.string.tx_operation_copy_transaction_hash:
-                    CopyManager.copyText(block.txs.get(0).txID);
+                    CopyManager.copyText(block.tx.txID);
                     ToastUtils.showShortToast(R.string.copy_successfully);
                     break;
             }

@@ -91,6 +91,11 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
+    public List<UserAndTx> loadAnnouncementMarketData(String chainID, int startPos, int loadSize) {
+        return db.txDao().loadAnnouncementMarketData(chainID, startPos, loadSize);
+    }
+
+    @Override
     public List<UserAndTx> loadAllMarketData(String chainID, int startPos, int loadSize) {
         return db.txDao().loadAllMarketData(chainID, startPos, loadSize);
     }

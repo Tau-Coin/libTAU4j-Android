@@ -139,8 +139,12 @@ public class DebugActivity extends BaseActivity implements View.OnClickListener 
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(i -> {
                     int progress = i * 100 / num;
+                    if (progress == 100) {
+                        debugBinding.tvStatus.setText(R.string.common_done);
+                        debugBinding.tvCancel.setText(R.string.ok);
+                        debugBinding.tvCancel.setTextColor(getResources().getColor(R.color.color_yellow));
+                    }
                     debugBinding.cvProgress.setProgress(progress);
-                    debugBinding.tvNum.setText(i + "/" + num);
                 });
     }
 

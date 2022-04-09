@@ -30,15 +30,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_sync_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:onClick="onClick"
-                    app:lineLeftText="@string/community_sync_status"
-                    app:lineRightImage="@mipmap/icon_arrow"/>
-
                 <LinearLayout
                     android:id="@+id/item_syncing_head_block"
                     android:orientation="horizontal"
@@ -254,6 +245,24 @@
                     android:gravity="center_vertical"
                     app:lineLeftText="@string/chain_mining_time" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/widget_size_20"
+                    android:paddingEnd="@dimen/widget_size_20"
+                    android:paddingTop="@dimen/widget_size_5"
+                    android:paddingBottom="@dimen/widget_size_5"
+                    android:includeFontPadding="false"
+                    android:text="@string/chain_mining_time_tips"
+                    android:background="@color/color_bg"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody3"/>
+
+                <include
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_1"
+                    layout="@layout/view_line"/>
+
                 <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_difficulty"
                     android:layout_width="match_parent"
@@ -305,6 +314,15 @@
                     android:gravity="center_vertical"
                     android:onClick="onClick"
                     app:lineLeftText="@string/chain_votes"
+                    app:lineRightImage="@mipmap/icon_arrow"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_sync_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:onClick="onClick"
+                    app:lineLeftText="@string/community_sync_status"
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
                 <LinearLayout

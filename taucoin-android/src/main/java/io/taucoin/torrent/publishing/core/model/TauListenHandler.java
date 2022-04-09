@@ -228,11 +228,13 @@ public class TauListenHandler {
             if (block.getPreviousBlockHash() != null) {
                 previousBlockHash = ByteUtil.toHexString(block.getPreviousBlockHash());
             }
+            String txID = isTransactionEmpty(transaction) ? null : transaction.getTxID().to_hex();
             blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty, 
-                    status, timestamp, previousBlockHash);
+                    status, timestamp, previousBlockHash, txID);
             blockRepository.addBlock(blockInfo);
-            logger.info("Save Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}, status::{}",
-                    chainID, blockHash, blockNumber, rewards, status);
+            logger.info("Save Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}, " +
+                            "txID::{}, status::{}",
+                    chainID, blockHash, blockNumber, rewards, txID, status);
         } else {
             // 由于第一次同步共识区块
             // 如果是同步，并且已经是上链状态了, 则保持上链状态
@@ -340,7 +342,6 @@ public class TauListenHandler {
         } else if (tx.txType == TxType.AIRDROP_TX.getType()) {
             AirdropTxContent sellTxContent = new AirdropTxContent(txMsg.getPayload());
             // 添加Airdrop信息
-            tx.coinName = Utils.textBytesToString(sellTxContent.getCoinName());
             tx.link = Utils.textBytesToString(sellTxContent.getLink());
         } else if (tx.txType == TxType.LEADER_INVITATION.getType()) {
             LeaderInvitationContent sellTxContent = new LeaderInvitationContent(txMsg.getPayload());

@@ -1,5 +1,6 @@
 package io.taucoin.torrent.publishing.ui.community;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -41,10 +42,12 @@ public class ChooseListAdapter extends ListAdapter<CommunityAndMember, ChooseLis
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         private ItemCommunityChooseBinding binding;
+        private Context context;
 
         ViewHolder(ItemCommunityChooseBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+            this.context = binding.getRoot().getContext();
         }
 
         /**
@@ -54,8 +57,12 @@ public class ChooseListAdapter extends ListAdapter<CommunityAndMember, ChooseLis
             if(null == community){
                 return;
             }
-            binding.tvName.setText(community.communityName);
-            binding.tvBalance.setText(FmtMicrometer.fmtBalance(community.balance));
+            String communityName = community.communityName + " chain";
+            binding.tvName.setText(communityName);
+
+            String balance = context.getResources().getString(R.string.drawer_balance);
+            balance += " " + FmtMicrometer.fmtBalance(community.balance);
+            binding.tvBalance.setText(balance);
         }
     }
 

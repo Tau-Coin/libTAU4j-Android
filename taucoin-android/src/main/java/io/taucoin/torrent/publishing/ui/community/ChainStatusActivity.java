@@ -198,7 +198,13 @@ public class ChainStatusActivity extends BaseActivity {
                 subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(progress -> {
-                    reloadBinding.cvProgress.setProgress(progress.intValue());
+                    int loadingProgress = progress.intValue();
+                    if (loadingProgress == 100) {
+                        reloadBinding.tvStatus.setText(R.string.common_done);
+                        reloadBinding.tvCancel.setText(R.string.ok);
+                        reloadBinding.tvCancel.setTextColor(getResources().getColor(R.color.color_yellow));
+                    }
+                    reloadBinding.cvProgress.setProgress(loadingProgress);
                 });
     }
 

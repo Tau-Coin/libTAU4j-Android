@@ -22,7 +22,7 @@ public class Constants {
     // 社区名最大字节长度
     public static final int MAX_COMMUNITY_NAME_LENGTH = 24;
     // APP分享URL
-    public static final String APP_SHARE_URL = "https://taucoin.io/d.html";
+    public static final String APP_SHARE_URL = "https://taucoin.io/d";
 
     // Chain link中bs默认数
     public static final int CHAIN_LINK_BS_LIMIT = 10;
@@ -57,7 +57,7 @@ public class Constants {
     public static final int STATISTICS_DISPLAY_PERIOD = 60;
 
     // 交易最大字节大小
-    public static final int TX_MAX_BYTE_SIZE = 600;
+    public static final int TX_MAX_BYTE_SIZE = 500;
 
     // 消息最大字节大小
     public static final int MSG_MAX_BYTE_SIZE = 821;

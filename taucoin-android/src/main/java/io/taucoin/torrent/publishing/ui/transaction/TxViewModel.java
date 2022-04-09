@@ -240,7 +240,7 @@ public class TxViewModel extends AndroidViewModel {
                     txEncoded = sellTxContent.getEncoded();
                     break;
                 case AIRDROP_TX:
-                    AirdropTxContent airdropContent = new AirdropTxContent(tx.coinName, tx.link, tx.memo);
+                    AirdropTxContent airdropContent = new AirdropTxContent(tx.link, tx.memo);
                     txEncoded = airdropContent.getEncoded();
                     break;
                 case LEADER_INVITATION:
@@ -417,10 +417,7 @@ public class TxViewModel extends AndroidViewModel {
                 return false;
             }
         } else if (msgType == AIRDROP_TX.getType()) {
-            if (StringUtil.isEmpty(tx.coinName)) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_coin_name);
-                return false;
-            } else if (StringUtil.isEmpty(tx.link) || null == UrlUtil.decodeAirdropUrl(tx.link)) {
+            if (StringUtil.isEmpty(tx.link) || null == UrlUtil.decodeAirdropUrl(tx.link)) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_airdrop_link);
                 return false;
             } else if (tx.fee < 0) {
@@ -625,6 +622,8 @@ public class TxViewModel extends AndroidViewModel {
                     txs = txRepo.loadAirdropMarketData(chainID, pos, pageSize);
                 } else if (filterItem == R.string.community_view_sell) {
                     txs = txRepo.loadSellMarketData(chainID, pos, pageSize);
+                } else if (filterItem == R.string.community_view_announcement) {
+                    txs = txRepo.loadAnnouncementMarketData(chainID, pos, pageSize);
                 } else {
                     txs = txRepo.loadAllMarketData(chainID, pos, pageSize);
                 }

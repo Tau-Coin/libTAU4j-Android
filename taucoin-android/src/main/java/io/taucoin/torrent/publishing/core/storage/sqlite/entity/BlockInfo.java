@@ -27,11 +27,12 @@ public class BlockInfo implements Parcelable {
     public int status;                 // 区块的状态 0：未上链；1：上链成功;
     public long timestamp;             // 区块时间戳
     public String previousBlockHash;   // 上一个区块hash
+    public String txID;                // 区块中交易ID
 
 
     public BlockInfo(@NonNull String chainID, @NonNull String blockHash, long blockNumber,
                      @NonNull String miner, long rewards, long difficulty, int status,
-                     long timestamp, String previousBlockHash) {
+                     long timestamp, String previousBlockHash, String txID) {
         this.chainID = chainID;
         this.blockHash = blockHash;
         this.blockNumber = blockNumber;
@@ -41,6 +42,7 @@ public class BlockInfo implements Parcelable {
         this.status = status;
         this.timestamp = timestamp;
         this.previousBlockHash = previousBlockHash;
+        this.txID = txID;
     }
 
     protected BlockInfo(Parcel in) {
@@ -53,6 +55,7 @@ public class BlockInfo implements Parcelable {
         status = in.readInt();
         timestamp = in.readLong();
         previousBlockHash = in.readString();
+        txID = in.readString();
     }
 
     @Override

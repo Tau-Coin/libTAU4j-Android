@@ -42,7 +42,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     public void initView() {
         super.initView();
         currentTab = TAB_NOTES;
-        binding.llOnChainCheckBox.setVisibility(View.VISIBLE);
+//        binding.llOnChainCheckBox.setVisibility(View.VISIBLE);
         adapter = new NotesListAdapter(this, chainID, true);
         binding.txList.setAdapter(adapter);
 
@@ -125,6 +125,9 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
         } else if (v.getId() == R.id.tv_fee) {
             KeyboardUtils.hideSoftInput(activity);
             txViewModel.showEditFeeDialog(activity, binding.tvFee, chainID);
+        } else if (v.getId() == R.id.tv_on_chain) {
+            boolean isChecked = binding.cbOnChain.isChecked();
+            binding.cbOnChain.setChecked(!isChecked);
         }
     }
 

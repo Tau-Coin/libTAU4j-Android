@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.core.model;
 import android.content.Context;
 import android.os.Build;
 import android.os.Debug;
+import android.os.PowerManager;
 import android.os.SystemClock;
 
 import org.slf4j.Logger;
@@ -49,6 +50,7 @@ public class TauInfoProvider {
     private Sampler sampler;
     private SettingsRepository settingsRepo;
     private StatisticRepository statisticRepo;
+    private PowerManager pm;
 
     public static TauInfoProvider getInstance(@NonNull Context appContext) {
         if (INSTANCE == null) {
@@ -75,6 +77,7 @@ public class TauInfoProvider {
         this.sampler = Sampler.getInstance();
         settingsRepo = RepositoryHelper.getSettingsRepository(MainApplication.getInstance());
         statisticRepo = RepositoryHelper.getStatisticRepository(MainApplication.getInstance());
+        pm = (PowerManager) MainApplication.getInstance().getSystemService(Context.POWER_SERVICE);
     }
 
     /**
@@ -246,6 +249,11 @@ public class TauInfoProvider {
                     }
                     logger.debug("invokedRequests::{}, seconds::{}, requests::{}, sessionNodes::{}",
                             invokedRequests, timeSeconds, requests, sessionNodes);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        logger.debug("deviceIdleMode::{}, interactive::{}, powerSaveMode::{}",
+                                pm.isDeviceIdleMode(), pm.isInteractive(), pm.isPowerSaveMode());
+                    }
 
                     statistic.timestamp = DateUtil.getTime();
                     statistic.workingFrequency = FrequencyUtil.getMainLoopFrequency();

@@ -14,6 +14,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.ItemAirdropBinding;
 
 /**
@@ -22,10 +23,13 @@ import io.taucoin.torrent.publishing.databinding.ItemAirdropBinding;
 public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.ViewHolder> {
 
     private OnClickListener listener;
+    private boolean linksSelector;
+    private Member member;
 
-    AirdropListAdapter(OnClickListener listener) {
+    AirdropListAdapter(OnClickListener listener, boolean linksSelector) {
         super(diffCallback);
         this.listener = listener;
+        this.linksSelector = linksSelector;
     }
 
     @NonNull
@@ -37,7 +41,11 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
                 parent,
                 false);
 
-        return new ViewHolder(binding, listener);
+        return new ViewHolder(this, binding);
+    }
+
+    public Member getMember() {
+        return member;
     }
 
     @Override
@@ -48,12 +56,12 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         private ItemAirdropBinding binding;
-        private OnClickListener listener;
+        private AirdropListAdapter adapter;
 
-        ViewHolder(ItemAirdropBinding binding, OnClickListener listener) {
+        ViewHolder(AirdropListAdapter adapter, ItemAirdropBinding binding) {
             super(binding.getRoot());
+            this.adapter = adapter;
             this.binding = binding;
-            this.listener = listener;
         }
 
         /**
@@ -63,6 +71,18 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
             if (null == member) {
                 return;
             }
+            binding.cbSelect.setVisibility(adapter.linksSelector ? View.VISIBLE : View.GONE);
+            binding.cbSelect.setOnCheckedChangeListener(null);
+            binding.cbSelect.setChecked(adapter.member != null && StringUtil.isEquals(adapter.member.chainID,
+                    member.chainID));
+            binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    adapter.member = member;
+                    adapter.notifyDataSetChanged();
+                } else {
+                    adapter.member = null;
+                }
+            });
             binding.tvLeft.setText(ChainIDUtil.getName(member.chainID));
             AirdropStatus status = AirdropStatus.valueOf(member.airdropStatus);
             Resources resources = binding.getRoot().getResources();
@@ -70,8 +90,8 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
             binding.tvShare.setVisibility(status == AirdropStatus.ON ? View.VISIBLE : View.INVISIBLE);
 
             binding.tvShare.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onShare(member.chainID);
+                if (adapter.listener != null) {
+                    adapter.listener.onShare(member.chainID);
                 }
             });
         }

@@ -27,6 +27,7 @@ import io.taucoin.torrent.publishing.databinding.ActivityAirdropCoinsBinding;
 import io.taucoin.torrent.publishing.databinding.ActivitySellBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.friends.AirdropCommunityActivity;
 
 /**
  * 发布Airdrop页面
@@ -68,7 +69,7 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
     @SuppressLint("ClickableViewAccessibility")
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.drawer_airdrop_links);
+        binding.toolbarInclude.toolbar.setTitle(R.string.community_airdrop);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
@@ -140,20 +141,18 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
     private Tx buildTx() {
         int txType = TxType.AIRDROP_TX.getType();
         String fee = ViewUtils.getStringTag(binding.tvFee);
-        String coinName = ViewUtils.getText(binding.etCoinName);
         String link = ViewUtils.getText(binding.etLink);
         String description = ViewUtils.getText(binding.etDescription);
-        return new Tx(chainID, FmtMicrometer.fmtTxLongValue(fee), txType, coinName, link, description);
+        return new Tx(chainID, FmtMicrometer.fmtTxLongValue(fee), txType, null, link, description);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.iv_coins:
+            case R.id.iv_links:
                 Intent intent = new Intent();
-                intent.putExtra(IntentExtra.COIN_NAME, ViewUtils.getText(binding.etCoinName));
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                ActivityUtil.startActivityForResult(intent, this, CoinsChooseActivity.class,
+                intent.putExtra(IntentExtra.LINKS_SELECTOR, true);
+                ActivityUtil.startActivityForResult(intent, this, AirdropCommunityActivity.class,
                         CHOOSE_REQUEST_CODE);
                 break;
             case R.id.tv_fee:
@@ -167,12 +166,10 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == CHOOSE_REQUEST_CODE) {
             if (data != null) {
-                String coinName = data.getStringExtra(IntentExtra.COIN_NAME);
-                if (StringUtil.isNotEmpty(coinName)) {
-                    binding.etCoinName.setText(coinName);
-                    binding.etCoinName.setSelection(coinName.length());
-                } else {
-                    binding.etCoinName.getText().clear();
+                String airdropLink = data.getStringExtra(IntentExtra.AIRDROP_LINK);
+                if (StringUtil.isNotEmpty(airdropLink)) {
+                    binding.etLink.setText(airdropLink);
+                    binding.etLink.setSelection(airdropLink.length());
                 }
             }
         }

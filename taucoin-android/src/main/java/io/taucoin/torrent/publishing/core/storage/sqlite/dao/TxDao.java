@@ -39,16 +39,19 @@ public interface TxDao {
             " GROUP BY receiverPk" +
             ") t" +
             " ON tx.senderPk = t.receiverPk" +
-            " WHERE tx.chainID = :chainID AND txStatus = 1";
+            " WHERE tx.chainID = :chainID";
 
     String QUERY_GET_ALL_MARKET = QUERY_GET_MARKET_SELECT +
             " AND tx.txType IN (3, 5, 6)" + QUERY_GET_TXS_ORDER;
 
     String QUERY_GET_AIRDROP_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND tx.txType IN (5, 6)" + QUERY_GET_TXS_ORDER;
+            " AND tx.txType = 5" + QUERY_GET_TXS_ORDER;
 
     String QUERY_GET_SELL_MARKET = QUERY_GET_MARKET_SELECT +
             " AND tx.txType = 3" + QUERY_GET_TXS_ORDER;
+
+    String QUERY_GET_ANNOUNCEMENT_MARKET = QUERY_GET_MARKET_SELECT +
+            " AND tx.txType = 6" + QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区里的交易(所有，排除WIRING Tx)
     String QUERY_GET_NOTES_SELECT = "SELECT tx.*, 0 AS trusts" +
@@ -160,6 +163,10 @@ public interface TxDao {
     @Transaction
     @Query(QUERY_GET_SELL_MARKET)
     List<UserAndTx> loadSellMarketData(String chainID, int startPosition, int loadSize);
+
+    @Transaction
+    @Query(QUERY_GET_ANNOUNCEMENT_MARKET)
+    List<UserAndTx> loadAnnouncementMarketData(String chainID, int startPosition, int loadSize);
 
     @Transaction
     @Query(QUERY_GET_ALL_MARKET)

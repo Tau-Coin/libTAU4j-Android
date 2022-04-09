@@ -188,7 +188,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             SpeedDialActionItem airdropItem = new SpeedDialActionItem.Builder(R.id.community_create_airdrop,
                     R.drawable.ic_add_36dp)
                     .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_14))
-                    .setLabel(getString(R.string.drawer_airdrop_links))
+                    .setLabel(getString(R.string.community_airdrop))
                     .setLabelColor(getResources().getColor(R.color.color_yellow))
                     .create();
             binding.fabButton.addActionItem(airdropItem);
@@ -272,16 +272,16 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         switch (view.getId()) {
             case R.id.tv_notes:
                 // note
-                spinnerItems = new int[] {R.string.community_view_all,
-                        R.string.community_view_onchain_notes};
+                spinnerItems = new int[] {};
                 currentTabFragment = new NotesTabFragment();
                 currentTab = CommunityTabFragment.TAB_NOTES;
                 break;
             case R.id.tv_market:
                 // market
                 spinnerItems = new int[] {R.string.community_view_all,
+                        R.string.community_view_sell,
                         R.string.community_view_airdrop,
-                        R.string.community_view_sell};
+                        R.string.community_view_announcement};
                 currentTabFragment = new MarketTabFragment();
                 currentTab = CommunityTabFragment.TAB_MARKET;
                 break;
