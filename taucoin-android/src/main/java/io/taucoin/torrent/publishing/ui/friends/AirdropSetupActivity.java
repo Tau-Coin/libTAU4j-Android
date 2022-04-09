@@ -1,5 +1,6 @@
 package io.taucoin.torrent.publishing.ui.friends;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
@@ -77,6 +79,9 @@ public class AirdropSetupActivity extends BaseActivity {
         });
 
         communityViewModel.getAirdropResult().observe(this, result -> {
+            Intent intent = new Intent();
+            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+            ActivityUtil.startActivity(intent, this, AirdropDetailActivity.class);
             onBackPressed();
         });
     }

@@ -12,9 +12,14 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
+import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -23,6 +28,8 @@ import io.taucoin.torrent.publishing.databinding.ActivityCommunityDetailBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
+import io.taucoin.torrent.publishing.ui.friends.AirdropDetailActivity;
+import io.taucoin.torrent.publishing.ui.friends.AirdropSetupActivity;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.qrcode.CommunityQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
@@ -36,6 +43,7 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
     private ActivityCommunityDetailBinding binding;
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private Disposable memberDisposable;
     private MemberListAdapter adapter;
     private String chainID;
     private CommonDialog blacklistDialog;
@@ -119,6 +127,25 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
             case R.id.item_blacklist:
                 blacklistDialog = communityViewModel.showBanCommunityTipsDialog(this, chainID);
                 break;
+            case R.id.item_airdrop_coins:
+                if (memberDisposable != null && !memberDisposable.isDisposed()) {
+                    return;
+                }
+                memberDisposable = communityViewModel.getMemberSingle(chainID)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(this::enterAirdropPage, it -> {});
+                break;
+        }
+    }
+
+    private void enterAirdropPage(Member member) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, member.chainID);
+        if (member.airdropStatus == AirdropStatus.ON.getStatus()) {
+            ActivityUtil.startActivity(intent, this, AirdropDetailActivity.class);
+        } else {
+            ActivityUtil.startActivity(intent, this, AirdropSetupActivity.class);
         }
     }
 
@@ -158,6 +185,9 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
         super.onDestroy();
         if (blacklistDialog != null) {
             blacklistDialog.closeDialog();
+        }
+        if (memberDisposable != null && !memberDisposable.isDisposed()) {
+            memberDisposable.dispose();
         }
     }
 }

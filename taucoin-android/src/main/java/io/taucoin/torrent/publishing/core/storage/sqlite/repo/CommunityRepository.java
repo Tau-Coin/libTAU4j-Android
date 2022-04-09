@@ -66,6 +66,8 @@ public interface CommunityRepository {
      */
     Single<Community> getCommunityByChainIDSingle(String chainID);
 
+    Single<Member> getMemberSingle(String chainID);
+
     Flowable<Community> observerCommunityByChainID(String chainID);
 
     /**

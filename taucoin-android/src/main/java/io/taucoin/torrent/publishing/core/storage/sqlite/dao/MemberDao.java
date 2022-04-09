@@ -192,4 +192,7 @@ public interface MemberDao {
 
     @Query(QUERY_AIRDROP_DETAIL)
     Flowable<Member> observeCommunityAirdropDetail(String chainID);
+
+    @Query(QUERY_GET_MEMBER_BY_CHAIN_ID_PK)
+    Single<Member> getMemberSingle(String chainID, String publicKey);
 }

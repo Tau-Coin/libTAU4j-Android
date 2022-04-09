@@ -579,6 +579,10 @@ public class CommunityViewModel extends AndroidViewModel {
         return communityRepo.getCommunityByChainIDSingle(chainID);
     }
 
+    public Single<Member> getMemberSingle(String chainID) {
+        return communityRepo.getMemberSingle(chainID);
+    }
+
     public Flowable<Community> observerCommunityByChainID(String chainID) {
         return communityRepo.observerCommunityByChainID(chainID);
     }

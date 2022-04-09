@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.room.RxRoom;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
@@ -123,6 +124,11 @@ public class CommunityRepositoryImpl implements CommunityRepository{
      */
     public Single<Community> getCommunityByChainIDSingle(String chainID){
         return db.communityDao().getCommunityByChainIDSingle(chainID);
+    }
+
+    @Override
+    public Single<Member> getMemberSingle(String chainID) {
+        return db.memberDao().getMemberSingle(chainID, MainApplication.getInstance().getPublicKey());
     }
 
     @Override
