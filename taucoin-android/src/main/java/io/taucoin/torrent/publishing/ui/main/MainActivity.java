@@ -269,7 +269,7 @@ public class MainActivity extends ScanTriggerActivity {
     public void onStart() {
         super.onStart();
         subscribeCurrentUser();
-//        downloadViewModel.checkAppVersion(this);
+        downloadViewModel.checkAppVersion(this);
 
         handleSettingsChanged(getString(R.string.pref_key_dht_nodes));
         disposables.add(settingsRepo.observeSettingsChanged()

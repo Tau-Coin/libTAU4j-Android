@@ -15,11 +15,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
@@ -39,11 +37,11 @@ import okhttp3.Response;
 public class DownloadViewModel extends AndroidViewModel {
 
     private static final Logger logger = LoggerFactory.getLogger("DownloadViewModel");
-    private static final String apiBaseUrl = "http://tau.taucoin.io/";
-    private static final String checkVersionPath = "tau/versions/";
+    private static final String CHECK_VERSION_URL = "https://taucoin.io/versions/";
+
     private SettingsRepository settingsRepository;
     private LocalDownloadManager localDownloadManager;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private Disposable disposable;
     public DownloadViewModel(@NonNull Application application) {
         super(application);
         settingsRepository = RepositoryHelper.getSettingsRepository(application);
@@ -53,7 +51,9 @@ public class DownloadViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        disposables.clear();
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
         localDownloadManager.unregisterContentObserver(getApplication());
     }
 
@@ -72,37 +72,36 @@ public class DownloadViewModel extends AndroidViewModel {
     /**
      * 检查APP版本，查看是否需要版本升级
      */
-    public void checkAppVersion(AppCompatActivity activity){
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<Version>) emitter -> {
+    public void checkAppVersion(AppCompatActivity activity) {
+        if (disposable != null && !disposable.isDisposed()) {
+            return;
+        }
+        disposable = Observable.create((ObservableOnSubscribe<Version>) emitter -> {
             int versionCode = AppUtil.getVersionCode();
             Map<String, Integer> map = Maps.newHashMap();
             map.put("version", versionCode);
-            String checkVersionUrl = apiBaseUrl + checkVersionPath;
             try {
-                Response response = HttpUtil.httpPost(checkVersionUrl, map);
-                if(response.isSuccessful() && response.code() == 200){
+                Response response = HttpUtil.httpPost(CHECK_VERSION_URL, map);
+                if (response.isSuccessful() && response.code() == 200) {
                     if (response.body() != null) {
                         String result = response.body().string();
                         DataResult dataResult = new Gson().fromJson(result, DataResult.class);
-                        if(dataResult != null && dataResult.getData() != null){
+                        if (dataResult != null && dataResult.getData() != null) {
+                            logger.debug("Response data::{}", dataResult.getData());
                             String data = new Gson().toJson(dataResult.getData());
                             Version version = new Gson().fromJson(data, Version.class);
-                            // 测试数据
                             version.setForced(false);
-                            version.setForcedNum(0);
                             emitter.onNext(version);
                         }
                     }
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.error("Error::Check app version", e);
             }
             emitter.onComplete();
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(Schedulers.io())
+        }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(version -> handleVersionUpgrade(activity, version));
-        disposables.add(disposable);
     }
 
     /**
