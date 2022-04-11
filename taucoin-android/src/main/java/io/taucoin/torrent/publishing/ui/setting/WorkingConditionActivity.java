@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
@@ -50,6 +51,11 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
 
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         binding.tvProcessors.setText(String.valueOf(availableProcessors));
+
+        if (!BuildConfig.DEBUG) {
+            binding.llCpu.setVisibility(View.GONE);
+            binding.lineCpu.setVisibility(View.GONE);
+        }
     }
 
     @Override

@@ -120,6 +120,7 @@
         </LinearLayout>
 
         <include
+            android:id="@+id/line_cpu_statistics"
             layout="@layout/view_line"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_1"

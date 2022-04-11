@@ -16,6 +16,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.log.LogConfigurator;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -67,6 +68,11 @@ public class JournalActivity extends BaseActivity implements View.OnClickListene
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setItemAnimator(animator);
         binding.recyclerView.setAdapter(adapter);
+
+        if (!BuildConfig.DEBUG) {
+            binding.llCpuStatistics.setVisibility(View.GONE);
+            binding.lineCpuStatistics.setVisibility(View.GONE);
+        }
 
     }
 

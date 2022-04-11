@@ -426,6 +426,7 @@
                     <include layout="@layout/view_line"/>
 
                     <LinearLayout
+                        android:id="@+id/ll_cpu"
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -452,7 +453,9 @@
 
                     </LinearLayout>
 
-                    <include layout="@layout/view_line"/>
+                    <include
+                        android:id="@+id/line_cpu"
+                        layout="@layout/view_line"/>
 
                     <LinearLayout
                         android:orientation="horizontal"

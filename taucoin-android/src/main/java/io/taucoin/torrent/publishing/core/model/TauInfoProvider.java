@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposables;
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
@@ -86,7 +87,7 @@ public class TauInfoProvider {
      */
     Flowable<Double> observeCPUStatistics() {
         return Flowable.create((emitter) -> {
-            if (sampler.isAccessibleFromFile()) {
+            if (sampler.isAccessibleFromFile() || !BuildConfig.DEBUG) {
                 emitter.onComplete();
                 return;
             }
