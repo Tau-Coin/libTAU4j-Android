@@ -90,7 +90,6 @@ public class DownloadViewModel extends AndroidViewModel {
                             logger.debug("Response data::{}", dataResult.getData());
                             String data = new Gson().toJson(dataResult.getData());
                             Version version = new Gson().fromJson(data, Version.class);
-                            version.setForced(false);
                             emitter.onNext(version);
                         }
                     }
