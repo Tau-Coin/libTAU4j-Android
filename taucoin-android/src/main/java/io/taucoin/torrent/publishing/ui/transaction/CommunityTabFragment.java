@@ -32,6 +32,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
@@ -353,7 +354,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         Spanned trustTip = Html.fromHtml(getString(R.string.tx_give_trust_tip, showName));
         binding.tvTrustTip.setText(trustTip);
         long txFee = txViewModel.getTxFee(chainID);
-        String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
+        String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.COIN.longValue());
         binding.tvTrustFee.setTag(R.id.median_fee, txFee);
 
         if (noBalance) {

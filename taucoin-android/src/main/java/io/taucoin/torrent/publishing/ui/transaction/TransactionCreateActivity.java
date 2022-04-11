@@ -14,6 +14,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
@@ -96,7 +97,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
             } else {
                 txFee = txViewModel.getTxFee(chainID);
             }
-            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
+            String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.COIN.longValue());
             binding.tvFee.setTag(R.id.median_fee, txFee);
 
             if (noBalance) {

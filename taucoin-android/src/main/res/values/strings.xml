@@ -140,7 +140,7 @@
     <string name="community_mining_income">Mining Income</string>
     <string name="community_filter_all">All</string>
     <string name="community_chain_note">Chat</string>
-    <string name="community_chain_market">News</string>
+    <string name="community_chain_market">On-Chain News</string>
     <string name="community_on_chain">Transactions</string>
     <string name="community_escrow_service_enter">Escrow Service</string>
     <string name="community_pinned_message">Pinned Message</string>
@@ -502,8 +502,8 @@
     <string name="bot_airdrop_tau_link">Android Link</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share android link</string>
-    <string name="bot_share_airdrop_link_content">1. Please download TAU app to join us.\n\n%1$s\n\n
-        2. To receive your airdrop coins, copy this full message and paste to TAU app airdrop.\n\n%2$s
+    <string name="bot_share_airdrop_link_content">1. Please download TAU app(size 25Mb) to join us.\n\n%1$s\n\n
+        2. To receive your airdrop coins, copy this FULL message and paste to TAU app airdrop function.\n\n%2$s
     </string>
     <string name="bot_hello_world">HelloWorld</string>
 

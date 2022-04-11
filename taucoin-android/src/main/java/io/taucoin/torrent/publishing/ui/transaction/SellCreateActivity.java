@@ -14,6 +14,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -76,7 +77,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
         if (StringUtil.isNotEmpty(chainID)) {
 
             long txFee = txViewModel.getTxFee(chainID);
-            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
+            String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.COIN.longValue());
             binding.tvFee.setTag(R.id.median_fee, txFee);
 
             if (noBalance) {

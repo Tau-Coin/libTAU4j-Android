@@ -13,6 +13,7 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
@@ -82,7 +83,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
 
         if (onChain && isUpdateFee) {
             long txFee = txViewModel.getTxFee(chainID);
-            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee);
+            String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.MIN_FEE.longValue());
             binding.tvFee.setTag(R.id.median_fee, txFee);
             if (noBalance) {
                 txFeeStr = "0";

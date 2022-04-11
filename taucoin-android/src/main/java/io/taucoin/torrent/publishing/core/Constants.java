@@ -17,7 +17,7 @@ public class Constants {
     // 小数保留2位(0.01 COIN), 最大为8
     public static final int COIN_DECIMAL = 2;
     // 最小值交易费 0.01 COIN
-    public static final BigInteger MIN_FEE = COIN.divide(new BigInteger("1", 10).pow(COIN_DECIMAL));
+    public static final BigInteger MIN_FEE = COIN.divide(new BigInteger("10", 10).pow(COIN_DECIMAL));
 
     // 社区名最大字节长度
     public static final int MAX_COMMUNITY_NAME_LENGTH = 24;
