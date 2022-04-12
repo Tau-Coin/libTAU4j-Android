@@ -52,7 +52,7 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, a.tailBlock, b.balance, b.power, b.blockNumber," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk, " +
-            " 0 AS msgUnread, '' AS msg, c.memo, c.timestamp" +
+            " 0 AS msgUnread, null AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
@@ -65,7 +65,7 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, a.tailBlock, b.balance, b.power, b.blockNumber," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk, " +
-            " 0 AS msgUnread, '' AS msg, c.memo, c.timestamp" +
+            " 0 AS msgUnread, null AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
