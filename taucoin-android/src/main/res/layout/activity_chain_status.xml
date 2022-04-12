@@ -238,30 +238,38 @@
 
                 <include layout="@layout/view_line"/>
 
-                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_mining_time"
+                <LinearLayout
+                    android:id="@+id/ll_mining_time"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    app:lineLeftText="@string/chain_mining_time" />
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/widget_size_20"
-                    android:paddingEnd="@dimen/widget_size_20"
-                    android:paddingTop="@dimen/widget_size_5"
-                    android:paddingBottom="@dimen/widget_size_5"
-                    android:includeFontPadding="false"
-                    android:text="@string/chain_mining_time_tips"
-                    android:background="@color/color_bg"
-                    android:textColor="@color/gray_dark"
-                    android:textAppearance="@style/TextAppearanceBody3"/>
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/item_mining_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        app:lineLeftText="@string/chain_mining_time" />
 
-                <include
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/widget_size_1"
-                    layout="@layout/view_line"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/widget_size_20"
+                        android:paddingEnd="@dimen/widget_size_20"
+                        android:paddingTop="@dimen/widget_size_5"
+                        android:paddingBottom="@dimen/widget_size_5"
+                        android:includeFontPadding="false"
+                        android:text="@string/chain_mining_time_tips"
+                        android:background="@color/color_bg"
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody3"/>
+
+                    <include
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/widget_size_1"
+                        layout="@layout/view_line"/>
+
+                </LinearLayout>
 
                 <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_difficulty"

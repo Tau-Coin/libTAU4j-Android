@@ -17,10 +17,12 @@ package io.taucoin.torrent.publishing.ui.customviews;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 
 import java.util.List;
 
@@ -90,6 +92,7 @@ public class MsgLogsDialog extends Dialog {
                     msgLogsListener.onCancel();
                 }
             });
+
             binding.recyclerView.setAdapter(adapter);
             LinearLayoutManager layoutManager = new LinearLayoutManager(context);
             binding.recyclerView.setLayoutManager(layoutManager);
@@ -102,6 +105,12 @@ public class MsgLogsDialog extends Dialog {
                     msgLogsListener.onCancel();
                 }
             });
+            WindowManager windowManager = (WindowManager) context
+                    .getSystemService(Context.WINDOW_SERVICE);
+            Display display = windowManager.getDefaultDisplay();
+            LayoutParams layoutParams = layout.getLayoutParams();
+            layoutParams.width = (int) (display.getWidth() * 0.85);
+            layout.setLayoutParams(layoutParams);
             return msgLogsDialog;
         }
     }

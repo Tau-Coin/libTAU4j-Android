@@ -275,7 +275,7 @@ public class ChainStatusActivity extends BaseActivity {
                 binding.itemMiningTime.setRightText(getString(R.string.chain_mining_time_seconds, seconds));
             }
         }
-        binding.itemMiningTime.setVisibility(time >= 0 ? View.VISIBLE : View.GONE);
+        binding.llMiningTime.setVisibility(time >= 0 ? View.VISIBLE : View.GONE);
     }
 
     @Override

@@ -5,11 +5,9 @@
 
     </data>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
         android:background="@color/color_white">
 
         <TextView
@@ -22,13 +20,14 @@
             android:text="@string/community_create_success"
             android:textAppearance="@style/TextAppearanceBody1"/>
 
-
         <LinearLayout
+            android:layout_below="@+id/tv_title"
+            android:id="@+id/ll_condition"
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/widget_size_20"
-            android:layout_gravity="center_horizontal">
+            android:layout_centerHorizontal="true">
 
             <ImageView
                 android:layout_width="@dimen/widget_size_18"
@@ -46,17 +45,21 @@
         </LinearLayout>
 
         <TextView
+            android:layout_below="@+id/ll_condition"
             android:id="@+id/tv_yes"
             android:minWidth="@dimen/widget_size_240"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/widget_size_50"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_44"
             android:text="@string/common_yes"
+            android:includeFontPadding="false"
             android:layout_marginTop="@dimen/widget_size_15"
             android:textAllCaps="false"
+            android:layout_centerHorizontal="true"
             android:gravity="center_horizontal|center"
             android:textColor="@color/color_white"
             android:textAppearance="@style/TextAppearanceBody1"
             android:background="@drawable/primary_rect_round_bg" />
 
-    </LinearLayout>
+    </RelativeLayout>
 </layout>

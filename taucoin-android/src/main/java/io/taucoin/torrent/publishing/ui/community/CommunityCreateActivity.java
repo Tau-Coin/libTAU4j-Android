@@ -134,7 +134,6 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
         successDialog = new CommonDialog.Builder(this)
                 .setContentView(binding.getRoot())
                 .setCanceledOnTouchOutside(false)
-                .setButtonWidth(R.dimen.widget_size_240)
                 .create();
         successDialog.show();
     }
