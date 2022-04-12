@@ -6,6 +6,8 @@ import org.libTAU4j.swig.settings_pack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.taucoin.torrent.publishing.BuildConfig;
+
 class SessionSettings {
     private static final Logger logger = LoggerFactory.getLogger("SessionSetting");
     static SessionParamsBuilder getSessionParamsBuilder() {
@@ -117,7 +119,11 @@ class SessionSettings {
         StringBuilder sb = new StringBuilder();
         // sb.append("dht.libtorrent.org:25401").append(",");
 //        sb.append("13.229.53.249:6882");
-        sb.append("tau://83024767468B8BF8DB868F336596C63561265D553833E5C0BF3E4767659B826B@13.229.53.249:6882");
+        if (BuildConfig.DEBUG) {
+            sb.append("tau://6e6170b970bae896803ecb10516537aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:7882");
+        } else {
+            sb.append("tau://83024767468B8BF8DB868F336596C63561265D553833E5C0BF3E4767659B826B@13.229.53.249:6882");
+        }
         return sb.toString();
     }
 }
