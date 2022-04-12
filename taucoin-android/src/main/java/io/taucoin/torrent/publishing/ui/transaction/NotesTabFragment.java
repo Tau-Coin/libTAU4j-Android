@@ -81,17 +81,20 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
         binding.tvFeeTips.setVisibility(!onChain ? View.VISIBLE : View.GONE);
         binding.tvFee.setVisibility(onChain ? View.VISIBLE : View.GONE);
 
-        if (onChain && isUpdateFee) {
-            long txFee = txViewModel.getTxFee(chainID);
-            String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.MIN_FEE.longValue());
-            binding.tvFee.setTag(R.id.median_fee, txFee);
-            if (noBalance) {
-                txFeeStr = "0";
+        if (onChain) {
+            String text = ViewUtils.getText(binding.tvFee);
+            if (isUpdateFee || StringUtil.isEmpty(text)) {
+                long txFee = txViewModel.getTxFee(chainID);
+                String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.MIN_FEE.longValue());
+                binding.tvFee.setTag(R.id.median_fee, txFee);
+                if (noBalance) {
+                    txFeeStr = "0";
+                }
+                String medianFree = getString(R.string.tx_median_fee, txFeeStr,
+                        ChainIDUtil.getCoinName(chainID));
+                binding.tvFee.setText(Html.fromHtml(medianFree));
+                binding.tvFee.setTag(txFeeStr);
             }
-            String medianFree = getString(R.string.tx_median_fee, txFeeStr,
-                    ChainIDUtil.getCoinName(chainID));
-            binding.tvFee.setText(Html.fromHtml(medianFree));
-            binding.tvFee.setTag(txFeeStr);
         }
     }
 

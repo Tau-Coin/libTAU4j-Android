@@ -173,7 +173,6 @@
                 android:id="@+id/tv_fee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/tx_median_fee"
                 android:textColor="@color/gray_dark"
                 android:includeFontPadding="false"
                 android:gravity="start"
