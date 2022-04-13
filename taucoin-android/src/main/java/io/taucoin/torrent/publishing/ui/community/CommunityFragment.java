@@ -378,7 +378,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                         binding.fabButton.setMainFabClosedBackgroundColor(getResources().getColor(color));
                     }
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
-                }));
+                }, it -> {}));
     }
 
     @Override

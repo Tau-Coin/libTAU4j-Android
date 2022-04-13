@@ -77,6 +77,9 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     }
 
     private void showBottomView() {
+        if (null == binding) {
+            return;
+        }
         binding.llBottomInput.setVisibility(isJoined ? View.VISIBLE : View.GONE);
         binding.tvFeeTips.setVisibility(!onChain ? View.VISIBLE : View.GONE);
         binding.tvFee.setVisibility(onChain ? View.VISIBLE : View.GONE);
