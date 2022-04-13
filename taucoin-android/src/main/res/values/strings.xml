@@ -73,11 +73,11 @@
     <string name="drawer_airdrop_links">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
     <string name="drawer_community_coin">Community Coin</string>
-    <string name="drawer_peers">Friends</string>
+    <string name="drawer_peers">Contacts</string>
     <string name="drawer_communities">Wallet</string>
     <string name="drawer_setting">Settings</string>
     <string name="drawer_data_cost">Data Cost</string>
-    <string name="drawer_working_condition">Working Condition</string>
+    <string name="drawer_working_condition">Dash Board</string>
     <string name="drawer_share">Share TAU App</string>
     <string name="drawer_export_seed">Export Key</string>
 

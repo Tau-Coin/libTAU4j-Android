@@ -134,21 +134,11 @@
                     android:layout_height="wrap_content">
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_contacts"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="@dimen/widget_size_5"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_friends"
-                        app:rightText="@string/drawer_peers"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_mining"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
+                        android:layout_marginTop="@dimen/widget_size_5"
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_mining"
@@ -175,6 +165,16 @@
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_airdrop_coins"
                         app:rightText="@string/drawer_airdrop_links"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                        android:id="@+id/item_contacts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:onClick="onClick"
+                        app:leftImage="@mipmap/icon_friends"
+                        app:rightText="@string/drawer_peers"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_working_condition"
