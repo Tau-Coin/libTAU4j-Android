@@ -132,6 +132,8 @@ class TxQueueManager {
             if (null == account) {
                 return true;
             }
+            logger.debug("sendWiringTx account nonce::{}, balance::{}, blockNumber::{}", account.getNonce(),
+                    account.getBalance(), account.getBlockNumber());
             // 交易已创建
             if (txQueue.status == 0) {
                 logger.debug("sendWiringTx account nonce::{}, queue nonce::{}", account.getNonce(),
@@ -244,6 +246,8 @@ class TxQueueManager {
                 result = context.getResources().getString(R.string.tx_resend_failed);
                 return result;
             }
+            logger.debug("resendTxQueue account nonce::{}, balance::{}, blockNumber::{}", account.getNonce(),
+                    account.getBalance(), account.getBlockNumber());
             // 已创建交易，重发
             if (account.getNonce() >= txQueue.nonce) {
                 // nonce冲突，重新入队列
