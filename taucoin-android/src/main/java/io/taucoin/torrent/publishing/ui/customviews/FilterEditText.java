@@ -35,9 +35,9 @@ public class FilterEditText extends EditText {
     }
 
     private void initFilters() {
-        if (BuildConfig.DEBUG) {
-            return;
-        }
-        setFilters(new InputFilter[]{new ChineseFilter()});
+//        if (BuildConfig.DEBUG) {
+//            return;
+//        }
+//        setFilters(new InputFilter[]{new ChineseFilter()});
     }
 }
