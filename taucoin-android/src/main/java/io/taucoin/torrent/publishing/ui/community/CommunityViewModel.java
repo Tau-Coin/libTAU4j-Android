@@ -221,8 +221,11 @@ public class CommunityViewModel extends AndroidViewModel {
                     success = daemon.followChain(chainID, peers);
                 }
                 if (success) {
-                    Community community = new Community(chainID, communityName);
-                    communityRepo.addCommunity(community);
+                    Community community = communityRepo.getCommunityByChainID(chainID);
+                    if (null == community) {
+                        community = new Community(chainID, communityName);
+                        communityRepo.addCommunity(community);
+                    }
                     if (peers != null) {
                         for (String peer : peers) {
                             addUserInfoToLocal(peer);

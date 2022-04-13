@@ -87,7 +87,7 @@ public class UserQRCodeActivity extends ScanTriggerActivity implements View.OnCl
         binding.qrCode.tvName.setText(stringBuilder);
         binding.qrCode.tvName.setTag(publicKeyQRContent.getPublicKey());
         DrawablesUtil.setEndDrawable(binding.qrCode.tvName, R.mipmap.icon_copy_text,
-                getResources().getDimension(R.dimen.widget_size_16));
+                getResources().getDimension(R.dimen.widget_size_18));
         userViewModel.generateQRCode(UserQRCodeActivity.this, content);
     }
 
@@ -106,7 +106,7 @@ public class UserQRCodeActivity extends ScanTriggerActivity implements View.OnCl
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_share) {
-            userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 240);
+            userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 480);
         }
         return true;
     }

@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.ui.setting;
 
 import android.os.Parcelable;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +21,7 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemBlacklistBinding;
+import io.taucoin.torrent.publishing.databinding.ItemUserBlacklistBinding;
 import io.taucoin.torrent.publishing.ui.Selectable;
 
 /**
@@ -27,30 +30,42 @@ import io.taucoin.torrent.publishing.ui.Selectable;
 public class BlackListAdapter extends ListAdapter<Parcelable, BlackListAdapter.ViewHolder>
         implements Selectable<Parcelable> {
     private List<Parcelable> dataList = new ArrayList<>();
+    private String type;
+    private ClickListener listener;
 
-    BlackListAdapter() {
+    BlackListAdapter(ClickListener listener, String type) {
         super(diffCallback);
+        this.listener = listener;
+        this.type = type;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ItemBlacklistBinding binding = DataBindingUtil.inflate(inflater,
-                R.layout.item_blacklist,
-                parent,
-                false);
+        ViewDataBinding binding;
+        if (StringUtil.isEquals(type, BlacklistActivity.TYPE_USERS)) {
+            binding = DataBindingUtil.inflate(inflater,
+                    R.layout.item_user_blacklist,
+                    parent,
+                    false);
+        } else {
+            binding = DataBindingUtil.inflate(inflater,
+                    R.layout.item_blacklist,
+                    parent,
+                    false);
+        }
 
-        return new ViewHolder(binding);
+        return new ViewHolder(binding, listener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull BlackListAdapter.ViewHolder holder, int position) {
         Parcelable parcelable = getItemKey(position);
         if(parcelable instanceof Community){
-            holder.bindCommunity((Community)parcelable);
+            holder.bindCommunity((Community)parcelable, getItemCount() != position + 1, position);
         }else if(parcelable instanceof User){
-            holder.bindUser((User)parcelable);
+            holder.bindUser((User)parcelable, getItemCount() != position + 1, position);
         }
     }
 
@@ -105,42 +120,62 @@ public class BlackListAdapter extends ListAdapter<Parcelable, BlackListAdapter.V
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private ItemBlacklistBinding binding;
+        private ViewDataBinding binding;
+        private ClickListener listener;
 
-        ViewHolder(ItemBlacklistBinding binding) {
+        ViewHolder(ViewDataBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
+            this.listener = listener;
         }
 
         /**
          * 绑定社区数据
          */
-        void bindCommunity(Community community) {
+        void bindCommunity(Community community, boolean isShowLine, int position) {
             if(null == community){
                 return;
             }
-            binding.tvName.setText(community.communityName);
+            ItemBlacklistBinding communityBinding = (ItemBlacklistBinding) binding;
+            communityBinding.tvName.setText(community.communityName);
             String firstLetters = StringUtil.getFirstLettersOfName(community.communityName);
-            binding.leftView.setText(firstLetters);
-            binding.leftView.setBgColor(Utils.getGroupColor(firstLetters));
+            communityBinding.leftView.setText(firstLetters);
+            communityBinding.leftView.setBgColor(Utils.getGroupColor(firstLetters));
+            communityBinding.line.setVisibility(isShowLine ? View.VISIBLE : View.GONE);
+            communityBinding.tvUnblock.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onUnblock(position);
+                }
+            });
         }
 
         /**
          * 绑定用户数据
          */
-        void bindUser(User user) {
+        void bindUser(User user, boolean isShowLine, int position) {
             if(null == user){
                 return;
             }
+            ItemUserBlacklistBinding userBinding = (ItemUserBlacklistBinding) binding;
+
             String showName = UsersUtil.getShowName(user);
-            binding.tvName.setText(showName);
+            userBinding.leftView.setImageBitmap(UsersUtil.getHeadPic(user));
+
+            userBinding.tvName.setText(showName);
             String publicKey = UsersUtil.getDefaultName(user.publicKey);
             publicKey = binding.getRoot().getResources().getString(R.string.common_parentheses, publicKey);
-            binding.tvPublicKey.setText(publicKey);
-            String firstLetters = StringUtil.getFirstLettersOfName(showName);
-            binding.leftView.setText(firstLetters);
-            binding.leftView.setBgColor(Utils.getGroupColor(firstLetters));
+            userBinding.tvPublicKey.setText(publicKey);
+            userBinding.line.setVisibility(isShowLine ? View.VISIBLE : View.GONE);
+            userBinding.tvUnblock.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onUnblock(position);
+                }
+            });
         }
+    }
+
+    public interface ClickListener {
+        void onUnblock(int pos);
     }
 
     private static final DiffUtil.ItemCallback<Parcelable> diffCallback = new DiffUtil.ItemCallback<Parcelable>() {

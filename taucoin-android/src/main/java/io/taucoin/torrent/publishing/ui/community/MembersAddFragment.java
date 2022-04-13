@@ -92,6 +92,9 @@ public class MembersAddFragment extends BaseFragment {
         if (StringUtil.isNotEmpty(chainID)) {
             txFree = viewModel.getTxFee(chainID);
         }
+        if (txFree < Constants.COIN.longValue()) {
+            txFree = Constants.COIN.longValue();
+        }
         medianFee = FmtMicrometer.fmtFeeValue(txFree);
         adapter = new MembersAddAdapter(airdropCoin);
         adapter.setListener(new MembersAddAdapter.ClickListener() {

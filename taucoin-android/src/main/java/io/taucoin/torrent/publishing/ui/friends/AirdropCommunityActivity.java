@@ -24,7 +24,6 @@ import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -34,7 +33,6 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityAirdropCommunityBinding;
 import io.taucoin.torrent.publishing.databinding.ExternalAirdropLinkDialogBinding;
 import io.taucoin.torrent.publishing.databinding.ExternalErrorLinkDialogBinding;
-import io.taucoin.torrent.publishing.databinding.PromptDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
@@ -54,7 +52,6 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private AirdropListAdapter adapter;
     private Disposable linkDisposable;
     private CommonDialog linkDialog;
-    private CommonDialog joinDialog;
     private CompositeDisposable disposables = new CompositeDisposable();
     private boolean linksSelector = false;
 
@@ -67,6 +64,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
         binding = DataBindingUtil.setContentView(this, R.layout.activity_airdrop_community);
         initParam();
         initLayout();
+        subscribeAddCommunity();
     }
 
     private void initParam() {
@@ -165,6 +163,17 @@ public class AirdropCommunityActivity extends BaseActivity implements
         return true;
     }
 
+    /**
+     * 订阅是否需要启动TauDaemon
+     */
+    private void subscribeAddCommunity(){
+        communityViewModel.getAddCommunityState().observe(this, result -> {
+            if(result.isSuccess()){
+                openCommunityActivity(result.getMsg());
+            }
+        });
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -186,10 +195,6 @@ public class AirdropCommunityActivity extends BaseActivity implements
         disposables.clear();
         if(linkDialog != null){
             linkDialog.closeDialog();
-        }
-
-        if(joinDialog != null){
-            joinDialog.closeDialog();
         }
     }
 
@@ -219,10 +224,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private void handleClipboardContent() {
         String content = CopyManager.getClipboardContent(this);
         if (StringUtil.isNotEmpty(content)) {
-            boolean isShowLinkDialog = showOpenExternalLinkDialog(content);
-            if (isShowLinkDialog) {
-                CopyManager.clearClipboardContent();
-            }
+            showOpenExternalLinkDialog(content);
         } else {
             showErrorLinkDialog(false);
         }
@@ -296,7 +298,6 @@ public class AirdropCommunityActivity extends BaseActivity implements
             userViewModel.addAirdropFriend(airdropPeer, decode.getChainID());
             // 加入社区
             String chainUrl = decode.getChainUrl();
-            initJoinSuccessDialog(decode.getAirdropPeer());
             openExternalChainLink(chainUrl);
         }
     }
@@ -309,17 +310,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
         ChainURL decode = ChainUrlUtil.decode(link);
         if (decode != null) {
             String chainID = decode.getChainID();
-            disposables.add(communityViewModel.getCommunityByChainIDSingle(chainID)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(community -> {
-                        openCommunityActivity(chainID);
-                        if (joinDialog != null) {
-                            joinDialog.closeDialog();
-                        }
-                    }, it -> {
-                        communityViewModel.addCommunity(chainID, link);
-                    }));
+            communityViewModel.addCommunity(chainID, link);
         }
     }
 
@@ -333,18 +324,5 @@ public class AirdropCommunityActivity extends BaseActivity implements
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra(IntentExtra.TYPE, 0);
         ActivityUtil.startActivity(intent, this, MainActivity.class);
-    }
-
-    private void initJoinSuccessDialog(String airdropPeer) {
-        PromptDialogBinding joinBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
-                R.layout.prompt_dialog, null, false);
-        String airdropPeerName = UsersUtil.getShowName(null, airdropPeer);
-        String joinSuccess = getString(R.string.main_chain_join_success, airdropPeerName);
-        joinBinding.tvTitle.setText(Html.fromHtml(joinSuccess));
-        joinDialog = new CommonDialog.Builder(this)
-                .setContentView(joinBinding.getRoot())
-                .setCanceledOnTouchOutside(true)
-                .create();
-        joinDialog.setOnCancelListener(l -> joinDialog = null);
     }
 }

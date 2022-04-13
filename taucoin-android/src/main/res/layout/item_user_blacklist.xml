@@ -14,22 +14,14 @@
         android:paddingStart="@dimen/widget_size_7"
         android:paddingEnd="@dimen/widget_size_0">
 
-        <io.taucoin.torrent.publishing.ui.customviews.RoundButton
+        <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
             android:id="@+id/left_view"
             android:layout_width="@dimen/widget_size_40"
             android:layout_height="@dimen/widget_size_40"
             android:layout_marginEnd="@dimen/widget_size_7"
             android:layout_marginStart="@dimen/widget_size_7"
             android:layout_centerVertical="true"
-            android:gravity="center"
-            android:textAllCaps="false"
-            android:textColor="@color/color_white"
-            android:textStyle="bold"
-            app:btnStrokeColor="@color/primary_light"
-            app:btnStrokeWidth="@dimen/widget_size_0"
-            app:btnCornerRadius="@dimen/widget_size_7"
-            app:btnSolidColor="@color/primary_light"
-            app:btnPressedRatio="1.5" />
+            android:scaleType="centerCrop"/>
 
         <TextView
             android:layout_toEndOf="@+id/left_view"
@@ -43,8 +35,8 @@
             android:textAppearance="@style/TextAppearanceBody1" />
 
         <TextView
-            android:layout_toEndOf="@+id/tv_name"
             android:layout_toStartOf="@+id/tv_unblock"
+            android:layout_toEndOf="@+id/tv_name"
             android:id="@+id/tv_public_key"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

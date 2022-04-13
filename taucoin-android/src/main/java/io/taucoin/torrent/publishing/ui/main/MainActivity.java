@@ -288,23 +288,6 @@ public class MainActivity extends ScanTriggerActivity {
         }
     }
 
-    private void handleClipboardContent() {
-        String content = CopyManager.getClipboardContent(this);
-        if(StringUtil.isNotEmpty(content)){
-            boolean isShowLinkDialog = showOpenExternalLinkDialog(content);
-            if(isShowLinkDialog){
-                CopyManager.clearClipboardContent();
-            }
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // android10中规定, 目前处于焦点的应用, 才能访问到剪贴板数据
-        this.getWindow().getDecorView().post(this::handleClipboardContent);
-    }
-
     @Override
     protected void onStop() {
         super.onStop();
@@ -615,17 +598,7 @@ public class MainActivity extends ScanTriggerActivity {
         ChainURL decode = ChainUrlUtil.decode(link);
         if (decode != null) {
             String chainID = decode.getChainID();
-            disposables.add(communityViewModel.getCommunityByChainIDSingle(chainID)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(community -> {
-                        updateCommunityFragment(chainID);
-                        if (joinDialog != null) {
-                            joinDialog.closeDialog();
-                        }
-                    }, it -> {
-                        communityViewModel.addCommunity(chainID, link);
-                    }));
+            communityViewModel.addCommunity(chainID, link);
         }
     }
 

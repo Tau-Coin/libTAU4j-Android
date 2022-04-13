@@ -24,6 +24,7 @@ import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
+import io.taucoin.torrent.publishing.core.utils.DrawablesUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityCommunityQrCodeBinding;
@@ -76,6 +77,10 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
         String showName = ChainIDUtil.getName(chainID);
         binding.qrCode.tvName.setText(showName);
         binding.qrCode.tvQrCode.setVisibility(View.GONE);
+        binding.qrCode.ivCopy.setVisibility(View.GONE);
+
+        DrawablesUtil.setEndDrawable(binding.qrCode.tvName, R.mipmap.icon_copy_text,
+                getResources().getDimension(R.dimen.widget_size_18));
 
         // 获取10个社区成员的公钥
         disposables.add(communityViewModel.getCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT)
@@ -108,7 +113,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_share) {
-            userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 240);
+            userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 480);
         }
         return true;
     }
@@ -126,7 +131,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     public void onClick(View v) {
         if (v.getId() == R.id.ll_scan_qr_code) {
             openScanQRActivityAndExit();
-        } else if (v.getId() == R.id.iv_copy) {
+        } else if (v.getId() == R.id.tv_name) {
             if (StringUtil.isNotEmpty(chainUrl)) {
                 CopyManager.copyText(chainUrl);
                 ToastUtils.showShortToast(R.string.copy_share_link);

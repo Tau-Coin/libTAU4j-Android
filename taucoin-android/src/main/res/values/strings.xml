@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TAU</string>
-    <string name="app_name_alpha">Version for testing\nand playing only</string>
+    <string name="app_name_alpha">TAU App Beta</string>
+    <string name="app_name_alpha_description">Freely Create Crypto Coins\nDecentral Serverless Network</string>
     <string name="app_share">Share app link via</string>
     <string name="app_share_error">Can\'t find share component to share</string>
 
@@ -58,7 +59,6 @@
     <string name="main_airdrop_link_share">Share link to airdrop to friends.</string>
 
     <string name="main_publish_video">Publish Video</string>
-    <string name="main_new_community">New Coin Community</string>
     <string name="main_community_settings">Community Settings</string>
     <string name="main_other_transaction">Other Transaction</string>
     <string name="main_no_messages">[No messages]</string>
@@ -69,12 +69,12 @@
     <string name="main_insufficient_device_space">Insufficient device space</string>
 
     <!-- Strings used for main drawer content -->
-    <string name="drawer_new_community">New Community</string>
+    <string name="drawer_new_community">Create Coin Community</string>
     <string name="drawer_airdrop_links">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Friends</string>
-    <string name="drawer_communities">Community Coins</string>
+    <string name="drawer_communities">Wallet</string>
     <string name="drawer_setting">Settings</string>
     <string name="drawer_data_cost">Data Cost</string>
     <string name="drawer_working_condition">Working Condition</string>
@@ -502,7 +502,7 @@
     <string name="bot_airdrop_tau_link">Android Link</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share android link</string>
-    <string name="bot_share_airdrop_link_content">1. Please download TAU app(size 20Mb) to join us.\n\n%1$s\n\n
+    <string name="bot_share_airdrop_link_content">1. Please download decentral server-less TAU app(size 20Mb) to join us.\n\n%1$s\n\n
         2. To receive your airdrop coins, copy this FULL message and paste to TAU app airdrop function.\n\n%2$s
     </string>
     <string name="bot_hello_world">HelloWorld</string>

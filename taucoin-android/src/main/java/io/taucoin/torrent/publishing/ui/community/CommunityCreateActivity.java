@@ -66,7 +66,7 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
      */
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.main_new_community);
+        binding.toolbarInclude.toolbar.setTitle(R.string.drawer_new_community);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 

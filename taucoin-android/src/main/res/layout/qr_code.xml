@@ -37,8 +37,8 @@
 
             <ImageView
                 android:id="@+id/iv_copy"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/widget_size_22"
+                android:layout_width="@dimen/widget_size_30"
+                android:layout_height="@dimen/widget_size_30"
                 android:contentDescription="@null"
                 android:onClick="@{listener::onClick}"
                 android:padding="@dimen/widget_size_5"

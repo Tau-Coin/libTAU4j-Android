@@ -107,7 +107,7 @@ public class KeyQRCodeActivity extends ScanTriggerActivity implements View.OnCli
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_share) {
-            userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 240);
+            userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 480);
         }
         return true;
     }

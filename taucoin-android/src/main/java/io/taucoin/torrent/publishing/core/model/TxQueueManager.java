@@ -154,6 +154,9 @@ class TxQueueManager {
         long fee = txQueue.fee;
         if (txQueue.queueType == 1) {
             fee = getMedianTxFree(txQueue.chainID);
+            if (fee < Constants.COIN.longValue()) {
+                fee = Constants.COIN.longValue();
+            }
             txQueue.fee = fee;
             // 更新airdrop的交易费
             txQueueRepos.updateQueue(txQueue);
