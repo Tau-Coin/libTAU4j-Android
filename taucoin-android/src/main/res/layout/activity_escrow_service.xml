@@ -58,7 +58,7 @@
                     android:lineSpacingExtra="@dimen/widget_size_2"
                     android:text="@string/escrow_service_step"
                     android:background="@drawable/white_rect_round_bg_no_border"
-                    android:textAppearance="@style/TextAppearanceBody3"/>
+                    android:textAppearance="@style/TextAppearanceBody2"/>
 
                 <TextView
                     android:id="@+id/tv_escrow_now"

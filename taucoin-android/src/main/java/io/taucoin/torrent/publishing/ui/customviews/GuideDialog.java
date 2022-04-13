@@ -105,8 +105,8 @@ public class GuideDialog extends Dialog {
             pointParams.leftMargin = context.getResources().getDimensionPixelSize(R.dimen.widget_size_2);
             pointParams.rightMargin = pointParams.leftMargin;
             List<View> viewList = new ArrayList<>();
-            int[] guides = new int[]{R.mipmap.icon_guide1, R.mipmap.icon_guide2};
-            int[] texts = new int[]{R.string.home_guide1, R.string.home_guide2};
+            int[] guides = new int[]{R.mipmap.icon_guide2};
+            int[] texts = new int[]{R.string.home_guide2};
             for (int i = 0; i < guides.length; i++) {
                 ItemGuideBinding itemBinding = DataBindingUtil.inflate(inflater, R.layout.item_guide,
                         null, false);
@@ -122,6 +122,7 @@ public class GuideDialog extends Dialog {
                     iv_point.setBackgroundResource(R.drawable.point_grey_border);
                 }
                 binding.llPoint.addView(iv_point);
+                binding.llPoint.setVisibility(guides.length > 1 ? View.VISIBLE : View.GONE);
             }
             binding.viewPager.setAdapter(new GuidePageAdapter(viewList));
             binding.viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
