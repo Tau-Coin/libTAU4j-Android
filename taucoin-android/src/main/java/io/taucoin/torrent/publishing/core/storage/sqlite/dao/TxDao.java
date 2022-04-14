@@ -117,6 +117,9 @@ public interface TxDao {
     String QUERY_GET_TX_BY_TX_ID = "SELECT * FROM Txs" +
             " WHERE txID = :txID";
 
+    String QUERY_GET_TX_BY_TX_QUEUE = "SELECT * FROM Txs" +
+            " WHERE queueID = :queueID AND timestamp = :timestamp";
+
     String QUERY_GET_NOT_ON_CHAIN_TX = "SELECT * FROM Txs" +
             " WHERE chainID = :chainID AND txType = :txType AND nonce = :nonce" +
             " ORDER BY timestamp DESC LIMIT 1";
@@ -234,6 +237,9 @@ public interface TxDao {
      */
     @Query(QUERY_GET_TX_BY_TX_ID)
     Tx getTxByTxID(String txID);
+
+    @Query(QUERY_GET_TX_BY_TX_QUEUE)
+    Tx getTxByQueueID(long queueID, long timestamp);
 
     @Transaction
     @Query(QUERY_GET_SELL_DETAIL)

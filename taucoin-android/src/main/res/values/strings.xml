@@ -140,7 +140,7 @@
     <string name="community_mining_income">Mining Income</string>
     <string name="community_filter_all">All</string>
     <string name="community_chain_note">Chat</string>
-    <string name="community_chain_market">On-Chain News</string>
+    <string name="community_chain_market">News</string>
     <string name="community_on_chain">Transactions</string>
     <string name="community_escrow_service_enter">Escrow Service</string>
     <string name="community_pinned_message">Pinned Message</string>

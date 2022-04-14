@@ -589,12 +589,15 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 取消当前焦点链（用户正在查看的链）
+     * 判断交易是否在交易池
      */
-    public void cancelFocusOnChain(String chainID) {
+    public boolean isTxInFeePool(String chainID, String txID) {
         if (isRunning) {
-            logger.debug("cancelFocusOnChain::{}", chainID);
+            boolean isExist = sessionManager.isTxInFeePool(ChainIDUtil.encode(chainID), txID);
+            logger.debug("isTxInFeePool::{}, chainID::{}, txID::{}", isExist, chainID, txID);
+            return isExist;
         }
+        return false;
     }
 
     /**
@@ -634,6 +637,10 @@ public abstract class TauDaemon {
      */
     public void updateTxQueue(String chainID) {
         txQueueManager.updateTxQueue(chainID);
+    }
+
+    public void updateTxQueue(String chainID, boolean isResendTx) {
+        txQueueManager.updateTxQueue(chainID, isResendTx);
     }
 
     public String resendTxQueue(TxQueue tx) {

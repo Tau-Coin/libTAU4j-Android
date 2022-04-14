@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import io.reactivex.Observable;
@@ -32,7 +33,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
@@ -52,6 +52,7 @@ class TxQueueManager {
     private MemberRepository memberRepo;
     private SettingsRepository settingsRepo;
     private LinkedBlockingQueue<String> chainIDQueue = new LinkedBlockingQueue<>();
+    private ConcurrentHashMap<String, Boolean> chainResendTx = new ConcurrentHashMap<String, Boolean>();
     private Disposable queueDisposable;
 
     TxQueueManager(TauDaemon daemon) {
@@ -76,7 +77,7 @@ class TxQueueManager {
                 logger.debug("init queue size::{}", null == list ? 0 : list.size());
                 if (list != null && list.size() > 0) {
                     for (String chainID : list) {
-                        updateTxQueue(chainID);
+                        updateTxQueue(chainID, true);
                     }
                 }
             }
@@ -104,6 +105,18 @@ class TxQueueManager {
             chainIDQueue.offer(chainID);
             logger.debug("updateTxQueue chainID::{}", chainID);
         }
+    }
+
+    /**
+     * 更新转账交易队列
+     * @param chainID 链ID
+     * @param isResendTx 是否重新发送等待上链的交易（防止由于libTAU丢弃交易而上不了链）
+     */
+    void updateTxQueue(String chainID, boolean isResendTx) {
+        if (isResendTx) {
+            chainResendTx.put(chainID, true);
+        }
+        updateTxQueue(chainID);
     }
 
     /**
@@ -142,6 +155,7 @@ class TxQueueManager {
                 if (account.getNonce() >= txQueue.nonce) {
                     return sendWiringTx(chainID, offset + 1);
                 } else {
+                    resendWiringTx(txQueue);
                     return false;
                 }
             }
@@ -150,6 +164,55 @@ class TxQueueManager {
             logger.debug("Error adding transaction::{}", e.getMessage());
         }
         return false;
+    }
+
+    /**
+     * 重新发送等待上链的交易（防止由于libTAU丢弃交易而上不了链）
+     */
+    private void resendWiringTx(TxQueueAndStatus txQueue) {
+        String chainID = txQueue.chainID;
+        if (chainResendTx.containsKey(chainID)) {
+            Boolean isResend = chainResendTx.get(chainID);
+            if (isResend != null && !isResend) {
+                logger.debug("resendWiringTx:: No need to resend");
+                return;
+            }
+        }
+        Tx tx = txRepo.getTxByQueueID(txQueue.queueID, txQueue.timestamp);
+        if ( null == tx) {
+            logger.debug("resendWiringTx:: tx not found");
+            return;
+        }
+        boolean isExist = daemon.isTxInFeePool(tx.chainID, tx.txID);
+        logger.debug("resendWiringTx isExist::{}, chainID::{} txID::{}, amount::{}, fee::{}, nonce::{}",
+                isExist, tx.chainID, tx.txID, tx.amount, tx.fee, tx.nonce);
+        if (isExist) {
+            return;
+        }
+        User user = userRepos.getUserByPublicKey(tx.senderPk);
+        byte[] senderSeed = ByteUtil.toByte(user.seed);
+        Pair<byte[], byte[]> keypair = Ed25519.createKeypair(senderSeed);
+        byte[] senderPk = keypair.first;
+        byte[] secretKey = keypair.second;
+        byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
+        byte[] chainIDBytes = ChainIDUtil.encode(tx.chainID);
+        long timestamp = tx.timestamp;
+        long nonce = tx.nonce;
+        long amount = tx.amount;
+        long fee = tx.fee;
+        byte[] memo = Utils.textStringToBytes(tx.memo);
+        TxContent txContent = new TxContent(WIRING_TX.getType(), memo);
+        byte[] txEncoded = txContent.getEncoded();
+        Transaction transaction = new Transaction(chainIDBytes, 0, timestamp, senderPk, receiverPk,
+                nonce, amount, fee, txEncoded);
+        transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
+        boolean isSubmitSuccess = daemon.submitTransaction(transaction);
+        logger.debug("resendWiringTx chainID::{} txID::{}, resend txID::{}, success::{}",
+                tx.chainID, tx.txID, transaction.getTxID().to_hex(), isSubmitSuccess);
+
+        if (isSubmitSuccess) {
+            chainResendTx.put(chainID, false);
+        }
     }
 
     private boolean sendWiringTx(Account account, TxQueueAndStatus txQueue) {

@@ -165,6 +165,11 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
+    public Tx getTxByQueueID(long queueID, long timestamp) {
+        return db.txDao().getTxByQueueID(queueID, timestamp);
+    }
+
+    @Override
     public Flowable<UserAndTx> observeSellTxDetail(String chainID, String txID) {
         return db.txDao().observeSellTxDetail(chainID, txID);
     }

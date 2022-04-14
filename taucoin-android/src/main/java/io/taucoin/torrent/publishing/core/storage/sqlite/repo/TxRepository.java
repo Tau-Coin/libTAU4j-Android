@@ -63,6 +63,8 @@ public interface TxRepository {
      */
     Tx getTxByTxID(String txID);
 
+    Tx getTxByQueueID(long queueID, long timestamp);
+
     /**
      * 观察社区的交易的变化
      */
