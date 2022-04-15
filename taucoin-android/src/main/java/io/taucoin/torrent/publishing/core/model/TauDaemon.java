@@ -557,11 +557,16 @@ public abstract class TauDaemon {
         return false;
     }
 
+    public boolean isRunning() {
+        return isRunning;
+    }
+
     /**
      * 获取挖矿时间
      * 返回-1：代表出不了块
      */
     public long getMiningTime(byte[] chainID) {
+        logger.debug("getMiningTime isRunning::{}", isRunning);
         if (isRunning) {
             return sessionManager.getMiningTime(chainID);
         }

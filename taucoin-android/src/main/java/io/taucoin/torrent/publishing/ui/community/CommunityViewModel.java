@@ -854,7 +854,7 @@ public class CommunityViewModel extends AndroidViewModel {
         return Observable.create(emitter -> {
             while (!emitter.isDisposed()) {
                 long time = daemon.getMiningTime(ChainIDUtil.encode(chainID));
-                logger.debug("Mining Time::{}, chainID::{}", time, chainID);
+                logger.debug("Mining Time::{}, chainID::{}, isRunning::{}", time, chainID, daemon.isRunning());
                 emitter.onNext(time);
                 try {
                     Thread.sleep(1000);

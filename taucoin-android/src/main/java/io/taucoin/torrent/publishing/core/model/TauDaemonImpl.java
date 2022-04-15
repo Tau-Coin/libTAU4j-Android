@@ -352,6 +352,7 @@ public class TauDaemonImpl extends TauDaemon {
      */
     @Override
     public Account getAccountInfo(byte[] chainID, String publicKey) {
+        logger.debug("getAccountInfo isRunning::{}", isRunning);
         Account account = null;
         if (isRunning) {
             account = sessionManager.getAccountInfo(chainID, publicKey);
@@ -385,8 +386,8 @@ public class TauDaemonImpl extends TauDaemon {
         if (isRunning) {
             success = sessionManager.followChain(ChainIDUtil.encode(chainID), peers);
         }
-        logger.debug("followChain chainID::{}, peers size::{}, success::{}", chainID,
-                peers.size(), success);
+        logger.debug("followChain chainID::{}, peers size::{}, success::{}, isRunning::{}", chainID,
+                peers.size(), success, isRunning);
         return success;
     }
 
@@ -400,7 +401,7 @@ public class TauDaemonImpl extends TauDaemon {
         if (isRunning) {
             success = sessionManager.unfollowChain(ChainIDUtil.encode(chainID));
         }
-        logger.debug("unfollowChain chainID::{}, success::{}", chainID, success);
+        logger.debug("unfollowChain chainID::{}, success::{}, isRunning::{}", chainID, success, isRunning);
         return success;
     }
 
