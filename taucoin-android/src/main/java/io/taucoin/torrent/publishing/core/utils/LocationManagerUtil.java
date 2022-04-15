@@ -118,12 +118,12 @@ public class LocationManagerUtil {
             long minTime = 0;
             long minDistance = 0;
             locationManager.removeUpdates(locationListener);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime,
-                    minDistance, locationListener);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime,
-                    minDistance, locationListener);
-            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, minTime,
-                    minDistance, locationListener);
+            if (providers != null) {
+                for (String provider: providers) {
+                    locationManager.requestLocationUpdates(provider, minTime, minDistance, locationListener);
+                    logger.debug("requestLocationUpdates provider::{}", provider);
+                }
+            }
             logger.debug("request Location Updates...");
         }
     }
