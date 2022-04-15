@@ -133,6 +133,10 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
             handleWarningView();
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_internet_state))) {
             handleWarningView();
+        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_metered_prompt_limit))) {
+            handleWarningView();
+        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_wifi_prompt_limit))) {
+            handleWarningView();
         }
     }
 
