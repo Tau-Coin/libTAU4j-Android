@@ -27,6 +27,8 @@ public interface MemberDao {
     String WHERE_NOT_PERISHABLE = " (blockNumber >= tailBlock)";
     String WHERE_ON_CHAIN = " ((balance > 0 OR power > 0) AND" + WHERE_NOT_PERISHABLE + ")";
 
+    String WHERE_OFF_CHAIN = " ((balance <= 0 AND power <= 0) OR (blockNumber < tailBlock))";
+
     String QUERY_GET_MEMBER_BY_CHAIN_ID_PK = "SELECT * FROM Members WHERE chainID = :chainID AND publicKey = :publicKey";
     String QUERY_GET_MEMBERS_BY_CHAIN_ID = "SELECT * FROM Members WHERE chainID = :chainID";
 
@@ -47,6 +49,11 @@ public interface MemberDao {
     String QUERY_COMMUNITY_MEMBERS_LIMIT = "SELECT m.publicKey FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
             " WHERE m.chainID = :chainID AND " + WHERE_ON_CHAIN +
+            " ORDER BY m.power limit :limit";
+
+    String QUERY_COMMUNITY_OFF_CHAIN_MEMBERS_LIMIT = "SELECT m.publicKey FROM Members m" +
+            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+            " WHERE m.chainID = :chainID AND " + WHERE_OFF_CHAIN +
             " ORDER BY m.power limit :limit";
 
     String QUERY_MEMBERS_STATISTICS = "SELECT COUNT(*) AS members FROM Members m" +
@@ -149,10 +156,10 @@ public interface MemberDao {
      * @param limit
      */
     @Query(QUERY_COMMUNITY_MEMBERS_LIMIT)
-    Single<List<String>> getCommunityMembersLimit(String chainID, int limit);
-
-    @Query(QUERY_COMMUNITY_MEMBERS_LIMIT)
     List<String> queryCommunityMembersLimit(String chainID, int limit);
+
+    @Query(QUERY_COMMUNITY_OFF_CHAIN_MEMBERS_LIMIT)
+    List<String> queryCommunityOffChainMembersLimit(String chainID, int limit);
 
     @Query(QUERY_MEMBERS_STATISTICS)
     Flowable<Statistics> getMembersStatistics(String chainID);

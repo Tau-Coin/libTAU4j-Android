@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,6 +13,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
@@ -107,21 +109,31 @@ public class MemberRepositoryImpl implements MemberRepository{
 
     /**
      * 获取社区limit个成员
+     * 先选取链上成员，如果链上成员不够，再选取链下成员
      * @param chainID
      * @param limit
      */
     @Override
-    public Single<List<String>> getCommunityMembersLimit(String chainID, int limit){
-        return db.memberDao().getCommunityMembersLimit(chainID, limit);
-    }
-
-    @Override
     public List<String> queryCommunityMembersLimit(String chainID, int limit) {
-        return db.memberDao().queryCommunityMembersLimit(chainID, limit);
+        // 获取链上成员
+        List<String> members = db.memberDao().queryCommunityMembersLimit(chainID, limit);
+        if (null == members) {
+            members = new ArrayList<>();
+        }
+        int offChainLimit = limit - members.size();
+        if (offChainLimit > 0) {
+            // 获取链下成员
+            List<String> offChainMembers = db.memberDao().queryCommunityOffChainMembersLimit(chainID,
+                    offChainLimit);
+            if (offChainMembers != null && offChainMembers.size() > 0) {
+                members.addAll(offChainMembers);
+            }
+        }
+        return members;
     }
 
     @Override
-    public Flowable<Statistics> getMembersStatistics(String chainID){
+    public Flowable<Statistics> getMembersStatistics(String chainID) {
         return db.memberDao().getMembersStatistics(chainID);
     }
 

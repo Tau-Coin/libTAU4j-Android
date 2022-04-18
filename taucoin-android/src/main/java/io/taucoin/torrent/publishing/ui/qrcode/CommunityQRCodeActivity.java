@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import androidx.databinding.DataBindingUtil;
@@ -45,6 +46,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     private UserViewModel userViewModel;
     private String chainID;
     private String chainUrl;
+    private String chainUrlCopy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +90,12 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
                     if (StringUtil.isNotEmpty(chainID)) {
                         chainUrl = ChainUrlUtil.encode(chainID, list);
+                        if (list.size() > Constants.AIRDROP_LINK_BS_LIMIT) {
+                            List<String> newList = list.subList(0, Constants.AIRDROP_LINK_BS_LIMIT);
+                            chainUrlCopy = ChainUrlUtil.encode(chainID, newList);
+                        } else {
+                            chainUrlCopy = chainUrl;
+                        }
                         logger.debug("chainUrl::{}", chainUrl);
                         communityViewModel.generateQRCode(this, chainUrl, this.chainID, showName);
                     }
@@ -132,8 +140,8 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
         if (v.getId() == R.id.ll_scan_qr_code) {
             openScanQRActivityAndExit();
         } else if (v.getId() == R.id.tv_name) {
-            if (StringUtil.isNotEmpty(chainUrl)) {
-                CopyManager.copyText(chainUrl);
+            if (StringUtil.isNotEmpty(chainUrlCopy)) {
+                CopyManager.copyText(chainUrlCopy);
                 ToastUtils.showShortToast(R.string.copy_share_link);
             }
         }

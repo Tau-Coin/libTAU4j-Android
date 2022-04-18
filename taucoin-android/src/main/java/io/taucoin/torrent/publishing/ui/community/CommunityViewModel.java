@@ -46,6 +46,7 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -561,8 +562,15 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param chainID
      * @param limit
      */
-    public Single<List<String>> getCommunityMembersLimit(String chainID, int limit) {
-        return memberRepo.getCommunityMembersLimit(chainID, limit);
+    public Observable<List<String>> getCommunityMembersLimit(String chainID, int limit) {
+        return Observable.create(emitter -> {
+            List<String> list = queryCommunityMembersLimit(chainID, limit);
+            if (null == list) {
+                list = new ArrayList<>();
+            }
+            emitter.onNext(list);
+            emitter.onComplete();
+        });
     }
 
     public List<String> queryCommunityMembersLimit(String chainID, int limit) {
