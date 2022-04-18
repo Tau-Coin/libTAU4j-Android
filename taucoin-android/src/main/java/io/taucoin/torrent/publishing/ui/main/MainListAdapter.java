@@ -95,7 +95,9 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                     binding.tvMsgLastTime.setText(null);
                 }
                 String communityName = ChainIDUtil.getName(bean.ID);
-                binding.tvGroupName.setText(context.getString(R.string.main_community_name, communityName));
+                String communityCode = ChainIDUtil.getCode(bean.ID);
+                binding.tvGroupName.setText(context.getString(R.string.main_community_name,
+                        communityName, communityCode));
                 String firstLetters = StringUtil.getFirstLettersOfName(communityName);
                 binding.leftView.setText(firstLetters);
                 String balance = FmtMicrometer.fmtBalance(bean.balance);
