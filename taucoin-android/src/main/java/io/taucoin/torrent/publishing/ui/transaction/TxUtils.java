@@ -11,6 +11,10 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
+import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
+import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
@@ -53,7 +57,7 @@ public class TxUtils {
                 return createSpanAirdropTx(tx, tab);
             case TRUST_TX:
                 return createSpanTrustTx(tx, tab);
-            case LEADER_INVITATION:
+            case ANNOUNCEMENT:
                 return createSpanLeaderTx(tx, tab);
         }
         return new SpanUtils().create();
@@ -239,21 +243,62 @@ public class TxUtils {
         return msg.create();
     }
 
-    public static SpannableStringBuilder createSpanTxQueue(TxQueueAndStatus tx) {
+    public static SpannableStringBuilder createSpanTxQueue(TxQueueAndStatus tx, boolean isShowNonce) {
         String coinName = ChainIDUtil.getCoinName(tx.chainID);
-        SpanUtils msg = new SpanUtils()
-                .append("Amount: ")
-                .append(FmtMicrometer.fmtBalance(tx.amount))
-                .append("\n").append("Fee: ")
-                .append(FmtMicrometer.fmtFeeValue(tx.fee))
-                .append(" ")
-                .append(coinName)
-                .append("\n").append("To: ")
-                .append(HashUtil.hashMiddleHide(tx.receiverPk));
-        if (tx.nonce > 0) {
-            msg.append("\n").append("Nonce: ").append(FmtMicrometer.fmtLong(tx.nonce));
+        SpanUtils msg = new SpanUtils();
+        if (tx.content != null) {
+            TxContent txContent = new TxContent(tx.content);
+            int txType = txContent.getType();
+            if (txType == TxType.WIRING_TX.getType()) {
+                msg.append("Amount: ").append(FmtMicrometer.fmtBalance(tx.amount))
+                        .append(" ").append(coinName)
+                        .append("\n");
+            }
+            msg.append("Fee: ").append(FmtMicrometer.fmtFeeValue(tx.fee))
+                    .append(" ").append(coinName);
+            if (isShowNonce && tx.nonce > 0) {
+                msg.append("\n").append("Nonce: ").append(FmtMicrometer.fmtLong(tx.nonce));
+            }
+            if (txType == TxType.WIRING_TX.getType()) {
+                msg.append("\n").append("To: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
+                if (StringUtil.isNotEmpty(txContent.getMemo())) {
+                    msg.append("\n").append("Description: ").append(txContent.getMemo());
+                }
+            } else if (txType == TxType.AIRDROP_TX.getType()) {
+                AirdropTxContent content = new AirdropTxContent(tx.content);
+                msg.append("\n").append("Link: ").append(content.getLink());
+                if (StringUtil.isNotEmpty(txContent.getMemo())) {
+                    msg.append("\n").append("Description: ").append(txContent.getMemo());
+                }
+            } else if (txType == TxType.ANNOUNCEMENT.getType()) {
+                AnnouncementContent content = new AnnouncementContent(tx.content);
+                msg.append("\n").append("Title: ").append(content.getTitle());
+                if (StringUtil.isNotEmpty(txContent.getMemo())) {
+                    msg.append("\n").append("Description: ").append(txContent.getMemo());
+                }
+            } else if (txType == TxType.SELL_TX.getType()) {
+                SellTxContent content = new SellTxContent(tx.content);
+                msg.append("\n").append("Selling: ")
+                        .append(content.getCoinName())
+                        .append("\n").append("Quantity: ");
+                if (content.getQuantity() > 0) {
+                    msg.append(String.valueOf(content.getQuantity()));
+                } else {
+                    msg.append("TBD");
+                }
+                if (StringUtil.isNotEmpty(content.getLink())) {
+                    msg.append("\n").append("Link: ").append(content.getLink());
+                }
+                if (StringUtil.isNotEmpty(content.getLocation())) {
+                    msg.append("\n").append("Location: ").append(content.getLocation());
+                }
+                if (StringUtil.isNotEmpty(content.getMemo())) {
+                    msg.append("\n").append("Description: ").append(content.getMemo());
+                }
+            } else if (txType == TxType.TRUST_TX.getType()) {
+                msg.append("\n").append("Trust: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
+            }
         }
-        msg.append("\n").append("Memo: ").append(tx.memo);
         return msg.create();
     }
 

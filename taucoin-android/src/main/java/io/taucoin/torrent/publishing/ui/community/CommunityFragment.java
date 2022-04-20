@@ -36,7 +36,7 @@ import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.transaction.ChainTabFragment;
-import io.taucoin.torrent.publishing.ui.transaction.LeaderInvitationCreateActivity;
+import io.taucoin.torrent.publishing.ui.transaction.AnnouncementCreateActivity;
 import io.taucoin.torrent.publishing.ui.transaction.MarketTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.NotesTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.QueueTabFragment;
@@ -222,7 +222,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                                 TX_REQUEST_CODE);
                         break;
                     case R.id.community_create_invitation:
-                        ActivityUtil.startActivityForResult(intent, activity, LeaderInvitationCreateActivity.class,
+                        ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
                                 TX_REQUEST_CODE);
                         break;
                 }

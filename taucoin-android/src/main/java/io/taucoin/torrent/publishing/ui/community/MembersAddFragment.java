@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -90,10 +91,7 @@ public class MembersAddFragment extends BaseFragment {
     private void initLayout() {
         long txFree = 0L;
         if (StringUtil.isNotEmpty(chainID)) {
-            txFree = viewModel.getTxFee(chainID);
-        }
-        if (txFree < Constants.COIN.longValue()) {
-            txFree = Constants.COIN.longValue();
+            txFree = viewModel.getTxFee(chainID, TxType.WIRING_TX);
         }
         medianFee = FmtMicrometer.fmtFeeValue(txFree);
         adapter = new MembersAddAdapter(airdropCoin);

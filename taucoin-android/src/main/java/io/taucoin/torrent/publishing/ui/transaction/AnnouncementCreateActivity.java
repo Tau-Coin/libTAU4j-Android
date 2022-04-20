@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,10 +12,11 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -30,14 +30,14 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 /**
  * 发布Sell页面
  */
-public class LeaderInvitationCreateActivity extends BaseActivity implements View.OnClickListener {
+public class AnnouncementCreateActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int CHOOSE_REQUEST_CODE = 0x01;
     private ActivityLeaderInvitationBinding binding;
     private TxViewModel txViewModel;
     private String chainID;
-    private boolean noBalance;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private TxQueue txQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,10 @@ public class LeaderInvitationCreateActivity extends BaseActivity implements View
     private void initParameter() {
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            noBalance = getIntent().getBooleanExtra(IntentExtra.NO_BALANCE, true);
+            txQueue = getIntent().getParcelableExtra(IntentExtra.BEAN);
+            if (txQueue != null) {
+                chainID = txQueue.chainID;
+            }
         }
     }
 
@@ -72,17 +75,20 @@ public class LeaderInvitationCreateActivity extends BaseActivity implements View
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         if (StringUtil.isNotEmpty(chainID)) {
-
-            long txFee = txViewModel.getTxFee(chainID);
-            String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.COIN.longValue());
-            binding.tvFee.setTag(R.id.median_fee, txFee);
-
-            if (noBalance) {
-                txFeeStr = "0";
+            long txFee = 0;
+            if (txQueue != null) {
+                txFee = txQueue.fee;
+                AnnouncementContent txContent = new AnnouncementContent(txQueue.content);
+                binding.etCoinName.setText(txContent.getTitle());
+                binding.etDescription.setText(txContent.getMemo());
             }
-            String medianFree = getString(R.string.tx_median_fee, txFeeStr,
+            long mediaTxFee = txViewModel.getTxFee(chainID, TxType.ANNOUNCEMENT);
+            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : mediaTxFee);
+            binding.tvFee.setTag(R.id.median_fee, mediaTxFee);
+
+            String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
                     ChainIDUtil.getCoinName(chainID));
-            binding.tvFee.setText(Html.fromHtml(medianFree));
+            binding.tvFee.setText(Html.fromHtml(txFreeHtml));
             binding.tvFee.setTag(txFeeStr);
         }
         String coinName = ChainIDUtil.getCoinName(chainID);
@@ -124,9 +130,9 @@ public class LeaderInvitationCreateActivity extends BaseActivity implements View
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_done) {
-            Tx tx = buildTx();
+            TxQueue tx = buildTx();
             if (txViewModel.validateTx(tx)) {
-                txViewModel.addTransaction(tx);
+                txViewModel.addTransaction(tx, null == txQueue);
             }
         }
         return true;
@@ -136,12 +142,18 @@ public class LeaderInvitationCreateActivity extends BaseActivity implements View
      * 构建交易数据
      * @return Tx
      */
-    private Tx buildTx() {
-        int txType = TxType.LEADER_INVITATION.getType();
+    private TxQueue buildTx() {
+        String senderPk = MainApplication.getInstance().getPublicKey();
         String fee = ViewUtils.getStringTag(binding.tvFee);
         String coinName = ViewUtils.getText(binding.etCoinName);
         String description = ViewUtils.getText(binding.etDescription);
-        return new Tx(chainID, FmtMicrometer.fmtTxLongValue(fee), txType, coinName, description);
+        AnnouncementContent content = new AnnouncementContent(coinName, description);
+        TxQueue tx = new TxQueue(chainID, senderPk, senderPk, 0L,
+                FmtMicrometer.fmtTxLongValue(fee), TxType.ANNOUNCEMENT, content.getEncoded());
+        if (txQueue != null) {
+            tx.queueID = txQueue.queueID;
+        }
+        return tx;
     }
 
     @Override

@@ -1,7 +1,5 @@
 package io.taucoin.torrent.publishing.core.model.data;
 
-import android.os.Parcel;
-
 import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 
@@ -14,13 +12,15 @@ public class TxQueueAndStatus extends TxQueue {
     public long timestamp;                  // 最新一笔未上链交易的时间
     public long sendCount;                  // 发送次数
 
-    public TxQueueAndStatus(@NonNull String chainID, @NonNull String senderPk, @NonNull String receiverPk, long amount, long fee, String memo) {
-        super(chainID, senderPk, receiverPk, amount, fee, memo);
+    public TxQueueAndStatus(@NonNull String chainID, @NonNull String senderPk, @NonNull String receiverPk,
+                            long amount, long fee, int queueType, int txType, byte[] content) {
+        super(chainID, senderPk, receiverPk, amount, fee, queueType, txType, content);
     }
 
-    protected TxQueueAndStatus(Parcel in) {
-        super(in);
-    }
+//    public TxQueueAndStatus(@NonNull String chainID, @NonNull String senderPk, @NonNull String receiverPk,
+//                            long amount, long fee, TxType txType, byte[] content) {
+//        super(chainID, senderPk, receiverPk, amount, fee, txType, content);
+//    }
 
     public boolean isProcessing() {
         return status == 0;

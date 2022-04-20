@@ -7,15 +7,15 @@ import io.taucoin.torrent.publishing.core.utils.rlp.RLPList;
 /**
  * 官方领导者邀请内容类
  */
-public class LeaderInvitationContent extends TxContent {
+public class AnnouncementContent extends TxContent {
     private byte[] title;
 
-    public LeaderInvitationContent(String title, String description) {
-        super(TxType.LEADER_INVITATION.getType(), Utils.textStringToBytes(description));
+    public AnnouncementContent(String title, String description) {
+        super(TxType.ANNOUNCEMENT.getType(), Utils.textStringToBytes(description));
         this.title = Utils.textStringToBytes(title);
     }
 
-    public LeaderInvitationContent(byte[] encode) {
+    public AnnouncementContent(byte[] encode) {
         super(encode);
 
         if (encode != null) {
@@ -29,7 +29,7 @@ public class LeaderInvitationContent extends TxContent {
         RLPList messageList = (RLPList) params.get(0);
 
         this.version = RLP.decodeInteger(messageList, 0, TxVersion.VERSION1.getV());
-        this.type = RLP.decodeInteger(messageList, 1, TxType.LEADER_INVITATION.getType());
+        this.type = RLP.decodeInteger(messageList, 1, TxType.ANNOUNCEMENT.getType());
         this.memo = RLP.decodeElement(messageList, 2);
         this.title = RLP.decodeElement(messageList, 3);
 
@@ -45,7 +45,10 @@ public class LeaderInvitationContent extends TxContent {
        return RLP.encodeList(version, type, memo, title);
     }
 
-    public byte[] getTitle() {
-        return title;
+    public String getTitle() {
+        if (title != null) {
+            return Utils.textBytesToString(title);
+        }
+        return null;
     }
 }

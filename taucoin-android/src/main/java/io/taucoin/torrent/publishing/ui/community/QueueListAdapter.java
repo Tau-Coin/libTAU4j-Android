@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 
 import org.libTAU4j.Account;
 
+import java.util.Arrays;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
@@ -78,13 +80,13 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
             if (null == tx) {
                 return;
             }
-            int progressText = tx.isProcessing() ? R.string.tx_result_status_processing :
+            int progressText = tx.isProcessing() && pos == 0 ? R.string.tx_result_status_processing :
                     R.string.tx_result_status_waiting;
-            int progressColor = tx.status == 0 ? R.color.color_yellow : R.color.color_black;
+            int progressColor = tx.isProcessing() && pos == 0 ? R.color.color_yellow : R.color.color_black;
             Resources resources = binding.getRoot().getResources();
             binding.tvProgress.setText(resources.getString(progressText));
             binding.tvProgress.setTextColor(resources.getColor(progressColor));
-            binding.tvContent.setText(TxUtils.createSpanTxQueue(tx));
+            binding.tvContent.setText(TxUtils.createSpanTxQueue(tx, pos == 0));
             binding.ivDelete.setVisibility(tx.isProcessing() ? View.GONE : View.VISIBLE);
             binding.ivDelete.setOnClickListener(v -> {
                 if (listener != null) {
@@ -97,12 +99,14 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
                 }
             });
             String errorMsg = "";
-            if (account != null) {
-                if (account.getBalance() < tx.amount + tx.fee && !tx.isProcessing() && pos == 0) {
+            if (account != null && pos == 0) {
+                if (account.getBalance() < tx.amount + tx.fee && !tx.isProcessing()) {
                     errorMsg = resources.getString(R.string.tx_error_insufficient_balance);
-                } else if (account.getNonce() >= tx.nonce && tx.isProcessing()) {
-                    errorMsg = resources.getString(R.string.tx_error_nonce_conflict);
                 }
+                // 取消nonce冲突提示，会主动重发
+//                else if (account.getNonce() >= tx.nonce && tx.isProcessing()) {
+//                    errorMsg = resources.getString(R.string.tx_error_nonce_conflict);
+//                }
             }
             binding.tvError.setVisibility((StringUtil.isNotEmpty(errorMsg))
                     ? View.VISIBLE : View.GONE);
@@ -122,7 +126,8 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
                     oldItem.status == newItem.status &&
                     oldItem.amount == newItem.amount &&
                     oldItem.fee == newItem.fee &&
-                    StringUtil.isEquals(oldItem.memo, newItem.memo);
+                    oldItem.nonce == newItem.nonce &&
+                    Arrays.equals(oldItem.content, newItem.content);
         }
 
         @Override

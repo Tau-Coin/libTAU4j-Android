@@ -1,5 +1,6 @@
 package io.taucoin.torrent.publishing.core.model.data.message;
 
+import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.RLP;
 import io.taucoin.torrent.publishing.core.utils.rlp.RLPList;
 
@@ -9,12 +10,18 @@ import io.taucoin.torrent.publishing.core.utils.rlp.RLPList;
 public class TxContent {
     protected int version;                    // 标识消息版本
     protected int type;                       // 可以标识消息类型
-    protected byte[] memo;                      // 原始消息体
+    protected byte[] memo;                    // 原始消息体
 
     public TxContent(int type, byte[] memo) {
         this.version = TxVersion.VERSION1.getV();
         this.type = type;
         this.memo = memo;
+    }
+
+    public TxContent(int type, String memo) {
+        this.version = TxVersion.VERSION1.getV();
+        this.type = type;
+        this.memo = Utils.textStringToBytes(memo);
     }
 
     private TxContent(int version, int type, byte[] memo) {
@@ -54,7 +61,10 @@ public class TxContent {
         return type;
     }
 
-    public byte[] getContent() {
-        return memo;
+    public String getMemo() {
+        if (memo != null) {
+            return Utils.textBytesToString(memo);
+        }
+        return null;
     }
 }

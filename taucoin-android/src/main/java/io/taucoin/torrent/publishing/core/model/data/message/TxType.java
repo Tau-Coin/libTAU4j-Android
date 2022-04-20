@@ -26,7 +26,7 @@ public enum TxType {
     SELL_TX(3),
     TRUST_TX(4),
     AIRDROP_TX(5),
-    LEADER_INVITATION(6);
+    ANNOUNCEMENT(6);
 
     private int type;
     TxType(int type) {

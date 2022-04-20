@@ -32,13 +32,14 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
+import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
+import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
@@ -262,7 +263,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     @Override
     public void onTrustClicked(User user) {
         KeyboardUtils.hideSoftInput(activity);
-        showTrustDialog(user);
+        showTrustDialog(user, null);
     }
 
     @Override
@@ -346,23 +347,33 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     /**
      * 显示信任的对话框
      */
-    private void showTrustDialog(User user) {
+    void showTrustDialog(User user, TxQueueAndStatus txQueue) {
         DialogTrustBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.dialog_trust, null, false);
-        String showName = UsersUtil.getShowName(user);
 
+        String showName = "";
+        String trustedPk = "";
+        TrustContent content;
+        if (user != null) {
+            showName = UsersUtil.getShowName(user);
+            content = new TrustContent(null, user.publicKey);
+        } else {
+            showName = UsersUtil.getShowName(null, txQueue.receiverPk);
+            content = new TrustContent(txQueue.content);
+        }
         Spanned trustTip = Html.fromHtml(getString(R.string.tx_give_trust_tip, showName));
         binding.tvTrustTip.setText(trustTip);
-        long txFee = txViewModel.getTxFee(chainID);
-        String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.COIN.longValue());
-        binding.tvTrustFee.setTag(R.id.median_fee, txFee);
-
-        if (noBalance) {
-            txFeeStr = "0";
+        long txFee = 0;
+        if (txQueue != null) {
+            txFee = txQueue.fee;
         }
-        String medianFree = getString(R.string.tx_median_fee, txFeeStr,
+        long medianFee = txViewModel.getTxFee(chainID, TxType.TRUST_TX);
+        String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : medianFee);
+        binding.tvTrustFee.setTag(R.id.median_fee, medianFee);
+
+        String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
                 ChainIDUtil.getCoinName(chainID));
-        binding.tvTrustFee.setText(Html.fromHtml(medianFree));
+        binding.tvTrustFee.setText(Html.fromHtml(txFreeHtml));
         binding.tvTrustFee.setTag(txFeeStr);
         binding.tvTrustFee.setOnClickListener(v -> {
             txViewModel.showEditFeeDialog(activity, binding.tvTrustFee, chainID);
@@ -370,11 +381,17 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
 
         binding.ivClose.setOnClickListener(v -> trustDialog.closeDialog());
         binding.tvSubmit.setOnClickListener(v -> {
-            int txType = TxType.TRUST_TX.getType();
             String fee = ViewUtils.getStringTag(binding.tvTrustFee);
-            Tx tx = new Tx(chainID, user.publicKey, FmtMicrometer.fmtTxLongValue(fee), txType);
-            txViewModel.addTransaction(tx);
-            trustDialog.closeDialog();
+            String senderPk = MainApplication.getInstance().getPublicKey();
+            TxQueue tx = new TxQueue(chainID, senderPk, senderPk, 0L,
+                    FmtMicrometer.fmtTxLongValue(fee), TxType.TRUST_TX, content.getEncoded());
+            if (txQueue != null) {
+                tx.queueID = txQueue.queueID;
+            }
+            if (txViewModel.validateTx(tx)) {
+                txViewModel.addTransaction(tx, null == txQueue);
+                trustDialog.closeDialog();
+            }
         });
         trustDialog = new CommonDialog.Builder(activity)
                 .setContentView(binding.getRoot())

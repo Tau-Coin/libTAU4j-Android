@@ -14,7 +14,8 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.MainApplication;
-import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
@@ -41,7 +42,6 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
     private CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
     private TxQueue txQueue;
-    private boolean noBalance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,6 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
             txQueue = getIntent().getParcelableExtra(IntentExtra.BEAN);
-            noBalance = getIntent().getBooleanExtra(IntentExtra.NO_BALANCE, true);
             if (txQueue != null) {
                 chainID = txQueue.chainID;
             }
@@ -81,10 +80,13 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         binding.etAmount.setFilters(new InputFilter[]{new MoneyValueFilter()});
 
         if (StringUtil.isNotEmpty(chainID)) {
-            long txFee;
+            long txFee = 0;
             if (txQueue != null) {
                 txFee = txQueue.fee;
-                binding.etMemo.setText(txQueue.memo);
+                if (txQueue.content != null) {
+                    TxContent txContent = new TxContent(txQueue.content);
+                    binding.etMemo.setText(txContent.getMemo());
+                }
                 binding.etPublicKey.setText(txQueue.receiverPk);
                 binding.etPublicKey.setEnabled(false);
                 LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)
@@ -93,19 +95,14 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
                 binding.etPublicKey.setLayoutParams(layoutParams);
                 binding.ivSelectPk.setVisibility(View.GONE);
                 binding.etAmount.setText(FmtMicrometer.fmtBalance(txQueue.amount));
-                binding.etMemo.setText(txQueue.memo);
-            } else {
-                txFee = txViewModel.getTxFee(chainID);
             }
-            String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.COIN.longValue());
-            binding.tvFee.setTag(R.id.median_fee, txFee);
+            long mediaTxFee = txViewModel.getTxFee(chainID, TxType.WIRING_TX);
+            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : mediaTxFee);
+            binding.tvFee.setTag(R.id.median_fee, mediaTxFee);
 
-            if (noBalance) {
-                txFeeStr = "0";
-            }
-            String medianFree = getString(R.string.tx_median_fee, txFeeStr,
+            String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
                     ChainIDUtil.getCoinName(chainID));
-            binding.tvFee.setText(Html.fromHtml(medianFree));
+            binding.tvFee.setText(Html.fromHtml(txFreeHtml));
             binding.tvFee.setTag(txFeeStr);
         }
     }
@@ -114,9 +111,9 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
     public void onStart() {
         super.onStart();
         txViewModel.getAddState().observe(this, result -> {
-            if(StringUtil.isNotEmpty(result)){
+            if (StringUtil.isNotEmpty(result)){
                 ToastUtils.showShortToast(result);
-            }else {
+            } else {
                 setResult(RESULT_OK);
                 onBackPressed();
             }
@@ -147,7 +144,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         if (item.getItemId() == R.id.menu_done) {
             TxQueue tx = buildTx();
             if (txViewModel.validateTx(tx)) {
-                txViewModel.addWringTransaction(tx, null == txQueue);
+                txViewModel.addTransaction(tx, null == txQueue);
             }
         }
         return true;
@@ -163,8 +160,9 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         String amount = ViewUtils.getText(binding.etAmount);
         String fee = ViewUtils.getStringTag(binding.tvFee);
         String memo = ViewUtils.getText(binding.etMemo);
+        TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
         TxQueue tx = new TxQueue(chainID, senderPk, receiverPk, FmtMicrometer.fmtTxLongValue(amount),
-                    FmtMicrometer.fmtTxLongValue(fee), memo);
+                    FmtMicrometer.fmtTxLongValue(fee), TxType.WIRING_TX, txContent.getEncoded());
         if (txQueue != null) {
             tx.queueID = txQueue.queueID;
         }
