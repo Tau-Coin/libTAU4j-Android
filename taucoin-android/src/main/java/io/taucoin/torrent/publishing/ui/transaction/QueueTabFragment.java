@@ -4,6 +4,8 @@ import android.content.Intent;
 
 import org.libTAU4j.Account;
 
+import java.util.List;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -56,7 +58,11 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
                 .subscribeOn(Schedulers.io())
                 .subscribe(list -> {
                     if (adapter != null) {
+                        List<TxQueueAndStatus> old = adapter.getCurrentList();
                         adapter.submitList(list);
+                        if (list != null && old.size() != list.size()) {
+                            adapter.notifyDataSetChanged();
+                        }
                     }
                 }));
 

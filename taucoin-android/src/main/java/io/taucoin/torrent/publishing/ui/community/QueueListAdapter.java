@@ -80,14 +80,15 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
             if (null == tx) {
                 return;
             }
-            int progressText = tx.isProcessing() && pos == 0 ? R.string.tx_result_status_processing :
+            boolean isProcessing = tx.isProcessing() && pos == 0;
+            int progressText = isProcessing ? R.string.tx_result_status_processing :
                     R.string.tx_result_status_waiting;
-            int progressColor = tx.isProcessing() && pos == 0 ? R.color.color_yellow : R.color.color_black;
+            int progressColor = isProcessing ? R.color.color_yellow : R.color.color_black;
             Resources resources = binding.getRoot().getResources();
             binding.tvProgress.setText(resources.getString(progressText));
             binding.tvProgress.setTextColor(resources.getColor(progressColor));
-            binding.tvContent.setText(TxUtils.createSpanTxQueue(tx, pos == 0));
-            binding.ivDelete.setVisibility(tx.isProcessing() ? View.GONE : View.VISIBLE);
+            binding.tvContent.setText(TxUtils.createSpanTxQueue(tx, isProcessing));
+            binding.ivDelete.setVisibility(isProcessing ? View.GONE : View.VISIBLE);
             binding.ivDelete.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onDeleteClicked(tx);
