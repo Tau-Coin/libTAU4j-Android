@@ -1,5 +1,6 @@
 package io.taucoin.torrent.publishing.core.model.data.message;
 
+import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.RLP;
 import io.taucoin.torrent.publishing.core.utils.rlp.RLPList;
@@ -10,8 +11,8 @@ import io.taucoin.torrent.publishing.core.utils.rlp.RLPList;
 public class TrustContent extends TxContent {
     private byte[] trustedPk;
 
-    public TrustContent(byte[] memo, String trustedPk) {
-        super(TxType.TRUST_TX.getType(), memo);
+    public TrustContent(String memo, String trustedPk) {
+        super(TxType.TRUST_TX.getType(), Utils.textStringToBytes(memo));
         this.trustedPk = ByteUtil.toByte(trustedPk);
     }
 

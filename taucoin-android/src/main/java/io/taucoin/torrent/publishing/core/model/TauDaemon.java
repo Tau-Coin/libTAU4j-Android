@@ -648,10 +648,6 @@ public abstract class TauDaemon {
         txQueueManager.updateTxQueue(chainID, isResendTx);
     }
 
-    public String resendTxQueue(TxQueue tx) {
-        return txQueueManager.resendTxQueue(tx);
-    }
-
     /**
      * 获取Alert消费者的发射器
      */

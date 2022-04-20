@@ -25,7 +25,7 @@ import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
-import io.taucoin.torrent.publishing.core.model.data.message.LeaderInvitationContent;
+import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
@@ -49,8 +49,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
@@ -320,7 +318,7 @@ public class TauListenHandler {
         Tx tx = new Tx(txID, chainID, fee);
         TxContent txContent = new TxContent(txMsg.getPayload());
         tx.txType = txContent.getType();
-        tx.memo = Utils.textBytesToString(txContent.getContent());
+        tx.memo = txContent.getMemo();
         tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
         tx.txStatus = onChain ? 1 : 0;
         tx.blockNumber = blockNumber;
@@ -337,18 +335,18 @@ public class TauListenHandler {
         } else if (tx.txType == TxType.SELL_TX.getType()) {
             SellTxContent sellTxContent = new SellTxContent(txMsg.getPayload());
             // 添加Sell信息
-            tx.coinName = Utils.textBytesToString(sellTxContent.getCoinName());
+            tx.coinName = sellTxContent.getCoinName();
             tx.quantity = sellTxContent.getQuantity();
-            tx.link = Utils.textBytesToString(sellTxContent.getLink());
-            tx.location = Utils.textBytesToString(sellTxContent.getLocation());
+            tx.link = sellTxContent.getLink();
+            tx.location = sellTxContent.getLocation();
         } else if (tx.txType == TxType.AIRDROP_TX.getType()) {
             AirdropTxContent sellTxContent = new AirdropTxContent(txMsg.getPayload());
             // 添加Airdrop信息
-            tx.link = Utils.textBytesToString(sellTxContent.getLink());
-        } else if (tx.txType == TxType.LEADER_INVITATION.getType()) {
-            LeaderInvitationContent sellTxContent = new LeaderInvitationContent(txMsg.getPayload());
+            tx.link = sellTxContent.getLink();
+        } else if (tx.txType == TxType.ANNOUNCEMENT.getType()) {
+            AnnouncementContent sellTxContent = new AnnouncementContent(txMsg.getPayload());
             // 添加社区领导者邀请信息
-            tx.coinName = Utils.textBytesToString(sellTxContent.getTitle());
+            tx.coinName = sellTxContent.getTitle();
         }
         txRepo.addTransaction(tx);
         logger.info("Add transaction to local, txID::{}, txType::{}", txID, tx.txType);
@@ -600,8 +598,9 @@ public class TauListenHandler {
                             FmtMicrometer.fmtFeeValue(medianTxFree));
                     if (null == txQueue) {
                         String memo = appContext.getString(R.string.tx_memo_auto_renewal);
+                        TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
                         TxQueue tx = new TxQueue(member.chainID, member.publicKey, member.publicKey,
-                                amount, txFree, 2, memo);
+                                amount, txFree, 2, TxType.WIRING_TX.getType(), txContent.getEncoded());
                         txQueueRepo.addQueue(tx);
                         daemon.updateTxQueue(tx.chainID);
                         logger.debug("accountAutoRenewal updateTxQueue");
@@ -609,8 +608,8 @@ public class TauListenHandler {
                         txQueue.amount = amount;
                         txQueue.fee = txFree;
                         txQueueRepo.updateQueue(txQueue);
-                        String result = daemon.resendTxQueue(txQueue);
-                        logger.debug("accountAutoRenewal resendTxQueue result::{}", result);
+                        daemon.updateTxQueue(txQueue.chainID);
+                        logger.debug("accountAutoRenewal resendTxQueue txFree::{}", txFree);
                     }
                 }
             }

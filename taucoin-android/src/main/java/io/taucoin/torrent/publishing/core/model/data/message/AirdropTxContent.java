@@ -45,7 +45,10 @@ public class AirdropTxContent extends TxContent {
        return RLP.encodeList(version, type, memo, link);
     }
 
-    public byte[] getLink() {
-        return link;
+    public String getLink() {
+        if (link != null) {
+            return Utils.toUTF8String(link);
+        }
+        return null;
     }
 }

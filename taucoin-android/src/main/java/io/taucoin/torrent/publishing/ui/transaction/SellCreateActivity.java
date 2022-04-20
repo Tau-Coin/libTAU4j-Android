@@ -9,14 +9,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.math.BigInteger;
+
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -37,8 +40,8 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     private ActivitySellBinding binding;
     private TxViewModel txViewModel;
     private String chainID;
-    private boolean noBalance;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private TxQueue txQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +61,10 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     private void initParameter() {
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            noBalance = getIntent().getBooleanExtra(IntentExtra.NO_BALANCE, true);
+            txQueue = getIntent().getParcelableExtra(IntentExtra.BEAN);
+            if (txQueue != null) {
+                chainID = txQueue.chainID;
+            }
         }
     }
 
@@ -75,17 +81,23 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
         binding.etQuantity.setFilters(new InputFilter[]{new MoneyValueFilter()});
 
         if (StringUtil.isNotEmpty(chainID)) {
-
-            long txFee = txViewModel.getTxFee(chainID);
-            String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.COIN.longValue());
-            binding.tvFee.setTag(R.id.median_fee, txFee);
-
-            if (noBalance) {
-                txFeeStr = "0";
+            long txFee = 0;
+            if (txQueue != null) {
+                txFee = txQueue.fee;
+                SellTxContent txContent = new SellTxContent(txQueue.content);
+                binding.etCoinName.setText(txContent.getCoinName());
+                binding.etLink.setText(txContent.getLink());
+                binding.etQuantity.setText(String.valueOf(txContent.getQuantity()));
+                binding.etLocation.setText(txContent.getLocation());
+                binding.etDescription.setText(txContent.getMemo());
             }
-            String medianFree = getString(R.string.tx_median_fee, txFeeStr,
+            long mediaTxFee = txViewModel.getTxFee(chainID, TxType.SELL_TX);
+            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : mediaTxFee);
+            binding.tvFee.setTag(R.id.median_fee, mediaTxFee);
+
+            String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
                     ChainIDUtil.getCoinName(chainID));
-            binding.tvFee.setText(Html.fromHtml(medianFree));
+            binding.tvFee.setText(Html.fromHtml(txFreeHtml));
             binding.tvFee.setTag(txFeeStr);
         }
         String coinName = ChainIDUtil.getCoinName(chainID);
@@ -127,9 +139,9 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_done) {
-            Tx tx = buildTx();
+            TxQueue tx = buildTx();
             if (txViewModel.validateTx(tx)) {
-                txViewModel.addTransaction(tx);
+                txViewModel.addTransaction(tx, null == txQueue);
             }
         }
         return true;
@@ -139,16 +151,23 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
      * 构建交易数据
      * @return Tx
      */
-    private Tx buildTx() {
-        int txType = TxType.SELL_TX.getType();
+    private TxQueue buildTx() {
+        String senderPk = MainApplication.getInstance().getPublicKey();
         String fee = ViewUtils.getStringTag(binding.tvFee);
         String coinName = ViewUtils.getText(binding.etCoinName);
         String quantity = ViewUtils.getText(binding.etQuantity);
         String link = ViewUtils.getText(binding.etLink);
         String location = ViewUtils.getText(binding.etLocation);
         String description = ViewUtils.getText(binding.etDescription);
-        return new Tx(chainID, FmtMicrometer.fmtTxLongValue(fee), txType, coinName,
-                FmtMicrometer.fmtTxLongValue(quantity), link, location, description);
+
+        SellTxContent content = new SellTxContent(coinName, new BigInteger(quantity).longValue(),
+                link, location, description);
+        TxQueue tx = new TxQueue(chainID, senderPk, senderPk, 0L,
+                FmtMicrometer.fmtTxLongValue(fee), TxType.SELL_TX, content.getEncoded());
+        if (txQueue != null) {
+            tx.queueID = txQueue.queueID;
+        }
+        return tx;
     }
 
     @Override

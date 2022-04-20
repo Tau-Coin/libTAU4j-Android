@@ -42,11 +42,12 @@ import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
-import io.taucoin.torrent.publishing.core.model.data.message.LeaderInvitationContent;
+import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -77,10 +78,9 @@ import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.AIRDROP_TX;
-import static io.taucoin.torrent.publishing.core.model.data.message.TxType.LEADER_INVITATION;
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.ANNOUNCEMENT;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.NOTE_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.SELL_TX;
-import static io.taucoin.torrent.publishing.core.model.data.message.TxType.TRUST_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.WIRING_TX;
 
 /**
@@ -161,12 +161,12 @@ public class TxViewModel extends AndroidViewModel {
      * 添加新的转账交易
      * @param tx 根据用户输入构建的用户数据
      */
-    void addWringTransaction(TxQueue tx, boolean isAdd) {
+    void addTransaction(TxQueue tx, boolean isAdd) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<String>) emitter -> {
             // 需要验证交易内容是否超出限制
-            String result = validateWiringSize(tx);
+            String result = validateTxSize(tx);
             if (StringUtil.isEmpty(result)) {
-                result = addWringTransactionTask(tx, isAdd);
+                result = addTransactionTask(tx, isAdd);
             }
             emitter.onNext(result);
             emitter.onComplete();
@@ -176,16 +176,16 @@ public class TxViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private String addWringTransactionTask(TxQueue tx, boolean isAdd) {
+    private String addTransactionTask(TxQueue tx, boolean isAdd) {
         if (isAdd) {
             txQueueRepo.addQueue(tx);
             daemon.updateTxQueue(tx.chainID);
-            return "";
         } else {
             // 重发交易队列
             txQueueRepo.updateQueue(tx);
-            return daemon.resendTxQueue(tx);
+            daemon.updateTxQueue(tx.chainID);
         }
+        return "";
     }
 
     /**
@@ -197,7 +197,7 @@ public class TxViewModel extends AndroidViewModel {
             return;
         }
         addTxDisposable = Observable.create((ObservableOnSubscribe<String>) emitter -> {
-            String result = createTransaction(tx, false);
+            String result = createTransaction(getApplication(), tx, false);
             emitter.onNext(result);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
@@ -205,7 +205,12 @@ public class TxViewModel extends AndroidViewModel {
             .subscribe(state -> addState.postValue(state));
     }
 
-    private String createTransaction(Tx tx, boolean isResend) {
+    public static String createTransaction(Context context, Tx tx, boolean isResend) {
+        UserRepository userRepo = RepositoryHelper.getUserRepository(context);
+        TxRepository txRepo = RepositoryHelper.getTxRepository(context);
+        SettingsRepository settingsRepo = RepositoryHelper.getSettingsRepository(context);
+        MemberRepository memberRepo = RepositoryHelper.getMemberRepository(context);
+        TauDaemon daemon = TauDaemon.getInstance(context);
         // 获取当前用户的Seed, 获取公私钥
         User currentUser = userRepo.getCurrentUser();
         byte[] senderSeed = ByteUtil.toByte(currentUser.seed);
@@ -218,20 +223,19 @@ public class TxViewModel extends AndroidViewModel {
             byte[] chainID = ChainIDUtil.encode(tx.chainID);
             Account account = daemon.getAccountInfo(chainID, currentUser.publicKey);
             if (null == account) {
-                result = getApplication().getString(R.string.tx_error_send_failed);
+                result = context.getString(R.string.tx_error_send_failed);
                 return result;
             }
             long timestamp = isResend ? tx.timestamp : daemon.getSessionTime();
-            byte[] memo = Utils.textStringToBytes(tx.memo);
             byte[] txEncoded = null;
             switch (TxType.valueOf(tx.txType)) {
                 case NOTE_TX:
                 case WIRING_TX:
-                    TxContent txContent = new TxContent(tx.txType, memo);
+                    TxContent txContent = new TxContent(tx.txType, tx.memo);
                     txEncoded = txContent.getEncoded();
                     break;
                 case TRUST_TX:
-                    TrustContent trustContent = new TrustContent(memo, tx.receiverPk);
+                    TrustContent trustContent = new TrustContent(tx.memo, tx.receiverPk);
                     txEncoded = trustContent.getEncoded();
                     break;
                 case SELL_TX:
@@ -243,8 +247,8 @@ public class TxViewModel extends AndroidViewModel {
                     AirdropTxContent airdropContent = new AirdropTxContent(tx.link, tx.memo);
                     txEncoded = airdropContent.getEncoded();
                     break;
-                case LEADER_INVITATION:
-                    LeaderInvitationContent invitationContent = new LeaderInvitationContent(tx.coinName, tx.memo);
+                case ANNOUNCEMENT:
+                    AnnouncementContent invitationContent = new AnnouncementContent(tx.coinName, tx.memo);
                     txEncoded = invitationContent.getEncoded();
                     break;
                 default:
@@ -266,12 +270,12 @@ public class TxViewModel extends AndroidViewModel {
                     transaction.getTxID().to_hex(), Constants.TX_MAX_BYTE_SIZE, transaction.Size());
             // 判断交易大小是否超出限制
             if (transaction.Size() > Constants.TX_MAX_BYTE_SIZE) {
-                return getApplication().getString(R.string.tx_error_memo_too_large);
+                return context.getString(R.string.tx_error_memo_too_large);
             }
             boolean isSubmitSuccess = daemon.submitTransaction(transaction);
             if (!isSubmitSuccess) {
-                result = isResend ? getApplication().getString(R.string.tx_resend_failed) :
-                        getApplication().getString(R.string.tx_error_send_failed);
+                result = isResend ? context.getString(R.string.tx_resend_failed) :
+                        context.getString(R.string.tx_error_send_failed);
                 return result;
             }
             if (!isResend) {
@@ -282,8 +286,8 @@ public class TxViewModel extends AndroidViewModel {
                 txRepo.addTransaction(tx);
                 logger.debug("createTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
                         tx.txID, tx.senderPk, tx.receiverPk, tx.memo);
-                addUserInfoToLocal(tx);
-                addMemberInfoToLocal(tx);
+                addUserInfoToLocal(tx, userRepo);
+                addMemberInfoToLocal(tx, memberRepo);
                 settingsRepo.lastTxFee(tx.chainID, tx.fee);
             } else {
                 logger.debug("resendTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
@@ -300,7 +304,7 @@ public class TxViewModel extends AndroidViewModel {
      * 如果是Wiring交易,添加用户信息到本地
      * @param tx 交易
      */
-    private void addUserInfoToLocal(Tx tx) {
+    private static void addUserInfoToLocal(Tx tx, UserRepository userRepo) {
         if (tx.txType == WIRING_TX.getType()) {
             User receiverUser = userRepo.getUserByPublicKey(tx.receiverPk);
             if (null == receiverUser) {
@@ -315,7 +319,7 @@ public class TxViewModel extends AndroidViewModel {
      * 添加社区成员信息
      * @param tx 交易
      */
-    private void addMemberInfoToLocal(Tx tx) {
+    private static void addMemberInfoToLocal(Tx tx, MemberRepository memberRepo) {
         long txType = tx.txType;
         Member member = memberRepo.getMemberByChainIDAndPk(tx.chainID, tx.senderPk);
         if (null == member) {
@@ -333,7 +337,7 @@ public class TxViewModel extends AndroidViewModel {
         }
     }
 
-    String validateWiringSize(TxQueue tx) {
+    String validateTxSize(TxQueue tx) {
         User user = userRepo.getUserByPublicKey(tx.senderPk);
         byte[] chainIDBytes = ChainIDUtil.encode(tx.chainID);
         Account account = daemon.getAccountInfo(chainIDBytes, user.publicKey);
@@ -346,12 +350,9 @@ public class TxViewModel extends AndroidViewModel {
         byte[] secretKey = keypair.second;
         byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
         long timestamp = daemon.getSessionTime();
-        byte[] memo = Utils.textStringToBytes(tx.memo);
-        TxContent txContent = new TxContent(WIRING_TX.getType(), memo);
-        byte[] txEncoded = txContent.getEncoded();
         long nonce = account.getNonce() + 1;
         Transaction transaction = new Transaction(chainIDBytes, 0, timestamp, senderPk, receiverPk,
-                nonce, tx.amount, tx.fee, txEncoded);
+                nonce, tx.amount, tx.fee, tx.content);
         transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
         logger.debug("createTransaction txID::{}, limit::{}, transaction::{}",
                 transaction.getTxID().to_hex(), Constants.TX_MAX_BYTE_SIZE, transaction.Size());
@@ -367,19 +368,60 @@ public class TxViewModel extends AndroidViewModel {
         String senderPk = MainApplication.getInstance().getPublicKey();
         Account account = daemon.getAccountInfo(chainID, senderPk);
         long balance = account != null ? account.getBalance() : 0;
-        if (StringUtil.isEmpty(tx.receiverPk) ||
-                ByteUtil.toByte(tx.receiverPk).length != Ed25519.PUBLIC_KEY_SIZE) {
-            ToastUtils.showShortToast(R.string.tx_error_invalid_pk);
-            return false;
-        } else if (tx.amount < 0) {
-            ToastUtils.showShortToast(R.string.tx_error_invalid_amount);
-            return false;
-        } else if (tx.fee < 0) {
-            ToastUtils.showShortToast(R.string.tx_error_invalid_free);
-            return false;
-        } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
-            ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
-            return false;
+        int type = tx.txType;
+        if (type == WIRING_TX.getType()) {
+            if (StringUtil.isEmpty(tx.receiverPk) ||
+                    ByteUtil.toByte(tx.receiverPk).length != Ed25519.PUBLIC_KEY_SIZE) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_pk);
+                return false;
+            } else if (tx.amount < 0) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_amount);
+                return false;
+            } else if (tx.fee < 0) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
+                return false;
+            } else if (tx.fee < Constants.WIRING_MIN_FEE.longValue()) {
+                String minFee = getApplication().getString(R.string.tx_error_min_free,
+                        FmtMicrometer.fmtFeeValue(Constants.WIRING_MIN_FEE.longValue()));
+                ToastUtils.showShortToast(minFee);
+                return false;
+            } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
+                ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
+                return false;
+            }
+        } else {
+            if (type == SELL_TX.getType()) {
+                SellTxContent txContent = new SellTxContent(tx.content);
+                if (StringUtil.isEmpty(txContent.getCoinName())) {
+                    ToastUtils.showShortToast(R.string.tx_error_invalid_coin_name);
+                    return false;
+                }
+            } else if (type == AIRDROP_TX.getType()) {
+                AirdropTxContent txContent = new AirdropTxContent(tx.content);
+                if (StringUtil.isEmpty(txContent.getLink()) ||
+                        null == UrlUtil.decodeAirdropUrl(txContent.getLink())) {
+                    ToastUtils.showShortToast(R.string.tx_error_invalid_airdrop_link);
+                    return false;
+                }
+            } else if (type == ANNOUNCEMENT.getType()) {
+                AnnouncementContent txContent = new AnnouncementContent(tx.content);
+                if (StringUtil.isEmpty(txContent.getTitle())) {
+                    ToastUtils.showShortToast(R.string.tx_error_invalid_title);
+                    return false;
+                }
+            }
+            if (tx.fee < 0) {
+                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
+                return false;
+            } else if (tx.fee < Constants.NEWS_MIN_FEE.longValue()) {
+                String minFee = getApplication().getString(R.string.tx_error_min_free,
+                        FmtMicrometer.fmtFeeValue(Constants.NEWS_MIN_FEE.longValue()));
+                ToastUtils.showShortToast(minFee);
+                return false;
+            } else if (tx.fee > balance) {
+                ToastUtils.showShortToast(R.string.tx_error_no_enough_coins_for_fee);
+                return false;
+            }
         }
         return true;
     }
@@ -388,55 +430,23 @@ public class TxViewModel extends AndroidViewModel {
      * 验证交易
      * @param tx 交易数据
      */
-    boolean validateTx(Tx tx) {
+    boolean validateNoteTx(Tx tx) {
         if (null == tx) {
             return false;
         }
-        long msgType = tx.txType;
         byte[] chainID = ChainIDUtil.encode(tx.chainID);
         String senderPk = MainApplication.getInstance().getPublicKey();
         Account account = daemon.getAccountInfo(chainID, senderPk);
         long balance = account != null ? account.getBalance() : 0;
-        if (msgType == NOTE_TX.getType()) {
-            if (StringUtil.isEmpty(tx.memo)) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_message);
-                return false;
-            } else if (tx.fee > balance) {
-                ToastUtils.showShortToast(R.string.tx_error_no_enough_coins_for_fee);
-                return false;
-            } else if (tx.fee < 0) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
-                return false;
-            }
-        } else if (msgType == SELL_TX.getType()) {
-            if (StringUtil.isEmpty(tx.coinName)) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_coin_name);
-                return false;
-            } else if (tx.fee < 0) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
-                return false;
-            }
-        } else if (msgType == AIRDROP_TX.getType()) {
-            if (StringUtil.isEmpty(tx.link) || null == UrlUtil.decodeAirdropUrl(tx.link)) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_airdrop_link);
-                return false;
-            } else if (tx.fee < 0) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
-                return false;
-            }
-        } else if (msgType == LEADER_INVITATION.getType()) {
-            if (StringUtil.isEmpty(tx.coinName)) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_title);
-                return false;
-            } else if (tx.fee < 0) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
-                return false;
-            }
-        } else if (msgType == TRUST_TX.getType()) {
-            if (tx.fee < 0) {
-                ToastUtils.showShortToast(R.string.tx_error_invalid_free);
-                return false;
-            }
+        if (StringUtil.isEmpty(tx.memo)) {
+            ToastUtils.showShortToast(R.string.tx_error_invalid_message);
+            return false;
+        } else if (tx.fee > balance) {
+            ToastUtils.showShortToast(R.string.tx_error_no_enough_coins_for_fee);
+            return false;
+        } else if (tx.fee < 0) {
+            ToastUtils.showShortToast(R.string.tx_error_invalid_free);
+            return false;
         }
         return true;
     }
@@ -482,16 +492,18 @@ public class TxViewModel extends AndroidViewModel {
      * 2、如果交易池返回小于等于0，用上次交易用的交易费
      * @param chainID 交易所属的社区chainID
      */
-    public long getTxFee(String chainID) {
-        long free = Constants.MIN_FEE.longValue();
-        long medianFree = daemon.getMedianTxFree(chainID);
-        if (medianFree > 0) {
-            free = medianFree;
+    public long getTxFee(String chainID, TxType type) {
+        long free;
+        if (type == WIRING_TX) {
+            free = Constants.WIRING_MIN_FEE.longValue();
+        } else if (type == NOTE_TX) {
+            free = Constants.NOTES_MIN_FEE.longValue();
         } else {
-            long lastTxFee = getLastTxFee(chainID);
-            if (lastTxFee > 0) {
-                free = lastTxFee;
-            }
+            free = Constants.NEWS_MIN_FEE.longValue();
+        }
+        long medianFree = daemon.getMedianTxFree(chainID);
+        if (medianFree > free) {
+            free = medianFree;
         }
         return free;
     }
@@ -554,8 +566,9 @@ public class TxViewModel extends AndroidViewModel {
     private String addMembers(String chainID, String senderPk, String friendPk,
                                   long amount, long fee) {
         String memo = getApplication().getString(R.string.community_added_members);
-        TxQueue tx = new TxQueue(chainID, senderPk, friendPk, amount, fee, memo);
-        return addWringTransactionTask(tx, true);
+        TxContent txContent = new TxContent(WIRING_TX.getType(), Utils.textStringToBytes(memo));
+        TxQueue tx = new TxQueue(chainID, senderPk, friendPk, amount, fee, TxType.WIRING_TX, txContent.getEncoded());
+        return addTransactionTask(tx, true);
     }
 
 
@@ -818,7 +831,7 @@ public class TxViewModel extends AndroidViewModel {
             logger.debug("resendTransaction txID::{}", txID);
             Tx tx = txRepo.getTxByTxID(txID);
             if (tx != null) {
-                String result = createTransaction(tx, true);
+                String result = createTransaction(getApplication(), tx, true);
                 if (StringUtil.isNotEmpty(result)) {
                     ToastUtils.showShortToast(result);
                 } else {

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,10 +12,11 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -37,7 +37,7 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
     private ActivityAirdropCoinsBinding binding;
     private TxViewModel txViewModel;
     private String chainID;
-    private boolean noBalance;
+    private TxQueue txQueue;
     private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
@@ -58,7 +58,10 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
     private void initParameter() {
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            noBalance = getIntent().getBooleanExtra(IntentExtra.NO_BALANCE, true);
+            txQueue = getIntent().getParcelableExtra(IntentExtra.BEAN);
+            if (txQueue != null) {
+                chainID = txQueue.chainID;
+            }
         }
     }
 
@@ -73,17 +76,21 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         if (StringUtil.isNotEmpty(chainID)) {
-
-            long txFee = txViewModel.getTxFee(chainID);
-            String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.COIN.longValue());
-            binding.tvFee.setTag(R.id.median_fee, txFee);
-
-            if (noBalance) {
-                txFeeStr = "0";
+            long txFee = 0;
+            if (txQueue != null) {
+                txFee = txQueue.fee;
+                AirdropTxContent txContent = new AirdropTxContent(txQueue.content);
+                binding.etLink.setText(txContent.getLink());
+                binding.etDescription.setText(txContent.getMemo());
             }
-            String medianFree = getString(R.string.tx_median_fee, txFeeStr,
+
+            long mediaTxFee = txViewModel.getTxFee(chainID, TxType.AIRDROP_TX);
+            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : mediaTxFee);
+            binding.tvFee.setTag(R.id.median_fee, mediaTxFee);
+
+            String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
                     ChainIDUtil.getCoinName(chainID));
-            binding.tvFee.setText(Html.fromHtml(medianFree));
+            binding.tvFee.setText(Html.fromHtml(txFreeHtml));
             binding.tvFee.setTag(txFeeStr);
         }
         String coinName = ChainIDUtil.getCoinName(chainID);
@@ -125,9 +132,9 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_done) {
-            Tx tx = buildTx();
+            TxQueue tx = buildTx();
             if (txViewModel.validateTx(tx)) {
-                txViewModel.addTransaction(tx);
+                txViewModel.addTransaction(tx, null == txQueue);
             }
         }
         return true;
@@ -137,12 +144,18 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
      * 构建交易数据
      * @return Tx
      */
-    private Tx buildTx() {
-        int txType = TxType.AIRDROP_TX.getType();
+    private TxQueue buildTx() {
+        String senderPk = MainApplication.getInstance().getPublicKey();
         String fee = ViewUtils.getStringTag(binding.tvFee);
         String link = ViewUtils.getText(binding.etLink);
         String description = ViewUtils.getText(binding.etDescription);
-        return new Tx(chainID, FmtMicrometer.fmtTxLongValue(fee), txType, null, link, description);
+        AirdropTxContent content = new AirdropTxContent(link, description);
+        TxQueue tx = new TxQueue(chainID, senderPk, senderPk, 0L,
+                FmtMicrometer.fmtTxLongValue(fee), TxType.AIRDROP_TX, content.getEncoded());
+        if (txQueue != null) {
+            tx.queueID = txQueue.queueID;
+        }
+        return tx;
     }
 
     @Override

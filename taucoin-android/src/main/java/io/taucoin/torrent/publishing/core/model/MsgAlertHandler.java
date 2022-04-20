@@ -18,6 +18,8 @@ import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
@@ -197,7 +199,9 @@ class MsgAlertHandler {
         String memo = appContext.getString(R.string.tx_memo_airdrop);
         long amount = member.airdropCoins;
         long fee = 0L;
-        TxQueue tx = new TxQueue(chainID, currentPk, friendPk, amount, fee, 1, memo);
+        TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
+        TxQueue tx = new TxQueue(chainID, currentPk, friendPk, amount, fee, 1,
+                TxType.WIRING_TX.getType(), txContent.getEncoded());
         txQueueRepo.addQueue(tx);
         daemon.updateTxQueue(tx.chainID);
     }

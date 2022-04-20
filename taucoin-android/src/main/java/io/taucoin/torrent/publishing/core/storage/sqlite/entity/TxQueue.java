@@ -7,7 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.Utils;
 
 /**
  * Room: 数据库存储TxQueues实体类
@@ -27,24 +29,26 @@ public class TxQueue implements Parcelable {
     public long queueTime;                  // 添加队列的时间
     public long amount;                     // 交易金额
     public long fee;                        // 交易费
-    public String memo;                     // 交易的备注、描述等
-
-    public TxQueue(@NonNull String chainID, @NonNull String senderPk, @NonNull String receiverPk,
-                   long amount, long fee, String memo) {
-        this(chainID, senderPk, receiverPk, amount, fee, 0, memo);
-    }
+    public byte[] content;                  // 交易内容编码后内容
+    public int txType;                  // 交易内容编码后内容
 
     @Ignore
     public TxQueue(@NonNull String chainID, @NonNull String senderPk, @NonNull String receiverPk,
-                   long amount, long fee, int queueType, String memo) {
+                   long amount, long fee, TxType txType, byte[] content) {
+        this(chainID, senderPk, receiverPk, amount, fee, 0, txType.getType(), content);
+    }
+
+    public TxQueue(@NonNull String chainID, @NonNull String senderPk, @NonNull String receiverPk,
+                   long amount, long fee, int queueType, int txType, byte[] content) {
         this.chainID = chainID;
         this.senderPk = senderPk;
         this.receiverPk = receiverPk;
         this.amount = amount;
         this.fee = fee;
-        this.memo = memo;
         this.queueType = queueType;
+        this.txType = txType;
         this.queueTime = DateUtil.getMillisTime();
+        this.content = content;
     }
 
     protected TxQueue(Parcel in) {
@@ -54,7 +58,14 @@ public class TxQueue implements Parcelable {
         receiverPk = in.readString();
         amount = in.readLong();
         fee = in.readLong();
-        memo = in.readString();
+        queueType = in.readInt();
+        txType = in.readInt();
+        queueTime = in.readLong();
+        int len = in.readInt();
+        if (len > 0) {
+            content = new byte[len];
+            in.readByteArray(content);
+        }
     }
 
     @Override
@@ -65,7 +76,11 @@ public class TxQueue implements Parcelable {
         dest.writeString(receiverPk);
         dest.writeLong(amount);
         dest.writeLong(fee);
-        dest.writeString(memo);
+        dest.writeInt(queueType);
+        dest.writeInt(txType);
+        dest.writeLong(queueTime);
+        dest.writeInt(content != null ? content.length : 0);
+        dest.writeByteArray(content);
     }
 
     public static final Creator<TxQueue> CREATOR = new Creator<TxQueue>() {

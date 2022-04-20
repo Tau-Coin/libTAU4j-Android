@@ -20,17 +20,20 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
  */
 @Dao
 public interface TxQueueDao {
-    String QUERY_COMMUNITY_TX_QUEUE = "SELECT * FROM" +
+    String QUERY_COMMUNITY_TX_QUEUE_SELECT = "SELECT * FROM" +
             " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
             " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
             " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID From Txs" +
-            " WHERE chainID = :chainID AND senderPk = :senderPk AND txType = 2" +
+            " WHERE chainID = :chainID AND senderPk = :senderPk AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
             " WHERE tq.chainID = :chainID AND tq.senderPk = :senderPk)" +
-            " WHERE status <= 0 ORDER BY queueID";
+            " WHERE status <= 0";
+
+    String QUERY_COMMUNITY_TX_QUEUE = QUERY_COMMUNITY_TX_QUEUE_SELECT +
+            " ORDER BY fee DESC, queueID ASC";
 
     String QUERY_QUEUE_FIRST_TX = QUERY_COMMUNITY_TX_QUEUE + " LIMIT 1 offset :offset";
 
@@ -40,7 +43,7 @@ public interface TxQueueDao {
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
             " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID From Txs" +
-            " WHERE queueID = :queueID AND txType = 2" +
+            " WHERE queueID = :queueID  AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
             " WHERE tq.queueID = :queueID)";
@@ -50,20 +53,19 @@ public interface TxQueueDao {
             " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID From Txs" +
-            " WHERE senderPk = :senderPk AND txType = 2" +
+            " WHERE senderPk = :senderPk AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
             " WHERE tq.senderPk = :senderPk)" +
             " WHERE status <= 0" +
-            " GROUP BY chainID" +
-            " ORDER BY queueID";
+            " GROUP BY chainID";
 
     String QUERY_AIRDROP_COUNT_ON_CHAIN = "SELECT count(*) FROM" +
             " (SELECT tq.chainID, tq.queueID," +
             " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID From Txs" +
-            " WHERE senderPk = :senderPk AND txType = 2" +
+            " WHERE senderPk = :senderPk AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
             " WHERE tq.senderPk = :senderPk AND tq.chainID = :chainID" +
@@ -75,7 +77,7 @@ public interface TxQueueDao {
             " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID From Txs" +
-            " WHERE senderPk = :senderPk AND txType = 2" +
+            " WHERE senderPk = :senderPk AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
             " WHERE tq.senderPk = :senderPk AND tq.chainID = :chainID" +
@@ -91,7 +93,7 @@ public interface TxQueueDao {
             " WHERE chainID = :chainID AND senderPk = :currentPk" +
             " AND queueTime >= :currentTime AND queueType = 1";
 
-    String QUERY_ACCOUNT_RENEWAL_OFF_CHAIN = QUERY_COMMUNITY_TX_QUEUE +
+    String QUERY_ACCOUNT_RENEWAL_OFF_CHAIN = QUERY_COMMUNITY_TX_QUEUE_SELECT +
             " AND queueType = 2 LIMIT 1";
 
     /**

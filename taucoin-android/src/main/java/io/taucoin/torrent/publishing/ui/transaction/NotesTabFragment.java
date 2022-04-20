@@ -87,7 +87,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
         if (onChain) {
             String text = ViewUtils.getText(binding.tvFee);
             if (isUpdateFee || StringUtil.isEmpty(text)) {
-                long txFee = txViewModel.getTxFee(chainID);
+                long txFee = txViewModel.getTxFee(chainID, TxType.NOTE_TX);
                 String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.MIN_FEE.longValue());
                 binding.tvFee.setTag(R.id.median_fee, txFee);
                 if (noBalance) {
@@ -125,7 +125,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
         super.onClick(v);
         if (v.getId() == R.id.tv_send) {
             Tx tx = buildTx();
-            if (txViewModel.validateTx(tx)) {
+            if (txViewModel.validateNoteTx(tx)) {
                 isScrollToBottom = true;
                 txViewModel.addTransaction(tx);
             }

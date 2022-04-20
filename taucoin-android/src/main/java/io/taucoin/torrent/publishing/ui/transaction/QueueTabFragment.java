@@ -10,6 +10,8 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
+import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.ui.community.QueueListAdapter;
@@ -47,7 +49,7 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
                 .subscribeOn(Schedulers.io())
                 .subscribe(member -> {
                     loadAccountInfo();
-                }));
+                }, it -> {}));
 
         disposables.add(txViewModel.observeCommunityTxQueue(chainID)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -76,10 +78,21 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
 
     @Override
     public void onEditClicked(TxQueueAndStatus tx) {
+        TxContent txContent = new TxContent(tx.content);
+        int type = txContent.getType();
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.BEAN, tx);
-        intent.putExtra(IntentExtra.NO_BALANCE, noBalance);
-        ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
+        if (type == TxType.WIRING_TX.getType()) {
+            ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
+        } else if (type == TxType.SELL_TX.getType()) {
+            ActivityUtil.startActivity(intent, this, SellCreateActivity.class);
+        } else if (type == TxType.AIRDROP_TX.getType()) {
+            ActivityUtil.startActivity(intent, this, AirdropCreateActivity.class);
+        } else if (type == TxType.ANNOUNCEMENT.getType()) {
+            ActivityUtil.startActivity(intent, this, AnnouncementCreateActivity.class);
+        } else if (type == TxType.TRUST_TX.getType()) {
+            showTrustDialog(null, tx);
+        }
     }
 
     @Override

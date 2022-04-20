@@ -58,16 +58,25 @@ public class SellTxContent extends TxContent {
        return RLP.encodeList(version, type, memo, coinName, link, location, quantity);
     }
 
-    public byte[] getCoinName() {
-        return coinName;
+    public String getCoinName() {
+        if (coinName != null) {
+            return Utils.textBytesToString(coinName);
+        }
+        return null;
     }
 
-    public byte[] getLink() {
-        return link;
+    public String getLink() {
+        if (link != null) {
+            return Utils.textBytesToString(link);
+        }
+        return null;
     }
 
-    public byte[] getLocation() {
-        return location;
+    public String getLocation() {
+        if (location != null) {
+            return Utils.textBytesToString(location);
+        }
+        return null;
     }
 
     public long getQuantity() {
