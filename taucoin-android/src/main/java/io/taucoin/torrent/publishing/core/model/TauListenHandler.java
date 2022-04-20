@@ -26,6 +26,7 @@ import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
+import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
@@ -50,6 +51,7 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
+import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 
 /**
  * TauListener处理程序
@@ -602,6 +604,7 @@ public class TauListenHandler {
                         TxQueue tx = new TxQueue(member.chainID, member.publicKey, member.publicKey,
                                 amount, txFree, 2, TxType.WIRING_TX.getType(), txContent.getEncoded());
                         txQueueRepo.addQueue(tx);
+                        ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.INSERT);
                         daemon.updateTxQueue(tx.chainID);
                         logger.debug("accountAutoRenewal updateTxQueue");
                     } else {

@@ -47,7 +47,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
         ChatMsgLog.class,
         Device.class,
         Statistic.class
-    }, version = 1)
+    }, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
     private static final Logger logger = LoggerFactory.getLogger("AppDatabase");
     private static final String DATABASE_NAME = "tau.db";

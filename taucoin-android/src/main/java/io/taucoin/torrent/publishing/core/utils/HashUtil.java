@@ -21,13 +21,17 @@ public class HashUtil {
      * @return
      */
     public static String makeSha256Hash(String str) {
+        return makeSha256Hash(str.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String makeSha256Hash(byte[] data) {
         MessageDigest messageDigest;
         try {
             messageDigest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
             return null;
         }
-        messageDigest.update(str.getBytes(StandardCharsets.UTF_8));
+        messageDigest.update(data);
         return bytesToString(messageDigest.digest());
     }
 
@@ -39,6 +43,25 @@ public class HashUtil {
     public static String makeSha256HashWithTimeStamp(String str) {
         str = System.currentTimeMillis() + str;
         return makeSha256Hash(str);
+    }
+
+    private static byte[] byteMergerAll(byte[]... args) {
+        int length_byte = 0;
+        for (byte[] b : args) {
+            length_byte += b.length;
+        }
+        byte[] all_byte = new byte[length_byte];
+        int countLength = 0;
+        for (byte[] b : args) {
+            System.arraycopy(b, 0, all_byte, countLength, b.length);
+            countLength += b.length;
+        }
+        return all_byte;
+    }
+
+    public static String makeSha256HashWithTimeStamp(byte[] data) {
+        byte[] time = String.valueOf(System.currentTimeMillis()).getBytes();
+        return makeSha256Hash(byteMergerAll(data, time));
     }
 
     private static String bytesToString(byte[] bytes) {

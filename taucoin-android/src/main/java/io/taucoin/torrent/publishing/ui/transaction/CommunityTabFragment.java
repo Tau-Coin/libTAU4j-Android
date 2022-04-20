@@ -351,8 +351,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         DialogTrustBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.dialog_trust, null, false);
 
-        String showName = "";
-        String trustedPk = "";
+        String showName;
         TrustContent content;
         if (user != null) {
             showName = UsersUtil.getShowName(user);
@@ -389,7 +388,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
                 tx.queueID = txQueue.queueID;
             }
             if (txViewModel.validateTx(tx)) {
-                txViewModel.addTransaction(tx, null == txQueue);
+                txViewModel.addTransaction(tx, txQueue);
                 trustDialog.closeDialog();
             }
         });

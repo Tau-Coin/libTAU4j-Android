@@ -42,6 +42,7 @@ public class Tx implements Parcelable {
     public long pinnedTime;                 // 置顶固定时间
     public long favoriteTime;               // 收藏时间
 
+    // wiring
     public Tx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo){
         this.chainID = chainID;
         this.receiverPk = receiverPk;
@@ -51,6 +52,7 @@ public class Tx implements Parcelable {
         this.memo = memo;
     }
 
+    // notes
     @Ignore
     public Tx(@NonNull String chainID, long fee, int txType, String memo){
         this.chainID = chainID;
@@ -59,18 +61,12 @@ public class Tx implements Parcelable {
         this.memo = memo;
     }
 
+    // sell
     @Ignore
-    public Tx(@NonNull String chainID, String receiverPk, long fee, int txType){
-        this.chainID = chainID;
-        this.receiverPk = receiverPk;
-        this.fee = fee;
-        this.txType = txType;
-    }
-
-    @Ignore
-    public Tx(@NonNull String chainID, long fee, int txType, String coinName, long quantity,
+    public Tx(@NonNull String chainID, String receiverPk, long fee, int txType, String coinName, long quantity,
               String link, String location, String memo){
         this.chainID = chainID;
+        this.receiverPk = receiverPk;
         this.fee = fee;
         this.txType = txType;
         this.coinName = coinName;
@@ -80,22 +76,13 @@ public class Tx implements Parcelable {
         this.memo = memo;
     }
 
+    // airdrop、announcement
     @Ignore
-    public Tx(@NonNull String chainID, long fee, int txType, String coinName, String link, String memo){
+    public Tx(@NonNull String chainID, String receiverPk, long fee, int txType, String memo){
         this.chainID = chainID;
+        this.receiverPk = receiverPk;
         this.fee = fee;
         this.txType = txType;
-        this.coinName = coinName;
-        this.link = link;
-        this.memo = memo;
-    }
-
-    @Ignore
-    public Tx(@NonNull String chainID, long fee, int txType, String coinName, String memo){
-        this.chainID = chainID;
-        this.fee = fee;
-        this.txType = txType;
-        this.coinName = coinName;
         this.memo = memo;
     }
 

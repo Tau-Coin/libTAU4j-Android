@@ -20,7 +20,12 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
+import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
+import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
@@ -34,6 +39,10 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.ui.transaction.TxViewModel;
 
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.AIRDROP_TX;
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.ANNOUNCEMENT;
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.SELL_TX;
+import static io.taucoin.torrent.publishing.core.model.data.message.TxType.TRUST_TX;
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.WIRING_TX;
 
 /**
@@ -207,7 +216,13 @@ class TxQueueManager {
         byte[] secretKey = keypair.second;
         byte[] receiverPk = ByteUtil.toByte(txQueue.receiverPk);
         long timestamp = daemon.getSessionTime();
-        byte[] txEncoded = txQueue.content;
+        byte[] txEncoded;
+        if (txQueue.txType == TxType.WIRING_TX.getType() && null == txQueue.content) {
+            TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), txQueue.memo);
+            txEncoded = txContent.getEncoded();
+        } else {
+            txEncoded = txQueue.content;
+        }
         long nonce = account.getNonce() + 1;
         byte[] chainIDBytes = ChainIDUtil.encode(txQueue.chainID);
         Transaction transaction = new Transaction(chainIDBytes, 0, timestamp, senderPk, receiverPk,
@@ -218,19 +233,41 @@ class TxQueueManager {
             return true;
         }
         TxContent txContent = new TxContent(txEncoded);
-        Tx tx = new Tx(txQueue.chainID, txQueue.receiverPk, txQueue.amount, fee,
-                WIRING_TX.getType(), txContent.getMemo());
-        // 保存交易数据到本地数据库
-        tx.txID = transaction.getTxID().to_hex();
-        tx.timestamp = timestamp;
-        tx.senderPk = txQueue.senderPk;
-        tx.nonce = nonce;
-        tx.queueID = txQueue.queueID;
-        txRepo.addTransaction(tx);
-        logger.debug("sendWiringTx createTransaction chainID::{}, txID::{}, senderPk::{}, receiverPk::{}, nonce::{}, memo::{}",
-                tx.chainID, tx.txID, tx.senderPk, tx.receiverPk, tx.nonce, tx.memo);
-        addUserInfoToLocal(tx);
-        addMemberInfoToLocal(tx);
+        int txType = txContent.getType();
+        Tx tx = null;
+        if (txType == WIRING_TX.getType()) {
+            tx = new Tx(txQueue.chainID, txQueue.receiverPk, txQueue.amount, fee,
+                    WIRING_TX.getType(), txContent.getMemo());
+        } else if (txType == SELL_TX.getType()) {
+            SellTxContent content = new SellTxContent(txEncoded);
+            tx = new Tx(txQueue.chainID, txQueue.receiverPk, fee, SELL_TX.getType(),
+                    content.getCoinName(), content.getQuantity(), content.getLink(),
+                    content.getLocation(), content.getMemo());
+        } else if (txType == AIRDROP_TX.getType()) {
+            AirdropTxContent content = new AirdropTxContent(txEncoded);
+            tx = new Tx(txQueue.chainID, txQueue.receiverPk, fee, AIRDROP_TX.getType(), content.getMemo());
+            tx.link = content.getLink();
+        } else if (txType == ANNOUNCEMENT.getType()) {
+            AnnouncementContent content = new AnnouncementContent(txEncoded);
+            tx = new Tx(txQueue.chainID, txQueue.receiverPk, fee, ANNOUNCEMENT.getType(), content.getMemo());
+            tx.coinName = content.getTitle();
+        } else if (txType == TRUST_TX.getType()) {
+            TrustContent content = new TrustContent(txEncoded);
+            tx = new Tx(txQueue.chainID, content.getTrustedPkStr(), fee, TRUST_TX.getType(), content.getMemo());
+        }
+        if (tx != null) {
+            // 保存交易数据到本地数据库
+            tx.txID = transaction.getTxID().to_hex();
+            tx.timestamp = timestamp;
+            tx.senderPk = txQueue.senderPk;
+            tx.nonce = nonce;
+            tx.queueID = txQueue.queueID;
+            txRepo.addTransaction(tx);
+            logger.debug("sendWiringTx createTransaction chainID::{}, txID::{}, senderPk::{}, receiverPk::{}, nonce::{}, memo::{}",
+                    tx.chainID, tx.txID, tx.senderPk, tx.receiverPk, tx.nonce, tx.memo);
+            addUserInfoToLocal(tx);
+            addMemberInfoToLocal(tx);
+        }
         return false;
     }
 
@@ -254,7 +291,7 @@ class TxQueueManager {
      * @param tx 交易
      */
     private void addUserInfoToLocal(Tx tx) {
-        if (tx.txType == WIRING_TX.getType()) {
+        if (tx.txType == WIRING_TX.getType() || tx.txType == TRUST_TX.getType()) {
             User receiverUser = userRepo.getUserByPublicKey(tx.receiverPk);
             if (null == receiverUser) {
                 receiverUser = new User(tx.receiverPk);
@@ -276,7 +313,7 @@ class TxQueueManager {
             memberRepo.addMember(member);
             logger.info("addMemberInfoToLocal, senderPk::{}", tx.senderPk);
         }
-        if (txType == WIRING_TX.getType() && StringUtil.isNotEquals(tx.senderPk, tx.receiverPk)) {
+        if ((txType == WIRING_TX.getType() || txType == TRUST_TX.getType()) && StringUtil.isNotEquals(tx.senderPk, tx.receiverPk)) {
             Member receiverMember = memberRepo.getMemberByChainIDAndPk(tx.chainID, tx.receiverPk);
             if (null == receiverMember) {
                 receiverMember = new Member(tx.chainID, tx.receiverPk);

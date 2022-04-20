@@ -20,6 +20,7 @@ import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
+import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
@@ -108,7 +109,7 @@ class MsgAlertHandler {
                 String logicMsgHash = msgContent.getLogicHash();
                 byte[] content = msgContent.getContent();
                 chatMsg = new ChatMsg(hash, senderPk, receiverPk, content, msgContent.getType(),
-                        sentTime, logicMsgHash);
+                        sentTime, logicMsgHash, msgContent.getAirdropChain());
                 chatRepo.addChatMsg(chatMsg);
 
                 // 标记消息未读, 更新上次交流的时间
@@ -203,6 +204,7 @@ class MsgAlertHandler {
         TxQueue tx = new TxQueue(chainID, currentPk, friendPk, amount, fee, 1,
                 TxType.WIRING_TX.getType(), txContent.getEncoded());
         txQueueRepo.addQueue(tx);
+        ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.INSERT);
         daemon.updateTxQueue(tx.chainID);
     }
 

@@ -14,9 +14,12 @@ import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
+import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -128,13 +131,10 @@ public class TxUtils {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
-        if (tab == CommunityTabFragment.TAB_CHAIN && tx.txStatus == 1) {
+        if ((tab == CommunityTabFragment.TAB_CHAIN ||
+                tab == CommunityTabFragment.TAB_MARKET) && tx.txStatus == 1) {
             msg.append("Status: ").setForegroundColor(titleColor)
                     .append(context.getString(R.string.community_block_on_chain))
-                    .append("\n");
-        } else if (tab == CommunityTabFragment.TAB_MARKET && tx.txStatus == 0) {
-            msg.append("Status: ").setForegroundColor(titleColor)
-                    .append(context.getString(R.string.tx_result_status_processing))
                     .append("\n");
         }
         msg.append("Selling: ").setForegroundColor(titleColor)
@@ -177,13 +177,10 @@ public class TxUtils {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
-        if (tab == CommunityTabFragment.TAB_CHAIN && tx.txStatus == 1) {
+        if ((tab == CommunityTabFragment.TAB_CHAIN ||
+                tab == CommunityTabFragment.TAB_MARKET) && tx.txStatus == 1) {
             msg.append("Status: ").setForegroundColor(titleColor)
                     .append(context.getString(R.string.community_block_on_chain))
-                    .append("\n");
-        } else if (tab == CommunityTabFragment.TAB_MARKET && tx.txStatus == 0) {
-            msg.append("Status: ").setForegroundColor(titleColor)
-                    .append(context.getString(R.string.tx_result_status_processing))
                     .append("\n");
         }
         msg.append("Link: ").setForegroundColor(titleColor)
@@ -212,13 +209,10 @@ public class TxUtils {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
-        if (tab == CommunityTabFragment.TAB_CHAIN && tx.txStatus == 1) {
+        if ((tab == CommunityTabFragment.TAB_CHAIN ||
+                tab == CommunityTabFragment.TAB_MARKET) && tx.txStatus == 1) {
             msg.append("Status: ").setForegroundColor(titleColor)
                     .append(context.getString(R.string.community_block_on_chain))
-                    .append("\n");
-        } else if (tab == CommunityTabFragment.TAB_MARKET && tx.txStatus == 0) {
-            msg.append("Status: ").setForegroundColor(titleColor)
-                    .append(context.getString(R.string.tx_result_status_processing))
                     .append("\n");
         }
         msg.append("Title: ").setForegroundColor(titleColor)
@@ -244,11 +238,33 @@ public class TxUtils {
     }
 
     public static SpannableStringBuilder createSpanTxQueue(TxQueueAndStatus tx, boolean isShowNonce) {
+        return createSpanTxQueue(tx, tx.nonce, isShowNonce, null);
+    }
+
+    public static SpannableStringBuilder createSpanTxQueue(TxQueue tx, QueueOperation operation) {
+        return createSpanTxQueue(tx, 0, false, operation);
+    }
+
+    private static SpannableStringBuilder createSpanTxQueue(TxQueue tx, long nonce, boolean isShowNonce,
+                                                            QueueOperation operation) {
         String coinName = ChainIDUtil.getCoinName(tx.chainID);
         SpanUtils msg = new SpanUtils();
         if (tx.content != null) {
             TxContent txContent = new TxContent(tx.content);
             int txType = txContent.getType();
+            if (operation != null) {
+                msg.append("Status: ");
+                if (operation == QueueOperation.INSERT) {
+                    msg.append("Added");
+                } else if (operation == QueueOperation.UPDATE) {
+                    msg.append("Modified");
+                } else {
+                    msg.append("Deleted");
+                }
+                msg.append("\n").append("Community: ")
+                    .append(ChainIDUtil.getName(tx.chainID))
+                    .append("\n");
+            }
             if (txType == TxType.WIRING_TX.getType()) {
                 msg.append("Amount: ").append(FmtMicrometer.fmtBalance(tx.amount))
                         .append(" ").append(coinName)
@@ -256,13 +272,17 @@ public class TxUtils {
             }
             msg.append("Fee: ").append(FmtMicrometer.fmtFeeValue(tx.fee))
                     .append(" ").append(coinName);
-            if (isShowNonce && tx.nonce > 0) {
-                msg.append("\n").append("Nonce: ").append(FmtMicrometer.fmtLong(tx.nonce));
+            if (isShowNonce && nonce > 0) {
+                msg.append("\n").append("Nonce: ").append(FmtMicrometer.fmtLong(nonce));
             }
             if (txType == TxType.WIRING_TX.getType()) {
-                msg.append("\n").append("To: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
+                if (null == operation) {
+                    msg.append("\n").append("To: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
+                }
                 if (StringUtil.isNotEmpty(txContent.getMemo())) {
                     msg.append("\n").append("Description: ").append(txContent.getMemo());
+                } else if (StringUtil.isNotEmpty(tx.memo)) {
+                    msg.append("\n").append("Description: ").append(tx.memo);
                 }
             } else if (txType == TxType.AIRDROP_TX.getType()) {
                 AirdropTxContent content = new AirdropTxContent(tx.content);
@@ -296,7 +316,8 @@ public class TxUtils {
                     msg.append("\n").append("Description: ").append(content.getMemo());
                 }
             } else if (txType == TxType.TRUST_TX.getType()) {
-                msg.append("\n").append("Trust: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
+                TrustContent trustContent = new TrustContent(tx.content);
+                msg.append("\n").append("Trust: ").append(HashUtil.hashMiddleHide(trustContent.getTrustedPkStr()));
             }
         }
         return msg.create();

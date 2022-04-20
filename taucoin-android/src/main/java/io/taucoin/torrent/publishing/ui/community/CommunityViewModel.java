@@ -338,7 +338,7 @@ public class CommunityViewModel extends AndroidViewModel {
                 result.setFailMsg(getApplication().getString(R.string.community_creation_failed));
                 return result;
             }
-            Tx tx = new Tx(community.chainID, 0, TxType.SELL_TX.getType(), coinName,
+            Tx tx = new Tx(community.chainID, currentUser.publicKey, 0, TxType.SELL_TX.getType(), coinName,
                     0, null, null, description);
             tx.txID = transaction.getTxID().to_hex();
             tx.timestamp = timestamp;

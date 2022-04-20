@@ -86,6 +86,8 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
                 if (txQueue.content != null) {
                     TxContent txContent = new TxContent(txQueue.content);
                     binding.etMemo.setText(txContent.getMemo());
+                } else {
+                    binding.etMemo.setText(txQueue.memo);
                 }
                 binding.etPublicKey.setText(txQueue.receiverPk);
                 binding.etPublicKey.setEnabled(false);
@@ -144,7 +146,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         if (item.getItemId() == R.id.menu_done) {
             TxQueue tx = buildTx();
             if (txViewModel.validateTx(tx)) {
-                txViewModel.addTransaction(tx, null == txQueue);
+                txViewModel.addTransaction(tx, txQueue);
             }
         }
         return true;

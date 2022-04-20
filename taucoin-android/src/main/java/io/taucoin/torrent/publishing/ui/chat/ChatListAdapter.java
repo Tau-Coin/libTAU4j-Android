@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -151,7 +150,8 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             }
             this.msg = msg;
             showStatusView(binding.ivWarning, msg);
-            bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, isShowTime, null, myBitmap);
+            showUserView(binding.ivHeadPic, binding.tvTime, isShowTime, null, myBitmap);
+            bindText(binding.tvMsg);
         }
 
         void bindText(ItemTextBinding binding, ChatMsg msg, boolean isShowTime, Bitmap headPic) {
@@ -159,10 +159,11 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
                 return;
             }
             this.msg = msg;
-            bindText(binding.ivHeadPic, binding.tvTime, binding.tvMsg, isShowTime, headPic, null);
+            showUserView(binding.ivHeadPic, binding.tvTime, isShowTime, headPic, null);
+            bindText(binding.tvMsg);
         }
 
-        private void bindText(RoundImageView roundButton, TextView tvTime, AutoLinkTextView tvMsg,
+        private void showUserView(RoundImageView roundButton, TextView tvTime,
                               boolean isShowTime, Bitmap headPic, Bitmap myBitmap) {
             if (null == msg) {
                 return;
@@ -183,6 +184,12 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
                 tvTime.setText(time);
             }
             tvTime.setVisibility(isShowTime ? View.VISIBLE : View.GONE);
+        }
+
+        private void bindText(AutoLinkTextView tvMsg) {
+            if (null == msg) {
+                return;
+            }
             String contentStr = Utils.textBytesToString(msg.content);
             tvMsg.setText(contentStr);
 

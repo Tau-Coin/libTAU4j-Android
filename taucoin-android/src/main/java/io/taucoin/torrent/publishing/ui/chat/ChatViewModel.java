@@ -32,10 +32,12 @@ import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
+import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
@@ -49,6 +51,7 @@ import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
+import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
 
 /**
  * 聊天相关的ViewModel
@@ -117,7 +120,7 @@ public class ChatViewModel extends AndroidViewModel {
     void sendMessage(String friendPk, String msg, int type) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Result>) emitter -> {
             String senderPk = MainApplication.getInstance().getPublicKey();
-            Result result = syncSendMessageTask(senderPk, friendPk, msg, type, null);
+            Result result = syncSendMessageTask(senderPk, friendPk, msg, type);
             emitter.onNext(result);
             emitter.onComplete();
         }).subscribeOn(Schedulers.single())
@@ -261,16 +264,26 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     /**
+     * 同步给朋友发转账任务
+     * @param context Context
+     */
+    public static Result syncSendMessageTask(Context context, TxQueue tx, QueueOperation operation) {
+        String text = TxUtils.createSpanTxQueue(tx, operation).toString();
+        return syncSendMessageTask(context, tx.senderPk, tx.receiverPk, text,
+                MessageType.WIRING.getType(), tx.chainID);
+    }
+
+    /**
      * 同步给朋友发信息任务
      * @param context Context
      * @param senderPk 发送者公钥
      * @param friendPk 朋友公钥
      * @param text 消息
      * @param type 消息类型
-     * @param airdropChain 发币的链
+     * @param chainID 发币的链
      */
     public static Result syncSendMessageTask(Context context, String senderPk, String friendPk,
-                                             String text, int type, String airdropChain) {
+                     String text, int type, String chainID) {
         Result result = new Result();
         UserRepository userRepo = RepositoryHelper.getUserRepository(context);
         ChatRepository chatRepo = RepositoryHelper.getChatRepository(context);
@@ -297,10 +310,10 @@ public class ChatViewModel extends AndroidViewModel {
                     currentTime = Math.max(currentTime, myLastSendTime + 1);
                     // 3、更新自己发送的最后一条的时间
                     myLastSendTime = currentTime;
-                    MsgContent msgContent = MsgContent.createContent(logicMsgHash, type, content, airdropChain);
-
+                    MsgContent msgContent = MsgContent.createContent(logicMsgHash, type, content, chainID);
+                    byte[] encoded = msgContent.getEncoded();
                     // 加密填充模式为16的倍数896, 最大控制为895
-                    byte[] encryptedEncoded = CryptoUtil.encrypt(msgContent.getEncoded(), key);
+                    byte[] encryptedEncoded = CryptoUtil.encrypt(encoded, key);
                     Message message = new Message(currentTime, ByteUtil.toByte(senderPk),
                             ByteUtil.toByte(friendPk), encryptedEncoded);
                     String hash = message.msgId();
@@ -313,7 +326,7 @@ public class ChatViewModel extends AndroidViewModel {
                     boolean isSuccess = daemon.addNewMessage(message);
                     // 组织Message的结构，并发送到DHT和数据入库
                     ChatMsg chatMsg = new ChatMsg(hash, senderPk, friendPk, content, type,
-                            currentTime, logicMsgHash);
+                            currentTime, logicMsgHash, chainID);
                     messages[nonce] = chatMsg;
 
                     // 更新消息日志信息
@@ -355,11 +368,11 @@ public class ChatViewModel extends AndroidViewModel {
             String sender = chatMsg.senderPk;
             String receiver = chatMsg.receiverPk;
             String logicMsgHash = chatMsg.logicMsgHash;
-            String airdropChain = chatMsg.airdropChain;
             User user = userRepo.getUserByPublicKey(sender);
-            MsgContent msgContent = MsgContent.createTextContent(logicMsgHash, chatMsg.content, airdropChain);
+            MsgContent msgContent = MsgContent.createTextContent(logicMsgHash, chatMsg.content, chatMsg.airdropChain);
+            byte[] encoded = msgContent.getEncoded();
             byte[] key = Utils.keyExchange(receiver, user.seed);
-            byte[] encryptedEncoded = CryptoUtil.encrypt(msgContent.getEncoded(), key);
+            byte[] encryptedEncoded = CryptoUtil.encrypt(encoded, key);
             Message message = new Message(timestamp, ByteUtil.toByte(sender),
                     ByteUtil.toByte(receiver), encryptedEncoded);
             boolean isSuccess = daemon.addNewMessage(message);

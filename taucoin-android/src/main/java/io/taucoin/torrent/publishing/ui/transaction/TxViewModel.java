@@ -46,14 +46,15 @@ import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
-import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.core.utils.UrlUtil;
+import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.MainApplication;
@@ -161,12 +162,12 @@ public class TxViewModel extends AndroidViewModel {
      * 添加新的转账交易
      * @param tx 根据用户输入构建的用户数据
      */
-    void addTransaction(TxQueue tx, boolean isAdd) {
+    void addTransaction(TxQueue tx, TxQueue oldTx) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<String>) emitter -> {
             // 需要验证交易内容是否超出限制
             String result = validateTxSize(tx);
             if (StringUtil.isEmpty(result)) {
-                result = addTransactionTask(tx, isAdd);
+                result = addTransactionTask(tx, oldTx);
             }
             emitter.onNext(result);
             emitter.onComplete();
@@ -176,13 +177,16 @@ public class TxViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private String addTransactionTask(TxQueue tx, boolean isAdd) {
-        if (isAdd) {
+    private String addTransactionTask(TxQueue tx, TxQueue oldTx) {
+        if (null == oldTx) {
             txQueueRepo.addQueue(tx);
+            ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.INSERT);
             daemon.updateTxQueue(tx.chainID);
         } else {
             // 重发交易队列
             txQueueRepo.updateQueue(tx);
+            // 只有转账金额或者备注被修改，才会通知对方
+            ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.UPDATE);
             daemon.updateTxQueue(tx.chainID);
         }
         return "";
@@ -226,6 +230,7 @@ public class TxViewModel extends AndroidViewModel {
                 result = context.getString(R.string.tx_error_send_failed);
                 return result;
             }
+            byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
             long timestamp = isResend ? tx.timestamp : daemon.getSessionTime();
             byte[] txEncoded = null;
             switch (TxType.valueOf(tx.txType)) {
@@ -235,8 +240,10 @@ public class TxViewModel extends AndroidViewModel {
                     txEncoded = txContent.getEncoded();
                     break;
                 case TRUST_TX:
+                    // trust UserPk占用receiverPk
                     TrustContent trustContent = new TrustContent(tx.memo, tx.receiverPk);
                     txEncoded = trustContent.getEncoded();
+                    receiverPk = senderPk;
                     break;
                 case SELL_TX:
                     SellTxContent sellTxContent = new SellTxContent(tx.coinName, tx.quantity,
@@ -259,7 +266,6 @@ public class TxViewModel extends AndroidViewModel {
             }
             Transaction transaction;
             if (tx.txType == WIRING_TX.getType()) {
-                byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
                 transaction = new Transaction(chainID, 0, timestamp, senderPk, receiverPk,
                         tx.nonce, tx.amount, tx.fee, txEncoded);
             } else {
@@ -568,7 +574,7 @@ public class TxViewModel extends AndroidViewModel {
         String memo = getApplication().getString(R.string.community_added_members);
         TxContent txContent = new TxContent(WIRING_TX.getType(), Utils.textStringToBytes(memo));
         TxQueue tx = new TxQueue(chainID, senderPk, friendPk, amount, fee, TxType.WIRING_TX, txContent.getEncoded());
-        return addTransactionTask(tx, true);
+        return addTransactionTask(tx, null);
     }
 
 
@@ -775,6 +781,7 @@ public class TxViewModel extends AndroidViewModel {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             try {
                 txQueueRepo.deleteQueue(tx);
+                ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.DELETE);
             } catch (Exception e) {
                 logger.error("deleteTxQueue error::", e);
             }

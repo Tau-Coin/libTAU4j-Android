@@ -29,8 +29,9 @@ public class TxQueue implements Parcelable {
     public long queueTime;                  // 添加队列的时间
     public long amount;                     // 交易金额
     public long fee;                        // 交易费
+    public String memo;                     // 数据库版本为1字段，新版本无用
     public byte[] content;                  // 交易内容编码后内容
-    public int txType;                  // 交易内容编码后内容
+    public int txType;                      // 交易类型
 
     @Ignore
     public TxQueue(@NonNull String chainID, @NonNull String senderPk, @NonNull String receiverPk,

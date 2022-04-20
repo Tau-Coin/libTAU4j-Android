@@ -54,6 +54,19 @@ public class ChatMsg implements Parcelable {
     }
 
     @Ignore
+    public ChatMsg(@NonNull String hash, String senderPk, String receiverPk, byte[] content,
+                   int contentType, long timestamp, String logicMsgHash, String airdropChain){
+        this.hash = hash;
+        this.senderPk = senderPk;
+        this.receiverPk = receiverPk;
+        this.content = content;
+        this.contentType = contentType;
+        this.timestamp = timestamp;
+        this.logicMsgHash = logicMsgHash;
+        this.airdropChain = airdropChain;
+    }
+
+    @Ignore
     private ChatMsg(Parcel in) {
         hash = in.readString();
         senderPk = in.readString();

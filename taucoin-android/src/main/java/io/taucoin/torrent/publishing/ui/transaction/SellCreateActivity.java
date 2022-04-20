@@ -141,7 +141,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
         if (item.getItemId() == R.id.menu_done) {
             TxQueue tx = buildTx();
             if (txViewModel.validateTx(tx)) {
-                txViewModel.addTransaction(tx, null == txQueue);
+                txViewModel.addTransaction(tx, txQueue);
             }
         }
         return true;
