@@ -217,7 +217,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private void shareAirdropLink(String airdropLink) {
         String shareTitle = getString(R.string.bot_share_airdrop_link_title);
         String text = getString(R.string.bot_share_airdrop_link_content,
-                Constants.APP_DOWNLOAD_URL, airdropLink);
+                Constants.APP_HOME_URL, airdropLink);
         ActivityUtil.shareText(this, shareTitle, text);
     }
 

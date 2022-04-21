@@ -708,22 +708,16 @@ public class UserViewModel extends AndroidViewModel {
         // 更新libTAU朋友信息
         boolean isSuccess = daemon.updateFriendInfo(user);
         logger.debug("AddFriendsLocally, libTAU updateFriendInfo success::{}", isSuccess);
-        boolean isExist = true;
+        boolean isExist = false;
         if (null == friend) {
             // 添加朋友
             int status = isSuccess ? FriendStatus.ADDED.getStatus() : FriendStatus.DISCOVERED.getStatus();
             friend = new Friend(userPK, publicKey, status);
             friendRepo.addFriend(friend);
             if (isSuccess) {
-                isExist = false;
                 result.setMsg(publicKey);
                 // 发送默认消息
-                boolean isAirdrop = StringUtil.isNotEmpty(airdropChain);
-                String msg = getApplication().getString(!isAirdrop ? R.string.contacts_have_added : R.string.contacts_accepting_airdrop);
-                int type = !isAirdrop ? MessageType.TEXT.getType() : MessageType.AIRDROP.getType();
-                String senderPk = MainApplication.getInstance().getPublicKey();
-                chatViewModel.syncSendMessageTask(senderPk, publicKey, msg, type, airdropChain);
-                logger.debug("AddFriendsLocally, syncSendMessageTask::{}", msg);
+                sendDefaultMessage(publicKey, airdropChain);
                 // 更新朋友信息
                 daemon.requestFriendInfo(publicKey);
             } else {
@@ -731,17 +725,42 @@ public class UserViewModel extends AndroidViewModel {
                 logger.debug("AddFriendsLocally, {}", result.getMsg());
             }
         } else {
-            result.setMsg(getApplication().getString(R.string.contacts_friend_already_exists));
-            logger.debug("AddFriendsLocally, {}", result.getMsg());
-            if (StringUtil.isNotEmpty(airdropChain)) {
-                String senderPk = MainApplication.getInstance().getPublicKey();
-                String msg = getApplication().getString(R.string.contacts_accepting_airdrop);
-                int type = MessageType.AIRDROP.getType();
-                chatViewModel.syncSendMessageTask(senderPk, publicKey, msg, type, airdropChain);
+            // 防止与libTAU第一次不通，造成的数据异常
+            if (friend.status == FriendStatus.DISCOVERED.getStatus()) {
+                // 如果再次尝试成功，则触发发送默认消息
+                if (isSuccess) {
+                    result.setMsg(publicKey);
+                    friend.status = FriendStatus.ADDED.getStatus();
+                    friendRepo.updateFriend(friend);
+                    // 发送默认消息
+                    sendDefaultMessage(publicKey, airdropChain);
+                    // 更新朋友信息
+                    daemon.requestFriendInfo(publicKey);
+                } else {
+                    result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));
+                    logger.debug("AddFriendsLocally, {}", result.getMsg());
+                }
+            } else {
+                isExist = true;
+                result.setMsg(getApplication().getString(R.string.contacts_friend_already_exists));
+                logger.debug("AddFriendsLocally, {}", result.getMsg());
+                if (StringUtil.isNotEmpty(airdropChain)) {
+                    // 发送接受airdrop消息
+                    sendDefaultMessage(publicKey, airdropChain);
+                }
             }
         }
         result.setExist(isExist);
         return result;
+    }
+
+    private void sendDefaultMessage(String friendPk, String airdropChain) {
+        boolean isAirdrop = StringUtil.isNotEmpty(airdropChain);
+        String msg = getApplication().getString(!isAirdrop ? R.string.contacts_have_added : R.string.contacts_accepting_airdrop);
+        int type = !isAirdrop ? MessageType.TEXT.getType() : MessageType.AIRDROP.getType();
+        String senderPk = MainApplication.getInstance().getPublicKey();
+        chatViewModel.syncSendMessageTask(senderPk, friendPk, msg, type, airdropChain);
+        logger.debug("AddFriendsLocally, syncSendMessageTask::{}", msg);
     }
 
     /**
