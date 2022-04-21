@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -57,7 +58,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
     private CommunityTabFragment currentTabFragment = null;
-    private TextView selectedView = null;
+    private RelativeLayout selectedView = null;
     private int currentTab = -1;
     private int[] spinnerItems;
     private int spinnerSelected = 0;
@@ -87,7 +88,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         initParameter();
         initLayout();
         initFabSpeedDial();
-        onClick(binding.tvNotes);
+        onClick(binding.rlNotes);
     }
 
     /**
@@ -270,13 +271,13 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         }
 
         switch (view.getId()) {
-            case R.id.tv_notes:
+            case R.id.rl_notes:
                 // note
                 spinnerItems = new int[] {};
                 currentTabFragment = new NotesTabFragment();
                 currentTab = CommunityTabFragment.TAB_NOTES;
                 break;
-            case R.id.tv_market:
+            case R.id.rl_market:
                 // market
                 spinnerItems = new int[] {R.string.community_view_all,
                         R.string.community_view_sell,
@@ -285,7 +286,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 currentTabFragment = new MarketTabFragment();
                 currentTab = CommunityTabFragment.TAB_MARKET;
                 break;
-            case R.id.tv_chain:
+            case R.id.rl_chain:
                 // chain
                 spinnerItems = new int[] {R.string.community_view_blocks,
                         R.string.community_view_own_txs,
@@ -378,19 +379,20 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                         binding.fabButton.setMainFabClosedBackgroundColor(getResources().getColor(color));
                     }
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
+                    binding.msgUnread.setVisibility(member.msgUnread == 1  ? View.VISIBLE : View.GONE);
                 }, it -> {}));
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.tv_notes:
+            case R.id.rl_notes:
                 onTabClick(v, CommunityTabFragment.TAB_NOTES);
                 break;
-            case R.id.tv_market:
+            case R.id.rl_market:
                 onTabClick(v, CommunityTabFragment.TAB_MARKET);
                 break;
-            case R.id.tv_chain:
+            case R.id.rl_chain:
                 onTabClick(v, CommunityTabFragment.TAB_CHAIN);
                 break;
             case R.id.tv_join:
@@ -412,11 +414,13 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 
         if (this.selectedView != null) {
             this.selectedView.setBackgroundResource(R.drawable.white_rect_round_bg_no_border);
-            this.selectedView.setTextColor(getResources().getColor(R.color.gray_dark));
+            TextView textView = (TextView) selectedView.getChildAt(0);
+            textView.setTextColor(getResources().getColor(R.color.gray_dark));
         }
-        TextView selectedView = (TextView) v;
+        RelativeLayout selectedView = (RelativeLayout) v;
         selectedView.setBackgroundResource(R.drawable.yellow_rect_round_border_small_radius);
-        selectedView.setTextColor(getResources().getColor(R.color.color_yellow));
+        TextView textView = (TextView) selectedView.getChildAt(0);
+        textView.setTextColor(getResources().getColor(R.color.color_yellow));
         this.selectedView = selectedView;
         this.spinnerSelected = 0;
         loadTabView(selectedView);

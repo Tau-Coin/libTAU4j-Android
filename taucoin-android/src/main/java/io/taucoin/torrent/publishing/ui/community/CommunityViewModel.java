@@ -74,6 +74,7 @@ import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
@@ -126,6 +127,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<UserAndFriend> largestCoinHolder = new MutableLiveData<>();
     private MutableLiveData<List<BlockAndTx>> chainBlocks = new MutableLiveData<>();
     private Disposable visitDisposable;
+    private Disposable clearDisposable;
 
     public CommunityViewModel(@NonNull Application application) {
         super(application);
@@ -368,6 +370,9 @@ public class CommunityViewModel extends AndroidViewModel {
         disposables.clear();
         if (visitDisposable != null && !visitDisposable.isDisposed()) {
             visitDisposable.dispose();
+        }
+        if (clearDisposable != null && !clearDisposable.isDisposed()) {
+            clearDisposable.dispose();
         }
     }
 
@@ -977,5 +982,31 @@ public class CommunityViewModel extends AndroidViewModel {
      */
     public Observable<List<TxConfirm>> observerTxConfirms(String txID) {
         return txRepo.observerTxConfirms(txID);
+    }
+
+    /**
+     * 清除社区的消息未读状态
+     */
+    public void clearMsgUnread(String chainID) {
+        if (clearDisposable != null && !clearDisposable.isDisposed()) {
+            return;
+        }
+        clearDisposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            try {
+                if (StringUtil.isNotEmpty(chainID)) {
+                    String userPk = MainApplication.getInstance().getPublicKey();
+                    Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
+                    if (member != null && member.msgUnread > 0) {
+                        member.msgUnread = 0;
+                        memberRepo.updateMember(member);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("clearMsgUnread error ", e);
+            }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe();
     }
 }

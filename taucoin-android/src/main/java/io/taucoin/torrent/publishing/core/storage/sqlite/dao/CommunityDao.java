@@ -52,7 +52,7 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, a.tailBlock, b.balance, b.power, b.blockNumber," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk, " +
-            " 0 AS msgUnread, null AS msg, c.memo, c.timestamp" +
+            " b.msgUnread AS msgUnread, null AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
@@ -65,7 +65,7 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, a.tailBlock, b.balance, b.power, b.blockNumber," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk, " +
-            " 0 AS msgUnread, null AS msg, c.memo, c.timestamp" +
+            " b.msgUnread AS msgUnread, null AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
@@ -109,7 +109,7 @@ public interface CommunityDao {
     String QUERY_GET_COMMUNITIES_IN_BLACKLIST = "SELECT * FROM Communities WHERE isBanned = 1";
     String QUERY_GET_COMMUNITY_BY_CHAIN_ID = "SELECT * FROM Communities WHERE chainID = :chainID";
     String QUERY_ADD_COMMUNITY_BLACKLIST = "Update Communities set isBanned =:isBanned WHERE chainID = :chainID";
-    String QUERY_JOINED_COMMUNITY = "SELECT c.*, m.balance, m.balance, m.power, m.nonce, m.blockNumber," +
+    String QUERY_JOINED_COMMUNITY = "SELECT c.*, m.balance, m.balance, m.power, m.nonce, m.blockNumber, m.msgUnread," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
             " FROM Communities c" +
             " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" +
@@ -119,7 +119,8 @@ public interface CommunityDao {
     String QUERY_CLEAR_COMMUNITY_STATE = "UPDATE Communities SET headBlock = 0, tailBlock = 0" +
             " WHERE chainID = :chainID";
 
-    String QUERY_CURRENT_COMMUNITY_MEMBER = "SELECT c.*, m.balance, m.balance, m.power, m.nonce, m.blockNumber," +
+    String QUERY_CURRENT_COMMUNITY_MEMBER = "SELECT c.*, m.balance, m.balance, m.power, m.nonce, " +
+            "m.blockNumber, m.msgUnread," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
             " FROM Communities c" +
             " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = :publicKey" +
@@ -135,7 +136,7 @@ public interface CommunityDao {
             " WHERE m.chainID = :chainID AND " + MemberDao.WHERE_ON_CHAIN  +
             " ORDER BY m.power DESC LIMIT :topNum";
 
-    String QUERY_COMMUNITIES = "SELECT c.*, m.balance, m.balance, m.power, m.nonce, m.blockNumber," +
+    String QUERY_COMMUNITIES = "SELECT c.*, m.balance, m.balance, m.power, m.nonce, m.blockNumber, m.msgUnread," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
             " FROM Communities c" +
             " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" +

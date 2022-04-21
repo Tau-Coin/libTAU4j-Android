@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -47,7 +48,7 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
             }
             binding.refreshLayout.setRefreshing(false);
             binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
-
+            communityViewModel.clearMsgUnread(chainID);
             logger.debug("txs.size::{}", txs.size());
             closeProgressDialog();
         });

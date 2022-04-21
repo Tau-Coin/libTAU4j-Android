@@ -114,6 +114,7 @@ public class UserViewModel extends AndroidViewModel {
     private GuideDialog guideDialog;
     private TauDaemon daemon;
     private ChatViewModel chatViewModel;
+    private Disposable clearDisposable;
     public UserViewModel(@NonNull Application application) {
         super(application);
         userRepo = RepositoryHelper.getUserRepository(getApplication());
@@ -148,6 +149,10 @@ public class UserViewModel extends AndroidViewModel {
             guideDialog.closeDialog();
             guideDialog = null;
         }
+        if (clearDisposable != null && !clearDisposable.isDisposed()) {
+            clearDisposable.dispose();
+        }
+
     }
 
     /**
@@ -1079,7 +1084,10 @@ public class UserViewModel extends AndroidViewModel {
      * 清除朋友的消息未读状态
      */
     public void clearMsgUnread(String friendPK) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
+        if (clearDisposable != null && !clearDisposable.isDisposed()) {
+            return;
+        }
+        clearDisposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
             try {
                 String userPk = MainApplication.getInstance().getPublicKey();
                 Friend friend = friendRepo.queryFriend(userPk, friendPK);
@@ -1095,7 +1103,6 @@ public class UserViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
-        disposables.add(disposable);
     }
 
     public void closeDialog() {

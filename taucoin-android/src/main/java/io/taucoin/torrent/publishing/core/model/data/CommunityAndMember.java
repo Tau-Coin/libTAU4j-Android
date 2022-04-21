@@ -11,6 +11,7 @@ public class CommunityAndMember extends Community {
     public long nonce;
     public long blockNumber;
     public int joined;
+    public int msgUnread;
 
     /**
      * 判断社区成员是否是read only

@@ -21,67 +21,115 @@
             android:id="@+id/ll_filter"
             android:layout_below="@+id/toolbar_include"
             android:orientation="horizontal"
-            android:minHeight="@dimen/widget_size_40"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/widget_size_40"
             android:background="@color/color_bg"
             android:paddingStart="@dimen/widget_size_2"
             android:paddingEnd="@dimen/widget_size_2"
             android:paddingTop="@dimen/widget_size_1"
             android:paddingBottom="@dimen/widget_size_1">
 
-            <TextView
-                android:id="@+id/tv_notes"
+            <RelativeLayout
+                android:id="@+id/rl_notes"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:paddingTop="@dimen/widget_size_5"
-                android:paddingBottom="@dimen/widget_size_5"
-                android:paddingStart="@dimen/widget_size_2"
-                android:paddingEnd="@dimen/widget_size_2"
-                android:textColor="@color/gray_dark"
-                android:text="@string/community_chain_note"
-                android:includeFontPadding="false"
-                android:gravity="center|center_vertical"
-                android:background="@drawable/white_rect_round_bg_no_border"
                 android:onClick="@{listener::onClick}"
-                android:textAppearance="@style/TextAppearanceBody2"/>
+                android:background="@drawable/white_rect_round_bg_no_border">
 
-            <TextView
-                android:id="@+id/tv_market"
+                <TextView
+                    android:id="@+id/tv_notes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingTop="@dimen/widget_size_5"
+                    android:paddingBottom="@dimen/widget_size_5"
+                    android:paddingStart="@dimen/widget_size_2"
+                    android:paddingEnd="@dimen/widget_size_2"
+                    android:textColor="@color/gray_dark"
+                    android:text="@string/community_chain_note"
+                    android:includeFontPadding="false"
+                    android:gravity="center|center_vertical"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
+
+                <View
+                    android:visibility="gone"
+                    android:layout_toEndOf="@+id/tv_notes"
+                    android:layout_width="@dimen/widget_size_6"
+                    android:layout_height="@dimen/widget_size_6"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:background="@drawable/red_rect_round_bg"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_market"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/widget_size_2"
                 android:layout_marginEnd="@dimen/widget_size_2"
-                android:paddingTop="@dimen/widget_size_5"
-                android:paddingBottom="@dimen/widget_size_5"
-                android:paddingStart="@dimen/widget_size_2"
-                android:paddingEnd="@dimen/widget_size_2"
-                android:textColor="@color/gray_dark"
-                android:text="@string/community_chain_market"
-                android:includeFontPadding="false"
-                android:gravity="center|center_vertical"
-                android:background="@drawable/white_rect_round_bg_no_border"
                 android:onClick="@{listener::onClick}"
-                android:textAppearance="@style/TextAppearanceBody2"/>
+                android:background="@drawable/white_rect_round_bg_no_border">
 
-            <TextView
-                android:id="@+id/tv_chain"
+                <TextView
+                    android:id="@+id/tv_market"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingTop="@dimen/widget_size_5"
+                    android:paddingBottom="@dimen/widget_size_5"
+                    android:paddingStart="@dimen/widget_size_2"
+                    android:paddingEnd="@dimen/widget_size_2"
+                    android:textColor="@color/gray_dark"
+                    android:text="@string/community_chain_market"
+                    android:includeFontPadding="false"
+                    android:gravity="center|center_vertical"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
+
+                <View
+                    android:visibility="gone"
+                    android:id="@+id/msg_unread"
+                    android:layout_toEndOf="@+id/tv_market"
+                    android:layout_width="@dimen/widget_size_6"
+                    android:layout_height="@dimen/widget_size_6"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:background="@drawable/red_rect_round_bg"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_chain"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:paddingTop="@dimen/widget_size_5"
-                android:paddingBottom="@dimen/widget_size_5"
-                android:paddingStart="@dimen/widget_size_2"
-                android:paddingEnd="@dimen/widget_size_2"
-                android:textColor="@color/gray_dark"
-                android:text="@string/community_on_chain"
-                android:includeFontPadding="false"
-                android:background="@drawable/white_rect_round_bg_no_border"
-                android:gravity="center|center_vertical"
                 android:onClick="@{listener::onClick}"
-                android:textAppearance="@style/TextAppearanceBody2"/>
+                android:background="@drawable/white_rect_round_bg_no_border">
+
+                <TextView
+                    android:id="@+id/tv_chain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingTop="@dimen/widget_size_5"
+                    android:paddingBottom="@dimen/widget_size_5"
+                    android:paddingStart="@dimen/widget_size_2"
+                    android:paddingEnd="@dimen/widget_size_2"
+                    android:textColor="@color/gray_dark"
+                    android:text="@string/community_on_chain"
+                    android:includeFontPadding="false"
+                    android:gravity="center|center_vertical"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
+
+                <View
+                    android:visibility="gone"
+                    android:layout_toEndOf="@+id/tv_chain"
+                    android:layout_width="@dimen/widget_size_6"
+                    android:layout_height="@dimen/widget_size_6"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:background="@drawable/red_rect_round_bg"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
 

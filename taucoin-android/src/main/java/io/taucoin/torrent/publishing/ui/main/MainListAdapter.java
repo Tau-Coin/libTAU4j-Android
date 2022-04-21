@@ -124,6 +124,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                         }
                     });
                 }
+                binding.msgUnread.setVisibility(bean.msgUnread > 0 ? View.VISIBLE : View.GONE);
             } else if (holder.binding instanceof ItemChatListBinding) {
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;
                 String friendNickName = UsersUtil.getShowNameWithYourself(bean.friend, bean.ID);
@@ -173,6 +174,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
             if (isSame) {
                 if (oldItem.type == 0) {
                     isSame = oldItem.timestamp == newItem.timestamp &&
+                            oldItem.msgUnread == newItem.msgUnread &&
                             oldItem.balance == newItem.balance &&
                             oldItem.power == newItem.power &&
                             StringUtil.isEquals(oldItem.memo, newItem.memo);

@@ -25,6 +25,7 @@ public class Member implements Parcelable {
     public int airdropMembers;          // 总的发币成员数
     public long airdropCoins;           // 每次发币的coins
     public long airdropTime;            // 开始发币的时间
+    public int msgUnread;               // 是否存在消息未读 0：已读，1：未读
 
     public Member(@NonNull String chainID, @NonNull String publicKey){
         this.chainID = chainID;

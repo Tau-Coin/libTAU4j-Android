@@ -24,6 +24,7 @@
                 android:layout_height="@dimen/widget_size_50"
                 android:layout_marginEnd="@dimen/widget_size_7"
                 android:layout_marginTop="@dimen/widget_size_2"
+                android:src="@color/color_yellow"
                 android:scaleType="centerCrop"/>
 
             <View
@@ -31,7 +32,7 @@
                 android:layout_width="@dimen/widget_size_8"
                 android:layout_height="@dimen/widget_size_8"
                 android:layout_marginStart="@dimen/widget_size_44"
-                android:layout_marginTop="@dimen/widget_size_0"
+                android:layout_marginTop="@dimen/widget_size_2"
                 android:background="@drawable/red_rect_round_bg"/>
 
         </RelativeLayout>
