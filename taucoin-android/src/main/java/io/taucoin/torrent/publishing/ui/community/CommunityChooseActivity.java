@@ -2,6 +2,8 @@ package io.taucoin.torrent.publishing.ui.community;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -10,6 +12,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityCommunityChooseBinding;
+import io.taucoin.torrent.publishing.databinding.ItemCommunityChooseBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 
@@ -52,13 +55,28 @@ public class CommunityChooseActivity extends BaseActivity {
             ActivityUtil.startActivity(intent, this, CommunitiesActivity.class);
         });
         binding.joinedList.setAdapter(adapter);
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        ItemCommunityChooseBinding headerBinding = DataBindingUtil.inflate(inflater,
+                R.layout.item_community_choose, null, false);
+        headerBinding.tvName.setText(R.string.community_paste_join);
+        View headerView = headerBinding.getRoot();
+        headerView.setOnClickListener(l -> {
+            ActivityUtil.startActivity(this, CommunityJoinActivity.class);
+        });
+        binding.joinedList.addHeaderView(headerView);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        communityViewModel.getJoinedCommunityList();
     }
 
     /**
      * 观察加入的社区列表
      */
     private void observeJoinedList() {
-        communityViewModel.getJoinedCommunityList();
         communityViewModel.getJoinedList().observe(this, communities -> {
             if(adapter != null){
                 adapter.submitList(communities);

@@ -152,6 +152,11 @@
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
     <string name="community_create_success" formatted="false"><Data><![CDATA[Creator shall keep phone in <strong>wifi</strong> and <strong>power charging</strong>
     as much as possible for community data exchange.]]></Data></string>
+    <string name="community_paste_join">Paste a community link to join</string>
+    <string name="community_paste_here">Paste link here</string>
+    <string name="community_join_title">Join community</string>
+    <string name="community_join_successfully">Successfully joined the community!</string>
+    <string name="community_join_failed">Failed to join the community!</string>
 
     <string name="community_view_all">All</string>
     <string name="community_view_on_chain_only">On Chain Only</string>

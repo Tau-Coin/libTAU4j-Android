@@ -76,6 +76,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.community.CommunityJoinActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.community.CommunitiesActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
