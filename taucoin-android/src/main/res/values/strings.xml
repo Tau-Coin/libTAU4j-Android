@@ -43,7 +43,7 @@
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
 
-    <string name="main_title">TAU</string>
+    <string name="main_title">TAU Serverless</string>
     <string name="main_empty_title">Welcome to TAU</string>
     <string name="main_empty_add_friends">Add Friend</string>
     <string name="main_empty_create_communities">Create Coin Community</string>
@@ -503,7 +503,7 @@
     <string name="bot_airdrop_tau_link">Android Link</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share android link</string>
-    <string name="bot_share_airdrop_link_content">1. Please download decentral server-less TAU app(size 20Mb) to join us.\n\n%1$s\n\n
+    <string name="bot_share_airdrop_link_content">1. Please download decentral server-less TAU app(size 24Mb) to join us.\n\n%1$s\n\n
         2. To receive your airdrop coins, copy this FULL message and paste to TAU app airdrop function.\n\n%2$s
     </string>
     <string name="bot_hello_world">HelloWorld</string>
