@@ -230,7 +230,7 @@ public class TxViewModel extends AndroidViewModel {
                 result = context.getString(R.string.tx_error_send_failed);
                 return result;
             }
-            byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
+            byte[] receiverPk = StringUtil.isEmpty(tx.receiverPk) ? null : ByteUtil.toByte(tx.receiverPk);
             long timestamp = isResend ? tx.timestamp : daemon.getSessionTime();
             byte[] txEncoded = null;
             switch (TxType.valueOf(tx.txType)) {
@@ -265,11 +265,11 @@ public class TxViewModel extends AndroidViewModel {
                 return result;
             }
             Transaction transaction;
-            if (tx.txType == WIRING_TX.getType()) {
+            if (tx.txType == NOTE_TX.getType()) {
+                transaction = new Transaction(chainID, 0, timestamp, senderPk, tx.fee, txEncoded);
+            } else {
                 transaction = new Transaction(chainID, 0, timestamp, senderPk, receiverPk,
                         tx.nonce, tx.amount, tx.fee, txEncoded);
-            } else {
-                transaction = new Transaction(chainID, 0, timestamp, senderPk, tx.fee, txEncoded);
             }
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
             logger.debug("createTransaction txID::{}, limit::{}, transaction::{}",
