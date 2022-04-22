@@ -19,7 +19,6 @@ import io.taucoin.torrent.publishing.core.utils.Formatter;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityWorkingConditionBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 
@@ -73,8 +72,6 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
         handleSettingsChanged(getString(R.string.pref_key_cpu_usage));
         handleSettingsChanged(getString(R.string.pref_key_memory_usage));
         handleSettingsChanged(getString(R.string.pref_key_current_heap_size));
-        handleSettingsChanged(TrafficUtil.getDownKey());
-        handleSettingsChanged(TrafficUtil.getUpKey());
 
         disposables.add(settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.newThread())
@@ -135,14 +132,6 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
             long heapSize = settingsRepo.getCurrentHeapSize();
             String heapSizeStr = Formatter.formatFileSize(this, heapSize);
             binding.tvHeapSize.setText(heapSizeStr);
-        } else if (StringUtil.isEquals(key, TrafficUtil.getDownKey())) {
-            long downloadTotal = TrafficUtil.getTrafficDownloadTotal();
-            String downloadTotalStr = Formatter.formatFileSize(this, downloadTotal).toUpperCase();
-            binding.tvDownload.setText(downloadTotalStr);
-        } else if (StringUtil.isEquals(key, TrafficUtil.getUpKey())) {
-            long uploadTotal = TrafficUtil.getTrafficUploadTotal();
-            String uploadTotalStr = Formatter.formatFileSize(this, uploadTotal).toUpperCase();
-            binding.tvUpload.setText(uploadTotalStr);
         }
     }
 
