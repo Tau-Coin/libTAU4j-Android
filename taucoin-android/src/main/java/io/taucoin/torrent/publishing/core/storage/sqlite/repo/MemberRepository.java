@@ -70,6 +70,12 @@ public interface MemberRepository {
     Flowable<Statistics> getMembersStatistics(String chainID);
 
     /**
+     * 获取社区区块统计
+     * @param chainID
+     */
+    Flowable<Statistics> getBlocksStatistics(String chainID);
+
+    /**
      * 删除社区成员数据
      * @param chainID
      */

@@ -112,7 +112,8 @@
     removed from \"setting>privacy>blacklist\".]]></Data></string>
 
     <string name="community_input_hint">Message</string>
-    <string name="community_users_stats">%1$d members</string>
+    <string name="community_users_stats">%1$d participants, %2$d members</string>
+    <string name="community_blocks_stats">Total blocks:%1$d, on-chain blocks:%2$d</string>
     <string name="common_loading">loading&#8230;</string>
 
     <string name="community_community_name">Name(required)</string>
@@ -150,8 +151,7 @@
     <string name="community_leader_invitation">Announcement</string>
     <string name="community_sell_detail">Sell Detail</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
-    <string name="community_create_success" formatted="false"><Data><![CDATA[Creator shall keep phone in <strong>wifi</strong> and <strong>power charging</strong>
-    as much as possible for community data exchange.]]></Data></string>
+    <string name="community_create_success" formatted="false"><Data><![CDATA[Keep on <strong>WIFI</strong> and <strong>charging battery</strong> to best exchange data.]]></Data></string>
     <string name="community_paste_join">Paste a community link to join</string>
     <string name="community_paste_here">Paste link here</string>
     <string name="community_join_title">Join community</string>

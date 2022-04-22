@@ -104,11 +104,11 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
      * 初始化布局
      */
     private void initLayout() {
-
+        binding.tvBlocksStatistics.setText(getString(R.string.community_blocks_stats, 0, 0));
         if (StringUtil.isNotEmpty(chainID)) {
             String communityName = ChainIDUtil.getName(chainID);
             binding.toolbarInclude.tvTitle.setText(Html.fromHtml(communityName));
-            binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats, 0));
+            binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats, 0, 0));
         }
         binding.toolbarInclude.ivBack.setOnClickListener(v -> {
             KeyboardUtils.hideSoftInput(activity);
@@ -363,7 +363,15 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(statistics ->
                     binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats,
-                            statistics.getMembers())))
+                            statistics.getTotal(), statistics.getOnChain())))
+        );
+
+        disposables.add(communityViewModel.getBlocksStatistics(chainID)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(statistics ->
+                        binding.tvBlocksStatistics.setText(getString(R.string.community_blocks_stats,
+                                statistics.getTotal(), statistics.getOnChain())))
         );
 
         disposables.add(communityViewModel.observerCurrentMember(chainID)

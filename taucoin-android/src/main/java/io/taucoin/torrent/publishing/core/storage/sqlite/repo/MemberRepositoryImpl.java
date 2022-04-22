@@ -138,6 +138,11 @@ public class MemberRepositoryImpl implements MemberRepository{
     }
 
     @Override
+    public Flowable<Statistics> getBlocksStatistics(String chainID) {
+        return db.blockDao().getBlocksStatistics(chainID);
+    }
+
+    @Override
     public void deleteCommunityMembers(String chainID) {
         db.memberDao().deleteCommunityMembers(chainID);
         submitDataSetChanged();

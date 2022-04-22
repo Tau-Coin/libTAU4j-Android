@@ -12,6 +12,7 @@ import io.reactivex.Flowable;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
+import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 
 /**
@@ -57,6 +58,17 @@ public interface BlockDao {
             " ORDER BY blockNumber DESC" +
             " LIMIT :loadSize OFFSET :startPosition";
 
+    String QUERY_BLOCKS_STATISTICS = "SELECT a.onChain, b.total" +
+            " FROM " +
+            " (SELECT chainID, COUNT(blockHash) AS onChain" +
+            " FROM Blocks WHERE chainID =:chainID AND status == 1" +
+            " LIMIT " + Constants.BLOCKS_NOT_PERISHABLE +
+            " ) AS a" +
+            " LEFT JOIN " +
+            " (SELECT chainID, COUNT(blockHash) AS total" +
+            " FROM Blocks WHERE chainID =:chainID) AS b" +
+            " ON a.chainID = b.chainID";
+
     /**
      * 添加用户设备信息
      */
@@ -91,4 +103,7 @@ public interface BlockDao {
     @Query(QUERY_COMMUNITY_BLOCKS)
     @Transaction
     List<BlockAndTx> queryCommunityBlocks(String chainID, int startPosition, int loadSize);
+
+    @Query(QUERY_BLOCKS_STATISTICS)
+    Flowable<Statistics> getBlocksStatistics(String chainID);
 }

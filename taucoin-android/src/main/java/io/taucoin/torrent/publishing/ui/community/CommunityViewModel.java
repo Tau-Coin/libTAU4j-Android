@@ -590,6 +590,14 @@ public class CommunityViewModel extends AndroidViewModel {
         return memberRepo.getMembersStatistics(chainID);
     }
 
+    /**
+     * 获取社区成员统计
+     * @param chainID
+     */
+    public Flowable<Statistics> getBlocksStatistics(String chainID) {
+        return memberRepo.getBlocksStatistics(chainID);
+    }
+
 
     public Single<Community> getCommunityByChainIDSingle(String chainID) {
         return communityRepo.getCommunityByChainIDSingle(chainID);

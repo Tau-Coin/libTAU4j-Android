@@ -4,13 +4,22 @@ package io.taucoin.torrent.publishing.core.model.data;
  * 社区成员相关统计
  */
 public class Statistics {
-    private int members;     // 社区成员数
+    private int total;       // 总数目
+    private int onChain;     // 上链数目
 
-    public int getMembers() {
-        return members;
+    public int getTotal() {
+        return total;
     }
 
-    public void setMembers(int members) {
-        this.members = members;
+    public void setTotal(int total) {
+        this.total = total;
+    }
+
+    public int getOnChain() {
+        return onChain;
+    }
+
+    public void setOnChain(int onChain) {
+        this.onChain = onChain;
     }
 }
