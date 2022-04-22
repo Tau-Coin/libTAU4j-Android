@@ -17,9 +17,25 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar_main_right" />
 
+        <TextView
+            android:layout_below="@+id/toolbar_include"
+            android:id="@+id/tv_blocks_statistics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/community_blocks_stats"
+            android:background="@color/gray_light"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:paddingStart="@dimen/widget_size_10"
+            android:paddingEnd="@dimen/widget_size_10"
+            android:paddingTop="@dimen/widget_size_7"
+            android:paddingBottom="@dimen/widget_size_7"
+            android:textColor="@color/color_white"
+            android:textAppearance="@style/TextAppearanceBody3"/>
+
         <LinearLayout
             android:id="@+id/ll_filter"
-            android:layout_below="@+id/toolbar_include"
+            android:layout_below="@+id/tv_blocks_statistics"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_40"
