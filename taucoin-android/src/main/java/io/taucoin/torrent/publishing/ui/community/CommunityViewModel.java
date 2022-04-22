@@ -42,11 +42,9 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -74,7 +72,6 @@ import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
@@ -996,6 +993,9 @@ public class CommunityViewModel extends AndroidViewModel {
      * 清除社区的消息未读状态
      */
     public void clearMsgUnread(String chainID) {
+        markReadOrUnread(chainID, 0);
+    }
+    public void markReadOrUnread(String chainID, int status) {
         if (clearDisposable != null && !clearDisposable.isDisposed()) {
             return;
         }
@@ -1004,17 +1004,40 @@ public class CommunityViewModel extends AndroidViewModel {
                 if (StringUtil.isNotEmpty(chainID)) {
                     String userPk = MainApplication.getInstance().getPublicKey();
                     Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-                    if (member != null && member.msgUnread > 0) {
-                        member.msgUnread = 0;
+                    if (member != null && member.msgUnread != status) {
+                        member.msgUnread = status;
                         memberRepo.updateMember(member);
                     }
                 }
             } catch (Exception e) {
-                logger.error("clearMsgUnread error ", e);
+                logger.error("markReadOrUnread error ", e);
             }
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe();
+    }
+
+    public void topStickyOrRemove(String chainID, int top) {
+        if (clearDisposable != null && !clearDisposable.isDisposed()) {
+            return;
+        }
+        clearDisposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            try {
+                if (StringUtil.isNotEmpty(chainID)) {
+                    String userPk = MainApplication.getInstance().getPublicKey();
+                    Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
+                    if (member != null && member.stickyTop != top) {
+                        member.stickyTop = top;
+                        memberRepo.updateMember(member);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("topStickyOrRemove error ", e);
+            }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 }

@@ -151,6 +151,18 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                     listener.onItemClicked(bean);
                 }
             });
+            holder.binding.getRoot().setOnLongClickListener(v -> {
+                if (listener != null) {
+                    listener.onItemLongClicked(bean);
+                }
+                return true;
+            });
+
+            if (bean.stickyTop == 1) {
+                holder.binding.getRoot().setBackgroundColor(context.getResources().getColor(R.color.divider_light));
+            } else {
+                holder.binding.getRoot().setBackgroundResource(R.drawable.main_white_rect_round_bg);
+            }
         }
     }
 
@@ -165,6 +177,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
     public interface ClickListener {
         void onCommunityJoined(String chainID);
         void onItemClicked(CommunityAndFriend item);
+        void onItemLongClicked(CommunityAndFriend item);
     }
 
     private static final DiffUtil.ItemCallback<CommunityAndFriend> diffCallback = new DiffUtil.ItemCallback<CommunityAndFriend>() {
@@ -175,12 +188,14 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 if (oldItem.type == 0) {
                     isSame = oldItem.timestamp == newItem.timestamp &&
                             oldItem.msgUnread == newItem.msgUnread &&
+                            oldItem.stickyTop == newItem.stickyTop &&
                             oldItem.balance == newItem.balance &&
                             oldItem.power == newItem.power &&
                             StringUtil.isEquals(oldItem.memo, newItem.memo);
                 } else {
                     isSame = oldItem.timestamp == newItem.timestamp &&
                             oldItem.msgUnread == newItem.msgUnread &&
+                            oldItem.stickyTop == newItem.stickyTop &&
                             Arrays.equals(oldItem.msg, newItem.msg) &&
                             StringUtil.isEquals(oldItem.friend != null ? oldItem.friend.remark : null,
                                     newItem.friend != null ? newItem.friend.remark : null) &&

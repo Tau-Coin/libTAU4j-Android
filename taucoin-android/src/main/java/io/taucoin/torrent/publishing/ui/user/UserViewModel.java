@@ -48,7 +48,6 @@ import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
-import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
@@ -59,7 +58,6 @@ import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FileUtil;
-import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
@@ -1084,23 +1082,46 @@ public class UserViewModel extends AndroidViewModel {
      * 清除朋友的消息未读状态
      */
     public void clearMsgUnread(String friendPK) {
+        markReadOrUnread(friendPK, 0);
+    }
+    public void markReadOrUnread(String friendPK, int status) {
         if (clearDisposable != null && !clearDisposable.isDisposed()) {
             return;
         }
-        clearDisposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
+        clearDisposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             try {
                 String userPk = MainApplication.getInstance().getPublicKey();
                 Friend friend = friendRepo.queryFriend(userPk, friendPK);
-                if (friend != null && friend.msgUnread > 0) {
-                    friend.msgUnread = 0;
+                if (friend != null && friend.msgUnread != status) {
+                    friend.msgUnread = status;
                     friendRepo.updateFriend(friend);
                 }
             } catch (Exception e) {
-                logger.error("clearMsgUnread error ", e);
+                logger.error("markReadOrUnread error ", e);
             }
             emitter.onComplete();
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(Schedulers.io())
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+    }
+
+    public void topStickyOrRemove(String friendPK, int status) {
+        if (clearDisposable != null && !clearDisposable.isDisposed()) {
+            return;
+        }
+        clearDisposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            try {
+                String userPk = MainApplication.getInstance().getPublicKey();
+                Friend friend = friendRepo.queryFriend(userPk, friendPK);
+                if (friend != null && friend.stickyTop != status) {
+                    friend.stickyTop = status;
+                    friendRepo.updateFriend(friend);
+                }
+            } catch (Exception e) {
+                logger.error("topStickyOrRemove error ", e);
+            }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }

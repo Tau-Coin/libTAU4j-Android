@@ -20,6 +20,7 @@ public class Friend implements Parcelable {
     public long lastSeenTime;          // 上次看到朋友的时间
     public int status;                 // 对应枚举类FriendStatus中状态
     public int msgUnread;              // 是否存在消息未读 0：已读，1：未读
+    public int stickyTop;              // 是否置顶 0：不置顶，1：置顶
     public int onlineCount;            // 在线信号的次数，累加到100，重置为0，范围0-99
 
     public Friend(@NonNull String userPK, @NonNull String friendPK){

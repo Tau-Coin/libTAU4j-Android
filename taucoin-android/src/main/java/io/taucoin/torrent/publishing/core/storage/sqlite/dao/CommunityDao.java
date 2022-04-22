@@ -52,7 +52,7 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, a.tailBlock, b.balance, b.power, b.blockNumber," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk, " +
-            " b.msgUnread AS msgUnread, null AS msg, c.memo, c.timestamp" +
+            " b.msgUnread AS msgUnread, b.stickyTop AS stickyTop, null AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
@@ -65,7 +65,7 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, a.tailBlock, b.balance, b.power, b.blockNumber," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk, " +
-            " b.msgUnread AS msgUnread, null AS msg, c.memo, c.timestamp" +
+            " b.msgUnread AS msgUnread, b.stickyTop AS stickyTop, null AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
@@ -78,7 +78,7 @@ public interface CommunityDao {
     String QUERY_FRIENDS_ASC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS tailBlock, 0 AS balance," +
             " 0 AS power, 0 AS blockNumber, 0 AS joined, 1 AS type," +
             " cm.senderPk AS senderPk, cm.receiverPk AS receiverPk," +
-            " f.msgUnread AS msgUnread," +
+            " f.msgUnread AS msgUnread, f.stickyTop AS stickyTop," +
             " cm.content AS msg, '' AS memo, cm.timestamp AS timestamp" +
             " FROM Friends f" +
             " LEFT JOIN " + QUERY_NEWEST_MSG_ASC + " AS cm" +
@@ -90,7 +90,7 @@ public interface CommunityDao {
     String QUERY_FRIENDS_DESC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS tailBlock, 0 AS balance," +
             " 0 AS power, 0 AS blockNumber, 0 AS joined, 1 AS type," +
             " cm.senderPk AS senderPk, cm.receiverPk AS receiverPk," +
-            " f.msgUnread AS msgUnread," +
+            " f.msgUnread AS msgUnread, f.stickyTop AS stickyTop," +
             " cm.content AS msg, '' AS memo, cm.timestamp AS timestamp" +
             " FROM Friends f" +
             " LEFT JOIN " + QUERY_NEWEST_MSG_DESC + " AS cm" +
@@ -100,11 +100,11 @@ public interface CommunityDao {
             " AND f.friendPK IN " + UserDao.QUERY_GET_USER_PKS_IN_WHITE_LIST;
 
     String QUERY_COMMUNITIES_AND_FRIENDS_DESC = "SELECT * FROM (" + QUERY_FRIENDS_DESC +
-            " UNION ALL " + QUERY_COMMUNITIES_DESC + ") ORDER BY timestamp DESC";
+            " UNION ALL " + QUERY_COMMUNITIES_DESC + ") ORDER BY stickyTop DESC, timestamp DESC";
 
     String QUERY_COMMUNITIES_AND_FRIENDS_ASC = "SELECT * FROM (" + QUERY_FRIENDS_ASC +
             " UNION ALL " + QUERY_COMMUNITIES_ASC + ")" +
-            " ORDER BY timestamp DESC";
+            " ORDER BY stickyTop DESC, timestamp DESC";
 
     String QUERY_GET_COMMUNITIES_IN_BLACKLIST = "SELECT * FROM Communities WHERE isBanned = 1";
     String QUERY_GET_COMMUNITY_BY_CHAIN_ID = "SELECT * FROM Communities WHERE chainID = :chainID";

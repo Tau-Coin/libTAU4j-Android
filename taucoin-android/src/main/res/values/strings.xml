@@ -68,6 +68,13 @@
     <string name="main_data_used_up">Background Daily Data Limit Used Up</string>
     <string name="main_insufficient_device_space">Insufficient device space</string>
 
+    <string name="main_operation_mark_read">Mark as Read</string>
+    <string name="main_operation_mark_unread">Mark as UnRead</string>
+    <string name="main_operation_sticky_top">Sticky on Top</string>
+    <string name="main_operation_remove_top">Remove from Top</string>
+    <string name="main_operation_ban_community">Ban this community</string>
+    <string name="main_operation_ban_friend">Ban this friend</string>
+
     <!-- Strings used for main drawer content -->
     <string name="drawer_new_community">Create Coin Community</string>
     <string name="drawer_airdrop_links">Airdrop Coins</string>

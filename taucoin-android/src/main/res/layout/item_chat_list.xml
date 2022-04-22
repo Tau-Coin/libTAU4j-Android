@@ -10,7 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/widget_size_65"
-        android:layout_marginStart="@dimen/widget_size_7">
+        android:background="@drawable/main_white_rect_round_bg"
+        android:paddingEnd="@dimen/widget_size_0"
+        android:paddingStart="@dimen/widget_size_7">
 
         <RelativeLayout
             android:id="@+id/rl_left_view"
