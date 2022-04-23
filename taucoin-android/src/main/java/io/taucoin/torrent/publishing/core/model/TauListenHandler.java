@@ -590,7 +590,7 @@ public class TauListenHandler {
                                 member.chainID, member.publicKey, FmtMicrometer.fmtBalance(member.balance));
                         continue;
                     }
-                    long medianTxFree = getTxFee(member.chainID);
+                    long medianTxFree = getMedianTxFree(member.chainID);
                     long txFree = medianTxFree;
                     TxQueueAndStatus txQueue = txQueueRepo.getAccountRenewalTxQueue(member.chainID,
                             member.publicKey);
@@ -607,7 +607,7 @@ public class TauListenHandler {
                     if (member.balance <= txFree) {
                         txFree = member.balance;
                     }
-                    long amount = member.balance - txFree;
+                    long amount = 0;
                     logger.debug("accountAutoRenewal chainID::{}, publicKey::{} (balance::{}, " +
                                     "amount::{}, fee::{}), medianTxFree::{}",
                             member.chainID, member.publicKey, FmtMicrometer.fmtBalance(member.balance),
@@ -626,6 +626,7 @@ public class TauListenHandler {
                         txQueue.amount = amount;
                         txQueue.fee = txFree;
                         txQueueRepo.updateQueue(txQueue);
+                        ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.UPDATE);
                         daemon.updateTxQueue(txQueue.chainID);
                         logger.debug("accountAutoRenewal resendTxQueue txFree::{}", txFree);
                     }
@@ -673,22 +674,11 @@ public class TauListenHandler {
         }
     }
 
-    /**
-     * 0、默认为最小交易费
-     * 1、从交易池中获取前10名交易费的中位数
-     * 2、如果交易池返回小于等于0，用上次交易用的交易费
-     * @param chainID 交易所属的社区chainID
-     */
-    private long getTxFee(String chainID) {
-        long free = Constants.MIN_FEE.longValue();
+    private long getMedianTxFree(String chainID) {
+        long free = Constants.WIRING_MIN_FEE.longValue();
         long medianFree = daemon.getMedianTxFree(chainID);
-        if (medianFree > 0) {
+        if (medianFree > free) {
             free = medianFree;
-        } else {
-            long lastTxFee = settingsRepo.lastTxFee(chainID);
-            if (lastTxFee > 0) {
-                free = lastTxFee;
-            }
         }
         return free;
     }

@@ -22,6 +22,7 @@ import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
+import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
@@ -37,6 +38,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
+import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.transaction.TxViewModel;
 
 import static io.taucoin.torrent.publishing.core.model.data.message.TxType.AIRDROP_TX;
@@ -203,6 +205,7 @@ class TxQueueManager {
             txQueue.fee = fee;
             // 更新airdrop的交易费
             txQueueRepos.updateQueue(txQueue);
+            ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.UPDATE);
         }
         if (txQueue.amount + fee > account.getBalance()) {
             logger.debug("sendWiringTx amount({}) + fee({}) > balance({})", txQueue.amount,
