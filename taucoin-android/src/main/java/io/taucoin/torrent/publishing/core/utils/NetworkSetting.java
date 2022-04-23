@@ -272,6 +272,11 @@ public class NetworkSetting {
                 averageSpeed = availableData / today24HLastSeconds;
             }
         }
+        // Metered 不充电状态限速降为1/2；
+        boolean chargingState = settingsRepo.chargingState();
+        if (!chargingState) {
+            averageSpeed = averageSpeed / 2;
+        }
         settingsRepo.setLongValue(context.getString(R.string.pref_key_metered_available_data), availableData);
         settingsRepo.setLongValue(context.getString(R.string.pref_key_metered_average_speed), averageSpeed);
     }
@@ -301,6 +306,11 @@ public class NetworkSetting {
             if (today24HLastSeconds > 0) {
                 averageSpeed = availableData / today24HLastSeconds;
             }
+        }
+        // WiFi 不充电状态限速降为1/5；
+        boolean chargingState = settingsRepo.chargingState();
+        if (!chargingState) {
+            averageSpeed = averageSpeed / 5;
         }
         settingsRepo.setLongValue(context.getString(R.string.pref_key_wifi_available_data), availableData);
         settingsRepo.setLongValue(context.getString(R.string.pref_key_wifi_average_speed), averageSpeed);
@@ -402,10 +412,19 @@ public class NetworkSetting {
             }
             float frequency;
             boolean isMetered = isMeteredNetwork();
+            boolean chargingState = settingsRepo.chargingState();
             if (isMetered) {
                 frequency = FrequencyUtil.getMeteredFixedFrequency();
+                // Metered 不充电状态限速降为1/2；
+                if (!chargingState) {
+                    frequency = frequency / 2;
+                }
             } else {
                 frequency = FrequencyUtil.getWifiFixedFrequency();
+                // WiFi 不充电状态限速降为1/5；
+                if (!chargingState) {
+                    frequency = frequency / 5;
+                }
             }
             FrequencyUtil.setMainLoopFrequency(frequency);
             logger.debug("calculateMainLoopInterval isForegroundRunning::true, fixedFrequency::{}, " +
