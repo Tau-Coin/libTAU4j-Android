@@ -883,6 +883,26 @@ public class CommunityViewModel extends AndroidViewModel {
         });
     }
 
+    Observable<List<String>> observerCommunityAccessList(String chainID) {
+        return Observable.create(emitter -> {
+            while (!emitter.isDisposed()) {
+                 List<String> list = daemon.getCommunityAccessList(ChainIDUtil.encode(chainID));
+                 if (null == list) {
+                     list = new ArrayList<>();
+                 }
+                logger.debug("getCommunityAccessList::{}, chainID::{}, isRunning::{}", list.size(),
+                        chainID, daemon.isRunning());
+                emitter.onNext(list);
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+            emitter.onComplete();
+        });
+    }
+
     Flowable<Float> reloadChain(String chainID) {
         return Flowable.create(emitter -> {
             Community community = communityRepo.getCommunityByChainID(chainID);

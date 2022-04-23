@@ -100,6 +100,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.community.AccessListActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.community.ChainTopActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 

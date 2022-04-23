@@ -15,6 +15,7 @@ import org.libTAU4j.alerts.AlertType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -558,6 +559,18 @@ public abstract class TauDaemon {
 
     public boolean isRunning() {
         return isRunning;
+    }
+
+    /**
+     * 获取社区访问列表
+     * @return 访问列表
+     */
+    public ArrayList<String> getCommunityAccessList(byte[] chainID) {
+        logger.debug("getCommunityAccessList isRunning::{}", isRunning);
+        if (isRunning) {
+            return sessionManager.getAccessList(chainID);
+        }
+        return null;
     }
 
     /**

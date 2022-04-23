@@ -182,6 +182,7 @@
     <string name="chain_total_peers">Total Peers</string>
     <string name="chain_peers_blocks">Blocks Self-mined</string>
     <string name="chain_total_coins">Total Coins</string>
+    <string name="chain_access_list">Access List</string>
     <string name="chain_top_peers">Top 10 peers</string>
     <string name="chain_votes">Votes</string>
     <string name="chain_current_fork">Recent Fork Out</string>

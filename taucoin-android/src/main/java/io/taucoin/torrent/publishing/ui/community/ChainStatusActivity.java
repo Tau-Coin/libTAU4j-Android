@@ -169,6 +169,11 @@ public class ChainStatusActivity extends BaseActivity {
             case R.id.item_reload_chain:
                 reloadChain();
                 break;
+            case R.id.item_access_list:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, AccessListActivity.class);
+                break;
         }
     }
 
