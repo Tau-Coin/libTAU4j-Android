@@ -649,12 +649,21 @@ public class TauListenHandler {
                 chainID, userPk, null == account);
         if (account != null) {
             Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-            if (member != null && account.getBlockNumber() >= member.blockNumber) {
+            if (null == member) {
+                member = new Member(chainID, userPk);
                 member.blockNumber = account.getBlockNumber();
                 member.balance = account.getBalance();
                 member.power = account.getEffectivePower();
                 member.nonce = account.getNonce();
-                memberRepo.updateMember(member);
+                memberRepo.addMember(member);
+            } else {
+                if (account.getBlockNumber() >= member.blockNumber) {
+                    member.blockNumber = account.getBlockNumber();
+                    member.balance = account.getBalance();
+                    member.power = account.getEffectivePower();
+                    member.nonce = account.getNonce();
+                    memberRepo.updateMember(member);
+                }
             }
         }
     }

@@ -385,6 +385,10 @@ public class TauDaemonImpl extends TauDaemon {
         boolean success = false;
         if (isRunning) {
             success = sessionManager.followChain(ChainIDUtil.encode(chainID), peers);
+            if (success) {
+                // follow链成功，立即请求用户状态
+                requestAccountState(chainID);
+            }
         }
         logger.debug("followChain chainID::{}, peers size::{}, success::{}, isRunning::{}", chainID,
                 peers.size(), success, isRunning);

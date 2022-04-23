@@ -37,7 +37,6 @@ import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
@@ -486,7 +485,7 @@ public abstract class TauDaemon {
                 logger.debug("updateUserAccountInfo count::{}", null == list ? 0 : list.size());
                 if (list != null && list.size() > 0) {
                     for (Member m: list) {
-                        requestChainState(m.chainID);
+                        requestAccountState(m.chainID);
                     }
                 }
             }
@@ -499,11 +498,11 @@ public abstract class TauDaemon {
     /**
      * 请求用户社区账户状态
      */
-    public void requestChainState(String chainID) {
+    public void requestAccountState(String chainID) {
         if (isRunning) {
             if (StringUtil.isNotEmpty(chainID)) {
                 sessionManager.requestChainState(ChainIDUtil.encode(chainID));
-                logger.debug("requestChainState::{}", chainID);
+                logger.debug("requestAccountState::{}", chainID);
             }
         }
     }

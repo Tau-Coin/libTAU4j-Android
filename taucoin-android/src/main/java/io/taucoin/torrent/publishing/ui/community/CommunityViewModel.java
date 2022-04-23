@@ -726,7 +726,6 @@ public class CommunityViewModel extends AndroidViewModel {
                 boolean success = daemon.followChain(chainID, peers);
                 if (success) {
                     addMemberInfoToLocal(chainID, publicKey);
-                    daemon.requestChainState(chainID);
                 }
                 result.setSuccess(success);
             } else {
