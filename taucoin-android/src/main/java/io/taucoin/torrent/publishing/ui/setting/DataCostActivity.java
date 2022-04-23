@@ -86,11 +86,6 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
 
         refreshAllData();
         changeTabView(R.id.tab_foreground);
-        handleSettingsChanged(getString(R.string.pref_key_wifi_fixed_frequency));
-        handleSettingsChanged(getString(R.string.pref_key_metered_fixed_frequency));
-
-        binding.wifiFixedFrequency.setOnItemSelectedListener(this);
-        binding.meteredFixedFrequency.setOnItemSelectedListener(this);
 
         // 设置Spinner样式
         ArrayAdapter wifiAdapter = new ArrayAdapter<>(this, R.layout.item_frequency_spinner,
@@ -99,12 +94,30 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         wifiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.wifiFixedFrequency.setAdapter(wifiAdapter);
 
+        int wifiFrequency = FrequencyUtil.getWifiFixedFrequency();
+        for (int i = 0; i < frequencies.length; i++) {
+            if (wifiFrequency == Integer.parseInt(frequencies[i])) {
+                binding.wifiFixedFrequency.setSelection(i, true);
+                break;
+            }
+        }
+        binding.wifiFixedFrequency.setOnItemSelectedListener(this);
+
         // 设置Spinner样式
         ArrayAdapter meteredAdapter = new ArrayAdapter<>(this, R.layout.item_frequency_spinner,
                 getResources().getStringArray(R.array.fixed_frequency));
         // 设置Spinner弹框样式
         meteredAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.meteredFixedFrequency.setAdapter(meteredAdapter);
+
+        int meteredFrequency = FrequencyUtil.getMeteredFixedFrequency();
+        for (int i = 0; i < frequencies.length; i++) {
+            if (meteredFrequency == Integer.parseInt(frequencies[i])) {
+                binding.meteredFixedFrequency.setSelection(i, true);
+                break;
+            }
+        }
+        binding.meteredFixedFrequency.setOnItemSelectedListener(this);
     }
 
     private void refreshAllData() {
@@ -221,23 +234,6 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             int dozeTime = NetworkSetting.getDozeTime();
             String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
             binding.tvDozeRunningTime.setRightText(dozeTimeStr);
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_metered_fixed_frequency))) {
-            int frequency = FrequencyUtil.getMeteredFixedFrequency();
-            for (int i = 0; i < frequencies.length; i++) {
-                if (frequency == Integer.parseInt(frequencies[i])) {
-                    binding.meteredFixedFrequency.setSelection(i);
-                    break;
-                }
-            }
-
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_wifi_fixed_frequency))) {
-            int frequency = FrequencyUtil.getWifiFixedFrequency();
-            for (int i = 0; i < frequencies.length; i++) {
-                if (frequency == Integer.parseInt(frequencies[i])) {
-                    binding.wifiFixedFrequency.setSelection(i);
-                    break;
-                }
-            }
         }
     }
 
