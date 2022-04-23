@@ -332,12 +332,10 @@ public class TauListenHandler {
         tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
         tx.amount = txMsg.getAmount();
 
-        boolean isNews = false;
         if (tx.txType == TxType.TRUST_TX.getType()) {
             TrustContent trustContent = new TrustContent(txMsg.getPayload());
             // 添加Trust信息
             tx.receiverPk = trustContent.getTrustedPkStr();
-            isNews = true;
         } else if (tx.txType == TxType.SELL_TX.getType()) {
             SellTxContent sellTxContent = new SellTxContent(txMsg.getPayload());
             // 添加Sell信息
@@ -345,24 +343,21 @@ public class TauListenHandler {
             tx.quantity = sellTxContent.getQuantity();
             tx.link = sellTxContent.getLink();
             tx.location = sellTxContent.getLocation();
-            isNews = true;
         } else if (tx.txType == TxType.AIRDROP_TX.getType()) {
             AirdropTxContent sellTxContent = new AirdropTxContent(txMsg.getPayload());
             // 添加Airdrop信息
             tx.link = sellTxContent.getLink();
-            isNews = true;
         } else if (tx.txType == TxType.ANNOUNCEMENT.getType()) {
             AnnouncementContent sellTxContent = new AnnouncementContent(txMsg.getPayload());
             // 添加社区领导者邀请信息
             tx.coinName = sellTxContent.getTitle();
-            isNews = true;
         }
 
         txRepo.addTransaction(tx);
         logger.info("Add transaction to local, txID::{}, txType::{}", txID, tx.txType);
 
         // 更新未读状态
-        if (isNews) {
+        if (tx.txType != TxType.WIRING_TX.getType()) {
             String userPk = MainApplication.getInstance().getPublicKey();
             if (StringUtil.isNotEmpty(userPk) && StringUtil.isNotEquals(tx.senderPk, userPk)) {
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);

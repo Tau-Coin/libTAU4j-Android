@@ -180,6 +180,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
             binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
 
             logger.debug("txs.size::{}", txs.size());
+            communityViewModel.clearMsgUnread(chainID);
             closeProgressDialog();
         });
         showProgressDialog();
