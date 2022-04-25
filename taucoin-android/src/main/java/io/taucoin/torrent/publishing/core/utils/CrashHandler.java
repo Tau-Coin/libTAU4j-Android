@@ -60,12 +60,21 @@ public class CrashHandler implements UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
+        String threadName = null == thread ? "" : thread.getName();
+        logger.error("uncaughtException threadName::{}", threadName);
         if (!handleException(ex) && mDefaultHandler != null) {
+            if (null == ex) {
+                logger.error("uncaughtException defaultHandler ex null");
+            } else {
+                logger.error("uncaughtException defaultHandler ", ex);
+            }
             // 如果用户没有处理则让系统默认的异常处理器来处理
             mDefaultHandler.uncaughtException(thread, ex);
         } else {
             // 退出程序
-            android.os.Process.killProcess(android.os.Process.myPid());
+            int pid = android.os.Process.myPid();
+            logger.error("uncaughtException killProcess pid::{}", pid);
+            android.os.Process.killProcess(pid);
             System.exit(0);
         }
     }
@@ -77,13 +86,17 @@ public class CrashHandler implements UncaughtExceptionHandler {
      * @return true:如果处理了该异常信息;否则返回false.
      */
     private boolean handleException(Throwable ex) {
+        logger.error("handleException start");
         if (ex == null) {
             return false;
         }
         //收集设备参数信息
+        logger.error("handleException collect device info");
         collectDeviceInfo(mContext);
         //保存日志文件
+        logger.error("handleException save crash info");
         saveCrashInfo2File(ex);
+        logger.error("handleException end");
         return true;
     }
 
