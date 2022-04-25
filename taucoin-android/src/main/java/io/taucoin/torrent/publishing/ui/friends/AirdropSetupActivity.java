@@ -5,12 +5,16 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.view.View;
+
+import java.math.BigInteger;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -75,6 +79,13 @@ public class AirdropSetupActivity extends BaseActivity {
                 ToastUtils.showShortToast(R.string.bot_airdrop_coins_error);
                 return;
             }
+            float airdropTotalCoins = members * coins;
+            long maxTotalCoins = Constants.TOTAL_COIN.divide(Constants.COIN).longValue();
+            if (airdropTotalCoins > maxTotalCoins) {
+                ToastUtils.showShortToast(getString(R.string.bot_airdrop_total_coins_error,
+                        FmtMicrometer.fmtLong(maxTotalCoins)));
+                return;
+            }
             communityViewModel.setupAirdropBot(chainID, members, coins);
         });
 
@@ -108,6 +119,14 @@ public class AirdropSetupActivity extends BaseActivity {
     private void updateAirdropCoinsTotal(float total) {
         String totalCoins = FmtMicrometer.fmtDecimal(total);
         binding.tvTotal.setText(getString(R.string.bot_airdrop_coins_total_value, totalCoins));
+
+        long maxTotalCoins = Constants.TOTAL_COIN.divide(Constants.COIN).longValue();
+        boolean isShowError = total > maxTotalCoins;
+        binding.tvTotalError.setVisibility(isShowError ? View.VISIBLE : View.INVISIBLE);
+        if (isShowError) {
+            binding.tvTotalError.setText(getString(R.string.bot_airdrop_total_coins_error,
+                    FmtMicrometer.fmtLong(maxTotalCoins)));
+        }
     }
 
     @Override

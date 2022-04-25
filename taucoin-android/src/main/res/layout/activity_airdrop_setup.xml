@@ -96,11 +96,24 @@
                     android:textAppearance="@style/TextAppearanceHeadline4"/>
 
                 <TextView
+                    android:visibility="invisible"
+                    android:id="@+id/tv_total_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_35"
+                    android:text="@string/bot_airdrop_total_coins_error"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/color_red"
+                    android:textAppearance="@style/TextAppearanceBody3"/>
+
+                <TextView
                     android:id="@+id/tv_submit"
-                    android:layout_width="@dimen/widget_size_200"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/primary_rect_round_bg"
-                    android:layout_marginTop="@dimen/widget_size_35"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_20"
+                    android:layout_marginTop="@dimen/widget_size_10"
                     android:text="@string/common_submit"
                     android:textColor="@color/color_white"
                     android:gravity="center_horizontal"

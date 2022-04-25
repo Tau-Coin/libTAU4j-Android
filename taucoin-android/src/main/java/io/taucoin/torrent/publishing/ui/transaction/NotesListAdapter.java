@@ -119,12 +119,15 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
                 rightBinding.tvResend.setVisibility(isShowBan ? View.VISIBLE : View.GONE);
                 if (isShowBan) {
                     int size = null == tx.confirms ? 0 : tx.confirms.size();
-                    rightBinding.tvResend.setText(size <= 99 ? String.valueOf(size) : "···");
-                    rightBinding.tvResend.setOnClickListener(v -> {
-                        if (listener != null) {
-                            listener.onResendClick(tx.txID);
-                        }
-                    });
+                    rightBinding.tvResend.setVisibility(size > 0 ? View.VISIBLE : View.GONE);
+                    if (size > 0) {
+                        rightBinding.tvResend.setText(size <= 99 ? String.valueOf(size) : "···");
+                        rightBinding.tvResend.setOnClickListener(v -> {
+                            if (listener != null) {
+                                listener.onResendClick(tx.txID);
+                            }
+                        });
+                    }
                 }
 
             } else {
