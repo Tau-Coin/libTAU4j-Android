@@ -73,8 +73,12 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
             }
             binding.cbSelect.setVisibility(adapter.linksSelector ? View.VISIBLE : View.GONE);
             binding.cbSelect.setOnCheckedChangeListener(null);
-            binding.cbSelect.setChecked(adapter.member != null && StringUtil.isEquals(adapter.member.chainID,
-                    member.chainID));
+            boolean checked = adapter.member != null && StringUtil.isEquals(adapter.member.chainID,
+                    member.chainID);
+            binding.cbSelect.setChecked(checked);
+            if (checked) {
+                adapter.member = member;
+            }
             binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
                     adapter.member = member;

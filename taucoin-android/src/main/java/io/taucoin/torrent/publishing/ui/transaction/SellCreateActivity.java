@@ -155,13 +155,12 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
         String senderPk = MainApplication.getInstance().getPublicKey();
         String fee = ViewUtils.getStringTag(binding.tvFee);
         String coinName = ViewUtils.getText(binding.etCoinName);
-        String quantity = ViewUtils.getText(binding.etQuantity);
+        long quantity = ViewUtils.getIntTag(binding.etQuantity);
         String link = ViewUtils.getText(binding.etLink);
         String location = ViewUtils.getText(binding.etLocation);
         String description = ViewUtils.getText(binding.etDescription);
 
-        SellTxContent content = new SellTxContent(coinName, new BigInteger(quantity).longValue(),
-                link, location, description);
+        SellTxContent content = new SellTxContent(coinName, quantity, link, location, description);
         TxQueue tx = new TxQueue(chainID, senderPk, senderPk, 0L,
                 FmtMicrometer.fmtTxLongValue(fee), TxType.SELL_TX, content.getEncoded());
         if (txQueue != null) {
