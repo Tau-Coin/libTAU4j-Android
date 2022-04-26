@@ -1082,9 +1082,14 @@ public class UserViewModel extends AndroidViewModel {
      * 清除朋友的消息未读状态
      */
     public void clearMsgUnread(String friendPK) {
-        markReadOrUnread(friendPK, 0);
+        markReadOrUnread(friendPK, 0, false);
     }
+
     public void markReadOrUnread(String friendPK, int status) {
+        markReadOrUnread(friendPK, status, true);
+    }
+
+    private void markReadOrUnread(String friendPK, int status, boolean isAutoAdd) {
         if (clearDisposable != null && !clearDisposable.isDisposed()) {
             return;
         }
@@ -1092,9 +1097,20 @@ public class UserViewModel extends AndroidViewModel {
             try {
                 String userPk = MainApplication.getInstance().getPublicKey();
                 Friend friend = friendRepo.queryFriend(userPk, friendPK);
-                if (friend != null && friend.msgUnread != status) {
-                    friend.msgUnread = status;
-                    friendRepo.updateFriend(friend);
+                if (friend != null) {
+                    if (friend.msgUnread != status) {
+                        friend.msgUnread = status;
+                        friendRepo.updateFriend(friend);
+                    }
+                } else {
+                    if (isAutoAdd) {
+                        addFriendTask(friendPK, null, null, null);
+                        friend = friendRepo.queryFriend(userPk, friendPK);
+                        if (friend != null) {
+                            friend.msgUnread = status;
+                            friendRepo.updateFriend(friend);
+                        }
+                    }
                 }
             } catch (Exception e) {
                 logger.error("markReadOrUnread error ", e);
@@ -1105,7 +1121,7 @@ public class UserViewModel extends AndroidViewModel {
                 .subscribe();
     }
 
-    public void topStickyOrRemove(String friendPK, int status) {
+    public void topStickyOrRemove(String friendPK, int top) {
         if (clearDisposable != null && !clearDisposable.isDisposed()) {
             return;
         }
@@ -1113,9 +1129,18 @@ public class UserViewModel extends AndroidViewModel {
             try {
                 String userPk = MainApplication.getInstance().getPublicKey();
                 Friend friend = friendRepo.queryFriend(userPk, friendPK);
-                if (friend != null && friend.stickyTop != status) {
-                    friend.stickyTop = status;
-                    friendRepo.updateFriend(friend);
+                if (friend != null) {
+                    if (friend.stickyTop != top) {
+                        friend.stickyTop = top;
+                        friendRepo.updateFriend(friend);
+                    }
+                } else {
+                    addFriendTask(friendPK, null, null, null);
+                    friend = friendRepo.queryFriend(userPk, friendPK);
+                    if (friend != null) {
+                        friend.stickyTop = top;
+                        friendRepo.updateFriend(friend);
+                    }
                 }
             } catch (Exception e) {
                 logger.error("topStickyOrRemove error ", e);

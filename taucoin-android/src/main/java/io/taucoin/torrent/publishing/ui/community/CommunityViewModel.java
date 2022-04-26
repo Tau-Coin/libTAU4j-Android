@@ -1024,9 +1024,14 @@ public class CommunityViewModel extends AndroidViewModel {
      * 清除社区的消息未读状态
      */
     public void clearMsgUnread(String chainID) {
-        markReadOrUnread(chainID, 0);
+        markReadOrUnread(chainID, 0, false);
     }
+
     public void markReadOrUnread(String chainID, int status) {
+        markReadOrUnread(chainID, status, true);
+    }
+
+    private void markReadOrUnread(String chainID, int status, boolean isAutoAdd) {
         if (clearDisposable != null && !clearDisposable.isDisposed()) {
             return;
         }
@@ -1035,9 +1040,17 @@ public class CommunityViewModel extends AndroidViewModel {
                 if (StringUtil.isNotEmpty(chainID)) {
                     String userPk = MainApplication.getInstance().getPublicKey();
                     Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-                    if (member != null && member.msgUnread != status) {
-                        member.msgUnread = status;
-                        memberRepo.updateMember(member);
+                    if (null == member) {
+                        if (isAutoAdd) {
+                            member = new Member(chainID, userPk);
+                            member.msgUnread = status;
+                            memberRepo.addMember(member);
+                        }
+                    } else {
+                        if (member.msgUnread != status) {
+                            member.msgUnread = status;
+                            memberRepo.updateMember(member);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -1058,9 +1071,15 @@ public class CommunityViewModel extends AndroidViewModel {
                 if (StringUtil.isNotEmpty(chainID)) {
                     String userPk = MainApplication.getInstance().getPublicKey();
                     Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-                    if (member != null && member.stickyTop != top) {
+                    if (null == member) {
+                        member = new Member(chainID, userPk);
                         member.stickyTop = top;
-                        memberRepo.updateMember(member);
+                        memberRepo.addMember(member);
+                    } else {
+                        if (member.stickyTop != top) {
+                            member.stickyTop = top;
+                            memberRepo.updateMember(member);
+                        }
                     }
                 }
             } catch (Exception e) {
