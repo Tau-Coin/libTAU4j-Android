@@ -32,12 +32,11 @@ public interface MemberDao {
     String QUERY_GET_MEMBER_BY_CHAIN_ID_PK = "SELECT * FROM Members WHERE chainID = :chainID AND publicKey = :publicKey";
     String QUERY_GET_MEMBERS_BY_CHAIN_ID = "SELECT * FROM Members WHERE chainID = :chainID";
 
-    String QUERY_GET_MEMBERS_ON_CHAIN = "SELECT m.*, f.lastSeenTime, c.headBlock" +
-            " FROM Members m LEFT JOIN Friends f" +
-            " ON m.publicKey = f.friendPK AND f.userPK = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+    String QUERY_GET_MEMBERS_IN_COMMUNITY = "SELECT m.*, c.headBlock, c.tailBlock" +
+            " FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.chainID = :chainID AND " + WHERE_ON_CHAIN +
-            " ORDER BY f.lastSeenTime DESC";
+            " WHERE m.chainID = :chainID" +
+            " ORDER BY m.power DESC";
 
     String QUERY_COMMUNITY_NUM_IN_COMMON = "SELECT chainID FROM " +
             " (Select count(*) AS num, m.chainID FROM Members m" +
@@ -145,9 +144,9 @@ public interface MemberDao {
      * @param chainID 社区链ID
      * @return DataSource.Factory
      */
-    @Query(QUERY_GET_MEMBERS_ON_CHAIN)
+    @Query(QUERY_GET_MEMBERS_IN_COMMUNITY)
     @Transaction
-    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembersOnChain(String chainID);
+    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID);
 
     /**
      * 获取和社区成员共在的社区数

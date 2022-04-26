@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ItemMemberListBinding;
 
@@ -67,27 +66,10 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberL
             holder.binding.tvName.setText(showName);
             holder.binding.leftView.setImageBitmap(UsersUtil.getHeadPic(member.user));
 
-            if (member.lastSeenTime > 0) {
-                String time = DateUtil.format(member.lastSeenTime, DateUtil.pattern6);
-                time = context.getResources().getString(R.string.contacts_last_seen, time);
-                holder.binding.tvTime.setText(time);
-                holder.binding.tvTime.setVisibility(View.VISIBLE);
-            } else {
-                holder.binding.tvTime.setVisibility(View.GONE);
-            }
-
-            holder.binding.tvCommunities.setVisibility(View.GONE);
-            holder.binding.ivShare.setVisibility(View.GONE);
-            holder.binding.ivShare.setVisibility(View.GONE);
-
-            holder.binding.ivShare.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onShareClicked(member);
-                }
-            });
+            holder.binding.tvNonMember.setVisibility(member.onChain() ? View.VISIBLE : View.GONE);
 
             holder.binding.getRoot().setOnClickListener(v -> {
-                if(listener != null){
+                if (listener != null) {
                     listener.onItemClicked(member);
                 }
             });
@@ -96,7 +78,6 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberL
 
     public interface ClickListener {
         void onItemClicked(MemberAndFriend item);
-        void onShareClicked(MemberAndFriend item);
     }
 
     private static final DiffUtil.ItemCallback<MemberAndFriend> diffCallback = new DiffUtil.ItemCallback<MemberAndFriend>() {

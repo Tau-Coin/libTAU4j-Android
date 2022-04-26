@@ -157,10 +157,6 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
     }
 
     @Override
-    public void onShareClicked(MemberAndFriend member) {
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         communityViewModel.getSetBlacklistState().observe(this, isSuccess -> {

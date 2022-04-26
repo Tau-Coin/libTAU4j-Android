@@ -94,7 +94,7 @@ public class MemberRepositoryImpl implements MemberRepository{
      */
     @Override
     public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID){
-        return db.memberDao().queryCommunityMembersOnChain(chainID);
+        return db.memberDao().queryCommunityMembers(chainID);
     }
 
     /**

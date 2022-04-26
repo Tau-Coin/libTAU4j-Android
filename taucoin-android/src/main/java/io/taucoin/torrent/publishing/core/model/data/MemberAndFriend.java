@@ -12,10 +12,14 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 public class MemberAndFriend extends Member {
     @Relation(parentColumn = "publicKey", entityColumn = "publicKey")
     public User user;
-    public long lastSeenTime;
     public long headBlock;
+    public long tailBlock;
 
     public MemberAndFriend(@NonNull String chainID, @NonNull String publicKey) {
         super(chainID, publicKey);
+    }
+
+    public boolean onChain() {
+        return power <=0 || blockNumber < tailBlock;
     }
 }

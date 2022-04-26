@@ -1,97 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
     </data>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/widget_size_5"
-        android:paddingBottom="@dimen/widget_size_5"
         android:layout_marginStart="@dimen/widget_size_20"
-        android:layout_marginEnd="@dimen/widget_size_20">
+        android:layout_marginEnd="@dimen/widget_size_10">
 
-        <CheckBox
-            android:visibility="gone"
-            android:id="@+id/cb_select"
-            android:layout_centerVertical="true"
-            android:layout_width="@dimen/widget_size_37"
-            android:layout_height="wrap_content"/>
-
-        <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
-            android:layout_toEndOf="@+id/cb_select"
-            android:id="@+id/left_view"
-            android:layout_width="@dimen/widget_size_40"
-            android:layout_height="@dimen/widget_size_40"
-            android:layout_marginEnd="@dimen/widget_size_7"
-            android:layout_centerVertical="true" />
-
-        <LinearLayout
-            android:id="@+id/middle_view"
-            android:layout_toEndOf="@+id/left_view"
-            android:layout_toStartOf="@id/iv_share"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:includeFontPadding="false"
-                android:singleLine="true"
-                android:ellipsize="middle"
-                android:textAppearance="@style/TextAppearanceHeadline6" />
-
-            <TextView
-                android:visibility="visible"
-                android:id="@+id/tv_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:includeFontPadding="false"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:layout_marginTop="@dimen/widget_size_5"
-                android:textColor="@color/gray_dark"
-                android:textAppearance="@style/TextAppearanceBody2" />
-
-            <TextView
-                android:visibility="gone"
-                android:id="@+id/tv_communities"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:includeFontPadding="false"
-                android:ellipsize="end"
-                android:textColor="@color/gray_dark"
-                android:textAppearance="@style/TextAppearanceBody2" />
-
-        </LinearLayout>
-
-        <ImageView
-            android:visibility="gone"
-            android:id="@+id/iv_share"
-            android:layout_width="@dimen/widget_size_22"
-            android:layout_height="@dimen/widget_size_22"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/widget_size_10"
-            android:layout_marginStart="@dimen/widget_size_20"
-            android:src="@mipmap/icon_share"
-            android:contentDescription="@null"/>
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_marginBottom="@dimen/widget_size_5">
+
+            <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
+                android:id="@+id/left_view"
+                android:layout_width="@dimen/widget_size_40"
+                android:layout_height="@dimen/widget_size_40"
+                android:layout_marginEnd="@dimen/widget_size_7"
+                android:layout_centerVertical="true" />
+
+            <LinearLayout
+                android:id="@+id/middle_view"
+                android:layout_toEndOf="@+id/left_view"
+                android:layout_toStartOf="@id/tv_non_member"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:singleLine="true"
+                    android:ellipsize="middle"
+                    android:textAppearance="@style/TextAppearanceHeadline6" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_non_member"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/widget_size_5"
+                android:text="@string/main_balance_non_member"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody3"/>
+
+        </RelativeLayout>
 
         <include
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_1"
-            android:layout_toEndOf="@+id/left_view"
-            android:layout_toStartOf="@+id/iv_share"
-            android:layout_centerVertical="true"
-            android:layout_alignParentBottom="true"
             layout="@layout/view_line"/>
-    </RelativeLayout>
+    </LinearLayout>
 </layout>

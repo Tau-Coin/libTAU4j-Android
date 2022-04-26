@@ -87,9 +87,10 @@
                     android:gravity="center_vertical"
                     android:paddingStart="@dimen/widget_size_20"
                     android:paddingEnd="@dimen/widget_size_20"
-                    android:paddingTop="@dimen/widget_size_10"
+                    android:paddingTop="@dimen/widget_size_8"
                     android:paddingBottom="@dimen/widget_size_8"
-                    android:textColor="@color/gray_light"
+                    android:background="@color/color_bg"
+                    android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody2"/>
 
                 <androidx.recyclerview.widget.RecyclerView
