@@ -36,6 +36,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/font_size_18"
+                android:singleLine="true"
+                android:ellipsize="middle"
                 android:textColor="@color/color_white"
                 android:textAppearance="@style/TextAppearanceHeadline5"/>
 
@@ -46,6 +48,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/color_white"
+                android:singleLine="true"
+                android:ellipsize="middle"
                 android:textAppearance="@style/TextAppearanceBody2"/>
 
         </RelativeLayout>

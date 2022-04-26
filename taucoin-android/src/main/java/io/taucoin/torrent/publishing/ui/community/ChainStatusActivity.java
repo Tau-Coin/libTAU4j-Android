@@ -172,6 +172,13 @@ public class ChainStatusActivity extends BaseActivity {
             case R.id.item_access_list:
                 intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                intent.putExtra(IntentExtra.TYPE, AccessListActivity.ACCESS_LIST_TYPE);
+                ActivityUtil.startActivity(intent, this, AccessListActivity.class);
+                break;
+            case R.id.item_gossip_list:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                intent.putExtra(IntentExtra.TYPE, AccessListActivity.GOSSIP_LIST_TYPE);
                 ActivityUtil.startActivity(intent, this, AccessListActivity.class);
                 break;
         }

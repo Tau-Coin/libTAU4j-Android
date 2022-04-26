@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -56,6 +58,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.TauListenHandler;
+import io.taucoin.torrent.publishing.core.model.data.AccessList;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
@@ -883,18 +886,27 @@ public class CommunityViewModel extends AndroidViewModel {
         });
     }
 
-    Observable<List<String>> observerCommunityAccessList(String chainID) {
+    Observable<List<String>> observerCommunityAccessList(String chainID, int type) {
         return Observable.create(emitter -> {
             while (!emitter.isDisposed()) {
-                 List<String> list = daemon.getCommunityAccessList(ChainIDUtil.encode(chainID));
-                 if (null == list) {
-                     list = new ArrayList<>();
-                 }
-                logger.debug("getCommunityAccessList::{}, chainID::{}, isRunning::{}", list.size(),
-                        chainID, daemon.isRunning());
+                List<String> list;
+                if (type == AccessListActivity.ACCESS_LIST_TYPE) {
+                    list = daemon.getCommunityAccessList(ChainIDUtil.encode(chainID));
+                } else {
+                    list = daemon.getGossipList(ChainIDUtil.encode(chainID));
+                }
+                if (null == list) {
+                    list = new ArrayList<>();
+                }
+                logger.debug("getCommunityAccessList::{}, type::{}, chainID::{}, isRunning::{}",
+                        type, list.size(), chainID, daemon.isRunning());
                 emitter.onNext(list);
                 try {
-                    Thread.sleep(10000);
+                    if (list.size() > 0) {
+                        Thread.sleep(10000);
+                    } else {
+                        Thread.sleep(1000);
+                    }
                 } catch (InterruptedException e) {
                     break;
                 }
@@ -1058,5 +1070,53 @@ public class CommunityViewModel extends AndroidViewModel {
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
+    }
+
+    Observable<AccessList> observeAccessList(String chainID) {
+        return Observable.create(emitter -> {
+            AccessList oldList = new AccessList();
+            AccessList newList = new AccessList();
+            if (StringUtil.isNotEmpty(chainID)) {
+                byte[] chainIDBytes = ChainIDUtil.encode(chainID);
+                String userPk = MainApplication.getInstance().getPublicKey();
+                while (!emitter.isDisposed()) {
+                    Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
+                    logger.debug("getAccessList non member::{}",  null == member);
+                    if (member != null) {
+                        Account account = daemon.getAccountInfo(chainIDBytes, userPk);
+                        if (account != null && account.getBlockNumber() > member.blockNumber) {
+                            member.blockNumber = account.getBlockNumber();
+                            member.power = account.getEffectivePower();
+                            member.balance = account.getBalance();
+                            member.nonce = account.getNonce();
+                            memberRepo.updateMember(member);
+                        }
+                        logger.debug("getAccessList blockNumber::{}, balance::{}, power::{}, nonce::{}",
+                                member.blockNumber, member.balance, member.power, member.nonce);
+                        List<String> connected = daemon.getCommunityAccessList(chainIDBytes);
+                        List<String> gossip = daemon.getGossipList(chainIDBytes);
+                        newList.setConnected(connected);
+                        newList.setGossip(gossip);
+                        if (oldList.getConnectedSize() != newList.getConnectedSize() ||
+                                oldList.getGossipSize() != newList.getGossipSize()) {
+                            oldList = newList;
+                        }
+                        logger.debug("getAccessList connectedSize::{}, gossipSize::{}",
+                                newList.getConnectedSize(), newList.getGossipSize());
+                        emitter.onNext(oldList);
+                    }
+                    try {
+                        if (oldList.getConnectedSize() > 0 && oldList.getGossipSize() > 0) {
+                            Thread.sleep(10000);
+                        } else {
+                            Thread.sleep(1000);
+                        }
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+            emitter.onComplete();
+        });
     }
 }

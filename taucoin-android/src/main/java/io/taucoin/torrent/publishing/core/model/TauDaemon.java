@@ -574,6 +574,18 @@ public abstract class TauDaemon {
     }
 
     /**
+     * 获取社区Gossip列表
+     * @return Gossip列表
+     */
+    public ArrayList<String> getGossipList(byte[] chainID) {
+        logger.debug("getGossipList isRunning::{}", isRunning);
+        if (isRunning) {
+            return sessionManager.getGossipList(chainID);
+        }
+        return null;
+    }
+
+    /**
      * 获取挖矿时间
      * 返回-1：代表出不了块
      */

@@ -119,7 +119,11 @@
     removed from \"setting>privacy>blacklist\".]]></Data></string>
 
     <string name="community_input_hint">Message</string>
-    <string name="community_users_stats">%1$d participants, %2$d members</string>
+    <string name="community_title">%1$s(%2$d)</string>
+    <string name="community_users_stats">members %1$d, g %2$d, c %3$d, %4$s</string>
+    <string name="community_users_discovering">discovering</string>
+    <string name="community_users_following">following</string>
+    <string name="community_users_mining">mining</string>
     <string name="community_blocks_stats">Total blocks:%1$d, on-chain blocks:%2$d</string>
     <string name="common_loading">loading&#8230;</string>
 
@@ -182,7 +186,8 @@
     <string name="chain_total_peers">Total Peers</string>
     <string name="chain_peers_blocks">Blocks Self-mined</string>
     <string name="chain_total_coins">Total Coins</string>
-    <string name="chain_access_list">Access List</string>
+    <string name="chain_access_list">Connected List</string>
+    <string name="chain_gossip_list">Gossip List</string>
     <string name="chain_top_peers">Top 10 peers</string>
     <string name="chain_votes">Votes</string>
     <string name="chain_current_fork">Recent Fork Out</string>

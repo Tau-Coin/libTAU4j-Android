@@ -2,7 +2,6 @@ package io.taucoin.torrent.publishing.ui.community;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +24,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.AccessList;
+import io.taucoin.torrent.publishing.core.model.data.Statistics;
+import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
@@ -56,6 +59,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private MainActivity activity;
     private FragmentCommunityBinding binding;
     private CommunityViewModel communityViewModel;
+    private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
     private CommunityTabFragment currentTabFragment = null;
     private RelativeLayout selectedView = null;
@@ -67,6 +71,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private boolean isOnChain = false;
     private boolean isNoBalance = true;
     private boolean isFirstLoad = true;
+    private Statistics statistics;
+    private AccessList accessList;
+    private long nodes = 0;
 
     @Nullable
     @Override
@@ -83,6 +90,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         activity = (MainActivity) getActivity();
         ViewModelProvider provider = new ViewModelProvider(this);
         communityViewModel = provider.get(CommunityViewModel.class);
+        settingsRepo = RepositoryHelper.getSettingsRepository(activity.getApplicationContext());
         binding.setListener(this);
         binding.toolbarInclude.setListener(this);
         initParameter();
@@ -105,11 +113,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
      */
     private void initLayout() {
         binding.tvBlocksStatistics.setText(getString(R.string.community_blocks_stats, 0, 0));
-        if (StringUtil.isNotEmpty(chainID)) {
-            String communityName = ChainIDUtil.getName(chainID);
-            binding.toolbarInclude.tvTitle.setText(Html.fromHtml(communityName));
-            binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats, 0, 0));
-        }
+        showCommunityTitle();
+        showCommunitySubtitle();
         binding.toolbarInclude.ivBack.setOnClickListener(v -> {
             KeyboardUtils.hideSoftInput(activity);
             activity.goBack();
@@ -151,6 +156,47 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 
             }
         });
+    }
+
+    private void handleSettingsChanged(String key) {
+        if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
+            long nodes = settingsRepo.getLongValue(key, 0);
+            showCommunitySubtitle();
+        }
+    }
+
+    private void showCommunityTitle() {
+        long total = 0;
+        if (statistics != null) {
+            total = statistics.getTotal();
+        }
+        if (StringUtil.isNotEmpty(chainID)) {
+            String communityName = ChainIDUtil.getName(chainID);
+            String communityTitle = getString(R.string.community_title, communityName, total);
+            binding.toolbarInclude.tvTitle.setText(communityTitle);
+        }
+    }
+
+    private void showCommunitySubtitle() {
+        long members = 0;
+        if (statistics != null) {
+            members = statistics.getOnChain();
+        }
+        String status;
+        if (nodes > 0) {
+            status = getString(R.string.community_users_discovering);
+        } else {
+            status = isOnChain ? getString(R.string.community_users_mining) :
+                    getString(R.string.community_users_following);
+        }
+        long gossip = 0;
+        long connected = 0;
+        if (accessList != null) {
+            connected = accessList.getConnectedSize();
+            gossip = accessList.getGossipSize();
+        }
+        binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats,
+                members, gossip, connected, status));
     }
 
     /**
@@ -358,13 +404,20 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 activity.goBack();
             }
         });
+
+        disposables.add(settingsRepo.observeSettingsChanged()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleSettingsChanged));
+
         disposables.add(communityViewModel.getMembersStatistics(chainID)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(statistics ->
-                    binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats,
-                            statistics.getTotal(), statistics.getOnChain())))
-        );
+                .subscribe(statistics -> {
+                    this.statistics = statistics;
+                    showCommunityTitle();
+                    showCommunitySubtitle();
+                }));
 
         disposables.add(communityViewModel.getBlocksStatistics(chainID)
                 .subscribeOn(Schedulers.newThread())
@@ -374,11 +427,22 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                                 statistics.getTotal(), statistics.getOnChain())))
         );
 
+        disposables.add(communityViewModel.observeAccessList(chainID)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list -> {
+                    this.accessList = list;
+                    showCommunitySubtitle();
+                }));
+
         disposables.add(communityViewModel.observerCurrentMember(chainID)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
                     isJoined = member.isJoined();
+                    if (isOnChain != member.onChain()) {
+                        showCommunitySubtitle();
+                    }
                     isOnChain = member.onChain();
                     isNoBalance = member.noBalance();
                     if (currentTabFragment != null) {
