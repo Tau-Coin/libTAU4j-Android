@@ -178,25 +178,28 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     }
 
     private void showCommunitySubtitle() {
-        long members = 0;
+        StringBuilder subtitle = new StringBuilder();
         if (statistics != null) {
-            members = statistics.getOnChain();
+            long members = statistics.getOnChain();
+            subtitle.append(getString(R.string.community_users_stats_m, members));
         }
-        String status;
-        if (nodes > 0) {
-            status = getString(R.string.community_users_discovering);
-        } else {
-            status = isOnChain ? getString(R.string.community_users_mining) :
-                    getString(R.string.community_users_following);
-        }
-        long gossip = 0;
-        long connected = 0;
         if (accessList != null) {
-            connected = accessList.getConnectedSize();
-            gossip = accessList.getGossipSize();
+            long gossip = accessList.getGossipSize();
+            if (gossip > 0) {
+                subtitle.append(getString(R.string.community_users_stats_g, gossip));
+            }
+            long connected = accessList.getConnectedSize();
+            if (connected > 0) {
+                subtitle.append(getString(R.string.community_users_stats_c, connected));
+            }
         }
-        binding.toolbarInclude.tvSubtitle.setText(getString(R.string.community_users_stats,
-                members, gossip, connected, status));
+        if (nodes > 0) {
+            subtitle.append(getString(R.string.community_users_discovering));
+        } else {
+            subtitle.append(isOnChain ? getString(R.string.community_users_mining) :
+                    getString(R.string.community_users_following));
+        }
+        binding.toolbarInclude.tvSubtitle.setText(subtitle);
     }
 
     /**

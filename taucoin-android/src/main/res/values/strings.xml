@@ -120,7 +120,10 @@
 
     <string name="community_input_hint">Message</string>
     <string name="community_title">%1$s(%2$d)</string>
-    <string name="community_users_stats">members %1$d, g %2$d, c %3$d, %4$s</string>
+    <string name="community_users_stats_m">members&#160;%1$d,&#160;</string>
+    <string name="community_users_stats_g">g&#160;%1$d,&#160;</string>
+    <string name="community_users_stats_c">c&#160;%1$d,&#160;</string>
+    <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">discovering</string>
     <string name="community_users_following">following</string>
     <string name="community_users_mining">mining</string>
