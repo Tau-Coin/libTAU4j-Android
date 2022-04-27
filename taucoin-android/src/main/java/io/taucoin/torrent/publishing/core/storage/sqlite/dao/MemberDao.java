@@ -57,13 +57,13 @@ public interface MemberDao {
 
     String QUERY_MEMBERS_STATISTICS = "SELECT a.onChain, b.total" +
             " FROM " +
+            " (SELECT chainID, COUNT(publicKey) AS total" +
+            " FROM Members WHERE chainID =:chainID) AS b" +
+            " LEFT JOIN " +
             " (SELECT m.chainID, COUNT(m.publicKey) AS onChain" +
             " FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
             " WHERE m.chainID =:chainID and " + WHERE_ON_CHAIN + ") AS a" +
-            " LEFT JOIN " +
-            " (SELECT chainID, COUNT(publicKey) AS total" +
-            " FROM Members WHERE chainID =:chainID) AS b" +
             " ON a.chainID = b.chainID";
 
     String QUERY_DELETE_COMMUNITY_MEMBERS = "DELETE FROM Members where chainID =:chainID";
