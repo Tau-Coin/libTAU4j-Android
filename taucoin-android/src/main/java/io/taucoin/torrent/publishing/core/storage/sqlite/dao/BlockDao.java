@@ -60,13 +60,13 @@ public interface BlockDao {
 
     String QUERY_BLOCKS_STATISTICS = "SELECT a.onChain, b.total" +
             " FROM " +
+            " (SELECT chainID, COUNT(blockHash) AS total" +
+            " FROM Blocks WHERE chainID =:chainID) AS b" +
+            " LEFT JOIN " +
             " (SELECT chainID, COUNT(blockHash) AS onChain" +
             " FROM Blocks WHERE chainID =:chainID AND status == 1" +
             " LIMIT " + Constants.BLOCKS_NOT_PERISHABLE +
             " ) AS a" +
-            " LEFT JOIN " +
-            " (SELECT chainID, COUNT(blockHash) AS total" +
-            " FROM Blocks WHERE chainID =:chainID) AS b" +
             " ON a.chainID = b.chainID";
 
     /**
