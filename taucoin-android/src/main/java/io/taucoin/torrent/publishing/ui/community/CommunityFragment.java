@@ -160,7 +160,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 
     private void handleSettingsChanged(String key) {
         if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
-            long nodes = settingsRepo.getLongValue(key, 0);
+            nodes = settingsRepo.getLongValue(key, 0);
             showCommunitySubtitle();
         }
     }
@@ -196,10 +196,10 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             }
         }
         if (nodes > 0) {
-            subtitle.append(getString(R.string.community_users_discovering));
-        } else {
             subtitle.append(isOnChain ? getString(R.string.community_users_mining) :
                     getString(R.string.community_users_following));
+        } else {
+            subtitle.append(getString(R.string.community_users_discovering));
         }
         binding.toolbarInclude.tvSubtitle.setText(subtitle);
     }
