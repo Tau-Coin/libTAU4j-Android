@@ -181,7 +181,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         StringBuilder subtitle = new StringBuilder();
         if (statistics != null) {
             long members = statistics.getOnChain();
-            subtitle.append(getString(R.string.community_users_stats_m, members));
+            if (members > 0) {
+                subtitle.append(getString(R.string.community_users_stats_m, members));
+            }
         }
         if (accessList != null) {
             long gossip = accessList.getGossipSize();
