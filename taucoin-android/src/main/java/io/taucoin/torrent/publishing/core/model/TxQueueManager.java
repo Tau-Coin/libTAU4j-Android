@@ -201,11 +201,14 @@ class TxQueueManager {
     private boolean sendTxQueue(Account account, TxQueueAndStatus txQueue) {
         long fee = txQueue.fee;
         if (txQueue.queueType == 1) {
-            fee = getMedianTxFree(txQueue.chainID);
-            txQueue.fee = fee;
-            // 更新airdrop的交易费
-            txQueueRepos.updateQueue(txQueue);
-            ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.UPDATE);
+            long medianFee = getMedianTxFree(txQueue.chainID);
+            if (fee != medianFee) {
+                fee = medianFee;
+                txQueue.fee = fee;
+                // 更新airdrop的交易费
+                txQueueRepos.updateQueue(txQueue);
+                ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.UPDATE);
+            }
         }
         if (txQueue.amount + fee > account.getBalance()) {
             logger.debug("sendWiringTx amount({}) + fee({}) > balance({})", txQueue.amount,
