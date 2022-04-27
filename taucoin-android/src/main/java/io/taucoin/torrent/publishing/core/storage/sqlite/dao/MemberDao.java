@@ -25,9 +25,9 @@ import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
 @Dao
 public interface MemberDao {
     String WHERE_NOT_PERISHABLE = " (blockNumber >= tailBlock)";
-    String WHERE_ON_CHAIN = " ((balance > 0 OR power > 0) AND" + WHERE_NOT_PERISHABLE + ")";
+    String WHERE_ON_CHAIN = " (power > 0 AND" + WHERE_NOT_PERISHABLE + ")";
 
-    String WHERE_OFF_CHAIN = " ((balance <= 0 AND power <= 0) OR (blockNumber < tailBlock))";
+    String WHERE_OFF_CHAIN = " (power <= 0 OR blockNumber < tailBlock)";
 
     String QUERY_GET_MEMBER_BY_CHAIN_ID_PK = "SELECT * FROM Members WHERE chainID = :chainID AND publicKey = :publicKey";
     String QUERY_GET_MEMBERS_BY_CHAIN_ID = "SELECT * FROM Members WHERE chainID = :chainID";
