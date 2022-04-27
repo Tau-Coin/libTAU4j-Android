@@ -25,4 +25,8 @@ public class TxQueueAndStatus extends TxQueue {
     public boolean isProcessing() {
         return status == 0;
     }
+
+    public boolean isWaiting() {
+        return status == -1;
+    }
 }

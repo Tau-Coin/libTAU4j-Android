@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import org.libTAU4j.Account;
 
 import java.util.Arrays;
+import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
@@ -30,6 +32,14 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
     public QueueListAdapter(ClickListener listener) {
         super(diffCallback);
         this.listener = listener;
+    }
+
+    public void submitList(@Nullable List<TxQueueAndStatus> list, boolean forceRefresh) {
+        this.submitList(list);
+        diffCallback.setForceRefresh(forceRefresh);
+        if (forceRefresh) {
+            this.notifyDataSetChanged();
+        }
     }
 
     @NonNull
@@ -101,13 +111,9 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
             });
             String errorMsg = "";
             if (account != null && pos == 0) {
-                if (account.getBalance() < tx.amount + tx.fee && !tx.isProcessing()) {
+                if (account.getBalance() < tx.amount + tx.fee && tx.isWaiting()) {
                     errorMsg = resources.getString(R.string.tx_error_insufficient_balance);
                 }
-                // 取消nonce冲突提示，会主动重发
-//                else if (account.getNonce() >= tx.nonce && tx.isProcessing()) {
-//                    errorMsg = resources.getString(R.string.tx_error_nonce_conflict);
-//                }
             }
             binding.tvError.setVisibility((StringUtil.isNotEmpty(errorMsg))
                     ? View.VISIBLE : View.GONE);
@@ -120,10 +126,17 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
         void onEditClicked(TxQueueAndStatus tx);
     }
 
-    private static final DiffUtil.ItemCallback<TxQueueAndStatus> diffCallback = new DiffUtil.ItemCallback<TxQueueAndStatus>() {
+    private static class ItemCallback extends DiffUtil.ItemCallback<TxQueueAndStatus> {
+
+        private boolean forceRefresh = false;
+
+        void setForceRefresh(boolean forceRefresh) {
+            this.forceRefresh = forceRefresh;
+        }
+
         @Override
-        public boolean areContentsTheSame(@NonNull TxQueueAndStatus oldItem, @NonNull TxQueueAndStatus newItem) {
-            return oldItem.equals(newItem) &&
+        public boolean areItemsTheSame(@NonNull TxQueueAndStatus oldItem, @NonNull TxQueueAndStatus newItem) {
+            return !forceRefresh && oldItem.equals(newItem) &&
                     oldItem.status == newItem.status &&
                     oldItem.amount == newItem.amount &&
                     oldItem.fee == newItem.fee &&
@@ -132,8 +145,10 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull TxQueueAndStatus oldItem, @NonNull TxQueueAndStatus newItem) {
+        public boolean areContentsTheSame(@NonNull TxQueueAndStatus oldItem, @NonNull TxQueueAndStatus newItem) {
             return oldItem.equals(newItem);
         }
     };
+
+    private static final ItemCallback diffCallback = new ItemCallback();
 }

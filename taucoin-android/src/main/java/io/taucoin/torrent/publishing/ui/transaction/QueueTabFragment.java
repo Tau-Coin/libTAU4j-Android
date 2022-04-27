@@ -59,10 +59,8 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
                 .subscribe(list -> {
                     if (adapter != null) {
                         List<TxQueueAndStatus> old = adapter.getCurrentList();
-                        adapter.submitList(list);
-                        if (list != null && old.size() != list.size()) {
-                            adapter.notifyDataSetChanged();
-                        }
+                        boolean isRefresh = list != null && old.size() != list.size();
+                        adapter.submitList(list, isRefresh);
                     }
                 }));
 
