@@ -72,11 +72,14 @@ import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
+import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
@@ -99,6 +102,7 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.databinding.BlacklistDialogBinding;
+import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 
@@ -357,6 +361,24 @@ public class CommunityViewModel extends AndroidViewModel {
                         account.getBalance(), account.getEffectivePower(), account.getNonce(),
                         account.getBlockNumber());
                 memberRepo.addMember(member);
+            }
+
+            // 发送通知
+            Set<String> keys = accounts.keySet();
+            if (keys.size() > 0) {
+                String memo = getApplication().getString(R.string.community_added_members);
+                TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
+                byte[] content = txContent.getEncoded();
+                for (String key : keys) {
+                    Account memberAccount = accounts.get(key);
+                    long amount = 0;
+                    if (memberAccount != null) {
+                        amount = memberAccount.getBalance();;
+                    }
+                    TxQueue txQueue = new TxQueue(community.chainID, currentUser.publicKey, key,
+                            amount, 0L, TxType.WIRING_TX, content);
+                    ChatViewModel.syncSendMessageTask(getApplication(), txQueue, QueueOperation.INSERT);
+                }
             }
         } catch (Exception e) {
             result.setFailMsg(e.getMessage());

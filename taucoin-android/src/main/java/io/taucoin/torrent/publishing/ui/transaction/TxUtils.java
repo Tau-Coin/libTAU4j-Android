@@ -253,13 +253,13 @@ public class TxUtils {
             TxContent txContent = new TxContent(tx.content);
             int txType = txContent.getType();
             if (operation != null) {
-                msg.append("Status: ");
+                msg.append("Funds update: ");
                 if (operation == QueueOperation.INSERT) {
-                    msg.append("Added");
+                    msg.append("sender wiring coins");
                 } else if (operation == QueueOperation.UPDATE) {
-                    msg.append("Modified");
+                    msg.append("sender waiting for blocks confirmation");
                 } else {
-                    msg.append("Deleted");
+                    msg.append("sender cancels wiring");
                 }
                 msg.append("\n").append("Community: ")
                     .append(ChainIDUtil.getName(tx.chainID))

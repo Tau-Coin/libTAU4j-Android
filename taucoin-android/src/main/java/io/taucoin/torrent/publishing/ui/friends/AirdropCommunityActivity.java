@@ -143,7 +143,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
                     }
                     String chainID = member.chainID;
                     linkDisposable = communityViewModel.getCommunityMembersLimit(member.chainID,
-                            Constants.AIRDROP_LINK_BS_LIMIT)
+                            Constants.AIRDROP_TX_BS_LIMIT)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
                         String airdropPeer = MainApplication.getInstance().getPublicKey();

@@ -35,6 +35,8 @@ public class Constants {
     // Chain link中bs默认数
     public static final int CHAIN_LINK_BS_LIMIT = 10;
 
+    public static final int AIRDROP_TX_BS_LIMIT = 1;
+
     public static final int AIRDROP_LINK_BS_LIMIT = 2;
 
     // 区块未过期的数目（半年）
