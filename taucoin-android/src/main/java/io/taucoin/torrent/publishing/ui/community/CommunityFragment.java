@@ -410,13 +410,14 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             }
         });
 
+        nodes = settingsRepo.getLongValue(getString(R.string.pref_key_dht_nodes), 0);
         disposables.add(settingsRepo.observeSettingsChanged()
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleSettingsChanged));
 
         disposables.add(communityViewModel.getMembersStatistics(chainID)
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(statistics -> {
                     this.statistics = statistics;
@@ -425,7 +426,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 }));
 
         disposables.add(communityViewModel.getBlocksStatistics(chainID)
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(statistics ->
                         binding.tvBlocksStatistics.setText(getString(R.string.community_blocks_stats,
@@ -433,7 +434,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         );
 
         disposables.add(communityViewModel.observeAccessList(chainID)
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(list -> {
                     this.accessList = list;
@@ -441,7 +442,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 }));
 
         disposables.add(communityViewModel.observerCurrentMember(chainID)
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
                     isJoined = member.isJoined();
