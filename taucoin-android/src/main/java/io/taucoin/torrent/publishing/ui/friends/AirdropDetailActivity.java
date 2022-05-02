@@ -8,6 +8,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -42,6 +45,8 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
     private String chainID;
     private Member member;
     private Disposable airdropDisposable;
+    private String airdropLink;
+    private String airdropLink1Bs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +149,16 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
                     if (StringUtil.isNotEmpty(chainID)) {
                         String airdropPeer = MainApplication.getInstance().getPublicKey();
-                        String airdropLink = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, list);
+                        airdropLink = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, list);
+                        if (list != null && list.size() > 0) {
+                            List<String> onePeerList = new ArrayList<>();
+                            String onePeer = list.get(0);
+                            if (list.size() > 1 && StringUtil.isEquals(onePeer, airdropPeer)) {
+                                onePeer = list.get(1);
+                            }
+                            onePeerList.add(onePeer);
+                            airdropLink1Bs = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, onePeerList);
+                        }
                         binding.tauLink.setText(airdropLink);
                     }
                 }));
@@ -161,7 +175,6 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        String airdropLink = StringUtil.getText(binding.tauLink);
         if (StringUtil.isEmpty(airdropLink)) {
             return;
         }
@@ -171,9 +184,12 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
                 ToastUtils.showShortToast(R.string.copy_link_successfully);
                 break;
             case R.id.ll_share:
+                if (StringUtil.isEmpty(airdropLink1Bs)) {
+                    return;
+                }
                 String shareTitle = getString(R.string.bot_share_airdrop_link_title);
                 String text = getString(R.string.bot_share_airdrop_link_content,
-                        Constants.APP_HOME_URL, airdropLink);
+                        Constants.APP_HOME_URL, airdropLink1Bs);
                 ActivityUtil.shareText(this, shareTitle, text);
                 break;
         }

@@ -203,7 +203,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
         if (linkDisposable != null && !linkDisposable.isDisposed()) {
             linkDisposable.dispose();
         }
-        linkDisposable = communityViewModel.getCommunityMembersLimit(chainID, Constants.AIRDROP_LINK_BS_LIMIT)
+        linkDisposable = communityViewModel.getCommunityMembersLimit(chainID, Constants.AIRDROP_TX_BS_LIMIT)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
                     if (StringUtil.isNotEmpty(chainID)) {
