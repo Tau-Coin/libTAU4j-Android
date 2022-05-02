@@ -28,6 +28,7 @@ import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
 public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAdapter.ViewHolder> {
     private ClickListener listener;
     private Account account;
+    private static boolean isTopProcessing = false; // 顶部是否是处理中
 
     public QueueListAdapter(ClickListener listener) {
         super(diffCallback);
@@ -57,7 +58,11 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
     @Override
     public void onBindViewHolder(@NonNull QueueListAdapter.ViewHolder holder, int position) {
         TxQueueAndStatus tx = getItem(position);
-        holder.bindTransaction(tx, account, position);
+        TxQueueAndStatus previousTx = null;
+        if (position > 0) {
+            previousTx = getItem(position - 1);
+        }
+        holder.bindTransaction(tx, previousTx, account, position);
     }
 
     public void setAccount(Account account) {
@@ -86,15 +91,31 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
         /**
          * 绑定交易数据
          */
-        void bindTransaction(TxQueueAndStatus tx, Account account, int pos) {
+        void bindTransaction(TxQueueAndStatus tx, TxQueueAndStatus previousTx, Account account, int pos) {
             if (null == tx) {
                 return;
             }
-            boolean isProcessing = tx.isProcessing() && pos == 0;
+            Resources resources = binding.getRoot().getResources();
+            String errorMsg = "";
+            boolean previousHaveError = false;
+            if (account != null) {
+                if (account.getBalance() < tx.amount + tx.fee) {
+                    errorMsg = resources.getString(R.string.tx_error_insufficient_balance);
+                }
+                if (previousTx != null && account.getBalance() < previousTx.amount + previousTx.fee) {
+                    previousHaveError = true;
+                }
+            }
+            boolean isHaveError = StringUtil.isNotEmpty(errorMsg);
+            boolean isProcessing = tx.isProcessing() && !isHaveError &&
+                    (pos == 0 || (!isTopProcessing && previousHaveError));
+            if (pos == 0) {
+                isTopProcessing = isProcessing;
+            }
             int progressText = isProcessing ? R.string.tx_result_status_processing :
                     R.string.tx_result_status_waiting;
             int progressColor = isProcessing ? R.color.color_yellow : R.color.color_black;
-            Resources resources = binding.getRoot().getResources();
+
             binding.tvProgress.setText(resources.getString(progressText));
             binding.tvProgress.setTextColor(resources.getColor(progressColor));
             binding.tvContent.setText(TxUtils.createSpanTxQueue(tx, isProcessing));
@@ -109,14 +130,8 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
                     listener.onEditClicked(tx);
                 }
             });
-            String errorMsg = "";
-            if (account != null && pos == 0) {
-                if (account.getBalance() < tx.amount + tx.fee && tx.isWaiting()) {
-                    errorMsg = resources.getString(R.string.tx_error_insufficient_balance);
-                }
-            }
-            binding.tvError.setVisibility((StringUtil.isNotEmpty(errorMsg))
-                    ? View.VISIBLE : View.GONE);
+
+            binding.tvError.setVisibility(isHaveError ? View.VISIBLE : View.GONE);
             binding.tvError.setText(errorMsg);
         }
     }

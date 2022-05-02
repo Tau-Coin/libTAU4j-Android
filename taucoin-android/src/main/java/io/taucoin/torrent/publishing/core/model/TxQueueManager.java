@@ -93,7 +93,7 @@ class TxQueueManager {
                 try {
                     String chainID = chainIDQueue.take();
                     logger.debug("QueueConsumer size::{}, chainID::{}", chainIDQueue.size(), chainID);
-                    boolean isResend = sendTxQueue(chainID);
+                    boolean isResend = sendTxQueue(chainID, 0);
                     if (isResend) {
                         updateTxQueue(chainID);
                         Thread.sleep(Interval.INTERVAL_RETRY.getInterval());
@@ -132,14 +132,14 @@ class TxQueueManager {
      * @param chainID 发送社区链ID
      * @return 是否需要重发
      */
-    private boolean sendTxQueue(String chainID) {
+    private boolean sendTxQueue(String chainID, int offset) {
         User currentUser = userRepos.getCurrentUser();
         if (null == currentUser) {
             logger.debug("sendTxQueue current user null");
             return true;
         }
         try {
-            TxQueueAndStatus txQueue = txQueueRepos.getQueueFirstTx(chainID, currentUser.publicKey, 0);
+            TxQueueAndStatus txQueue = txQueueRepos.getQueueFirstTx(chainID, currentUser.publicKey, offset);
             if (null == txQueue) {
                 logger.debug("sendTxQueue queue null");
                 return false;
@@ -154,6 +154,12 @@ class TxQueueManager {
             }
             logger.debug("sendTxQueue account nonce::{}, balance::{}, blockNumber::{}", account.getNonce(),
                     account.getBalance(), account.getBlockNumber());
+
+            if (txQueue.amount + txQueue.fee > account.getBalance()) {
+                logger.debug("sendWiringTx amount({}) + fee({}) > balance({})", txQueue.amount,
+                        txQueue.fee, account.getBalance());
+                return sendTxQueue(chainID, offset + 1);
+            }
             // 交易已创建
             if (txQueue.status == 0) {
                 logger.debug("sendTxQueue account nonce::{}, queue nonce::{}", account.getNonce(),
@@ -162,7 +168,7 @@ class TxQueueManager {
                 if (account.getNonce() >= txQueue.nonce || queueChanged(account, txQueue)) {
                     return sendTxQueue(account, txQueue);
                 } else {
-                    resendTxQueue(txQueue);
+                    resendTxQueue(account, txQueue);
                     return false;
                 }
             }
@@ -184,11 +190,9 @@ class TxQueueManager {
         Tx tx = txRepo.getTxByQueueID(txQueue.queueID, txQueue.timestamp);
         if (tx != null) {
             Transaction transaction = createTransaction(account, txQueue, txQueue.timestamp);
-            if (transaction != null) {
-                String newTxID = transaction.getTxID().to_hex();
-                logger.debug("sendTxQueue txID::{}, newTxID::{}", tx.txID, newTxID);
-                changed = StringUtil.isNotEquals(tx.txID, newTxID);
-            }
+            String newTxID = transaction.getTxID().to_hex();
+            logger.debug("sendTxQueue txID::{}, newTxID::{}", tx.txID, newTxID);
+            changed = StringUtil.isNotEquals(tx.txID, newTxID);
         }
         logger.debug("sendTxQueue queueChanged::{}", changed);
         return changed;
@@ -197,11 +201,11 @@ class TxQueueManager {
     /**
      * 重新发送等待上链的交易（防止由于libTAU丢弃交易而上不了链）
      */
-    private void resendTxQueue(TxQueueAndStatus txQueue) {
+    private void resendTxQueue(Account account, TxQueueAndStatus txQueue) {
         String chainID = txQueue.chainID;
         if (chainResendTx.containsKey(chainID)) {
             Boolean isResend = chainResendTx.get(chainID);
-            if (isResend != null && !isResend) {
+            if (isResend != null && !isResend && txQueue.sendStatus != 1) {
                 logger.debug("resendTransaction:: No need to resend");
                 return;
             }
@@ -209,6 +213,12 @@ class TxQueueManager {
         Tx tx = txRepo.getTxByQueueID(txQueue.queueID, txQueue.timestamp);
         if ( null == tx) {
             logger.debug("resendTransaction:: tx not found");
+            return;
+        }
+
+        if (tx.amount + tx.fee > account.getBalance()) {
+            logger.debug("resendTransaction amount({}) + fee({}) > balance({})", txQueue.amount,
+                    txQueue.fee, account.getBalance());
             return;
         }
         String result = TxViewModel.createTransaction(appContext, tx, true);

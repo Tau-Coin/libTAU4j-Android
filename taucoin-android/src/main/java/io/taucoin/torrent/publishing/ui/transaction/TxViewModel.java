@@ -396,10 +396,11 @@ public class TxViewModel extends AndroidViewModel {
                         FmtMicrometer.fmtFeeValue(Constants.WIRING_MIN_FEE.longValue()));
                 ToastUtils.showShortToast(minFee);
                 return false;
-            } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
-                ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
-                return false;
             }
+//            else if (tx.amount > balance || tx.amount + tx.fee > balance) {
+//                ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
+//                return false;
+//            }
         } else {
             if (type == SELL_TX.getType()) {
                 SellTxContent txContent = new SellTxContent(tx.content);
