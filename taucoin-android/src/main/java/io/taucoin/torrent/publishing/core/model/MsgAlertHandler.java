@@ -3,6 +3,7 @@ package io.taucoin.torrent.publishing.core.model;
 import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 
+import org.libTAU4j.Account;
 import org.libTAU4j.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -204,9 +206,27 @@ class MsgAlertHandler {
         TxQueue tx = new TxQueue(chainID, currentPk, friendPk, amount, fee, 1,
                 TxType.WIRING_TX.getType(), txContent.getEncoded());
         txQueueRepo.addQueue(tx);
-        ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.INSERT);
+
+        // 余额不足不发送点对点消息
+        Account account = daemon.getAccountInfo(ChainIDUtil.encode(chainID), tx.senderPk);
+        if (account != null) {
+            long medianFee = getMedianTxFree(tx.chainID);
+            if (tx.amount + medianFee <= account.getBalance()) {
+                ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.INSERT);
+            }
+        }
         daemon.updateTxQueue(tx.chainID);
     }
+
+    private long getMedianTxFree(String chainID) {
+        long free = Constants.WIRING_MIN_FEE.longValue();
+        long medianFree = daemon.getMedianTxFree(chainID);
+        if (medianFree > free) {
+            free = medianFree;
+        }
+        return free;
+    }
+
 
     /**
      * 消息已被接收

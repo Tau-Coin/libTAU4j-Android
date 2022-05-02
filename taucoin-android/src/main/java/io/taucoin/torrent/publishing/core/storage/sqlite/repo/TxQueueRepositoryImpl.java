@@ -35,8 +35,8 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     }
 
     @Override
-    public void addQueue(TxQueue tx) {
-        db.txQueueDao().addQueue(tx);
+    public long addQueue(TxQueue tx) {
+        return db.txQueueDao().addQueue(tx);
     }
 
     @Override

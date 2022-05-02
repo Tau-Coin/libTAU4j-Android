@@ -21,7 +21,7 @@ public interface TxQueueRepository {
     /**
      * 添加新的交易进队列
      */
-    void addQueue(TxQueue tx);
+    long addQueue(TxQueue tx);
 
     void deleteQueue(TxQueue tx);
 

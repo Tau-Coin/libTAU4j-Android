@@ -38,6 +38,7 @@ import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
@@ -670,6 +671,10 @@ public abstract class TauDaemon {
 
     public void updateTxQueue(String chainID, boolean isResendTx) {
         txQueueManager.updateTxQueue(chainID, isResendTx);
+    }
+
+    public void sendTxQueue(TxQueue txQueue) {
+        txQueueManager.sendTxQueue(txQueue);
     }
 
     /**

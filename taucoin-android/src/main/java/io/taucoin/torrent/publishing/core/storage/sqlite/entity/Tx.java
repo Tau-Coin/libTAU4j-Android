@@ -39,6 +39,7 @@ public class Tx implements Parcelable {
     public long quantity;                   // 币的数量 只针对TxType.SELL_TX类型
     public String location;                 // 位置信息 只针对TxType.SELL_TX类型
     public long queueID = -1;               // 交易对应的队列ID
+    public int sendStatus = 0;              // 交易发送状态 0: 已发送，1: 未发送（供本地显示）
     public long pinnedTime;                 // 置顶固定时间
     public long favoriteTime;               // 收藏时间
 

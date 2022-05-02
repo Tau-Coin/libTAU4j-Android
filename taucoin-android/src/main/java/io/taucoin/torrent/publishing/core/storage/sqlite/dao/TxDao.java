@@ -139,6 +139,8 @@ public interface TxDao {
     String QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH = "SELECT * FROM Txs" +
             " WHERE txStatus = 1 AND blockHash = :blockHash";
 
+    String DELETE_UNSENT_TX = "DELETE FROM Txs WHERE queueID = :queueID AND sendStatus = 1";
+
     /**
      * 添加新的交易
      */
@@ -267,4 +269,7 @@ public interface TxDao {
 
     @Query(QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH)
     List<Tx> getOnChainTxsByBlockHash(String blockHash);
+
+    @Query(DELETE_UNSENT_TX)
+    void deleteUnsentTx(long queueID);
 }

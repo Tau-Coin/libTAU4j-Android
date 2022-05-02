@@ -10,7 +10,6 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.AirdropHistory;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
@@ -22,10 +21,12 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 public interface TxQueueDao {
     String QUERY_COMMUNITY_TX_QUEUE_SELECT = "SELECT * FROM" +
             " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status, " +
+            " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
-            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID From Txs" +
+            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID, MAX(sendStatus) AS sendStatus" +
+            " From Txs" +
             " WHERE chainID = :chainID AND senderPk = :senderPk AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
@@ -39,10 +40,12 @@ public interface TxQueueDao {
 
     String QUERY_TX_QUEUE_BY_ID = "SELECT * FROM" +
             " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status," +
+            " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
-            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID From Txs" +
+            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID, MAX(sendStatus) AS sendStatus" +
+            " From Txs" +
             " WHERE queueID = :queueID  AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
@@ -62,9 +65,11 @@ public interface TxQueueDao {
 
     String QUERY_AIRDROP_COUNT_ON_CHAIN = "SELECT count(*) FROM" +
             " (SELECT tq.chainID, tq.queueID," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status," +
+            " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
             " FROM TxQueues tq" +
-            " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID From Txs" +
+            " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID, MAX(sendStatus) AS sendStatus" +
+            " From Txs" +
             " WHERE senderPk = :senderPk AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
@@ -74,9 +79,11 @@ public interface TxQueueDao {
 
     String QUERY_AIRDROP_HISTORY_ON_CHAIN = "SELECT queueID, receiverPk FROM" +
             " (SELECT tq.chainID, tq.queueID, tq.receiverPk," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status," +
+            " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
             " FROM TxQueues tq" +
-            " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID From Txs" +
+            " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID, MAX(sendStatus) AS sendStatus" +
+            " From Txs" +
             " WHERE senderPk = :senderPk AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
@@ -100,7 +107,7 @@ public interface TxQueueDao {
      * 入队列
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void addQueue(TxQueue tx);
+    long addQueue(TxQueue tx);
 
     /**
      * 删除交易队列

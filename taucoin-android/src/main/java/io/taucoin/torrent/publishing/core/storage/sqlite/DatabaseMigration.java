@@ -14,7 +14,8 @@ class DatabaseMigration {
 
     static Migration[] getMigrations(@NonNull Context appContext) {
         return new Migration[] {
-                MIGRATION_1_2
+                MIGRATION_1_2,
+                MIGRATION_2_3
         };
     }
 
@@ -32,6 +33,14 @@ class DatabaseMigration {
             database.execSQL("ALTER TABLE Members ADD COLUMN stickyTop INTEGER NOT NULL DEFAULT 0");
             // 朋友置顶字段
             database.execSQL("ALTER TABLE Friends ADD COLUMN stickyTop INTEGER NOT NULL DEFAULT 0");
+        }
+    };
+
+    private static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // 添加交易发送状态, 默认老数据都是已发送
+            database.execSQL("ALTER TABLE Txs ADD COLUMN sendStatus INTEGER NOT NULL DEFAULT 0");
         }
     };
 }

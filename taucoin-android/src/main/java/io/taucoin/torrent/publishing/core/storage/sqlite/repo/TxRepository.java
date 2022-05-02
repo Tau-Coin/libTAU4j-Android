@@ -120,4 +120,6 @@ public interface TxRepository {
     TxConfirm getTxConfirm(String txID, String peer);
 
     Observable<List<TxConfirm>> observerTxConfirms(String txID);
+
+    void deleteUnsentTx(long queueID);
 }

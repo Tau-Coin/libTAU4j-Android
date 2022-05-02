@@ -254,4 +254,9 @@ public class TxRepositoryImpl implements TxRepository{
     public Observable<List<TxConfirm>> observerTxConfirms(String txID) {
         return db.txConfirmDao().observerTxConfirms(txID);
     }
+
+    @Override
+    public void deleteUnsentTx(long queueID) {
+        db.txDao().deleteUnsentTx(queueID);
+    }
 }
