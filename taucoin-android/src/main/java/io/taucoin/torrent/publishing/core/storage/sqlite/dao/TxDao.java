@@ -56,7 +56,8 @@ public interface TxDao {
     // SQL:查询社区里的交易(所有，排除WIRING Tx)
     String QUERY_GET_NOTES_SELECT = "SELECT tx.*, 0 AS trusts" +
             " FROM Txs AS tx" +
-            " WHERE tx.chainID = :chainID AND txType IN (1, 3, 4, 5, 6) ";
+            " WHERE tx.chainID = :chainID AND txType IN (1, 3, 4, 5, 6)" +
+            " AND sendStatus = 0";
 
     String QUERY_GET_ALL_NOTES = QUERY_GET_NOTES_SELECT +
             QUERY_GET_TXS_ORDER;
@@ -68,7 +69,7 @@ public interface TxDao {
     // SQL:查询社区里的交易(上链)
     String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, 0 AS trusts" +
             " FROM Txs AS tx" +
-            " WHERE tx.chainID = :chainID";
+            " WHERE tx.chainID = :chainID AND sendStatus = 0";
 
     // SQL:查询社区里的交易(上链)
     String QUERY_GET_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT +
