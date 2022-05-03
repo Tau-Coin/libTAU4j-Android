@@ -524,9 +524,9 @@
     <string name="bot_airdrop_tau_link">Android Link</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share android link</string>
-    <string name="bot_share_airdrop_link_content">1. Please download decentral server-less TAU app(size 24Mb) to join us.\n\n%1$s\n\n
-        2. To receive your airdrop coins, copy this FULL message and paste to TAU app airdrop function.\n\n%2$s
-    </string>
+    <string name="bot_share_airdrop_link_content">Hello, I am sending you some %1$s community coins.\n1.
+        Please download decentral server-less TAU app(size 24Mb) to join us.\n\n%2$s\n\n2.
+        To receive your %3$s coins, copy this FULL message and paste to TAU app airdrop function.\n\n%4$s</string>
     <string name="bot_hello_world">HelloWorld</string>
 
     <!-- Strings used for QRCode -->

@@ -24,6 +24,7 @@ import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -209,15 +210,16 @@ public class AirdropCommunityActivity extends BaseActivity implements
                     if (StringUtil.isNotEmpty(chainID)) {
                         String airdropPeer = MainApplication.getInstance().getPublicKey();
                         String airdropLink = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, list);
-                        shareAirdropLink(airdropLink);
+                        shareAirdropLink(chainID, airdropLink);
                     }
                 });
     }
 
-    private void shareAirdropLink(String airdropLink) {
+    private void shareAirdropLink(String chainID, String airdropLink) {
+        String communityName = ChainIDUtil.getName(chainID);
         String shareTitle = getString(R.string.bot_share_airdrop_link_title);
         String text = getString(R.string.bot_share_airdrop_link_content,
-                Constants.APP_HOME_URL, airdropLink);
+                communityName, Constants.APP_HOME_URL, communityName, airdropLink);
         ActivityUtil.shareText(this, shareTitle, text);
     }
 

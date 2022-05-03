@@ -187,9 +187,10 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
                 if (StringUtil.isEmpty(airdropLink1Bs)) {
                     return;
                 }
+                String communityName = ChainIDUtil.getName(chainID);
                 String shareTitle = getString(R.string.bot_share_airdrop_link_title);
                 String text = getString(R.string.bot_share_airdrop_link_content,
-                        Constants.APP_HOME_URL, airdropLink1Bs);
+                        communityName, Constants.APP_HOME_URL, communityName, airdropLink1Bs);
                 ActivityUtil.shareText(this, shareTitle, text);
                 break;
         }
