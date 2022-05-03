@@ -1,6 +1,7 @@
 package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
+import android.text.SpannableStringBuilder;
 
 import com.google.gson.Gson;
 
@@ -53,7 +54,9 @@ import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
+import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
+import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
 
 /**
  * TauListener处理程序
@@ -75,6 +78,8 @@ public class TauListenHandler {
         OFF_CHAIN,
         ON_CHAIN,
         SYNCING,
+        NEW_TX,
+        NEW_BLOCK,
     }
 
     TauListenHandler(Context appContext, TauDaemon daemon) {
@@ -137,7 +142,7 @@ public class TauListenHandler {
             communityRepo.updateCommunity(community);
         }
 
-        handleBlockData(block, BlockStatus.ON_CHAIN);
+        handleBlockData(block, BlockStatus.NEW_BLOCK);
 
         updateTxQueue(block);
         // 每个账户自动更新周期，检测是否需要更新账户信息
@@ -226,7 +231,7 @@ public class TauListenHandler {
                 rewards = null == transaction ? 0L : transaction.getFee();
             }
             // 第一次创建
-            int status = blockStatus == BlockStatus.ON_CHAIN ? 1 : 0;
+            int status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
             long timestamp = block.getTimestamp();
             String previousBlockHash = null;
             if (block.getPreviousBlockHash() != null) {
@@ -246,7 +251,7 @@ public class TauListenHandler {
             if (blockInfo.status == 1 && blockStatus == BlockStatus.SYNCING) {
                 status = 1;
             } else {
-                status = blockStatus == BlockStatus.ON_CHAIN ? 1 : 0;
+                status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
             }
             blockInfo.status = status;
             blockRepository.updateBlock(blockInfo);
@@ -291,7 +296,7 @@ public class TauListenHandler {
                 if (tx.txStatus == 1 && blockStatus == BlockStatus.SYNCING) {
                     status = 1;
                 } else {
-                    status = blockStatus == BlockStatus.ON_CHAIN ? 1 : 0;
+                    status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
                 }
                 tx.txStatus = status;
                 tx.blockNumber = block.getBlockNumber();
@@ -299,7 +304,7 @@ public class TauListenHandler {
                 txRepo.updateTransaction(tx);
             } else {
                 handleTransactionData(block.getBlockNumber(), block.Hash(), txMsg,
-                        blockStatus == BlockStatus.ON_CHAIN);
+                        blockStatus);
             }
         }
     }
@@ -309,13 +314,14 @@ public class TauListenHandler {
      * @param blockNumber 区块号
      * @param blockHash 区块哈希
      * @param txMsg 交易
-     * @param onChain 是否上链
+     * @param status 区块状态
      */
-    private void handleTransactionData(long blockNumber, String blockHash, Transaction txMsg, boolean onChain) {
+    private void handleTransactionData(long blockNumber, String blockHash, Transaction txMsg, BlockStatus status) {
         if (isTransactionEmpty(txMsg)) {
             logger.info("handleTransactionData transaction empty");
             return;
         }
+        boolean onChain = status == BlockStatus.ON_CHAIN || status == BlockStatus.NEW_BLOCK;
         String txID = txMsg.getTxID().to_hex();
         String chainID = ChainIDUtil.decode(txMsg.getChainID());
         long fee = txMsg.getFee();
@@ -357,14 +363,19 @@ public class TauListenHandler {
         logger.info("Add transaction to local, txID::{}, txType::{}", txID, tx.txType);
 
         // 更新未读状态
-        if (tx.txType != TxType.WIRING_TX.getType()) {
+        if (tx.txType != TxType.WIRING_TX.getType() && (status == BlockStatus.NEW_TX ||
+                status == BlockStatus.NEW_BLOCK)) {
             String userPk = MainApplication.getInstance().getPublicKey();
+            // 不是自己发的交易
             if (StringUtil.isNotEmpty(userPk) && StringUtil.isNotEquals(tx.senderPk, userPk)) {
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
                 if (member != null && member.msgUnread == 0) {
                     member.msgUnread = 1;
                     memberRepo.updateMember(member);
                 }
+                // 发送社区新交易通知
+                SpannableStringBuilder msg = TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
+                TauNotifier.getInstance().makeCommunityNotify(tx.chainID, msg);
             }
         }
     }
@@ -522,7 +533,7 @@ public class TauListenHandler {
                 txID, txMsg.getTimestamp(), txMsg.getNonce(), tx != null, isTransactionEmpty(txMsg));
         if (null == tx) {
             handleUserInfo(txMsg);
-            handleTransactionData(0, null, txMsg, false);
+            handleTransactionData(0, null, txMsg, BlockStatus.NEW_TX);
         }
     }
 

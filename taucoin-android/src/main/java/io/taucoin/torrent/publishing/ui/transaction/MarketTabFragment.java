@@ -11,6 +11,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 
 /**
@@ -51,6 +52,7 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
             communityViewModel.clearMsgUnread(chainID);
             logger.debug("txs.size::{}", txs.size());
             closeProgressDialog();
+            TauNotifier.getInstance().cancelNotify(chainID);
         });
         showProgressDialog();
         loadData(0);

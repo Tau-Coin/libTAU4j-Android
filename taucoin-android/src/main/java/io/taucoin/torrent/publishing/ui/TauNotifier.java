@@ -21,6 +21,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -39,7 +40,7 @@ public class TauNotifier {
     // 前台服务通知渠道ID
     private static final String FOREGROUND_NOTIFY_CHANNEL_ID = "io.taucoin.torrent.publishing.FOREGROUND_NOTIFY_CHANNEL_ID";
     // 默认通知渠道ID
-    private static final String CHAT_NOTIFY_CHANNEL_ID = "io.taucoin.torrent.publishing.CHAT_NOTIFY_CHANNEL_ID";
+    private static final String MSG_NOTIFY_CHANNEL_ID = "io.taucoin.torrent.publishing.MSG_NOTIFY_CHANNEL_ID";
 
     // 服务启动的通知ID
     private static final int SERVICE_STARTED_NOTIFICATION_ID = -1;
@@ -72,12 +73,12 @@ public class TauNotifier {
      * 创建通知渠道
      */
     public void makeNotifyChannels() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return;
         }
         ArrayList<NotificationChannel> channels = new ArrayList<>();
         // 添加默认通知渠道
-        NotificationChannel defaultChannel = new NotificationChannel(CHAT_NOTIFY_CHANNEL_ID,
+        NotificationChannel defaultChannel = new NotificationChannel(MSG_NOTIFY_CHANNEL_ID,
                 appContext.getString(R.string.chat_channel), NotificationManager.IMPORTANCE_HIGH);
         defaultChannel.enableVibration(false);
         defaultChannel.enableLights(false);
@@ -113,13 +114,8 @@ public class TauNotifier {
                 .setContentIntent(startupPendingIntent)
                 .setContentTitle(context.getString(R.string.app_running_in_the_background))
                 .setTicker(context.getString(R.string.app_running_in_the_background))
-                .setWhen(System.currentTimeMillis());
-
-//        foregroundNotify.addAction(makeShutdownAction(service));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            foregroundNotify.setCategory(Notification.CATEGORY_SERVICE);
-        }
-
+                .setWhen(System.currentTimeMillis())
+                .setCategory(Notification.CATEGORY_SERVICE);
         /* Disallow killing the service process by system */
         service.startForeground(SERVICE_STARTED_NOTIFICATION_ID, foregroundNotify.build());
     }
@@ -127,23 +123,12 @@ public class TauNotifier {
     /**
      * 创建聊天消息通知
      * @param friend
-     * @param msgRes
-     */
-    public void makeChatMsgNotify(User friend, int msgRes) {
-        makeChatMsgNotify(friend, appContext.getString(msgRes));
-    }
-
-    /**
-     * 创建聊天消息通知
-     * @param friend
      * @param msg
      */
-    private void makeChatMsgNotify(User friend, String msg) {
+    public void makeChatNotify(User friend, CharSequence msg) {
         String friendPk = friend.publicKey;
         String friendName = UsersUtil.getShowName(friend);
-        int bgColor = Utils.getGroupColor(friendPk);
-        String firstLettersName = StringUtil.getFirstLettersOfName(friendName);
-        Bitmap bitmap = BitmapUtil.createLogoBitmap(bgColor, firstLettersName);
+        Bitmap bitmap = UsersUtil.getHeadPic(friend);
         // 点击通知后进入的活动
         Intent intent = new Intent(appContext, MainActivity.class);
         // 解决PendingIntent的extra数据不准确问题
@@ -155,39 +140,69 @@ public class TauNotifier {
 //        // 这两句非常重要，使之前的活动不出栈
 //        intent.setAction(Intent.ACTION_MAIN);
 //        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        makeNotify(friend.publicKey.hashCode(), friendName, msg, bitmap, intent);
+    }
 
+    /**
+     * 创建社区消息通知
+     * @param chainID
+     * @param msg
+     */
+    public void makeCommunityNotify(String chainID, CharSequence msg) {
+        String communityName = ChainIDUtil.getName(chainID);
+        int bgColor = Utils.getGroupColor(chainID);
+        String firstLettersName = StringUtil.getFirstLettersOfName(communityName);
+        Bitmap bitmap = BitmapUtil.createLogoBitmap(bgColor, firstLettersName);
+        // 点击通知后进入的活动
+        Intent intent = new Intent(appContext, MainActivity.class);
+        // 解决PendingIntent的extra数据不准确问题
+        intent.setAction(chainID);
+        intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(IntentExtra.TYPE, 0);
+//        // 这两句非常重要，使之前的活动不出栈
+//        intent.setAction(Intent.ACTION_MAIN);
+//        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        makeNotify(chainID.hashCode(), communityName, msg, bitmap, intent);
+    }
+
+    private void makeNotify(int id, CharSequence title, CharSequence text, Bitmap largeIcon, Intent intent) {
         PendingIntent pendingIntent = PendingIntent.getActivity(appContext, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT); // 允许更新
-        NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(appContext, CHAT_NOTIFY_CHANNEL_ID)
+        NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(appContext, MSG_NOTIFY_CHANNEL_ID)
                 .setAutoCancel(true)
-                .setContentTitle(friendName)
-                .setContentText(msg)
+                .setContentTitle(title)
+                .setContentText(text)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setDefaults(Notification.FLAG_ONLY_ALERT_ONCE)
                 // 悬浮框
-                .setTicker(friendName)
+                .setTicker(title)
                 .setPriority(Notification.PRIORITY_HIGH)
-                .setLargeIcon(bitmap)
+                .setLargeIcon(largeIcon)
                 .setContentIntent(pendingIntent);
         // 3条以上通知取消合并
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             notifyBuilder.setGroupSummary(false)
                     .setGroup("group");
         }
-        notifyManager.notify(friendPk.hashCode(), notifyBuilder.build());
+        notifyManager.notify(id, notifyBuilder.build());
     }
 
     /**
-     * 关闭当前朋友的通知
-     * @param friendPk
+     * 关闭通知
+     * @param id 通知id
      */
-    public void cancelChatMsgNotify(String friendPk) {
-        notifyManager.cancel(friendPk.hashCode());
+    public void cancelNotify(String id) {
+        cancelNotify(id.hashCode());
+    }
+
+    private void cancelNotify(int id) {
+        notifyManager.cancel(id);
     }
 
     /**
-     * 关闭当前用户的所有通知
+     * 关闭当前的所有通知
      */
     public void cancelAllNotify() {
         notifyManager.cancelAll();

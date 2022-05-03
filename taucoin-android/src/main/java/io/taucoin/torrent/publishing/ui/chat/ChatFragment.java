@@ -50,6 +50,7 @@ import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.FragmentChatBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
+import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView;
@@ -309,6 +310,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             userViewModel.clearMsgUnread(friendPK);
             logger.debug("messages.size::{}", messages.size());
             closeProgressDialog();
+            TauNotifier.getInstance().cancelNotify(friendPK);
         });
 
         chatViewModel.getChatResult().observe(this, result -> {

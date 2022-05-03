@@ -73,6 +73,7 @@ import io.taucoin.torrent.publishing.databinding.ContactsDialogBinding;
 import io.taucoin.torrent.publishing.databinding.SeedDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
+import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
@@ -212,6 +213,8 @@ public class UserViewModel extends AndroidViewModel {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<String>) emitter -> {
             String result = "";
             try {
+                // 清除当前用户的所有通知
+                TauNotifier.getInstance().cancelAllNotify();
                 // 必须顺序执行以下逻辑, 保证数据不会错乱
                 // 0、清除libTAU中的朋友关系和跟随的社区链
                 User oldUser = userRepo.getCurrentUser();

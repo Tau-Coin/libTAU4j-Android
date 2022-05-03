@@ -57,6 +57,7 @@ import io.taucoin.torrent.publishing.receiver.ConnectionReceiver;
 import io.taucoin.torrent.publishing.service.SystemServiceManager;
 import io.taucoin.torrent.publishing.receiver.PowerReceiver;
 import io.taucoin.torrent.publishing.service.TauService;
+import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.setting.TrafficTipsActivity;
 
 /**
@@ -249,6 +250,7 @@ public abstract class TauDaemon {
         if (updateBootstrapIntervalTimer != null && !updateBootstrapIntervalTimer.isDisposed()) {
             updateBootstrapIntervalTimer.dispose();
         }
+        TauNotifier.getInstance().cancelAllNotify();
         locationManager.stopLocation();
         appContext.unregisterReceiver(powerReceiver);
         appContext.unregisterReceiver(connectionReceiver);

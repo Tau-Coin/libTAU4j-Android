@@ -42,6 +42,7 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
+import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 
 /**
@@ -158,6 +159,12 @@ class MsgAlertHandler {
                 if (msgContent.getType() == MessageType.AIRDROP.getType()) {
                     String chainID = msgContent.getAirdropChain();
                     handleAirdropCoins(chainID, userPk, senderPk);
+                }
+
+                // 创建通知栏消息
+                User friendUser = userRepo.getUserByPublicKey(senderPk);
+                if (friendUser != null && content != null) {
+                    TauNotifier.getInstance().makeChatNotify(friendUser, Utils.textBytesToString(content));
                 }
             }
         } catch (Exception e) {

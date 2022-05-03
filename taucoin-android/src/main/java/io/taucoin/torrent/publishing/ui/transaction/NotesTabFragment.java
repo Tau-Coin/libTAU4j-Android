@@ -24,6 +24,7 @@ import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
+import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 
 /**
@@ -182,6 +183,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
             logger.debug("txs.size::{}", txs.size());
             communityViewModel.clearMsgUnread(chainID);
             closeProgressDialog();
+            TauNotifier.getInstance().cancelNotify(chainID);
         });
         showProgressDialog();
 
