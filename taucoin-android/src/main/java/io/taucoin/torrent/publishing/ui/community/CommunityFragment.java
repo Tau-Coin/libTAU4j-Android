@@ -313,8 +313,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 
         Bundle bundle = new Bundle();
         bundle.putString(IntentExtra.CHAIN_ID, chainID);
-        bundle.putBoolean(IntentExtra.NO_BALANCE, isNoBalance);
-        bundle.putBoolean(IntentExtra.ON_CHAIN, isOnChain);
         bundle.putBoolean(IntentExtra.IS_JOINED, isJoined);
 
         if (currentTabFragment != null) {

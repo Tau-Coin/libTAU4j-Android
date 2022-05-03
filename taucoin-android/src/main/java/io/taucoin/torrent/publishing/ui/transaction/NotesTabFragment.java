@@ -3,7 +3,6 @@ package io.taucoin.torrent.publishing.ui.transaction;
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextWatcher;
 import android.view.View;
 
@@ -13,13 +12,10 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
-import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
@@ -34,7 +30,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
 
     private Handler handler = new Handler();
     private NotesListAdapter adapter;
-    private boolean isUpdateFee = true;
 
     /**
      * 初始化视图
@@ -44,7 +39,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     public void initView() {
         super.initView();
         currentTab = TAB_NOTES;
-//        binding.llOnChainCheckBox.setVisibility(View.VISIBLE);
         adapter = new NotesListAdapter(this, chainID, true);
         binding.txList.setAdapter(adapter);
 
@@ -69,11 +63,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
             }
         });
 
-        binding.cbOnChain.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            isScrollToBottom = true;
-            loadData(0);
-        });
-
         showBottomView();
     }
 
@@ -82,24 +71,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
             return;
         }
         binding.llBottomInput.setVisibility(isJoined ? View.VISIBLE : View.GONE);
-        binding.tvFeeTips.setVisibility(!onChain ? View.VISIBLE : View.GONE);
-        binding.tvFee.setVisibility(onChain ? View.VISIBLE : View.GONE);
-
-        if (onChain) {
-            String text = ViewUtils.getText(binding.tvFee);
-            if (isUpdateFee || StringUtil.isEmpty(text)) {
-                long txFee = txViewModel.getTxFee(chainID, TxType.NOTE_TX);
-                String txFeeStr = FmtMicrometer.fmtFeeValue(Constants.MIN_FEE.longValue());
-                binding.tvFee.setTag(R.id.median_fee, txFee);
-                if (noBalance) {
-                    txFeeStr = "0";
-                }
-                String medianFree = getString(R.string.tx_median_fee, txFeeStr,
-                        ChainIDUtil.getCoinName(chainID));
-                binding.tvFee.setText(Html.fromHtml(medianFree));
-                binding.tvFee.setTag(txFeeStr);
-            }
-        }
     }
 
     private TextWatcher textWatcher = new TextWatcher() {
@@ -130,12 +101,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
                 isScrollToBottom = true;
                 txViewModel.addTransaction(tx);
             }
-        } else if (v.getId() == R.id.tv_fee) {
-            KeyboardUtils.hideSoftInput(activity);
-            txViewModel.showEditFeeDialog(activity, binding.tvFee, chainID);
-        } else if (v.getId() == R.id.tv_on_chain) {
-            boolean isChecked = binding.cbOnChain.isChecked();
-            binding.cbOnChain.setChecked(!isChecked);
         }
     }
 
@@ -145,9 +110,8 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
      */
     private Tx buildTx() {
         int txType = TxType.NOTE_TX.getType();
-        String fee = ViewUtils.getStringTag(binding.tvFee);
         String memo = ViewUtils.getText(binding.etMessage);
-        return new Tx(chainID, FmtMicrometer.fmtTxLongValue(fee), txType, memo);
+        return new Tx(chainID, 0L, txType, memo);
     }
 
     @Override
@@ -163,7 +127,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
             if (StringUtil.isNotEmpty(result)) {
                 ToastUtils.showShortToast(result);
             } else {
-                binding.cbOnChain.setChecked(false);
                 binding.etMessage.getText().clear();
             }
         });
@@ -241,14 +204,12 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     public void handleMember(CommunityAndMember member) {
         super.handleMember(member);
         showBottomView();
-        isUpdateFee = false;
     }
 
     @Override
     public void loadData(int pos) {
         super.loadData(pos);
-        boolean onChain = binding.cbOnChain.isChecked();
-        txViewModel.loadNotesData(onChain, chainID, pos, getItemCount());
+        txViewModel.loadNotesData(false, chainID, pos, getItemCount());
     }
 
     @Override

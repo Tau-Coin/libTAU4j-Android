@@ -247,9 +247,4 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         });
         operationsMenu.show(activity.getPoint());
     }
-
-    @Override
-    public void onCommunityJoined(String chainID) {
-        communityViewModel.joinCommunity(chainID);
-    }
 }

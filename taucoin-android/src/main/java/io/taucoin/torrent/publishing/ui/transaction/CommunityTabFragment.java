@@ -80,9 +80,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     private CommonDialog confirmsDialog;
     private Disposable confirmDisposable;
 
-    boolean noBalance = true;
     boolean isJoined = false;
-    boolean onChain = false;
     protected String chainID;
     int currentTab;
     int currentPos = 0;
@@ -123,9 +121,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     private void initParameter() {
         if(getArguments() != null){
             chainID = getArguments().getString(IntentExtra.CHAIN_ID);
-            noBalance = getArguments().getBoolean(IntentExtra.NO_BALANCE, true);
             isJoined = getArguments().getBoolean(IntentExtra.IS_JOINED, false);
-            onChain = getArguments().getBoolean(IntentExtra.ON_CHAIN, false);
         }
     }
 
@@ -446,8 +442,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         if (null == binding) {
             return;
         }
-        noBalance = !member.onChain() || member.noBalance();
-        onChain = member.onChain();
         isJoined = member.isJoined();
     }
 

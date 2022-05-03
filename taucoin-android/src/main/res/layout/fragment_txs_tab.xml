@@ -106,52 +106,15 @@
 
                 </RelativeLayout>
 
-                <RelativeLayout
+                <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                    android:id="@+id/tx_list"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
-                        android:id="@+id/tx_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="@dimen/widget_size_0"
-                        android:clipToPadding="false"
-                        android:scrollbars="vertical"
-                        android:focusable="true"
-                        android:scrollbarStyle="outsideOverlay" />
-
-                    <LinearLayout
-                        android:visibility="gone"
-                        android:id="@+id/ll_on_chain_check_box"
-                        android:orientation="horizontal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/widget_size_2"
-                        android:layout_marginEnd="@dimen/widget_size_5"
-                        android:layout_marginStart="@dimen/widget_size_5"
-                        android:elevation="@dimen/widget_size_5"
-                        android:background="@drawable/white_rect_round_bg_no_border">
-
-                        <CheckBox
-                            android:id="@+id/cb_on_chain"
-                            android:layout_width="@dimen/widget_size_26"
-                            android:layout_height="@dimen/widget_size_26"
-                            android:textAppearance="@style/TextAppearanceBody2"/>
-
-                        <TextView
-                            android:id="@+id/tv_on_chain"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/widget_size_2"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:text="@string/community_view_on_chain_only"
-                            android:onClick="@{listener::onClick}"
-                            android:textColor="@color/gray_dark"
-                            android:textAppearance="@style/TextAppearanceBody2"/>
-
-                    </LinearLayout>
-
-                </RelativeLayout>
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/widget_size_0"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical"
+                    android:focusable="true"
+                    android:scrollbarStyle="outsideOverlay" />
 
             </LinearLayout>
 
@@ -168,33 +131,6 @@
             <include
                 android:id="@+id/top_line"
                 layout="@layout/view_line"/>
-
-            <TextView
-                android:id="@+id/tv_fee"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/gray_dark"
-                android:includeFontPadding="false"
-                android:gravity="start"
-                android:onClick="@{listener::onClick}"
-                android:layout_marginTop="@dimen/widget_size_5"
-                android:layout_marginStart="@dimen/widget_size_12"
-                android:layout_marginEnd="@dimen/widget_size_10"
-                android:textAppearance="@style/TextAppearanceBody3"/>
-
-            <TextView
-                android:id="@+id/tv_fee_tips"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tx_set_note_tips"
-                android:textColor="@color/color_blue_link"
-                android:includeFontPadding="false"
-                android:gravity="start"
-                android:onClick="@{listener::onClick}"
-                android:layout_marginTop="@dimen/widget_size_5"
-                android:layout_marginStart="@dimen/widget_size_12"
-                android:layout_marginEnd="@dimen/widget_size_10"
-                android:textAppearance="@style/TextAppearanceBody3"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
