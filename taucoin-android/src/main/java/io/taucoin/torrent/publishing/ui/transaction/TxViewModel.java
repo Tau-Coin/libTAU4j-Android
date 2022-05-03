@@ -446,18 +446,8 @@ public class TxViewModel extends AndroidViewModel {
         if (null == tx) {
             return false;
         }
-        byte[] chainID = ChainIDUtil.encode(tx.chainID);
-        String senderPk = MainApplication.getInstance().getPublicKey();
-        Account account = daemon.getAccountInfo(chainID, senderPk);
-        long balance = account != null ? account.getBalance() : 0;
         if (StringUtil.isEmpty(tx.memo)) {
             ToastUtils.showShortToast(R.string.tx_error_invalid_message);
-            return false;
-        } else if (tx.fee > balance) {
-            ToastUtils.showShortToast(R.string.tx_error_no_enough_coins_for_fee);
-            return false;
-        } else if (tx.fee < 0) {
-            ToastUtils.showShortToast(R.string.tx_error_invalid_free);
             return false;
         }
         return true;
