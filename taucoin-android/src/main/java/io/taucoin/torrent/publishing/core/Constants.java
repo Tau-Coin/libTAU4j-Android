@@ -32,6 +32,9 @@ public class Constants {
 
     public static final String APP_SHARE_URL = "https://www.taucoin.io/download";
 
+    // 官方telegram链接
+    public static final String OFFICIAL_TELEGRAM_URL = "https://t.me/taucoin";
+
     // Chain link中bs默认数
     public static final int CHAIN_LINK_BS_LIMIT = 10;
 

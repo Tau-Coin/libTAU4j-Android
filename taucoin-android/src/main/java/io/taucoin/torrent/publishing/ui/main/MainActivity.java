@@ -360,6 +360,9 @@ public class MainActivity extends ScanTriggerActivity {
             case R.id.item_airdrop_coins:
                 ActivityUtil.startActivity(this, AirdropCommunityActivity.class);
                 break;
+            case R.id.item_official_telegram:
+                ActivityUtil.openUri(Constants.OFFICIAL_TELEGRAM_URL);
+                break;
         }
         if (binding != null) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
