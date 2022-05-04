@@ -317,9 +317,9 @@ public class TauDaemonImpl extends TauDaemon {
      * @return boolean 是否创建成功
      */
     @Override
-    public boolean createNewCommunity(byte[] chainID, Map<String, Account> accounts, Transaction tx) {
+    public boolean createNewCommunity(byte[] chainID, Map<String, Account> accounts) {
         if (isRunning) {
-            boolean isAddSuccess = sessionManager.createNewCommunity(chainID, accounts, tx);
+            boolean isAddSuccess = sessionManager.createNewCommunity(chainID, accounts);
             logger.debug("createNewCommunity success::{}", isAddSuccess);
             return isAddSuccess;
         }

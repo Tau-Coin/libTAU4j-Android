@@ -722,8 +722,7 @@ public abstract class TauDaemon {
     /**
      * 创建新的社区
      */
-    public abstract boolean createNewCommunity(byte[] chainID, Map<String, Account> accounts,
-                                               Transaction tx);
+    public abstract boolean createNewCommunity(byte[] chainID, Map<String, Account> accounts);
 
     /**
      * 创建新的社区链ID

@@ -16,15 +16,11 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
 import org.libTAU4j.ChainURL;
-import org.libTAU4j.Ed25519;
-import org.libTAU4j.Pair;
-import org.libTAU4j.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,7 +39,6 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -100,11 +95,11 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
-import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.databinding.BlacklistDialogBinding;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
+import io.taucoin.torrent.publishing.ui.transaction.TxViewModel;
 
 /**
  * Community模块的ViewModel
@@ -132,6 +127,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<List<BlockAndTx>> chainBlocks = new MutableLiveData<>();
     private Disposable visitDisposable;
     private Disposable clearDisposable;
+    private TxViewModel txViewModel;
 
     public CommunityViewModel(@NonNull Application application) {
         super(application);
@@ -142,6 +138,7 @@ public class CommunityViewModel extends AndroidViewModel {
         blockRepo = RepositoryHelper.getBlockRepository(getApplication());
         txRepo = RepositoryHelper.getTxRepository(getApplication());
         daemon = TauDaemon.getInstance(getApplication());
+        txViewModel = new TxViewModel(getApplication());
     }
 
     public void observeNeedStartDaemon () {
@@ -325,31 +322,12 @@ public class CommunityViewModel extends AndroidViewModel {
             }
             // 把社区创建者添加为社区成员
             User currentUser = userRepo.getCurrentUser();
-            byte[] senderSeed = ByteUtil.toByte(currentUser.seed);
-            Pair<byte[], byte[]> keypair = Ed25519.createKeypair(senderSeed);
-            byte[] senderPk = keypair.first;
-            byte[] secretKey = keypair.second;
-            String coinName = ChainIDUtil.getCoinName(community.chainID);
             byte[] chainID = ChainIDUtil.encode(community.chainID);
-            long timestamp = DateUtil.getMillisTime();
-            String description = getApplication().getString(R.string.tx_community_creator_selling, coinName);
-            SellTxContent sellTxContent = new SellTxContent(coinName, 0,
-                    null, null, description);
-            byte[] txEncoded = sellTxContent.getEncoded();
-            Transaction transaction = new Transaction(chainID, 0, timestamp, senderPk, 0, txEncoded);
-            transaction.sign(currentUser.publicKey, ByteUtil.toHexString(secretKey));
-
-            boolean isCreateSuccess = daemon.createNewCommunity(chainID, accounts, transaction);
+            boolean isCreateSuccess = daemon.createNewCommunity(chainID, accounts);
             if (!isCreateSuccess) {
                 result.setFailMsg(getApplication().getString(R.string.community_creation_failed));
                 return result;
             }
-            Tx tx = new Tx(community.chainID, currentUser.publicKey, 0, TxType.SELL_TX.getType(), coinName,
-                    0, null, null, description);
-            tx.txID = transaction.getTxID().to_hex();
-            tx.timestamp = timestamp;
-            tx.senderPk = currentUser.publicKey;
-            txRepo.addTransaction(tx);
 
             communityRepo.addCommunity(community);
             logger.debug("Add community to database: communityName={}, chainID={}",
@@ -363,6 +341,14 @@ public class CommunityViewModel extends AndroidViewModel {
                 memberRepo.addMember(member);
             }
 
+            // 自动发送一笔Sell交易
+            String coinName = ChainIDUtil.getCoinName(community.chainID);
+            String description = getApplication().getString(R.string.tx_community_creator_selling, coinName);
+            SellTxContent sellContent = new SellTxContent(coinName, 0, null, null, description);
+            TxQueue sellTxQueue = new TxQueue(community.chainID, currentUser.publicKey, currentUser.publicKey, 0L,
+                    Constants.NEWS_MIN_FEE.longValue(), TxType.SELL_TX, sellContent.getEncoded());
+            txViewModel.addTransactionTask(sellTxQueue, null);
+
             // 发送通知
             Set<String> keys = accounts.keySet();
             if (keys.size() > 0) {
@@ -373,7 +359,7 @@ public class CommunityViewModel extends AndroidViewModel {
                     Account memberAccount = accounts.get(key);
                     long amount = 0;
                     if (memberAccount != null) {
-                        amount = memberAccount.getBalance();;
+                        amount = memberAccount.getBalance();
                     }
                     TxQueue txQueue = new TxQueue(community.chainID, currentUser.publicKey, key,
                             amount, 0L, TxType.WIRING_TX, content);

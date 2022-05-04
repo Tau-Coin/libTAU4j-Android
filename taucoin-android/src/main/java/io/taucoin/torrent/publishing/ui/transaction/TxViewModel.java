@@ -177,7 +177,7 @@ public class TxViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private String addTransactionTask(TxQueue tx, TxQueue oldTx) {
+    public String addTransactionTask(TxQueue tx, TxQueue oldTx) {
         if (null == oldTx) {
             long queueID = txQueueRepo.addQueue(tx);
             tx.queueID = queueID;
@@ -271,7 +271,7 @@ public class TxViewModel extends AndroidViewModel {
             }
             Transaction transaction;
             if (tx.txType == NOTE_TX.getType()) {
-                transaction = new Transaction(chainID, 0, timestamp, senderPk, tx.fee, txEncoded);
+                transaction = new Transaction(chainID, 0, timestamp, senderPk, txEncoded);
             } else {
                 transaction = new Transaction(chainID, 0, timestamp, senderPk, receiverPk,
                         tx.nonce, tx.amount, tx.fee, txEncoded);
