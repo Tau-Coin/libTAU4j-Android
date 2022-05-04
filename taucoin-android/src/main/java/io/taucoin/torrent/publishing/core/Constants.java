@@ -43,7 +43,7 @@ public class Constants {
     public static final int AIRDROP_LINK_BS_LIMIT = 2;
 
     // 区块未过期的数目（半年）
-    public static final int BLOCKS_NOT_PERISHABLE = 288 * 180;
+    public static final int BLOCKS_NOT_PERISHABLE = 288 * 30;
 
     // 自动更新账户开始点（7天）
     public static final int AUTO_RENEWAL_MAX_BLOCKS = 288 * 7;
