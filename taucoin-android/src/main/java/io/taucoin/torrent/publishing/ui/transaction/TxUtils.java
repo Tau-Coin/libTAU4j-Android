@@ -159,6 +159,9 @@ public class TxUtils {
         }
 
         if (tab == CommunityTabFragment.TAB_CHAIN) {
+            msg.append("\n").append("Nonce: ").setForegroundColor(titleColor)
+                    .append(FmtMicrometer.fmtLong(tx.nonce));
+
             String coinName = ChainIDUtil.getCoinName(tx.chainID);
             msg.append("\n").append("Fee: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtFeeValue(tx.fee))
@@ -191,6 +194,9 @@ public class TxUtils {
         }
 
         if (tab == CommunityTabFragment.TAB_CHAIN) {
+            msg.append("\n").append("Nonce: ").setForegroundColor(titleColor)
+                    .append(FmtMicrometer.fmtLong(tx.nonce));
+
             String coinName = ChainIDUtil.getCoinName(tx.chainID);
             msg.append("\n").append("Fee: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtFeeValue(tx.fee))
@@ -223,6 +229,9 @@ public class TxUtils {
         }
 
         if (tab == CommunityTabFragment.TAB_CHAIN) {
+            msg.append("\n").append("Nonce: ").setForegroundColor(titleColor)
+                    .append(FmtMicrometer.fmtLong(tx.nonce));
+
             String coinName = ChainIDUtil.getCoinName(tx.chainID);
             msg.append("\n").append("Fee: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtFeeValue(tx.fee))
@@ -335,7 +344,11 @@ public class TxUtils {
         msg.append("Trust: ")
                 .setForegroundColor(titleColor)
                 .append(HashUtil.hashMiddleHide(tx.receiverPk));
+
         if (tab == CommunityTabFragment.TAB_CHAIN) {
+            msg.append("\n").append("Nonce: ").setForegroundColor(titleColor)
+                    .append(FmtMicrometer.fmtLong(tx.nonce));
+
             String coinName = ChainIDUtil.getCoinName(tx.chainID);
             msg.append("\n").append("Fee: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtFeeValue(tx.fee))
