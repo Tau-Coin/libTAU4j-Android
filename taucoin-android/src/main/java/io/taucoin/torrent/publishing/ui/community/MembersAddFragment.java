@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +20,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
+import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -32,21 +35,26 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.transaction.TxViewModel;
+import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
  * 社区成员添加页面
  */
 public class MembersAddFragment extends BaseFragment {
 
+    public static final int PAGE_COMMUNITY_CREATION = 0x01;
+    public static final int PAGE_ADD_MEMBERS = 0x02;
     private FragmentActivity activity;
     private FragmentMembersAddBinding binding;
     private TxViewModel viewModel;
+    private UserViewModel userViewModel;
     private CommonDialog confirmDialog;
     private MembersAddAdapter adapter;
     private String chainID;
     private String medianFee;
     private long airdropCoin;
-    private List<User> friends = new ArrayList<>();
+    private int page;
+    private List<User> friends;
 
     @Nullable
     @Override
@@ -62,6 +70,7 @@ public class MembersAddFragment extends BaseFragment {
         activity = getActivity();
         ViewModelProvider provider = new ViewModelProvider(this);
         viewModel = provider.get(TxViewModel.class);
+        userViewModel = provider.get(UserViewModel.class);
         initParameter();
         initLayout();
         observeAirdropState();
@@ -76,13 +85,12 @@ public class MembersAddFragment extends BaseFragment {
             friends = getArguments().getParcelableArrayList(IntentExtra.BEAN);
             airdropCoin = getArguments().getLong(IntentExtra.AIRDROP_COIN,
                     Constants.AIRDROP_COIN.longValue());
-        }
-    }
+            page = getArguments().getInt(IntentExtra.TYPE, PAGE_ADD_MEMBERS);
+            if (null == friends) {
+                friends = new ArrayList<>();
+            }
 
-    void updateData(List<User> friends) {
-        this.friends = friends;
-        adapter.submitFriendList(friends);
-        calculateTotalCoins();
+        }
     }
 
     /**
@@ -111,8 +119,19 @@ public class MembersAddFragment extends BaseFragment {
         binding.recyclerList.setItemAnimator(null);
         binding.recyclerList.setAdapter(adapter);
 
-        adapter.submitFriendList(friends);
-        calculateTotalCoins();
+        if (page == PAGE_COMMUNITY_CREATION) {
+            userViewModel.loadUsersList(0, true, null);
+            userViewModel.getUserList().observe(getViewLifecycleOwner(), friends -> {
+                if (friends != null) {
+                    this.friends.addAll(friends);
+                    adapter.submitFriendList(this.friends, false);
+                    calculateTotalCoins();
+                }
+            });
+        } else {
+            adapter.submitFriendList(friends, true);
+            calculateTotalCoins();
+        }
     }
 
     private void calculateTotalCoins() {
@@ -165,6 +184,14 @@ public class MembersAddFragment extends BaseFragment {
         if (getSelectedMap().size() == 0) {
             ToastUtils.showShortToast(R.string.community_added_members_empty);
             return;
+        }
+        Collection<String> values = getSelectedMap().values();
+        for (String value : values) {
+            long coin = FmtMicrometer.fmtTxLongValue(value);
+            if (coin == 0) {
+                ToastUtils.showLongToast(R.string.error_airdrop_coins_empty);
+                return;
+            }
         }
         ViewConfirmDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.view_confirm_dialog, null, false);

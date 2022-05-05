@@ -9,19 +9,15 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import java.util.ArrayList;
 import java.util.Map;
 
-import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.EditTextInhibitInput;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -35,14 +31,12 @@ import io.taucoin.torrent.publishing.databinding.DialogCreateCommunitySuccessBin
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
-import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
 /**
  * 群组/社区创建页面
  */
-public class CommunityCreateActivity extends BaseActivity implements View.OnClickListener {
-    private static int ADD_MEMBERS_CODE = 0x01;
+public class CommunityCreateActivity extends BaseActivity {
     private ActivityCommunityCreateBinding binding;
     private CommunityViewModel viewModel;
     private String chainID;
@@ -56,7 +50,6 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
         viewModel = provider.get(CommunityViewModel.class);
         viewModel.observeNeedStartDaemon();
         binding = DataBindingUtil.setContentView(this, R.layout.activity_community_create);
-        binding.setListener(this);
         initLayout();
         observeAddCommunityState();
     }
@@ -77,6 +70,8 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
         binding.etCommunityName.setFilters(new InputFilter[]{
                 new EditTextInhibitInput(EditTextInhibitInput.NAME_REGEX)});
         binding.etCommunityName.addTextChangedListener(mTextWatcher);
+
+        loadFragment();
     }
 
     private TextWatcher mTextWatcher = new TextWatcher() {
@@ -186,44 +181,22 @@ public class CommunityCreateActivity extends BaseActivity implements View.OnClic
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.tv_add_members) {
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_CREATION_ADD_MEMBERS);
-            ActivityUtil.startActivityForResult(intent, this, FriendsActivity.class,
-                    ADD_MEMBERS_CODE);
+    private void loadFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.isDestroyed()) {
+            return;
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == ADD_MEMBERS_CODE && data != null) {
-            loadFragment(data.getParcelableArrayListExtra(IntentExtra.BEAN));
-        }
-    }
-
-    private void loadFragment(ArrayList<User> friends) {
-        if (null == currentFragment) {
-            FragmentManager fm = getSupportFragmentManager();
-            if (fm.isDestroyed()) {
-                return;
-            }
-            currentFragment = new MembersAddFragment();
-            Bundle bundle = new Bundle();
-            bundle.putLong(IntentExtra.AIRDROP_COIN, Constants.CREATION_AIRDROP_COIN.longValue());
-            bundle.putParcelableArrayList(IntentExtra.BEAN, friends);
-            currentFragment.setArguments(bundle);
-            FragmentTransaction transaction = fm.beginTransaction();
-            // Replace whatever is in the fragment container view with this fragment,
-            // and add the transaction to the back stack
-            transaction.replace(R.id.members_fragment, currentFragment);
-            // 执行此方法后，fragment的onDestroy()方法和ViewModel的onCleared()方法都不执行
-            // transaction.addToBackStack(null);
-            transaction.commitAllowingStateLoss();
-        } else {
-            currentFragment.updateData(friends);
-        }
+        currentFragment = new MembersAddFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(IntentExtra.TYPE, MembersAddFragment.PAGE_COMMUNITY_CREATION);
+        bundle.putLong(IntentExtra.AIRDROP_COIN, Constants.CREATION_AIRDROP_COIN.longValue());
+        currentFragment.setArguments(bundle);
+        FragmentTransaction transaction = fm.beginTransaction();
+        // Replace whatever is in the fragment container view with this fragment,
+        // and add the transaction to the back stack
+        transaction.replace(R.id.members_fragment, currentFragment);
+        // 执行此方法后，fragment的onDestroy()方法和ViewModel的onCleared()方法都不执行
+        // transaction.addToBackStack(null);
+        transaction.commitAllowingStateLoss();
     }
 }

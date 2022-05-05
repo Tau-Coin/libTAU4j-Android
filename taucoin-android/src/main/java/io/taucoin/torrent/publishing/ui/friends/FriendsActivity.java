@@ -39,7 +39,6 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     public static final int PAGE_FRIENDS_LIST = 0;
     public static final int PAGE_SELECT_CONTACT = 1;
     public static final int PAGE_ADD_MEMBERS = 2;
-    public static final int PAGE_CREATION_ADD_MEMBERS = 4;
     private ActivityFriendsBinding binding;
     private UserViewModel userViewModel;
     private CommunityViewModel communityViewModel;
@@ -181,7 +180,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         MenuItem menuItem = menu.findItem(R.id.menu_done);
         MenuItem menuRankC = menu.findItem(R.id.menu_rank_c);
         MenuItem menuRankA = menu.findItem(R.id.menu_rank_a);
-        menuItem.setVisible(page == PAGE_ADD_MEMBERS || page == PAGE_CREATION_ADD_MEMBERS);
+        menuItem.setVisible(page == PAGE_ADD_MEMBERS);
         menuRankC.setVisible(page == PAGE_FRIENDS_LIST && order == 0);
         menuRankA.setVisible(page == PAGE_FRIENDS_LIST && order != 0);
         return super.onPrepareOptionsMenu(menu);
@@ -193,12 +192,11 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_done) {
-            Intent intent = new Intent();
-            intent.putParcelableArrayListExtra(IntentExtra.BEAN, adapter.getSelectedList());
-            if (page == PAGE_CREATION_ADD_MEMBERS) {
-                setResult(RESULT_OK, intent);
-                this.finish();
+            if (adapter.getSelectedList().size() == 0) {
+                ToastUtils.showShortToast(R.string.community_added_members_empty);
             } else {
+                Intent intent = new Intent();
+                intent.putParcelableArrayListExtra(IntentExtra.BEAN, adapter.getSelectedList());
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, MembersAddActivity.class);
             }

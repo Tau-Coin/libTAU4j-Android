@@ -405,6 +405,10 @@ public class CommunityViewModel extends AndroidViewModel {
             Collection<String> values = selectedMap.values();
             for (String value : values) {
                 long coin = FmtMicrometer.fmtTxLongValue(value);
+                if (coin == 0) {
+                    ToastUtils.showLongToast(R.string.error_airdrop_coins_empty);
+                    return false;
+                }
                 totalCoins = totalCoins.add(BigInteger.valueOf(coin));
             }
             if (totalCoins.compareTo(Constants.TOTAL_COIN) > 0) {

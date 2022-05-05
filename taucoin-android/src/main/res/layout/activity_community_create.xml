@@ -12,105 +12,85 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/color_bg"
+        android:background="@color/color_white"
         android:fitsSystemWindows="true">
 
         <include
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/color_white">
 
-            <LinearLayout
-                android:orientation="vertical"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/color_white">
+                android:paddingStart="@dimen/widget_size_15"
+                android:paddingEnd="@dimen/widget_size_15"
+                android:layout_marginTop="@dimen/widget_size_10">
 
-                <RelativeLayout
+                <io.taucoin.torrent.publishing.ui.customviews.RoundButton
+                    android:id="@+id/round_button"
+                    android:layout_width="@dimen/widget_size_60"
+                    android:layout_height="@dimen/widget_size_60"
+                    android:layout_marginEnd="@dimen/widget_size_10"
+                    android:layout_marginTop="@dimen/widget_size_25"
+                    android:gravity="center"
+                    android:textSize="@dimen/font_size_18"
+                    android:textAllCaps="false"
+                    android:textColor="@color/color_white"
+                    app:btnStrokeColor="@color/primary_light"
+                    app:btnStrokeWidth="0dp"
+                    app:btnCornerRadius="@dimen/widget_size_10"
+                    app:btnSolidColor="@color/primary_light"
+                    app:btnPressedRatio="1.5" />
+
+                <EditText
+                    android:layout_toEndOf="@+id/round_button"
+                    android:id="@+id/et_community_name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/widget_size_15"
-                    android:paddingEnd="@dimen/widget_size_15"
-                    android:layout_marginTop="@dimen/widget_size_10">
-
-                    <io.taucoin.torrent.publishing.ui.customviews.RoundButton
-                        android:id="@+id/round_button"
-                        android:layout_width="@dimen/widget_size_60"
-                        android:layout_height="@dimen/widget_size_60"
-                        android:layout_marginEnd="@dimen/widget_size_10"
-                        android:layout_marginTop="@dimen/widget_size_25"
-                        android:gravity="center"
-                        android:textSize="@dimen/font_size_18"
-                        android:textAllCaps="false"
-                        android:textColor="@color/color_white"
-                        app:btnStrokeColor="@color/primary_light"
-                        app:btnStrokeWidth="0dp"
-                        app:btnCornerRadius="@dimen/widget_size_10"
-                        app:btnSolidColor="@color/primary_light"
-                        app:btnPressedRatio="1.5" />
-
-                    <EditText
-                        android:layout_toEndOf="@+id/round_button"
-                        android:id="@+id/et_community_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/widget_size_50"
-                        android:singleLine="true"
-                        android:layout_marginTop="@dimen/widget_size_10"
-                        android:hint="@string/community_community_name"
-                        android:inputType="text"
-                        android:textAppearance="@style/TextAppearanceBody1"
-                        android:autofillHints="@string/community_community_name" />
-
-                    <TextView
-                        android:layout_toEndOf="@+id/round_button"
-                        android:layout_below="@+id/et_community_name"
-                        android:id="@+id/tv_community_name_tips"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/widget_size_2"
-                        android:text="@string/community_community_name_tips"
-                        android:textColor="@color/gray_dark"
-                        android:textAppearance="@style/TextAppearanceBody3" />
-
-                    <TextView
-                        android:layout_toEndOf="@+id/round_button"
-                        android:layout_below="@+id/tv_community_name_tips"
-                        android:id="@+id/tv_total_coin"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/widget_size_6"
-                        android:layout_marginStart="@dimen/widget_size_2"
-                        android:text="@string/community_total_coins"
-                        android:textAppearance="@style/TextAppearanceBody2" />
-
-                </RelativeLayout>
+                    android:layout_height="@dimen/widget_size_50"
+                    android:singleLine="true"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:hint="@string/community_community_name"
+                    android:inputType="text"
+                    android:textAppearance="@style/TextAppearanceBody1"
+                    android:autofillHints="@string/community_community_name" />
 
                 <TextView
-                    android:id="@+id/tv_add_members"
+                    android:layout_toEndOf="@+id/round_button"
+                    android:layout_below="@+id/et_community_name"
+                    android:id="@+id/tv_community_name_tips"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:layout_marginTop="@dimen/widget_size_50"
-                    android:text="@string/community_added_members"
-                    android:layout_marginStart="@dimen/widget_size_20"
-                    android:layout_marginEnd="@dimen/widget_size_20"
-                    android:textColor="@color/color_white"
-                    android:gravity="center_vertical|center"
-                    android:onClick="@{listener::onClick}"
-                    android:background="@drawable/primary_rect_round_bg"
-                    android:textAppearance="@style/TextAppearanceBody1"/>
+                    android:layout_marginStart="@dimen/widget_size_2"
+                    android:text="@string/community_community_name_tips"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody3" />
 
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/members_fragment"
+                <TextView
+                    android:layout_toEndOf="@+id/round_button"
+                    android:layout_below="@+id/tv_community_name_tips"
+                    android:id="@+id/tv_total_coin"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/widget_size_20"
-                    android:layout_marginEnd="@dimen/widget_size_20"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_6"
+                    android:layout_marginStart="@dimen/widget_size_2"
+                    android:text="@string/community_total_coins"
+                    android:textAppearance="@style/TextAppearanceBody2" />
 
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+            </RelativeLayout>
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/members_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/widget_size_20"
+                android:layout_marginEnd="@dimen/widget_size_20"/>
+
+        </LinearLayout>
     </LinearLayout>
 </layout>

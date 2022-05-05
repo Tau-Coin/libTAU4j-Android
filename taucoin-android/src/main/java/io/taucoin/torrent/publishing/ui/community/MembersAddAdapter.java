@@ -38,26 +38,27 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
         this.airdropCoin = airdropCoin;
     }
 
-    void submitFriendList(@NonNull List<User> list) {
+    void submitFriendList(@NonNull List<User> list, boolean isSelected) {
         Map<String, String> selectedMap = new HashMap<>();
-        for (User user : list) {
-            String key = user.publicKey;
-            String value = getInputCoins(this.selectedMap, key,
-                    FmtMicrometer.fmtFormat(String.valueOf(airdropCoin)));
-            selectedMap.put(key, value);
+        if (isSelected) {
+            for (User user : list) {
+                String key = user.publicKey;
+                String value = getInputCoins(this.selectedMap, key, airdropCoin);
+                selectedMap.put(key, value);
+            }
         }
         this.selectedMap.clear();
         this.selectedMap.putAll(selectedMap);
         submitList(list);
     }
 
-    public static String getInputCoins(Map<String, String> selectedMap, String publicKey) {
-        return getInputCoins(selectedMap, publicKey, "");
-    }
+//    public static String getInputCoins(Map<String, String> selectedMap, String publicKey) {
+//        return getInputCoins(selectedMap, publicKey, "");
+//    }
 
     @SuppressWarnings("ConstantConditions")
-    private static String getInputCoins(Map<String, String> selectedMap, String publicKey, String defaultValue) {
-        String value = defaultValue;
+    private static String getInputCoins(Map<String, String> selectedMap, String publicKey, long defaultValue) {
+        String value = FmtMicrometer.fmtFormat(String.valueOf(defaultValue));
         if (selectedMap.containsKey(publicKey)) {
             value = selectedMap.get(publicKey);
         }
@@ -77,7 +78,7 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
                 parent,
                 false);
 
-        return new ViewHolder(binding, listener, selectedMap);
+        return new ViewHolder(binding, listener, selectedMap, airdropCoin);
     }
 
     @Override
@@ -103,13 +104,15 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
         private ItemAddMembersBinding binding;
         private ClickListener listener;
         private Map<String, String> selectedMap;
+        private long airdropCoin;
 
         ViewHolder(ItemAddMembersBinding binding, ClickListener listener,
-                   Map<String, String> selectedMap) {
+                   Map<String, String> selectedMap, long airdropCoin) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
             this.selectedMap = selectedMap;
+            this.airdropCoin = airdropCoin;
         }
 
         void bind(ViewHolder holder, User user) {
@@ -120,7 +123,7 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
             holder.binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 selectedMap.remove(user.publicKey);
                 if (isChecked) {
-                    selectedMap.put(user.publicKey, "");
+                    selectedMap.put(user.publicKey, ViewUtils.getText(holder.binding.etAirdropCoins));
                 }
                 if(listener != null){
                     listener.onSelectClicked();
@@ -162,7 +165,7 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
             if (oldTextWatcher != null) {
                 holder.binding.etAirdropCoins.removeTextChangedListener(oldTextWatcher);
             }
-            holder.binding.etAirdropCoins.setText(getInputCoins(this.selectedMap, user.publicKey));
+            holder.binding.etAirdropCoins.setText(getInputCoins(this.selectedMap, user.publicKey, airdropCoin));
             holder.binding.etAirdropCoins.addTextChangedListener(textWatcher);
             holder.binding.etAirdropCoins.setTag(textWatcher);
         }

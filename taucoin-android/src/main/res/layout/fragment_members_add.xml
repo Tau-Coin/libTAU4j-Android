@@ -48,7 +48,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/widget_size_10"
             android:clipToPadding="false"
-            android:scrollbars="vertical"
+            android:scrollbars="none"
             android:focusable="true"
             android:scrollbarStyle="outsideOverlay" />
     </LinearLayout>

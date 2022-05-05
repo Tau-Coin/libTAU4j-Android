@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
@@ -18,15 +17,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
-import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.GeoUtils;
 import io.taucoin.torrent.publishing.core.utils.SpanUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
-import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemFriendListBinding;
 
 /**
@@ -96,8 +92,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
             if(null == holder || null == user){
                 return;
             }
-            boolean isShowSelect = type == FriendsActivity.PAGE_ADD_MEMBERS ||
-                    type == FriendsActivity.PAGE_CREATION_ADD_MEMBERS;
+            boolean isShowSelect = type == FriendsActivity.PAGE_ADD_MEMBERS;
             holder.binding.cbSelect.setVisibility(isShowSelect ? View.VISIBLE : View.GONE);
             if (isShowSelect) {
                 holder.binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
