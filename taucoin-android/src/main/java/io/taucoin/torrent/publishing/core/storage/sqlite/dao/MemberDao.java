@@ -47,12 +47,16 @@ public interface MemberDao {
 
     String QUERY_COMMUNITY_MEMBERS_LIMIT = "SELECT m.publicKey FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.chainID = :chainID AND " + WHERE_ON_CHAIN +
+            " WHERE m.chainID = :chainID" +
+            " AND m.publicKey != '0000000000000000000000000000000000000000000000000000000000000000'" +
+            " AND " + WHERE_ON_CHAIN +
             " ORDER BY m.power DESC LIMIT :limit";
 
     String QUERY_COMMUNITY_OFF_CHAIN_MEMBERS_LIMIT = "SELECT m.publicKey FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.chainID = :chainID AND " + WHERE_OFF_CHAIN +
+            " WHERE m.chainID = :chainID" +
+            " AND m.publicKey != '0000000000000000000000000000000000000000000000000000000000000000'" +
+            " AND " + WHERE_OFF_CHAIN +
             " ORDER BY m.power limit :limit";
 
     String QUERY_MEMBERS_STATISTICS = "SELECT a.onChain, b.total" +
