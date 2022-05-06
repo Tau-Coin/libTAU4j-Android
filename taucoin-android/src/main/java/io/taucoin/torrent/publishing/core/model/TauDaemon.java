@@ -635,6 +635,18 @@ public abstract class TauDaemon {
     }
 
     /**
+     * 添加新Bootstrap节点
+     */
+    public boolean addNewBootstrapPeers(String chainID, Set<String> peers) {
+        if (isRunning) {
+            boolean isSuccess = sessionManager.addNewBootstrapPeers(ChainIDUtil.encode(chainID), peers);
+            logger.debug("addNewBootstrapPeers chainID::{}, peers size::{}", chainID, peers.size());
+            return isSuccess;
+        }
+        return false;
+    }
+
+    /**
      * 账户自动更新
      */
     public void accountAutoRenewal() {

@@ -418,14 +418,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
      * @param chainID
      */
     private void openChainLink(String chainID, String chainLink) {
-        disposables.add(communityViewModel.getCommunityByChainIDSingle(chainID)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(community -> {
-                    openCommunityActivity(chainID);
-                }, it -> {
-                    communityViewModel.addCommunity(chainID, chainLink);
-                }));
+        communityViewModel.addCommunity(chainID, chainLink);
     }
 
     /**

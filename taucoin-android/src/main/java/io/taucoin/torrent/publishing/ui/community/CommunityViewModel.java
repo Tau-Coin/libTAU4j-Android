@@ -212,31 +212,42 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param chainID
      * @param chainUrl
      */
-    public void addCommunity(String chainID, String chainUrl){
+    public void addCommunity(String chainID, String chainUrl) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             Result result = new Result();
             String communityName = ChainIDUtil.getName(chainID);
             if (StringUtil.isNotEmpty(communityName)) {
-                // 链端follow community
+                String userPk = MainApplication.getInstance().getPublicKey();
                 ChainURL url = ChainUrlUtil.decode(chainUrl);
-                boolean success = false;
                 Set<String> peers = null;
                 if (url != null) {
                     peers = url.getPeers();
-                    success = daemon.followChain(chainID, peers);
                 }
-                if (success) {
-                    Community community = communityRepo.getCommunityByChainID(chainID);
-                    if (null == community) {
+                boolean success = false;
+                Community community = communityRepo.getCommunityByChainID(chainID);
+                if (null == community) {
+                    // 链端follow community
+                    if (peers != null) {
+                        success = daemon.followChain(chainID, peers);
+                    }
+                    if (success) {
                         community = new Community(chainID, communityName);
                         communityRepo.addCommunity(community);
                     }
-                    if (peers != null) {
-                        for (String peer : peers) {
-                            addUserInfoToLocal(peer);
-                            addMemberInfoToLocal(chainID, peer);
-                            addMemberInfoToLocal(chainID, MainApplication.getInstance().getPublicKey());
-                        }
+                } else {
+                    // 是否join
+                    Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
+                    if (null == member && peers != null) {
+                        success = daemon.followChain(chainID, peers);
+                    } else {
+                        daemon.addNewBootstrapPeers(chainID, peers);
+                    }
+                }
+                if (peers != null) {
+                    for (String peer : peers) {
+                        addUserInfoToLocal(peer);
+                        addMemberInfoToLocal(chainID, peer);
+                        addMemberInfoToLocal(chainID, userPk);
                     }
                 }
                 result.setSuccess(success);
