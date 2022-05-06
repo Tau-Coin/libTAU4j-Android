@@ -34,15 +34,6 @@ public class Community implements Parcelable {
     }
 
     @Ignore
-    public Community(@NonNull String communityName){
-        this.communityName = communityName;
-    }
-
-    @Ignore
-    public Community(){
-    }
-
-    @Ignore
     protected Community(Parcel in) {
         chainID = in.readString();
         communityName = in.readString();

@@ -13,7 +13,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
-import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
@@ -138,7 +138,7 @@ public class MemberRepositoryImpl implements MemberRepository{
     }
 
     @Override
-    public Flowable<Statistics> getBlocksStatistics(String chainID) {
+    public Flowable<BlockStatistics> getBlocksStatistics(String chainID) {
         return db.blockDao().getBlocksStatistics(chainID);
     }
 

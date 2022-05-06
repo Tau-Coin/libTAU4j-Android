@@ -24,16 +24,22 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.AccessList;
+import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
+import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
+import io.taucoin.torrent.publishing.databinding.ViewDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
+import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.transaction.AirdropCreateActivity;
 import io.taucoin.torrent.publishing.ui.transaction.BlocksTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
@@ -71,9 +77,11 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private boolean isOnChain = false;
     private boolean isNoBalance = true;
     private boolean isFirstLoad = true;
-    private Statistics statistics;
+    private BlockStatistics blockStatistics;
+    private Statistics memberStatistics;
     private AccessList accessList;
     private long nodes = 0;
+    private CommonDialog helpDialog;
 
     @Nullable
     @Override
@@ -167,8 +175,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 
     private void showCommunityTitle() {
         long total = 0;
-        if (statistics != null) {
-            total = statistics.getTotal();
+        if (memberStatistics != null) {
+            total = memberStatistics.getTotal();
         }
         if (StringUtil.isNotEmpty(chainID)) {
             String communityName = ChainIDUtil.getName(chainID);
@@ -179,8 +187,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 
     private void showCommunitySubtitle() {
         StringBuilder subtitle = new StringBuilder();
-        if (statistics != null) {
-            long members = statistics.getOnChain();
+        if (memberStatistics != null) {
+            long members = memberStatistics.getOnChain();
             if (members > 0) {
                 subtitle.append(getString(R.string.community_users_stats_m, members));
             }
@@ -195,11 +203,38 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 subtitle.append(getString(R.string.community_users_stats_c, connected));
             }
         }
-        if (nodes > 0) {
-            subtitle.append(isOnChain ? getString(R.string.community_users_mining) :
-                    getString(R.string.community_users_following));
+        if (isJoined) {
+            // 已加入社区
+            if (nodes > 0) {
+                // 如果社区成员就自己一个, 或者区块总数为0
+                boolean isMiningAlone = (memberStatistics != null && memberStatistics.getTotal() == 1) ||
+                        (blockStatistics != null && blockStatistics.getTotal() == 0);
+                // 显示help, 区块总数为0，社区只有自己一个成员的话不显示
+                boolean isShowHelp = blockStatistics != null && blockStatistics.getTotal() == 0;
+                if (!isMiningAlone) {
+                    long latestTime = TauDaemon.daemonStartTime;
+                    if (blockStatistics != null && blockStatistics.getMaxCreateTime() > latestTime) {
+                        latestTime = blockStatistics.getMaxCreateTime();
+                    }
+                    // 30分钟内无Total Blocks无变化为mining alone
+                    float minutes = DateUtil.timeDiffMinutes(latestTime, DateUtil.getMillisTime());
+                    isMiningAlone = minutes > 30;
+                    if (!isShowHelp) {
+                        isShowHelp = isMiningAlone;
+                    }
+                }
+                subtitle.append(isMiningAlone ? getString(R.string.community_users_mining_alone) :
+                        getString(R.string.community_users_mining));
+                binding.ivHelp.setVisibility(isShowHelp ? View.VISIBLE : View.GONE);
+            } else {
+                subtitle.append(getString(R.string.community_users_discovering));
+            }
         } else {
-            subtitle.append(getString(R.string.community_users_discovering));
+            // 未加入社区
+            int length = subtitle.length();
+            if (length > 0) {
+                subtitle.delete(length - 2, length - 1);
+            }
         }
         binding.toolbarInclude.tvSubtitle.setText(subtitle);
     }
@@ -390,6 +425,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         super.onStop();
         disposables.clear();
         communityViewModel.unsetVisitChain(chainID);
+        if (helpDialog != null && helpDialog.isShowing()) {
+            helpDialog.closeDialog();
+        }
     }
 
     @Override
@@ -408,6 +446,12 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             }
         });
 
+        // 60s更新检查一次
+        disposables.add(ObservableUtil.intervalSeconds(60)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(l -> showCommunitySubtitle()));
+
         nodes = settingsRepo.getLongValue(getString(R.string.pref_key_dht_nodes), 0);
         disposables.add(settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.io())
@@ -418,7 +462,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(statistics -> {
-                    this.statistics = statistics;
+                    this.memberStatistics = statistics;
                     showCommunityTitle();
                     showCommunitySubtitle();
                 }));
@@ -426,9 +470,12 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         disposables.add(communityViewModel.getBlocksStatistics(chainID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(statistics ->
-                        binding.tvBlocksStatistics.setText(getString(R.string.community_blocks_stats,
-                                statistics.getTotal(), statistics.getOnChain())))
+                .subscribe(statistics -> {
+                    this.blockStatistics = statistics;
+                    showCommunitySubtitle();
+                    binding.tvBlocksStatistics.setText(getString(R.string.community_blocks_stats,
+                            statistics.getTotal(), statistics.getOnChain()));
+                })
         );
 
         disposables.add(communityViewModel.observeAccessList(chainID)
@@ -474,6 +521,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
                 break;
+            case R.id.iv_help:
+                showHelpDialog();
+                break;
         }
     }
 
@@ -509,5 +559,22 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         if (currentTabFragment != null) {
             currentTabFragment.onFragmentResult(requestCode, resultCode, data);
         }
+    }
+
+    private void showHelpDialog() {
+        if (helpDialog != null && helpDialog.isShowing()) {
+            helpDialog.closeDialog();
+        }
+        ViewDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
+                R.layout.view_dialog, null, false);
+        dialogBinding.tvMsg.setTextColor(getResources().getColor(R.color.color_black));
+        dialogBinding.tvMsg.setText(R.string.community_peers_help);
+        dialogBinding.ivClose.setVisibility(View.GONE);
+        helpDialog = new CommonDialog.Builder(activity)
+                .setContentView(dialogBinding.getRoot())
+                .setCanceledOnTouchOutside(true)
+                .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss())
+                .create();
+        helpDialog.show();
     }
 }

@@ -53,7 +53,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/widget_size_5"
-                android:text="@string/main_community_follower"
+                android:text="@string/main_community_non_member"
                 android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody3"/>
 

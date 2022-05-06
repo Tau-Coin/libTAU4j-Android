@@ -103,7 +103,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 String balance = FmtMicrometer.fmtBalance(bean.balance);
                 boolean readOnly = bean.isReadOnly();
                 if (readOnly) {
-                    binding.tvBalancePower.setText(context.getString(R.string.main_community_follower));
+                    binding.tvBalancePower.setText(context.getString(R.string.main_community_non_member));
                 } else {
                     String power = FmtMicrometer.fmtLong(bean.power);
                     binding.tvBalancePower.setText(context.getString(R.string.main_balance_power, balance, power));

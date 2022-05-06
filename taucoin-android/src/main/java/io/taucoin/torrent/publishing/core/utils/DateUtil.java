@@ -456,6 +456,16 @@ public class DateUtil {
         return millisecond * 1.0f / 3600000;
     }
 
+    public static float timeDiffMinutes(long date1, long date2) {
+        long millisecond;
+        if (date1 >= date2) {
+            millisecond = date1 - date2;
+        } else {
+            millisecond = date2 - date1;
+        }
+        return millisecond * 1.0f / 60000;
+    }
+
     public static boolean isShowTime(long currentTime, long previousTime) {
         if (previousTime > 0) {
             int interval = DateUtil.getSeconds(previousTime, currentTime);

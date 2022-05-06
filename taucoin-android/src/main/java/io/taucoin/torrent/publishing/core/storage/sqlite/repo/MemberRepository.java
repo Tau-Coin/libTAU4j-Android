@@ -8,6 +8,7 @@ import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
@@ -73,7 +74,7 @@ public interface MemberRepository {
      * 获取社区区块统计
      * @param chainID
      */
-    Flowable<Statistics> getBlocksStatistics(String chainID);
+    Flowable<BlockStatistics> getBlocksStatistics(String chainID);
 
     /**
      * 删除社区成员数据

@@ -1,5 +1,6 @@
 package io.taucoin.torrent.publishing.core.model.data;
 
+import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 
 /**
@@ -12,6 +13,10 @@ public class CommunityAndMember extends Community {
     public long blockNumber;
     public int joined;
     public int msgUnread;
+
+    public CommunityAndMember(@NonNull String chainID, @NonNull String communityName) {
+        super(chainID, communityName);
+    }
 
     /**
      * 判断社区成员是否是read only

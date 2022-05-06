@@ -8,6 +8,7 @@ import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Index;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 
 /**
  * 数据库存储区块的实体类
@@ -28,6 +29,7 @@ public class BlockInfo implements Parcelable {
     public long timestamp;             // 区块时间戳
     public String previousBlockHash;   // 上一个区块hash
     public String txID;                // 区块中交易ID
+    public long createTime;            // 本地数据库创建时间
 
 
     public BlockInfo(@NonNull String chainID, @NonNull String blockHash, long blockNumber,
@@ -43,6 +45,7 @@ public class BlockInfo implements Parcelable {
         this.timestamp = timestamp;
         this.previousBlockHash = previousBlockHash;
         this.txID = txID;
+        this.createTime = DateUtil.getMillisTime();
     }
 
     protected BlockInfo(Parcel in) {

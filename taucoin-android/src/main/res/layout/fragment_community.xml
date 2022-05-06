@@ -17,25 +17,45 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar_main_right" />
 
-        <TextView
+        <LinearLayout
             android:layout_below="@+id/toolbar_include"
-            android:id="@+id/tv_blocks_statistics"
+            android:id="@+id/ll_top_statistics"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/community_blocks_stats"
-            android:background="@color/gray_light"
-            android:singleLine="true"
-            android:ellipsize="end"
+            android:gravity="center_vertical"
             android:paddingStart="@dimen/widget_size_10"
             android:paddingEnd="@dimen/widget_size_10"
-            android:paddingTop="@dimen/widget_size_7"
-            android:paddingBottom="@dimen/widget_size_7"
-            android:textColor="@color/color_white"
-            android:textAppearance="@style/TextAppearanceBody3"/>
+            android:background="@color/gray_light">
+
+            <TextView
+                android:id="@+id/tv_blocks_statistics"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_size_7"
+                android:layout_marginBottom="@dimen/widget_size_7"
+                android:text="@string/community_blocks_stats"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="@color/color_white"
+                android:textAppearance="@style/TextAppearanceBody3"/>
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/iv_help"
+                android:layout_width="@dimen/widget_size_30"
+                android:layout_height="@dimen/widget_size_30"
+                android:padding="@dimen/widget_size_5"
+                android:contentDescription="@null"
+                android:onClick="@{listener::onClick}"
+                android:src="@mipmap/icon_warning_white"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_filter"
-            android:layout_below="@+id/tv_blocks_statistics"
+            android:layout_below="@+id/ll_top_statistics"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_40"

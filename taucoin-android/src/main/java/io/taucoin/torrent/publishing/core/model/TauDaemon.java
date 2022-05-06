@@ -44,6 +44,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
@@ -69,6 +70,7 @@ public abstract class TauDaemon {
     private static final int SHOW_DIALOG_THRESHOLD = 10;        // 单位s
     static final int ALERT_QUEUE_CAPACITY = 10000;              // Alert缓存队列
     private static volatile TauDaemon instance;
+    public static long daemonStartTime = DateUtil.getMillisTime(); // Daemon启动时间
 
     Context appContext;
     private SettingsRepository settingsRepo;

@@ -55,6 +55,7 @@ import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.TauListenHandler;
 import io.taucoin.torrent.publishing.core.model.data.AccessList;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
+import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.DrawBean;
@@ -606,7 +607,7 @@ public class CommunityViewModel extends AndroidViewModel {
      * 获取社区成员统计
      * @param chainID
      */
-    public Flowable<Statistics> getBlocksStatistics(String chainID) {
+    public Flowable<BlockStatistics> getBlocksStatistics(String chainID) {
         return memberRepo.getBlocksStatistics(chainID);
     }
 

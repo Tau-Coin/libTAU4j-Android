@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 
 /**
  * 数据库升级迁移类
@@ -41,6 +42,9 @@ class DatabaseMigration {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             // 添加交易发送状态, 默认老数据都是已发送
             database.execSQL("ALTER TABLE Txs ADD COLUMN sendStatus INTEGER NOT NULL DEFAULT 0");
+            // 添加社区和区块入库时间
+            long createTime = DateUtil.getMillisTime();
+            database.execSQL("ALTER TABLE Blocks ADD COLUMN createTime INTEGER NOT NULL DEFAULT " + createTime);
         }
     };
 }
