@@ -213,21 +213,34 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param chainUrl
      */
     public void addCommunity(String chainID, String chainUrl) {
+        addCommunity(null, chainID, chainUrl);
+    }
+
+    /**
+     * 添加新的社区到数据库
+     * @param airdropPeer
+     * @param chainID
+     * @param chainUrl
+     */
+    public void addCommunity(String airdropPeer, String chainID, String chainUrl) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             Result result = new Result();
             String communityName = ChainIDUtil.getName(chainID);
             if (StringUtil.isNotEmpty(communityName)) {
                 String userPk = MainApplication.getInstance().getPublicKey();
                 ChainURL url = ChainUrlUtil.decode(chainUrl);
-                Set<String> peers = null;
+                Set<String> peers = new HashSet<>();
                 if (url != null) {
-                    peers = url.getPeers();
+                    peers.addAll(url.getPeers());
+                }
+                if (StringUtil.isNotEmpty(airdropPeer)) {
+                    peers.add(airdropPeer);
                 }
                 boolean success = false;
                 Community community = communityRepo.getCommunityByChainID(chainID);
                 if (null == community) {
                     // 链端follow community
-                    if (peers != null) {
+                    if (peers.size() > 0) {
                         success = daemon.followChain(chainID, peers);
                     }
                     if (success) {
@@ -235,15 +248,15 @@ public class CommunityViewModel extends AndroidViewModel {
                         communityRepo.addCommunity(community);
                     }
                 } else {
-                    // 是否join
+                    // 判断是否join, 没join也需要follow
                     Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-                    if (null == member && peers != null) {
+                    if (null == member && peers.size() > 0) {
                         success = daemon.followChain(chainID, peers);
                     } else {
                         daemon.addNewBootstrapPeers(chainID, peers);
                     }
                 }
-                if (peers != null) {
+                if (peers.size() > 0) {
                     for (String peer : peers) {
                         addUserInfoToLocal(peer);
                         addMemberInfoToLocal(chainID, peer);

@@ -300,7 +300,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
             userViewModel.addAirdropFriend(airdropPeer, decode.getChainID());
             // 加入社区
             String chainUrl = decode.getChainUrl();
-            openExternalChainLink(chainUrl);
+            openExternalChainLink(airdropPeer, chainUrl);
         }
     }
 
@@ -308,11 +308,11 @@ public class AirdropCommunityActivity extends BaseActivity implements
      * 打开外部chain link
      * @param link chain link
      */
-    private void openExternalChainLink(String link) {
+    private void openExternalChainLink(String airdropPeer, String link) {
         ChainURL decode = ChainUrlUtil.decode(link);
         if (decode != null) {
             String chainID = decode.getChainID();
-            communityViewModel.addCommunity(chainID, link);
+            communityViewModel.addCommunity(airdropPeer, chainID, link);
         }
     }
 

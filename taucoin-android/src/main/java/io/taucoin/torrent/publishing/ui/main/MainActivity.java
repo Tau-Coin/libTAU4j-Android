@@ -143,7 +143,7 @@ public class MainActivity extends ScanTriggerActivity {
             logger.info("MainActivity::chain link clicked");
             if (intent.hasExtra(IntentExtra.LINK)) {
                 String chainLink = intent.getStringExtra(IntentExtra.LINK);
-                openExternalChainLink(chainLink);
+                openExternalChainLink(null, chainLink);
             }
         } else if (StringUtil.isNotEmpty(action) && StringUtil.isEquals(action,
                 ExternalLinkActivity.ACTION_AIRDROP_LINK_CLICK)) {
@@ -448,7 +448,7 @@ public class MainActivity extends ScanTriggerActivity {
                 if(linkDialog != null){
                     linkDialog.closeDialog();
                 }
-                openExternalChainLink(url);
+                openExternalChainLink(null, url);
             });
             linkDialog = new CommonDialog.Builder(this)
                     .setContentView(dialogBinding.getRoot())
@@ -595,13 +595,14 @@ public class MainActivity extends ScanTriggerActivity {
 
     /**
      * 打开外部chain link
+     * @param airdropPeer airdrop Peer
      * @param link chain link
      */
-    private void openExternalChainLink(String link) {
+    private void openExternalChainLink(String airdropPeer, String link) {
         ChainURL decode = ChainUrlUtil.decode(link);
         if (decode != null) {
             String chainID = decode.getChainID();
-            communityViewModel.addCommunity(chainID, link);
+            communityViewModel.addCommunity(airdropPeer, chainID, link);
         }
     }
 
@@ -618,7 +619,7 @@ public class MainActivity extends ScanTriggerActivity {
             // 加入社区
             String chainUrl = decode.getChainUrl();
             initJoinSuccessDialog(decode.getAirdropPeer());
-            openExternalChainLink(chainUrl);
+            openExternalChainLink(decode.getAirdropPeer(), chainUrl);
         }
     }
 
