@@ -41,7 +41,7 @@
                         android:id="@+id/tv_working_frequency"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:lineLeftText="@string/setting_work_frequency"/>
+                        app:lineLeftText="@string/setting_work_frequency_battery"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_reset_time"

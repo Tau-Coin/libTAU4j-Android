@@ -133,6 +133,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         NetworkSetting.updateWiFiSpeedLimit();
         handleSettingsChanged(getString(R.string.pref_key_wifi_average_speed));
         handleSettingsChanged(getString(R.string.pref_key_wifi_available_data));
+        handleSettingsChanged(getString(R.string.pref_key_charging_state));
     }
 
     @Override
@@ -234,6 +235,10 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             int dozeTime = NetworkSetting.getDozeTime();
             String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
             binding.tvDozeRunningTime.setRightText(dozeTimeStr);
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_charging_state))) {
+            boolean charging = settingsRepo.chargingState();
+            binding.tvWorkingFrequency.setLeftText2(charging ? R.string.setting_work_frequency_charging :
+                    R.string.setting_work_frequency_battery);
         }
     }
 

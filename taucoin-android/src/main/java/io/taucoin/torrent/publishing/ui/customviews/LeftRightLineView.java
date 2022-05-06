@@ -111,4 +111,10 @@ public class LeftRightLineView extends RelativeLayout {
            binding.tvRight.setVisibility(VISIBLE);
        }
     }
+
+    public void setLeftText2(int resId) {
+        if(binding != null){
+            binding.tvLeft2.setText(resId);
+        }
+    }
 }
