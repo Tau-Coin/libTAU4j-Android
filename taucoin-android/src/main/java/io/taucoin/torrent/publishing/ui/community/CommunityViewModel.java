@@ -363,7 +363,7 @@ public class CommunityViewModel extends AndroidViewModel {
                     }
                     TxQueue txQueue = new TxQueue(community.chainID, currentUser.publicKey, key,
                             amount, 0L, TxType.WIRING_TX, content);
-                    ChatViewModel.syncSendMessageTask(getApplication(), txQueue, QueueOperation.INSERT);
+                    ChatViewModel.syncSendMessageTask(getApplication(), txQueue, QueueOperation.ON_CHAIN);
                 }
             }
         } catch (Exception e) {

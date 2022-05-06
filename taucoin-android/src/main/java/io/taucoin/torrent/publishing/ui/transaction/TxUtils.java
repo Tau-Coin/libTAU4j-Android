@@ -251,6 +251,18 @@ public class TxUtils {
     }
 
     public static SpannableStringBuilder createSpanTxQueue(TxQueue tx, QueueOperation operation) {
+        if (operation == QueueOperation.INSERT) {
+            SpanUtils msg = new SpanUtils();
+            String coinName = ChainIDUtil.getCoinName(tx.chainID);
+            String communityName = ChainIDUtil.getName(tx.chainID);
+            msg.append("I am sending you ");
+            msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName);
+            msg.append(" of ").append(communityName);
+            msg.append(" community with ");
+            msg.append(FmtMicrometer.fmtFeeValue(tx.fee)).append(" ").append(coinName);
+            msg.append(" as miner fee.");
+            return msg.create();
+        }
         return createSpanTxQueue(tx, 0, false, operation);
     }
 
@@ -263,12 +275,16 @@ public class TxUtils {
             int txType = txContent.getType();
             if (operation != null) {
                 msg.append("Funds update: ");
-                if (operation == QueueOperation.INSERT) {
-                    msg.append("sender wiring coins");
-                } else if (operation == QueueOperation.UPDATE) {
+                if (operation == QueueOperation.UPDATE) {
                     msg.append("sender waiting for blocks confirmation");
-                } else {
+                } else if (operation == QueueOperation.DELETE) {
                     msg.append("sender cancels wiring");
+                } else if (operation == QueueOperation.ON_CHAIN) {
+                    msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
+                            .append(" is on chain");
+                } else if (operation == QueueOperation.ROLL_BACK) {
+                    msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
+                            .append(" were rolled back by some blockchain fork, sender is resending.");
                 }
                 msg.append("\n").append("Community: ")
                     .append(ChainIDUtil.getName(tx.chainID))
@@ -329,6 +345,72 @@ public class TxUtils {
                 msg.append("\n").append("Trust: ").append(HashUtil.hashMiddleHide(trustContent.getTrustedPkStr()));
             }
         }
+        return msg.create();
+    }
+
+    public static SpannableStringBuilder createSpanTxQueue(Tx tx, QueueOperation operation) {
+        String coinName = ChainIDUtil.getCoinName(tx.chainID);
+        SpanUtils msg = new SpanUtils();
+        int txType = tx.txType;
+        if (operation != null) {
+            msg.append("Funds update: ");
+            if (operation == QueueOperation.ON_CHAIN) {
+                msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
+                        .append(" is on chain");
+            } else if (operation == QueueOperation.ROLL_BACK) {
+                msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
+                        .append(" were rolled back by some blockchain fork, sender is resending.");
+            }
+            msg.append("\n").append("Community: ")
+                    .append(ChainIDUtil.getName(tx.chainID))
+                    .append("\n");
+        }
+        if (txType == TxType.WIRING_TX.getType()) {
+            msg.append("Amount: ").append(FmtMicrometer.fmtBalance(tx.amount))
+                    .append(" ").append(coinName)
+                    .append("\n");
+        }
+        msg.append("Fee: ").append(FmtMicrometer.fmtFeeValue(tx.fee))
+                .append(" ").append(coinName);
+        if (txType == TxType.WIRING_TX.getType()) {
+            if (null == operation) {
+                msg.append("\n").append("To: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
+            }
+            if (StringUtil.isNotEmpty(tx.memo)) {
+                msg.append("\n").append("Description: ").append(tx.memo);
+            }
+        } else if (txType == TxType.AIRDROP_TX.getType()) {
+            msg.append("\n").append("Link: ").append(tx.link);
+            if (StringUtil.isNotEmpty(tx.memo)) {
+                msg.append("\n").append("Description: ").append(tx.memo);
+            }
+        } else if (txType == TxType.ANNOUNCEMENT.getType()) {
+            msg.append("\n").append("Title: ").append(tx.coinName);
+            if (StringUtil.isNotEmpty(tx.memo)) {
+                msg.append("\n").append("Description: ").append(tx.memo);
+            }
+        } else if (txType == TxType.SELL_TX.getType()) {
+            msg.append("\n").append("Selling: ")
+                    .append(tx.coinName)
+                    .append("\n").append("Quantity: ");
+            if (tx.quantity > 0) {
+                msg.append(String.valueOf(tx.quantity));
+            } else {
+                msg.append("TBD");
+            }
+            if (StringUtil.isNotEmpty(tx.link)) {
+                msg.append("\n").append("Link: ").append(tx.link);
+            }
+            if (StringUtil.isNotEmpty(tx.location)) {
+                msg.append("\n").append("Location: ").append(tx.location);
+            }
+            if (StringUtil.isNotEmpty(tx.memo)) {
+                msg.append("\n").append("Description: ").append(tx.memo);
+            }
+        } else if (txType == TxType.TRUST_TX.getType()) {
+            msg.append("\n").append("Trust: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
+        }
+
         return msg.create();
     }
 

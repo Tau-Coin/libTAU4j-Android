@@ -37,6 +37,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
@@ -268,6 +269,16 @@ public class ChatViewModel extends AndroidViewModel {
      * @param context Context
      */
     public static Result syncSendMessageTask(Context context, TxQueue tx, QueueOperation operation) {
+        String text = TxUtils.createSpanTxQueue(tx, operation).toString();
+        return syncSendMessageTask(context, tx.senderPk, tx.receiverPk, text,
+                MessageType.WIRING.getType(), tx.chainID);
+    }
+
+    /**
+     * 同步给朋友发转账任务
+     * @param context Context
+     */
+    public static Result syncSendMessageTask(Context context, Tx tx, QueueOperation operation) {
         String text = TxUtils.createSpanTxQueue(tx, operation).toString();
         return syncSendMessageTask(context, tx.senderPk, tx.receiverPk, text,
                 MessageType.WIRING.getType(), tx.chainID);

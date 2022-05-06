@@ -3,7 +3,9 @@ package io.taucoin.torrent.publishing.core.model.data.message;
 public enum QueueOperation {
     INSERT(0),
     UPDATE(1),
-    DELETE(2);
+    DELETE(2),
+    ON_CHAIN(3),
+    ROLL_BACK(4);
 
     private int operation;
     QueueOperation(int operation) {

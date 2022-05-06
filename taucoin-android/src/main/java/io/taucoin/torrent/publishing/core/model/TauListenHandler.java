@@ -75,7 +75,7 @@ public class TauListenHandler {
     private Context appContext;
 
     public enum BlockStatus {
-        OFF_CHAIN,
+        ROLL_BACK,
         ON_CHAIN,
         SYNCING,
         NEW_TX,
@@ -159,7 +159,7 @@ public class TauListenHandler {
      */
     void handleRollbackBlock(Block block) {
         logger.debug("handleRollBack");
-        handleBlockData(block, BlockStatus.OFF_CHAIN);
+        handleBlockData(block, BlockStatus.ROLL_BACK);
     }
 
     /**
@@ -297,6 +297,14 @@ public class TauListenHandler {
                     status = 1;
                 } else {
                     status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
+                }
+                //  交易状态改变
+                if (status != tx.txStatus) {
+                    if (status == 1) {
+                        ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.ON_CHAIN);
+                    } else {
+                        ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.ROLL_BACK);
+                    }
                 }
                 tx.txStatus = status;
                 tx.blockNumber = block.getBlockNumber();
