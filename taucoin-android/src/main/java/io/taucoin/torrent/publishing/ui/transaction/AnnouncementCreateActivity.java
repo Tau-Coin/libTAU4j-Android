@@ -91,9 +91,6 @@ public class AnnouncementCreateActivity extends BaseActivity implements View.OnC
             binding.tvFee.setText(Html.fromHtml(txFreeHtml));
             binding.tvFee.setTag(txFeeStr);
         }
-        String coinName = ChainIDUtil.getCoinName(chainID);
-        String[] items = getResources().getStringArray(R.array.coin_name);
-        items[1] = coinName;
     }
 
     @Override

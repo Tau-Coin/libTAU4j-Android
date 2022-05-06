@@ -3,7 +3,9 @@ package io.taucoin.torrent.publishing.ui.transaction;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Html;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
@@ -22,10 +25,12 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
+import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityAirdropCoinsBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.customviews.FilterEditText;
 import io.taucoin.torrent.publishing.ui.friends.AirdropCommunityActivity;
 
 /**
@@ -39,6 +44,7 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
     private String chainID;
     private TxQueue txQueue;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private boolean isClickPaste = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,9 +99,39 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
             binding.tvFee.setText(Html.fromHtml(txFreeHtml));
             binding.tvFee.setTag(txFeeStr);
         }
-        String coinName = ChainIDUtil.getCoinName(chainID);
-        String[] items = getResources().getStringArray(R.array.coin_name);
-        items[1] = coinName;
+
+        binding.etLink.setOnPasteCallback(new FilterEditText.OnPasteCallback() {
+            @Override
+            public void onPaste() {
+                isClickPaste = true;
+            }
+        });
+
+        binding.etLink.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isClickPaste) {
+                    isClickPaste = false;
+                    String content = binding.etLink.getEditableText().toString();
+                    if (StringUtil.isNotEmpty(content)) {
+                        AirdropUrl airdropUrl = UrlUtil.decodeAirdropUrl(content);
+                        if (airdropUrl != null) {
+                            String newUrl = UrlUtil.encodeOnePeerAirdropUrl(airdropUrl.getAirdropPeer(),
+                                    airdropUrl.getChainID(), airdropUrl.getPeers());
+                            binding.etLink.setText(newUrl);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override

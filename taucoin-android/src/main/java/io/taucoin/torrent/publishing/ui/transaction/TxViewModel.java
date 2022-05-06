@@ -396,11 +396,10 @@ public class TxViewModel extends AndroidViewModel {
                         FmtMicrometer.fmtFeeValue(Constants.WIRING_MIN_FEE.longValue()));
                 ToastUtils.showShortToast(minFee);
                 return false;
+            } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
+                ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
+                return false;
             }
-//            else if (tx.amount > balance || tx.amount + tx.fee > balance) {
-//                ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
-//                return false;
-//            }
         } else {
             if (type == SELL_TX.getType()) {
                 SellTxContent txContent = new SellTxContent(tx.content);
@@ -410,8 +409,7 @@ public class TxViewModel extends AndroidViewModel {
                 }
             } else if (type == AIRDROP_TX.getType()) {
                 AirdropTxContent txContent = new AirdropTxContent(tx.content);
-                if (StringUtil.isEmpty(txContent.getLink()) ||
-                        null == UrlUtil.decodeAirdropUrl(txContent.getLink())) {
+                if (!UrlUtil.verifyAirdropUrl(txContent.getLink())) {
                     ToastUtils.showShortToast(R.string.tx_error_invalid_airdrop_link);
                     return false;
                 }

@@ -14,6 +14,13 @@ import io.taucoin.torrent.publishing.core.utils.ChineseFilter;
  */
 @SuppressLint({"AppCompatCustomView"})
 public class FilterEditText extends EditText {
+
+    public OnPasteCallback mOnPasteCallback;
+
+    public interface OnPasteCallback {
+        void onPaste();
+    }
+
     public FilterEditText(Context context) {
         super(context);
         initFilters();
@@ -39,5 +46,27 @@ public class FilterEditText extends EditText {
 //            return;
 //        }
 //        setFilters(new InputFilter[]{new ChineseFilter()});
+    }
+
+    @Override
+    public boolean onTextContextMenuItem(int id) {
+        switch (id) {
+            case android.R.id.cut:
+                // 剪切
+                break;
+            case android.R.id.copy:
+                // 复制
+                break;
+            case android.R.id.paste:
+                // 粘贴
+                if (mOnPasteCallback != null) {
+                    mOnPasteCallback.onPaste();
+                }
+        }
+        return super.onTextContextMenuItem(id);
+    }
+
+    public void setOnPasteCallback(OnPasteCallback onPasteCallback) {
+        mOnPasteCallback = onPasteCallback;
     }
 }

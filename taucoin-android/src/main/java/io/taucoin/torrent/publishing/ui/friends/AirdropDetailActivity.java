@@ -150,15 +150,7 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
                     if (StringUtil.isNotEmpty(chainID)) {
                         String airdropPeer = MainApplication.getInstance().getPublicKey();
                         airdropLink = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, list);
-                        if (list != null && list.size() > 0) {
-                            List<String> onePeerList = new ArrayList<>();
-                            String onePeer = list.get(0);
-                            if (list.size() > 1 && StringUtil.isEquals(onePeer, airdropPeer)) {
-                                onePeer = list.get(1);
-                            }
-                            onePeerList.add(onePeer);
-                            airdropLink1Bs = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, onePeerList);
-                        }
+                        airdropLink1Bs = UrlUtil.encodeOnePeerAirdropUrl(airdropPeer, chainID, list);
                         binding.tauLink.setText(airdropLink);
                     }
                 }));

@@ -2,6 +2,8 @@ package io.taucoin.torrent.publishing.core.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +46,20 @@ public class UrlUtil {
         return null;
     }
 
+    public static boolean verifyAirdropUrl(String url) {
+        try {
+            if (StringUtil.isNotEmpty(url)) {
+                Pattern airdrop = Pattern.compile(AIRDROP_PATTERN);
+                Matcher matcher = airdrop.matcher(url);
+                Logger logger = LoggerFactory.getLogger("decodeAirdropUrl");
+                logger.debug("url::{}", url);
+                return matcher.matches();
+            }
+        } catch (Exception ignore) {
+        }
+        return false;
+    }
+
     /**
      * Airdrop URL 编码
      * @param airdropPeer 发布airdrop的节点
@@ -55,5 +71,19 @@ public class UrlUtil {
                                           List<String> peers) {
         String chainUrl = ChainUrlUtil.encode(chainID, peers);
         return String.format(AIRDROP_URL, airdropPeer, chainUrl);
+    }
+
+    public static String encodeOnePeerAirdropUrl(@NonNull String airdropPeer, @NonNull String chainID,
+                                          List<String> peers) {
+
+        List<String> onePeerList = new ArrayList<>();
+        if (peers != null && peers.size() > 0) {
+            String onePeer = peers.get(0);
+            if (peers.size() > 1 && StringUtil.isEquals(onePeer, airdropPeer)) {
+                onePeer = peers.get(1);
+            }
+            onePeerList.add(onePeer);
+        }
+        return encodeAirdropUrl(airdropPeer, chainID, onePeerList);
     }
 }
