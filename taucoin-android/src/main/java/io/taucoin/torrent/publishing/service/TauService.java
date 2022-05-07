@@ -140,7 +140,10 @@ public class TauService extends Service {
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::stopServiceWaitAlertDisposed));
+                .subscribe(this::stopServiceWaitAlertDisposed, it -> {
+                    logger.error("Daemon stop error ", it);
+                    stopService();
+                }));
     }
 
     @Override
