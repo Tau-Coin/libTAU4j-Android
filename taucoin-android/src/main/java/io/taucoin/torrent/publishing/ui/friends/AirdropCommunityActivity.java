@@ -297,7 +297,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
         if (decode != null) {
             // 加朋友
             String airdropPeer = decode.getAirdropPeer();
-            userViewModel.addAirdropFriend(airdropPeer, decode.getChainID());
+            userViewModel.addAirdropFriend(airdropPeer, decode);
             // 加入社区
             String chainUrl = decode.getChainUrl();
             openExternalChainLink(airdropPeer, chainUrl);
