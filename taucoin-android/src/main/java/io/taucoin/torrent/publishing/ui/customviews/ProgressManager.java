@@ -87,6 +87,7 @@ public class ProgressManager {
     }
 
     public void closeProgressDialog(){
+        logger.info("showProgressDialog");
         if (isShowing()) {
             mDialog.dismiss();
         }

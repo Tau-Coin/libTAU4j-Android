@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.taucoin.torrent.publishing.R;
@@ -17,10 +20,12 @@ import io.taucoin.torrent.publishing.ui.customviews.ProgressManager;
 
 public abstract class BaseActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener {
+    protected static Logger logger = LoggerFactory.getLogger("BaseActivity");
     private ProgressManager progressManager = null;
     protected Point point = new Point();
 
     private boolean isFullScreen = true;
+    private String className = getClass().getSimpleName();
     public void setIsFullScreen(boolean isFullScreen){
         this.isFullScreen = isFullScreen;
     }
@@ -70,6 +75,31 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        logger.debug("{} onStart", className);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        logger.debug("{} onResume", className);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        logger.debug("{} onPause", className);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        closeProgressDialog();
+        logger.debug("{} onStop", className);
+    }
+
     /**
      * Activity或Fragment视图被销毁回调
      * APP分屏操作，Activity重新加载，释放资源
@@ -78,6 +108,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
         getViewModelStore().clear();
+        logger.debug("{} onDestroy", className);
     }
 
     /**

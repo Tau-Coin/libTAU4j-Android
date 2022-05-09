@@ -3,6 +3,10 @@ package io.taucoin.torrent.publishing.ui;
 import android.content.Context;
 import android.content.Intent;
 
+import org.slf4j.LoggerFactory;
+
+import java.util.logging.Logger;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -12,6 +16,7 @@ import io.taucoin.torrent.publishing.core.utils.FixMemLeak;
 public abstract class BaseFragment extends Fragment implements
         SwipeRefreshLayout.OnRefreshListener {
     private BaseActivity baseActivity;
+    private String className = getClass().getSimpleName();
 
     @Override
     public void onRefresh() {
@@ -32,6 +37,7 @@ public abstract class BaseFragment extends Fragment implements
 
     public void showProgressDialog(boolean isCanCancel){
         if(baseActivity != null){
+            baseActivity.closeProgressDialog();
             baseActivity.showProgressDialog();
         }
     }
@@ -43,11 +49,31 @@ public abstract class BaseFragment extends Fragment implements
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        BaseActivity.logger.debug("{} onStart", className);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BaseActivity.logger.debug("{} onPause", className);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        closeProgressDialog();
+        BaseActivity.logger.debug("{} onStop", className);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         getViewModelStore().clear();
         FixMemLeak.fixOPPOLeak(this);
         FixMemLeak.fixSamSungInputConnectionLeak(baseActivity);
+        BaseActivity.logger.debug("{} onDestroy", className);
     }
 
     public void onFragmentResult(int requestCode, int resultCode, @Nullable Intent data) {
