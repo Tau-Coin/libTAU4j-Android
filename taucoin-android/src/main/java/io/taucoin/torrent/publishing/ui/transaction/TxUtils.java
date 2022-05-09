@@ -276,15 +276,15 @@ public class TxUtils {
             if (operation != null) {
                 msg.append("Funds update: ");
                 if (operation == QueueOperation.UPDATE) {
-                    msg.append("sender waiting for blocks confirmation");
+                    msg.append("transaction pending on settlement");
                 } else if (operation == QueueOperation.DELETE) {
                     msg.append("sender cancels wiring");
                 } else if (operation == QueueOperation.ON_CHAIN) {
                     msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
-                            .append(" is on chain");
+                            .append(" is on chain and settled");
                 } else if (operation == QueueOperation.ROLL_BACK) {
                     msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
-                            .append(" were rolled back by some blockchain fork, sender is resending.");
+                            .append(" were rolled back");
                 }
                 msg.append("\n").append("Community: ")
                     .append(ChainIDUtil.getName(tx.chainID))
@@ -356,10 +356,10 @@ public class TxUtils {
             msg.append("Funds update: ");
             if (operation == QueueOperation.ON_CHAIN) {
                 msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
-                        .append(" is on chain");
+                        .append(" is on chain and settled");
             } else if (operation == QueueOperation.ROLL_BACK) {
                 msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
-                        .append(" were rolled back by some blockchain fork, sender is resending.");
+                        .append(" were rolled back");
             }
             msg.append("\n").append("Community: ")
                     .append(ChainIDUtil.getName(tx.chainID))
