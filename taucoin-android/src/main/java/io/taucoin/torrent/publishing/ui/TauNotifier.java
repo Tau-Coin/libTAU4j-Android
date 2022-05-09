@@ -129,6 +129,8 @@ public class TauNotifier {
         String friendPk = friend.publicKey;
         String friendName = UsersUtil.getShowName(friend);
         Bitmap bitmap = UsersUtil.getHeadPic(friend);
+        Bitmap roundBitmap = BitmapUtil.toRoundBitmap(bitmap);
+        bitmap.recycle();
         // 点击通知后进入的活动
         Intent intent = new Intent(appContext, MainActivity.class);
         // 解决PendingIntent的extra数据不准确问题
@@ -140,7 +142,7 @@ public class TauNotifier {
 //        // 这两句非常重要，使之前的活动不出栈
 //        intent.setAction(Intent.ACTION_MAIN);
 //        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        makeNotify(friend.publicKey.hashCode(), friendName, msg, bitmap, intent);
+        makeNotify(friend.publicKey.hashCode(), friendName, msg, roundBitmap, intent);
     }
 
     /**
