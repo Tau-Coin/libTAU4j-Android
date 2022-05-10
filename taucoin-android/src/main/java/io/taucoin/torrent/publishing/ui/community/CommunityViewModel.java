@@ -243,24 +243,42 @@ public class CommunityViewModel extends AndroidViewModel {
                     if (peers.size() > 0) {
                         success = daemon.followChain(chainID, peers);
                     }
+                    logger.debug("addCommunity chainID::{}, peers::{}, success::{}", chainID,
+                            peers.size(), success);
                     if (success) {
                         community = new Community(chainID, communityName);
                         communityRepo.addCommunity(community);
+                        addMemberInfoToLocal(chainID, userPk);
                     }
                 } else {
-                    // 判断是否join, 没join也需要follow
-                    Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-                    if (null == member && peers.size() > 0) {
+                    // 如果已经被banned
+                    if (community.isBanned) {
                         success = daemon.followChain(chainID, peers);
+                        logger.debug("addCommunity isBanned::true, chainID::{}, peers::{}, success::{}",
+                                chainID, peers.size(), success);
+                        if (success) {
+                            community.isBanned = false;
+                            communityRepo.updateCommunity(community);
+                            addMemberInfoToLocal(chainID, userPk);
+                        }
                     } else {
-                        daemon.addNewBootstrapPeers(chainID, peers);
+                        success = true;
+                        // 没被banned未加入，判断是否join, 没join也需要follow
+                        Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
+                        logger.debug("addCommunity isBanned::false, chainID::{}, peers::{}, joined::{}",
+                                chainID, peers.size(), member != null);
+                        if (null == member && peers.size() > 0) {
+                            daemon.followChain(chainID, peers);
+                            addMemberInfoToLocal(chainID, userPk);
+                        } else {
+                            daemon.addNewBootstrapPeers(chainID, peers);
+                        }
                     }
                 }
                 if (peers.size() > 0) {
                     for (String peer : peers) {
                         addUserInfoToLocal(peer);
                         addMemberInfoToLocal(chainID, peer);
-                        addMemberInfoToLocal(chainID, userPk);
                     }
                 }
                 result.setSuccess(success);
