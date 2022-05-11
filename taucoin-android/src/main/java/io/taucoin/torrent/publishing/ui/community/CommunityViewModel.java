@@ -240,9 +240,7 @@ public class CommunityViewModel extends AndroidViewModel {
                 Community community = communityRepo.getCommunityByChainID(chainID);
                 if (null == community) {
                     // 链端follow community
-                    if (peers.size() > 0) {
-                        success = daemon.followChain(chainID, peers);
-                    }
+                    success = daemon.followChain(chainID, peers);
                     logger.debug("addCommunity chainID::{}, peers::{}, success::{}", chainID,
                             peers.size(), success);
                     if (success) {
@@ -267,10 +265,12 @@ public class CommunityViewModel extends AndroidViewModel {
                         Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
                         logger.debug("addCommunity isBanned::false, chainID::{}, peers::{}, joined::{}",
                                 chainID, peers.size(), member != null);
-                        if (null == member && peers.size() > 0) {
+                        if (null == member) {
                             daemon.followChain(chainID, peers);
                             addMemberInfoToLocal(chainID, userPk);
                         } else {
+                            // 防止libTAU没有此社区chain
+                            daemon.followChain(chainID, peers);
                             daemon.addNewBootstrapPeers(chainID, peers);
                         }
                     }
@@ -377,12 +377,17 @@ public class CommunityViewModel extends AndroidViewModel {
                     community.communityName, community.chainID);
 
             Account account = daemon.getAccountInfo(chainID, currentUser.publicKey);
+            Member member;
             if (account != null) {
-                Member member = new Member(community.chainID, currentUser.publicKey,
+                member = new Member(community.chainID, currentUser.publicKey,
                         account.getBalance(), account.getEffectivePower(), account.getNonce(),
                         account.getBlockNumber());
-                memberRepo.addMember(member);
+            } else {
+                // 防止与libTAU交互失败的情况！！！
+                member = new Member(community.chainID, currentUser.publicKey,
+                        0, 0, 0, 0);
             }
+            memberRepo.addMember(member);
 
             // 自动发送一笔Sell交易
             String coinName = ChainIDUtil.getCoinName(community.chainID);
