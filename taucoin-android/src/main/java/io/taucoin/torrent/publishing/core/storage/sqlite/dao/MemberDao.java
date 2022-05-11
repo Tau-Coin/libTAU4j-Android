@@ -88,8 +88,7 @@ public interface MemberDao {
     String QUERY_FOLLOWED_COMMUNITIES = "SELECT m.chainID" +
             " FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.publicKey = :userPk AND c.isBanned = 0" +
-            " AND " + WHERE_ON_CHAIN;
+            " WHERE m.publicKey = :userPk AND c.isBanned = 0";
 
     // 获取社区最大币持有者
     String QUERY_LARGEST_COIN_HOLDER = "SELECT publicKey FROM Members" +

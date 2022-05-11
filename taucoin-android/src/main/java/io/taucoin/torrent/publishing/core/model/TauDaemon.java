@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -142,10 +144,10 @@ public abstract class TauDaemon {
                     handleSettingsChanged(appContext.getString(R.string.pref_key_main_loop_frequency));
                     // 更新当前用户自己的信息
                     updateCurrentUserInfo();
+                    // 更新用户跟随的社区和其账户状态
+                    updateChainsAndAccountInfo();
                     // 账户自动更新
                     accountAutoRenewal();
-                    // 更新用户社区账户状态
-                    updateUserAccountInfo();
                 }
             }
         });
@@ -478,16 +480,42 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 更新用户社区账户状态
+     * 更新用户跟随的社区和其账户状态
      */
-    public void updateUserAccountInfo() {
+    private void updateChainsAndAccountInfo() {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             UserRepository userRepo = RepositoryHelper.getUserRepository(appContext);
             MemberRepository memberRepo = RepositoryHelper.getMemberRepository(appContext);
             User user = userRepo.getCurrentUser();
             if (user != null) {
-                // 获取未加入或者过期社区列表
-                List<Member> list = memberRepo.getUnJoinedExpiredCommunityList(user.publicKey);
+                String userPk = user.publicKey;
+                // 1、检查本地followed的社区和libTAU中followed的社区数据是否一致
+                List<String> tauChains = getTauAllChains();
+                List<String> localChains = memberRepo.queryFollowedCommunities(userPk);
+                logger.debug("checkAllChains localChain::{}, tauChains::{}",
+                        localChains.size(), tauChains.size());
+                // 1.1、处理本地跟随的chains, libTAU未跟随的情况
+                for (String chainID : localChains) {
+                    if (!tauChains.contains(chainID)) {
+                        // libTAU followChain
+                        List<String> list = memberRepo.queryCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT);
+                        Set<String> peers = new HashSet<>(list);
+                        boolean success = followChain(chainID, peers);
+                        logger.debug("checkAllChains followChain chainID::{}, success::{}", chainID, success);
+                    } else {
+                        // 从列表中移除，为1.2准备数据
+                        tauChains.remove(chainID);
+                    }
+                }
+                // 1.2、处理本地未跟随的chains, libTAU跟随的情况
+                for (String chainID : tauChains) {
+                    // libTAU unfollowChain
+                    boolean success = unfollowChain(chainID);
+                    logger.debug("checkAllChains unfollowChain chainID::{}, success::{}", chainID, success);
+                }
+
+                // 2、获取未加入或者过期社区列表, 从其他节点请求状态数据
+                List<Member> list = memberRepo.getUnJoinedExpiredCommunityList(userPk);
                 logger.debug("updateUserAccountInfo count::{}", null == list ? 0 : list.size());
                 if (list != null && list.size() > 0) {
                     for (Member m: list) {
@@ -504,7 +532,21 @@ public abstract class TauDaemon {
     /**
      * 请求用户社区账户状态
      */
-    public void requestAccountState(String chainID) {
+    private List<String> getTauAllChains() {
+        List<String> list = null;
+        if (isRunning) {
+            list = sessionManager.getAllChains();
+        }
+        if (null == list) {
+            list = new ArrayList<>();
+        }
+        return list;
+    }
+
+    /**
+     * 请求用户社区账户状态
+     */
+    void requestAccountState(String chainID) {
         if (isRunning) {
             if (StringUtil.isNotEmpty(chainID)) {
                 sessionManager.requestChainState(ChainIDUtil.encode(chainID));
