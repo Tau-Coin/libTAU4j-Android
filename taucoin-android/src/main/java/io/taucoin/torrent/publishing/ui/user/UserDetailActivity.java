@@ -19,6 +19,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
+import io.taucoin.torrent.publishing.core.utils.DrawablesUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
@@ -99,9 +100,9 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         userViewModel.getUserDetail(publicKey);
 
         boolean isMine = StringUtil.isEquals(publicKey, MainApplication.getInstance().getPublicKey());
-        if ((type == TYPE_CHAT_PAGE || type == TYPE_FRIEND_LIST) && !isMine) {
-            binding.tvBan.setVisibility(View.VISIBLE);
-        }
+        boolean isShowBan = (type == TYPE_CHAT_PAGE || type == TYPE_FRIEND_LIST) && !isMine;
+        binding.leftView.tvBlacklist.setVisibility(isShowBan ? View.VISIBLE : View.GONE);
+        binding.leftView.tvBlacklist.setOnClickListener(this);
     }
 
     private void initData() {
@@ -114,7 +115,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             } else {
                 binding.tvAddToContact.setVisibility(View.GONE);
                 binding.tvStartChat.setVisibility(View.VISIBLE);
-                binding.tvRemark.setVisibility(View.VISIBLE);
             }
         });
 
@@ -148,7 +148,11 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         binding.tvAddToContact.setVisibility(!isMine && userInfo.isDiscovered() ? View.VISIBLE : View.GONE);
         boolean isShowChat = !isMine && !userInfo.isDiscovered() && type != TYPE_CHAT_PAGE;
         binding.tvStartChat.setVisibility(isShowChat ? View.VISIBLE : View.GONE);
-        binding.tvRemark.setVisibility(!isMine && !userInfo.isDiscovered() ? View.VISIBLE : View.GONE);
+        if (!isMine) {
+            DrawablesUtil.setEndDrawable(binding.tvShowName, R.mipmap.icon_edit,
+                    getResources().getDimension(R.dimen.widget_size_20));
+            binding.tvShowName.setOnClickListener(this);
+        }
         this.user = userInfo;
         if (!isMine) {
             String nickName = UsersUtil.getCurrentUserName(user);
@@ -157,12 +161,11 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         binding.tvNickName.setVisibility(isMine ? View.GONE : View.VISIBLE);
         String showName = UsersUtil.getShowName(user);
         binding.tvShowName.setText(showName);
-        binding.leftView.setImageBitmap(UsersUtil.getHeadPic(userInfo));
+        binding.leftView.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(userInfo));
         String midHideName = UsersUtil.getMidHideName(user.publicKey);
         binding.tvPublicKey.setText(getString(R.string.user_public_key, midHideName));
-        binding.ivPublicKeyCopy.setOnClickListener(v -> {
-            copyPublicKey(user.publicKey);
-        });
+        DrawablesUtil.setEndDrawable(binding.tvPublicKey, R.mipmap.icon_copy_text,
+                getResources().getDimension(R.dimen.widget_size_16));
         binding.tvPublicKey.setOnClickListener(v -> {
             copyPublicKey(user.publicKey);
         });
@@ -188,10 +191,10 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
                 onBackPressed();
                 openChatActivity(user.publicKey);
                 break;
-            case R.id.tv_remark:
+            case R.id.tv_show_name:
                 userViewModel.showRemarkDialog(this, publicKey);
                 break;
-            case R.id.tv_ban:
+            case R.id.tv_blacklist:
                 userViewModel.setUserBlacklist(publicKey, true);
                 break;
             case R.id.iv_public_key_copy:
@@ -234,6 +237,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        BitmapUtil.recycleImageView(binding.leftView);
+        BitmapUtil.recycleImageView(binding.leftView.ivHeadPic);
     }
 }

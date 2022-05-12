@@ -355,7 +355,6 @@
     <string name="user_start_chat">Chat</string>
     <string name="user_remark">Remark</string>
     <string name="user_remark_too_long">Remark too long</string>
-    <string name="user_add_to_contact">Add To Friends</string>
     <string name="user_share_qr">Share QR To Friend</string>
 
     <string name="operation_copy">Copy</string>
