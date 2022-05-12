@@ -88,11 +88,13 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
             }
             if (holder.binding instanceof ItemGroupListBinding) {
                 ItemGroupListBinding binding = (ItemGroupListBinding) holder.binding;
-                if(bean.timestamp > 0){
+                if (bean.timestamp > 0) {
                     String time = DateUtil.getWeekTime(bean.timestamp);
                     binding.tvMsgLastTime.setText(time);
-                }else{
+                    binding.tvMsgLastTime.setVisibility(View.VISIBLE);
+                } else {
                     binding.tvMsgLastTime.setText(null);
+                    binding.tvMsgLastTime.setVisibility(View.GONE);
                 }
                 String communityName = ChainIDUtil.getName(bean.ID);
                 String communityCode = ChainIDUtil.getCode(bean.ID);
@@ -133,8 +135,10 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 if (bean.timestamp > 0) {
                     String time = DateUtil.getWeekTime(bean.timestamp);
                     binding.tvMsgLastTime.setText(time);
+                    binding.tvMsgLastTime.setVisibility(View.VISIBLE);
                 } else {
                     binding.tvMsgLastTime.setText(null);
+                    binding.tvMsgLastTime.setVisibility(View.GONE);
                 }
                 binding.msgUnread.setVisibility(bean.msgUnread > 0 ? View.VISIBLE : View.GONE);
             }

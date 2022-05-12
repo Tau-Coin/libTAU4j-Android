@@ -50,7 +50,7 @@
         <LinearLayout
             android:id="@+id/middle_view"
             android:layout_toEndOf="@+id/rl_left_view"
-            android:layout_toStartOf="@id/tv_msg_last_time"
+            android:layout_toStartOf="@id/ll_right"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -89,21 +89,36 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_msg_last_time"
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/ll_right"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/widget_size_10"
-            android:layout_marginEnd="@dimen/widget_size_15"
-            android:paddingBottom="@dimen/widget_size_35"
-            android:gravity="center_vertical|end"
+            android:layout_marginEnd="@dimen/widget_size_7"
             android:layout_centerVertical="true"
-            android:singleLine="true"
-            android:includeFontPadding="false"
-            android:ellipsize="end"
-            android:textColor="@color/gray_dark"
-            android:textAppearance="@style/TextAppearanceBody3" />
+            android:layout_alignParentEnd="true">
+
+            <TextView
+                android:id="@+id/tv_msg_last_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/widget_size_10"
+                android:gravity="center_vertical|end"
+                android:singleLine="true"
+                android:includeFontPadding="false"
+                android:ellipsize="end"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody3" />
+
+            <ImageView
+                android:layout_width="@dimen/widget_size_20"
+                android:layout_height="@dimen/widget_size_20"
+                android:layout_gravity="end"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_long_press"/>
+
+        </LinearLayout>
 
         <include
             android:layout_width="match_parent"
