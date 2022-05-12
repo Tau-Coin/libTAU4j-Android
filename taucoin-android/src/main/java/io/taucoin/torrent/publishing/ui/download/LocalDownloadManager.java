@@ -123,7 +123,7 @@ class LocalDownloadManager {
         // 设置通知栏的message
         request.setDescription(context.getString(R.string.app_upgrade_description));
         // 现在完成后在通知栏里显示
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         // 系统下载界面是否显示
         request.setVisibleInDownloadsUi(true);
         // 允许漫游时下载
