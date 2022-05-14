@@ -112,6 +112,7 @@
                 android:textAppearance="@style/TextAppearanceBody3" />
 
             <ImageView
+                android:id="@+id/iv_long_press"
                 android:layout_width="@dimen/widget_size_20"
                 android:layout_height="@dimen/widget_size_20"
                 android:layout_gravity="end"

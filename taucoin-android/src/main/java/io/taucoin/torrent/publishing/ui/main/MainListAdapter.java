@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.util.Arrays;
 
@@ -86,6 +87,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
             if(null == holder || null == bean){
                 return;
             }
+            ImageView ivLongPress = null;
             if (holder.binding instanceof ItemGroupListBinding) {
                 ItemGroupListBinding binding = (ItemGroupListBinding) holder.binding;
                 if (bean.timestamp > 0) {
@@ -119,6 +121,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 binding.leftView.setBgColor(bgColor);
 
                 binding.msgUnread.setVisibility(bean.msgUnread > 0 ? View.VISIBLE : View.GONE);
+                ivLongPress = binding.ivLongPress;
             } else if (holder.binding instanceof ItemChatListBinding) {
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;
                 String friendNickName = UsersUtil.getShowNameWithYourself(bean.friend, bean.ID);
@@ -141,6 +144,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                     binding.tvMsgLastTime.setVisibility(View.GONE);
                 }
                 binding.msgUnread.setVisibility(bean.msgUnread > 0 ? View.VISIBLE : View.GONE);
+                ivLongPress = binding.ivLongPress;
             }
             holder.binding.getRoot().setOnClickListener(v -> {
                 if (listener != null) {
@@ -153,7 +157,13 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 }
                 return true;
             });
-
+            if (ivLongPress != null) {
+                ivLongPress.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onItemLongClicked(bean);
+                    }
+                });
+            }
             if (bean.stickyTop == 1) {
                 holder.binding.getRoot().setBackgroundColor(context.getResources().getColor(R.color.divider_light));
             } else {
