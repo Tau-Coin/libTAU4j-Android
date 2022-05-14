@@ -126,13 +126,13 @@ public class TopConsensusFragment extends BaseFragment implements TopConsensusAd
                     .subscribe(community -> {
                         Type type = new TypeToken<List<ConsensusInfo>>(){}.getType();
                         List<ConsensusInfo> list = new Gson().fromJson(community.topConsensus, type);
-                        if (list != null) {
+                        if (list != null && adapter != null) {
                             Collections.sort(list);
                             adapter.submitList(list);
                         }
                     }));
         } else {
-            disposables.add(getTopTipBlock(chainID, 3)
+            disposables.add(getTopTipBlock(chainID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(list -> adapter.submitList(list)));
@@ -142,25 +142,30 @@ public class TopConsensusFragment extends BaseFragment implements TopConsensusAd
     /**
      * 获取tip block列表
      * @param chainID 社区ID
-     * @param topNum 返回的数目
      * @return Observable<List<Block>>
      */
-    Observable<List<ConsensusInfo>> getTopTipBlock(String chainID, int topNum) {
+    private Observable<List<ConsensusInfo>> getTopTipBlock(String chainID) {
         return Observable.create(emitter -> {
             try {
+                int topNum = 3;
                 List<Block> blocks = tauDaemon.getTopTipBlock(chainID, topNum);
                 List<ConsensusInfo> list = new ArrayList<>();
                 if (blocks != null && blocks.size() > 0) {
                     for (Block block : blocks) {
+                        if (emitter.isDisposed()) {
+                            break;
+                        }
                         ConsensusInfo info = new ConsensusInfo(block.Hash(), block.getBlockNumber(),
                                 block.getBlockNumber());
                         list.add(info);
-                        if (list.size() == 3) {
+                        if (list.size() == topNum) {
                             break;
                         }
                     }
                 }
-                emitter.onNext(list);
+                if (!emitter.isDisposed()) {
+                    emitter.onNext(list);
+                }
             } catch (Exception e) {
                 logger.error("getBlockByNumber error ", e);
             }
