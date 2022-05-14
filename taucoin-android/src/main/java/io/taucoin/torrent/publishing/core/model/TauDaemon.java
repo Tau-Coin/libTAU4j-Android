@@ -222,6 +222,7 @@ public abstract class TauDaemon {
                 .setAccountSeed(seed)
                 .setDeviceID(deviceID)
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir)
+//                .setDatabaseDir(FileUtil.getExternalDir())  // 数据库sdcard测试路径
                 .setDhtNonReferable(true)
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)

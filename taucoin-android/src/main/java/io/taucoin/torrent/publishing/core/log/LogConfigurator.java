@@ -16,7 +16,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import io.taucoin.torrent.publishing.BuildConfig;
-import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.utils.FileUtil;
 import io.taucoin.torrent.publishing.core.utils.LogbackSizeBasedTriggeringPolicy;
 
 /**
@@ -39,21 +39,7 @@ public class LogConfigurator {
     }
 
     public static String getLogDir() {
-        Context context = MainApplication.getInstance();
-        String logDir;
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-            || !Environment.isExternalStorageRemovable()) {
-            //外部存储可用
-            File file = context.getExternalFilesDir(null);
-            if (file != null && file.exists()) {
-                logDir = file.getAbsolutePath();
-            } else {
-                logDir = Environment.getExternalStorageDirectory() + File.separator + BuildConfig.APPLICATION_ID;
-            }
-        } else {
-            //外部存储不可用
-            logDir = context.getFilesDir().getPath() ;
-        }
+        String logDir = FileUtil.getExternalDir();
         String prefix = "logs";
         logDir += File.separator + prefix;
         return logDir;
