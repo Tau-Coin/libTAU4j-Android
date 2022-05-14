@@ -339,6 +339,10 @@
         <item name="android:textSize">@dimen/font_size_14</item>
     </style>
 
+    <style name="TabLayoutMain" parent="@android:style/TextAppearance.Widget.TabWidget">
+        <item name="android:textSize">@dimen/font_size_16</item>
+    </style>
+
     <style name="TextAppearanceHeadline4" parent="Base.TextAppearance.MaterialComponents.Headline6">
         <!-- Roboto Medium was added in this api level -->
         <item name="fontFamily">sans-serif-medium</item>

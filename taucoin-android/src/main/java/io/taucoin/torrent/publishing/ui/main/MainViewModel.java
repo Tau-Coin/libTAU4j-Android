@@ -2,6 +2,9 @@ package io.taucoin.torrent.publishing.ui.main;
 
 import android.app.Application;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +34,9 @@ public class MainViewModel extends AndroidViewModel {
     private final static Logger logger = LoggerFactory.getLogger("MainViewModel");
     private CommunityRepository communityRepo;
     private TauDaemon daemon;
-    private MutableLiveData<List<CommunityAndFriend>> homeData = new MutableLiveData<>();
+    private MutableLiveData<List<CommunityAndFriend>> homeAllData = new MutableLiveData<>();
+    private MutableLiveData<List<CommunityAndFriend>> homeCommunityData = new MutableLiveData<>();
+    private MutableLiveData<List<CommunityAndFriend>> homeFriendData = new MutableLiveData<>();
     private CompositeDisposable disposables = new CompositeDisposable();
     private Disposable homeDisposable;
     public MainViewModel(@NonNull Application application) {
@@ -52,8 +57,16 @@ public class MainViewModel extends AndroidViewModel {
         return communityRepo.observeHomeChanged();
     }
 
-    public MutableLiveData<List<CommunityAndFriend>> getHomeData() {
-        return homeData;
+    public MutableLiveData<List<CommunityAndFriend>> getHomeAllData() {
+        return homeAllData;
+    }
+
+    public MutableLiveData<List<CommunityAndFriend>> getHomeCommunityData() {
+        return homeCommunityData;
+    }
+
+    public MutableLiveData<List<CommunityAndFriend>> getHomeFriendData() {
+        return homeFriendData;
     }
 
     /**
@@ -71,12 +84,16 @@ public class MainViewModel extends AndroidViewModel {
             if (null == list) {
                 list = new ArrayList<>();
             }
+            Iterable<CommunityAndFriend> communities = Iterables.filter(list, data -> data != null && data.type == 0);
+            Iterable<CommunityAndFriend> friends = Iterables.filter(list, data -> data != null && data.type == 1);
+            homeCommunityData.postValue(Lists.newArrayList(communities));
+            homeFriendData.postValue(Lists.newArrayList(friends));
             long end = DateUtil.getMillisTime();
             logger.debug("queryHomeData time::{}, list::{}", end - start, list.size());
             emitter.onNext(list);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
-                 .subscribe(list -> homeData.postValue(list));
+                 .subscribe(list -> homeAllData.postValue(list));
     }
 
     @Override

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
@@ -40,6 +41,45 @@
                 android:layout_marginStart="@dimen/widget_size_10"
                 android:textAppearance="@style/TextAppearanceBody1"/>
         </LinearLayout>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_height="@dimen/widget_size_40"
+            android:layout_width="match_parent"
+            android:background="@color/color_white"
+            app:tabIndicatorFullWidth="false"
+            app:tabMode="fixed"
+            app:tabMaxWidth="0dp"
+            app:tabGravity="fill"
+            app:tabTextAppearance="@style/TabLayoutMain"
+            app:tabIndicatorHeight="@dimen/widget_size_4"
+            app:tabIndicatorColor="@color/primary_dark"
+            app:tabSelectedTextColor="@color/primary_dark"
+            app:tabTextColor="@color/gray_dark"
+            app:tabBackground="@color/color_transparent"
+            app:tabRippleColor="@color/color_transparent">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/main_tab_all"/>
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/main_tab_community"/>
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/main_tab_personal"/>
+
+        </com.google.android.material.tabs.TabLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_1"
+            android:background="@color/color_bg"/>
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/refresh_layout"

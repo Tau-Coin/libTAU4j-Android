@@ -2,11 +2,11 @@ package io.taucoin.torrent.publishing.ui.main;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.style.URLSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.tabs.TabLayout;
 import com.noober.menu.FloatMenu;
 
 import java.util.ArrayList;
@@ -26,12 +26,10 @@ import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
-import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
@@ -93,8 +91,30 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
             }
         });
         showProgressDialog();
-        viewModel.getHomeData().observe(getViewLifecycleOwner(), this::showCommunityList);
+        viewModel.getHomeAllData().observe(getViewLifecycleOwner(), list -> {
+            int pos = binding.tabLayout.getSelectedTabPosition();
+            showCommunityList(pos);
+        });
+
+        binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
     }
+
+    private TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+        @Override
+        public void onTabSelected(TabLayout.Tab tab) {
+            showCommunityList(tab.getPosition());
+        }
+
+        @Override
+        public void onTabUnselected(TabLayout.Tab tab) {
+
+        }
+
+        @Override
+        public void onTabReselected(TabLayout.Tab tab) {
+
+        }
+    };
 
     private void subscribeMainViewModel() {
         viewModel.queryHomeData();
@@ -151,10 +171,18 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         }
     }
 
-    private void showCommunityList(List<CommunityAndFriend> communities) {
+    private void showCommunityList(int pos) {
         closeProgressDialog();
-        if (communities != null) {
-            adapter.submitList(communities);
+        List<CommunityAndFriend> list;
+        if (pos == 1) {
+            list = viewModel.getHomeCommunityData().getValue();
+        } else if (pos == 2) {
+            list = viewModel.getHomeFriendData().getValue();
+        } else {
+            list = viewModel.getHomeAllData().getValue();
+        }
+        if (list != null) {
+            adapter.submitList(list);
         }
     }
 
@@ -178,6 +206,14 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         if (operationsMenu != null) {
             operationsMenu.setOnItemClickListener(null);
             operationsMenu.dismiss();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (binding.tabLayout != null) {
+            binding.tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
         }
     }
 
