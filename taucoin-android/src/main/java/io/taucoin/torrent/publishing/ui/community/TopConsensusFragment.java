@@ -1,7 +1,6 @@
 package io.taucoin.torrent.publishing.ui.community;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.view.ViewGroup;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.libTAU4j.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,26 +24,20 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
-import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMemberBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 
 /**
  * 社区排名页面
  */
-public class TopConsensusFragment extends BaseFragment implements TopConsensusAdapter.ClickListener {
+public class TopConsensusFragment extends BaseFragment {
 
     static final int TOP_CONSENSUS = 0x03;
     static final int TOP_TIP = 0x04;
@@ -55,7 +47,6 @@ public class TopConsensusFragment extends BaseFragment implements TopConsensusAd
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
     private TopConsensusAdapter adapter;
-    private TauDaemon tauDaemon;
 
     private String chainID;
     private int type;
@@ -75,7 +66,6 @@ public class TopConsensusFragment extends BaseFragment implements TopConsensusAd
         assert activity != null;
         ViewModelProvider provider = new ViewModelProvider(activity);
         communityViewModel = provider.get(CommunityViewModel.class);
-        tauDaemon = TauDaemon.getInstance(activity);
         initParameter();
         initView();
     }
@@ -95,7 +85,7 @@ public class TopConsensusFragment extends BaseFragment implements TopConsensusAd
      */
     private void initView() {
         logger.debug("chainID::{}, type::{}", chainID, type);
-        adapter = new TopConsensusAdapter(this, type);
+        adapter = new TopConsensusAdapter();
         DefaultItemAnimator animator = new DefaultItemAnimator() {
             @Override
             public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
@@ -128,61 +118,20 @@ public class TopConsensusFragment extends BaseFragment implements TopConsensusAd
                         List<ConsensusInfo> list = new Gson().fromJson(community.topConsensus, type);
                         if (list != null && adapter != null) {
                             Collections.sort(list);
-                            adapter.submitList(list);
+                            adapter.submitList(new ArrayList<>(list));
                         }
                     }));
         } else {
-            disposables.add(getTopTipBlock(chainID)
+            disposables.add(communityViewModel.observerCommunityTopBlocks(chainID, 3)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(list -> adapter.submitList(list)));
+                    .subscribe(list -> adapter.submitList(new ArrayList<>(list))));
         }
-    }
-
-    /**
-     * 获取tip block列表
-     * @param chainID 社区ID
-     * @return Observable<List<Block>>
-     */
-    private Observable<List<ConsensusInfo>> getTopTipBlock(String chainID) {
-        return Observable.create(emitter -> {
-            try {
-                int topNum = 3;
-                List<Block> blocks = tauDaemon.getTopTipBlock(chainID, topNum);
-                List<ConsensusInfo> list = new ArrayList<>();
-                if (blocks != null && blocks.size() > 0) {
-                    for (Block block : blocks) {
-                        if (emitter.isDisposed()) {
-                            break;
-                        }
-                        ConsensusInfo info = new ConsensusInfo(block.Hash(), block.getBlockNumber(),
-                                block.getBlockNumber());
-                        list.add(info);
-                        if (list.size() == topNum) {
-                            break;
-                        }
-                    }
-                }
-                if (!emitter.isDisposed()) {
-                    emitter.onNext(list);
-                }
-            } catch (Exception e) {
-                logger.error("getBlockByNumber error ", e);
-            }
-            emitter.onComplete();
-        });
     }
 
     @Override
     public void onStop() {
         super.onStop();
         disposables.clear();
-    }
-
-    @Override
-    public void onItemClicked(String publicKey) {
-        Intent intent = new Intent();
-        intent.putExtra(IntentExtra.PUBLIC_KEY, publicKey);
-        ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
     }
 }

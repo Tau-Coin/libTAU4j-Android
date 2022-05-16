@@ -671,6 +671,10 @@ public class CommunityViewModel extends AndroidViewModel {
         return communityRepo.observerCommunityByChainID(chainID);
     }
 
+    Flowable<List<BlockInfo>> observerCommunityTopBlocks(String chainID, int num) {
+        return communityRepo.observerCommunityTopBlocks(chainID, num);
+    }
+
     LiveData<PagedList<MemberAndFriend>> observerCommunityMembers(String chainID) {
         return new LivePagedListBuilder<>(queryCommunityMembers(chainID),
                 Page.getPageListConfig()).build();

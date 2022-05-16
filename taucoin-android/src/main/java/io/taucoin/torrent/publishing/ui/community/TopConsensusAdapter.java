@@ -3,30 +3,32 @@ package io.taucoin.torrent.publishing.ui.community;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
-import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
+import io.taucoin.torrent.publishing.core.utils.HashUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ItemChainTopBinding;
 
 /**
  * 社区排名的Adapter
  */
-public class TopConsensusAdapter extends ListAdapter<ConsensusInfo, TopConsensusAdapter.ViewHolder> {
-    private ClickListener listener;
-    private int type;
+public class TopConsensusAdapter extends ListAdapter<Object, TopConsensusAdapter.ViewHolder> {
 
-    TopConsensusAdapter(ClickListener listener, int type) {
+    TopConsensusAdapter() {
         super(diffCallback);
-        this.listener = listener;
-        this.type = type;
+    }
+
+    public void submitList(@Nullable List<Object> list) {
+        super.submitList(list);
     }
 
     @NonNull
@@ -38,7 +40,7 @@ public class TopConsensusAdapter extends ListAdapter<ConsensusInfo, TopConsensus
                 parent,
                 false);
 
-        return new ViewHolder(binding, listener, type);
+        return new ViewHolder(binding);
     }
 
     @Override
@@ -48,41 +50,49 @@ public class TopConsensusAdapter extends ListAdapter<ConsensusInfo, TopConsensus
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         private ItemChainTopBinding binding;
-        private ClickListener listener;
-        private int type;
 
-        ViewHolder(ItemChainTopBinding binding, ClickListener listener, int type) {
+        ViewHolder(ItemChainTopBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            this.listener = listener;
-            this.type = type;
         }
 
-        void bind(ViewHolder holder, ConsensusInfo info, int pos) {
-            if(null == holder || null == info){
+        void bind(ViewHolder holder, Object obj, int pos) {
+            if(null == holder || null == obj){
                 return;
             }
             holder.binding.tvCol1.setText(String.valueOf(pos + 1));
-            holder.binding.tvCol2.setText(String.valueOf(info.getNumber()));
-            holder.binding.tvCol3.setText(info.getHash());
-
+            if (obj instanceof ConsensusInfo) {
+                ConsensusInfo info = (ConsensusInfo) obj;
+                holder.binding.tvCol2.setText(String.valueOf(info.getNumber()));
+                holder.binding.tvCol3.setText(HashUtil.hashMiddleHide(info.getHash()));
+            } else if (obj instanceof BlockInfo) {
+                BlockInfo info = (BlockInfo) obj;
+                holder.binding.tvCol2.setText(String.valueOf(info.blockNumber));
+                holder.binding.tvCol3.setText(HashUtil.hashMiddleHide(info.blockHash));
+            }
             ViewUtils.updateViewWeight(binding.tvCol2, 3);
             ViewUtils.updateViewWeight(binding.tvCol3, 4);
         }
     }
 
-    public interface ClickListener {
-        void onItemClicked(String publicKey);
-    }
-
-    private static final DiffUtil.ItemCallback<ConsensusInfo> diffCallback = new DiffUtil.ItemCallback<ConsensusInfo>() {
+    private static final DiffUtil.ItemCallback<Object> diffCallback = new DiffUtil.ItemCallback<Object>() {
         @Override
-        public boolean areContentsTheSame(@NonNull ConsensusInfo oldItem, @NonNull ConsensusInfo newItem) {
-            return oldItem.equals(newItem);
+        public boolean areContentsTheSame(@NonNull Object oldItem, @NonNull Object newItem) {
+            if (oldItem instanceof ConsensusInfo) {
+                return ((ConsensusInfo)oldItem).equals(newItem);
+            } else if (oldItem instanceof BlockInfo) {
+                return ((BlockInfo)oldItem).equals(newItem);
+            }
+            return true;
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull ConsensusInfo oldItem, @NonNull ConsensusInfo newItem) {
+        public boolean areItemsTheSame(@NonNull Object oldItem, @NonNull Object newItem) {
+            if (oldItem instanceof ConsensusInfo) {
+                return ((ConsensusInfo)oldItem).equals(newItem);
+            } else if (oldItem instanceof BlockInfo) {
+                return ((BlockInfo)oldItem).equals(newItem);
+            }
             return oldItem.equals(newItem);
         }
     };

@@ -13,6 +13,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 
@@ -134,6 +135,11 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     @Override
     public Flowable<Community> observerCommunityByChainID(String chainID) {
         return db.communityDao().observerCommunityByChainID(chainID);
+    }
+
+    @Override
+    public Flowable<List<BlockInfo>> observerCommunityTopBlocks(String chainID, int num) {
+        return db.blockDao().observerCommunityTopBlocks(chainID, num);
     }
 
     @Override

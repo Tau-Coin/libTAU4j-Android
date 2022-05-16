@@ -74,6 +74,10 @@ public interface BlockDao {
             " AND miner != (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")) AS c" +
             " ON a.chainID = c.chainID";
 
+    String QUERY_BLOCKS_LIMIT = "SELECT * FROM Blocks " +
+            " WHERE chainID = :chainID AND status == 1" +
+            " ORDER BY blockNumber DESC LIMIT :num";
+
     /**
      * 添加用户设备信息
      */
@@ -111,4 +115,7 @@ public interface BlockDao {
 
     @Query(QUERY_BLOCKS_STATISTICS)
     Flowable<BlockStatistics> getBlocksStatistics(String chainID);
+
+    @Query(QUERY_BLOCKS_LIMIT)
+    Flowable<List<BlockInfo>> observerCommunityTopBlocks(String chainID, int num);
 }

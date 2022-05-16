@@ -4,10 +4,10 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 
@@ -69,6 +69,8 @@ public interface CommunityRepository {
     Single<Member> getMemberSingle(String chainID);
 
     Flowable<Community> observerCommunityByChainID(String chainID);
+
+    Flowable<List<BlockInfo>> observerCommunityTopBlocks(String chainID, int num);
 
     /**
      * 清除社区状态，totalBlocks, syncBlock数据
