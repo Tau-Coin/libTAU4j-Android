@@ -385,7 +385,7 @@ public class TxViewModel extends AndroidViewModel {
                     ByteUtil.toByte(tx.receiverPk).length != Ed25519.PUBLIC_KEY_SIZE) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_pk);
                 return false;
-            } else if (tx.amount < 0) {
+            } else if (tx.amount <= 0) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_amount);
                 return false;
             } else if (tx.fee < 0) {

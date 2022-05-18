@@ -167,6 +167,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
                     FmtMicrometer.fmtTxLongValue(fee), TxType.WIRING_TX, txContent.getEncoded());
         if (txQueue != null) {
             tx.queueID = txQueue.queueID;
+            tx.queueTime = txQueue.queueTime;
         }
         return tx;
     }

@@ -382,6 +382,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
                     FmtMicrometer.fmtTxLongValue(fee), TxType.TRUST_TX, content.getEncoded());
             if (txQueue != null) {
                 tx.queueID = txQueue.queueID;
+                tx.queueTime = txQueue.queueTime;
             }
             if (txViewModel.validateTx(tx)) {
                 txViewModel.addTransaction(tx, txQueue);

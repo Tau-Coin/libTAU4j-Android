@@ -190,6 +190,7 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
                 FmtMicrometer.fmtTxLongValue(fee), TxType.AIRDROP_TX, content.getEncoded());
         if (txQueue != null) {
             tx.queueID = txQueue.queueID;
+            tx.queueTime = txQueue.queueTime;
         }
         return tx;
     }

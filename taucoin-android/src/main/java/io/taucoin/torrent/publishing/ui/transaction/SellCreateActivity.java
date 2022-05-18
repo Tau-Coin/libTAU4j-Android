@@ -165,6 +165,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
                 FmtMicrometer.fmtTxLongValue(fee), TxType.SELL_TX, content.getEncoded());
         if (txQueue != null) {
             tx.queueID = txQueue.queueID;
+            tx.queueTime = txQueue.queueTime;
         }
         return tx;
     }

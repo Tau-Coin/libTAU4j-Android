@@ -255,8 +255,12 @@ public class TxUtils {
             SpanUtils msg = new SpanUtils();
             String coinName = ChainIDUtil.getCoinName(tx.chainID);
             String communityName = ChainIDUtil.getName(tx.chainID);
-            msg.append("I am sending you ");
-            msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName);
+            if (tx.txType == TxType.WIRING_TX.getType()) {
+                msg.append("I am sending you ");
+                msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName);
+            } else {
+                msg.append("I am posting news ");
+            }
             msg.append(" of ").append(communityName);
             msg.append(" community with ");
             msg.append(FmtMicrometer.fmtFeeValue(tx.fee)).append(" ").append(coinName);
@@ -279,18 +283,14 @@ public class TxUtils {
                     msg.append("transaction pending on settlement");
                 } else if (operation == QueueOperation.DELETE) {
                     msg.append("sender cancels wiring");
-                } else if (operation == QueueOperation.ON_CHAIN) {
-                    msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
-                            .append(" is on chain and settled");
-                } else if (operation == QueueOperation.ROLL_BACK) {
-                    msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
-                            .append(" were rolled back");
                 }
                 msg.append("\n").append("Community: ")
                     .append(ChainIDUtil.getName(tx.chainID))
+                    .append("\n").append("ID: ")
+                    .append(HashUtil.hashMiddleHide(String.valueOf(tx.queueTime)))
                     .append("\n");
             }
-            if (txType == TxType.WIRING_TX.getType()) {
+            if (txType == TxType.WIRING_TX.getType() && tx.amount > 0) {
                 msg.append("Amount: ").append(FmtMicrometer.fmtBalance(tx.amount))
                         .append(" ").append(coinName)
                         .append("\n");
@@ -348,21 +348,30 @@ public class TxUtils {
         return msg.create();
     }
 
-    public static SpannableStringBuilder createSpanTxQueue(Tx tx, QueueOperation operation) {
+    public static SpannableStringBuilder createSpanTxQueue(Tx tx, long timestamp, QueueOperation operation) {
         String coinName = ChainIDUtil.getCoinName(tx.chainID);
         SpanUtils msg = new SpanUtils();
         int txType = tx.txType;
         if (operation != null) {
             msg.append("Funds update: ");
+            String prefix;
+            if (txType == TxType.WIRING_TX.getType()) {
+                prefix = FmtMicrometer.fmtBalance(tx.amount) + " " + coinName;
+            } else {
+                prefix = "News";
+            }
             if (operation == QueueOperation.ON_CHAIN) {
-                msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
-                        .append(" is on chain and settled");
+                msg.append(prefix);
+                msg.append(" is on chain and settled");
             } else if (operation == QueueOperation.ROLL_BACK) {
+                msg.append(prefix);
                 msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
                         .append(" were rolled back");
             }
             msg.append("\n").append("Community: ")
                     .append(ChainIDUtil.getName(tx.chainID))
+                    .append("\n").append("ID: ")
+                    .append(HashUtil.hashMiddleHide(String.valueOf(timestamp)))
                     .append("\n");
         }
         if (txType == TxType.WIRING_TX.getType()) {

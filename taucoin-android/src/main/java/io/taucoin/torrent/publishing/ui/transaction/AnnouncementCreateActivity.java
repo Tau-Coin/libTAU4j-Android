@@ -149,6 +149,7 @@ public class AnnouncementCreateActivity extends BaseActivity implements View.OnC
                 FmtMicrometer.fmtTxLongValue(fee), TxType.ANNOUNCEMENT, content.getEncoded());
         if (txQueue != null) {
             tx.queueID = txQueue.queueID;
+            tx.queueTime = txQueue.queueTime;
         }
         return tx;
     }

@@ -33,6 +33,7 @@ import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.message.MsgContent;
 import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -269,6 +270,11 @@ public class ChatViewModel extends AndroidViewModel {
      * @param context Context
      */
     public static Result syncSendMessageTask(Context context, TxQueue tx, QueueOperation operation) {
+        // 自己发给自己的wiring交易，并且交易金额为0；不发送点对点消息
+        if (null == tx || (operation == QueueOperation.INSERT && tx.txType == TxType.WIRING_TX.getType() &&
+                StringUtil.isEquals(tx.senderPk, tx.receiverPk) && tx.amount <= 0 )) {
+            return null;
+        }
         String text = TxUtils.createSpanTxQueue(tx, operation).toString();
         return syncSendMessageTask(context, tx.senderPk, tx.receiverPk, text,
                 MessageType.WIRING.getType(), tx.chainID);
@@ -278,8 +284,8 @@ public class ChatViewModel extends AndroidViewModel {
      * 同步给朋友发转账任务
      * @param context Context
      */
-    public static Result syncSendMessageTask(Context context, Tx tx, QueueOperation operation) {
-        String text = TxUtils.createSpanTxQueue(tx, operation).toString();
+    public static Result syncSendMessageTask(Context context, Tx tx, long timestamp, QueueOperation operation) {
+        String text = TxUtils.createSpanTxQueue(tx, timestamp, operation).toString();
         return syncSendMessageTask(context, tx.senderPk, tx.receiverPk, text,
                 MessageType.WIRING.getType(), tx.chainID);
     }

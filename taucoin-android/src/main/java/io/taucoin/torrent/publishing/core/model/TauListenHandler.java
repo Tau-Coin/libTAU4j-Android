@@ -299,11 +299,14 @@ public class TauListenHandler {
                     status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
                 }
                 //  交易状态改变
-                if (status != tx.txStatus) {
-                    if (status == 1) {
-                        ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.ON_CHAIN);
-                    } else {
-                        ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.ROLL_BACK);
+                if (status != tx.txStatus && tx.queueID >= 0) {
+                    TxQueue txQueue = txQueueRepo.getTxQueueByID(tx.queueID);
+                    if (txQueue != null) {
+                        if (status == 1) {
+                            ChatViewModel.syncSendMessageTask(appContext, tx, txQueue.queueTime, QueueOperation.ON_CHAIN);
+                        } else {
+                            ChatViewModel.syncSendMessageTask(appContext, tx, txQueue.queueTime, QueueOperation.ROLL_BACK);
+                        }
                     }
                 }
                 tx.txStatus = status;
