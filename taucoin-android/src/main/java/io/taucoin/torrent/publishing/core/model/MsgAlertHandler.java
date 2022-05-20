@@ -217,23 +217,13 @@ class MsgAlertHandler {
         // 余额不足不发送点对点消息
         Account account = daemon.getAccountInfo(ChainIDUtil.encode(chainID), tx.senderPk);
         if (account != null) {
-            long medianFee = getMedianTxFree(tx.chainID);
+            long medianFee = Constants.WIRING_MIN_FEE.longValue();
             if (tx.amount + medianFee <= account.getBalance()) {
                 ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.INSERT);
             }
         }
         daemon.updateTxQueue(tx.chainID);
     }
-
-    private long getMedianTxFree(String chainID) {
-        long free = Constants.WIRING_MIN_FEE.longValue();
-        long medianFree = daemon.getMedianTxFree(chainID);
-        if (medianFree > free) {
-            free = medianFree;
-        }
-        return free;
-    }
-
 
     /**
      * 消息已被接收

@@ -612,7 +612,7 @@ public class TauListenHandler {
                                 member.chainID, member.publicKey, FmtMicrometer.fmtBalance(member.balance));
                         continue;
                     }
-                    long medianTxFree = getMedianTxFree(member.chainID);
+                    long medianTxFree = Constants.WIRING_MIN_FEE.longValue();
                     long txFree = medianTxFree;
                     TxQueueAndStatus txQueue = txQueueRepo.getAccountRenewalTxQueue(member.chainID,
                             member.publicKey);
@@ -703,15 +703,6 @@ public class TauListenHandler {
             txConfirm = new TxConfirm(txID, peer, DateUtil.getMillisTime());
             txRepo.addTxConfirm(txConfirm);
         }
-    }
-
-    private long getMedianTxFree(String chainID) {
-        long free = Constants.WIRING_MIN_FEE.longValue();
-        long medianFree = daemon.getMedianTxFree(chainID);
-        if (medianFree > free) {
-            free = medianFree;
-        }
-        return free;
     }
 
     public void onCleared() {

@@ -236,7 +236,7 @@ class TxQueueManager {
     private boolean sendTxQueue(Account account, TxQueueAndStatus txQueue) {
         boolean isSendMessage = false;
         if (txQueue.queueType == 1) {
-            long medianFee = getMedianTxFree(txQueue.chainID);
+            long medianFee = Constants.WIRING_MIN_FEE.longValue();
             if (txQueue.fee != medianFee) {
                 txQueue.fee = medianFee;
                 // 更新airdrop的交易费
@@ -365,21 +365,6 @@ class TxQueueManager {
             addMemberInfoToLocal(tx);
         }
         return false;
-    }
-
-    /**
-     * 0、默认为最小交易费
-     * 1、从交易池中获取前10名交易费的中位数
-     * 2、如果交易池返回小于等于0，用上次交易用的交易费
-     * @param chainID 交易所属的社区chainID
-     */
-    private long getMedianTxFree(String chainID) {
-        long free = Constants.WIRING_MIN_FEE.longValue();
-        long medianFree = daemon.getMedianTxFree(chainID);
-        if (medianFree > free) {
-            free = medianFree;
-        }
-        return free;
     }
 
     /**

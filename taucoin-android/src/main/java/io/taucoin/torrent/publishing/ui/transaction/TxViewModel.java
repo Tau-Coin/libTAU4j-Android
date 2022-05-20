@@ -501,10 +501,6 @@ public class TxViewModel extends AndroidViewModel {
         } else {
             free = Constants.NEWS_MIN_FEE.longValue();
         }
-        long medianFree = daemon.getMedianTxFree(chainID);
-        if (medianFree > free) {
-            free = medianFree;
-        }
         return free;
     }
 
