@@ -48,6 +48,7 @@ import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
+import io.taucoin.torrent.publishing.core.utils.FileUtil;
 import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
@@ -221,8 +222,9 @@ public abstract class TauDaemon {
         SessionParams sessionParams = SessionSettings.getSessionParamsBuilder()
                 .setAccountSeed(seed)
                 .setDeviceID(deviceID)
-                .setDatabaseDir(appContext.getApplicationInfo().dataDir)
-//                .setDatabaseDir(FileUtil.getExternalDir())  // 数据库sdcard测试路径
+//                .setDatabaseDir(appContext.getApplicationInfo().dataDir)
+                .setDatabaseDir(FileUtil.getExternalDir())  // 数据库sdcard测试路径
+                .setDumpfileDir(FileUtil.getExternalDir())  // 数据库sdcard测试路径
                 .setDhtNonReferable(true)
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)
