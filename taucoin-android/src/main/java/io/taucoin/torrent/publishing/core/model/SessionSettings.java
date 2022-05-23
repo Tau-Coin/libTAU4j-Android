@@ -46,6 +46,17 @@ class SessionSettings {
         }
 
         /**
+         * set dump dir
+         * @param dumpFileDir dump file dir
+         */
+        SessionParamsBuilder setDumpfileDir(String dumpFileDir) {
+            dumpFileDir += "/libTAU/dumpfile";
+            logger.debug("Dumpfile::{}", dumpFileDir);
+            sp.set_str(settings_pack.string_types.dump_dir.swigValue(), dumpFileDir);
+            return this;
+        }
+
+        /**
          *  set device id
          * @param deviceId device id
          */
@@ -119,11 +130,11 @@ class SessionSettings {
         StringBuilder sb = new StringBuilder();
         // sb.append("dht.libtorrent.org:25401").append(",");
 //        sb.append("13.229.53.249:6882");
-//        if (BuildConfig.DEBUG) {
-//            sb.append("tau://6e6170b970bae896803ecb10516537aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:7882");
-//        } else {
-            sb.append("tau://83024767468B8BF8DB868F336596C63561265D553833E5C0BF3E4767659B826B@13.229.53.249:6882");
-//        }
+        if (BuildConfig.DEBUG) {
+            sb.append("tau://6e6170b970bae896803ecb10516537aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:7882");
+        } else {
+            //sb.append("tau://83024767468B8BF8DB868F336596C63561265D553833E5C0BF3E4767659B826B@13.229.53.249:6882");
+        }
         return sb.toString();
     }
 }
