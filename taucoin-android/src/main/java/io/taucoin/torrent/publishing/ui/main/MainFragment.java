@@ -5,25 +5,26 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.google.android.material.tabs.TabLayout;
-import com.noober.menu.FloatMenu;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
-import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
@@ -32,26 +33,21 @@ import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
-import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
  * 群组列表页面
  */
-public class MainFragment extends BaseFragment implements MainListAdapter.ClickListener {
+public class MainFragment extends BaseFragment {
 
     private MainActivity activity;
 
-    private MainListAdapter adapter;
     private FragmentMainBinding binding;
     private MainViewModel viewModel;
-    private CommunityViewModel communityViewModel;
-    private UserViewModel userViewModel;
     private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
     private boolean dataChanged = false;
-    private FloatMenu operationsMenu;
+    private MainTabFragment[] fragments = new MainTabFragment[3];
 
     @Nullable
     @Override
@@ -67,42 +63,62 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         activity = (MainActivity) getActivity();
         ViewModelProvider provider = new ViewModelProvider(activity);
         viewModel = provider.get(MainViewModel.class);
-        communityViewModel = provider.get(CommunityViewModel.class);
-        userViewModel = provider.get(UserViewModel.class);
         settingsRepo = RepositoryHelper.getSettingsRepository(MainApplication.getInstance());
         initView();
     }
 
     private void initView() {
-        adapter = new MainListAdapter(this);
-        binding.refreshLayout.setRefreshing(false);
-        binding.refreshLayout.setEnabled(false);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
-        binding.groupList.setLayoutManager(layoutManager);
-        binding.groupList.setItemAnimator(null);
-        binding.groupList.setAdapter(adapter);
-
-        communityViewModel.getJoinedResult().observe(getViewLifecycleOwner(), result -> {
-            if (result.isSuccess()) {
-                Bundle bundle = new Bundle();
-                bundle.putInt(IntentExtra.TYPE, 0);
-                bundle.putString(IntentExtra.ID, result.getMsg());
-                activity.updateMainRightFragment(bundle);
-            }
-        });
         showProgressDialog();
         viewModel.getHomeAllData().observe(getViewLifecycleOwner(), list -> {
-            int pos = binding.tabLayout.getSelectedTabPosition();
-            showCommunityList(pos);
+            showFragmentData();
         });
 
+        //自定义的Adapter继承自FragmentPagerAdapter
+        StateAdapter stateAdapter = new StateAdapter(activity);
+        // ViewPager设置Adapter
+        binding.viewPager.setAdapter(stateAdapter);
+        binding.viewPager.setOffscreenPageLimit(3);
+
+        //为ViewPager添加页面改变监听
+        TabLayoutMediator mediator = new TabLayoutMediator(binding.tabLayout, binding.viewPager,
+                (tab, position) -> {
+                    if (position == 0) {
+                        tab.setText(R.string.main_tab_all);
+                    } else if (position == 1) {
+                        tab.setText(R.string.main_tab_community);
+                    } else if (position == 2) {
+                        tab.setText(R.string.main_tab_personal);
+                    }
+                });
+        mediator.attach();
+
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
+        binding.root.getViewTreeObserver().addOnPreDrawListener(onPreDrawListener);
     }
 
+    private ViewTreeObserver.OnPreDrawListener onPreDrawListener = new ViewTreeObserver.OnPreDrawListener() {
+        @Override
+        public boolean onPreDraw() {
+            int width = binding.root.getWidth();
+            if (width > 0) {
+                ViewGroup.LayoutParams layoutParams = binding.viewPager.getLayoutParams();
+                layoutParams.width = width;
+                binding.viewPager.setLayoutParams(layoutParams);
+            }
+            return true;
+        }
+    };
+
     private TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
-            showCommunityList(tab.getPosition());
+            int currentTab = tab.getPosition();
+            int currentItem = binding.viewPager.getCurrentItem();
+            if (currentTab != currentItem) {
+                binding.viewPager.setCurrentItem(currentTab);
+            }
+            showFragmentData();
         }
 
         @Override
@@ -171,21 +187,6 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
         }
     }
 
-    private void showCommunityList(int pos) {
-        closeProgressDialog();
-        List<CommunityAndFriend> list;
-        if (pos == 1) {
-            list = viewModel.getHomeCommunityData().getValue();
-        } else if (pos == 2) {
-            list = viewModel.getHomeFriendData().getValue();
-        } else {
-            list = viewModel.getHomeAllData().getValue();
-        }
-        if (list != null) {
-            adapter.submitList(list);
-        }
-    }
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -203,84 +204,60 @@ public class MainFragment extends BaseFragment implements MainListAdapter.ClickL
     public void onStop() {
         super.onStop();
         disposables.clear();
-        if (operationsMenu != null) {
-            operationsMenu.setOnItemClickListener(null);
-            operationsMenu.dismiss();
-        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (binding.tabLayout != null) {
-            binding.tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+        binding.root.getViewTreeObserver().removeOnPreDrawListener(onPreDrawListener);
+        binding.tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+    }
+
+    public class StateAdapter extends FragmentStateAdapter {
+
+        int itemCount;
+        StateAdapter(@NonNull FragmentActivity fragmentActivity) {
+            super(fragmentActivity);
+            itemCount = binding.tabLayout.getTabCount();
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            return showFragmentView(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return itemCount;
         }
     }
 
-    /**
-     * 社区ListItem点击事件
-     */
-    @Override
-    public void onItemClicked(@NonNull CommunityAndFriend item) {
+    private void showFragmentData() {
+        int currentItem = binding.viewPager.getCurrentItem();
+        if (fragments[currentItem] != null) {
+            fragments[currentItem].showDataList(getDataList(currentItem));
+        }
+    }
+
+    private ArrayList<CommunityAndFriend> getDataList(int pos) {
+        if (pos == 1) {
+            return viewModel.getHomeCommunityData().getValue();
+        } else if (pos == 2) {
+            return viewModel.getHomeFriendData().getValue();
+        } else {
+            return viewModel.getHomeAllData().getValue();
+        }
+    }
+
+    private MainTabFragment showFragmentView(int position) {
+        closeProgressDialog();
+        int pos = position < binding.tabLayout.getTabCount() ? position : 0;
+        MainTabFragment tab = new MainTabFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt(IntentExtra.TYPE, item.type);
-        bundle.putString(IntentExtra.ID, item.ID);
-        activity.updateMainRightFragment(bundle);
-    }
-
-    @Override
-    public void onItemLongClicked(CommunityAndFriend bean) {
-        List<OperationMenuItem> menuList = new ArrayList<>();
-        if (bean.msgUnread == 1) {
-            menuList.add(new OperationMenuItem(R.string.main_operation_mark_read));
-        } else {
-            menuList.add(new OperationMenuItem(R.string.main_operation_mark_unread));
-        }
-        if (bean.stickyTop == 1) {
-            menuList.add(new OperationMenuItem(R.string.main_operation_remove_top));
-        } else {
-            menuList.add(new OperationMenuItem(R.string.main_operation_sticky_top));
-        }
-        if (bean.type == 0) {
-            menuList.add(new OperationMenuItem(R.string.main_operation_ban_community));
-        } else {
-            // 不能拉黑自己
-            if (StringUtil.isNotEquals(bean.ID, MainApplication.getInstance().getPublicKey())) {
-                menuList.add(new OperationMenuItem(R.string.main_operation_ban_friend));
-            }
-        }
-        operationsMenu = new FloatMenu(activity);
-        operationsMenu.items(menuList);
-        operationsMenu.setOnItemClickListener((v, position) -> {
-            OperationMenuItem menuItem = menuList.get(position);
-            int resId = menuItem.getResId();
-            switch (resId) {
-                case R.string.main_operation_mark_read:
-                case R.string.main_operation_mark_unread:
-                    int status = bean.msgUnread == 0 ? 1 : 0;
-                    if (bean.type == 0) {
-                        communityViewModel.markReadOrUnread(bean.ID, status);
-                    } else {
-                        userViewModel.markReadOrUnread(bean.ID, status);
-                    }
-                    break;
-                case R.string.main_operation_sticky_top:
-                case R.string.main_operation_remove_top:
-                    int top = bean.stickyTop == 0 ? 1 : 0;
-                    if (bean.type == 0) {
-                        communityViewModel.topStickyOrRemove(bean.ID, top);
-                    } else {
-                        userViewModel.topStickyOrRemove(bean.ID, top);
-                    }
-                    break;
-                case R.string.main_operation_ban_community:
-                    communityViewModel.setCommunityBlacklist(bean.ID, true);
-                    break;
-                case R.string.main_operation_ban_friend:
-                    userViewModel.setUserBlacklist(bean.ID, true);
-                    break;
-            }
-        });
-        operationsMenu.show(activity.getPoint());
+        bundle.putParcelableArrayList(IntentExtra.BEAN, getDataList(pos));
+        fragments[pos] = tab;
+        tab.setArguments(bundle);
+        return tab;
     }
 }

@@ -9,6 +9,7 @@
     </data>
 
     <LinearLayout
+        android:id="@+id/root"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -81,21 +82,10 @@
             android:layout_height="@dimen/widget_size_1"
             android:background="@color/color_bg"/>
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/refresh_layout"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent">
-
-            <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
-                android:id="@+id/group_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:scrollbars="vertical"
-                android:focusable="true"
-                android:scrollbarStyle="outsideOverlay" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 </layout>

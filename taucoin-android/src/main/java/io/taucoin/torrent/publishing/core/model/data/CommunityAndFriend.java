@@ -1,12 +1,16 @@
 package io.taucoin.torrent.publishing.core.model.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.room.Ignore;
 import androidx.room.Relation;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 
 /**
  * Room: 查询Communities 和Friends, 首页显示
  */
-public class CommunityAndFriend {
+public class CommunityAndFriend implements Parcelable {
     // 社区相关数据
     public long balance;                    // 成员在此社区的balance
     public long power;                      // 成员在此社区的power
@@ -45,4 +49,66 @@ public class CommunityAndFriend {
     public boolean isReadOnly() {
         return power <=0 || blockNumber < tailBlock;
     }
+
+
+    public CommunityAndFriend() {
+
+    }
+
+    @Ignore
+    protected CommunityAndFriend(Parcel in) {
+        balance = in.readLong();
+        power = in.readLong();
+        blockNumber = in.readLong();
+        headBlock = in.readLong();
+        tailBlock = in.readLong();
+        joined = in.readInt();
+        senderPk = in.readString();
+        receiverPk = in.readString();
+        ID = in.readString();
+        type = in.readInt();
+        msgUnread = in.readInt();
+        stickyTop = in.readInt();
+        msg = in.createByteArray();
+        memo = in.readString();
+        timestamp = in.readLong();
+        friend = in.readParcelable(User.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(balance);
+        dest.writeLong(power);
+        dest.writeLong(blockNumber);
+        dest.writeLong(headBlock);
+        dest.writeLong(tailBlock);
+        dest.writeInt(joined);
+        dest.writeString(senderPk);
+        dest.writeString(receiverPk);
+        dest.writeString(ID);
+        dest.writeInt(type);
+        dest.writeInt(msgUnread);
+        dest.writeInt(stickyTop);
+        dest.writeByteArray(msg);
+        dest.writeString(memo);
+        dest.writeLong(timestamp);
+        dest.writeParcelable(friend, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<CommunityAndFriend> CREATOR = new Creator<CommunityAndFriend>() {
+        @Override
+        public CommunityAndFriend createFromParcel(Parcel in) {
+            return new CommunityAndFriend(in);
+        }
+
+        @Override
+        public CommunityAndFriend[] newArray(int size) {
+            return new CommunityAndFriend[size];
+        }
+    };
 }
