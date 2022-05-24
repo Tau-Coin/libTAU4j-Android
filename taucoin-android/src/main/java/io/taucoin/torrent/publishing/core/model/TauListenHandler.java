@@ -577,8 +577,9 @@ public class TauListenHandler {
         if (community != null) {
             List<ConsensusInfo> list = new ArrayList<>();
             for (Vote vote : votes) {
-                String hash = vote.getBlockHash().to_hex();
-                long number = vote.getBlockNumber();
+                Block block = vote.getBlock();
+                String hash = block.Hash();
+                long number = block.getBlockNumber();
                 long count = vote.getVoteCount();
                 ConsensusInfo info = new ConsensusInfo(hash, number, count);
                 list.add(info);
