@@ -34,6 +34,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
@@ -226,6 +227,7 @@ public abstract class TauDaemon {
                 .setDhtNonReferable(true)
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)
+                .enableDebugLog(BuildConfig.DEBUG)
                 .build();
         sessionManager.start(sessionParams);
     }

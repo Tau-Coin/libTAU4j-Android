@@ -1,8 +1,5 @@
 package io.taucoin.torrent.publishing.core.log;
 
-import android.content.Context;
-import android.os.Environment;
-
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -31,7 +28,7 @@ public class LogConfigurator {
 
     private static final int RELEASE_MAX_INDEX = 5;               // 发布版本最大编号
     private static final String RELEASE_MAX_FILE_SIZE = "20MB";   // 发布版最大文件大小
-    private static final Level RELEASE_LOG_LEVEL = Level.OFF;   // 发布版日志等级
+    private static final Level RELEASE_LOG_LEVEL = Level.INFO;    // 发布版日志等级
 
     public static void configure() {
         String logDir = getLogDir();
