@@ -10,6 +10,7 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 
@@ -98,6 +99,15 @@ public interface TxDao {
             " AND txType = 4 AND txStatus = 1 AND receiverPk = :trustPk" +
             " ORDER BY timestamp DESC" +
             " limit :loadSize offset :startPosition";
+
+    // 查询钱包里上链账单列表
+    String QUERY_GET_WALLET_TRANSACTIONS = "SELECT *, 0 AS trusts FROM Txs WHERE chainID = :chainID" +
+            " AND txType = 2" +
+            " AND txStatus = 1" +
+            " AND (senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " OR receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
+            " AND blockNumber >= (SELECT tailBlock FROM Communities WHERE chainID = :chainID)" +
+            " ORDER BY timestamp DESC";
 
     // SQL:查询未上链并且已过期的条件语句
     String QUERY_PENDING_TXS_NOT_EXPIRED_WHERE = " WHERE senderPk = :senderPk AND chainID = :chainID" +
@@ -212,6 +222,10 @@ public interface TxDao {
 
     @Query(QUERY_GET_TRUST_TXS)
     List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPosition, int loadSize);
+
+    @Transaction
+    @Query(QUERY_GET_WALLET_TRANSACTIONS)
+    Observable<List<UserAndTx>> observeWalletTransactions(String chainID);
 
     /**
      * 获取社区里用户未上链并且未过期的交易数

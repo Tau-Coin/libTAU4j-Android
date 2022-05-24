@@ -84,7 +84,7 @@
     <string name="drawer_balance">Balance</string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Contacts</string>
-    <string name="drawer_communities">Wallet</string>
+    <string name="drawer_wallet">Wallet</string>
     <string name="drawer_setting">Settings</string>
     <string name="drawer_official_telegram">Official Telegram</string>
     <string name="drawer_data_cost">Data Cost</string>
@@ -105,6 +105,7 @@
     <string name="menu_history">History</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_community_info">Community Info</string>
+    <string name="menu_transactions">Transactions</string>
 
     <string name="community_settings">Settings</string>
     <string name="community_chain_status">Blockchain Status</string>
@@ -246,6 +247,8 @@
     <string name="community_tip_block_difficulty">Difficulty:&#160;</string>
     <string name="community_tip_block_size">Size: </string>
     <string name="community_block_on_chain">Onchain</string>
+    <string name="community_transfer_to">Transfer to %s</string>
+    <string name="community_transfer_from">Transfer from %s</string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_key_explain">Key is your private secret. Address is your open ID for friends.</string>

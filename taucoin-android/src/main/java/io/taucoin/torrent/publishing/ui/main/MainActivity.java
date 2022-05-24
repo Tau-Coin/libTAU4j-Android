@@ -69,13 +69,12 @@ import io.taucoin.torrent.publishing.service.WorkloadManager;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.chat.ChatFragment;
-import io.taucoin.torrent.publishing.ui.community.CommunityChooseActivity;
+import io.taucoin.torrent.publishing.ui.community.WalletActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityFragment;
 import io.taucoin.torrent.publishing.ui.ExternalLinkActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityCreateActivity;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.customviews.BadgeActionProvider;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.download.DownloadViewModel;
 import io.taucoin.torrent.publishing.ui.friends.AirdropCommunityActivity;
@@ -344,8 +343,8 @@ public class MainActivity extends ScanTriggerActivity {
             case R.id.item_contacts:
                 ActivityUtil.startActivity(this, FriendsActivity.class);
                 break;
-            case R.id.item_mining:
-                ActivityUtil.startActivity(this, CommunityChooseActivity.class);
+            case R.id.item_wallet:
+                ActivityUtil.startActivity(this, WalletActivity.class);
                 break;
             case R.id.item_setting:
                 ActivityUtil.startActivityForResult(this, SettingActivity.class,

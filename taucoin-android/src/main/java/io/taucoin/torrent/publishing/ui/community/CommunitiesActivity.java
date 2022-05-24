@@ -1,8 +1,13 @@
 package io.taucoin.torrent.publishing.ui.community;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -13,18 +18,21 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityCommunitiesBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
 /**
  * 社区信息页面
  */
-public class CommunitiesActivity extends BaseActivity {
+public class CommunitiesActivity extends BaseActivity implements View.OnClickListener {
     private ActivityCommunitiesBinding binding;
     private CommunityViewModel viewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -36,6 +44,7 @@ public class CommunitiesActivity extends BaseActivity {
         ViewModelProvider provider = new ViewModelProvider(this);
         viewModel = provider.get(CommunityViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_communities);
+        binding.setListener(this);
         initParameter();
         initLayout();
         loadMemberData(null);
@@ -59,6 +68,18 @@ public class CommunitiesActivity extends BaseActivity {
         binding.toolbarInclude.toolbar.setTitle(ChainIDUtil.getName(chainID));
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        viewModel.getJoinedResult().observe(this, result -> {
+            if (result.isSuccess()) {
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra(IntentExtra.TYPE, 0);
+                ActivityUtil.startActivity(intent, this, MainActivity.class);
+            } else {
+                ToastUtils.showShortToast(R.string.community_join_failed);
+            }
+        });
     }
 
     private void loadMiningInfo() {
@@ -114,6 +135,37 @@ public class CommunitiesActivity extends BaseActivity {
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
         binding.itemExpiryDate.setVisibility(onChain ? View.VISIBLE : View.GONE);
         binding.itemRenewalDate.setVisibility(onChain ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     *  创建右上角Menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_transactions, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.menu_transactions);
+        CharSequence title = item.getTitle();
+        item.setActionView(R.layout.menu_textview);
+        TextView tv = (TextView) item.getActionView();
+        tv.setText(title);
+        tv.setOnClickListener(this);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.tv_join) {
+            viewModel.joinCommunity(chainID);
+        } else if (v.getId() == R.id.tv_menu) {
+            Intent intent = new Intent();
+            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+            ActivityUtil.startActivity(intent, this, TransactionsActivity.class);
+        }
     }
 
     @Override

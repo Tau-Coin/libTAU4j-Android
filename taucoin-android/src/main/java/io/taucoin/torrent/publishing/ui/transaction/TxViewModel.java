@@ -842,4 +842,8 @@ public class TxViewModel extends AndroidViewModel {
                 .subscribe();
         disposables.add(disposable);
     }
+
+    public Observable<List<UserAndTx>> observeWalletTransactions(String chainID) {
+        return txRepo.observeWalletTransactions(chainID);
+    }
 }

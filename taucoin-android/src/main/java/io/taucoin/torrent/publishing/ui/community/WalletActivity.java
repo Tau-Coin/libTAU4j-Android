@@ -17,9 +17,9 @@ import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 
 /**
- * 群组选择页面
+ * 钱包页面
  */
-public class CommunityChooseActivity extends BaseActivity {
+public class WalletActivity extends BaseActivity {
 
     private ActivityCommunityChooseBinding binding;
     private CommunityViewModel communityViewModel;
@@ -40,7 +40,7 @@ public class CommunityChooseActivity extends BaseActivity {
      */
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.drawer_communities);
+        binding.toolbarInclude.toolbar.setTitle(R.string.drawer_wallet);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 

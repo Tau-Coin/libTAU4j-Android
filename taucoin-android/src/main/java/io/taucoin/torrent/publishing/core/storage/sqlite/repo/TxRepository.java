@@ -122,4 +122,6 @@ public interface TxRepository {
     Observable<List<TxConfirm>> observerTxConfirms(String txID);
 
     void deleteUnsentTx(long queueID);
+
+    Observable<List<UserAndTx>> observeWalletTransactions(String chainID);
 }

@@ -72,7 +72,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name=".ui.community.CommunityChooseActivity"
+            android:name=".ui.community.WalletActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
@@ -81,6 +81,10 @@
 
         <activity
             android:name=".ui.community.CommunitiesActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.community.TransactionsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
