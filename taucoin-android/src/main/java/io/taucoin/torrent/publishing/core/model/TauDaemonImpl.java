@@ -287,17 +287,6 @@ public class TauDaemonImpl extends TauDaemon {
     }
 
     /**
-     * 设置libTAU主循环时间间隔
-     */
-    @Override
-    public void setMainLoopInterval(int interval) {
-        if (isRunning) {
-            sessionManager.setLoopTimeInterval(interval);
-            logger.debug("setMainLoopInterval interval::{}ms", interval);
-        }
-    }
-
-    /**
      * 添加新消息
      */
     @Override

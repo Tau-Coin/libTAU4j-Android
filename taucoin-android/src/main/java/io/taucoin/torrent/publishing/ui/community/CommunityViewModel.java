@@ -88,7 +88,6 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
-import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
@@ -126,7 +125,6 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
     private MutableLiveData<UserAndFriend> largestCoinHolder = new MutableLiveData<>();
     private MutableLiveData<List<BlockAndTx>> chainBlocks = new MutableLiveData<>();
-    private Disposable visitDisposable;
     private Disposable clearDisposable;
     private TxViewModel txViewModel;
 
@@ -424,9 +422,6 @@ public class CommunityViewModel extends AndroidViewModel {
     protected void onCleared() {
         super.onCleared();
         disposables.clear();
-        if (visitDisposable != null && !visitDisposable.isDisposed()) {
-            visitDisposable.dispose();
-        }
         if (clearDisposable != null && !clearDisposable.isDisposed()) {
             clearDisposable.dispose();
         }
@@ -1034,32 +1029,6 @@ public class CommunityViewModel extends AndroidViewModel {
             }
             emitter.onComplete();
         }, BackpressureStrategy.LATEST);
-    }
-
-    /**
-     * 设置优先级链（用户正在查看的链）
-     * @param chainID 链ID
-     */
-    public void setVisitChain(String chainID) {
-        if (StringUtil.isEmpty(chainID)) {
-            return;
-        }
-        if (null == visitDisposable) {
-            daemon.setPriorityChain(chainID);
-        }
-        visitDisposable = ObservableUtil.intervalSeconds(1)
-            .subscribeOn(Schedulers.io())
-            .subscribe(l -> daemon.setPriorityChain(chainID));
-    }
-
-    /**
-     * 取消设置优先级链（用户正在查看的链）
-     */
-    public void unsetVisitChain(String chainID) {
-        if (visitDisposable != null && !visitDisposable.isDisposed()) {
-            visitDisposable.dispose();
-        }
-        daemon.unsetPriorityChain(chainID);
     }
 
     public Observable<Integer> batchAddCommunities(String name, int num) {

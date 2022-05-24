@@ -49,7 +49,6 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.FileUtil;
-import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
@@ -341,8 +340,6 @@ public abstract class TauDaemon {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
             logger.info("SettingsChanged, UPnP mapped::{}", settingsRepo.isUPnpMapped());
-        } else if (key.equals(appContext.getString(R.string.pref_key_main_loop_frequency))) {
-            setMainLoopInterval(FrequencyUtil.getMainLoopInterval());
         }
     }
 
@@ -647,26 +644,6 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 设置优先级链（用户正在查看的链）
-     */
-    public void setPriorityChain(String chainID) {
-        if (isRunning) {
-            sessionManager.setPriorityChain(ChainIDUtil.encode(chainID));
-            logger.debug("focusOnChain::{}", chainID);
-        }
-    }
-
-    /**
-     * 取消设置优先级链（用户正在查看的链）
-     */
-    public void unsetPriorityChain(String chainID) {
-        if (isRunning) {
-            sessionManager.unsetPriorityChain();
-            logger.debug("focusOnChain::{}", chainID);
-        }
-    }
-
-    /**
      * 判断交易是否在交易池
      */
     public boolean isTxInFeePool(String chainID, String txID) {
@@ -766,11 +743,6 @@ public abstract class TauDaemon {
      * @param friendPk 朋友公钥
      */
     public abstract boolean deleteFriend(String friendPk);
-
-    /**
-     * 设置libTAU主循环时间间隔
-     */
-    public abstract void setMainLoopInterval(int interval);
 
     /**
      * 添加新消息
