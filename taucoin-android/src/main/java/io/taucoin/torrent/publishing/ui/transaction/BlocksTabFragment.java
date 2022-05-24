@@ -1,6 +1,10 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
+import android.os.Bundle;
 import android.text.style.URLSpan;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.noober.menu.FloatMenu;
@@ -8,6 +12,11 @@ import com.noober.menu.FloatMenu;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
@@ -17,6 +26,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
+import io.taucoin.torrent.publishing.databinding.FragmentTxsTabBinding;
 import io.taucoin.torrent.publishing.ui.community.BlockListAdapter;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 
@@ -28,6 +38,26 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
 
     private BlockListAdapter adapter;
     private FloatMenu operationsMenu;
+    private FragmentTxsTabBinding binding;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_txs_tab, container, false);
+        binding.setListener(this);
+        return binding.getRoot();
+    }
+
+    @Override
+    public RecyclerView getRecyclerView() {
+        return binding.txList;
+    }
+
+    @Override
+    public SwipeRefreshLayout getRefreshLayout() {
+        return binding.refreshLayout;
+    }
 
     /**
      * 初始化视图

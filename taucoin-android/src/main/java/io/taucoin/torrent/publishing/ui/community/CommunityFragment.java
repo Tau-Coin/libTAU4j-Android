@@ -2,23 +2,17 @@ package io.taucoin.torrent.publishing.ui.community;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.leinardi.android.speeddial.SpeedDialActionItem;
+import com.google.android.material.tabs.TabLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -40,21 +34,13 @@ import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.torrent.publishing.databinding.ViewDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
-import io.taucoin.torrent.publishing.ui.transaction.AirdropCreateActivity;
-import io.taucoin.torrent.publishing.ui.transaction.BlocksTabFragment;
+import io.taucoin.torrent.publishing.ui.customviews.FragmentStatePagerAdapter;
 import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
-import io.taucoin.torrent.publishing.ui.transaction.ChainTabFragment;
-import io.taucoin.torrent.publishing.ui.transaction.AnnouncementCreateActivity;
 import io.taucoin.torrent.publishing.ui.transaction.MarketTabFragment;
 import io.taucoin.torrent.publishing.ui.transaction.NotesTabFragment;
-import io.taucoin.torrent.publishing.ui.transaction.QueueTabFragment;
-import io.taucoin.torrent.publishing.ui.transaction.SellCreateActivity;
-import io.taucoin.torrent.publishing.ui.transaction.SpinnerAdapter;
-import io.taucoin.torrent.publishing.ui.transaction.TransactionCreateActivity;
-
-import static io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment.TX_REQUEST_CODE;
+import io.taucoin.torrent.publishing.ui.transaction.TransactionsTabFragment;
 
 /**
  * 单个群组页面
@@ -67,16 +53,11 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private CommunityViewModel communityViewModel;
     private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
-    private CommunityTabFragment currentTabFragment = null;
-    private RelativeLayout selectedView = null;
-    private int currentTab = -1;
-    private int[] spinnerItems;
-    private int spinnerSelected = 0;
+    private CommunityTabFragment[] fragments = new CommunityTabFragment[3];
     private String chainID;
     private boolean isJoined = false;
     private boolean isOnChain = false;
     private boolean isNoBalance = true;
-    private boolean isFirstLoad = true;
     private BlockStatistics blockStatistics;
     private Statistics memberStatistics;
     private AccessList accessList;
@@ -103,8 +84,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.toolbarInclude.setListener(this);
         initParameter();
         initLayout();
-        initFabSpeedDial();
-        onClick(binding.rlNotes);
     }
 
     /**
@@ -141,30 +120,38 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             ActivityUtil.startActivityForResult(intent, activity, CommunityDetailActivity.class, MEMBERS_REQUEST_CODE);
         });
 
-        int verticalOffset = -getResources().getDimensionPixelSize(R.dimen.widget_size_5);
-        binding.viewSpinner.setDropDownVerticalOffset(verticalOffset);
-        binding.viewSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!isFirstLoad) {
-                    if (currentTab == CommunityTabFragment.TAB_CHAIN) {
-                        spinnerSelected = position;
-                        loadTabView(selectedView);
-                    } else {
-                        if (currentTabFragment != null) {
-                            currentTabFragment.switchView(spinnerItems[position]);
-                        }
-                    }
-                }
-                isFirstLoad = false;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        // 自定义的Adapter继承自FragmentPagerAdapter
+        StateAdapter stateAdapter = new StateAdapter(this.getChildFragmentManager(),
+                binding.tabLayout.getTabCount());
+        // ViewPager设置Adapter
+        binding.viewPager.setAdapter(stateAdapter);
+        binding.viewPager.setOffscreenPageLimit(3);
+        binding.tabLayout.setupWithViewPager(binding.viewPager);
+        binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
     }
+
+    private TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+
+        @Override
+        public void onTabSelected(TabLayout.Tab tab) {
+            int currentTab = tab.getPosition();
+            int currentItem = binding.viewPager.getCurrentItem();
+            if (currentTab != currentItem) {
+                binding.viewPager.setCurrentItem(currentTab);
+            }
+            KeyboardUtils.hideSoftInput(activity);
+        }
+
+        @Override
+        public void onTabUnselected(TabLayout.Tab tab) {
+
+        }
+
+        @Override
+        public void onTabReselected(TabLayout.Tab tab) {
+
+        }
+    };
 
     private void handleSettingsChanged(String key) {
         if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
@@ -239,192 +226,16 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.toolbarInclude.tvSubtitle.setText(subtitle);
     }
 
-    /**
-     * 初始化右下角悬浮按钮组件
-     */
-    private void initFabSpeedDial() {
-        FloatingActionButton mainFab = binding.fabButton.getMainFab();
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mainFab.getLayoutParams();
-        layoutParams.gravity = Gravity.END | Gravity.BOTTOM;
-        mainFab.setLayoutParams(layoutParams);
-        mainFab.setCustomSize(getResources().getDimensionPixelSize(R.dimen.widget_size_50));
-    }
-
-    /**
-     * 更新右下角悬浮按钮组件
-     */
-    private void updateFabSpeedDial(int currentTab) {
-        if (currentTab == CommunityTabFragment.TAB_NOTES) {
-            return;
-        }
-        Intent intent = new Intent();
-        intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-        intent.putExtra(IntentExtra.ON_CHAIN, isOnChain);
-        intent.putExtra(IntentExtra.NO_BALANCE, !isOnChain || isNoBalance);
-
-        if (currentTab == CommunityTabFragment.TAB_MARKET) {
-            binding.fabButton.setMainFabAnimationRotateAngle(45);
-            SpeedDialActionItem invitationItem = new SpeedDialActionItem.Builder(R.id.community_create_invitation,
-                    R.drawable.ic_add_36dp)
-                    .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_20))
-                    .setLabel(getString(R.string.community_leader_invitation))
-                    .setLabelColor(getResources().getColor(R.color.color_yellow))
-                    .create();
-            binding.fabButton.addActionItem(invitationItem);
-
-            SpeedDialActionItem airdropItem = new SpeedDialActionItem.Builder(R.id.community_create_airdrop,
-                    R.drawable.ic_add_36dp)
-                    .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_14))
-                    .setLabel(getString(R.string.community_airdrop))
-                    .setLabelColor(getResources().getColor(R.color.color_yellow))
-                    .create();
-            binding.fabButton.addActionItem(airdropItem);
-
-            SpeedDialActionItem sellItem = new SpeedDialActionItem.Builder(R.id.community_create_sell,
-                    R.drawable.ic_add_36dp)
-                    .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_30))
-                    .setLabel(getString(R.string.community_sell_coins))
-                    .setLabelColor(getResources().getColor(R.color.color_yellow))
-                    .create();
-            binding.fabButton.addActionItem(sellItem);
-
-            binding.fabButton.getMainFab().setOnClickListener(v -> {
-                if (binding.fabButton.isOpen()) {
-                    binding.fabButton.close();
-                } else {
-                    binding.fabButton.open();
-                }
-            });
-            binding.fabButton.setOnActionSelectedListener(actionItem -> {
-                if (!isJoined) {
-                    return false;
-                }
-                switch (actionItem.getId()) {
-                    case R.id.community_create_sell:
-                        ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
-                                TX_REQUEST_CODE);
-                        break;
-                    case R.id.community_create_airdrop:
-                        ActivityUtil.startActivityForResult(intent, activity, AirdropCreateActivity.class,
-                                TX_REQUEST_CODE);
-                        break;
-                    case R.id.community_create_invitation:
-                        ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
-                                TX_REQUEST_CODE);
-                        break;
-                }
-                return false;
-            });
-        } else {
-            binding.fabButton.clearActionItems();
-            binding.fabButton.setMainFabAnimationRotateAngle(0);
-            // 自定义点击事件
-            binding.fabButton.getMainFab().setOnClickListener(v -> {
-                if (!isJoined) {
-                    return;
-                }
-                // chain
-                ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
-                        TX_REQUEST_CODE);
-            });
-        }
-    }
-
-    private void refreshSpinnerView() {
-        if (null == currentTabFragment || null == spinnerItems) {
-            return;
-        }
-        SpinnerAdapter adapter = new SpinnerAdapter(activity, spinnerItems);
-        isFirstLoad = true;
-        binding.viewSpinner.setSelection(0);
-        binding.viewSpinner.setAdapter(adapter);
-    }
-
-    /**
-     * 加载Tab视图
-     */
-    private void loadTabView(View view) {
-        KeyboardUtils.hideSoftInput(activity);
-
-        Bundle bundle = new Bundle();
-        bundle.putString(IntentExtra.CHAIN_ID, chainID);
-        bundle.putBoolean(IntentExtra.IS_JOINED, isJoined);
-
-        if (currentTabFragment != null) {
-            currentTabFragment.hideView();
-        }
-
-        switch (view.getId()) {
-            case R.id.rl_notes:
-                // note
-                spinnerItems = new int[] {};
-                currentTabFragment = new NotesTabFragment();
-                currentTab = CommunityTabFragment.TAB_NOTES;
-                break;
-            case R.id.rl_market:
-                // market
-                spinnerItems = new int[] {R.string.community_view_all,
-                        R.string.community_view_sell,
-                        R.string.community_view_airdrop,
-                        R.string.community_view_announcement};
-                currentTabFragment = new MarketTabFragment();
-                currentTab = CommunityTabFragment.TAB_MARKET;
-                break;
-            case R.id.rl_chain:
-                // chain
-                spinnerItems = new int[] {R.string.community_view_blocks,
-                        R.string.community_view_own_txs,
-                        R.string.community_view_mining_pool};
-                if (spinnerItems[spinnerSelected] == R.string.community_view_own_txs) {
-                    currentTabFragment = new QueueTabFragment();
-                } else if (spinnerItems[spinnerSelected] == R.string.community_view_blocks) {
-                    currentTabFragment = new BlocksTabFragment();
-                } else {
-                    currentTabFragment = new ChainTabFragment();
-                }
-                currentTab = CommunityTabFragment.TAB_CHAIN;
-                break;
-        }
-        if (currentTabFragment != null) {
-            currentTabFragment.setArguments(bundle);
-        }
-        replaceOrRemoveFragment(false);
-    }
-
-    private void replaceOrRemoveFragment(boolean isRemove) {
-        if (currentTabFragment != null && activity != null) {
-            FragmentManager fm = activity.getSupportFragmentManager();
-            if (fm.isDestroyed()) {
-                return;
-            }
-            FragmentTransaction transaction = fm.beginTransaction();
-            if (!isRemove) {
-                // Replace whatever is in the fragment container view with this fragment,
-                // and add the transaction to the back stack
-                transaction.replace(R.id.tab_fragment, currentTabFragment);
-                // 执行此方法后，fragment的onDestroy()方法和ViewModel的onCleared()方法都不执行
-                // transaction.addToBackStack(null);
-                transaction.commitAllowingStateLoss();
-            } else {
-                transaction.remove(currentTabFragment);
-                transaction.commitAllowingStateLoss();
-                currentTabFragment = null;
-            }
-        }
-    }
-
     @Override
     public void onStart() {
         super.onStart();
         subscribeCommunityViewModel();
-        communityViewModel.setVisitChain(chainID);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         disposables.clear();
-        communityViewModel.unsetVisitChain(chainID);
         if (helpDialog != null && helpDialog.isShowing()) {
             helpDialog.closeDialog();
         }
@@ -433,7 +244,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        replaceOrRemoveFragment(true);
+        binding.tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
     }
 
     /**
@@ -496,28 +307,18 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     }
                     isOnChain = member.onChain();
                     isNoBalance = member.noBalance();
-                    if (currentTabFragment != null) {
-                        currentTabFragment.handleMember(member);
-                        int color = !isJoined ? R.color.gray_light : R.color.primary;
-                        binding.fabButton.setMainFabClosedBackgroundColor(getResources().getColor(color));
+                    for (CommunityTabFragment fragment: fragments) {
+                        if (fragment != null) {
+                            fragment.handleMember(member);
+                        }
                     }
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
-//                    binding.msgUnread.setVisibility(member.msgUnread == 1  ? View.VISIBLE : View.GONE);
                 }, it -> {}));
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.rl_notes:
-                onTabClick(v, CommunityTabFragment.TAB_NOTES);
-                break;
-            case R.id.rl_market:
-                onTabClick(v, CommunityTabFragment.TAB_MARKET);
-                break;
-            case R.id.rl_chain:
-                onTabClick(v, CommunityTabFragment.TAB_CHAIN);
-                break;
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
                 break;
@@ -527,37 +328,13 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         }
     }
 
-    private void onTabClick(View v, int currentTab) {
-        // 避免同一页面多次刷新
-        if (this.selectedView != null && selectedView.getId() == v.getId()) {
-            return;
-        }
-        boolean isShow = currentTab != CommunityTabFragment.TAB_NOTES;
-        binding.fabButton.setVisibility(isShow ? View.VISIBLE : View.GONE);
-        binding.rlBottom.setVisibility(isShow ? View.VISIBLE : View.GONE);
-
-        updateFabSpeedDial(currentTab);
-
-        if (this.selectedView != null) {
-            this.selectedView.setBackgroundResource(R.drawable.white_rect_round_bg_no_border);
-            TextView textView = (TextView) selectedView.getChildAt(0);
-            textView.setTextColor(getResources().getColor(R.color.gray_dark));
-        }
-        RelativeLayout selectedView = (RelativeLayout) v;
-        selectedView.setBackgroundResource(R.drawable.yellow_rect_round_border_small_radius);
-        TextView textView = (TextView) selectedView.getChildAt(0);
-        textView.setTextColor(getResources().getColor(R.color.color_yellow));
-        this.selectedView = selectedView;
-        this.spinnerSelected = 0;
-        loadTabView(selectedView);
-        refreshSpinnerView();
-    }
-
     @Override
     public void onFragmentResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onFragmentResult(requestCode, resultCode, data);
-        if (currentTabFragment != null) {
-            currentTabFragment.onFragmentResult(requestCode, resultCode, data);
+        for (CommunityTabFragment fragment : fragments) {
+            if (fragment != null) {
+                fragment.onFragmentResult(requestCode, resultCode, data);
+            }
         }
     }
 
@@ -576,5 +353,49 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss())
                 .create();
         helpDialog.show();
+    }
+
+    private CommunityTabFragment createFragmentView(int position) {
+        int pos = position < binding.tabLayout.getTabCount() ? position : 0;
+        CommunityTabFragment tab;
+        if (pos == 0) {
+            tab = new NotesTabFragment();
+        } else if (pos == 1) {
+            tab = new MarketTabFragment();
+        } else {
+            tab = new TransactionsTabFragment();
+        }
+        fragments[pos] = tab;
+
+        Bundle bundle = new Bundle();
+        bundle.putString(IntentExtra.CHAIN_ID, chainID);
+        bundle.putBoolean(IntentExtra.IS_JOINED, isJoined);
+        tab.setArguments(bundle);
+        return tab;
+    }
+
+    public class StateAdapter extends FragmentStatePagerAdapter {
+
+        StateAdapter(@NonNull FragmentManager fm, int count) {
+            super(fm, count);
+        }
+
+        @NonNull
+        @Override
+        public Fragment getItem(int position) {
+            return createFragmentView(position);
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position == 1) {
+                return getString(R.string.community_chain_market);
+            } else if (position == 2) {
+                return getString(R.string.community_on_chain);
+            } else {
+                return getString(R.string.community_chain_note);
+            }
+        }
     }
 }

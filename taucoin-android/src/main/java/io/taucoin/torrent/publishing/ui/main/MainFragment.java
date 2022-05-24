@@ -5,10 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 
@@ -16,9 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -34,6 +31,7 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.customviews.FragmentStatePagerAdapter;
 
 /**
  * 群组列表页面
@@ -70,44 +68,20 @@ public class MainFragment extends BaseFragment {
     private void initView() {
         showProgressDialog();
         viewModel.getHomeAllData().observe(getViewLifecycleOwner(), list -> {
+            closeProgressDialog();
             showFragmentData();
         });
 
         //自定义的Adapter继承自FragmentPagerAdapter
-        StateAdapter stateAdapter = new StateAdapter(activity);
+        StateAdapter stateAdapter = new StateAdapter(getChildFragmentManager(),
+                binding.tabLayout.getTabCount());
         // ViewPager设置Adapter
         binding.viewPager.setAdapter(stateAdapter);
         binding.viewPager.setOffscreenPageLimit(3);
 
-        //为ViewPager添加页面改变监听
-        TabLayoutMediator mediator = new TabLayoutMediator(binding.tabLayout, binding.viewPager,
-                (tab, position) -> {
-                    if (position == 0) {
-                        tab.setText(R.string.main_tab_all);
-                    } else if (position == 1) {
-                        tab.setText(R.string.main_tab_community);
-                    } else if (position == 2) {
-                        tab.setText(R.string.main_tab_personal);
-                    }
-                });
-        mediator.attach();
-
+        binding.tabLayout.setupWithViewPager(binding.viewPager);
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
-        binding.root.getViewTreeObserver().addOnPreDrawListener(onPreDrawListener);
     }
-
-    private ViewTreeObserver.OnPreDrawListener onPreDrawListener = new ViewTreeObserver.OnPreDrawListener() {
-        @Override
-        public boolean onPreDraw() {
-            int width = binding.root.getWidth();
-            if (width > 0) {
-                ViewGroup.LayoutParams layoutParams = binding.viewPager.getLayoutParams();
-                layoutParams.width = width;
-                binding.viewPager.setLayoutParams(layoutParams);
-            }
-            return true;
-        }
-    };
 
     private TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
 
@@ -209,27 +183,31 @@ public class MainFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        binding.root.getViewTreeObserver().removeOnPreDrawListener(onPreDrawListener);
         binding.tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
     }
 
-    public class StateAdapter extends FragmentStateAdapter {
+    public class StateAdapter extends FragmentStatePagerAdapter {
 
-        int itemCount;
-        StateAdapter(@NonNull FragmentActivity fragmentActivity) {
-            super(fragmentActivity);
-            itemCount = binding.tabLayout.getTabCount();
+        public StateAdapter(@NonNull FragmentManager fm, int count) {
+            super(fm, count);
         }
 
         @NonNull
         @Override
-        public Fragment createFragment(int position) {
-            return showFragmentView(position);
+        public Fragment getItem(int position) {
+            return createFragmentView(position);
         }
 
+        @Nullable
         @Override
-        public int getItemCount() {
-            return itemCount;
+        public CharSequence getPageTitle(int position) {
+            if (position == 1) {
+                return getString(R.string.main_tab_community);
+            } else if (position == 2) {
+                return getString(R.string.main_tab_personal);
+            } else {
+                return getString(R.string.main_tab_all);
+            }
         }
     }
 
@@ -250,7 +228,7 @@ public class MainFragment extends BaseFragment {
         }
     }
 
-    private MainTabFragment showFragmentView(int position) {
+    private MainTabFragment createFragmentView(int position) {
         closeProgressDialog();
         int pos = position < binding.tabLayout.getTabCount() ? position : 0;
         MainTabFragment tab = new MainTabFragment();

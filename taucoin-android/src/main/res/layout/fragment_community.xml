@@ -53,177 +53,55 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/ll_filter"
+        <com.google.android.material.tabs.TabLayout
             android:layout_below="@+id/ll_top_statistics"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
+            android:id="@+id/tab_layout"
             android:layout_height="@dimen/widget_size_40"
-            android:background="@color/color_bg"
-            android:paddingStart="@dimen/widget_size_2"
-            android:paddingEnd="@dimen/widget_size_2"
-            android:paddingTop="@dimen/widget_size_1"
-            android:paddingBottom="@dimen/widget_size_1">
-
-            <RelativeLayout
-                android:id="@+id/rl_notes"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:onClick="@{listener::onClick}"
-                android:background="@drawable/white_rect_round_bg_no_border">
-
-                <TextView
-                    android:id="@+id/tv_notes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:paddingTop="@dimen/widget_size_5"
-                    android:paddingBottom="@dimen/widget_size_5"
-                    android:paddingStart="@dimen/widget_size_2"
-                    android:paddingEnd="@dimen/widget_size_2"
-                    android:textColor="@color/gray_dark"
-                    android:text="@string/community_chain_note"
-                    android:includeFontPadding="false"
-                    android:gravity="center|center_vertical"
-                    android:textAppearance="@style/TextAppearanceBody2"/>
-
-                <View
-                    android:visibility="gone"
-                    android:layout_toEndOf="@+id/tv_notes"
-                    android:layout_width="@dimen/widget_size_6"
-                    android:layout_height="@dimen/widget_size_6"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:background="@drawable/red_rect_round_bg"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/rl_market"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:layout_marginStart="@dimen/widget_size_2"
-                android:layout_marginEnd="@dimen/widget_size_2"
-                android:onClick="@{listener::onClick}"
-                android:background="@drawable/white_rect_round_bg_no_border">
-
-                <TextView
-                    android:id="@+id/tv_market"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:paddingTop="@dimen/widget_size_5"
-                    android:paddingBottom="@dimen/widget_size_5"
-                    android:paddingStart="@dimen/widget_size_2"
-                    android:paddingEnd="@dimen/widget_size_2"
-                    android:textColor="@color/gray_dark"
-                    android:text="@string/community_chain_market"
-                    android:includeFontPadding="false"
-                    android:gravity="center|center_vertical"
-                    android:textAppearance="@style/TextAppearanceBody2"/>
-
-                <View
-                    android:visibility="gone"
-                    android:id="@+id/msg_unread"
-                    android:layout_toEndOf="@+id/tv_market"
-                    android:layout_width="@dimen/widget_size_6"
-                    android:layout_height="@dimen/widget_size_6"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:background="@drawable/red_rect_round_bg"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/rl_chain"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:onClick="@{listener::onClick}"
-                android:background="@drawable/white_rect_round_bg_no_border">
-
-                <TextView
-                    android:id="@+id/tv_chain"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:paddingTop="@dimen/widget_size_5"
-                    android:paddingBottom="@dimen/widget_size_5"
-                    android:paddingStart="@dimen/widget_size_2"
-                    android:paddingEnd="@dimen/widget_size_2"
-                    android:textColor="@color/gray_dark"
-                    android:text="@string/community_on_chain"
-                    android:includeFontPadding="false"
-                    android:gravity="center|center_vertical"
-                    android:textAppearance="@style/TextAppearanceBody2"/>
-
-                <View
-                    android:visibility="gone"
-                    android:layout_toEndOf="@+id/tv_chain"
-                    android:layout_width="@dimen/widget_size_6"
-                    android:layout_height="@dimen/widget_size_6"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:background="@drawable/red_rect_round_bg"/>
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-        <RelativeLayout
-            android:layout_below="@+id/ll_filter"
-            android:layout_above="@+id/fl_join"
-            android:background="@color/color_chat_bg"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:background="@color/color_white"
+            app:tabIndicatorFullWidth="false"
+            app:tabMode="fixed"
+            app:tabMaxWidth="0dp"
+            app:tabGravity="fill"
+            app:tabTextAppearance="@style/TabLayout"
+            app:tabIndicatorHeight="@dimen/widget_size_4"
+            app:tabIndicatorColor="@color/primary_dark"
+            app:tabSelectedTextColor="@color/primary_dark"
+            app:tabTextColor="@color/gray_dark"
+            app:tabBackground="@color/color_transparent"
+            app:tabRippleColor="@color/color_transparent">
 
-            <androidx.fragment.app.FragmentContainerView
-                android:layout_above="@+id/rl_bottom"
-                android:id="@+id/tab_fragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/color_chat_bg"/>
-
-            <io.taucoin.torrent.publishing.ui.customviews.ThemedSpeedDialView
-                android:id="@+id/fab_button"
+            <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:gravity="center_horizontal|center"
-                app:sdMainFabClosedSrc="@drawable/ic_add_36dp"
-                app:sdMainFabAnimationRotateAngle="45" />
+                android:text="@string/community_chain_note"/>
 
-            <RelativeLayout
-                android:id="@+id/rl_bottom"
-                android:layout_width="match_parent"
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/widget_size_10"
-                android:layout_marginBottom="@dimen/widget_size_10"
-                android:layout_marginStart="@dimen/widget_size_10"
-                android:layout_marginEnd="@dimen/widget_size_80"
-                android:background="@drawable/white_rect_round_bg_big_radius"
-                android:layout_alignParentBottom="true">
+                android:text="@string/community_chain_market"/>
 
-                <ImageView
-                    android:layout_width="@dimen/widget_size_14"
-                    android:layout_height="@dimen/widget_size_14"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="@dimen/widget_size_10"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/icon_up_triangle"/>
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/community_on_chain"/>
 
-                <Spinner
-                    android:id="@+id/view_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/widget_size_44"
-                    android:background="@color/color_transparent"
-                    android:popupBackground="@drawable/white_rect_round_bg_big_radius"
-                    android:spinnerMode="dropdown"/>
+        </com.google.android.material.tabs.TabLayout>
 
-            </RelativeLayout>
+        <View
+            android:layout_below="@+id/tab_layout"
+            android:id="@+id/view_line"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_2"
+            android:background="@color/color_bg"/>
 
-        </RelativeLayout>
+        <androidx.viewpager.widget.ViewPager
+            android:layout_below="@+id/view_line"
+            android:layout_above="@+id/fl_join"
+            android:background="@color/color_chat_bg"
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
         <FrameLayout
             android:visibility="gone"

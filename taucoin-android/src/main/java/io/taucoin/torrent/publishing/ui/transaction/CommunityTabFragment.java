@@ -9,7 +9,6 @@ import android.text.Spanned;
 import android.text.style.URLSpan;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.TextView;
 
@@ -26,6 +25,8 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -51,7 +52,6 @@ import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.DialogTrustBinding;
-import io.taucoin.torrent.publishing.databinding.FragmentTxsTabBinding;
 import io.taucoin.torrent.publishing.databinding.TxConfirmDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
@@ -70,7 +70,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     public static final int TAB_MARKET = 1;
     public static final int TAB_CHAIN = 2;
     protected BaseActivity activity;
-    protected FragmentTxsTabBinding binding;
     protected TxViewModel txViewModel;
     protected UserViewModel userViewModel;
     protected CommunityViewModel communityViewModel;
@@ -91,15 +90,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         super.onAttach(context);
         if (context instanceof BaseActivity)
             activity = (BaseActivity)context;
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_txs_tab, container, false);
-        binding.setListener(this);
-        return binding.getRoot();
     }
 
     @Override
@@ -125,20 +115,34 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         }
     }
 
+    public RecyclerView getRecyclerView() {
+        return null;
+    };
+
+    public SwipeRefreshLayout getRefreshLayout() {
+        return null;
+    }
+
     /**
      * 初始化视图
      */
     public void initView() {
-        binding.refreshLayout.setOnRefreshListener(this);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+        if (getRefreshLayout() != null) {
+            getRefreshLayout().setOnRefreshListener(this);
+        }
+        if (getRecyclerView() != null) {
+            LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
 //        layoutManager.setStackFromEnd(true);
-        binding.txList.setLayoutManager(layoutManager);
-        binding.txList.setItemAnimator(null);
+            getRecyclerView().setLayoutManager(layoutManager);
+            getRecyclerView().setItemAnimator(null);
+        }
     }
 
     final Runnable handleUpdateAdapter = () -> {
-        LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
+        if (null == getRecyclerView()) {
+            return;
+        }
+        LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
         if (layoutManager != null) {
             logger.debug("handleUpdateAdapter isScrollToBottom::{}", isScrollToBottom);
             if (isScrollToBottom) {
@@ -152,7 +156,10 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     };
 
     final Runnable handlePullAdapter = () -> {
-        LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
+        if (null == getRecyclerView()) {
+            return;
+        }
+        LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
         if (layoutManager != null) {
             int bottomPosition = getItemCount() - 1;
             int position = bottomPosition - currentPos;
@@ -440,9 +447,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     }
 
     public void handleMember(CommunityAndMember member) {
-        if (null == binding) {
-            return;
-        }
         isJoined = member.isJoined();
     }
 
@@ -461,7 +465,11 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
 
     void initScrollToBottom() {
         if (!isScrollToBottom) {
-            LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
+            this.isScrollToBottom = true;
+            if (null == getRecyclerView()) {
+                return;
+            }
+            LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
             if (layoutManager != null) {
                 int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
                 int bottomPosition = getItemCount() - 1;
@@ -484,9 +492,4 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     public void switchView(int spinnerItem) {
         this.isScrollToBottom = true;
     }
-
-    /**
-     * 消除子fragment和父fragment渲染速度不一致，造成的视觉效果
-     */
-    public void hideView() { }
 }

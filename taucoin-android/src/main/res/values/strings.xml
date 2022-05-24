@@ -151,7 +151,7 @@
     <string name="community_intro">Introduction(optional)</string>
     <string name="community_more_settings">More Settings</string>
     <string name="community_bootstrap_node">DHT Bootstrap Node</string>
-    <string name="community_transaction">Wiring Transaction</string>
+    <string name="community_transaction">Pay People</string>
     <string name="community_transaction_queue">Wiring Transaction Queue</string>
     <string name="community_nickname">Community Nickname</string>
     <string name="community_choose_coin">Choose Coin</string>

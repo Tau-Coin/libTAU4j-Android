@@ -222,9 +222,8 @@ public abstract class TauDaemon {
         SessionParams sessionParams = SessionSettings.getSessionParamsBuilder()
                 .setAccountSeed(seed)
                 .setDeviceID(deviceID)
-//                .setDatabaseDir(appContext.getApplicationInfo().dataDir)
-                .setDatabaseDir(FileUtil.getExternalDir())  // 数据库sdcard测试路径
-                .setDumpfileDir(FileUtil.getExternalDir())  // 数据库sdcard测试路径
+                .setDatabaseDir(appContext.getApplicationInfo().dataDir) // 数据库目录
+                .setDumpfileDir(FileUtil.getExternalDir())  // Dump File目录
                 .setDhtNonReferable(true)
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)

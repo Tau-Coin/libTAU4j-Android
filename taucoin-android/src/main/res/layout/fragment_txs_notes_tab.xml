@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
         <variable
@@ -119,6 +118,70 @@
             </LinearLayout>
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ll_bottom_input"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/widget_size_5">
+
+            <include
+                android:id="@+id/top_line"
+                layout="@layout/view_line"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/widget_size_10"
+                android:paddingEnd="@dimen/widget_size_10"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:background="@color/color_chat_pop"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+                    android:id="@+id/et_message"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:layout_weight="1"
+                    android:paddingStart="@dimen/widget_size_10"
+                    android:paddingEnd="@dimen/widget_size_10"
+                    android:paddingTop="@dimen/widget_size_5"
+                    android:paddingBottom="@dimen/widget_size_5"
+                    android:hint="@string/community_input_hint"
+                    android:maxLines="4"
+                    android:inputType="textMultiLine"
+                    android:autofillHints="@string/community_input_hint"
+                    android:textSize="@dimen/font_size_16"
+                    android:background="@drawable/white_rect_round_bg"/>
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/tv_send"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="false"
+                    android:onClick="@{listener::onClick}"
+                    android:layout_gravity="bottom|center"
+                    android:gravity="center_vertical|center"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:layout_marginBottom="@dimen/widget_size_1"
+                    android:includeFontPadding="false"
+                    android:paddingStart="@dimen/widget_size_7"
+                    android:paddingEnd="@dimen/widget_size_7"
+                    android:paddingTop="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_10"
+                    android:text="@string/tx_send"
+                    android:background="@drawable/primary_rect_round_bg"
+                    android:textColor="@color/color_white"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 </layout>

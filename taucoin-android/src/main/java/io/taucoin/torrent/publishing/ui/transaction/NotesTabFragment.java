@@ -1,14 +1,22 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
 import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
@@ -20,6 +28,8 @@ import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
+import io.taucoin.torrent.publishing.databinding.FragmentTxsNotesTabBinding;
+import io.taucoin.torrent.publishing.databinding.FragmentTxsTabBinding;
 import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 
@@ -30,6 +40,27 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
 
     private Handler handler = new Handler();
     private NotesListAdapter adapter;
+    private FragmentTxsNotesTabBinding binding;
+
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_txs_notes_tab, container, false);
+        binding.setListener(this);
+        return binding.getRoot();
+    }
+
+    @Override
+    public RecyclerView getRecyclerView() {
+        return binding.txList;
+    }
+
+    @Override
+    public SwipeRefreshLayout getRefreshLayout() {
+        return binding.refreshLayout;
+    }
 
     /**
      * 初始化视图
@@ -83,7 +114,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             boolean isEmpty = StringUtil.isEmpty(s);
             binding.tvSend.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
-//            binding.ivAdd.setVisibility(!isEmpty ? View.GONE : View.VISIBLE);
         }
 
         @Override
@@ -210,11 +240,5 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     public void loadData(int pos) {
         super.loadData(pos);
         txViewModel.loadNotesData(false, chainID, pos, getItemCount());
-    }
-
-    @Override
-    public void hideView() {
-        super.hideView();
-        binding.llBottomInput.setVisibility(View.GONE);
     }
 }

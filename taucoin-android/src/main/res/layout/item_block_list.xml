@@ -46,8 +46,8 @@
 
             <ImageView
                 android:id="@+id/iv_detail"
-                android:layout_width="@dimen/widget_size_16"
-                android:layout_height="@dimen/widget_size_16"
+                android:layout_width="@dimen/widget_size_14"
+                android:layout_height="@dimen/widget_size_14"
                 android:rotation="90"
                 android:src="@mipmap/icon_arrow"
                 android:contentDescription="@null" />
@@ -98,6 +98,10 @@
                 android:textAppearance="@style/TextAppearanceBody3"/>
 
         </LinearLayout>
-        <include layout="@layout/view_line" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_bg" />
     </LinearLayout>
 </layout>

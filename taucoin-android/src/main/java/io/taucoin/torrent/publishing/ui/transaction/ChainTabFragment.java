@@ -1,14 +1,24 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.databinding.FragmentTxsTabBinding;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 
 /**
@@ -17,6 +27,26 @@ import io.taucoin.torrent.publishing.ui.constant.Page;
 public class ChainTabFragment extends CommunityTabFragment implements ChainListAdapter.ClickListener {
 
     private ChainListAdapter adapter;
+    private FragmentTxsTabBinding binding;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_txs_tab, container, false);
+        binding.setListener(this);
+        return binding.getRoot();
+    }
+
+    @Override
+    public RecyclerView getRecyclerView() {
+        return binding.txList;
+    }
+
+    @Override
+    public SwipeRefreshLayout getRefreshLayout() {
+        return binding.refreshLayout;
+    }
 
     /**
      * 初始化视图

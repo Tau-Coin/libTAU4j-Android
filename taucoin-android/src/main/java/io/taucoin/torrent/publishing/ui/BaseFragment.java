@@ -55,6 +55,12 @@ public abstract class BaseFragment extends Fragment implements
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        BaseActivity.logger.debug("{} onResume", className);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         BaseActivity.logger.debug("{} onPause", className);
