@@ -393,7 +393,7 @@ public class CommunityViewModel extends AndroidViewModel {
             SellTxContent sellContent = new SellTxContent(coinName, 0, null, null, description);
             TxQueue sellTxQueue = new TxQueue(community.chainID, currentUser.publicKey, currentUser.publicKey, 0L,
                     Constants.NEWS_MIN_FEE.longValue(), TxType.SELL_TX, sellContent.getEncoded());
-            txViewModel.addTransactionTask(sellTxQueue, null);
+            txViewModel.addTransactionTask(sellTxQueue, null, DateUtil.getMillisTime());
 
             // 发送通知
             Set<String> keys = accounts.keySet();

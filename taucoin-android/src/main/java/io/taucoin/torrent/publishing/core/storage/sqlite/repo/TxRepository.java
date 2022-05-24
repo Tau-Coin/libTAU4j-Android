@@ -123,5 +123,7 @@ public interface TxRepository {
 
     void deleteUnsentTx(long queueID);
 
+    Tx queryUnsentTx(long queueID);
+
     Observable<List<UserAndTx>> observeWalletTransactions(String chainID);
 }

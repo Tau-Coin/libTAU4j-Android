@@ -178,18 +178,22 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     public String addTransactionTask(TxQueue tx, TxQueue oldTx) {
+        return addTransactionTask(tx, oldTx, 0);
+    }
+
+    public String addTransactionTask(TxQueue tx, TxQueue oldTx, long pinnedTime) {
         if (null == oldTx) {
             long queueID = txQueueRepo.addQueue(tx);
             tx.queueID = queueID;
             logger.debug("addTransactionTask insert queueID::{}", queueID);
-            daemon.sendTxQueue(tx);
+            daemon.sendTxQueue(tx, pinnedTime);
             ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.INSERT);
             daemon.updateTxQueue(tx.chainID);
         } else {
             // 重发交易队列
             txQueueRepo.updateQueue(tx);
             logger.debug("addTransactionTask update queueID::{}", tx.queueID);
-            daemon.sendTxQueue(tx);
+            daemon.sendTxQueue(tx, 0);
             // 只有转账金额或者备注被修改，才会通知对方
             ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.UPDATE);
             daemon.updateTxQueue(tx.chainID);

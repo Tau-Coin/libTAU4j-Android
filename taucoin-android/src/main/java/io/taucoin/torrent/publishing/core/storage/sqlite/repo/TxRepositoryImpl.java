@@ -261,6 +261,11 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
+    public Tx queryUnsentTx(long queueID) {
+        return db.txDao().queryUnsentTx(queueID);
+    }
+
+    @Override
     public Observable<List<UserAndTx>> observeWalletTransactions(String chainID) {
         return db.txDao().observeWalletTransactions(chainID);
     }

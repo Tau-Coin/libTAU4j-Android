@@ -712,8 +712,8 @@ public abstract class TauDaemon {
         txQueueManager.updateTxQueue(chainID, isResendTx);
     }
 
-    public void sendTxQueue(TxQueue txQueue) {
-        txQueueManager.sendTxQueue(txQueue);
+    public void sendTxQueue(TxQueue txQueue, long pinnedTime) {
+        txQueueManager.sendTxQueue(txQueue, pinnedTime);
     }
 
     /**

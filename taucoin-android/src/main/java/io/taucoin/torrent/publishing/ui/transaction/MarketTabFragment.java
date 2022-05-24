@@ -58,7 +58,6 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
         super.initView();
         filterItem = R.string.community_view_all;
         currentTab = TAB_MARKET;
-        binding.llPinnedMessage.setVisibility(View.VISIBLE);
         adapter = new MarketListAdapter(this, chainID);
         binding.txList.setAdapter(adapter);
 
@@ -198,6 +197,17 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
                         binding.refreshLayout.setEnabled(false);
                         // 立即执行刷新
                         loadData(0);
+                    }
+                }));
+
+        disposables.add(txViewModel.observeLatestPinnedMsg(currentTab, chainID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list -> {
+                    boolean isHavePinnedMsg = list != null && list.size() > 0;
+                    binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
+                    if (isHavePinnedMsg) {
+                        binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
                     }
                 }));
     }

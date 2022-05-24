@@ -163,7 +163,6 @@
     <string name="community_chain_note">Chat</string>
     <string name="community_chain_market">News</string>
     <string name="community_on_chain">Transactions</string>
-    <string name="community_escrow_service_enter">Escrow Service</string>
     <string name="community_pinned_message">Pinned Message</string>
     <string name="community_chain_note_title">Note Transaction</string>
     <string name="community_sell_coins">Sale</string>

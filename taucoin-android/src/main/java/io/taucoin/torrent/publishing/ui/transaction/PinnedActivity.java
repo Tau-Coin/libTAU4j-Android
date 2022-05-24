@@ -32,8 +32,7 @@ import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 /**
  * Pinned Message
  */
-public class PinnedActivity extends BaseActivity implements NotesListAdapter.ClickListener,
-        View.OnClickListener {
+public class PinnedActivity extends BaseActivity implements NotesListAdapter.ClickListener {
     private ActivityPinnedBinding binding;
     private TxViewModel txViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -48,7 +47,6 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
         ViewModelProvider provider = new ViewModelProvider(this);
         txViewModel = provider.get(TxViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pinned);
-        binding.setListener(this);
         initParam();
         initView();
     }
@@ -78,9 +76,6 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setItemAnimator(null);
         binding.recyclerView.setAdapter(adapter);
-
-        binding.escrowService.setVisibility(currentTab == CommunityTabFragment.TAB_MARKET ?
-                View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -205,14 +200,5 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
 
     private void loadData() {
         txViewModel.loadPinnedTxsData(currentTab, chainID);
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.escrow_service) {
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            ActivityUtil.startActivity(intent, PinnedActivity.this, EscrowServiceActivity.class);
-        }
     }
 }

@@ -24,7 +24,7 @@
                 android:layout_height="match_parent">
 
                 <RelativeLayout
-                    android:visibility="gone"
+                    android:visibility="visible"
                     android:id="@+id/ll_pinned_message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -94,7 +94,6 @@
                             android:id="@+id/tv_pinned_content"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/community_escrow_service_enter"
                             android:includeFontPadding="false"
                             android:maxLines="1"
                             android:singleLine="true"

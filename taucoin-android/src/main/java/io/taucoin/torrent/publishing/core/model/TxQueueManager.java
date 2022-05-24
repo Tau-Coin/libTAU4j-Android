@@ -252,7 +252,7 @@ class TxQueueManager {
         if (isSendMessage) {
             ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.UPDATE);
         }
-        sendTxQueue(account, txQueue, true);
+        sendTxQueue(account, txQueue, true, 0);
         return false;
     }
 
@@ -261,7 +261,7 @@ class TxQueueManager {
      * @param txQueue 队列信息
      * @return 是否需要重发
      */
-    boolean sendTxQueue(TxQueue txQueue) {
+    boolean sendTxQueue(TxQueue txQueue, long pinnedTime) {
         byte[] chainID = ChainIDUtil.encode(txQueue.chainID);
         Account account = daemon.getAccountInfo(chainID, txQueue.senderPk);
         TxQueueAndStatus tx = txQueueRepos.getTxQueueByID(txQueue.queueID);
@@ -274,7 +274,7 @@ class TxQueueManager {
             // 如果只创建了一条, 并且不是未发送状态直接返回
             return false;
         }
-        return sendTxQueue(account, txQueue, false);
+        return sendTxQueue(account, txQueue, false, pinnedTime);
     }
 
     /**
@@ -311,7 +311,7 @@ class TxQueueManager {
      * @param txQueue 队列信息
      * @return 是否需要重发
      */
-    private boolean sendTxQueue(Account account, TxQueue txQueue, boolean isDirectSend) {
+    private boolean sendTxQueue(Account account, TxQueue txQueue, boolean isDirectSend, long pinnedTime) {
         long timestamp = daemon.getSessionTime();
         Transaction transaction = createTransaction(account, txQueue, timestamp);
         long nonce = transaction.getNonce();
@@ -320,6 +320,13 @@ class TxQueueManager {
             boolean isSubmitSuccess = daemon.submitTransaction(transaction);
             if (!isSubmitSuccess) {
                 return true;
+            }
+        }
+        // 更新未发送的交易是否置顶
+        if (pinnedTime == 0) {
+            Tx tx = txRepo.queryUnsentTx(txQueue.queueID);
+            if (tx != null) {
+                pinnedTime = tx.pinnedTime;
             }
         }
         // 删除未发送的交易
@@ -358,6 +365,9 @@ class TxQueueManager {
             tx.nonce = nonce;
             tx.queueID = txQueue.queueID;
             tx.sendStatus = isDirectSend ? 0 : 1;
+            if (pinnedTime > 0) {
+                tx.pinnedTime = pinnedTime;
+            }
             txRepo.addTransaction(tx);
             logger.debug("sendWiringTx createTransaction chainID::{}, txID::{}, senderPk::{}, " +
                             "receiverPk::{}, nonce::{}, memo::{}", tx.chainID, tx.txID, tx.senderPk, tx.receiverPk, tx.nonce, tx.memo);

@@ -85,13 +85,13 @@ public interface TxDao {
     // SQL:查询社区里的置顶交易(MARKET交易，排除Trust Tx, 并且上链)
     String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
-            " AND (tx.txType = 3 OR tx.txType = 5) AND pinnedTime > 0" +
+            " AND tx.txType IN (3, 5, 6) AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里的置顶交易(上链)
     String QUERY_GET_CHAIN_PINNED_TXS = QUERY_GET_CHAIN_TXS_SELECT +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
-            "AND (tx.txStatus = 1 OR tx.txType = 2) AND pinnedTime > 0" +
+            " AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里用户Trust交易(上链)
@@ -149,6 +149,9 @@ public interface TxDao {
 
     String QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH = "SELECT * FROM Txs" +
             " WHERE txStatus = 1 AND blockHash = :blockHash";
+
+
+    String QUERY_UNSENT_TX = "SELECT * FROM Txs WHERE queueID = :queueID AND sendStatus = 1 LIMIT 1";
 
     String DELETE_UNSENT_TX = "DELETE FROM Txs WHERE queueID = :queueID AND sendStatus = 1";
 
@@ -284,6 +287,9 @@ public interface TxDao {
 
     @Query(QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH)
     List<Tx> getOnChainTxsByBlockHash(String blockHash);
+
+    @Query(QUERY_UNSENT_TX)
+    Tx queryUnsentTx(long queueID);
 
     @Query(DELETE_UNSENT_TX)
     void deleteUnsentTx(long queueID);
