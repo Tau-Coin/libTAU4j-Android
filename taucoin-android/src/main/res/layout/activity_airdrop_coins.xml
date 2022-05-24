@@ -43,7 +43,7 @@
                 android:hint="@string/tx_airdrop_link"
                 android:inputType="textMultiLine"
                 android:textAppearance="@style/TextAppearanceBody1"
-                android:autofillHints="@string/tx_coin_name" />
+                android:autofillHints="@string/tx_airdrop_link" />
 
         </RelativeLayout>
 

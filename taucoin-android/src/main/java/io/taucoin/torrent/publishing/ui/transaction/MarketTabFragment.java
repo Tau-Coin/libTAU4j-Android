@@ -186,7 +186,6 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
             closeProgressDialog();
             TauNotifier.getInstance().cancelNotify(chainID);
         });
-        showProgressDialog();
         loadData(0);
 
         disposables.add(txViewModel.observeDataSetChanged()

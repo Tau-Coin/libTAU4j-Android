@@ -107,24 +107,32 @@ public class CommunityCreateActivity extends BaseActivity {
     private void observeAddCommunityState() {
         viewModel.getAddCommunityState().observe(this, state -> {
             if (state.isSuccess()) {
-                showCreateSuccessDialog(state.getMsg());
+                openCommunityActivity(state.getMsg());
             } else {
                 ToastUtils.showShortToast(state.getMsg());
             }
         });
     }
 
+    /**
+     * 打开社区页面
+     */
+    private void openCommunityActivity(String chainID) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(IntentExtra.TYPE, 0);
+        ActivityUtil.startActivity(intent, this, MainActivity.class);
+    }
+
+    @Deprecated
     private void showCreateSuccessDialog(String chainID) {
         DialogCreateCommunitySuccessBinding binding = DataBindingUtil.inflate(LayoutInflater.from(this),
                 R.layout.dialog_create_community_success, null, false);
         binding.tvTitle.setText(Html.fromHtml(getString(R.string.community_create_success)));
         binding.tvYes.setOnClickListener(v -> {
             // 进入社区页面
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.putExtra(IntentExtra.TYPE, 0);
-            ActivityUtil.startActivity(intent, this, MainActivity.class);
+            openCommunityActivity(chainID);
         });
         successDialog = new CommonDialog.Builder(this)
                 .setContentView(binding.getRoot())

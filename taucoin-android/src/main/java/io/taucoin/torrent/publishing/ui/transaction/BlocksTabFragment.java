@@ -87,7 +87,6 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
 
             closeProgressDialog();
         });
-        showProgressDialog();
         loadData(0);
 
         disposables.add(communityViewModel.observeBlocksSetChanged()

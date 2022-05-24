@@ -1,7 +1,6 @@
 package io.taucoin.torrent.publishing.ui.transaction;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.InputFilter;
@@ -9,9 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.math.BigInteger;
-
-import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
@@ -20,7 +16,6 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
-import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
@@ -36,7 +31,6 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
  */
 public class SellCreateActivity extends BaseActivity implements View.OnClickListener {
 
-    private static final int CHOOSE_REQUEST_CODE = 0x01;
     private ActivitySellBinding binding;
     private TxViewModel txViewModel;
     private String chainID;
@@ -85,7 +79,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
             if (txQueue != null) {
                 txFee = txQueue.fee;
                 SellTxContent txContent = new SellTxContent(txQueue.content);
-                binding.etCoinName.setText(txContent.getCoinName());
+                binding.etItemName.setText(txContent.getCoinName());
                 binding.etLink.setText(txContent.getLink());
                 binding.etQuantity.setText(String.valueOf(txContent.getQuantity()));
                 binding.etLocation.setText(txContent.getLocation());
@@ -154,7 +148,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     private TxQueue buildTx() {
         String senderPk = MainApplication.getInstance().getPublicKey();
         String fee = ViewUtils.getStringTag(binding.tvFee);
-        String coinName = ViewUtils.getText(binding.etCoinName);
+        String coinName = ViewUtils.getText(binding.etItemName);
         long quantity = ViewUtils.getIntTag(binding.etQuantity);
         String link = ViewUtils.getText(binding.etLink);
         String location = ViewUtils.getText(binding.etLocation);
@@ -173,32 +167,9 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.iv_coins:
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.COIN_NAME, ViewUtils.getText(binding.etCoinName));
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                ActivityUtil.startActivityForResult(intent, this, CoinsChooseActivity.class,
-                        CHOOSE_REQUEST_CODE);
-                break;
             case R.id.tv_fee:
                 txViewModel.showEditFeeDialog(this, binding.tvFee, chainID);
                 break;
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == CHOOSE_REQUEST_CODE) {
-            if (data != null) {
-                String coinName = data.getStringExtra(IntentExtra.COIN_NAME);
-                if (StringUtil.isNotEmpty(coinName)) {
-                    binding.etCoinName.setText(coinName);
-                    binding.etCoinName.setSelection(coinName.length());
-                } else {
-                    binding.etCoinName.getText().clear();
-                }
-            }
         }
     }
 }

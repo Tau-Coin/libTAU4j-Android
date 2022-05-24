@@ -123,38 +123,31 @@
                         android:paddingEnd="@dimen/widget_size_20"
                         android:textAppearance="@style/TextAppearanceBody1"/>
 
-                    <include
-                        layout="@layout/view_line"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/widget_size_1"
-                        android:layout_marginStart="@dimen/widget_size_20"
-                        android:layout_marginEnd="@dimen/widget_size_20"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/tv_import_new_key"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:gravity="center_vertical"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_import"
-                        app:rightText="@string/setting_import_seed"/>
-
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/widget_size_15"
-                    android:layout_marginEnd="@dimen/widget_size_15"
-                    android:layout_marginTop="@dimen/widget_size_2"
-                    android:layout_marginBottom="@dimen/widget_size_0"
+                    android:layout_marginTop="@dimen/widget_size_7"
+                    android:layout_marginBottom="@dimen/widget_size_7"
                     android:includeFontPadding="false"
                     android:text="@string/setting_key_explain"
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody3"/>
+
+                <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    android:id="@+id/tv_import_new_key"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/widget_size_7"
+                    android:paddingBottom="@dimen/widget_size_7"
+                    android:background="@color/color_white"
+                    android:gravity="center_vertical"
+                    android:minHeight="@dimen/widget_size_44"
+                    android:onClick="onClick"
+                    app:leftImage="@mipmap/icon_import"
+                    app:rightText="@string/setting_import_seed"/>
 
                 <TextView
                     android:layout_width="wrap_content"

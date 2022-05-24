@@ -404,7 +404,7 @@ public class TxViewModel extends AndroidViewModel {
             if (type == SELL_TX.getType()) {
                 SellTxContent txContent = new SellTxContent(tx.content);
                 if (StringUtil.isEmpty(txContent.getCoinName())) {
-                    ToastUtils.showShortToast(R.string.tx_error_invalid_coin_name);
+                    ToastUtils.showShortToast(R.string.tx_error_invalid_item_name);
                     return false;
                 }
             } else if (type == AIRDROP_TX.getType()) {

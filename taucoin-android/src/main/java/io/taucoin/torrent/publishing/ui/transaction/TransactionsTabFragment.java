@@ -61,6 +61,7 @@ public class TransactionsTabFragment extends CommunityTabFragment {
         binding.viewSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                showProgressDialog();
                 loadSpinnerView(spinnerItems[position]);
             }
 

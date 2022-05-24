@@ -17,6 +17,7 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 /**
  * 群组选择页面
  */
+@Deprecated
 public class CoinsChooseActivity extends BaseActivity {
 
     private ActivityCommunityChooseBinding binding;

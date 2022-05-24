@@ -347,14 +347,14 @@
     <string name="user_seed_save_tips">Please make sure your key\nhas been saved</string>
     <string name="user_show_name">%1$s(%2$s)</string>
     <string name="user_nick_name">Nickname: %s</string>
-    <string name="user_public_key">Public Key: %s</string>
+    <string name="user_public_key">Address: %s</string>
     <string name="user_ban">Ban</string>
     <string name="user_ban_list">Banlist</string>
     <string name="user_edit_name">Edit Name</string>
     <string name="user_mutual_communities">Mutual Communities:</string>
     <string name="user_new_name_hint">Nick Name</string>
     <string name="user_invalid_new_name">Invalid Nickname</string>
-    <string name="user_invalid_friend_pk">Invalid Friend\'s Public Key</string>
+    <string name="user_invalid_friend_pk">Invalid Friend\'s Address</string>
     <string name="user_new_name_too_long">Nickname too long</string>
     <string name="user_no_messages_from">No messages from</string>
     <string name="user_until_removed">until removed from the ban list.</string>
@@ -391,7 +391,7 @@
     <string name="tx_contact_id">%1$s(Optional)</string>
     <string name="tx_bootstrap_node">Bootstrap node(required)</string>
     <string name="tx_comment">Comment(required)</string>
-    <string name="tx_coin_name">Coin Name</string>
+    <string name="tx_item_name">Item Name</string>
     <string name="tx_link">Link - optional</string>
     <string name="tx_airdrop_link">Airdrop Link</string>
     <string name="tx_airdrop_select">Please select an airdrop community first!</string>
@@ -420,7 +420,7 @@
     <string name="tx_fee_hint">Fee</string>
     <string name="tx_median_fee_tips">Median fee:%1$s %2$s</string>
     <string name="tx_fee_tips">*The higher fee, the faster the note will be accepted by community.</string>
-    <string name="tx_error_invalid_pk">Invalid receiver\'s Public Key!</string>
+    <string name="tx_error_invalid_pk">Invalid receiver\'s Address!</string>
     <string name="tx_error_invalid_amount">Invalid Transaction amount</string>
     <string name="tx_error_invalid_airdrop_link">Invalid airdrop link</string>
     <string name="tx_error_invalid_free">Invalid Transaction free</string>
@@ -434,7 +434,7 @@
     <string name="tx_error_invalid_comment">Invalid Comment</string>
     <string name="tx_error_send_failed">Transaction sending failed, please try again later!</string>
     <string name="tx_error_memo_too_large">The transaction content is too large!</string>
-    <string name="tx_error_invalid_coin_name">Invalid coin name</string>
+    <string name="tx_error_invalid_item_name">Invalid item name</string>
     <string name="tx_error_invalid_title">Invalid title</string>
 
     <string name="tx_result_status_waiting">Waiting&#8230;</string>
@@ -490,7 +490,7 @@
 
     <!-- Strings used for connected peers -->
     <string name="contacts_exchange_qr">Show QR code to add friend</string>
-    <string name="contacts_import_friend_pk">Import friend\'s address</string>
+    <string name="contacts_import_friend_pk">Add friend\'s address</string>
     <string name="contacts_have_added">Hello.</string>
     <string name="contacts_accepting_airdrop">Please send me %1$s community coins from the attached airdrop invitation.</string>
     <string name="contacts_yourself">&#160;-&#160;yourself</string>
@@ -519,10 +519,8 @@
     <string name="bot_airdrop">Airdrop</string>
     <string name="bot_airdrop_paste_link">Paste Airdrop Link</string>
     <string name="bot_airdrop_history">Airdrop History</string>
-    <string name="bot_airdrop_members">Members</string>
     <string name="bot_airdrop_members_error">Members invalid</string>
     <string name="bot_airdrop_members_hit">Max number of airdropping members</string>
-    <string name="bot_airdrop_coins">Airdrop Coins</string>
     <string name="bot_airdrop_coins_error">Airdrop Coins invalid</string>
     <string name="bot_airdrop_total_coins_error">Airdrop total coins cannot exceed %1$s coins</string>
     <string name="bot_airdrop_coins_hit">Number of coins for each member</string>
