@@ -64,15 +64,19 @@ public class AppUtil {
     /**
      * 判断某个界面是否在前台,返回true，为显示,否则不是
      */
-    public static boolean isForeground(Context context, String className) {
-        if (context == null || StringUtil.isEmpty(className))
+    public static boolean isForeground(Context context, String... classNames) {
+        if (context == null || null == classNames || classNames.length == 0)
             return false;
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> list = am.getRunningTasks(1);
         if (list != null && list.size() > 0) {
             ComponentName cpn = list.get(0).topActivity;
             String topClassName = cpn.getClassName();
-            return className.equals(topClassName);
+            for (String className: classNames) {
+                if (StringUtil.isEquals(className, topClassName)) {
+                    return true;
+                }
+            }
         }
         return false;
     }

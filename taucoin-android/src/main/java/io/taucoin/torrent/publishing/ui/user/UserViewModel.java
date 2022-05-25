@@ -999,7 +999,9 @@ public class UserViewModel extends AndroidViewModel {
     public void promptUserFirstStartApp(AppCompatActivity activity, User user) {
         String firstStartKey = activity.getString(R.string.pref_key_first_start);
         boolean isFirstStart = settingsRepo.getBooleanValue(firstStartKey, true);
-        boolean isForeground = AppUtil.isForeground(activity, MainActivity.class.getName());
+        String permissionsActivity = "com.android.permissioncontroller.permission.ui.GrantPermissionsActivity";
+        String mainActivity = MainActivity.class.getName();
+        boolean isForeground = AppUtil.isForeground(activity, permissionsActivity, mainActivity);
         // 如果APP是第一次启动, 并且MainActivity也在前台
         if (isFirstStart && isForeground) {
             GuideDialog.Builder builder = new GuideDialog.Builder(activity);
@@ -1011,7 +1013,6 @@ public class UserViewModel extends AndroidViewModel {
                 String defaultName = UsersUtil.getDefaultName(user.publicKey);
                 logger.trace("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
                 if (StringUtil.isEquals(showName, defaultName)) {
-                    showEditNameDialog(activity, user.publicKey);
                     showEditNameDialog(activity, user.publicKey);
                 }
             });
