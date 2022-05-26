@@ -64,9 +64,17 @@ public abstract class BaseActivity extends AppCompatActivity implements
         showProgressDialog(true);
     }
 
+    public void showProgressDialog(CharSequence text){
+        showProgressDialog(true, text);
+    }
+
     public void showProgressDialog(boolean isCanCancel){
+        showProgressDialog(isCanCancel, null);
+    }
+
+    public void showProgressDialog(boolean isCanCancel, CharSequence text){
         progressManager = ProgressManager.newInstance();
-        progressManager.showProgressDialog(this, isCanCancel);
+        progressManager.showProgressDialog(this, isCanCancel, text);
     }
 
     public void closeProgressDialog() {

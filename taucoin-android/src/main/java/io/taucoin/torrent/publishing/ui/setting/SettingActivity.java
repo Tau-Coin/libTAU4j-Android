@@ -26,6 +26,7 @@ import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.DrawablesUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -35,6 +36,7 @@ import io.taucoin.torrent.publishing.core.utils.media.MediaUtil;
 import io.taucoin.torrent.publishing.databinding.ActivitySettingBinding;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
+import io.taucoin.torrent.publishing.ui.download.DownloadViewModel;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
@@ -45,6 +47,7 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
     private static final Logger logger = LoggerFactory.getLogger("SettingActivity");
     private ActivitySettingBinding binding;
     private UserViewModel viewModel;
+    private DownloadViewModel downloadViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
@@ -52,6 +55,7 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
         viewModel = provider.get(UserViewModel.class);
+        downloadViewModel = provider.get(DownloadViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_setting);
         binding.setListener(this);
         initView();
@@ -72,6 +76,8 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(R.string.setting_title);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        binding.itemUpdates.setRightText2(AppUtil.getVersionName());
 
         DrawablesUtil.setEndDrawable(binding.tvUsernameTitle, R.mipmap.icon_edit,
                 getResources().getDimension(R.dimen.widget_size_14));
@@ -172,6 +178,10 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
             case R.id.iv_head_pic:
                 MediaUtil.openGalleryAndCamera(this);
                 break;
+            case R.id.item_updates:
+                showProgressDialog(getString(R.string.app_upgrade_checking));
+                downloadViewModel.checkAppVersion(this, true);
+                break;
         }
     }
 
@@ -207,6 +217,7 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        closeProgressDialog();
         BitmapUtil.recycleImageView(binding.ivHeadPic);
     }
 }

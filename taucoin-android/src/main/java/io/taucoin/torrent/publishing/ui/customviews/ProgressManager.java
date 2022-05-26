@@ -21,6 +21,7 @@ import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class ProgressManager {
     }
 
     private void showProgressDialog(BaseActivity activity){
-        showProgressDialog(activity, true);
+        showProgressDialog(activity, true, null);
     }
 
     public void showProgressDialog(FragmentActivity activity){
@@ -49,12 +50,12 @@ public class ProgressManager {
         showProgressDialog(baseActivity);
     }
 
-    public void showProgressDialog(FragmentActivity activity, boolean isCanCancel){
+    public void showProgressDialog(FragmentActivity activity, boolean isCanCancel, CharSequence text){
         BaseActivity baseActivity = (BaseActivity) activity;
-        showProgressDialog(baseActivity, isCanCancel);
+        showProgressDialog(baseActivity, isCanCancel, text);
     }
 
-    private void showProgressDialog(BaseActivity activity, boolean isCanCancel){
+    private void showProgressDialog(BaseActivity activity, boolean isCanCancel, CharSequence text){
         try {
             closeProgressDialog();
             logger.info("showProgressDialog");
@@ -70,6 +71,10 @@ public class ProgressManager {
                     // 背景透明
                     Window window = progress.getWindow();
                     if (window != null) {
+                        TextView textView = window.findViewById(R.id.tv_text);
+                        if (textView != null && text != null) {
+                            textView.setText(text);
+                        }
                         window.setBackgroundDrawable(new ColorDrawable(0));
                         window.setDimAmount(0f);
                         WindowManager.LayoutParams layout = window.getAttributes();

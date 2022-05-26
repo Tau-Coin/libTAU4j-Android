@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.Version;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.PermissionUtils;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.DialogDownloadProgressBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
@@ -81,9 +83,14 @@ public class UpgradeActivity extends BaseActivity {
         }
         int leftButton = version.isForced() ? R.string.exit : R.string.cancel;
         int rightButton = isDownload ? R.string.app_upgrade_install : R.string.ok;
+
+        SpannableStringBuilder message = new SpannableStringBuilder();
+        if (StringUtil.isNotEmpty(version.getContent())) {
+            message.append(Html.fromHtml(version.getContent()));
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(R.string.app_upgrade_title)
-                .setMessage(Html.fromHtml(version.getContent()))
+                .setTitle(getString(R.string.app_upgrade_title, version.getName()))
+                .setMessage(message)
                 .setNegativeButton(leftButton, null)
                 .setPositiveButton(rightButton, null)
                 .setCancelable(false);

@@ -284,6 +284,7 @@
         <attr name="leftImage" format="reference" />
         <attr name="leftText" format="string" />
         <attr name="rightText" format="string" />
+        <attr name="rightText2" format="string" />
         <attr name="rightImage" format="reference" />
         <attr name="rightTextColor" format="color" />
     </declare-styleable>

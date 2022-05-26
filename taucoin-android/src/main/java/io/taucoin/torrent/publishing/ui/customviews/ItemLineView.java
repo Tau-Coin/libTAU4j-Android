@@ -29,6 +29,7 @@ import io.taucoin.torrent.publishing.databinding.ViewItemLineBinding;
 public class ItemLineView extends RelativeLayout {
     private String leftText;
     private String rightText;
+    private String rightText2;
     private int rightTextColor;
     private int leftImage;
     private int rightImage;
@@ -54,6 +55,7 @@ public class ItemLineView extends RelativeLayout {
         this.rightImage = a.getResourceId(R.styleable.ItemLineView_rightImage, -1);
         this.leftText = a.getString(R.styleable.ItemLineView_leftText);
         this.rightText = a.getString(R.styleable.ItemLineView_rightText);
+        this.rightText2 = a.getString(R.styleable.ItemLineView_rightText2);
         this.rightTextColor = a.getColor(R.styleable.ItemLineView_rightTextColor, getResources().getColor(R.color.color_black));
         a.recycle();
         loadView();
@@ -66,6 +68,7 @@ public class ItemLineView extends RelativeLayout {
         }
         if(rightImage != -1){
             binding.ivRight.setImageResource(rightImage);
+            binding.rlRight.setVisibility(VISIBLE);
         }
         if(StringUtil.isNotEmpty(leftText)){
             binding.tvLeft.setText(leftText);
@@ -73,13 +76,25 @@ public class ItemLineView extends RelativeLayout {
         if(StringUtil.isNotEmpty(rightText)){
             binding.tvRight.setText(rightText);
         }
+        if(StringUtil.isNotEmpty(rightText2)){
+            binding.tvRight2.setText(rightText2);
+            binding.rlRight.setVisibility(VISIBLE);
+        }
         binding.tvRight.setTextColor(rightTextColor);
     }
 
     public void setRightText(CharSequence rightText) {
         this.rightText = rightText.toString();
-       if(binding != null){
+        if(binding != null){
            binding.tvRight.setText(rightText);
-       }
+        }
+    }
+
+    public void setRightText2(CharSequence rightText) {
+        this.rightText2 = rightText.toString();
+        if(binding != null){
+            binding.tvRight2.setText(rightText);
+            binding.rlRight.setVisibility(VISIBLE);
+        }
     }
 }

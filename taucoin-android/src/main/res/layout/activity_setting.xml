@@ -260,6 +260,25 @@
                         layout="@layout/view_line"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                        android:id="@+id/item_updates"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/widget_size_7"
+                        android:paddingBottom="@dimen/widget_size_7"
+                        android:gravity="center_vertical"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:onClick="onClick"
+                        app:leftImage="@mipmap/icon_version_updates"
+                        app:rightText="@string/setting_check_updates"/>
+
+                    <include
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/widget_size_1"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        layout="@layout/view_line"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_help"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

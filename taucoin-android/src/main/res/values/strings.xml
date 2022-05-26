@@ -260,6 +260,7 @@
     <string name="setting_journal">Journal</string>
     <string name="setting_font_size">Font Size</string>
     <string name="setting_journal_share">Share journal to</string>
+    <string name="setting_check_updates">Check for Updates</string>
     <string name="setting_help">Help</string>
     <string name="setting_community">Community</string>
     <string name="setting_favorites">Favorites</string>
@@ -560,11 +561,12 @@
 
     <!--version upgrade-->
     <string name="app_upgrade_progress">Updating progress&#8230;</string>
-    <string name="app_upgrade_title">Update Log</string>
+    <string name="app_upgrade_title">Ver%s update log</string>
     <string name="app_upgrade_install">Install</string>
     <string name="app_upgrade_fail">Failed</string>
     <string name="app_upgrade_retry">Retry</string>
-    <string name="app_upgrade_latest">latest version</string>
+    <string name="app_upgrade_checking">Checking&#8230;</string>
+    <string name="app_upgrade_latest">No updates</string>
 
     <!--permission tip-->
     <string name="permission_tip_camera_denied">

@@ -28,6 +28,8 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.FileUtil;
 import io.taucoin.torrent.publishing.core.utils.HttpUtil;
+import io.taucoin.torrent.publishing.core.utils.ToastUtils;
+import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import okhttp3.Response;
 
@@ -72,7 +74,16 @@ public class DownloadViewModel extends AndroidViewModel {
     /**
      * 检查APP版本，查看是否需要版本升级
      */
-    public void checkAppVersion(AppCompatActivity activity) {
+    public void checkAppVersion(BaseActivity activity) {
+        checkAppVersion(activity, false);
+    }
+
+    /**
+     * 检查APP版本，查看是否需要版本升级
+     * @param activity
+     * @param showNoUpdates 显示无需更新
+     */
+    public void checkAppVersion(BaseActivity activity, boolean showNoUpdates) {
         if (disposable != null && !disposable.isDisposed()) {
             return;
         }
@@ -100,7 +111,7 @@ public class DownloadViewModel extends AndroidViewModel {
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(version -> handleVersionUpgrade(activity, version));
+                .subscribe(version -> handleVersionUpgrade(activity, version, showNoUpdates));
     }
 
     /**
@@ -108,13 +119,19 @@ public class DownloadViewModel extends AndroidViewModel {
      * @param activity
      * @param version
      */
-    private void handleVersionUpgrade(AppCompatActivity activity, Version version) {
+    private void handleVersionUpgrade(BaseActivity activity, Version version, boolean showNoUpdates) {
+        if (showNoUpdates) {
+            activity.closeProgressDialog();
+        }
         if (null == version) {
             return;
         }
         // 是否需要升级
         boolean isNeedUpgrade = version.getNumber() > AppUtil.getVersionCode();
-        if(!isNeedUpgrade){
+        if (!isNeedUpgrade) {
+            if (showNoUpdates) {
+                ToastUtils.showShortToast(R.string.app_upgrade_latest);
+            }
             // 不需要升级，删除本地的apk
             removeOldApk();
             return;
@@ -126,7 +143,7 @@ public class DownloadViewModel extends AndroidViewModel {
 
         boolean isNeedPrompt = settingsRepository.isNeedPromptUser();
         // 非强制升级且不需要提示
-        if(!version.isForced() && !isNeedPrompt){
+        if(!version.isForced() && !isNeedPrompt && !showNoUpdates){
             return;
         }
 
