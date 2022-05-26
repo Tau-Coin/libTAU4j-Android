@@ -1,18 +1,15 @@
 package io.taucoin.torrent.publishing.ui.qrcode;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import org.libTAU4j.ChainURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -25,7 +22,6 @@ import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
-import io.taucoin.torrent.publishing.core.utils.DrawablesUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityCommunityQrCodeBinding;
@@ -47,6 +43,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     private String chainID;
     private String chainUrl;
     private String chainUrlCopy;
+    private int maxLines = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +75,10 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
 
         String showName = ChainIDUtil.getName(chainID);
         binding.qrCode.tvName.setText(showName);
+        binding.qrCode.tvName.setMaxLines(maxLines);
+        binding.qrCode.tvName.setEllipsize(TextUtils.TruncateAt.END);
         binding.qrCode.tvQrCode.setVisibility(View.GONE);
         binding.qrCode.ivCopy.setVisibility(View.GONE);
-
-        DrawablesUtil.setEndDrawable(binding.qrCode.tvName, R.mipmap.icon_copy_text,
-                getResources().getDimension(R.dimen.widget_size_18));
 
         // 获取10个社区成员的公钥
         disposables.add(communityViewModel.getCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT)
@@ -96,6 +92,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
                         } else {
                             chainUrlCopy = chainUrl;
                         }
+                        binding.qrCode.tvName.setText(chainUrlCopy);
                         logger.debug("chainUrl::{}", chainUrl);
                         communityViewModel.generateQRCode(this, chainUrl, this.chainID, showName);
                     }
@@ -139,7 +136,18 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     public void onClick(View v) {
         if (v.getId() == R.id.ll_scan_qr_code) {
             openScanQRActivityAndExit();
-        } else if (v.getId() == R.id.tv_name) {
+        } else if (v.getId() == R.id.iv_see) {
+            if (StringUtil.isNotEmpty(chainUrlCopy)) {
+                int maxLines = binding.qrCode.tvName.getMaxLines();
+                if (this.maxLines == maxLines) {
+                    binding.qrCode.tvName.setMaxLines(1000);
+                    binding.ivSee.setImageResource(R.mipmap.icon_no_see);
+                } else {
+                    binding.qrCode.tvName.setMaxLines(this.maxLines);
+                    binding.ivSee.setImageResource(R.mipmap.icon_see);
+                }
+            }
+        } else if (v.getId() == R.id.iv_copy) {
             if (StringUtil.isNotEmpty(chainUrlCopy)) {
                 CopyManager.copyText(chainUrlCopy);
                 ToastUtils.showShortToast(R.string.copy_share_link);
