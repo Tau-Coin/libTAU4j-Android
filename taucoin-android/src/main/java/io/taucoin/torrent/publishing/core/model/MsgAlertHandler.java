@@ -226,6 +226,68 @@ class MsgAlertHandler {
     }
 
     /**
+     * Sent to Internet 桔黄色 (traversal complete > 1)
+     * @param msgHash 消息hash
+     * @param timestamp 时间
+     * @param userPk 用户公钥
+     */
+    void onMsgSync(byte[] msgHash, BigInteger timestamp, String userPk) {
+        try {
+            String hash = ByteUtil.toHexString(msgHash);
+            ChatMsg msg = chatRepo.queryChatMsg(hash);
+            String senderPk = msg != null ? msg.senderPk : null;
+            String receiverPk = msg != null ? msg.receiverPk : null;
+            if (StringUtil.isNotEquals(senderPk, userPk)) {
+                logger.debug("onMsgSync MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
+                return;
+            }
+            ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
+                    ChatMsgStatus.SENT_INTERNET.getStatus());
+            logger.trace("onMsgSync MessageHash::{}, exist::{}", hash, msgLog != null);
+            if (null == msgLog) {
+                msgLog = new ChatMsgLog(hash, ChatMsgStatus.SENT_INTERNET.getStatus(),
+                        timestamp.longValue());
+                chatRepo.addChatMsgLogs(receiverPk, msgLog);
+            }
+
+        } catch (SQLiteConstraintException ignore) {
+        } catch (Exception e) {
+            logger.error("onMsgSync error", e);
+        }
+    }
+
+    /**
+     * Arrived Prefix Swarm 绿色(等价网络节点>1)
+     * @param msgHash 消息hash
+     * @param timestamp 时间
+     * @param userPk 用户公钥
+     */
+    void onMsgArrived(byte[] msgHash, BigInteger timestamp, String userPk) {
+        try {
+            String hash = ByteUtil.toHexString(msgHash);
+            ChatMsg msg = chatRepo.queryChatMsg(hash);
+            String senderPk = msg != null ? msg.senderPk : null;
+            String receiverPk = msg != null ? msg.receiverPk : null;
+            if (StringUtil.isNotEquals(senderPk, userPk)) {
+                logger.debug("onMsgArrived MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
+                return;
+            }
+            ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
+                    ChatMsgStatus.ARRIVED_SWARM.getStatus());
+            logger.trace("onMsgArrived MessageHash::{}, exist::{}", hash, msgLog != null);
+            if (null == msgLog) {
+                msgLog = new ChatMsgLog(hash, ChatMsgStatus.ARRIVED_SWARM.getStatus(),
+                        timestamp.longValue());
+                chatRepo.addChatMsgLogs(receiverPk, msgLog);
+            }
+
+        } catch (SQLiteConstraintException ignore) {
+        } catch (Exception e) {
+            logger.error("onMsgArrived error", e);
+        }
+    }
+
+    /**
      * 消息已被接收
      * @param hashList 消息root
      */

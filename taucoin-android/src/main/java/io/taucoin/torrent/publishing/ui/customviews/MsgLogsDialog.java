@@ -17,6 +17,11 @@ package io.taucoin.torrent.publishing.ui.customviews;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,16 +29,18 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -63,6 +70,7 @@ public class MsgLogsDialog extends Dialog {
         private Context context;
         private boolean isCanCancel = true;
         private MsgLogsListener msgLogsListener;
+        private boolean yourself;
 
         public Builder(Context context) {
             this.context = context;
@@ -75,6 +83,11 @@ public class MsgLogsDialog extends Dialog {
 
         public Builder setMsgLogsListener(MsgLogsListener msgLogsListener) {
             this.msgLogsListener = msgLogsListener;
+            return this;
+        }
+
+        public Builder setYourself(boolean yourself) {
+            this.yourself = yourself;
             return this;
         }
 
@@ -92,10 +105,19 @@ public class MsgLogsDialog extends Dialog {
                     msgLogsListener.onCancel();
                 }
             });
-
             binding.recyclerView.setAdapter(adapter);
             LinearLayoutManager layoutManager = new LinearLayoutManager(context);
             binding.recyclerView.setLayoutManager(layoutManager);
+
+            List<ChatMsgStatus> list;
+            if (yourself) {
+                list = new ArrayList<>();
+                list.add(ChatMsgStatus.CONFIRMED);
+            } else {
+                list = Arrays.asList(ChatMsgStatus.values());
+            }
+            adapter.submitList(list);
+
             View layout = binding.getRoot();
             msgLogsDialog.addContentView(layout, new LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
@@ -115,13 +137,20 @@ public class MsgLogsDialog extends Dialog {
         }
     }
 
-    private static class LogsAdapter extends ListAdapter<ChatMsgLog, LogsAdapter.ViewHolder> {
+    private static class LogsAdapter extends ListAdapter<ChatMsgStatus, LogsAdapter.ViewHolder> {
         private MsgLogsListener listener;
-        private int size;
-        private int oldSize;
+        private List<ChatMsgLog> logs = new ArrayList<>();
         LogsAdapter(MsgLogsListener listener) {
             super(diffCallback);
             this.listener = listener;
+        }
+
+        private void setLogsData(List<ChatMsgLog> logs) {
+            if (logs != null) {
+                this.logs.clear();
+                this.logs.addAll(logs);
+                notifyDataSetChanged();
+            }
         }
 
         @NonNull
@@ -132,59 +161,84 @@ public class MsgLogsDialog extends Dialog {
                     R.layout.item_msg_log,
                     parent,
                     false);
-            return new ViewHolder(binding, listener);
+            return new ViewHolder(binding, listener, logs);
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.bind(holder, getItem(position), position, getCurrentList().size());
+            int count = getCurrentList().size();
+            holder.bind(holder, getItem(count - 1 - position), position, count);
         }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
             private ItemMsgLogBinding binding;
             private MsgLogsListener listener;
-            ViewHolder(ItemMsgLogBinding binding, MsgLogsListener listener) {
+            private List<ChatMsgLog> logs;
+            private Context context;
+            private int blackColor;
+            private int grayColor;
+            ViewHolder(ItemMsgLogBinding binding, MsgLogsListener listener, List<ChatMsgLog> logs) {
                 super(binding.getRoot());
                 this.binding = binding;
                 this.listener = listener;
+                this.logs = logs;
+                this.context = binding.getRoot().getContext();
+                blackColor = context.getResources().getColor(R.color.color_black);
+                grayColor = context.getResources().getColor(R.color.gray_dark);
             }
 
-            public void bind(ViewHolder holder, ChatMsgLog log, int pos, int size) {
-                if (null == binding || null == holder || null == log) {
+            public void bind(ViewHolder holder, ChatMsgStatus status, int pos, int size) {
+                if (null == binding || null == holder || null == status) {
                     return;
                 }
-                Context context = binding.getRoot().getContext();
-                // 消息是否送达送达
-                boolean highlight = pos == 0;
-                int color = highlight ? R.color.color_black : R.color.gray_dark;
-                binding.tvTime.setTextColor(context.getResources().getColor(color));
-                binding.tvStatus.setText(ChatMsgStatus.getStatusInfo(log.status));
-                binding.tvStatus.setTextColor(context.getResources().getColor(color));
-
+                binding.tvStatus.setText(status.getStatusInfo());
                 binding.timeLineBottom.setVisibility(pos == size - 1 ? View.GONE : View.VISIBLE);
 
+                int latestStatus = ChatMsgStatus.SENT.getStatus();
+                if (logs.size() > 0) {
+                    latestStatus = logs.get(0).status;
+                }
+                boolean isShowResend = latestStatus == status.getStatus();
                 int timePointRes;
-                String time;
-                if (log.status == ChatMsgStatus.CONFIRMED.getStatus()) {
+                if (status == ChatMsgStatus.CONFIRMED) {
                     timePointRes = R.mipmap.icon_msg_comfirmed;
-                } else if (log.status == ChatMsgStatus.SEND_FAIL.getStatus()) {
-                    timePointRes = R.mipmap.icon_msg_resend;
+                    isShowResend = false;
+                } else if (status == ChatMsgStatus.ARRIVED_SWARM) {
+                    timePointRes = R.mipmap.icon_msg_swarm;
+                } else if (status == ChatMsgStatus.SENT_INTERNET) {
+                    timePointRes = R.mipmap.icon_msg_internet;
                 } else {
                     timePointRes = R.mipmap.icon_msg_waitting;
                 }
-                time = DateUtil.format(log.timestamp, DateUtil.pattern9);
-                binding.tvTime.setText(time);
-                binding.timePoint.setImageResource(timePointRes);
-
-                boolean isShowResend = false;
-                if (pos == 0) {
-                    long timestamp = log.timestamp;
-                    long currentTime = DateUtil.getMillisTime();
-                    if (log.status == ChatMsgStatus.SEND_FAIL.getStatus() || (timestamp > 0 &&
-                            DateUtil.timeDiffHours(timestamp, currentTime) >= Constants.MSG_RESEND_PERIOD)) {
-                        isShowResend = true;
+                ChatMsgLog currentLog = null;
+                for (int i = 0; i < logs.size(); i++) {
+                    ChatMsgLog log = logs.get(i);
+                    if (log.status == status.getStatus()) {
+                        currentLog = log;
+                        break;
                     }
                 }
+                binding.timePoint.setImageResource(timePointRes);
+
+                if (currentLog != null) {
+                    String time = DateUtil.format(currentLog.timestamp, DateUtil.pattern9);
+                    binding.tvTime.setText(time);
+                    binding.tvTime.setVisibility(View.VISIBLE);
+                    binding.tvTime.setTextColor(blackColor);
+                    binding.tvStatus.setTextColor(blackColor);
+
+                    binding.timePoint.setColorFilter(null);
+                } else {
+                    binding.tvTime.setVisibility(View.GONE);
+                    binding.tvTime.setTextColor(grayColor);
+                    binding.tvStatus.setTextColor(grayColor);
+
+                    ColorMatrix cm = new ColorMatrix();
+                    cm.setSaturation(0); // 设置饱和度
+                    ColorMatrixColorFilter grayColorFilter = new ColorMatrixColorFilter(cm);
+                    binding.timePoint.setColorFilter(grayColorFilter);
+                }
+
                 binding.tvResend.setVisibility(isShowResend ? View.VISIBLE : View.GONE);
                 if (isShowResend) {
                     binding.tvResend.setOnClickListener(v -> {
@@ -196,15 +250,15 @@ public class MsgLogsDialog extends Dialog {
             }
         }
 
-        private static final DiffUtil.ItemCallback<ChatMsgLog> diffCallback = new DiffUtil.ItemCallback<ChatMsgLog>() {
+        private static final DiffUtil.ItemCallback<ChatMsgStatus> diffCallback = new DiffUtil.ItemCallback<ChatMsgStatus>() {
             @Override
-            public boolean areContentsTheSame(@NonNull ChatMsgLog oldItem, @NonNull ChatMsgLog newItem) {
-                return oldItem.equals(newItem) && oldItem.status == newItem.status;
+            public boolean areContentsTheSame(@NonNull ChatMsgStatus oldItem, @NonNull ChatMsgStatus newItem) {
+                return false;
             }
 
             @Override
-            public boolean areItemsTheSame(@NonNull ChatMsgLog oldItem, @NonNull ChatMsgLog newItem) {
-                return oldItem.equals(newItem);
+            public boolean areItemsTheSame(@NonNull ChatMsgStatus oldItem, @NonNull ChatMsgStatus newItem) {
+                return oldItem.getStatus() == newItem.getStatus();
             }
         };
     }
@@ -222,8 +276,7 @@ public class MsgLogsDialog extends Dialog {
 
     public void submitList(List<ChatMsgLog> logs) {
         if (adapter != null) {
-            adapter.submitList(logs);
-            adapter.notifyDataSetChanged();
+            adapter.setLogsData(logs);
         }
     }
 }

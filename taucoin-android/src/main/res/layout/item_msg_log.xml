@@ -45,7 +45,7 @@
                 android:layout_marginStart="@dimen/widget_size_10"
                 android:layout_marginEnd="@dimen/widget_size_10"
                 android:layout_centerHorizontal="true"
-                android:src="@mipmap/icon_msg_built"
+                android:src="@mipmap/icon_msg_waitting"
                 android:contentDescription="@null"/>
 
         </RelativeLayout>
@@ -57,19 +57,19 @@
             android:paddingBottom="@dimen/widget_size_20">
 
             <TextView
-                android:id="@+id/tv_time"
+                android:id="@+id/tv_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody2" />
 
             <TextView
-                android:id="@+id/tv_status"
+                android:id="@+id/tv_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/widget_size_2"
                 android:textColor="@color/gray_dark"
-                android:textAppearance="@style/TextAppearanceBody2" />
+                android:textAppearance="@style/TextAppearanceBody3" />
 
             <TextView
                 android:id="@+id/tv_resend"

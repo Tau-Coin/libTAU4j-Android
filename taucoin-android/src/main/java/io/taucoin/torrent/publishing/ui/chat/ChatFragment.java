@@ -323,6 +323,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             if (!result.isSuccess()) {
                 ToastUtils.showShortToast(R.string.chatting_resend_failed);
             } else {
+                ToastUtils.showShortToast(R.string.tx_resend_successful);
                 int pos = StringUtil.getIntString(result.getMsg());
                 if (pos >= 0 && pos < adapter.getCurrentList().size()) {
                     adapter.notifyItemChanged(pos);
@@ -452,6 +453,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             return;
         }
         msgLogsDialog = new MsgLogsDialog.Builder(activity)
+                .setYourself(StringUtil.isEquals(msg.senderPk, msg.receiverPk))
                 .setMsgLogsListener(new MsgLogsDialog.MsgLogsListener() {
                     @Override
                     public void onRetry() {

@@ -25,7 +25,9 @@ import org.libTAU4j.alerts.BlockChainTxConfirmAlert;
 import org.libTAU4j.alerts.CommConfirmRootAlert;
 import org.libTAU4j.alerts.CommFriendInfoAlert;
 import org.libTAU4j.alerts.CommLastSeenAlert;
+import org.libTAU4j.alerts.CommMsgArrivedAlert;
 import org.libTAU4j.alerts.CommNewMsgAlert;
+import org.libTAU4j.alerts.CommSyncMsgAlert;
 import org.libTAU4j.alerts.ListenSucceededAlert;
 import org.libTAU4j.alerts.PortmapAlert;
 import org.libTAU4j.alerts.PortmapErrorAlert;
@@ -100,8 +102,16 @@ class TauDaemonAlertHandler {
                 // 新消息
                 onNewMessage(alert, alertAndUser.getUserPk());
                 break;
+            case COMM_SYNC_MSG:
+                // Sent to Internet 桔黄色 (traversal complete > 1)
+                onMsgSync(alert, alertAndUser.getUserPk());
+                break;
+            case COMM_MSG_ARRIVED:
+                // Arrived Prefix Swarm 绿色(等价网络节点>1)
+                onMsgArrived(alert, alertAndUser.getUserPk());
+                break;
             case COMM_CONFIRM_ROOT:
-                // 消息确认
+                // 消息确认 Displayed on Device (来温斯坦)蓝色
                 onConfirmRoot(alert, alertAndUser.getUserPk());
                 break;
             case BLOCK_CHAIN_HEAD_BLOCK:
@@ -157,7 +167,34 @@ class TauDaemonAlertHandler {
     }
 
     /**
-     * 消息确认（已接收）
+     * Sent to Internet 桔黄色 (traversal complete > 1)
+     * @param alert libTAU上报
+     * @param userPk 当前用户公钥
+     */
+    private void onMsgSync(Alert alert, String userPk) {
+        CommSyncMsgAlert msgSyncAlert = (CommSyncMsgAlert) alert;
+        logger.info(msgSyncAlert.get_message());
+        long timestamp = msgSyncAlert.get_timestamp();
+        byte[] msgHash = msgSyncAlert.getSyncing_msg_hash();
+        msgListenHandler.onMsgSync(msgHash, BigInteger.valueOf(timestamp), userPk);
+    }
+
+
+    /**
+     * Arrived Prefix Swarm 绿色(等价网络节点>1)
+     * @param alert libTAU上报
+     * @param userPk 当前用户公钥
+     */
+    private void onMsgArrived(Alert alert, String userPk) {
+        CommMsgArrivedAlert msgArrivedAlert = (CommMsgArrivedAlert) alert;
+        logger.info(msgArrivedAlert.get_message());
+        long timestamp = msgArrivedAlert.get_timestamp();
+        byte[] msgHash = msgArrivedAlert.getMsg_arrived_hash();
+        msgListenHandler.onMsgArrived(msgHash, BigInteger.valueOf(timestamp), userPk);
+    }
+
+    /**
+     * 消息确认（已接收）Displayed on Device (来温斯坦)蓝色
      * @param alert libTAU上报
      * @param userPk 当前用户公钥
      */

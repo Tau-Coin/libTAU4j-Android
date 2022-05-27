@@ -241,21 +241,18 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
     private static int parseWarningReid(ChatMsgAndLog msg) {
         List<ChatMsgLog> logs = msg.logs;
         if (null == logs || logs.size() <= 0) {
-            return R.mipmap.icon_msg_resend;
+            return R.mipmap.icon_msg_waitting;
         }
         ChatMsgLog log = msg.logs.get(0);
         if (log.status == ChatMsgStatus.CONFIRMED.getStatus()) {
             return R.mipmap.icon_msg_comfirmed;
-        } else if (log.status == ChatMsgStatus.SEND_FAIL.getStatus()) {
-            return R.mipmap.icon_msg_resend;
+        } else if (log.status == ChatMsgStatus.ARRIVED_SWARM.getStatus()) {
+            return R.mipmap.icon_msg_swarm;
+        } else if (log.status == ChatMsgStatus.SENT_INTERNET.getStatus()) {
+            return R.mipmap.icon_msg_internet;
+        } else {
+            return R.mipmap.icon_msg_waitting;
         }
-        long maxTimestamp = log.timestamp;
-        long currentTime = DateUtil.getMillisTime();
-        if (maxTimestamp > 0 && DateUtil.timeDiffHours(maxTimestamp, currentTime) >=
-                Constants.MSG_RESEND_PERIOD) {
-            return R.mipmap.icon_msg_resend;
-        }
-        return R.mipmap.icon_msg_waitting;
     }
 
     public interface ClickListener {

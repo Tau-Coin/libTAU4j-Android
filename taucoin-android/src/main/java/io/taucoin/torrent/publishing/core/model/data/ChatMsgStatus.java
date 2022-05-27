@@ -4,10 +4,10 @@ package io.taucoin.torrent.publishing.core.model.data;
  * 消息状态枚举
  */
 public enum ChatMsgStatus {
-    SEND_FAIL(0, "Send failure"),
-    SENT(1, "Sent and waiting for response"),
-    RESEND(2, "Resend and waiting response"),
-    CONFIRMED(3, "Received");
+    SENT(0, "Try to Send"),
+    SENT_INTERNET(1, "Sent to Internet"),
+    ARRIVED_SWARM(2, "Arrived Prefix Swarm"),
+    CONFIRMED(3, "Displayed on Device");
 
     private int status;
     private String statusInfo;

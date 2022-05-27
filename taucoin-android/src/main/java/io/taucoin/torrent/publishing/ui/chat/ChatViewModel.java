@@ -356,12 +356,11 @@ public class ChatViewModel extends AndroidViewModel {
                             status = ChatMsgStatus.SENT;
                         }
                     } else {
-                        status = ChatMsgStatus.SEND_FAIL;
+                        status = ChatMsgStatus.SENT;
                     }
                     // 确认接收的时间精确到秒
                     chatMsgLogs[nonce] = new ChatMsgLog(hash,
                             status.getStatus(), currentTime);
-
                 }
                 // 批量添加到数据库
                 chatRepo.addChatMsgLogs(friendPk, chatMsgLogs);
@@ -401,12 +400,13 @@ public class ChatViewModel extends AndroidViewModel {
                         ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
                                 ChatMsgStatus.CONFIRMED.getStatus(), daemon.getSessionTime());
                         chatRepo.addChatMsgLogs(chatMsg.receiverPk, chatMsgLog);
-                    } else {
-                        ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
-                                ChatMsgStatus.RESEND.getStatus(), daemon.getSessionTime());
-                        chatRepo.addChatMsgLogs(chatMsg.receiverPk, chatMsgLog);
-                        msg.logs.add(chatMsgLog);
                     }
+//                    else {
+//                        ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
+//                                ChatMsgStatus.ARRIVED_SWARM.getStatus(), daemon.getSessionTime());
+//                        chatRepo.addChatMsgLogs(chatMsg.receiverPk, chatMsgLog);
+//                        msg.logs.add(chatMsgLog);
+//                    }
                 } catch (SQLiteConstraintException ignore) {
                 }
             }
