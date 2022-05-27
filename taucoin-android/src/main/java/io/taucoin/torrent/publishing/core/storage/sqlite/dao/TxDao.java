@@ -13,6 +13,8 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 
 /**
  * Room:Transaction操作接口
@@ -155,6 +157,10 @@ public interface TxDao {
 
     String DELETE_UNSENT_TX = "DELETE FROM Txs WHERE queueID = :queueID AND sendStatus = 1";
 
+    String QUERY_TX_LOG = "SELECT * FROM TxLogs WHERE hash = :hash AND status = :status";
+
+    String QUERY_TX_LOGS = "SELECT * FROM TxLogs WHERE hash = :hash ORDER BY status DESC";
+
     /**
      * 添加新的交易
      */
@@ -293,4 +299,13 @@ public interface TxDao {
 
     @Query(DELETE_UNSENT_TX)
     void deleteUnsentTx(long queueID);
+
+    @Insert()
+    void addTxLog(TxLog log);
+
+    @Query(QUERY_TX_LOG)
+    TxLog getTxLog(String hash, int status);
+
+    @Query(QUERY_TX_LOGS)
+    Observable<List<TxLog>> observerTxLogs(String hash);
 }

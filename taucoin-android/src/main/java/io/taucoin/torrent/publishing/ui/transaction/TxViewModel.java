@@ -38,8 +38,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
+import io.taucoin.torrent.publishing.core.model.data.TxLogStatus;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
@@ -47,6 +49,7 @@ import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
@@ -304,9 +307,18 @@ public class TxViewModel extends AndroidViewModel {
                 addUserInfoToLocal(tx, userRepo);
                 addMemberInfoToLocal(tx, memberRepo);
                 settingsRepo.lastTxFee(tx.chainID, tx.fee);
+
+                TxLog log = new TxLog(tx.txID, TxLogStatus.SENT.getStatus(), DateUtil.getMillisTime());
+                txRepo.addTxLog(log);
             } else {
+                String txID = transaction.getTxID().to_hex();
                 logger.debug("resendTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
-                        transaction.getTxID().to_hex(), tx.senderPk, tx.receiverPk, tx.memo);
+                        txID, tx.senderPk, tx.receiverPk, tx.memo);
+                TxLog log = txRepo.getTxLog(txID, TxLogStatus.SENT.getStatus());
+                if (null == log) {
+                    log = new TxLog(tx.txID, TxLogStatus.SENT.getStatus(), DateUtil.getMillisTime());
+                    txRepo.addTxLog(log);
+                }
             }
         } catch (Exception e) {
             result = e.getMessage();
@@ -601,6 +613,12 @@ public class TxViewModel extends AndroidViewModel {
                         onChain, pos, pageSize, txs.size());
                 logger.trace("loadNotesData getMessagesTime::{}", getMessagesTime - startTime);
                 Collections.reverse(txs);
+
+                for (UserAndTx tx : txs) {
+                    if (tx.logs != null && tx.logs.size() > 0) {
+                        Collections.sort(tx.logs);
+                    }
+                }
             } catch (Exception e) {
                 logger.error("loadNotesData error::", e);
             }

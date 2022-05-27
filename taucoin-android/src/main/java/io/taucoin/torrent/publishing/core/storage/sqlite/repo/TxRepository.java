@@ -9,6 +9,7 @@ import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 
 /**
  * 提供外部操作User数据的接口
@@ -115,11 +116,11 @@ public interface TxRepository {
 
     List<Tx> getOnChainTxsByBlockHash(String blockHash);
 
-    void addTxConfirm(TxConfirm txConfirm);
+    void addTxLog(TxLog txLog);
 
-    TxConfirm getTxConfirm(String txID, String peer);
+    TxLog getTxLog(String txID, int status);
 
-    Observable<List<TxConfirm>> observerTxConfirms(String txID);
+    Observable<List<TxLog>> observerTxLogs(String txID);
 
     void deleteUnsentTx(long queueID);
 

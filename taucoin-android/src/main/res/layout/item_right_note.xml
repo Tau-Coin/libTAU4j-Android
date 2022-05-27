@@ -35,18 +35,16 @@
             android:layout_marginTop="@dimen/widget_size_5"
             android:gravity="top">
 
-            <TextView
-                android:id="@+id/tv_resend"
+            <ImageView
+                android:id="@+id/iv_status"
                 android:layout_width="@dimen/widget_size_20"
                 android:layout_height="@dimen/widget_size_20"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="@dimen/widget_size_5"
-                android:background="@drawable/circle_blue"
-                android:gravity="center_vertical|center_horizontal"
+                android:gravity="center_vertical"
                 android:includeFontPadding="false"
-                android:singleLine="true"
-                android:textAppearance="@style/TextAppearanceBody3"
-                android:textColor="@color/color_white" />
+                android:layout_marginEnd="@dimen/widget_size_5"
+                android:layout_gravity="center_vertical"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_warning"/>
 
             <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
                 android:id="@+id/tv_msg"

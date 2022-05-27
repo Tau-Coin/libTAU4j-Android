@@ -463,11 +463,6 @@
     <string name="tx_unknown">Unknown Transaction</string>
     <string name="tx_community_creator_selling">This is community creator selling coins anchor. Contact me for %s matter. </string>
 
-    <string name="tx_confirmed_low">Low</string>
-    <string name="tx_confirmed_middle">Middle</string>
-    <string name="tx_confirmed_high">High</string>
-    <string name="tx_confirmed" formatted="false"><Data><![CDATA[<font color="#f19322">[%1$s]</font> Received by %2$d peers]]></Data></string>
-
     <string name="escrow_now">Escrow Now</string>
     <string name="escrow_tip">Need an escrow service for p2p trading?\nConnect to the largest holder.</string>
     <string name="escrow_secure_tip">Making your transactions more secure.</string>

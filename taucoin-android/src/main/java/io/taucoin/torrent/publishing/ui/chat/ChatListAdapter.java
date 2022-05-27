@@ -245,7 +245,7 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
         }
         ChatMsgLog log = msg.logs.get(0);
         if (log.status == ChatMsgStatus.CONFIRMED.getStatus()) {
-            return R.mipmap.icon_msg_comfirmed;
+            return R.mipmap.icon_msg_displayed;
         } else if (log.status == ChatMsgStatus.ARRIVED_SWARM.getStatus()) {
             return R.mipmap.icon_msg_swarm;
         } else if (log.status == ChatMsgStatus.SENT_INTERNET.getStatus()) {

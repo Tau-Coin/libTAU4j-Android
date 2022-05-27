@@ -149,7 +149,8 @@ public class TauDaemonImpl extends TauDaemon {
                         AlertType.BLOCK_CHAIN_SYNCING_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_SYNCING_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_SYNCING_HEAD_BLOCK.swig(),
-                        AlertType.BLOCK_CHAIN_TX_CONFIRM.swig(),
+                        AlertType.BLOCK_CHAIN_TX_SENT.swig(),
+                        AlertType.BLOCK_CHAIN_TX_ARRIVED.swig(),
                     };
                 }
 

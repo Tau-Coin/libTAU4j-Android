@@ -15,7 +15,7 @@ import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
 
@@ -241,18 +241,20 @@ public class TxRepositoryImpl implements TxRepository{
         return db.txDao().getOnChainTxsByBlockHash(blockHash);
     }
 
-    public void addTxConfirm(TxConfirm txConfirm) {
-        db.txConfirmDao().addTxConfirm(txConfirm);
+    @Override
+    public void addTxLog(TxLog txLog) {
+        db.txDao().addTxLog(txLog);
         submitDataSetChanged();
     }
 
-    public TxConfirm getTxConfirm(String txID, String peer) {
-        return db.txConfirmDao().getTxConfirm(txID, peer);
+    @Override
+    public TxLog getTxLog(String txID, int status) {
+        return db.txDao().getTxLog(txID, status);
     }
 
     @Override
-    public Observable<List<TxConfirm>> observerTxConfirms(String txID) {
-        return db.txConfirmDao().observerTxConfirms(txID);
+    public Observable<List<TxLog>> observerTxLogs(String txID) {
+        return db.txDao().observerTxLogs(txID);
     }
 
     @Override

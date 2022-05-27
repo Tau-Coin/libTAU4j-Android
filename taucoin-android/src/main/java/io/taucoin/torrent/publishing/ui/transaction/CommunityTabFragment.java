@@ -9,7 +9,6 @@ import android.text.Spanned;
 import android.text.style.URLSpan;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.widget.TextView;
 
 import com.noober.menu.FloatMenu;
@@ -39,7 +38,7 @@ import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -52,12 +51,13 @@ import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.DialogTrustBinding;
-import io.taucoin.torrent.publishing.databinding.TxConfirmDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
+import io.taucoin.torrent.publishing.ui.customviews.MsgLogsDialog;
+import io.taucoin.torrent.publishing.ui.customviews.TxLogsDialog;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
@@ -76,8 +76,8 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     protected CompositeDisposable disposables = new CompositeDisposable();
     private FloatMenu operationsMenu;
     private CommonDialog trustDialog;
-    private CommonDialog confirmsDialog;
-    private Disposable confirmDisposable;
+    private TxLogsDialog txLogsDialog;
+    private Disposable logsDisposable;
 
     boolean isJoined = false;
     protected String chainID;
@@ -288,63 +288,42 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     @Override
     public void onResendClick(String txID) {
         KeyboardUtils.hideSoftInput(activity);
-        if (confirmDisposable != null) {
-            disposables.remove(confirmDisposable);
+        if (logsDisposable != null) {
+            disposables.remove(logsDisposable);
         }
-        confirmDisposable = communityViewModel.observerTxConfirms(txID)
+        logsDisposable = communityViewModel.observerTxLogs(txID)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(confirms -> {
-                    showTxConfirmsDialog(txID, confirms);
+                .subscribe(logs -> {
+                    showTxLogsDialog(txID, logs);
                 });
-        disposables.add(confirmDisposable);
+        disposables.add(logsDisposable);
     }
 
     /**
      * 显示交易确认的对话框
      */
-    private void showTxConfirmsDialog(String txID, List<TxConfirm> confirms) {
-        int count = null == confirms ? 0 : confirms.size();
-        View confirmRoot = null;
-        if (null == confirmsDialog || !confirmsDialog.isShowing()) {
-            TxConfirmDialogBinding txConfirmBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
-                    R.layout.tx_confirm_dialog, null, false);
-            txConfirmBinding.ivClose.setOnClickListener(v -> {
-                confirmsDialog.closeDialog();
-                if (confirmDisposable != null) {
-                    disposables.remove(confirmDisposable);
-                }
-            });
-            confirmRoot = txConfirmBinding.getRoot();
-            confirmsDialog = new CommonDialog.Builder(activity)
-                    .setContentView(confirmRoot)
-                    .setPositiveButton(R.string.common_resend, (dialog, which) -> {
-                        dialog.cancel();
+    private void showTxLogsDialog(String txID, List<TxLog> logs) {
+        if (txLogsDialog != null && txLogsDialog.isShowing()) {
+            txLogsDialog.submitList(logs);
+            return;
+        }
+        txLogsDialog = new TxLogsDialog.Builder(activity)
+                .setMsgLogsListener(new TxLogsDialog.MsgLogsListener() {
+                    @Override
+                    public void onRetry() {
                         txViewModel.resendTransaction(txID);
-                        if (confirmDisposable != null) {
-                            disposables.remove(confirmDisposable);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        if (logsDisposable != null) {
+                            disposables.remove(logsDisposable);
                         }
-                    }).create();
-            confirmsDialog.show();
-        } else {
-            Window window = confirmsDialog.getWindow();
-            if (window != null) {
-                confirmRoot = window.getDecorView();
-            }
-        }
-        if (confirmRoot != null) {
-            TextView tvStatus = confirmRoot.findViewById(R.id.tv_status);
-            String status;
-            if (count >= 5) {
-                status = getString(R.string.tx_confirmed_high);
-            } else if (count >= 3) {
-                status = getString(R.string.tx_confirmed_middle);
-            } else {
-                status = getString(R.string.tx_confirmed_low);
-            }
-            status = getString(R.string.tx_confirmed, status, count);
-            tvStatus.setText(Html.fromHtml(status));
-        }
+                    }
+                }).create();
+        txLogsDialog.submitList(logs);
+        txLogsDialog.show();
     }
 
     /**
@@ -443,6 +422,9 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         }
         if (trustDialog != null) {
             trustDialog.closeDialog();
+        }
+        if (txLogsDialog != null) {
+            txLogsDialog.closeDialog();
         }
     }
 

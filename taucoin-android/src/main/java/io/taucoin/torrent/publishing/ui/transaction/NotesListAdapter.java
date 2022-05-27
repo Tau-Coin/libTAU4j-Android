@@ -17,8 +17,9 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.TxLogStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.UrlUtil;
@@ -116,20 +117,15 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
                 tvTime = rightBinding.tvTime;
                 headView = rightBinding.leftView;
                 rightBinding.leftView.tvBlacklist.setVisibility(View.GONE);
-                rightBinding.tvResend.setVisibility(isShowBan ? View.VISIBLE : View.GONE);
+                rightBinding.ivStatus.setVisibility(isShowBan ? View.VISIBLE : View.GONE);
                 if (isShowBan) {
-                    int size = null == tx.confirms ? 0 : tx.confirms.size();
-                    rightBinding.tvResend.setVisibility(size > 0 ? View.VISIBLE : View.GONE);
-                    if (size > 0) {
-                        rightBinding.tvResend.setText(size <= 99 ? String.valueOf(size) : "···");
-                        rightBinding.tvResend.setOnClickListener(v -> {
-                            if (listener != null) {
-                                listener.onResendClick(tx.txID);
-                            }
-                        });
-                    }
+                    rightBinding.ivStatus.setImageResource(parseStatusReid(tx));
+                    rightBinding.ivStatus.setOnClickListener(v -> {
+                        if (listener != null) {
+                            listener.onResendClick(tx.txID);
+                        }
+                    });
                 }
-
             } else {
                 ItemLeftNoteBinding leftBinding = (ItemLeftNoteBinding) holder.binding;
                 tvMsg = leftBinding.tvMsg;
@@ -163,6 +159,21 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
                     listener.onItemClicked(tvMsg, tx);
                 }
             });
+        }
+
+        private static int parseStatusReid(UserAndTx msg) {
+            List<TxLog> logs = msg.logs;
+            if (null == logs || logs.size() <= 0) {
+                return R.mipmap.icon_msg_waitting;
+            }
+            TxLog log = msg.logs.get(0);
+            if (log.status == TxLogStatus.ARRIVED_SWARM.getStatus()) {
+                return R.mipmap.icon_msg_swarm;
+            } else if (log.status == TxLogStatus.SENT_INTERNET.getStatus()) {
+                return R.mipmap.icon_msg_internet;
+            } else {
+                return R.mipmap.icon_msg_waitting;
+            }
         }
 
         private void setLeftViewClickListener(TxLeftViewBinding binding, UserAndTx tx) {
@@ -222,13 +233,13 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
         void onResendClick(String txID);
     }
 
-    private static boolean isSameConfirms(List<TxConfirm> oldList, List<TxConfirm> newList) {
+    private static boolean isSameConfirms(List<TxLog> oldList, List<TxLog> newList) {
         if (null == oldList && null == newList) {
             return true;
         } else if ((null == oldList) || (null == newList) ) {
             return false;
         } else {
-           return oldList.size() == newList.size();
+            return oldList.size() == newList.size();
         }
     }
 
@@ -253,7 +264,7 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
             if (isSame && oldItem.favoriteTime != newItem.favoriteTime) {
                 isSame = false;
             }
-            if (isSame && !isSameConfirms(oldItem.confirms, newItem.confirms)) {
+            if (isSame && !isSameConfirms(oldItem.logs, newItem.logs)) {
                 isSame = false;
             }
             return isSame;

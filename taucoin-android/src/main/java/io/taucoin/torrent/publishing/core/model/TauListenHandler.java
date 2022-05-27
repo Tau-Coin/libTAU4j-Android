@@ -25,6 +25,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
+import io.taucoin.torrent.publishing.core.model.data.TxLogStatus;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
@@ -37,7 +38,9 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
@@ -674,17 +677,11 @@ public class TauListenHandler {
             Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
             if (null == member) {
                 member = new Member(chainID, userPk);
-                member.blockNumber = account.getBlockNumber();
                 member.balance = account.getBalance();
-                member.power = account.getEffectivePower();
-                member.nonce = account.getNonce();
                 memberRepo.addMember(member);
             } else {
-                if (account.getBlockNumber() >= member.blockNumber) {
-                    member.blockNumber = account.getBlockNumber();
+                if (member.blockNumber == 0) {
                     member.balance = account.getBalance();
-                    member.power = account.getEffectivePower();
-                    member.nonce = account.getNonce();
                     memberRepo.updateMember(member);
                 }
             }
@@ -692,17 +689,30 @@ public class TauListenHandler {
     }
 
     /**
-     * 交易确认
+     * Sent to Internet 桔黄色 (traversal complete > 1)
      * @param txHash 交易Hash
-     * @param peer peerID
      */
-    void onTxConfirmed(byte[] txHash, String peer) {
-        String txID = ByteUtil.toHexString(txHash);
-        TxConfirm txConfirm = txRepo.getTxConfirm(txID, peer);
-        logger.trace("onTxConfirmed txID::{}, exist::{}", txID, txConfirm != null);
-        if (null == txConfirm) {
-            txConfirm = new TxConfirm(txID, peer, DateUtil.getMillisTime());
-            txRepo.addTxConfirm(txConfirm);
+    void onTxSent(byte[] txHash) {
+        String hash = ByteUtil.toHexString(txHash);
+        TxLog log = txRepo.getTxLog(hash, TxLogStatus.SENT_INTERNET.getStatus());
+        logger.trace("onTxSent txID::{}, exist::{}", hash, log != null);
+        if (null == log) {
+            log = new TxLog(hash, TxLogStatus.SENT_INTERNET.getStatus(), DateUtil.getMillisTime());
+            txRepo.addTxLog(log);
+        }
+    }
+
+    /**
+     * Arrived Prefix Swarm 绿色(等价网络节点>1)
+     * @param txHash 交易Hash
+     */
+    void onTxArrived(byte[] txHash) {
+        String hash = ByteUtil.toHexString(txHash);
+        TxLog log = txRepo.getTxLog(hash, TxLogStatus.ARRIVED_SWARM.getStatus());
+        logger.trace("onTxArrived txID::{}, exist::{}", hash, log != null);
+        if (null == log) {
+            log = new TxLog(hash, TxLogStatus.ARRIVED_SWARM.getStatus(), DateUtil.getMillisTime());
+            txRepo.addTxLog(log);
         }
     }
 

@@ -21,7 +21,9 @@ import org.libTAU4j.alerts.BlockChainStateAlert;
 import org.libTAU4j.alerts.BlockChainSyncingBlockAlert;
 import org.libTAU4j.alerts.BlockChainSyncingHeadBlockAlert;
 import org.libTAU4j.alerts.BlockChainTopThreeVotesAlert;
+import org.libTAU4j.alerts.BlockChainTxArrivedAlert;
 import org.libTAU4j.alerts.BlockChainTxConfirmAlert;
+import org.libTAU4j.alerts.BlockChainTxSentAlert;
 import org.libTAU4j.alerts.CommConfirmRootAlert;
 import org.libTAU4j.alerts.CommFriendInfoAlert;
 import org.libTAU4j.alerts.CommLastSeenAlert;
@@ -144,8 +146,11 @@ class TauDaemonAlertHandler {
             case BLOCK_CHAIN_STATE:
                 onAccountState(alert, alertAndUser.getUserPk());
                 break;
-            case BLOCK_CHAIN_TX_CONFIRM:
-                onTxConfirmed(alert);
+            case BLOCK_CHAIN_TX_SENT:
+                onTxSent(alert);
+                break;
+            case BLOCK_CHAIN_TX_ARRIVED:
+                onTxArrived(alert);
                 break;
             default:
                 logger.info("Unknown alert");
@@ -424,15 +429,25 @@ class TauDaemonAlertHandler {
     }
 
     /**
-     * 交易确认
+     * Sent to Internet 桔黄色 (traversal complete > 1)
      * @param alert libTAU上报
      */
-    private void onTxConfirmed(Alert alert) {
-        BlockChainTxConfirmAlert a = (BlockChainTxConfirmAlert) alert;
+    private void onTxSent(Alert alert) {
+        BlockChainTxSentAlert a = (BlockChainTxSentAlert) alert;
         logger.info(a.get_message());
-        byte[] txID = a.getHash();
-        String peer = a.get_peer();
-        tauListenHandler.onTxConfirmed(txID, peer);
+        byte[] txID = a.getSent_tx_hash();
+        tauListenHandler.onTxSent(txID);
+    }
+
+    /**
+     * Arrived Prefix Swarm 绿色(等价网络节点>1
+     * @param alert libTAU上报
+     */
+    private void onTxArrived(Alert alert) {
+        BlockChainTxArrivedAlert a = (BlockChainTxArrivedAlert) alert;
+        logger.info(a.get_message());
+        byte[] txID = a.getArrived_tx_hash();
+        tauListenHandler.onTxArrived(txID);
     }
 
     /**

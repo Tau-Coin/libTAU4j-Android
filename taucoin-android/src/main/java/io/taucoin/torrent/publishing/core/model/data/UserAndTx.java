@@ -7,6 +7,7 @@ import androidx.room.Ignore;
 import androidx.room.Relation;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 
 /**
@@ -24,8 +25,8 @@ public class UserAndTx extends Tx {
     public int trusts;
 
     @Relation(parentColumn = "txID",
-            entityColumn = "txID")
-    public List<TxConfirm> confirms;
+            entityColumn = "hash")
+    public List<TxLog> logs;
 
     public UserAndTx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo) {
         super(chainID, receiverPk, amount, fee, txType, memo);

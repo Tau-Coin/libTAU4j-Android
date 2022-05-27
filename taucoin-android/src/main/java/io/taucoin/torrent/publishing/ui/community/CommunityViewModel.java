@@ -75,6 +75,7 @@ import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
@@ -1049,8 +1050,8 @@ public class CommunityViewModel extends AndroidViewModel {
     /**
      * 观察交易确认信息
      */
-    public Observable<List<TxConfirm>> observerTxConfirms(String txID) {
-        return txRepo.observerTxConfirms(txID);
+    public Observable<List<TxLog>> observerTxLogs(String txID) {
+        return txRepo.observerTxLogs(txID);
     }
 
     /**

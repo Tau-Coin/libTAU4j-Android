@@ -16,7 +16,8 @@ class DatabaseMigration {
     static Migration[] getMigrations(@NonNull Context appContext) {
         return new Migration[] {
                 MIGRATION_1_2,
-                MIGRATION_2_3
+                MIGRATION_2_3,
+                MIGRATION_3_4
         };
     }
 
@@ -45,6 +46,14 @@ class DatabaseMigration {
             // 添加社区和区块入库时间
             long createTime = DateUtil.getMillisTime();
             database.execSQL("ALTER TABLE Blocks ADD COLUMN createTime INTEGER NOT NULL DEFAULT " + createTime);
+        }
+    };
+
+    private static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // 创建交易日志表
+            database.execSQL("CREATE TABLE IF NOT EXISTS TxLogs (`hash` TEXT NOT NULL, `status` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`hash`, `status`, `timestamp`))");
         }
     };
 }

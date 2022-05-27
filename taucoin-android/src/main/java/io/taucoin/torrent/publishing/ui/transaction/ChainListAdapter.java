@@ -13,7 +13,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
-import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -76,22 +75,7 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
 //            Linkify.addLinks(binding.tvMsg, hash, null);
 
             setClickListener(binding.tvMsg, tx);
-
-            boolean isMyself = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
-            if (isMyself) {
-                int size = null == tx.confirms ? 0 : tx.confirms.size();
-                binding.tvResend.setVisibility(size > 0 ? View.VISIBLE : View.GONE);
-                if (size > 0) {
-                    binding.tvResend.setText(size <= 99 ? String.valueOf(size) : "···");
-                    binding.tvResend.setOnClickListener(v -> {
-                        if (listener != null) {
-                            listener.onResendClick(tx.txID);
-                        }
-                    });
-                }
-            } else {
-                binding.tvResend.setVisibility(View.GONE);
-            }
+            binding.tvResend.setVisibility(View.GONE);
         }
 
         private void setClickListener(AutoLinkTextView tvMsg, UserAndTx tx) {
@@ -122,7 +106,6 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
         void onItemLongClicked(TextView view, UserAndTx tx);
         void onItemClicked(UserAndTx tx);
         void onLinkClick(String link);
-        void onResendClick(String txID);
     }
 
     private static final DiffUtil.ItemCallback<UserAndTx> diffCallback = new DiffUtil.ItemCallback<UserAndTx>() {
