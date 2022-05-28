@@ -1,5 +1,8 @@
 package io.taucoin.torrent.publishing.core.utils;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -9,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -16,6 +20,8 @@ import android.os.Build;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.taucoin.torrent.publishing.MainApplication;
 
 /**
  * UncaughtException处理类,当程序发生Uncaught异常的时候,有该类来接管程序,并记录发送错误报告.
@@ -62,15 +68,25 @@ public class CrashHandler implements UncaughtExceptionHandler {
     public void uncaughtException(Thread thread, Throwable ex) {
         String threadName = null == thread ? "" : thread.getName();
         logger.error("uncaughtException threadName::{}", threadName);
-        if (!handleException(ex) && mDefaultHandler != null) {
-            if (null == ex) {
-                logger.error("uncaughtException defaultHandler ex null");
-            } else {
-                logger.error("uncaughtException defaultHandler ", ex);
-            }
+        if (null == ex) {
+            logger.error("uncaughtException defaultHandler ex null");
             // 如果用户没有处理则让系统默认的异常处理器来处理
-            mDefaultHandler.uncaughtException(thread, ex);
+            if (mDefaultHandler != null) {
+                mDefaultHandler.uncaughtException(thread, ex);
+            }
         } else {
+            handleException(ex);
+            logger.error("uncaughtException killProcess");
+
+            Context appContext = MainApplication.getInstance();
+            // 重启APP
+            Intent intent = appContext.getPackageManager().getLaunchIntentForPackage(appContext.getPackageName());
+            if (intent != null) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                appContext.startActivity(intent);
+                logger.error("uncaughtException restart app");
+            }
             // 退出程序
             int pid = android.os.Process.myPid();
             logger.error("uncaughtException killProcess pid::{}", pid);
@@ -80,24 +96,24 @@ public class CrashHandler implements UncaughtExceptionHandler {
     }
 
     /**
-     * 自定义错误处理,收集错误信息 发送错误报告等操作均在此完成.
-     *
-     * @param ex
-     * @return true:如果处理了该异常信息;否则返回false.
+     * 自定义错误处理, 收集错误信息保存到日志文件，单独保存一个dump文件
+     * @param ex 异常信息
      */
-    private boolean handleException(Throwable ex) {
-        logger.error("handleException start");
-        if (ex == null) {
-            return false;
+    private void handleException(Throwable ex) {
+        try {
+            logger.error("handleException start");
+            //收集设备参数信息
+            logger.error("handleException collect device info");
+            collectDeviceInfo(mContext);
+            //保存日志文件
+            logger.error("handleException save crash info");
+            String crashInfo = saveCrashInfo2LogFile(ex);
+            logger.error("handleException crate dump file");
+            createCrashDumpFile(crashInfo);
+            logger.error("handleException end");
+        } catch (Exception e) {
+            logger.error("handleException ", e);
         }
-        //收集设备参数信息
-        logger.error("handleException collect device info");
-        collectDeviceInfo(mContext);
-        //保存日志文件
-        logger.error("handleException save crash info");
-        saveCrashInfo2File(ex);
-        logger.error("handleException end");
-        return true;
     }
 
     /**
@@ -132,7 +148,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
      * 保存错误信息到日志文件
      * @param ex 异常
      */
-    private void saveCrashInfo2File(Throwable ex) {
+    private String saveCrashInfo2LogFile(Throwable ex) {
         StringBuffer sb = new StringBuffer();
         sb.append("------------------start----------------------");
         sb.append("\t\n");
@@ -156,6 +172,36 @@ public class CrashHandler implements UncaughtExceptionHandler {
         sb.append("\t\n");
         sb.append("-------------------end-----------------------");
         sb.append("\t\n");
-        logger.error("Crash::{}", sb.toString());
+        String crashInfo = sb.toString();
+        logger.error("Crash::{}", crashInfo);
+        return crashInfo;
+    }
+
+    /**
+     * 创建崩溃dump文件
+     */
+    private void createCrashDumpFile(String info) {
+        FileWriter fWriter = null;
+        try {
+            String path = FileUtil.getDumpfileDir();
+            path += File.separator + FileUtil.getDumpFileName();
+            File file = new File(path);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            fWriter = new FileWriter(path);
+            fWriter.write(info);
+        } catch (IOException ex) {
+            logger.error("createCrashDumpFile", ex);
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (fWriter != null) {
+                    fWriter.flush();
+                    fWriter.close();
+                }
+            } catch (IOException ignore) {
+            }
+        }
     }
 }

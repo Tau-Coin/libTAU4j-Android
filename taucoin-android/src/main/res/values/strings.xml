@@ -16,6 +16,8 @@
     <string name="common_slant">(%1$d/%2$d)</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_submit">Submit</string>
+    <string name="common_report">Report</string>
+    <string name="common_report_exit">Report and Exit</string>
     <string name="common_percent">%1$d%%</string>
     <string name="common_unknown">Unknown</string>
     <string name="common_on">ON</string>
@@ -607,4 +609,9 @@
     <string name="tx_resend_successful">Resend successful</string>
 
     <string name="home_guide2" formatted="false"><Data><![CDATA[Airdrop coins to <font color="#f19322">contacts</font> and emails for <font color="#f19322">Free</font> to expand community.]]></Data></string>
+    <string name="dump_report">The application exited abnormally last time. Do you want to report logs to developers?</string>
+    <string name="dump_many_times">The application has exited abnormally many times in one day. Do you want to proceed?</string>
+    <string name="dump_uploading">Reporting&#8230;</string>
+    <string name="dump_uploading_failure">Reported failed</string>
+    <string name="dump_uploading_successfully">Reported successfully</string>
 </resources>

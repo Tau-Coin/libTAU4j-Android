@@ -239,7 +239,7 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowFullscreen">true</item>
-        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
@@ -487,5 +487,14 @@
         <!-- 自动计算按下(pressed)状态颜色的系数, 值为0时不自动计算 -->
         <attr name="btnPressedRatio" format="float"/>
     </declare-styleable>
+
+    <style name="CustomAlertDialog" parent="@style/Theme.AppCompat.Light.Dialog.Alert">
+        <item name="buttonBarButtonStyle">@style/CustomAlertDialogButton</item>
+    </style>
+
+    <style name="CustomAlertDialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="textAllCaps">false</item> <!--关闭默认大写的设置 -->
+        <item name="android:textColor">@color/primary</item> <!--关闭默认大写的设置 -->
+    </style>
 
 </resources>

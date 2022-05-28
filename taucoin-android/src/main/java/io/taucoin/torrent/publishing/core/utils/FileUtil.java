@@ -244,4 +244,17 @@ public class FileUtil {
         }
         return logDir;
     }
+
+    public static String getDumpfileDir() {
+        String dir = getExternalDir() + "/dumpfile";
+        File file = new File(dir);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return dir;
+    }
+
+    public static String getDumpFileName() {
+        return "Dump" + DateUtil.getMillisTime() +".txt";
+    }
 }

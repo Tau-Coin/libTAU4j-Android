@@ -50,7 +50,6 @@ class SessionSettings {
          * @param dumpFileDir dump file dir
          */
         SessionParamsBuilder setDumpfileDir(String dumpFileDir) {
-            dumpFileDir += "/libTAU/dumpfile";
             logger.debug("Dumpfile::{}", dumpFileDir);
             sp.set_str(settings_pack.string_types.dump_dir.swigValue(), dumpFileDir);
             return this;
