@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -20,8 +19,6 @@ import android.os.Build;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.taucoin.torrent.publishing.MainApplication;
 
 /**
  * UncaughtException处理类,当程序发生Uncaught异常的时候,有该类来接管程序,并记录发送错误报告.
@@ -68,25 +65,26 @@ public class CrashHandler implements UncaughtExceptionHandler {
     public void uncaughtException(Thread thread, Throwable ex) {
         String threadName = null == thread ? "" : thread.getName();
         logger.error("uncaughtException threadName::{}", threadName);
-        if (null == ex) {
-            logger.error("uncaughtException defaultHandler ex null");
-            // 如果用户没有处理则让系统默认的异常处理器来处理
-            if (mDefaultHandler != null) {
-                mDefaultHandler.uncaughtException(thread, ex);
-            }
-        } else {
+        if (ex != null) {
             handleException(ex);
-            logger.error("uncaughtException killProcess");
-
-            Context appContext = MainApplication.getInstance();
+            logger.error("uncaughtException handleException");
+        } else {
+            logger.error("uncaughtException ex null");
+        }
+        if (mDefaultHandler != null) {
+            mDefaultHandler.uncaughtException(thread, ex);
+            logger.error("uncaughtException defaultHandler");
+        } else {
+            logger.error("uncaughtException defaultHandler ex null");
             // 重启APP
-            Intent intent = appContext.getPackageManager().getLaunchIntentForPackage(appContext.getPackageName());
-            if (intent != null) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                appContext.startActivity(intent);
-                logger.error("uncaughtException restart app");
-            }
+//            Context appContext = MainApplication.getInstance();
+//            Intent intent = appContext.getPackageManager().getLaunchIntentForPackage(appContext.getPackageName());
+//            if (intent != null) {
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
+//                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                appContext.startActivity(intent);
+//                logger.error("uncaughtException restart app");
+//            }
             // 退出程序
             int pid = android.os.Process.myPid();
             logger.error("uncaughtException killProcess pid::{}", pid);
@@ -101,6 +99,9 @@ public class CrashHandler implements UncaughtExceptionHandler {
      */
     private void handleException(Throwable ex) {
         try {
+            if (null == ex) {
+                return;
+            }
             logger.error("handleException start");
             //收集设备参数信息
             logger.error("handleException collect device info");

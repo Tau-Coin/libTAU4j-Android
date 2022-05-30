@@ -669,6 +669,16 @@ public abstract class TauDaemon {
         return false;
     }
 
+
+    /**
+     * crash测试
+     */
+    public void crashTest() {
+        if (isRunning) {
+            sessionManager.crashTest();
+        }
+    }
+
     /**
      * 账户自动更新
      */

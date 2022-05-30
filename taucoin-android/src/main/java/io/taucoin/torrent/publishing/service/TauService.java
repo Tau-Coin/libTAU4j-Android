@@ -76,7 +76,7 @@ public class TauService extends Service {
         if (isAlreadyRunning.compareAndSet(false, true)){
             subscribeCurrentUser();
         }
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     /**
