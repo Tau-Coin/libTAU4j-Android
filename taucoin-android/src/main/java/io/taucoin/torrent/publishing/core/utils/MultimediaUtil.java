@@ -19,18 +19,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 
-import com.luck.picture.lib.compress.Luban;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  *
@@ -101,7 +96,7 @@ public class MultimediaUtil {
                 tagBitmap = imageScale(tagBitmap, width, height, true);
                 baos.reset();
                 tagBitmap.compress(Bitmap.CompressFormat.WEBP, minQuality, baos);
-                byte[] zipData = gZip(baos.toByteArray());
+                byte[] zipData = ZipUtil.gZip(baos.toByteArray());
                 if (zipData != null) {
                     gzipSize = zipData.length;
                 }
@@ -111,7 +106,7 @@ public class MultimediaUtil {
             }
             baos.reset();
             tagBitmap.compress(Bitmap.CompressFormat.WEBP, quality, baos);
-            byte[] zipData = gZip(baos.toByteArray());
+            byte[] zipData = ZipUtil.gZip(baos.toByteArray());
             if (zipData != null) {
                 gzipSize = zipData.length;
             }
@@ -125,44 +120,6 @@ public class MultimediaUtil {
         fos.flush();
         fos.close();
         baos.close();
-    }
-
-    public static byte[] gZip(byte[] data) {
-        byte[] zipData = null;
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            GZIPOutputStream gzip = new GZIPOutputStream(bos);
-            gzip.write(data);
-            gzip.finish();
-            gzip.close();
-            zipData = bos.toByteArray();
-            bos.close();
-        } catch (Exception e) {
-            logger.error("gZip error ::{}", e.getMessage());
-        }
-        return zipData;
-    }
-
-    public static byte[] unGZip(byte[] zipData) {
-        byte[] data = null;
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(zipData);
-            GZIPInputStream gzip = new GZIPInputStream(bis);
-            byte[] buf = new byte[1024];
-            int num;
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            while ((num = gzip.read(buf, 0, buf.length)) != -1) {
-                bos.write(buf, 0, num);
-            }
-            data = bos.toByteArray();
-            bos.flush();
-            bos.close();
-            gzip.close();
-            bis.close();
-        } catch (Exception e) {
-            logger.error("unGZip error ::{}", e.getMessage());
-        }
-        return data;
     }
 
     private static Bitmap getSmallBitmap(String filePath, int maxWidth, int maxHeight) {

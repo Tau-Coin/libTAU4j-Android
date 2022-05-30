@@ -11,11 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.Utils;
+import io.taucoin.torrent.publishing.ui.crash.CrashViewModel;
 import io.taucoin.torrent.publishing.ui.customviews.ProgressManager;
 
 public abstract class BaseActivity extends AppCompatActivity implements
@@ -26,6 +28,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private boolean isFullScreen = true;
     private String className = getClass().getSimpleName();
+    protected CrashViewModel crashViewModel;
     public void setIsFullScreen(boolean isFullScreen){
         this.isFullScreen = isFullScreen;
     }
@@ -39,6 +42,13 @@ public abstract class BaseActivity extends AppCompatActivity implements
 //            ActivityUtil.setRequestedOrientation(this);
 //        }
         super.onCreate(savedInstanceState);
+
+        // 上传Crash文件
+        ViewModelProvider provider = new ViewModelProvider(this);
+        crashViewModel = provider.get(CrashViewModel.class);
+        if (savedInstanceState != null) {
+            crashViewModel.uploadDumpFile(this, false);
+        }
     }
 
     @Override

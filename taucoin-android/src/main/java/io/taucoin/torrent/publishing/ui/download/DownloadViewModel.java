@@ -9,7 +9,6 @@ import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
@@ -23,7 +22,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.DataResult;
-import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.Version;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -43,13 +41,10 @@ public class DownloadViewModel extends AndroidViewModel {
     private static final Logger logger = LoggerFactory.getLogger("DownloadViewModel");
     private static final String BASE_URL = "https://taucoin.io/";
     private static final String CHECK_VERSION_URL = BASE_URL + "versions/";
-    private static final String DUMP_FILE_UPLOAD = BASE_URL + "upload";
 
     private SettingsRepository settingsRepository;
     private LocalDownloadManager localDownloadManager;
     private Disposable disposable;
-    private Disposable uploadDisposable;
-    private MutableLiveData<Result> uploadResult = new MutableLiveData<>();
     public DownloadViewModel(@NonNull Application application) {
         super(application);
         settingsRepository = RepositoryHelper.getSettingsRepository(application);
@@ -61,9 +56,6 @@ public class DownloadViewModel extends AndroidViewModel {
         super.onCleared();
         if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
-        }
-        if (uploadDisposable != null && !uploadDisposable.isDisposed()) {
-            uploadDisposable.dispose();
         }
         localDownloadManager.unregisterContentObserver(getApplication());
     }
@@ -229,39 +221,5 @@ public class DownloadViewModel extends AndroidViewModel {
      */
     void closeQuerySchedule() {
         localDownloadManager.closeQuerySchedule();
-    }
-
-    /**
-     * 上传Dump文件
-     */
-    public void dumpFileUpload(File file) {
-        if (uploadDisposable != null && !uploadDisposable.isDisposed()) {
-            return;
-        }
-        uploadDisposable = Observable.create((ObservableOnSubscribe<Result>) emitter -> {
-            Result result = new Result();
-            try {
-                Response response = HttpUtil.httpPostFile(DUMP_FILE_UPLOAD, file);
-                if (response.isSuccessful()) {
-                    result.setSuccess(response.code() == 200);
-                } else {
-                    result.setSuccess(false);
-                }
-                result.setMsg(response.message());
-            } catch (Exception e) {
-                result.setFailMsg(e.getMessage());
-            }
-            logger.info("dump file upload success::{}, msg::{}", result.isSuccess(), result.getMsg());
-            emitter.onNext(result);
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
-                    uploadResult.postValue(result);
-                });
-    }
-
-    public MutableLiveData<Result> getUploadResult() {
-        return uploadResult;
     }
 }

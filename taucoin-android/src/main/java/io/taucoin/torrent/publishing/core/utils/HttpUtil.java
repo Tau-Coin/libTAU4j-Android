@@ -50,7 +50,7 @@ public class HttpUtil {
      * @return Response
      * @throws IOException
      */
-    public static Response httpPostFile(String url, File file) throws IOException {
+    public static Response httpPostFile(String url, File file) throws Exception {
         OkHttpClient client = new OkHttpClient();
         MediaType mediaType = MediaType.parse("multipart/form-data");
         MultipartBody.Builder builder = new MultipartBody.Builder();    // 首先拿到创建者

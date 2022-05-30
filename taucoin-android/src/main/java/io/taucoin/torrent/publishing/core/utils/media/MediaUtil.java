@@ -21,6 +21,7 @@ import java.io.IOException;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.utils.MultimediaUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.ZipUtil;
 
 public class MediaUtil {
 
@@ -41,7 +42,7 @@ public class MediaUtil {
     public static byte[] media2Bytes(LocalMedia media) {
         String imagePath = getImagePath(media);
         byte[] data = file2Bytes(imagePath);
-        return MultimediaUtil.gZip(data);
+        return ZipUtil.gZip(data);
     }
 
     public static byte[] file2Bytes(String imagePath) {
@@ -64,7 +65,7 @@ public class MediaUtil {
     public static Bitmap bytes2Bitmap(byte[] bytes) {
         try {
             if (bytes != null) {
-                byte[] unGzipData = MultimediaUtil.unGZip(bytes);
+                byte[] unGzipData = ZipUtil.unGZip(bytes);
                 return BitmapFactory.decodeByteArray(unGzipData, 0, unGzipData.length);
             }
         } catch (Exception ignore) { }
