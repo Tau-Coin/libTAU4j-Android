@@ -40,7 +40,6 @@ import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
@@ -495,7 +494,7 @@ public abstract class TauDaemon {
                 List<String> localChains = memberRepo.queryFollowedCommunities(userPk);
                 logger.debug("checkAllChains localChain::{}, tauChains::{}",
                         localChains.size(), tauChains.size());
-                // 1.1、处理本地跟随的chains, libTAU未跟随的情况
+                // 1、处理本地跟随的chains, libTAU未跟随的情况
                 for (String chainID : localChains) {
                     if (!tauChains.contains(chainID)) {
                         // libTAU followChain
@@ -508,20 +507,11 @@ public abstract class TauDaemon {
                         tauChains.remove(chainID);
                     }
                 }
-                // 1.2、处理本地未跟随的chains, libTAU跟随的情况
+                // 2、处理本地未跟随的chains, libTAU跟随的情况
                 for (String chainID : tauChains) {
                     // libTAU unfollowChain
                     boolean success = unfollowChain(chainID);
                     logger.debug("checkAllChains unfollowChain chainID::{}, success::{}", chainID, success);
-                }
-
-                // 2、获取未加入或者过期社区列表, 从其他节点请求状态数据
-                List<Member> list = memberRepo.getUnJoinedExpiredCommunityList(userPk);
-                logger.debug("updateUserAccountInfo count::{}", null == list ? 0 : list.size());
-                if (list != null && list.size() > 0) {
-                    for (Member m: list) {
-                        requestAccountState(m.chainID);
-                    }
                 }
             }
             emitter.onComplete();
@@ -542,18 +532,6 @@ public abstract class TauDaemon {
             list = new ArrayList<>();
         }
         return list;
-    }
-
-    /**
-     * 请求用户社区账户状态
-     */
-    void requestAccountState(String chainID) {
-        if (isRunning) {
-            if (StringUtil.isNotEmpty(chainID)) {
-                sessionManager.requestChainState(ChainIDUtil.encode(chainID));
-                logger.debug("requestAccountState::{}", chainID);
-            }
-        }
     }
 
     /**
@@ -643,18 +621,6 @@ public abstract class TauDaemon {
             return sessionManager.getMiningTime(chainID);
         }
         return -1;
-    }
-
-    /**
-     * 判断交易是否在交易池
-     */
-    public boolean isTxInFeePool(String chainID, String txID) {
-        if (isRunning) {
-            boolean isExist = sessionManager.isTxInFeePool(ChainIDUtil.encode(chainID), txID);
-            logger.debug("isTxInFeePool::{}, chainID::{}, txID::{}", isExist, chainID, txID);
-            return isExist;
-        }
-        return false;
     }
 
     /**
@@ -801,19 +767,6 @@ public abstract class TauDaemon {
     public abstract boolean unfollowChain(String chainID);
 
     /**
-     * 获取tip前三名区块号和哈希
-     * @param chainID 链ID
-     * @param topNum 获取数目
-     */
-    public abstract List<Block> getTopTipBlock(String chainID, int topNum);
-
-    /**
-     * 获取交易打包的最小交易费
-     * @param chainID 链ID
-     */
-    public abstract long getMedianTxFree(String chainID);
-
-    /**
      * 获取Session Time
      */
     public abstract long getSessionTime();
@@ -824,11 +777,4 @@ public abstract class TauDaemon {
      * @param blockNumber 区块号
      */
     public abstract Block getBlockByNumber(String chainID, long blockNumber);
-
-    /**
-     * 通过区块hash查询区块
-     * @param chainID 链ID
-     * @param hash 区块hash
-     */
-    public abstract Block getBlockByHash(String chainID, String hash);
 }
