@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,7 +46,6 @@ public class MainFragment extends BaseFragment {
     private SettingsRepository settingsRepo;
     private CompositeDisposable disposables = new CompositeDisposable();
     private boolean dataChanged = false;
-    private MainTabFragment[] fragments = new MainTabFragment[3];
 
     @Nullable
     @Override
@@ -183,7 +183,9 @@ public class MainFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        binding.tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+        if (binding != null) {
+            binding.tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+        }
     }
 
     public class StateAdapter extends FragmentStatePagerAdapter {
@@ -212,9 +214,14 @@ public class MainFragment extends BaseFragment {
     }
 
     private void showFragmentData() {
-        int currentItem = binding.viewPager.getCurrentItem();
-        if (fragments[currentItem] != null) {
-            fragments[currentItem].showDataList(getDataList(currentItem));
+        int pos = binding.tabLayout.getSelectedTabPosition();
+        FragmentManager fragmentManager = getChildFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        if (pos >= 0 && fragments!= null && pos < fragments.size()) {
+            Fragment currentFragment = fragments.get(pos);
+            if (currentFragment instanceof MainTabFragment) {
+                ((MainTabFragment)currentFragment).showDataList(getDataList(pos));
+            }
         }
     }
 
@@ -234,7 +241,6 @@ public class MainFragment extends BaseFragment {
         MainTabFragment tab = new MainTabFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(IntentExtra.BEAN, getDataList(pos));
-        fragments[pos] = tab;
         tab.setArguments(bundle);
         return tab;
     }
