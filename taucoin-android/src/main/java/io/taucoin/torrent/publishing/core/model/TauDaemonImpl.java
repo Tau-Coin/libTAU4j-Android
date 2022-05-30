@@ -9,7 +9,6 @@ import org.libTAU4j.Transaction;
 import org.libTAU4j.alerts.Alert;
 import org.libTAU4j.alerts.AlertType;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -398,34 +397,6 @@ public class TauDaemonImpl extends TauDaemon {
     }
 
     /**
-     * 获取tip前三名区块号和哈希
-     * @param chainID 链ID
-     * @param topNum 获取数目
-     */
-    @Override
-    public List<Block> getTopTipBlock(String chainID, int topNum) {
-        if (isRunning) {
-            logger.debug("getTopTipBlock chainID::{}, topNum::{}", chainID, topNum);
-            return sessionManager.getTopTipBlock(ChainIDUtil.encode(chainID), topNum);
-        }
-        return null;
-    }
-
-    /**
-     * 获取交易打包的最小交易费
-     * @param chainID 链ID
-     */
-    @Override
-    public long getMedianTxFree(String chainID) {
-        long medianTxFee = 0;
-        if (isRunning) {
-            medianTxFee = sessionManager.getMedianTxFee(ChainIDUtil.encode(chainID));
-        }
-        logger.debug("getMedianTxFree chainID::{}, medianTxFee::{}", chainID, medianTxFee);
-        return medianTxFee;
-    }
-
-    /**
      * 获取Session Time
      */
     @Override
@@ -452,19 +423,6 @@ public class TauDaemonImpl extends TauDaemon {
     public Block getBlockByNumber(String chainID, long blockNumber) {
         if (isRunning) {
             return sessionManager.getBlockByNumber(ChainIDUtil.encode(chainID), blockNumber);
-        }
-        return null;
-    }
-
-    /**
-     * 通过区块hash查询区块
-     * @param chainID 链ID
-     * @param hash 区块hash
-     */
-    @Override
-    public Block getBlockByHash(String chainID, String hash) {
-        if (isRunning) {
-            return sessionManager.getBlockByHash(ChainIDUtil.encode(chainID), hash);
         }
         return null;
     }

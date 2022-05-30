@@ -33,6 +33,7 @@ import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.service.SystemServiceManager;
 
 import static java.lang.Runtime.getRuntime;
 
@@ -225,6 +226,8 @@ public class TauInfoProvider {
                     }
 
                     // 流量统计
+                    boolean isMetered = SystemServiceManager.getInstance().isNetworkMetered();
+                    NetworkSetting.setMeteredNetwork(isMetered);
                     handlerTrafficStatistics(sessionStatistics);
 
                     // nodes和invoked统计
