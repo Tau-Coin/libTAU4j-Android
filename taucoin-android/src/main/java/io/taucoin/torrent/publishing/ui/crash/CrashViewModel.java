@@ -102,12 +102,12 @@ public class CrashViewModel extends AndroidViewModel {
     }
 
     private void uploadDumpFileSync(File file, Result result) throws Exception {
-        Response response = null;
+        Response response;
         String filePath = file.getParentFile().getAbsolutePath();
         String fileName = file.getName();
         fileName = fileName.substring(0, fileName.indexOf("."));
-        String destZipFile = filePath + File.separator + fileName + ".gzip";
-        ZipUtil.gZip(file, destZipFile);
+        String destZipFile = filePath + File.separator + fileName + ".tar.gz";
+        ZipUtil.compress(file.getAbsolutePath(), destZipFile);
         File zipFile = new File(destZipFile);
         if (zipFile.exists() && zipFile.length() > 0) {
             result.setMsg(destZipFile);
@@ -118,7 +118,6 @@ public class CrashViewModel extends AndroidViewModel {
             logger.debug("uploadDumpFileSync file size::{}",
                     Formatter.formatFileSize(getApplication(), file.length()));
             response = HttpUtil.httpPostFile(DUMP_FILE_UPLOAD, file);
-
         }
         if (response.isSuccessful()) {
             result.setSuccess(response.code() == 200);
