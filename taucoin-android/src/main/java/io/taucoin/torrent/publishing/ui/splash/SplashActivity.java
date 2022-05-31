@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -24,6 +25,7 @@ import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.PermissionUtils;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
+import io.taucoin.torrent.publishing.ui.crash.CrashViewModel;
 import io.taucoin.torrent.publishing.ui.customviews.permission.EasyPermissions;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
@@ -32,6 +34,7 @@ public class SplashActivity extends BaseActivity {
     private static final Logger logger = LoggerFactory.getLogger("SplashActivity");
     private volatile boolean isAsk = false;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private CrashViewModel crashViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,9 @@ public class SplashActivity extends BaseActivity {
             logger.info("SplashActivity show");
             // Open for the first time
             setContentView(R.layout.activity_splash);
+
+            ViewModelProvider provider = new ViewModelProvider(this);
+            crashViewModel = provider.get(CrashViewModel.class);
 
             // 每次APP重新启动如果有新版本更新需要提示用户
             RepositoryHelper.getSettingsRepository(this).setNeedPromptUser(true);

@@ -28,7 +28,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private boolean isFullScreen = true;
     private String className = getClass().getSimpleName();
-    protected CrashViewModel crashViewModel;
     public void setIsFullScreen(boolean isFullScreen){
         this.isFullScreen = isFullScreen;
     }
@@ -43,10 +42,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
 //        }
         super.onCreate(savedInstanceState);
 
-        // 上传Crash文件
-        ViewModelProvider provider = new ViewModelProvider(this);
-        crashViewModel = provider.get(CrashViewModel.class);
         if (savedInstanceState != null) {
+            // 上传Crash文件
+            ViewModelProvider provider = new ViewModelProvider(this);
+            CrashViewModel crashViewModel = provider.get(CrashViewModel.class);
             crashViewModel.uploadDumpFile(this, false);
         }
     }
