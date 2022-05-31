@@ -35,7 +35,6 @@ public class CrashViewModel extends AndroidViewModel {
     private static final Logger logger = LoggerFactory.getLogger("CrashViewModel");
     private static final String BASE_URL = "https://taucoin.io/";
     private static final String DUMP_FILE_UPLOAD = BASE_URL + "upload";
-    private static final int DUMP_FILE_ZIP_LIMIT = 1024 * 1024;
     private AlertDialog mDialog;
 
     private Disposable uploadAsyncDisposable;
@@ -104,21 +103,18 @@ public class CrashViewModel extends AndroidViewModel {
 
     private void uploadDumpFileSync(File file, Result result) throws Exception {
         Response response = null;
-        if (file.length() > DUMP_FILE_ZIP_LIMIT) {
-            String filePath = file.getParentFile().getAbsolutePath();
-            String fileName = file.getName();
-            fileName = fileName.substring(0, fileName.indexOf("."));
-            String destZipFile = filePath + File.separator + fileName + ".gzip";
-            ZipUtil.gZip(file, destZipFile);
-            File zipFile = new File(destZipFile);
-            if (zipFile.exists() && zipFile.length() > 0) {
-                result.setMsg(destZipFile);
-                logger.debug("DumpFile gzip::{}, size::{}", destZipFile,
-                        Formatter.formatFileSize(getApplication(), zipFile.length()));
-                response = HttpUtil.httpPostFile(DUMP_FILE_UPLOAD, zipFile);
-            }
-        }
-        if (null == response) {
+        String filePath = file.getParentFile().getAbsolutePath();
+        String fileName = file.getName();
+        fileName = fileName.substring(0, fileName.indexOf("."));
+        String destZipFile = filePath + File.separator + fileName + ".gzip";
+        ZipUtil.gZip(file, destZipFile);
+        File zipFile = new File(destZipFile);
+        if (zipFile.exists() && zipFile.length() > 0) {
+            result.setMsg(destZipFile);
+            logger.debug("DumpFile gzip::{}, size::{}", destZipFile,
+                    Formatter.formatFileSize(getApplication(), zipFile.length()));
+            response = HttpUtil.httpPostFile(DUMP_FILE_UPLOAD, zipFile);
+        } else {
             logger.debug("uploadDumpFileSync file size::{}",
                     Formatter.formatFileSize(getApplication(), file.length()));
             response = HttpUtil.httpPostFile(DUMP_FILE_UPLOAD, file);
@@ -126,7 +122,7 @@ public class CrashViewModel extends AndroidViewModel {
         }
         if (response.isSuccessful()) {
             result.setSuccess(response.code() == 200);
-//            FileUtil.deleteFile(file.getParentFile());
+            FileUtil.deleteFile(file.getParentFile());
         } else {
             result.setSuccess(false);
         }
