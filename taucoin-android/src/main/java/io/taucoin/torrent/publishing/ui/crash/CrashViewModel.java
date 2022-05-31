@@ -200,7 +200,7 @@ public class CrashViewModel extends AndroidViewModel {
         mDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             mDialog.cancel();
             FileUtil.deleteFile(file.getParentFile());
-            result.setSuccess(true);
+            result.setExist(false);
             uploadResult.postValue(result);
         });
     }
