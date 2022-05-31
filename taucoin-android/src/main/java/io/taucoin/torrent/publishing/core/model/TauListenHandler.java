@@ -671,8 +671,6 @@ public class TauListenHandler {
      */
     void onAccountState(byte[] chainIDBytes, String userPk, Account account) {
         String chainID = ChainIDUtil.decode(chainIDBytes);
-        logger.debug("onAccountState chainID::{}, userPk::{}, account empty::{}",
-                chainID, userPk, null == account);
         if (account != null) {
             Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
             if (null == member) {
@@ -685,6 +683,8 @@ public class TauListenHandler {
                     memberRepo.updateMember(member);
                 }
             }
+            logger.debug("onAccountState chainID::{}, userPk::{}, newBalance::{}, balance::{}, blockNumber::{}",
+                    chainID, userPk, account.getBalance(), member.balance, member.blockNumber);
         }
     }
 
