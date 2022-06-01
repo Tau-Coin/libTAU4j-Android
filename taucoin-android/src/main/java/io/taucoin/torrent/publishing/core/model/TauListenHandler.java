@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
+import org.libTAU4j.ChainURL;
 import org.libTAU4j.Transaction;
 import org.libTAU4j.Vote;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
@@ -38,8 +40,6 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
@@ -53,6 +53,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -443,12 +444,22 @@ public class TauListenHandler {
         if (null == publicKey) {
             return;
         }
-        String userPk = ByteUtil.toHexString(publicKey);
-        User user = userRepo.getUserByPublicKey(userPk);
+        saveUserInfo(ByteUtil.toHexString(publicKey));
+    }
+
+    /**
+     * 保存用户信息到本地
+     * @param publicKey 公钥
+     */
+    private void saveUserInfo(String publicKey) {
+        if (StringUtil.isEmpty(publicKey)) {
+            return;
+        }
+        User user = userRepo.getUserByPublicKey(publicKey);
         if (null == user) {
-            user = new User(userPk);
+            user = new User(publicKey);
             userRepo.addUser(user);
-            logger.info("SaveUserInfo to local, publicKey::{}", userPk);
+            logger.info("SaveUserInfo to local, publicKey::{}", publicKey);
         }
     }
 
@@ -487,7 +498,10 @@ public class TauListenHandler {
             logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}, power::{}",
                     chainIDStr, publicKey, balance, power);
         } else {
-            member.balance = balance;
+            // 防止和初始上报的onAccountState冲突
+            if (blockNumber > 0 || balance > 0) {
+                member.balance = balance;
+            }
             member.power = power;
             member.blockNumber = blockNumber;
             member.nonce = nonce;
@@ -721,5 +735,36 @@ public class TauListenHandler {
             autoRenewalDisposable.dispose();
         }
         autoRenewalDisposable = null;
+    }
+
+    /**
+     * 添加社区
+     * @param chainURL 链URL
+     */
+    public void addCommunity(String chainURL) {
+        if (StringUtil.isEmpty(chainURL)) {
+            return;
+        }
+        ChainURL url = ChainUrlUtil.decode(chainURL);
+        if (null == url) {
+            return;
+        }
+        String chainID = url.getChainID();
+        Set<String> peers = url.getPeers();
+        boolean isSuccess = daemon.followChain(chainID, peers);
+        if (isSuccess) {
+            Community community = new Community(chainID, ChainIDUtil.getName(chainID));
+            communityRepo.addCommunity(community);
+
+            String userPK = MainApplication.getInstance().getPublicKey();
+            saveUserInfo(userPK);
+            addMemberInfo(ChainIDUtil.encode(chainID), userPK);
+            if (peers != null) {
+                for (String peer : peers) {
+                    saveUserInfo(peer);
+                    addMemberInfo(ChainIDUtil.encode(chainID), peer);
+                }
+            }
+        }
     }
 }

@@ -494,6 +494,10 @@ public abstract class TauDaemon {
                 List<String> localChains = memberRepo.queryFollowedCommunities(userPk);
                 logger.debug("checkAllChains localChain::{}, tauChains::{}",
                         localChains.size(), tauChains.size());
+                // 0、添加默认TAU Testing Community
+                if (localChains.size() == 0) {
+                    tauDaemonAlertHandler.addCommunity(Constants.TAU_TESTING_COMMUNITY);
+                }
                 // 1、处理本地跟随的chains, libTAU未跟随的情况
                 for (String chainID : localChains) {
                     if (!tauChains.contains(chainID)) {

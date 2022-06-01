@@ -464,4 +464,12 @@ class TauDaemonAlertHandler {
     public void onCleared() {
         tauListenHandler.onCleared();
     }
+
+    /**
+     * 添加社区
+     * @param chainURL 链URL
+     */
+    public void addCommunity(String chainURL) {
+        tauListenHandler.addCommunity(chainURL);
+    }
 }
