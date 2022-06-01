@@ -23,7 +23,6 @@ import io.taucoin.torrent.publishing.core.log.LogConfigurator;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.PermissionUtils;
-import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.crash.CrashViewModel;
 import io.taucoin.torrent.publishing.ui.customviews.permission.EasyPermissions;
@@ -78,16 +77,9 @@ public class SplashActivity extends BaseActivity {
         if (!isAsk) {
             crashViewModel.getUploadResult().observe(this, result -> {
                 closeProgressDialog();
-                if (result.isExist()) {
-                    if (result.isSuccess()) {
-                        ToastUtils.showShortToast(R.string.dump_uploading_successfully);
-                    } else {
-                        ToastUtils.showShortToast(R.string.dump_uploading_failure);
-                    }
-                }
                 splashJumpDirect();
             });
-            crashViewModel.uploadDumpFile(this, true);
+            crashViewModel.uploadDumpFile(this, false);
         }
         isAsk = false;
     }
