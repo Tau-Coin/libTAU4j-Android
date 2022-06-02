@@ -2,9 +2,6 @@ package io.taucoin.torrent.publishing.ui.main;
 
 import android.app.Application;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,14 +78,21 @@ public class MainViewModel extends AndroidViewModel {
                  emitter -> {
             long start = DateUtil.getMillisTime();
             List<CommunityAndFriend> dataList = communityRepo.queryCommunitiesAndFriends();
+            ArrayList<CommunityAndFriend> communities = new ArrayList<>();
+            ArrayList<CommunityAndFriend> friends = new ArrayList<>();
             ArrayList<CommunityAndFriend> list = new ArrayList<>();
             if (dataList != null && dataList.size() > 0) {
                 list.addAll(dataList);
+                for(CommunityAndFriend data : dataList) {
+                    if (data.type == 0) {
+                        communities.add(data);
+                    } else if (data.type == 1) {
+                        friends.add(data);
+                    }
+                }
             }
-            Iterable<CommunityAndFriend> communities = Iterables.filter(list, data -> data != null && data.type == 0);
-            Iterable<CommunityAndFriend> friends = Iterables.filter(list, data -> data != null && data.type == 1);
-            homeCommunityData.postValue(Lists.newArrayList(communities));
-            homeFriendData.postValue(Lists.newArrayList(friends));
+            homeCommunityData.postValue(communities);
+            homeFriendData.postValue(friends);
             long end = DateUtil.getMillisTime();
             logger.debug("queryHomeData time::{}, list::{}", end - start, list.size());
             emitter.onNext(list);

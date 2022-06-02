@@ -179,6 +179,6 @@ dependencies {
     // float menu
     implementation 'com.noober.floatmenu:common:1.0.4'
 
-    // 文件压缩
-    implementation 'org.apache.commons:commons-compress:1.21'
+    // file compress
+    implementation 'org.apache.commons:commons-compress:1.18'
 }

@@ -17,12 +17,9 @@ package io.taucoin.torrent.publishing.core.utils;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -107,63 +104,125 @@ public class ZipUtil {
     }
 
     /**
-     * 压缩文件
-     * @param sourceFile 指定打包的源目录
-     * @param tarGzPath    指定目标 tar 包的位置
+     * tar打包，GZip压缩
+     *
+     * @param file    待压缩的文件或文件夹
+     * @param taos    压缩流
+     * @param baseDir 相对压缩文件的相对路径
      */
-    public static void compress(String sourceFile, String tarGzPath) {
-        logger.info("compress：{}", tarGzPath);
-        TarArchiveOutputStream tarOs = null;
-        try {
-            // 创建一个 FileOutputStream 到输出文件（.tar.gz）
-            FileOutputStream fos = new FileOutputStream(tarGzPath);
-            // 创建一个 GZIPOutputStream，用来包装 FileOutputStream 对象
-            GZIPOutputStream gos = new GZIPOutputStream(new BufferedOutputStream(fos));
-            // 创建一个 TarArchiveOutputStream，用来包装 GZIPOutputStream 对象
-            tarOs = new TarArchiveOutputStream(gos);
-            // 使文件名支持超过 100 个字节
-            tarOs.setLongFileMode(TarArchiveOutputStream.LONGFILE_POSIX);
-            addFilesToTarGZ(sourceFile, "", tarOs);
-        } catch (Exception e) {
-            logger.error("compress，", e);
-        } finally {
+    private static void tarGZip(File file, TarArchiveOutputStream taos, String baseDir) {
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (File f : files) {
+                tarGZip(f, taos, baseDir + file.getName() + File.separator);
+            }
+        } else {
+            byte[] buffer = new byte[1024];
+            int len;
+            FileInputStream fis = null;
+            TarArchiveEntry tarArchiveEntry = null;
             try {
-                if (tarOs != null) {
-                    tarOs.close();
+                fis = new FileInputStream(file);
+                tarArchiveEntry = new TarArchiveEntry(baseDir + file.getName());
+                tarArchiveEntry.setSize(file.length());
+                taos.putArchiveEntry(tarArchiveEntry);
+                while ((len = fis.read(buffer)) != -1) {
+                    taos.write(buffer, 0, len);
                 }
-            } catch (IOException ignore) {
+                taos.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (fis != null) fis.close();
+                    if (tarArchiveEntry != null) taos.closeArchiveEntry();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     /**
-     * @param sourcePath 源文件
-     * @param parent     源目录
-     * @param tarArchive 压缩输出流
-     * @throws IOException
+     * tar打包，GZip压缩
+     *
+     * @param srcFile 待压缩的文件或文件夹
      */
-    private static void addFilesToTarGZ(String sourcePath, String parent,
-                                        TarArchiveOutputStream tarArchive) throws IOException {
-        File sourceFile = new File(sourcePath);
-        // 获取新目录下的文件名称
-        String fileName = parent.concat(sourceFile.getName());
-        //打包压缩该文件
-        tarArchive.putArchiveEntry(new TarArchiveEntry(sourceFile, fileName));
-        if (sourceFile.isFile()) {
-            FileInputStream fis = new FileInputStream(sourceFile);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            // 写入文件
-            IOUtils.copy(bis, tarArchive);
-            tarArchive.closeArchiveEntry();
-            bis.close();
-        } else if (sourceFile.isDirectory()) {
-            // 因为是个文件夹，无需写入内容，关闭即可
-            tarArchive.closeArchiveEntry();
-            // 遍历文件夹下的文件
-            for (File f : sourceFile.listFiles()) {
-                // 递归遍历文件目录树
-                addFilesToTarGZ(f.getAbsolutePath(), fileName + File.separator, tarArchive);
+    public static void tarGZip(File srcFile) {
+        tarGZip(srcFile, srcFile.getParentFile().getAbsolutePath());
+    }
+
+    /**
+     * tar打包，GZip压缩
+     *
+     * @param srcFile 待压缩的文件或文件夹
+     * @param dstDir  压缩至该目录，保持原文件名，后缀改为zip
+     */
+    public static void tarGZip(File srcFile, String dstDir) {
+        File file = new File(dstDir);
+        //需要判断该文件存在，且是文件夹
+        if (!file.exists() || !file.isDirectory()) file.mkdirs();
+        // 先打包成tar格式
+        String dstTarPath = dstDir + File.separator + getTarFileName(srcFile) + ".tar";
+        String dstPath = dstTarPath + ".gz";
+        FileOutputStream fos = null;
+        TarArchiveOutputStream taos = null;
+        try {
+            fos = new FileOutputStream(dstTarPath);
+            taos = new TarArchiveOutputStream(fos);
+            tarGZip(srcFile, taos, "");
+            taos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                //关闭数据流的时候要先关闭外层，否则会报Stream Closed的错误
+                if (taos != null) taos.close();
+                if (fos != null) fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+        File tarFile = new File(dstTarPath);
+        fos = null;
+        GZIPOutputStream gzip = null;
+        FileInputStream fis = null;
+        try {
+            //再压缩成gz格式
+            fos = new FileOutputStream(dstPath);
+            gzip = new GZIPOutputStream(fos);
+            fis = new FileInputStream(tarFile);
+            int len;
+            byte[] buffer = new byte[1024];
+            while ((len = fis.read(buffer)) != -1) {
+                gzip.write(buffer, 0, len);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fis != null) fis.close();
+                //关闭数据流的时候要先关闭外层，否则会报Stream Closed的错误
+                if (gzip != null) gzip.close();
+                if (fos != null) fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //删除生成的tar临时文件
+        if (tarFile.exists()) tarFile.delete();
+    }
+
+    public static String getTarFileName(File file) {
+        String name = "";
+        if (file != null) {
+            name = file.getName();
+            name = name.substring(0, name.indexOf("."));
+        }
+        return name;
+    }
+
+    public static String getTarFileNameAndType(File file) {
+        return getTarFileName(file) + ".tar.gz";
     }
 }
