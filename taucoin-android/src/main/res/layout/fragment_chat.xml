@@ -34,7 +34,7 @@
                     android:id="@+id/msg_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/widget_size_10"
+                    android:paddingBottom="@dimen/widget_size_0"
                     android:clipToPadding="false"
                     android:onClick="@{listener::onClick}"
                     android:scrollbars="none"
