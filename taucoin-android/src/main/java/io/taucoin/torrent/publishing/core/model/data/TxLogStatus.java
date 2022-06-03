@@ -6,7 +6,7 @@ package io.taucoin.torrent.publishing.core.model.data;
 public enum TxLogStatus {
     SENT(0, "Try to Send"),
     SENT_INTERNET(1, "Sent to Internet"),
-    ARRIVED_SWARM(2, "Arrived Prefix Swarm");
+    ARRIVED_SWARM(2, "Arrived on Community Swarm");
 
     private int status;
     private String statusInfo;
