@@ -137,34 +137,37 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         binding.itemRenewalDate.setVisibility(onChain ? View.VISIBLE : View.GONE);
     }
 
-    /**
-     *  创建右上角Menu
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_transactions, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.menu_transactions);
-        CharSequence title = item.getTitle();
-        item.setActionView(R.layout.menu_textview);
-        TextView tv = (TextView) item.getActionView();
-        tv.setText(title);
-        tv.setOnClickListener(this);
-        return super.onPrepareOptionsMenu(menu);
-    }
+//    /**
+//     *  创建右上角Menu
+//     */
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_transactions, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onPrepareOptionsMenu(Menu menu) {
+//        MenuItem item = menu.findItem(R.id.menu_transactions);
+//        CharSequence title = item.getTitle();
+//        item.setActionView(R.layout.menu_textview);
+//        TextView tv = (TextView) item.getActionView();
+//        tv.setText(title);
+//        tv.setOnClickListener(this);
+//        return super.onPrepareOptionsMenu(menu);
+//    }
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.tv_join) {
-            viewModel.joinCommunity(chainID);
-        } else if (v.getId() == R.id.tv_menu) {
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            ActivityUtil.startActivity(intent, this, TransactionsActivity.class);
+        switch (v.getId()) {
+            case R.id.tv_join:
+                viewModel.joinCommunity(chainID);
+                break;
+            case R.id.rl_transactions:
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, TransactionsActivity.class);
+                break;
         }
     }
 

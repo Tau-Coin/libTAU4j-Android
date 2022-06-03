@@ -118,7 +118,7 @@
     <string name="community_total_blocks">Total Blocks</string>
     <string name="community_mining_power">Mining Power</string>
     <string name="community_expiry_date">Expiry Date</string>
-    <string name="community_renewal_date">Renewal Date</string>
+    <string name="community_renewal_date">Auto Renewal Date</string>
     <string name="community_info">Info</string>
     <string name="community_invite_link">Invite Link</string>
     <string name="community_qr_code">Share Community and QR</string>
@@ -224,6 +224,7 @@
     <string name="community_added_successfully">Create Community Successful!</string>
     <string name="community_added_failed">Failed to add community!</string>
     <string name="community_join">Join</string>
+    <string name="community_open">Open</string>
     <string name="community_added_members">Add Members</string>
     <string name="community_added_members_empty">Please add or select friends first!</string>
     <string name="community_custom_airdrop_tips">Custom airdrop coins to friends</string>

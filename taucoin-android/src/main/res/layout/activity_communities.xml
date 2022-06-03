@@ -29,6 +29,44 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <RelativeLayout
+                    android:id="@+id/rl_transactions"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:background="@color/color_white"
+                    android:layout_height="@dimen/widget_size_40"
+                    android:onClick="@{listener::onClick}">
+
+                    <TextView
+                        android:id="@+id/menu_transactions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:gravity="center_vertical"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_centerVertical="true"
+                        android:text="@string/menu_transactions"
+                        android:textAppearance="@style/TextAppearanceBody1" />
+
+                    <ImageView
+                        android:layout_width="@dimen/widget_size_14"
+                        android:layout_height="@dimen/widget_size_14"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:contentDescription="@null"
+                        android:src="@mipmap/icon_arrow"/>
+
+                    <View
+                        android:id="@+id/view_line"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="@color/color_bg" />
+
+                </RelativeLayout>
+
                 <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_balance"
                     android:layout_width="match_parent"
@@ -113,7 +151,7 @@
                     android:gravity="center_horizontal|center"
                     android:onClick="@{listener::onClick}"
                     android:textColor="@color/color_white"
-                    android:text="@string/community_join"/>
+                    android:text="@string/community_open"/>
 
             </LinearLayout>
 

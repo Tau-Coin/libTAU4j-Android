@@ -28,6 +28,7 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:layout_centerVertical="true"
+                android:textColor="@color/color_yellow"
                 android:text="@string/community_transaction"
                 android:textAppearance="@style/TextAppearanceBody2" />
 
