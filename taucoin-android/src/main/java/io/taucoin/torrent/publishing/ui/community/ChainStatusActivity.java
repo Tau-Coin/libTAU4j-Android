@@ -10,8 +10,8 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 
 import org.libTAU4j.Block;
-
-import java.util.Locale;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,6 +26,7 @@ import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityChainStatusBinding;
@@ -39,7 +40,7 @@ import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
  * 群组成员页面
  */
 public class ChainStatusActivity extends BaseActivity {
-
+    private static Logger logger = LoggerFactory.getLogger("ChainStatusActivity");
     private ActivityChainStatusBinding binding;
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -96,19 +97,34 @@ public class ChainStatusActivity extends BaseActivity {
         blockDisposables.add(getBlockByNumber(chainID, status.headBlock)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(block -> loadBlockDetailData(binding.headBlock, block)));
+                .subscribe(block -> {
+                    logger.debug("head blockTime::{}, currentTime::{}", block.getTimestamp(), DateUtil.getMillisTime());
+                    loadBlockDetailData(binding.headBlock, block);
+                }, it-> {
+                    logger.error("load head block error ", it);
+                }));
 
         binding.tvTailBlock.setText(FmtMicrometer.fmtLong(status.tailBlock));
         blockDisposables.add(getBlockByNumber(chainID, status.tailBlock)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(block -> loadBlockDetailData(binding.tailBlock, block)));
+                .subscribe(block -> {
+                    logger.debug("tail blockTime::{}, currentTime::{}", block.getTimestamp(), DateUtil.getMillisTime());
+                    loadBlockDetailData(binding.tailBlock, block);
+                }, it-> {
+                    logger.error("load tail block error ", it);
+                }));
 
         binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(status.consensusBlock));
         blockDisposables.add(getBlockByNumber(chainID, status.consensusBlock)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(block -> loadBlockDetailData(binding.consensusBlock, block)));
+                .subscribe(block -> {
+                    logger.debug("consensus blockTime::{}, currentTime::{}", block.getTimestamp(), DateUtil.getMillisTime());
+                    loadBlockDetailData(binding.consensusBlock, block);
+                }, it-> {
+                    logger.error("load consensus block error ", it);
+                }));
 
         binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
         binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
