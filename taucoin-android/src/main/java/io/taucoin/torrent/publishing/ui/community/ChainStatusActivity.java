@@ -100,8 +100,6 @@ public class ChainStatusActivity extends BaseActivity {
                 .subscribe(block -> {
                     logger.debug("head blockTime::{}, currentTime::{}", block.getTimestamp(), DateUtil.getMillisTime());
                     loadBlockDetailData(binding.headBlock, block);
-                }, it-> {
-                    logger.error("load head block error ", it);
                 }));
 
         binding.tvTailBlock.setText(FmtMicrometer.fmtLong(status.tailBlock));
@@ -111,8 +109,6 @@ public class ChainStatusActivity extends BaseActivity {
                 .subscribe(block -> {
                     logger.debug("tail blockTime::{}, currentTime::{}", block.getTimestamp(), DateUtil.getMillisTime());
                     loadBlockDetailData(binding.tailBlock, block);
-                }, it-> {
-                    logger.error("load tail block error ", it);
                 }));
 
         binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(status.consensusBlock));
@@ -122,8 +118,6 @@ public class ChainStatusActivity extends BaseActivity {
                 .subscribe(block -> {
                     logger.debug("consensus blockTime::{}, currentTime::{}", block.getTimestamp(), DateUtil.getMillisTime());
                     loadBlockDetailData(binding.consensusBlock, block);
-                }, it-> {
-                    logger.error("load consensus block error ", it);
                 }));
 
         binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
