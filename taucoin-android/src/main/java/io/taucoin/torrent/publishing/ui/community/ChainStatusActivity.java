@@ -98,7 +98,10 @@ public class ChainStatusActivity extends BaseActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(block -> {
-                    logger.debug("head blockTime::{}, currentTime::{}", block.getTimestamp(), DateUtil.getMillisTime());
+                    if (block != null) {
+                        logger.debug("head blockNum::{}, blockTime::{}, currentTime::{}",
+                                block.getBlockNumber(), block.getTimestamp(), DateUtil.getTime());
+                    }
                     loadBlockDetailData(binding.headBlock, block);
                 }));
 
@@ -107,7 +110,10 @@ public class ChainStatusActivity extends BaseActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(block -> {
-                    logger.debug("tail blockTime::{}, currentTime::{}", block.getTimestamp(), DateUtil.getMillisTime());
+                    if (block != null) {
+                        logger.debug("tail blockNum::{}, blockTime::{}, currentTime::{}",
+                                block.getBlockNumber(), block.getTimestamp(), DateUtil.getTime());
+                    }
                     loadBlockDetailData(binding.tailBlock, block);
                 }));
 
@@ -116,7 +122,10 @@ public class ChainStatusActivity extends BaseActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(block -> {
-                    logger.debug("consensus blockTime::{}, currentTime::{}", block.getTimestamp(), DateUtil.getMillisTime());
+                    if (block != null) {
+                        logger.debug("consensus blockNum::{}, blockTime::{}, currentTime::{}",
+                                block.getBlockNumber(), block.getTimestamp(), DateUtil.getTime());
+                    }
                     loadBlockDetailData(binding.consensusBlock, block);
                 }));
 

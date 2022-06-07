@@ -54,22 +54,18 @@ public class DateUtil {
     public static final String pattern13 = "MM-dd HH:mm";
 
     private static String[] weeks = {"Sun", "Mon","Tue","Wed","Thu","Fri","Sat"};
+    private static final ThreadLocal<SimpleDateFormat> tlFormat = new ThreadLocal<>();
 
-    @SuppressWarnings("CanBeFinal")
-    private static SimpleDateFormat format;
-
-    static {
-        if (format == null) {
-            synchronized (DateUtil.class) {
-                if (format == null) {
-                    format = new SimpleDateFormat(pattern6, Locale.CHINA);
-                }
-            }
+    public static SimpleDateFormat getSimpleDateFormat() {
+        if (null == tlFormat.get()) {
+            tlFormat.set(new SimpleDateFormat(pattern6, Locale.CHINA));
         }
+        return tlFormat.get();
     }
 
     public static String format(String time, String parsePattern, String pattern) {
         try {
+            SimpleDateFormat format = getSimpleDateFormat();
             format.applyPattern(parsePattern);
             Date parse = format.parse(time);
             TimeZone timeZone = TimeZone.getDefault();
@@ -83,6 +79,7 @@ public class DateUtil {
     }
 
     public static String format(long time, String pattern) {
+        SimpleDateFormat format = getSimpleDateFormat();
         format.applyPattern(pattern);
         TimeZone timeZone = TimeZone.getDefault();
         format.setTimeZone(timeZone);
@@ -126,6 +123,7 @@ public class DateUtil {
         timeSeconds = timeSeconds * 1000;
         Date date = new Date(timeSeconds);
         TimeZone timeZone = TimeZone.getDefault();
+        SimpleDateFormat format = getSimpleDateFormat();
         format.setTimeZone(timeZone);
 
         format.applyPattern(pattern);
@@ -180,6 +178,7 @@ public class DateUtil {
     @SuppressWarnings("SameParameterValue")
     private static long getLong(String time, String pattern) {
         try {
+            SimpleDateFormat format = getSimpleDateFormat();
             format.applyPattern(pattern);
             TimeZone timeZone = TimeZone.getDefault();
             format.setTimeZone(timeZone);
@@ -237,6 +236,7 @@ public class DateUtil {
 
     public static String formatUTCTime(String formerTime) {
         try {
+            SimpleDateFormat format = getSimpleDateFormat();
             SimpleDateFormat temFormat = (SimpleDateFormat) format.clone();
             temFormat.applyPattern(pattern6);
             temFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -317,6 +317,7 @@ public class DateUtil {
      * @return
      */
     public static int getTodayLastSeconds(){
+        SimpleDateFormat format = getSimpleDateFormat();
         format.applyPattern(pattern4);
         TimeZone timeZone = TimeZone.getDefault();
         format.setTimeZone(timeZone);
@@ -346,6 +347,7 @@ public class DateUtil {
             // tomorrow
             calendar.add(Calendar.DATE, 1);
         }
+        SimpleDateFormat format = getSimpleDateFormat();
         format.applyPattern(pattern4);
         TimeZone timeZone = TimeZone.getDefault();
         format.setTimeZone(timeZone);
@@ -383,6 +385,7 @@ public class DateUtil {
     public static long getPastTime(int pastSecond){
         Date date = new Date();
         try {
+            SimpleDateFormat format = getSimpleDateFormat();
             format.applyPattern(pattern6);
             format.format(date);
 
@@ -413,6 +416,7 @@ public class DateUtil {
     public static int getHourOfDay(long time) {
         try {
             Date date = new Date(time);
+            SimpleDateFormat format = getSimpleDateFormat();
             format.applyPattern(pattern6);
             format.format(date);
 
