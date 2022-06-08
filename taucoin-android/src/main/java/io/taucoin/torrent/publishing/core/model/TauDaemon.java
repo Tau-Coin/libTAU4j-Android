@@ -217,6 +217,11 @@ public abstract class TauDaemon {
         if (isRunning)
             return;
 
+        boolean enableDebugLog = true;
+        if (!BuildConfig.DEBUG) {
+            enableDebugLog = settingsRepo.getBooleanValue(appContext.getString(R.string.pref_key_log_enable),
+                    false);
+        }
         // 设置SessionManager启动参数
         SessionParams sessionParams = SessionSettings.getSessionParamsBuilder()
                 .setAccountSeed(seed)
@@ -226,7 +231,7 @@ public abstract class TauDaemon {
                 .setDhtNonReferable(true)
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)
-                .enableDebugLog(BuildConfig.DEBUG)
+                .enableDebugLog(enableDebugLog)
                 .build();
         sessionManager.start(sessionParams);
     }
@@ -639,6 +644,15 @@ public abstract class TauDaemon {
         return false;
     }
 
+    /**
+     * 启用debug日志
+     */
+    public void enableDebugLog(boolean enable) {
+        if (isRunning) {
+            sessionManager.enableDebugLog(enable);
+        }
+        logger.debug("enableDebugLog enable::{}, isRunning::{}", enable, isRunning);
+    }
 
     /**
      * crash测试

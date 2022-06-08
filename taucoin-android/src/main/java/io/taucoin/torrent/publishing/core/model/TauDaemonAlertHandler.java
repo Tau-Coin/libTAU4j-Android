@@ -22,7 +22,6 @@ import org.libTAU4j.alerts.BlockChainSyncingBlockAlert;
 import org.libTAU4j.alerts.BlockChainSyncingHeadBlockAlert;
 import org.libTAU4j.alerts.BlockChainTopThreeVotesAlert;
 import org.libTAU4j.alerts.BlockChainTxArrivedAlert;
-import org.libTAU4j.alerts.BlockChainTxConfirmAlert;
 import org.libTAU4j.alerts.BlockChainTxSentAlert;
 import org.libTAU4j.alerts.CommConfirmRootAlert;
 import org.libTAU4j.alerts.CommFriendInfoAlert;
@@ -153,7 +152,7 @@ class TauDaemonAlertHandler {
                 onTxArrived(alert);
                 break;
             default:
-                logger.info("Unknown alert");
+                logger.warn("Unknown alert");
                 break;
         }
     }

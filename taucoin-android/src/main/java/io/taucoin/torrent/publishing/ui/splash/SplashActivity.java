@@ -13,16 +13,19 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.log.LogConfigurator;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.PermissionUtils;
+import io.taucoin.torrent.publishing.databinding.ActivitySplashBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.crash.CrashViewModel;
 import io.taucoin.torrent.publishing.ui.customviews.permission.EasyPermissions;
@@ -53,7 +56,8 @@ public class SplashActivity extends BaseActivity {
             ActivityUtil.fullScreenAll(this);
             logger.info("SplashActivity show");
             // Open for the first time
-            setContentView(R.layout.activity_splash);
+            ActivitySplashBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
+            binding.appTitle.setText(BuildConfig.SPLASH_APP_NAME);
 
             ViewModelProvider provider = new ViewModelProvider(this);
             crashViewModel = provider.get(CrashViewModel.class);

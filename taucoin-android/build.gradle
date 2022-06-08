@@ -9,6 +9,7 @@ android {
         targetSdkVersion 28
         versionCode 12
         versionName "1.6.5"
+        flavorDimensions("default")
 
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -50,14 +51,14 @@ android {
         release {
             minifyEnabled false
             shrinkResources false
-            zipAlignEnabled false
+            zipAlignEnabled true
             signingConfig signingConfigs.myConfig
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
         debug {
             minifyEnabled false
-            minifyEnabled false
+            shrinkResources false
             zipAlignEnabled true
             signingConfig signingConfigs.myConfig
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -90,6 +91,29 @@ android {
             force 'com.google.code.findbugs:jsr305:2.0.1'
             force "androidx.camera:camera-camera2:1.0.2"
             force 'androidx.camera:camera-core:1.0.2'
+        }
+    }
+
+    productFlavors {
+        develop {
+            buildConfigField "String", "SPLASH_APP_NAME", "\"TAU App Develop\""     // 启动页文案
+            buildConfigField "Integer", "ENABLE_RELEASE_LOG_LEVEL", "5000"          // Level.TRACE
+            buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://6e6170b970bae896803ecb1051653" +
+                    "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:7882\""
+        }
+
+        beta {
+            buildConfigField "String", "SPLASH_APP_NAME", "\"TAU App Beta\""        // 启动页文案
+            buildConfigField "Integer", "ENABLE_RELEASE_LOG_LEVEL", "10000"         // Level.DEBUG
+            buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://83024767468B8BF8DB868F336596C" +
+                    "63561265D553833E5C0BF3E4767659B826B@13.229.53.249:6882\""
+        }
+
+        official {
+            buildConfigField "String", "SPLASH_APP_NAME", "\"TAU App\""             // 启动页文案
+            buildConfigField "Integer", "ENABLE_RELEASE_LOG_LEVEL", "20000"         // Level.INFO
+            buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://83024767468B8BF8DB868F336596C" +
+                    "63561265D553833E5C0BF3E4767659B826B@13.229.53.249:6882\""
         }
     }
 }

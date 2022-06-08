@@ -32,7 +32,7 @@
             android:includeFontPadding="false"
             android:layout_marginStart="@dimen/widget_size_20"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_marginTop="@dimen/widget_size_7"
             android:singleLine="true"
             android:ellipsize="middle"
             android:textColor="@color/gray_dark"

@@ -1,48 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/widget_size_100"
-    android:background="@color/color_white">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageView
-        android:layout_above="@+id/app_title"
-        android:id="@+id/iv_logo"
-        android:layout_width="@dimen/widget_size_160"
-        android:layout_height="@dimen/widget_size_220"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:contentDescription="@null"
-        android:src="@mipmap/icon_logo_orange" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/widget_size_100"
+        android:background="@color/color_white">
 
-    <TextView
-        android:visibility="visible"
-        android:id="@+id/app_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:textSize="@dimen/splash_size_alpha"
-        android:textStyle="bold"
-        android:gravity="center_horizontal"
-        android:textColor="@color/primary_dark"
-        android:textAppearance="@style/TextAppearanceBody1"
-        android:text="@string/app_name_alpha" />
+        <ImageView
+            android:layout_above="@+id/app_title"
+            android:id="@+id/iv_logo"
+            android:layout_width="@dimen/widget_size_160"
+            android:layout_height="@dimen/widget_size_220"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@null"
+            android:src="@mipmap/icon_logo_orange" />
 
-    <TextView
-        android:layout_below="@+id/app_title"
-        android:visibility="visible"
-        android:id="@+id/app_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/widget_size_15"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:lineSpacingExtra="@dimen/widget_size_5"
-        android:textSize="@dimen/widget_size_16"
-        android:textStyle="bold"
-        android:gravity="center_horizontal|bottom"
-        android:textColor="@color/primary_dark"
-        android:textAppearance="@style/TextAppearanceBody2"
-        android:text="@string/app_name_alpha_description" />
-</RelativeLayout>
+        <TextView
+            android:visibility="visible"
+            android:id="@+id/app_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/splash_size_alpha"
+            android:textStyle="bold"
+            android:gravity="center_horizontal"
+            android:textColor="@color/primary_dark"
+            android:textAppearance="@style/TextAppearanceBody1"
+            android:text="@string/app_name_alpha" />
+
+        <TextView
+            android:layout_below="@+id/app_title"
+            android:visibility="visible"
+            android:id="@+id/app_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_15"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:lineSpacingExtra="@dimen/widget_size_5"
+            android:textSize="@dimen/widget_size_16"
+            android:textStyle="bold"
+            android:gravity="center_horizontal|bottom"
+            android:textColor="@color/primary_dark"
+            android:textAppearance="@style/TextAppearanceBody2"
+            android:text="@string/app_name_alpha_description" />
+    </RelativeLayout>
+
+</layout>
