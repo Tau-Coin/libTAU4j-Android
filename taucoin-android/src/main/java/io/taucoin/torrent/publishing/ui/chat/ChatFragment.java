@@ -123,7 +123,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             boolean isEmpty = StringUtil.isEmpty(s);
             binding.tvSend.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
-            if (BuildConfig.DEBUG) {
+            if (BuildConfig.DEBUG || BuildConfig.DISPLAY_DEBUG_VIEW) {
                 binding.ivAdd.setVisibility(!isEmpty ? View.GONE : View.VISIBLE);
             }
         }
@@ -144,7 +144,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             activity.goBack();
         });
         binding.toolbarInclude.ivAction.setVisibility(View.INVISIBLE);
-        binding.ivAdd.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+        binding.ivAdd.setVisibility(BuildConfig.DEBUG || BuildConfig.DISPLAY_DEBUG_VIEW ? View.VISIBLE : View.GONE);
         binding.etMessage.addTextChangedListener(textWatcher);
         binding.etMessage.setOnFocusChangeListener((v, hasFocus) -> {
             showOrHideChatAddView(false);
