@@ -116,12 +116,12 @@ class SessionSettings {
         }
 
         /**
-         * set dht ping interval
-         * @param enable shi
+         * set log level
+         * @param level 日志level
          */
-        SessionParamsBuilder enableDebugLog(boolean enable) {
-            logger.debug("enableDebugLog::{}", enable);
-            sp.set_bool(settings_pack.bool_types.enable_debug_log.swigValue(), enable);
+        SessionParamsBuilder setLogLevel(int level) {
+            logger.debug("setLogLevel::{}", level);
+            sp.set_int(settings_pack.int_types.log_level.swigValue(), level);
             return this;
         }
 

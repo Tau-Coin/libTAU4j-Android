@@ -20,14 +20,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.log.LogConfigurator;
-import io.taucoin.torrent.publishing.core.model.TauDaemon;
-import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
-import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FileUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityJournalBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 
@@ -41,16 +37,12 @@ public class JournalActivity extends BaseActivity implements View.OnClickListene
     private ActivityJournalBinding binding;
     private JournalAdapter adapter;
     private JournalFileObserver fileObserver;
-    private SettingsRepository settingsRepo;
-    private TauDaemon tauDaemon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_journal);
         binding.setListener(this);
-        settingsRepo = RepositoryHelper.getSettingsRepository(getApplicationContext());
-        tauDaemon = TauDaemon.getInstance(getApplicationContext());
         initView();
         loadJournalData();
     }
@@ -82,31 +74,6 @@ public class JournalActivity extends BaseActivity implements View.OnClickListene
         if (!BuildConfig.DEBUG) {
             binding.llCpuStatistics.setVisibility(View.GONE);
             binding.lineCpuStatistics.setVisibility(View.GONE);
-
-            logEnable = settingsRepo.getBooleanValue(getString(R.string.pref_key_log_enable));
-            binding.journalSwitch.setChecked(logEnable);
-            enableDebugJournal(logEnable);
-            binding.journalSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                settingsRepo.setBooleanValue(getString(R.string.pref_key_log_enable), isChecked);
-                enableDebugJournal(isChecked);
-
-                tauDaemon.enableDebugLog(isChecked);
-                logger.debug("enableDebugJournal::{}", isChecked);
-                if (isChecked) {
-                    LogConfigurator.setLogLevel(isChecked);
-                }
-            });
-        }
-    }
-
-    /**
-     * 启用测试日志
-     */
-    private void enableDebugJournal(boolean enable) {
-        this.logEnable = enable;
-        if (logEnable) {
-            binding.journalSwitch.setVisibility(View.VISIBLE);
-            binding.llJournal.setEnabled(false);
         }
     }
 
@@ -157,41 +124,8 @@ public class JournalActivity extends BaseActivity implements View.OnClickListene
             case R.id.ll_peers_invoked:
                 ActivityUtil.startActivity(this, PeersAndInvokedActivity.class);
                 break;
-            case R.id.ll_journal:
-                enableDebugLog();
-                break;
             default:
                 break;
-        }
-    }
-
-    private long lastClickTime = 0;
-    private int clickTimes = 0;
-    private boolean logEnable = false;
-    private void enableDebugLog() {
-        if (!BuildConfig.DEBUG) {
-            if (logEnable) {
-                ToastUtils.showShortToast(R.string.journal_enabled);
-                return;
-            }
-            long currentTime = DateUtil.getMillisTime();
-            // 2次点击时间大于1s重新计数
-            if (currentTime - lastClickTime > 2000) {
-                clickTimes = 1;
-            } else {
-                clickTimes += 1;
-            }
-            lastClickTime = currentTime;
-            // You need 3 steps to enable debug Journal!
-            // You have enabled debug journal!
-            if (clickTimes >= 7) {
-                clickTimes = 0;
-                lastClickTime = 0;
-                ToastUtils.showShortToast(R.string.journal_enabled);
-                binding.journalSwitch.setChecked(true);
-            } else if (clickTimes > 2) {
-                ToastUtils.showShortToast(getString(R.string.journal_steps, 7 - clickTimes));
-            }
         }
     }
 

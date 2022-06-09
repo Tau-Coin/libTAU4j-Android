@@ -19,6 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.log.LogUtil;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.utils.FileUtil;
 import io.taucoin.torrent.publishing.core.utils.Formatter;
@@ -75,6 +76,10 @@ public class CrashViewModel extends AndroidViewModel {
             try {
                 File file = checkDumpFile();
                 if (file != null) {
+                    // 更新日志等级，保证下次再发生Crash时，可以收集相关日志
+                    LogUtil.increaseLogLevel();
+                    logger.debug("increase log level");
+                    // 上传日志文件
                     result.setExist(true);
                     result.setMsg(file.getAbsolutePath());
                     if (!isPromptUser) {

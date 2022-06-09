@@ -54,5 +54,4 @@
     <string name="pref_key_dump_file_timestamp" translatable="false">pref_key_dump_file_timestamp</string>
     <string name="pref_key_dump_times" translatable="false">pref_key_dump_times</string>
 
-    <string name="pref_key_log_enable" translatable="false">pref_key_log_enable</string>
 </resources>

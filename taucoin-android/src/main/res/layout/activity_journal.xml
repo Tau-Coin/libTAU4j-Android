@@ -164,38 +164,23 @@
             android:layout_marginEnd="@dimen/widget_size_20"/>
 
         <LinearLayout
-            android:id="@+id/ll_journal"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/color_white"
-            android:onClick="@{listener::onClick}"
             android:paddingStart="@dimen/widget_size_20"
             android:paddingEnd="@dimen/widget_size_20"
             android:paddingTop="@dimen/widget_size_10"
             android:paddingBottom="@dimen/widget_size_10">
 
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:text="@string/setting_journal_path"
-                    android:textAppearance="@style/TextAppearanceBody1" />
-
-                <Switch
-                    android:visibility="gone"
-                    android:id="@+id/journal_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="@string/setting_journal_path"
+                android:textAppearance="@style/TextAppearanceBody1" />
 
             <TextView
                 android:id="@+id/tv_journal_directory"

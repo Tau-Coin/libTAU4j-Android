@@ -34,9 +34,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.log.LogUtil;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -148,6 +148,8 @@ public abstract class TauDaemon {
                     updateChainsAndAccountInfo();
                     // 账户自动更新
                     accountAutoRenewal();
+                    // 防止Crash后重启 初始化来不及设置新的日志等级
+                    setLogLevel(LogUtil.getTauLogLevel());
                 }
             }
         });
@@ -217,11 +219,6 @@ public abstract class TauDaemon {
         if (isRunning)
             return;
 
-        boolean enableDebugLog = true;
-        if (!BuildConfig.DEBUG) {
-            enableDebugLog = settingsRepo.getBooleanValue(appContext.getString(R.string.pref_key_log_enable),
-                    false);
-        }
         // 设置SessionManager启动参数
         SessionParams sessionParams = SessionSettings.getSessionParamsBuilder()
                 .setAccountSeed(seed)
@@ -231,7 +228,7 @@ public abstract class TauDaemon {
                 .setDhtNonReferable(true)
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)
-                .enableDebugLog(enableDebugLog)
+                .setLogLevel(LogUtil.getTauLogLevel())
                 .build();
         sessionManager.start(sessionParams);
     }
@@ -645,13 +642,13 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 启用debug日志
+     * 设置日志等级
      */
-    public void enableDebugLog(boolean enable) {
+    public void setLogLevel(int level) {
         if (isRunning) {
-            sessionManager.enableDebugLog(enable);
+            sessionManager.setLogLevel(level);
         }
-        logger.debug("enableDebugLog enable::{}, isRunning::{}", enable, isRunning);
+        logger.debug("setLogLevel level::{}, isRunning::{}", level, isRunning);
     }
 
     /**
@@ -661,6 +658,7 @@ public abstract class TauDaemon {
         if (isRunning) {
             sessionManager.crashTest();
         }
+        logger.warn("crashTest isRunning::{}", isRunning);
     }
 
     /**
