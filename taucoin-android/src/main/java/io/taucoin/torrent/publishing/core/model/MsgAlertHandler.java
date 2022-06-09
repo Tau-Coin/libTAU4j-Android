@@ -87,7 +87,7 @@ class MsgAlertHandler {
             long receivedTime = daemon.getSessionTime();
 
             ChatMsg chatMsg = chatRepo.queryChatMsg(senderPk, hash);
-            logger.debug("TAU messaging onNewMessage senderPk::{}, receiverPk::{}, hash::{}, " +
+            logger.info("TAU messaging onNewMessage senderPk::{}, receiverPk::{}, hash::{}, " +
                             "SentTime::{}, ReceivedTime::{}, DelayTime::{}ms, exist::{}",
                     senderPk, receiverPk, hash,
                     DateUtil.format(sentTime, DateUtil.pattern9),
@@ -141,7 +141,7 @@ class MsgAlertHandler {
                     if (isSuccess) {
                         // 发送默认消息
                         String msg = appContext.getString(R.string.contacts_have_added);
-                        logger.debug("AddFriendsLocally, syncSendMessageTask userPk::{}, friendPk::{}, msg::{}",
+                        logger.info("AddFriendsLocally, syncSendMessageTask userPk::{}, friendPk::{}, msg::{}",
                                 userPk, friendPkStr, msg);
                         ChatViewModel.syncSendMessageTask(appContext, userPk, friendPkStr, msg, MessageType.TEXT.getType());
                         // 更新本地朋友关系
@@ -178,30 +178,30 @@ class MsgAlertHandler {
      * @param friendPk 接受airdrop的朋友
      */
     private void handleAirdropCoins(String chainID, String currentPk, String friendPk) {
-        logger.debug("handleAirdropCoins: yourself::{}, currentPk::{}, friendPk::{}, chainID::{}",
+        logger.info("handleAirdropCoins: yourself::{}, currentPk::{}, friendPk::{}, chainID::{}",
                 StringUtil.isEquals(currentPk, friendPk), currentPk, friendPk, chainID);
         if (StringUtil.isEquals(currentPk, friendPk)) {
            return;
         }
         Member member = memberRepo.getMemberByChainIDAndPk(chainID, currentPk);
         if (null == member) {
-            logger.debug("handleAirdropCoins: not a member of the community");
+            logger.info("handleAirdropCoins: not a member of the community");
             return;
         }
         if (member.airdropStatus != AirdropStatus.ON.getStatus()) {
             AirdropStatus status = AirdropStatus.valueOf(member.airdropStatus);
-            logger.debug("handleAirdropCoins: airdrop status::{}", status.getName());
+            logger.info("handleAirdropCoins: airdrop status::{}", status.getName());
             return;
         }
         // 一个朋友只能airdrop一次
         TxQueue txQueue = txQueueRepo.getAirdropTxQueue(chainID, currentPk, friendPk);
         if (txQueue != null) {
-            logger.debug("handleAirdropCoins: A peer can only be sent once!");
+            logger.info("handleAirdropCoins: A peer can only be sent once!");
             return;
         }
         long currentTime = member.airdropTime;
         int airdropCount = txQueueRepo.getAirdropCount(chainID, currentPk, currentTime);
-        logger.debug("handleAirdropCoins: airdrop progress::{}/{}", airdropCount, member.airdropMembers);
+        logger.info("handleAirdropCoins: airdrop progress::{}/{}", airdropCount, member.airdropMembers);
         // airdrop朋友数是否完成
         if (airdropCount >= member.airdropMembers) {
             return;
@@ -238,12 +238,12 @@ class MsgAlertHandler {
             String senderPk = msg != null ? msg.senderPk : null;
             String receiverPk = msg != null ? msg.receiverPk : null;
             if (StringUtil.isNotEquals(senderPk, userPk)) {
-                logger.debug("onMsgSync MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
+                logger.info("onMsgSync MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
                 return;
             }
             ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
                     ChatMsgStatus.SENT_INTERNET.getStatus());
-            logger.trace("onMsgSync MessageHash::{}, exist::{}", hash, msgLog != null);
+            logger.info("onMsgSync MessageHash::{}, exist::{}", hash, msgLog != null);
             if (null == msgLog) {
                 msgLog = new ChatMsgLog(hash, ChatMsgStatus.SENT_INTERNET.getStatus(),
                         timestamp.longValue());
@@ -269,12 +269,12 @@ class MsgAlertHandler {
             String senderPk = msg != null ? msg.senderPk : null;
             String receiverPk = msg != null ? msg.receiverPk : null;
             if (StringUtil.isNotEquals(senderPk, userPk)) {
-                logger.debug("onMsgArrived MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
+                logger.info("onMsgArrived MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
                 return;
             }
             ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
                     ChatMsgStatus.ARRIVED_SWARM.getStatus());
-            logger.trace("onMsgArrived MessageHash::{}, exist::{}", hash, msgLog != null);
+            logger.info("onMsgArrived MessageHash::{}, exist::{}", hash, msgLog != null);
             if (null == msgLog) {
                 msgLog = new ChatMsgLog(hash, ChatMsgStatus.ARRIVED_SWARM.getStatus(),
                         timestamp.longValue());
@@ -293,7 +293,7 @@ class MsgAlertHandler {
      */
     void onReadMessageRoot(List<byte[]> hashList, BigInteger timestamp, String userPk) {
         try {
-            logger.trace("onReadMessageRoot hashList.size::{}", hashList.size());
+            logger.info("onReadMessageRoot hashList.size::{}", hashList.size());
             for (byte[] root : hashList) {
                 String hash = ByteUtil.toHexString(root);
                 ChatMsg msg = chatRepo.queryChatMsg(hash);
@@ -305,7 +305,7 @@ class MsgAlertHandler {
                 }
                 ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
                         ChatMsgStatus.CONFIRMED.getStatus());
-                logger.trace("onReadMessageRoot MessageHash::{}, exist::{}", hash, msgLog != null);
+                logger.info("onReadMessageRoot MessageHash::{}, exist::{}", hash, msgLog != null);
                 if (null == msgLog) {
                     msgLog = new ChatMsgLog(hash, ChatMsgStatus.CONFIRMED.getStatus(),
                             timestamp.longValue());
@@ -342,7 +342,7 @@ class MsgAlertHandler {
             if (isSuccess) {
                 // 发送默认消息
                 String msg = appContext.getString(R.string.contacts_have_added);
-                logger.debug("AddFriendsLocally, syncSendMessageTask userPk::{}, friendPk::{}, msg::{}",
+                logger.info("AddFriendsLocally, syncSendMessageTask userPk::{}, friendPk::{}, msg::{}",
                         userPk, friendPk, msg);
                 ChatViewModel.syncSendMessageTask(appContext, userPk, friendPk, msg, MessageType.TEXT.getType());
                 // 更新本地朋友关系
@@ -384,7 +384,7 @@ class MsgAlertHandler {
      * @param userPk 当前用户的公钥
      */
     void addNewDeviceID(String deviceID, String userPk) {
-        logger.debug("addNewDeviceID userPk::{}, deviceID::{}",
+        logger.info("addNewDeviceID userPk::{}, deviceID::{}",
                 userPk, deviceID);
         if (StringUtil.isNotEmpty(deviceID) && StringUtil.isNotEmpty(userPk)) {
             Device device = new Device(userPk, deviceID, DateUtil.getTime());
@@ -409,7 +409,7 @@ class MsgAlertHandler {
         long updateNNTime = bean.getUpdateNNTime().longValue();
         long updateHPTime = bean.getUpdateHPTime().longValue();
         long updateLocationTime = bean.getUpdateLocationTime().longValue();
-        logger.debug("onFriendInfo userPk::{}, friendPk::{}, updaterNNTime::{}, nickname::{}, longitude::{}, latitude::{}," +
+        logger.info("onFriendInfo userPk::{}, friendPk::{}, updaterNNTime::{}, nickname::{}, longitude::{}, latitude::{}," +
                         " updateHPTime::{}, headPic.size::{}", userPk, friendPkStr, updateNNTime, nickname,
                 longitude, latitude, updateHPTime, headPic != null ? headPic.length : 0);
         User user = userRepo.getUserByPublicKey(friendPkStr);

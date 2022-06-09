@@ -334,7 +334,7 @@ public class ChatViewModel extends AndroidViewModel {
                     Message message = new Message(currentTime, ByteUtil.toByte(senderPk),
                             ByteUtil.toByte(friendPk), encryptedEncoded);
                     String hash = message.msgId();
-                    logger.debug("sendMessageTask newMsgHash::{}, contentType::{}, " +
+                    logger.info("sendMessageTask newMsgHash::{}, contentType::{}, " +
                                     "nonce::{}, rawLength::{}, encryptedEncoded::{}, " +
                                     "logicMsgHash::{}, millisTime::{}",
                             hash, type, nonce, content.length, encryptedEncoded.length,
@@ -435,9 +435,9 @@ public class ChatViewModel extends AndroidViewModel {
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
                 messages = chatRepo.getMessages(friendPk, pos, pageSize);
                 long getMessagesTime = System.currentTimeMillis();
-                logger.trace("loadMessagesData pos::{}, pageSize::{}, messages.size::{}",
+                logger.debug("loadMessagesData pos::{}, pageSize::{}, messages.size::{}",
                         pos, pageSize, messages.size());
-                logger.trace("loadMessagesData getMessagesTime::{}", getMessagesTime - startTime);
+                logger.debug("loadMessagesData getMessagesTime::{}", getMessagesTime - startTime);
                 Collections.reverse(messages);
                 for (ChatMsgAndLog msg : messages) {
                     if (msg.logs != null && msg.logs.size() > 0) {
@@ -445,7 +445,7 @@ public class ChatViewModel extends AndroidViewModel {
                     }
                 }
                 long endTime = System.currentTimeMillis();
-                logger.trace("loadMessagesData reverseTime Time::{}", endTime - getMessagesTime);
+                logger.debug("loadMessagesData reverseTime Time::{}", endTime - getMessagesTime);
             } catch (Exception e) {
                 logger.error("loadMessagesData error::", e);
             }

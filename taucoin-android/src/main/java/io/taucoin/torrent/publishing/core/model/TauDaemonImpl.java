@@ -53,9 +53,9 @@ public class TauDaemonImpl extends TauDaemon {
         this.seed = seed;
         // 更新用户登录的设备信息
         tauDaemonAlertHandler.addNewDeviceID(deviceID, seed);
-        logger.debug("updateUserDeviceInfo deviceID::{}", deviceID);
+        logger.info("updateUserDeviceInfo deviceID::{}", deviceID);
 
-        logger.debug("updateSeed ::{}", seed);
+        logger.info("updateSeed ::{}", seed);
         byte[] bytesSeed = ByteUtil.toByte(seed);
         if (isRunning) {
             // SessionManager Start()之后再更新，
@@ -189,7 +189,7 @@ public class TauDaemonImpl extends TauDaemon {
                     tauDaemonAlertHandler.handleAlertAndUser(alertAndUser);
                     long endTime = System.currentTimeMillis();
                     String alertType = alertAndUser.getAlert().type().name();
-                    logger.trace("alertQueue size::{}, alertType::{}, time cost::{}ms",
+                    logger.debug("alertQueue size::{}, alertType::{}, time cost::{}ms",
                             alertQueue.size(), alertType, endTime - startTime);
                 } catch (InterruptedException e) {
                     break;
@@ -237,7 +237,7 @@ public class TauDaemonImpl extends TauDaemon {
             String deviceID = DeviceUtils.getCustomDeviceID(appContext);
             FriendInfo friendInfo = new FriendInfo(deviceID, friend);
             byte[] encoded = friendInfo.getEncoded();
-            logger.debug("updateFriendInfo publicKey::{}, nickname::{}, longitude::{}, " +
+            logger.info("updateFriendInfo publicKey::{}, nickname::{}, longitude::{}, " +
                             "latitude::{}, isSuccess::{}, encoded.length::{}",
                     friend.publicKey, friend.nickname, friend.longitude,
                     friend.latitude, isSuccess, encoded.length);
@@ -255,7 +255,7 @@ public class TauDaemonImpl extends TauDaemon {
         boolean isSuccess = false;
         if (isRunning) {
             isSuccess = sessionManager.addNewFriend(friendPk);
-            logger.debug("addNewFriend friendPk::{}, isSuccess::{}", friendPk, isSuccess);
+            logger.info("addNewFriend friendPk::{}, isSuccess::{}", friendPk, isSuccess);
         }
         return isSuccess;
     }
@@ -270,7 +270,7 @@ public class TauDaemonImpl extends TauDaemon {
         if (isRunning) {
             isSuccess = sessionManager.deleteFriend(friendPk);
         }
-        logger.debug("deleteFriend friendPk::{}, isSuccess::{}", friendPk, isSuccess);
+        logger.info("deleteFriend friendPk::{}, isSuccess::{}", friendPk, isSuccess);
         return isSuccess;
     }
 
@@ -283,7 +283,7 @@ public class TauDaemonImpl extends TauDaemon {
         boolean isSuccess = false;
         if (isRunning) {
             isSuccess = sessionManager.updateFriendInfo(friendPk, friendInfo);
-            logger.debug("updateFriendInfo friendPk::{}, isSuccess::{}", friendPk, isSuccess);
+            logger.info("updateFriendInfo friendPk::{}, isSuccess::{}", friendPk, isSuccess);
         }
         return isSuccess;
     }
@@ -295,7 +295,7 @@ public class TauDaemonImpl extends TauDaemon {
     public boolean addNewMessage(Message msg) {
         if (isRunning) {
             boolean isAddSuccess = sessionManager.addNewMsg(msg);
-            logger.debug("addNewMessage success::{}", isAddSuccess);
+            logger.info("addNewMessage success::{}", isAddSuccess);
             return isAddSuccess;
         }
         return false;
@@ -311,7 +311,7 @@ public class TauDaemonImpl extends TauDaemon {
     public boolean createNewCommunity(byte[] chainID, Map<String, Account> accounts) {
         if (isRunning) {
             boolean isAddSuccess = sessionManager.createNewCommunity(chainID, accounts);
-            logger.debug("createNewCommunity success::{}", isAddSuccess);
+            logger.info("createNewCommunity success::{}", isAddSuccess);
             return isAddSuccess;
         }
         return false;
@@ -331,7 +331,7 @@ public class TauDaemonImpl extends TauDaemon {
             newChainID = ChainIDUtil.decode(chainID);
             logger.debug("createNewChainID String length::{}", newChainID.length());
         }
-        logger.debug("createNewChainID isRunning::{}, chainID::{}", isRunning, newChainID);
+        logger.info("createNewChainID isRunning::{}, chainID::{}", isRunning, newChainID);
         return newChainID;
     }
 
@@ -347,7 +347,7 @@ public class TauDaemonImpl extends TauDaemon {
         Account account = null;
         if (isRunning) {
             account = sessionManager.getAccountInfo(chainID, publicKey);
-            logger.debug("getAccountInfo balance::{}, power::{}, nonce::{}", account.getBalance(),
+            logger.info("getAccountInfo balance::{}, power::{}, nonce::{}", account.getBalance(),
                     account.getEffectivePower(), account.getNonce());
         }
         return account;
@@ -360,7 +360,7 @@ public class TauDaemonImpl extends TauDaemon {
     @Override
     public boolean submitTransaction(Transaction tx) {
         if (isRunning) {
-            logger.debug("submitTransaction txID::{}, nonce::{}", tx.getTxID().to_hex(), tx.getNonce());
+            logger.info("submitTransaction txID::{}, nonce::{}", tx.getTxID().to_hex(), tx.getNonce());
             return sessionManager.submitTransaction(tx);
         }
         return false;
@@ -377,7 +377,7 @@ public class TauDaemonImpl extends TauDaemon {
         if (isRunning) {
             success = sessionManager.followChain(ChainIDUtil.encode(chainID), peers);
         }
-        logger.debug("followChain chainID::{}, peers size::{}, success::{}, isRunning::{}", chainID,
+        logger.info("followChain chainID::{}, peers size::{}, success::{}, isRunning::{}", chainID,
                 peers.size(), success, isRunning);
         return success;
     }
@@ -392,7 +392,7 @@ public class TauDaemonImpl extends TauDaemon {
         if (isRunning) {
             success = sessionManager.unfollowChain(ChainIDUtil.encode(chainID));
         }
-        logger.debug("unfollowChain chainID::{}, success::{}, isRunning::{}", chainID, success, isRunning);
+        logger.info("unfollowChain chainID::{}, success::{}, isRunning::{}", chainID, success, isRunning);
         return success;
     }
 
@@ -409,7 +409,7 @@ public class TauDaemonImpl extends TauDaemon {
         if (isLocalTime) {
             time = DateUtil.getMillisTime();
         }
-        logger.debug("SessionTime::{}({}), isLocalTime::{}", DateUtil.format(time, DateUtil.pattern9),
+        logger.info("SessionTime::{}({}), isLocalTime::{}", DateUtil.format(time, DateUtil.pattern9),
                 time, isLocalTime);
         return time;
     }

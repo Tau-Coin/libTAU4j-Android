@@ -226,7 +226,7 @@ public class UserViewModel extends AndroidViewModel {
                     if (friends != null && friends.size() > 0) {
                         for (Friend friend : friends) {
                             boolean isSuccess = daemon.deleteFriend(friend.friendPK);
-                            logger.debug("importSeed deleteFriend::{}, isSuccess::{}, size::{}",
+                            logger.info("importSeed deleteFriend::{}, isSuccess::{}, size::{}",
                                     friend.friendPK, isSuccess, friends.size());
                         }
                     }
@@ -235,7 +235,7 @@ public class UserViewModel extends AndroidViewModel {
                     if (communities != null && communities.size() > 0) {
                         for (String chainID : communities) {
                             boolean isSuccess = daemon.unfollowChain(chainID);
-                            logger.debug("importSeed unfollowChain::{}, isSuccess::{}, size::{}",
+                            logger.info("importSeed unfollowChain::{}, isSuccess::{}, size::{}",
                                     chainID, isSuccess, communities.size());
                         }
                     }
@@ -243,7 +243,7 @@ public class UserViewModel extends AndroidViewModel {
                 byte[] seedBytes = ByteUtil.toByte(seed);
                 Pair<byte[], byte[]> keypair = Ed25519.createKeypair(seedBytes);
                 String publicKey = ByteUtil.toHexString(keypair.first);
-                logger.debug("importSeed publicKey::{}, size::{}", publicKey, publicKey.length());
+                logger.info("importSeed publicKey::{}, size::{}", publicKey, publicKey.length());
                 User newUser = userRepo.getUserByPublicKey(publicKey);
                 if (oldUser != null) {
                     userRepo.setCurrentUser(oldUser.publicKey, false);
@@ -285,7 +285,7 @@ public class UserViewModel extends AndroidViewModel {
                 if (friends != null && friends.size() > 0) {
                     for (FriendAndUser fau : friends) {
                         boolean isSuccess = daemon.updateFriendInfo(fau.user);
-                        logger.debug("importSeed updateFriendInfo::{}, isSuccess::{}, size::{}",
+                        logger.info("importSeed updateFriendInfo::{}, isSuccess::{}, size::{}",
                                 fau.friendPK, isSuccess, friends.size());
                     }
                 }
@@ -296,13 +296,13 @@ public class UserViewModel extends AndroidViewModel {
                         List<String> list = memRepo.queryCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT);
                         Set<String> peers = new HashSet<>(list);
                         boolean isSuccess = daemon.followChain(chainID, peers);
-                        logger.debug("importSeed followChain::{}, peers size::{}, isSuccess::{}, size::{}", chainID,
+                        logger.info("importSeed followChain::{}, peers size::{}, isSuccess::{}, size::{}", chainID,
                                 peers.size(), isSuccess, communities.size());
                     }
                 }
             } catch (Exception e){
                 result = getApplication().getString(R.string.user_seed_invalid);
-                logger.debug("import seed error::{}", result);
+                logger.warn("import seed error::{}", result);
             }
             emitter.onNext(result);
             emitter.onComplete();
@@ -618,7 +618,7 @@ public class UserViewModel extends AndroidViewModel {
                 long startTime = System.currentTimeMillis();
                 users = userRepo.getUsers(isAll, order, friendPk);
                 long getUsersTime = System.currentTimeMillis();
-                logger.trace("loadUsersList getUsers::{}ms, users.size::{}",
+                logger.debug("loadUsersList getUsers::{}ms, users.size::{}",
                         getUsersTime - startTime, users.size());
             } catch (Exception e) {
                 logger.error("loadUsersList error::", e);
@@ -680,12 +680,12 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     private Result addFriendTask(String publicKey, String nickname, String remark, AirdropUrl airdropUrl) {
-        logger.debug("AddFriendsLocally, publicKey::{}, nickname::{}", publicKey, nickname);
+        logger.info("AddFriendsLocally, publicKey::{}, nickname::{}", publicKey, nickname);
         Result result = new Result();
         result.setKey(publicKey);
         User user = userRepo.getUserByPublicKey(publicKey);
         if(null == user){
-            logger.debug("AddFriendsLocally, new user");
+            logger.info("AddFriendsLocally, new user");
             user = new User(publicKey);
             if (StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
@@ -696,7 +696,7 @@ public class UserViewModel extends AndroidViewModel {
             }
             userRepo.addUser(user);
         } else {
-            logger.debug("AddFriendsLocally, user exist");
+            logger.info("AddFriendsLocally, user exist");
             boolean isUpdate = false;
             if (StringUtil.isEmpty(user.nickname) && StringUtil.isNotEmpty(nickname)) {
                 user.nickname = nickname;
@@ -716,7 +716,7 @@ public class UserViewModel extends AndroidViewModel {
 
         // 更新libTAU朋友信息
         boolean isSuccess = daemon.updateFriendInfo(user);
-        logger.debug("AddFriendsLocally, libTAU updateFriendInfo success::{}", isSuccess);
+        logger.info("AddFriendsLocally, libTAU updateFriendInfo success::{}", isSuccess);
         boolean isExist = false;
         if (null == friend) {
             // 添加朋友
@@ -731,7 +731,7 @@ public class UserViewModel extends AndroidViewModel {
                 daemon.requestFriendInfo(publicKey);
             } else {
                 result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));
-                logger.debug("AddFriendsLocally, {}", result.getMsg());
+                logger.info("AddFriendsLocally, {}", result.getMsg());
             }
         } else {
             // 防止与libTAU第一次不通，造成的数据异常
@@ -747,12 +747,12 @@ public class UserViewModel extends AndroidViewModel {
                     daemon.requestFriendInfo(publicKey);
                 } else {
                     result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));
-                    logger.debug("AddFriendsLocally, {}", result.getMsg());
+                    logger.info("AddFriendsLocally, {}", result.getMsg());
                 }
             } else {
                 isExist = true;
                 result.setMsg(getApplication().getString(R.string.contacts_friend_already_exists));
-                logger.debug("AddFriendsLocally, {}", result.getMsg());
+                logger.info("AddFriendsLocally, {}", result.getMsg());
                 if (airdropUrl != null) {
                     // 发送接受airdrop消息
                     sendDefaultMessage(publicKey, airdropUrl);
@@ -782,7 +782,7 @@ public class UserViewModel extends AndroidViewModel {
             String link = airdropUrl.getAirdropUrl();
             chatViewModel.syncSendMessageTask(senderPk, friendPk, link, MessageType.TEXT.getType(), null);
         }
-        logger.debug("AddFriendsLocally, syncSendMessageTask::{}", msg);
+        logger.info("AddFriendsLocally, syncSendMessageTask::{}", msg);
     }
 
     /**
@@ -1011,7 +1011,7 @@ public class UserViewModel extends AndroidViewModel {
                 settingsRepo.setBooleanValue(firstStartKey, false);
                 String showName = UsersUtil.getCurrentUserName(user);
                 String defaultName = UsersUtil.getDefaultName(user.publicKey);
-                logger.trace("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
+                logger.info("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
                 if (StringUtil.isEquals(showName, defaultName)) {
                     showEditNameDialog(activity, user.publicKey);
                 }

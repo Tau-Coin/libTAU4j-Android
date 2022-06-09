@@ -138,7 +138,7 @@ public class NetworkSetting {
         updateRunningTime();
         updateMeteredSpeedLimit();
         updateWiFiSpeedLimit();
-//        logger.trace("updateSpeed, CurrentSpeed::{}/s",
+//        logger.debug("updateSpeed, CurrentSpeed::{}/s",
 //                Formatter.formatFileSize(context, currentSpeed).toUpperCase());
     }
 
@@ -260,7 +260,7 @@ public class NetworkSetting {
         BigInteger bigLimit = BigInteger.valueOf(limit).multiply(bigUnit).multiply(bigUnit);
         BigInteger bigUsage = BigInteger.valueOf(usage);
 
-        logger.trace("updateSpeedLimit meteredLimit::{}, meteredUsage::{}, compareTo::{}",
+        logger.debug("updateSpeedLimit meteredLimit::{}, meteredUsage::{}, compareTo::{}",
                 bigLimit.longValue(), bigUsage, bigLimit.compareTo(bigUsage));
 
         // 今天剩余的秒数
@@ -295,7 +295,7 @@ public class NetworkSetting {
         BigInteger bigUnit = new BigInteger("1024");
         BigInteger bigLimit = BigInteger.valueOf(limit).multiply(bigUnit).multiply(bigUnit);
         BigInteger bigUsage = BigInteger.valueOf(usage);
-        logger.trace("updateSpeedLimit wifiLimit::{}, wifiUsage::{}, compareTo::{}",
+        logger.debug("updateSpeedLimit wifiLimit::{}, wifiUsage::{}, compareTo::{}",
                 bigLimit.longValue(), bigUsage, bigLimit.compareTo(bigUsage));
 
         // 今天剩余的秒数

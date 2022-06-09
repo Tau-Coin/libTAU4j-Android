@@ -240,7 +240,7 @@ public class CommunityViewModel extends AndroidViewModel {
                 if (null == community) {
                     // 链端follow community
                     success = daemon.followChain(chainID, peers);
-                    logger.debug("addCommunity chainID::{}, peers::{}, success::{}", chainID,
+                    logger.info("addCommunity chainID::{}, peers::{}, success::{}", chainID,
                             peers.size(), success);
                     if (success) {
                         community = new Community(chainID, communityName);
@@ -251,7 +251,7 @@ public class CommunityViewModel extends AndroidViewModel {
                     // 如果已经被banned
                     if (community.isBanned) {
                         success = daemon.followChain(chainID, peers);
-                        logger.debug("addCommunity isBanned::true, chainID::{}, peers::{}, success::{}",
+                        logger.info("addCommunity isBanned::true, chainID::{}, peers::{}, success::{}",
                                 chainID, peers.size(), success);
                         if (success) {
                             community.isBanned = false;
@@ -262,7 +262,7 @@ public class CommunityViewModel extends AndroidViewModel {
                         success = true;
                         // 没被banned未加入，判断是否join, 没join也需要follow
                         Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-                        logger.debug("addCommunity isBanned::false, chainID::{}, peers::{}, joined::{}",
+                        logger.info("addCommunity isBanned::false, chainID::{}, peers::{}, joined::{}",
                                 chainID, peers.size(), member != null);
                         if (null == member) {
                             daemon.followChain(chainID, peers);
@@ -372,7 +372,7 @@ public class CommunityViewModel extends AndroidViewModel {
             }
 
             communityRepo.addCommunity(community);
-            logger.debug("Add community to database: communityName={}, chainID={}",
+            logger.info("Add community to database: communityName={}, chainID={}",
                     community.communityName, community.chainID);
 
             Account account = daemon.getAccountInfo(chainID, currentUser.publicKey);
@@ -907,12 +907,12 @@ public class CommunityViewModel extends AndroidViewModel {
                 }
                 blocks = blockRepo.queryCommunityBlocks(chainID, pos, pageSize);
                 long getMessagesTime = System.currentTimeMillis();
-                logger.trace("loadBlocksData pos::{}, pageSize::{}, blocks.size::{}",
+                logger.debug("loadBlocksData pos::{}, pageSize::{}, blocks.size::{}",
                         pos, pageSize, blocks.size());
-                logger.trace("loadBlocksData getMessagesTime::{}", getMessagesTime - startTime);
+                logger.debug("loadBlocksData getMessagesTime::{}", getMessagesTime - startTime);
                 Collections.reverse(blocks);
                 long endTime = System.currentTimeMillis();
-                logger.trace("loadBlocksData reverseTime Time::{}", endTime - getMessagesTime);
+                logger.debug("loadBlocksData reverseTime Time::{}", endTime - getMessagesTime);
             } catch (Exception e) {
                 logger.error("loadBlocksData error::", e);
             }

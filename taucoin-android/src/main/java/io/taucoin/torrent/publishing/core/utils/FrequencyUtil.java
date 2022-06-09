@@ -62,7 +62,7 @@ public class FrequencyUtil {
     public static void setMainLoopFrequency(float frequency) {
         Context context = MainApplication.getInstance();
         settingsRepo.setFloatValue(context.getString(R.string.pref_key_main_loop_frequency), frequency);
-        logger.trace("setMainLoopFrequency:: frequency::{}", frequency);
+        logger.debug("setMainLoopFrequency:: frequency::{}", frequency);
     }
 
     /**
@@ -71,7 +71,7 @@ public class FrequencyUtil {
     public static float getMainLoopFrequency() {
         Context context = MainApplication.getInstance();
         float frequency = settingsRepo.getFloatValue(context.getString(R.string.pref_key_main_loop_frequency), 0);
-        logger.trace("getMainLoopFrequency:: frequency::{}", frequency);
+        logger.debug("getMainLoopFrequency:: frequency::{}", frequency);
         return frequency;
     }
 
@@ -102,7 +102,7 @@ public class FrequencyUtil {
         Context context = MainApplication.getInstance();
         int frequency = settingsRepo.getIntValue(context.getString(R.string.pref_key_wifi_fixed_frequency),
                 Interval.FORE_DEFAULT_WIFI_FREQUENCY.getInterval());
-        logger.trace("getWifiFixedFrequency:: frequency::{}", frequency);
+        logger.debug("getWifiFixedFrequency:: frequency::{}", frequency);
         return frequency;
     }
 
@@ -112,7 +112,7 @@ public class FrequencyUtil {
     public static void setWifiFixedFrequency(int freq) {
         Context context = MainApplication.getInstance();
         settingsRepo.setIntValue(context.getString(R.string.pref_key_wifi_fixed_frequency), freq);
-        logger.trace("setWifiFixedFrequency:: freq::{}", freq);
+        logger.debug("setWifiFixedFrequency:: freq::{}", freq);
         if (!NetworkSetting.isMeteredNetwork()) {
             setMainLoopFrequency(freq);
         }
@@ -125,7 +125,7 @@ public class FrequencyUtil {
         Context context = MainApplication.getInstance();
         int frequency = settingsRepo.getIntValue(context.getString(R.string.pref_key_metered_fixed_frequency),
                 Interval.FORE_DEFAULT_METERED_FREQUENCY.getInterval());
-        logger.trace("getMeteredFixedFrequency:: frequency::{}", frequency);
+        logger.debug("getMeteredFixedFrequency:: frequency::{}", frequency);
         return frequency;
     }
 
@@ -135,7 +135,7 @@ public class FrequencyUtil {
     public static void setMeteredFixedFrequency(int freq) {
         Context context = MainApplication.getInstance();
         settingsRepo.setIntValue(context.getString(R.string.pref_key_metered_fixed_frequency), freq);
-        logger.trace("setMeteredFixedInterval:: freq::{}", freq);
+        logger.debug("setMeteredFixedInterval:: freq::{}", freq);
         if (NetworkSetting.isMeteredNetwork()) {
             setMainLoopFrequency(freq);
         }

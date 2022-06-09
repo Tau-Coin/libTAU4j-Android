@@ -151,7 +151,7 @@ public class TauListenHandler {
         updateTxQueue(block);
         // 每个账户自动更新周期，检测是否需要更新账户信息
         if (block.getBlockNumber() % Constants.AUTO_RENEWAL_PERIOD_BLOCKS == 0) {
-            logger.debug("accountAutoRenewal chainID::{}, block number::{}",
+            logger.info("accountAutoRenewal chainID::{}, block number::{}",
                     ChainIDUtil.decode(block.getChainID()), block.getBlockNumber());
             accountAutoRenewal();
         }
@@ -162,7 +162,7 @@ public class TauListenHandler {
      * @param block Block
      */
     void handleRollbackBlock(Block block) {
-        logger.debug("handleRollBack");
+        logger.info("handleRollBack");
         handleBlockData(block, BlockStatus.ROLL_BACK);
     }
 
@@ -171,7 +171,7 @@ public class TauListenHandler {
      * @param block Block
      */
     void handleSyncingBlock(Block block) {
-        logger.debug("handleSyncingBlock");
+        logger.info("handleSyncingBlock");
         handleBlockData(block, BlockStatus.SYNCING);
     }
 
@@ -180,7 +180,7 @@ public class TauListenHandler {
      * @param block Block
      */
     void handleSyncingHeadBlock(Block block) {
-        logger.debug("handleSyncingHeadBlock");
+        logger.info("handleSyncingHeadBlock");
         String chainID = ChainIDUtil.decode(block.getChainID());
         Community community = communityRepo.getCommunityByChainID(chainID);
         if (community != null) {
@@ -202,7 +202,7 @@ public class TauListenHandler {
      */
     protected void handleBlockData(Block block, BlockStatus status) {
         String chainID = ChainIDUtil.decode(block.getChainID());
-        logger.debug("handleBlockData:: chainID::{}，blockNum::{}, blockHash::{}", chainID,
+        logger.info("handleBlockData:: chainID::{}，blockNum::{}, blockHash::{}", chainID,
                 block.getBlockNumber(), block.Hash());
         // 更新区块信息
         saveBlockInfo(block, status);
@@ -284,7 +284,7 @@ public class TauListenHandler {
         String txID = txMsg.getTxID().to_hex();
         Tx tx = txRepo.getTxByTxID(txID);
         boolean isEmpty = isTransactionEmpty(txMsg);
-        logger.debug("handleTransactionData txID::{}, timestamp::{}, nonce::{}, exist::{}, transaction empty::{}", txID,
+        logger.info("handleTransactionData txID::{}, timestamp::{}, nonce::{}, exist::{}, transaction empty::{}", txID,
                 txMsg.getTimestamp(), txMsg.getNonce(), tx != null, isEmpty);
         if (!isEmpty) {
             // 处理用户信息
@@ -557,7 +557,7 @@ public class TauListenHandler {
         }
         String txID = txMsg.getTxID().to_hex();
         Tx tx = txRepo.getTxByTxID(txID);
-        logger.debug("handleNewTransaction txID::{}, timestamp::{}, nonce::{}, exist::{}, transaction empty::{}",
+        logger.info("handleNewTransaction txID::{}, timestamp::{}, nonce::{}, exist::{}, transaction empty::{}",
                 txID, txMsg.getTimestamp(), txMsg.getNonce(), tx != null, isTransactionEmpty(txMsg));
         if (null == tx) {
             handleUserInfo(txMsg);
@@ -648,7 +648,7 @@ public class TauListenHandler {
                         txFree = member.balance;
                     }
                     long amount = 0;
-                    logger.debug("accountAutoRenewal chainID::{}, publicKey::{} (balance::{}, " +
+                    logger.info("accountAutoRenewal chainID::{}, publicKey::{} (balance::{}, " +
                                     "amount::{}, fee::{}), medianTxFree::{}",
                             member.chainID, member.publicKey, FmtMicrometer.fmtBalance(member.balance),
                             FmtMicrometer.fmtBalance(amount), FmtMicrometer.fmtFeeValue(txFree),
@@ -661,14 +661,14 @@ public class TauListenHandler {
                         txQueueRepo.addQueue(tx);
                         ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.INSERT);
                         daemon.updateTxQueue(tx.chainID);
-                        logger.debug("accountAutoRenewal updateTxQueue");
+                        logger.info("accountAutoRenewal updateTxQueue");
                     } else {
                         txQueue.amount = amount;
                         txQueue.fee = txFree;
                         txQueueRepo.updateQueue(txQueue);
                         ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.UPDATE);
                         daemon.updateTxQueue(txQueue.chainID);
-                        logger.debug("accountAutoRenewal resendTxQueue txFree::{}", txFree);
+                        logger.info("accountAutoRenewal resendTxQueue txFree::{}", txFree);
                     }
                 }
             }
@@ -697,7 +697,7 @@ public class TauListenHandler {
                     memberRepo.updateMember(member);
                 }
             }
-            logger.debug("onAccountState chainID::{}, userPk::{}, newBalance::{}, balance::{}, blockNumber::{}",
+            logger.info("onAccountState chainID::{}, userPk::{}, newBalance::{}, balance::{}, blockNumber::{}",
                     chainID, userPk, account.getBalance(), member.balance, member.blockNumber);
         }
     }
@@ -709,7 +709,7 @@ public class TauListenHandler {
     void onTxSent(byte[] txHash) {
         String hash = ByteUtil.toHexString(txHash);
         TxLog log = txRepo.getTxLog(hash, TxLogStatus.SENT_INTERNET.getStatus());
-        logger.trace("onTxSent txID::{}, exist::{}", hash, log != null);
+        logger.info("onTxSent txID::{}, exist::{}", hash, log != null);
         if (null == log) {
             log = new TxLog(hash, TxLogStatus.SENT_INTERNET.getStatus(), DateUtil.getMillisTime());
             txRepo.addTxLog(log);
@@ -723,7 +723,7 @@ public class TauListenHandler {
     void onTxArrived(byte[] txHash) {
         String hash = ByteUtil.toHexString(txHash);
         TxLog log = txRepo.getTxLog(hash, TxLogStatus.ARRIVED_SWARM.getStatus());
-        logger.trace("onTxArrived txID::{}, exist::{}", hash, log != null);
+        logger.info("onTxArrived txID::{}, exist::{}", hash, log != null);
         if (null == log) {
             log = new TxLog(hash, TxLogStatus.ARRIVED_SWARM.getStatus(), DateUtil.getMillisTime());
             txRepo.addTxLog(log);

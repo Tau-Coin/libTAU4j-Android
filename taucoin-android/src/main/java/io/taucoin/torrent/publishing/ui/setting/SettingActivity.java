@@ -114,7 +114,7 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
         if (null == user) {
             return;
         }
-        logger.debug("updateUserInfo::{}", user.nickname);
+        logger.info("updateUserInfo::{}", user.nickname);
         binding.tvPublicKey.setText(UsersUtil.getMidHideName(user.publicKey));
         String userName = UsersUtil.getCurrentUserName(user);
         binding.tvUsername.setText(userName);

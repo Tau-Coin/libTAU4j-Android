@@ -69,7 +69,7 @@ public class HashImageView extends RoundImageView {
                 isLoadSuccess = true;
                 disposable.dispose();
             }
-            logger.trace("showImage imageHash::{}, loadBitmapNum::{}", imageHash, loadBitmapNum);
+            logger.debug("showImage imageHash::{}, loadBitmapNum::{}", imageHash, loadBitmapNum);
         } else {
             setImageResource(R.mipmap.icon_image_loading);
         }

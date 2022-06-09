@@ -312,13 +312,13 @@ class TauDaemonAlertHandler {
      * @param alert libTAU上报
      */
     void handleLogAlert(Alert<?> alert) {
-//        if (logger.isInfoEnabled()) {
-//            logger.info("{}: {}", alert.type().name(), alert.message());
-//        } else if (logger.isWarnEnabled()) {
-//            logger.warn("{}: {}", alert.type().name(), alert.message());
-//        } else {
-//            logger.error("{}: {}", alert.type().name(), alert.message());
-//        }
+        if (logger.isInfoEnabled()) {
+            logger.info("{}: {}", alert.type().name(), alert.message());
+        } else if (logger.isWarnEnabled()) {
+            logger.warn("{}: {}", alert.type().name(), alert.message());
+        } else {
+            logger.error("{}: {}", alert.type().name(), alert.message());
+        }
     }
 
     /**

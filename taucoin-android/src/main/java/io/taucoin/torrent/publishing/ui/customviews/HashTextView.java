@@ -67,7 +67,7 @@ public class HashTextView extends TextView {
         }
         if (isLoadSuccess && content != null
                 && Arrays.equals(this.content, content)) {
-            logger.trace("showTextContent isLoadSuccess::{}, isEquals::{}::", isLoadSuccess,
+            logger.debug("showTextContent isLoadSuccess::{}, isEquals::{}::", isLoadSuccess,
                     Arrays.equals(this.content, content));
             return;
         }
@@ -87,7 +87,7 @@ public class HashTextView extends TextView {
                 long decryptTime = System.currentTimeMillis() - startTime;
                 String rawContentLog = rawContentStr.length() > 50 ?
                         rawContentStr.substring(0, 10) : rawContentStr;
-                logger.trace("showTextContent decryptTime::{}, keyExchangeTime::{}, rawContent::{}",
+                logger.debug("showTextContent decryptTime::{}, keyExchangeTime::{}, rawContent::{}",
                         decryptTime, keyExchangeTime, rawContentLog);
                 emitter.onNext(rawContentStr);
             } catch (Exception e) {

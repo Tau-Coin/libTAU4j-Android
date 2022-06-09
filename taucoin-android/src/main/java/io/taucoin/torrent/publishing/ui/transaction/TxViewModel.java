@@ -188,14 +188,14 @@ public class TxViewModel extends AndroidViewModel {
         if (null == oldTx) {
             long queueID = txQueueRepo.addQueue(tx);
             tx.queueID = queueID;
-            logger.debug("addTransactionTask insert queueID::{}", queueID);
+            logger.info("addTransactionTask insert queueID::{}", queueID);
             daemon.sendTxQueue(tx, pinnedTime);
             ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.INSERT);
             daemon.updateTxQueue(tx.chainID);
         } else {
             // 重发交易队列
             txQueueRepo.updateQueue(tx);
-            logger.debug("addTransactionTask update queueID::{}", tx.queueID);
+            logger.info("addTransactionTask update queueID::{}", tx.queueID);
             daemon.sendTxQueue(tx, 0);
             // 只有转账金额或者备注被修改，才会通知对方
             ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.UPDATE);
@@ -284,7 +284,7 @@ public class TxViewModel extends AndroidViewModel {
                         tx.nonce, tx.amount, tx.fee, txEncoded);
             }
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
-            logger.debug("createTransaction txID::{}, limit::{}, transaction::{}",
+            logger.info("createTransaction txID::{}, limit::{}, transaction::{}",
                     transaction.getTxID().to_hex(), Constants.TX_MAX_BYTE_SIZE, transaction.Size());
             // 判断交易大小是否超出限制
             if (transaction.Size() > Constants.TX_MAX_BYTE_SIZE) {
@@ -302,7 +302,7 @@ public class TxViewModel extends AndroidViewModel {
                 tx.timestamp = timestamp;
                 tx.senderPk = currentUser.publicKey;
                 txRepo.addTransaction(tx);
-                logger.debug("createTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
+                logger.info("createTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
                         tx.txID, tx.senderPk, tx.receiverPk, tx.memo);
                 addUserInfoToLocal(tx, userRepo);
                 addMemberInfoToLocal(tx, memberRepo);
@@ -312,7 +312,7 @@ public class TxViewModel extends AndroidViewModel {
                 txRepo.addTxLog(log);
             } else {
                 String txID = transaction.getTxID().to_hex();
-                logger.debug("resendTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
+                logger.info("resendTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
                         txID, tx.senderPk, tx.receiverPk, tx.memo);
                 TxLog log = txRepo.getTxLog(txID, TxLogStatus.SENT.getStatus());
                 if (null == log) {
@@ -322,7 +322,7 @@ public class TxViewModel extends AndroidViewModel {
             }
         } catch (Exception e) {
             result = e.getMessage();
-            logger.debug("Error adding transaction::{}", result);
+            logger.warn("Error adding transaction::{}", result);
         }
         return result;
     }
@@ -381,7 +381,7 @@ public class TxViewModel extends AndroidViewModel {
         Transaction transaction = new Transaction(chainIDBytes, 0, timestamp, senderPk, receiverPk,
                 nonce, tx.amount, tx.fee, tx.content);
         transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
-        logger.debug("createTransaction txID::{}, limit::{}, transaction::{}",
+        logger.info("createTransaction txID::{}, limit::{}, transaction::{}",
                 transaction.getTxID().to_hex(), Constants.TX_MAX_BYTE_SIZE, transaction.Size());
         // 判断交易大小是否超出限制
         if (transaction.Size() > Constants.TX_MAX_BYTE_SIZE) {
@@ -549,7 +549,7 @@ public class TxViewModel extends AndroidViewModel {
                     Set<String> friends = friendPks.keySet();
                     for (String friend : friends) {
                         String amount = friendPks.get(friend);
-                        logger.debug("airdropToFriends chainID::{}, friend::{}, amount::{}, fee::{}",
+                        logger.info("airdropToFriends chainID::{}, friend::{}, amount::{}, fee::{}",
                                 chainID, friend, amount, fee);
                         String airdropResult = addMembers(chainID, senderPk, friend,
                                 FmtMicrometer.fmtTxLongValue(amount),
@@ -609,9 +609,9 @@ public class TxViewModel extends AndroidViewModel {
                     txs = txRepo.loadAllNotesData(chainID, pos, pageSize);
                 }
                 long getMessagesTime = System.currentTimeMillis();
-                logger.trace("loadNotesData onChain::{}, pos::{}, pageSize::{}, messages.size::{}",
+                logger.debug("loadNotesData onChain::{}, pos::{}, pageSize::{}, messages.size::{}",
                         onChain, pos, pageSize, txs.size());
-                logger.trace("loadNotesData getMessagesTime::{}", getMessagesTime - startTime);
+                logger.debug("loadNotesData getMessagesTime::{}", getMessagesTime - startTime);
                 Collections.reverse(txs);
 
                 for (UserAndTx tx : txs) {
@@ -658,7 +658,7 @@ public class TxViewModel extends AndroidViewModel {
                 } else {
                     txs = txRepo.loadAllMarketData(chainID, pos, pageSize);
                 }
-                logger.trace("loadMarketData filterItem::{}, pos::{}, pageSize::{}, messages.size::{}",
+                logger.debug("loadMarketData filterItem::{}, pos::{}, pageSize::{}, messages.size::{}",
                         application.getString(filterItem), pos, pageSize, txs.size());
                 Collections.reverse(txs);
             } catch (Exception e) {
@@ -691,7 +691,7 @@ public class TxViewModel extends AndroidViewModel {
                     pageSize = initSize;
                 }
                 txs = txRepo.loadChainTxsData(chainID, pos, pageSize);
-                logger.trace("loadChainTxsData, pos::{}, pageSize::{}, messages.size::{}",
+                logger.debug("loadChainTxsData, pos::{}, pageSize::{}, messages.size::{}",
                         pos, pageSize, txs.size());
                 Collections.reverse(txs);
             } catch (Exception e) {
@@ -720,7 +720,7 @@ public class TxViewModel extends AndroidViewModel {
             List<UserAndTx> txs = new ArrayList<>();
             try {
                 txs = txRepo.queryCommunityPinnedTxs(chainID, currentTab);
-                logger.trace("loadPinnedTxsData, currentTab::{}, messages.size::{}",
+                logger.debug("loadPinnedTxsData, currentTab::{}, messages.size::{}",
                         currentTab, txs.size());
             } catch (Exception e) {
                 logger.error("loadPinnedTxsData error::", e);
@@ -754,12 +754,12 @@ public class TxViewModel extends AndroidViewModel {
                 long startTime = System.currentTimeMillis();
                 trustTxs = txRepo.queryCommunityTrustTxs(chainID, trustPk, pos, pageSize);
                 long getMessagesTime = System.currentTimeMillis();
-                logger.trace("loadTrustTxsData pos::{}, pageSize::{}, messages.size::{}",
+                logger.debug("loadTrustTxsData pos::{}, pageSize::{}, messages.size::{}",
                         pos, pageSize, trustTxs.size());
-                logger.trace("loadTrustTxsData getMessagesTime::{}", getMessagesTime - startTime);
+                logger.debug("loadTrustTxsData getMessagesTime::{}", getMessagesTime - startTime);
                 Collections.reverse(trustTxs);
                 long endTime = System.currentTimeMillis();
-                logger.trace("loadTrustTxsData reverseTime Time::{}", endTime - getMessagesTime);
+                logger.debug("loadTrustTxsData reverseTime Time::{}", endTime - getMessagesTime);
             } catch (Exception e) {
                 logger.error("loadTrustTxsData error::", e);
             }

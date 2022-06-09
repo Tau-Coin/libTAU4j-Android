@@ -251,7 +251,7 @@ public class TauInfoProvider {
                         oldInvokedRequests = invokedRequests;
                         oldInvokedTime = currentInvokedTime;
                     }
-                    logger.debug("invokedRequests::{}, seconds::{}, requests::{}, sessionNodes::{}",
+                    logger.info("invokedRequests::{}, seconds::{}, requests::{}, sessionNodes::{}",
                             invokedRequests, timeSeconds, requests, sessionNodes);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

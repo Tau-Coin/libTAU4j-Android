@@ -137,7 +137,7 @@ public abstract class TauDaemon {
             @Override
             public void alert(Alert<?> alert) {
                 if (alert != null && alert.type() == AlertType.SES_START_OVER) {
-                    logger.debug("Tau start successfully");
+                    logger.info("Tau start successfully");
                     isRunning = true;
                     handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
                     // 防止第一次更新时，链端未启动成功，后面无法触发
@@ -362,7 +362,7 @@ public abstract class TauDaemon {
         } else {
             SystemServiceManager.getInstance().getNetworkAddress();
             sessionManager.reopenNetworkSockets();
-            logger.debug("Network change reopen network sockets...");
+            logger.info("Network change reopen network sockets...");
         }
     }
 
@@ -494,7 +494,7 @@ public abstract class TauDaemon {
                 // 1、检查本地followed的社区和libTAU中followed的社区数据是否一致
                 List<String> tauChains = getTauAllChains();
                 List<String> localChains = memberRepo.queryFollowedCommunities(userPk);
-                logger.debug("checkAllChains localChain::{}, tauChains::{}",
+                logger.info("checkAllChains localChain::{}, tauChains::{}",
                         localChains.size(), tauChains.size());
                 // 0、添加默认TAU Testing Community
                 if (localChains.size() == 0) {
@@ -507,7 +507,7 @@ public abstract class TauDaemon {
                         List<String> list = memberRepo.queryCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT);
                         Set<String> peers = new HashSet<>(list);
                         boolean success = followChain(chainID, peers);
-                        logger.debug("checkAllChains followChain chainID::{}, success::{}", chainID, success);
+                        logger.info("checkAllChains followChain chainID::{}, success::{}", chainID, success);
                     } else {
                         // 从列表中移除，为1.2准备数据
                         tauChains.remove(chainID);
@@ -547,7 +547,7 @@ public abstract class TauDaemon {
         if (isRunning) {
             if (StringUtil.isNotEmpty(friendPk)) {
                 sessionManager.requestFriendInfo(friendPk);
-                logger.debug("requestFriendInfo::{}", friendPk);
+                logger.info("requestFriendInfo::{}", friendPk);
             }
         }
     }
@@ -559,7 +559,7 @@ public abstract class TauDaemon {
         if (isRunning) {
             if (this.sessionManager != null) {
                 (new SessionHandle(sessionManager.swig())).setNonReferrable(nonReferable);
-                logger.debug("setNonReferable::{}", nonReferable);
+                logger.info("setNonReferable::{}", nonReferable);
             }
         }
     }
@@ -583,7 +583,7 @@ public abstract class TauDaemon {
     public boolean updateBootstrapInterval(int interval) {
         if (isRunning) {
             sessionManager.updateBootstrapIntervel(interval);
-            logger.debug("updateBootstrapInterval::{}s", interval);
+            logger.info("updateBootstrapInterval::{}s", interval);
             return true;
         }
         return false;
@@ -598,7 +598,7 @@ public abstract class TauDaemon {
      * @return 访问列表
      */
     public ArrayList<String> getCommunityAccessList(byte[] chainID) {
-        logger.debug("getCommunityAccessList isRunning::{}", isRunning);
+        logger.info("getCommunityAccessList isRunning::{}", isRunning);
         if (isRunning) {
             return sessionManager.getAccessList(chainID);
         }
@@ -610,7 +610,7 @@ public abstract class TauDaemon {
      * @return Gossip列表
      */
     public ArrayList<String> getGossipList(byte[] chainID) {
-        logger.debug("getGossipList isRunning::{}", isRunning);
+        logger.info("getGossipList isRunning::{}", isRunning);
         if (isRunning) {
             return sessionManager.getGossipList(chainID);
         }
@@ -622,7 +622,7 @@ public abstract class TauDaemon {
      * 返回-1：代表出不了块
      */
     public long getMiningTime(byte[] chainID) {
-        logger.debug("getMiningTime isRunning::{}", isRunning);
+        logger.info("getMiningTime isRunning::{}", isRunning);
         if (isRunning) {
             return sessionManager.getMiningTime(chainID);
         }
@@ -635,7 +635,7 @@ public abstract class TauDaemon {
     public boolean addNewBootstrapPeers(String chainID, Set<String> peers) {
         if (isRunning) {
             boolean isSuccess = sessionManager.addNewBootstrapPeers(ChainIDUtil.encode(chainID), peers);
-            logger.debug("addNewBootstrapPeers chainID::{}, peers size::{}", chainID, peers.size());
+            logger.info("addNewBootstrapPeers chainID::{}, peers size::{}", chainID, peers.size());
             return isSuccess;
         }
         return false;
@@ -648,7 +648,7 @@ public abstract class TauDaemon {
         if (isRunning) {
             sessionManager.setLogLevel(level);
         }
-        logger.debug("setLogLevel level::{}, isRunning::{}", level, isRunning);
+        logger.info("setLogLevel level::{}, isRunning::{}", level, isRunning);
     }
 
     /**

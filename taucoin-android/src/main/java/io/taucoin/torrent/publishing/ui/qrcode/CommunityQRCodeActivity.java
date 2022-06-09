@@ -93,7 +93,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
                             chainUrlCopy = chainUrl;
                         }
                         binding.qrCode.tvName.setText(chainUrlCopy);
-                        logger.debug("chainUrl::{}", chainUrl);
+                        logger.info("chainUrl::{}", chainUrl);
                         communityViewModel.generateQRCode(this, chainUrl, this.chainID, showName);
                     }
                 }));

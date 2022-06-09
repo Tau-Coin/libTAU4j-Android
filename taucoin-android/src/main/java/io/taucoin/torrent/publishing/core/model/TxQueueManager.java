@@ -85,7 +85,7 @@ class TxQueueManager {
             User currentUser = userRepos.getCurrentUser();
             if (currentUser != null) {
                 List<String> list = txQueueRepos.getNeedWiringTxCommunities(currentUser.publicKey);
-                logger.debug("init queue size::{}", null == list ? 0 : list.size());
+                logger.info("init queue size::{}", null == list ? 0 : list.size());
                 if (list != null && list.size() > 0) {
                     for (String chainID : list) {
                         updateTxQueue(chainID, true);
@@ -95,7 +95,7 @@ class TxQueueManager {
             while (!emitter.isDisposed()) {
                 try {
                     String chainID = chainIDQueue.take();
-                    logger.debug("QueueConsumer size::{}, chainID::{}", chainIDQueue.size(), chainID);
+                    logger.info("QueueConsumer size::{}, chainID::{}", chainIDQueue.size(), chainID);
                     boolean isResend = sendTxQueue(chainID, 0);
                     if (isResend) {
                         updateTxQueue(chainID);
@@ -114,7 +114,7 @@ class TxQueueManager {
     void updateTxQueue(String chainID) {
         if (!chainIDQueue.contains(chainID)) {
             chainIDQueue.offer(chainID);
-            logger.debug("updateTxQueue chainID::{}", chainID);
+            logger.info("updateTxQueue chainID::{}", chainID);
         }
     }
 
@@ -138,16 +138,16 @@ class TxQueueManager {
     private boolean sendTxQueue(String chainID, int offset) {
         User currentUser = userRepos.getCurrentUser();
         if (null == currentUser) {
-            logger.debug("sendTxQueue current user null");
+            logger.info("sendTxQueue current user null");
             return true;
         }
         try {
             TxQueueAndStatus txQueue = txQueueRepos.getQueueFirstTx(chainID, currentUser.publicKey, offset);
             if (null == txQueue) {
-                logger.debug("sendTxQueue queue null");
+                logger.info("sendTxQueue queue null");
                 return false;
             }
-            logger.debug("sendTxQueue status::{}, sendCount::{}, timestamp::{}, offset::{}", txQueue.status,
+            logger.info("sendTxQueue status::{}, sendCount::{}, timestamp::{}, offset::{}", txQueue.status,
                     txQueue.sendCount, txQueue.timestamp, 0);
             // 获取当前用户在社区中链上nonce值
             byte[] chainIDBytes = ChainIDUtil.encode(chainID);
@@ -155,17 +155,17 @@ class TxQueueManager {
             if (null == account) {
                 return true;
             }
-            logger.debug("sendTxQueue account nonce::{}, balance::{}, blockNumber::{}", account.getNonce(),
+            logger.info("sendTxQueue account nonce::{}, balance::{}, blockNumber::{}", account.getNonce(),
                     account.getBalance(), account.getBlockNumber());
 
             if (txQueue.amount + txQueue.fee > account.getBalance()) {
-                logger.debug("sendWiringTx amount({}) + fee({}) > balance({})", txQueue.amount,
+                logger.info("sendWiringTx amount({}) + fee({}) > balance({})", txQueue.amount,
                         txQueue.fee, account.getBalance());
                 return sendTxQueue(chainID, offset + 1);
             }
             // 交易已创建
             if (txQueue.status == 0) {
-                logger.debug("sendTxQueue account nonce::{}, queue nonce::{}", account.getNonce(),
+                logger.info("sendTxQueue account nonce::{}, queue nonce::{}", account.getNonce(),
                         txQueue.nonce);
                 // 判断是否nonce冲突, 如果冲突重建按最新nonce重新创建交易
                 if (account.getNonce() >= txQueue.nonce || queueChanged(account, txQueue)) {
@@ -177,7 +177,7 @@ class TxQueueManager {
             }
             return sendTxQueue(account, txQueue);
         } catch (Exception e) {
-            logger.debug("Error adding transaction::{}", e.getMessage());
+            logger.warn("Error adding transaction::{}", e.getMessage());
         }
         return false;
     }
@@ -197,7 +197,7 @@ class TxQueueManager {
             logger.debug("sendTxQueue txID::{}, newTxID::{}", tx.txID, newTxID);
             changed = StringUtil.isNotEquals(tx.txID, newTxID);
         }
-        logger.debug("sendTxQueue queueChanged::{}", changed);
+        logger.info("sendTxQueue queueChanged::{}", changed);
         return changed;
     }
 
@@ -209,18 +209,18 @@ class TxQueueManager {
         if (chainResendTx.containsKey(chainID)) {
             Boolean isResend = chainResendTx.get(chainID);
             if (isResend != null && !isResend && txQueue.sendStatus != 1) {
-                logger.debug("resendTransaction:: No need to resend");
+                logger.info("resendTransaction:: No need to resend");
                 return;
             }
         }
         Tx tx = txRepo.getTxByQueueID(txQueue.queueID, txQueue.timestamp);
         if ( null == tx) {
-            logger.debug("resendTransaction:: tx not found");
+            logger.info("resendTransaction:: tx not found");
             return;
         }
 
         if (tx.amount + tx.fee > account.getBalance()) {
-            logger.debug("resendTransaction amount({}) + fee({}) > balance({})", txQueue.amount,
+            logger.info("resendTransaction amount({}) + fee({}) > balance({})", txQueue.amount,
                     txQueue.fee, account.getBalance());
             return;
         }
@@ -268,7 +268,7 @@ class TxQueueManager {
         byte[] chainID = ChainIDUtil.encode(txQueue.chainID);
         Account account = daemon.getAccountInfo(chainID, txQueue.senderPk);
         TxQueueAndStatus tx = txQueueRepos.getTxQueueByID(txQueue.queueID);
-        logger.debug("sendTxQueue chainID::{}, queueID::{}, status::{}, sendCount::{}",
+        logger.info("sendTxQueue chainID::{}, queueID::{}, status::{}, sendCount::{}",
                 txQueue.chainID, txQueue.queueID, tx.status, tx.sendCount);
         if (tx.status > 0) {
             // 如果上链成功直接返回
@@ -334,7 +334,7 @@ class TxQueueManager {
         }
         // 删除未发送的交易
         txRepo.deleteUnsentTx(txQueue.queueID);
-        logger.debug("sendTxQueue delete unsent tx");
+        logger.info("sendTxQueue delete unsent tx");
 
         // 创建新的交易
         TxContent txContent = new TxContent(txEncoded);
@@ -372,7 +372,7 @@ class TxQueueManager {
                 tx.pinnedTime = pinnedTime;
             }
             txRepo.addTransaction(tx);
-            logger.debug("sendWiringTx createTransaction chainID::{}, txID::{}, senderPk::{}, " +
+            logger.info("sendWiringTx createTransaction chainID::{}, txID::{}, senderPk::{}, " +
                             "receiverPk::{}, nonce::{}, memo::{}", tx.chainID, tx.txID, tx.senderPk, tx.receiverPk, tx.nonce, tx.memo);
             addUserInfoToLocal(tx);
             addMemberInfoToLocal(tx);
