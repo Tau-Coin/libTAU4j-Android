@@ -33,12 +33,6 @@
         <item>A</item>
     </string-array>
 
-    <string-array name="fixed_frequency">
-        <item>5</item>
-        <item>10</item>
-        <item>15</item>
-    </string-array>
-
     <string-array name="coin_name">
         <item>TAU</item>
         <item></item>

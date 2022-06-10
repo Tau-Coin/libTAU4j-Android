@@ -140,7 +140,6 @@ public class MemoryStatisticsActivity extends BaseActivity {
         // 组织数据
         List<String> xValues = new ArrayList<>();
         List<Entry> yLeftValues = new ArrayList<>();
-        List<Entry> yRightValues = new ArrayList<>();
 
         // 统计数据较少时，补充数据
         long initSupplySize = 7;
@@ -159,7 +158,6 @@ public class MemoryStatisticsActivity extends BaseActivity {
             long timestamp = firstTimestamp - j * Constants.STATISTICS_DISPLAY_PERIOD;
             xValues.add(DateUtil.formatTime(timestamp, DateUtil.pattern0));
             yLeftValues.add(new Entry(yLeftValues.size(), 0));
-            yRightValues.add(new Entry(yRightValues.size(), 0));
         }
 
         for (int i = 0; i < statistics.size(); i++) {
@@ -173,14 +171,11 @@ public class MemoryStatisticsActivity extends BaseActivity {
                         long timestamp = lastStatistic.getTimestamp() + j * Constants.STATISTICS_DISPLAY_PERIOD;
                         xValues.add(DateUtil.formatTime(timestamp, DateUtil.pattern0));
                         yLeftValues.add(new Entry(yLeftValues.size(), 0));
-                        yRightValues.add(new Entry(yRightValues.size(), 0));
                     }
                 }
             }
             xValues.add(DateUtil.formatTime(statistic.getTimestamp(), DateUtil.pattern0));
             yLeftValues.add(new Entry(yLeftValues.size(), statistic.getMemoryAvg()));
-            float workingFreqAvg = Float.parseFloat(String.valueOf(statistic.getWorkingFreqAvg()));
-            yRightValues.add(new Entry(yRightValues.size(), workingFreqAvg));
         }
 
         // X轴
@@ -235,18 +230,8 @@ public class MemoryStatisticsActivity extends BaseActivity {
         setComp.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
         setComp.setLineWidth(1f);// 设置线宽
 
-        LineDataSet setComp1 = new LineDataSet(yRightValues, getString(R.string.setting_working_frequency));
-        setComp1.setAxisDependency(YAxis.AxisDependency.RIGHT);
-        setComp1.setColor(getResources().getColor(R.color.color_red));
-        setComp1.setDrawFilled(true);
-        setComp1.setDrawValues(false);
-        setComp1.setDrawCircles(false);
-        setComp1.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
-        setComp1.setLineWidth(1f);// 设置线宽
-
         List<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(setComp);
-        dataSets.add(setComp1);
 
         LineData lineData = new LineData(dataSets);
 

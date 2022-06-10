@@ -140,8 +140,6 @@ public abstract class TauDaemon {
                     logger.info("Tau start successfully");
                     isRunning = true;
                     handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
-                    // 防止第一次更新时，链端未启动成功，后面无法触发
-                    handleSettingsChanged(appContext.getString(R.string.pref_key_main_loop_frequency));
                     // 更新当前用户自己的信息
                     updateCurrentUserInfo();
                     // 更新用户跟随的社区和其账户状态

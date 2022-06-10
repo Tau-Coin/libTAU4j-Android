@@ -14,9 +14,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.Formatter;
-import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityWorkingConditionBinding;
@@ -62,7 +60,6 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
         super.onStart();
         handleSettingsChanged(getString(R.string.pref_key_charging_state));
         handleSettingsChanged(getString(R.string.pref_key_internet_state));
-        handleSettingsChanged(getString(R.string.pref_key_main_loop_frequency));
         handleSettingsChanged(getString(R.string.pref_key_upnp_mapped));
         handleSettingsChanged(getString(R.string.pref_key_nat_pmp_mapped));
         handleSettingsChanged(getString(R.string.pref_key_is_metered_network));
@@ -90,9 +87,6 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_internet_state))) {
             boolean internetState = settingsRepo.internetState();
             binding.tvInternet.setText(internetState ? R.string.common_on : R.string.common_off);
-        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_main_loop_frequency))) {
-            double frequency = FrequencyUtil.getMainLoopFrequency();
-            binding.tvWorkingFrequency.setText(FmtMicrometer.formatTwoDecimal(frequency));
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_upnp_mapped))) {
             boolean isMapped = settingsRepo.isUPnpMapped();
             binding.tvUpnp.setText(isMapped ? R.string.common_on : R.string.common_off);

@@ -286,13 +286,8 @@
     <string name="setting_metered_network_title">Metered - likely paid internet</string>
     <string name="setting_data_reset_time">Data Quota Daily Reset</string>
     <string name="setting_data_reset_time_value">%d pm</string>
-    <string name="setting_work_frequency">Working Frequency</string>
-    <string name="setting_work_frequency_battery">Working Frequency on Battery</string>
-    <string name="setting_work_frequency_charging">Working Frequency on Charging</string>
     <string name="setting_fore_running_time">Foreground Time</string>
-    <string name="setting_foreground">Foreground</string>
     <string name="setting_bg_running_time">Background Time</string>
-    <string name="setting_background">Background</string>
     <string name="setting_doze_running_time">Doze Time</string>
     <string name="setting_survival_mode">Survival Mode</string>
     <string name="setting_doze_time">Doze time: %1$s</string>
@@ -303,10 +298,6 @@
     <string name="setting_daily_quota_unit_m">%1$dM</string>
     <string name="setting_daily_quota_unit_g">%1$dG</string>
     <string name="setting_network_current_speed">Speed</string>
-    <string name="setting_fixed_frequency">Target Frequency</string>
-    <string name="setting_fixed_frequency_hint">Please enter a fixed frequency</string>
-    <string name="setting_average_speed">Speed Limit</string>
-    <string name="setting_network_average_speed">Average Speed</string>
     <string name="setting_network_available_data">Today Remaining Data</string>
     <string name="setting_metered_network_limit_speed">%1$s/s</string>
     <string name="setting_master_node">Master node</string>

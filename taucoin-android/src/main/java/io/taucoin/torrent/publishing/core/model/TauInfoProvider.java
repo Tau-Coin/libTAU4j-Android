@@ -26,7 +26,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Statistic;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.StatisticRepository;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.Formatter;
-import io.taucoin.torrent.publishing.core.utils.FrequencyUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.Sampler;
 import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
@@ -260,7 +259,6 @@ public class TauInfoProvider {
                     }
 
                     statistic.timestamp = DateUtil.getTime();
-                    statistic.workingFrequency = FrequencyUtil.getMainLoopFrequency();
                     statistic.dataSize = sessionStatistics.getDownloadRate() + sessionStatistics.getUploadRate();
                     statistic.memorySize = samplerStatistics.totalMemory;
                     statistic.cpuUsageRate = samplerStatistics.cpuUsage;
@@ -291,8 +289,6 @@ public class TauInfoProvider {
         TrafficUtil.saveTrafficTotal(statistics);
         // 更新网速采样数据
         NetworkSetting.updateNetworkSpeed(statistics);
-        // 更新UI展示链端主循环时间间隔
-        NetworkSetting.calculateMainLoopInterval();
         // 根据当前的流量包的使用，判断是否给用户更换流量包的提示
         daemon.handleNoRemainingDataTips();
 //        Context context = MainApplication.getInstance();

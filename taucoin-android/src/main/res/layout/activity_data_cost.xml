@@ -38,12 +38,6 @@
                     android:layout_marginTop="@dimen/widget_size_10">
 
                     <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-                        android:id="@+id/tv_working_frequency"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:lineLeftText="@string/setting_work_frequency_battery"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_reset_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -71,47 +65,12 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/tab_foreground"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical|center"
-                        android:text="@string/setting_foreground"
-                        android:background="@color/color_white"
-                        android:textColor="@color/colorPrimary"
-                        android:onClick="@{listener::onClick}"
-                        android:includeFontPadding="false"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    <TextView
-                        android:id="@+id/tab_background"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:text="@string/setting_background"
-                        android:background="@color/colorPrimary"
-                        android:textColor="@color/color_white"
-                        android:gravity="center_vertical|center"
-                        android:onClick="@{listener::onClick}"
-                        android:includeFontPadding="false"
-                        android:textAppearance="@style/TextAppearanceBody1"/>
-
-                </LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/ll_metered"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/color_white"
-                    android:layout_marginTop="@dimen/widget_size_1"
+                    android:layout_marginTop="@dimen/widget_size_10"
                     android:paddingTop="@dimen/widget_size_15"
                     android:paddingStart="@dimen/widget_size_20"
                     android:paddingEnd="@dimen/widget_size_0">
@@ -202,70 +161,6 @@
                         android:paddingBottom="@dimen/widget_size_7"
                         android:minHeight="@dimen/widget_size_44"
                         android:layout_marginEnd="@dimen/widget_size_20"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:layout_marginEnd="@dimen/widget_size_10"
-                            android:text="@string/setting_average_speed"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <TextView
-                            android:id="@+id/tv_metered_average_speed"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/gray_dark"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    </LinearLayout>
-
-                    <include layout="@layout/view_line"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:layout_marginEnd="@dimen/widget_size_20"
-                        android:layout_marginTop="0dp"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_fixed_frequency"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <Spinner
-                            android:id="@+id/metered_fixed_frequency"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="end"
-                            android:paddingStart="@dimen/widget_size_5"
-                            android:paddingEnd="@dimen/widget_size_35"
-                            android:spinnerMode="dialog"
-                            android:entries="@array/fixed_frequency"/>
-
-                    </LinearLayout>
-
-                    <include layout="@layout/view_line"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:layout_marginEnd="@dimen/widget_size_20"
                         android:layout_marginTop="0dp"
                         android:gravity="center_vertical">
 
@@ -294,7 +189,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/color_white"
-                    android:layout_marginTop="@dimen/widget_size_1"
+                    android:layout_marginTop="@dimen/widget_size_10"
                     android:paddingTop="@dimen/widget_size_15"
                     android:paddingStart="@dimen/widget_size_20"
                     android:paddingEnd="0dp">
@@ -373,71 +268,6 @@
                             android:textColor="@color/gray_dark"
                             android:layout_marginEnd="@dimen/widget_size_5"
                             android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    </LinearLayout>
-
-                    <include layout="@layout/view_line"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:layout_marginEnd="@dimen/widget_size_20"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_average_speed"
-                            android:layout_marginEnd="@dimen/widget_size_10"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <TextView
-                            android:id="@+id/tv_wifi_average_speed"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/gray_dark"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    </LinearLayout>
-
-                    <include layout="@layout/view_line"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:layout_marginEnd="@dimen/widget_size_20"
-                        android:layout_marginTop="0dp"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_fixed_frequency"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <Spinner
-                            style="@style/Widget.AppCompat.TextView.SpinnerItem"
-                            android:id="@+id/wifi_fixed_frequency"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:spinnerMode="dialog"
-                            android:gravity="end"
-                            android:paddingStart="@dimen/widget_size_5"
-                            android:paddingEnd="@dimen/widget_size_35"
-                            android:entries="@array/fixed_frequency"/>
 
                     </LinearLayout>
 
