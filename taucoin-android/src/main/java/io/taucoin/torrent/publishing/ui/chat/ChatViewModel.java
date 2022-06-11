@@ -40,7 +40,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -52,7 +51,6 @@ import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
-import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
 import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
 
 /**
@@ -309,11 +307,9 @@ public class ChatViewModel extends AndroidViewModel {
             try {
                 String logicMsgHash = HashUtil.makeSha256HashWithTimeStamp(text);
                 List<byte[]> contents = MsgSplitUtil.splitTextMsg(text);
-                User user = userRepo.getUserByPublicKey(senderPk);
                 ChatMsg[] messages = new ChatMsg[contents.size()];
                 ChatMsgLog[] chatMsgLogs = new ChatMsgLog[contents.size()];
                 int contentSize = contents.size();
-                byte[] key = Utils.keyExchange(friendPk, user.seed);
                 // 朋友的最后一条信息时间
                 long friendLastSendTime = chatRepo.getLastSendTime(friendPk, senderPk);
                 // 自己的最后一条信息的时间
@@ -329,16 +325,13 @@ public class ChatViewModel extends AndroidViewModel {
                     myLastSendTime = currentTime;
                     MsgContent msgContent = MsgContent.createContent(logicMsgHash, type, content, chainID);
                     byte[] encoded = msgContent.getEncoded();
-                    // 加密填充模式为16的倍数896, 最大控制为895
-                    byte[] encryptedEncoded = CryptoUtil.encrypt(encoded, key);
                     Message message = new Message(currentTime, ByteUtil.toByte(senderPk),
-                            ByteUtil.toByte(friendPk), encryptedEncoded);
+                            ByteUtil.toByte(friendPk), encoded);
                     String hash = message.msgId();
                     logger.info("sendMessageTask newMsgHash::{}, contentType::{}, " +
-                                    "nonce::{}, rawLength::{}, encryptedEncoded::{}, " +
-                                    "logicMsgHash::{}, millisTime::{}",
-                            hash, type, nonce, content.length, encryptedEncoded.length,
-                            logicMsgHash, DateUtil.format(currentTime, DateUtil.pattern9));
+                                    "nonce::{}, rawLength::{}, logicMsgHash::{}, millisTime::{}",
+                            hash, type, nonce, content.length, logicMsgHash,
+                            DateUtil.format(currentTime, DateUtil.pattern9));
 
                     boolean isSuccess = daemon.addNewMessage(message);
                     // 组织Message的结构，并发送到DHT和数据入库
@@ -384,13 +377,10 @@ public class ChatViewModel extends AndroidViewModel {
             String sender = chatMsg.senderPk;
             String receiver = chatMsg.receiverPk;
             String logicMsgHash = chatMsg.logicMsgHash;
-            User user = userRepo.getUserByPublicKey(sender);
             MsgContent msgContent = MsgContent.createTextContent(logicMsgHash, chatMsg.content, chatMsg.airdropChain);
             byte[] encoded = msgContent.getEncoded();
-            byte[] key = Utils.keyExchange(receiver, user.seed);
-            byte[] encryptedEncoded = CryptoUtil.encrypt(encoded, key);
             Message message = new Message(timestamp, ByteUtil.toByte(sender),
-                    ByteUtil.toByte(receiver), encryptedEncoded);
+                    ByteUtil.toByte(receiver), encoded);
             boolean isSuccess = daemon.addNewMessage(message);
             if (isSuccess) {
                 try {

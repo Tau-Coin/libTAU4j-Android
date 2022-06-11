@@ -103,11 +103,7 @@ class MsgAlertHandler {
                 } else {
                     friendPkStr = senderPk;
                 }
-                logger.error("payload.size::{}", message.payload().length);
-                byte[] encryptedEncoded = message.payload();
-                // 原始数据解密
-                byte[] cryptoKey = Utils.keyExchange(friendPkStr, user.seed);
-                byte[] encoded = CryptoUtil.decrypt(encryptedEncoded, cryptoKey);
+                byte[] encoded = message.payload();
                 MsgContent msgContent = new MsgContent(encoded);
                 String logicMsgHash = msgContent.getLogicHash();
                 byte[] content = msgContent.getContent();
