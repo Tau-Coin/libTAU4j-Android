@@ -90,9 +90,8 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
             }
         });
 
-        if (!BuildConfig.DEBUG && BuildConfig.DISPLAY_DEBUG_VIEW) {
-            binding.debugLayout.setVisibility(View.GONE);
-        }
+        boolean showDebug = BuildConfig.DEBUG || BuildConfig.DISPLAY_DEBUG_VIEW;
+        binding.debugLayout.setVisibility(showDebug ? View.VISIBLE : View.GONE);
     }
 
     /**
