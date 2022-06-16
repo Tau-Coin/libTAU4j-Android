@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -81,6 +82,16 @@ public class MainFragment extends BaseFragment {
 
         binding.tabLayout.setupWithViewPager(binding.viewPager);
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
+
+        for (int i = 0; i < binding.tabLayout.getTabCount(); i++ ) {
+            TabLayout.Tab tab = binding.tabLayout.getTabAt(i);
+            if (tab != null) {
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) tab.view.getLayoutParams();
+                layoutParams.width = 0;
+                layoutParams.weight = i == 0 ? 1.2f : 2f;
+                tab.view.setLayoutParams(layoutParams);
+            }
+        }
     }
 
     private TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
