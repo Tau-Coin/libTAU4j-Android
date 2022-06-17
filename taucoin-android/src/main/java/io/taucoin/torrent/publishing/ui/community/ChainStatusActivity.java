@@ -10,8 +10,8 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 
 import org.libTAU4j.Block;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,7 +26,6 @@ import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityChainStatusBinding;
@@ -40,7 +39,6 @@ import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
  * 群组成员页面
  */
 public class ChainStatusActivity extends BaseActivity {
-    private static Logger logger = LoggerFactory.getLogger("ChainStatusActivity");
     private ActivityChainStatusBinding binding;
     private CommunityViewModel communityViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -85,70 +83,85 @@ public class ChainStatusActivity extends BaseActivity {
     /**
      * 加载链状态数据
      */
+    private ChainStatus mStatus;
+    private String headBlockHash;
+    private String tailBlockHash;
+    private String consensusBlockHash;
     private void loadChainStatusData(ChainStatus status) {
         if (null == status) {
             return;
         }
         blockDisposables.clear();
 
-        binding.tvExternalHeadBlock.setText(FmtMicrometer.fmtLong(status.syncingHeadBlock));
+        if (null == mStatus || mStatus.syncingHeadBlock != status.syncingHeadBlock) {
+            binding.tvExternalHeadBlock.setText(FmtMicrometer.fmtLong(status.syncingHeadBlock));
+        }
 
-        binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(status.headBlock));
-        blockDisposables.add(getBlockByNumber(chainID, status.headBlock)
+        if (null == mStatus || mStatus.headBlock != status.headBlock) {
+            binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(status.headBlock));
+        }
+        if (null == mStatus || mStatus.tailBlock != status.tailBlock) {
+            binding.tvTailBlock.setText(FmtMicrometer.fmtLong(status.tailBlock));
+        }
+        if (null == mStatus || mStatus.consensusBlock != status.consensusBlock) {
+            binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(status.consensusBlock));
+        }
+        blockDisposables.add(getBlockByNumber(chainID, status.headBlock, status.tailBlock, status.consensusBlock)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(block -> {
-                    if (block != null) {
-                        logger.debug("head blockNum::{}, blockTime::{}, currentTime::{}",
-                                block.getBlockNumber(), block.getTimestamp(), DateUtil.getTime());
+                .subscribe(blocksMap -> {
+                    Block block = blocksMap.get(status.headBlock);
+                    if (block != null && StringUtil.isNotEquals(headBlockHash, block.Hash())) {
+                        headBlockHash = block.Hash();
+                        loadBlockDetailData(binding.headBlock, block);
                     }
-                    loadBlockDetailData(binding.headBlock, block);
+                    block = blocksMap.get(status.tailBlock);
+                    if (block != null && StringUtil.isNotEquals(tailBlockHash, block.Hash())) {
+                        tailBlockHash = block.Hash();
+                        loadBlockDetailData(binding.tailBlock, block);
+                    }
+                    block = blocksMap.get(status.consensusBlock);
+                    if (block != null && StringUtil.isNotEquals(consensusBlockHash, block.Hash())) {
+                        consensusBlockHash = block.Hash();
+                        loadBlockDetailData(binding.consensusBlock, block);
+                    }
                 }));
 
-        binding.tvTailBlock.setText(FmtMicrometer.fmtLong(status.tailBlock));
-        blockDisposables.add(getBlockByNumber(chainID, status.tailBlock)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(block -> {
-                    if (block != null) {
-                        logger.debug("tail blockNum::{}, blockTime::{}, currentTime::{}",
-                                block.getBlockNumber(), block.getTimestamp(), DateUtil.getTime());
-                    }
-                    loadBlockDetailData(binding.tailBlock, block);
-                }));
+        if (null == mStatus || mStatus.difficulty != status.difficulty) {
+            binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
+        }
+        if (null == mStatus || mStatus.totalPeers != status.totalPeers) {
+            binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
+        }
 
-        binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(status.consensusBlock));
-        blockDisposables.add(getBlockByNumber(chainID, status.consensusBlock)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(block -> {
-                    if (block != null) {
-                        logger.debug("consensus blockNum::{}, blockTime::{}, currentTime::{}",
-                                block.getBlockNumber(), block.getTimestamp(), DateUtil.getTime());
-                    }
-                    loadBlockDetailData(binding.consensusBlock, block);
-                }));
+        if (null == mStatus || mStatus.peerBlocks != status.peerBlocks) {
+            binding.itemPeersBlocks.setRightText(FmtMicrometer.fmtLong(status.peerBlocks));
+        }
 
-        binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
-        binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
-        binding.itemPeersBlocks.setRightText(FmtMicrometer.fmtLong(status.peerBlocks));
-        binding.itemTotalCoins.setRightText(FmtMicrometer.fmtBalance(status.totalCoin));
-        binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(status.balance));
+        if (null == mStatus || mStatus.totalCoin != status.totalCoin) {
+            binding.itemTotalCoins.setRightText(FmtMicrometer.fmtBalance(status.totalCoin));
+        }
+
+        if (null == mStatus || mStatus.balance != status.balance) {
+            binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(status.balance));
+        }
+        mStatus = status;
     }
 
     /**
      * 加载社区数据
      */
+    private String forkPoint;
     private void loadCommunityData(Community community) {
-        ForkPoint point = null;
-        if (community != null) {
-            point = new Gson().fromJson(community.forkPoint, ForkPoint.class);
+        if (community != null && StringUtil.isNotEquals(forkPoint, community.forkPoint)) {
+            forkPoint = community.forkPoint;
+            ForkPoint point = new Gson().fromJson(community.forkPoint, ForkPoint.class);
             if (point != null) {
                 binding.itemForkBlockHash.setRightText(point.getHash());
                 binding.itemForkBlockNum.setRightText(String.valueOf(point.getNumber()));
             }
         }
-        binding.llForkPoint.setVisibility(point != null ? View.VISIBLE : View.GONE);
+        binding.llForkPoint.setVisibility(StringUtil.isNotEmpty(forkPoint) ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -242,17 +255,21 @@ public class ChainStatusActivity extends BaseActivity {
     /**
      * 获取区块
      * @param chainID 社区ID
-     * @param blockNumber 区块号
+     * @param blockNumbers 区块号
      * @return Block
      */
-    Observable<Block> getBlockByNumber(String chainID, long blockNumber) {
+    Observable<Map<Long, Block>> getBlockByNumber(String chainID, long... blockNumbers) {
         return Observable.create(emitter -> {
             try {
-                Block block = tauDaemon.getBlockByNumber(chainID, blockNumber);
-                if (block != null) {
-                    emitter.onNext(block);
+                if (blockNumbers != null && blockNumbers.length > 0) {
+                    Map<Long, Block> map = new HashMap<>();
+                    for (long blockNum : blockNumbers) {
+                        Block block = tauDaemon.getBlockByNumber(chainID, blockNum);
+                        map.put(blockNum, block);
+                    }
+                    emitter.onNext(map);
                 }
-            } catch (Exception e) {
+            } catch (Exception ignore) {
             }
             emitter.onComplete();
         });
