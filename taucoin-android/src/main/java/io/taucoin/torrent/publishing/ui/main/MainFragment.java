@@ -1,6 +1,7 @@
 package io.taucoin.torrent.publishing.ui.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,19 +27,22 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
+import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.customviews.FragmentStatePagerAdapter;
+import io.taucoin.torrent.publishing.ui.setting.TrafficTipsActivity;
 
 /**
  * 群组列表页面
  */
-public class MainFragment extends BaseFragment {
+public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     private MainActivity activity;
 
@@ -53,6 +57,7 @@ public class MainFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false);
+        binding.setListener(this);
         return binding.getRoot();
     }
 
@@ -141,6 +146,7 @@ public class MainFragment extends BaseFragment {
     }
 
     private void handleWarningView() {
+        binding.llWarning.setTag(false);
         binding.llWarning.setVisibility(View.VISIBLE);
         String interfacesKey = getString(R.string.pref_key_network_interfaces);
         if (!settingsRepo.internetState()) {
@@ -149,6 +155,7 @@ public class MainFragment extends BaseFragment {
             binding.tvWarning.setText(getString(R.string.main_no_ipv4));
         } else if (!NetworkSetting.isHaveAvailableData()) {
             binding.tvWarning.setText(getString(R.string.main_data_used_up));
+            binding.llWarning.setTag(true);
         } else if (DeviceUtils.isSpaceInsufficient()) {
             binding.tvWarning.setText(getString(R.string.main_insufficient_device_space));
         } else {
@@ -196,6 +203,20 @@ public class MainFragment extends BaseFragment {
         super.onDestroy();
         if (binding != null) {
             binding.tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.ll_warning) {
+            boolean isShowTips = ViewUtils.getBooleanTag(view);
+            if (isShowTips) {
+                if (!AppUtil.isForeground(activity, TrafficTipsActivity.class)) {
+                    Intent intent = new Intent(activity, TrafficTipsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    activity.startActivity(intent);
+                }
+            }
         }
     }
 

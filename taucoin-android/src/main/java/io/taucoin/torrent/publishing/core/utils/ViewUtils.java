@@ -69,6 +69,15 @@ public class ViewUtils {
         return 0f;
     }
 
+    public static boolean getBooleanTag(View view) {
+        try {
+            Object obj = view.getTag();
+            return Boolean.parseBoolean(obj.toString());
+        } catch (Exception ignore) {
+        }
+        return false;
+    }
+
     public static int getIntText(TextView view) {
         String text = getText(view);
         try {
