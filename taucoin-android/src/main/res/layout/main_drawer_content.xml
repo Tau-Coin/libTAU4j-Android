@@ -177,16 +177,6 @@
                         app:rightText="@string/drawer_peers"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_working_condition"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical"
-                        android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_working_condition"
-                        app:rightText="@string/drawer_working_condition"/>
-
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_setting"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

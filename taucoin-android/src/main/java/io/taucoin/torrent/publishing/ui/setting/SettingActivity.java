@@ -146,6 +146,9 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
             case R.id.item_privacy_security:
                 ActivityUtil.startActivity(this, PrivacySecurityActivity.class);
                 break;
+            case R.id.item_dash_board:
+                ActivityUtil.startActivity(this, WorkingConditionActivity.class);
+                break;
             case R.id.item_data_cost:
                 ActivityUtil.startActivity(this, DataCostActivity.class);
                 break;
