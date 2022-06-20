@@ -27,7 +27,7 @@ public interface BlockDao {
     String QUERY_BLOCKS = "SELECT * FROM Blocks " +
             " WHERE chainID = :chainID and blockNumber= :blockNumber";
 
-    String QUERY_CHAIN_STATUS = "SELECT a.syncingHeadBlock, a.headBlock, a.tailBlock, a.consensusBlock, a.difficulty," +
+    String QUERY_CHAIN_STATUS = "SELECT a.syncingHeadBlock, a.headBlock, a.tailBlock, a.consensusBlock, a.difficulty, a.forkPoint," +
             " c.peerBlocks, c.totalRewards, d.totalPeers, d.totalCoin, e.balance" +
             " FROM Communities a" +
             " LEFT JOIN (SELECT bb.chainID, count(*) AS peerBlocks, SUM(rewards) AS totalRewards" +
@@ -100,7 +100,7 @@ public interface BlockDao {
      * 观察链上状态信息
      */
     @Query(QUERY_CHAIN_STATUS)
-    Flowable<ChainStatus> observerChainStatus(String chainID);
+    ChainStatus queryChainStatus(String chainID);
 
     /**
      * 观察链上同步状态信息

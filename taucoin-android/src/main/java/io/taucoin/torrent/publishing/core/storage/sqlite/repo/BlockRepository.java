@@ -51,11 +51,11 @@ public interface BlockRepository {
     List<BlockInfo> getBlocks(String chainID, long blockNumber);
 
     /**
-     * 观察链上状态信息
+     * 查询链上状态信息
      * @param chainID 链ID
      * @return Flowable<ChainStatus>
      */
-    Flowable<ChainStatus> observerChainStatus(String chainID);
+    ChainStatus queryChainStatus(String chainID);
 
     Flowable<List<BlockAndTx>> observeCommunitySyncStatus(String chainID);
 

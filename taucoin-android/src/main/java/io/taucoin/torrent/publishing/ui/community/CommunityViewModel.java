@@ -765,11 +765,21 @@ public class CommunityViewModel extends AndroidViewModel {
 
     /**
      * 观察链上状态信息
-     * @param chainID 链ID
      * @return Flowable<ChainStatus>
      */
     public Flowable<ChainStatus> observerChainStatus(String chainID) {
-        return blockRepo.observerChainStatus(chainID);
+        return Flowable.create(emitter -> {
+            while (!emitter.isCancelled() && !Thread.interrupted()) {
+                try {
+                    ChainStatus status = blockRepo.queryChainStatus(chainID);
+                    if (status != null) {
+                        emitter.onNext(status);
+                    }
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignore) {}
+            }
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST);
     }
 
     /**

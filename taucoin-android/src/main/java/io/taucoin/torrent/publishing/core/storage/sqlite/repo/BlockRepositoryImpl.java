@@ -98,13 +98,13 @@ public class BlockRepositoryImpl implements BlockRepository{
     }
 
     /**
-     * 观察链上状态信息
+     * 查询链上状态信息
      * @param chainID 链ID
      * @return Flowable<ChainStatus>
      */
     @Override
-    public Flowable<ChainStatus> observerChainStatus(String chainID) {
-        return db.blockDao().observerChainStatus(chainID);
+    public ChainStatus queryChainStatus(String chainID) {
+        return db.blockDao().queryChainStatus(chainID);
     }
 
     @Override

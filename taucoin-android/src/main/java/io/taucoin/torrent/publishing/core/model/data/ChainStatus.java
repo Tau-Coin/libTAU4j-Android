@@ -15,5 +15,6 @@ public class ChainStatus {
     public long totalPeers;                      // 当前链的总peers
     public long totalCoin;                       // 当前链的总流通币量
     public long balance;                         // 当前链用户余额
+    public String forkPoint;                     // 当前链分叉点
 
 }

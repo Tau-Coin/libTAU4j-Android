@@ -57,7 +57,6 @@ public class ChainStatusActivity extends BaseActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chain_status);
         initParameter();
         initLayout();
-        loadCommunityData(null);
         loadChainStatusData(new ChainStatus());
     }
 
@@ -145,23 +144,21 @@ public class ChainStatusActivity extends BaseActivity {
         if (null == mStatus || mStatus.balance != status.balance) {
             binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(status.balance));
         }
-        mStatus = status;
-    }
-
-    /**
-     * 加载社区数据
-     */
-    private String forkPoint;
-    private void loadCommunityData(Community community) {
-        if (community != null && StringUtil.isNotEquals(forkPoint, community.forkPoint)) {
-            forkPoint = community.forkPoint;
-            ForkPoint point = new Gson().fromJson(community.forkPoint, ForkPoint.class);
-            if (point != null) {
-                binding.itemForkBlockHash.setRightText(point.getHash());
-                binding.itemForkBlockNum.setRightText(String.valueOf(point.getNumber()));
+        if (null == mStatus || StringUtil.isNotEquals(mStatus.forkPoint, status.forkPoint)) {
+            if (StringUtil.isNotEmpty(status.forkPoint)) {
+                ForkPoint point = new Gson().fromJson(status.forkPoint, ForkPoint.class);
+                if (point != null) {
+                    binding.itemForkBlockHash.setRightText(point.getHash());
+                    binding.itemForkBlockNum.setRightText(String.valueOf(point.getNumber()));
+                    binding.llForkPoint.setVisibility(View.VISIBLE);
+                } else {
+                    binding.llForkPoint.setVisibility(View.GONE);
+                }
+            } else {
+                binding.llForkPoint.setVisibility(View.GONE);
             }
         }
-        binding.llForkPoint.setVisibility(StringUtil.isNotEmpty(forkPoint) ? View.VISIBLE : View.GONE);
+        mStatus = status;
     }
 
     /**
@@ -299,11 +296,6 @@ public class ChainStatusActivity extends BaseActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::loadChainStatusData));
-
-            disposables.add(communityViewModel.observerCommunityByChainID(chainID)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::loadCommunityData));
 
             disposables.add(communityViewModel.observerCommunityMiningTime(chainID)
                     .subscribeOn(Schedulers.io())
