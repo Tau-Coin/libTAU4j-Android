@@ -164,7 +164,7 @@
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_airdrop_coins"
-                        app:rightText="@string/drawer_airdrop_links"/>
+                        app:rightText="@string/drawer_send_and_airdrop_coins"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_contacts"

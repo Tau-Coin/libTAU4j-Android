@@ -83,6 +83,7 @@
     <!-- Strings used for main drawer content -->
     <string name="drawer_new_community">Create Coin Community</string>
     <string name="drawer_airdrop_links">Airdrop Coins</string>
+    <string name="drawer_send_and_airdrop_coins">Send and Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Contacts</string>
