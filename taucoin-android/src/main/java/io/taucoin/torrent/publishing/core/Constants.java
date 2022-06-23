@@ -72,8 +72,8 @@ public class Constants {
     // 消息最大字节大小
     public static final int MSG_MAX_BYTE_SIZE = 821;
 
-    public static final String TAU_TESTING_COMMUNITY = "tauchain:?dn=97e6bb70cf14b24aTAU%20Testing" +
-            "&bs=6f6e6e5d461a1978fd087c7ae433d3fed6b66005097ecea1ac95417c058cf1f9" +
-            "&bs=3e87c35d2079858d88dcb113edadaf1b339fcd4f74c539faa9a9bd59e787f124";;
+    public static final String TAU_TESTING_COMMUNITY = "tauchain:?dn=278ac0c475551b4aTAU%20Testing" +
+            "&bs=a13e3563ad23048e388ecbaa8e384a83d08c88e77ee79b1b3ba42fd17f736968" +
+            "&bs=bbdef2cfbdd9d3576e1f28deb99e002a32576dd05ab7ff29131c3bf10cf74445";
 
 }
