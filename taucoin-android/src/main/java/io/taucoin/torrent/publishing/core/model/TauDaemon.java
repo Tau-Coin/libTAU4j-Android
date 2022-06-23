@@ -660,6 +660,16 @@ public abstract class TauDaemon {
     }
 
     /**
+     * sql测试
+     */
+    public void sqlTest() {
+        if (isRunning) {
+            sessionManager.sqlTest();
+        }
+        logger.warn("sqlTest isRunning::{}", isRunning);
+    }
+
+    /**
      * 账户自动更新
      */
     public void accountAutoRenewal() {
