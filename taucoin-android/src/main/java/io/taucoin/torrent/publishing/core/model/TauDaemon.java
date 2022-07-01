@@ -38,8 +38,8 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.log.LogUtil;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
-import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
+import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
@@ -57,8 +57,8 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.receiver.ConnectionReceiver;
-import io.taucoin.torrent.publishing.service.SystemServiceManager;
 import io.taucoin.torrent.publishing.receiver.PowerReceiver;
+import io.taucoin.torrent.publishing.service.SystemServiceManager;
 import io.taucoin.torrent.publishing.service.TauService;
 import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.setting.TrafficTipsActivity;
@@ -75,19 +75,21 @@ public abstract class TauDaemon {
     public static long daemonStartTime = DateUtil.getMillisTime(); // Daemon启动时间
 
     Context appContext;
-    private SettingsRepository settingsRepo;
+    private final SettingsRepository settingsRepo;
     CompositeDisposable disposables = new CompositeDisposable();
-    private PowerReceiver powerReceiver = new PowerReceiver();
-    private ConnectionReceiver connectionReceiver = new ConnectionReceiver();
+    private final PowerReceiver powerReceiver = new PowerReceiver();
+    private final ConnectionReceiver connectionReceiver = new ConnectionReceiver();
     SessionManager sessionManager;
-    private SystemServiceManager systemServiceManager;
-    private TauInfoProvider tauInfoProvider;
-    private LocationManagerUtil locationManager;
+    private final SystemServiceManager systemServiceManager;
+    private final TauInfoProvider tauInfoProvider;
+    private final LocationManagerUtil locationManager;
     private Disposable updateBootstrapIntervalTimer; // 更新BootstrapInterval定时任务
     private Disposable updateLocationTimer;          // 更新位置信息定时任务
     private Disposable noRemainingDataTimer;         // 触发无剩余流量的提示定时任务
+    private Disposable libTauDozeTimer;              // 触发libTAU休眠定时任务
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
-    private TxQueueManager txQueueManager;           //交易队列管理
+    private final TxQueueManager txQueueManager;     // 交易队列管理
+    private final TauDozeManager tauDozeManager;     // tau休息模式管理
     volatile boolean isRunning = false;
     private volatile boolean trafficTips = true;     // 剩余流量用完提示
     volatile String seed;
@@ -119,6 +121,7 @@ public abstract class TauDaemon {
         deviceID = DeviceUtils.getCustomDeviceID(appContext);
         sessionManager = new SessionManager(true);
         txQueueManager = new TxQueueManager(this);
+        tauDozeManager = new TauDozeManager(this);
 
         observeTauDaemon();
         initLocalParam();
@@ -295,8 +298,12 @@ public abstract class TauDaemon {
      * 电源充电状态切换广播接受器
      */
     private void switchPowerReceiver() {
+        boolean chargeState = systemServiceManager.isPlugged();
+        setChargingState(chargeState);
         settingsRepo.chargingState(systemServiceManager.isPlugged());
-        settingsRepo.setBatteryLevel(systemServiceManager.getBatteryLevel());
+
+        int batteryLevel = systemServiceManager.getBatteryLevel();
+        setBatteryLevel(batteryLevel);
         try {
             appContext.unregisterReceiver(powerReceiver);
         } catch (IllegalArgumentException ignore) {
@@ -342,6 +349,70 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
             logger.info("SettingsChanged, UPnP mapped::{}", settingsRepo.isUPnpMapped());
         }
+    }
+
+    public void setBatteryLevel(int level) {
+        tauDozeManager.setBatteryLevel(level);
+    }
+
+    public void setDataAvailableRate(int rate) {
+        tauDozeManager.setDataAvailableRate(rate);
+    }
+
+    public void setChargingState(boolean on) {
+        tauDozeManager.setChargingState(on);
+    }
+
+    /**
+     * 用户新的操作时间
+     */
+    public void newActionEvent() {
+        logger.debug("TauDoze newActionEvent");
+        if (libTauDozeTimer != null && !libTauDozeTimer.isDisposed()) {
+            libTauDozeTimer.dispose();
+            // TAU还处于doze mode中，强制唤醒后计算doze时间
+            if (tauDozeManager.isDozeMode()) {
+                long realDozeTime = tauDozeManager.calculateRealDozeTime();
+                if (realDozeTime > 0) {
+                    settingsRepo.updateTauDozeTime(realDozeTime);
+                    logger.debug("TauDoze totalDozeTime::{}, realDozeTime::{}",
+                            settingsRepo.getTauDozeTime(), realDozeTime);
+                }
+            }
+        }
+        tauDozeManager.setDozeMode(false);
+        startTauDozeTimer(TauDozeManager.TAU_UP_TIME);
+    }
+
+    /**
+     * 开始Tau doze定时任务
+     * @param interval 单位s
+     */
+    private void startTauDozeTimer(long interval) {
+        libTauDozeTimer = ObservableUtil.intervalSeconds(interval)
+                .subscribeOn(Schedulers.io())
+                .subscribe(l -> {
+                    if (tauDozeManager.isDozeMode()) {
+                        settingsRepo.updateTauDozeTime(interval);
+                        logger.debug("TauDoze totalDozeTime::{}, realDozeTime::{}",
+                                settingsRepo.getTauDozeTime(), interval);
+                        if (!libTauDozeTimer.isDisposed()) {
+                            libTauDozeTimer.dispose();
+                        }
+                        newActionEvent();
+                    } else {
+                        long dozeTime = tauDozeManager.calculateDozeTime(true);
+                        logger.debug("TauDoze start dozeTime::{}", dozeTime);
+                        if (!libTauDozeTimer.isDisposed()) {
+                            libTauDozeTimer.dispose();
+                        }
+                        if (dozeTime > 0) {
+                            // TAU处于Doze Mode中，重建创建定时器等待doze结束
+                            tauDozeManager.setDozeMode(true);
+                            startTauDozeTimer(dozeTime);
+                        }
+                    }
+                });
     }
 
     /**

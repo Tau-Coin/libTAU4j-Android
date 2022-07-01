@@ -23,6 +23,7 @@
     <string name="pref_key_foreground_running_time" translatable="false">pref_key_foreground_running_time</string>
     <string name="pref_key_background_running_time" translatable="false">pref_key_background_running_time</string>
     <string name="pref_key_doze_running_time" translatable="false">pref_key_doze_running_time</string>
+    <string name="pref_key_tau_doze_time" translatable="false">pref_key_tau_doze_time</string>
 
     <string name="pref_key_first_start" translatable="false">pref_key_first_start</string>
 
@@ -39,8 +40,6 @@
     <string name="pref_key_dht_nodes" translatable="false">pref_key_dht_nodes</string>
 
     <string name="pref_key_community_filters_selected" translatable="false">pref_key_community_filters_selected</string>
-
-    <string name="pref_key_battery_level" translatable="false">pref_key_battery_level</string>
 
     <string name="pref_key_font_scale_size" translatable="false">pref_key_font_scale_size</string>
     <string name="pref_key_dump_file_timestamp" translatable="false">pref_key_dump_file_timestamp</string>

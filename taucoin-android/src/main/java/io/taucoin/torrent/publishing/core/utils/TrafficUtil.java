@@ -142,6 +142,8 @@ public class TrafficUtil {
         NetworkSetting.updateForegroundRunningTime(0);
         NetworkSetting.updateBackgroundRunningTime(0);
         NetworkSetting.updateDozeTime(0);
+        settingsRepo.setTauDozeTime(0);
+        NetworkSetting.updateDataAvailableRate(100);
         NetworkSetting.clearWifiPromptLimit();
         NetworkSetting.clearMeteredPromptLimit();
 

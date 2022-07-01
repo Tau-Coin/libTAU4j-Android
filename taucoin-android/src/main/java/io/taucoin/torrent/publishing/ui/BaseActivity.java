@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -168,7 +170,14 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             point.x = (int) ev.getRawX();
             point.y = (int) ev.getRawY();
+            TauDaemon.getInstance(getApplicationContext()).newActionEvent();
         }
         return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        TauDaemon.getInstance(getApplicationContext()).newActionEvent();
+        return super.onKeyDown(keyCode, event);
     }
 }

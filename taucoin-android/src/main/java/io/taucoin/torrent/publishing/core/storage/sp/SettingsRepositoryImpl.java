@@ -346,22 +346,21 @@ public class SettingsRepositoryImpl implements SettingsRepository {
                 filters).apply();
     }
 
-    /**
-     * 设置电池电量
-     * @param level 电量百分比
-     */
     @Override
-    public void setBatteryLevel(int level) {
-        edit.putInt(appContext.getString(R.string.pref_key_battery_level), level).apply();
+    public void setTauDozeTime(long time) {
+        edit.putLong(appContext.getString(R.string.pref_key_tau_doze_time),
+                time).apply();
     }
 
-    /**
-     * 获取电池电量
-     * @return 电量百分比
-     */
     @Override
-    public int getBatteryLevel() {
-        String key = appContext.getString(R.string.pref_key_battery_level);
-        return pref.getInt(key, 0);
+    public void updateTauDozeTime(long time) {
+        long dozeTime = getTauDozeTime() + time;
+        setTauDozeTime(dozeTime);
+    }
+
+    @Override
+    public long getTauDozeTime() {
+        String key = appContext.getString(R.string.pref_key_tau_doze_time);
+        return pref.getLong(key, 0);
     }
 }

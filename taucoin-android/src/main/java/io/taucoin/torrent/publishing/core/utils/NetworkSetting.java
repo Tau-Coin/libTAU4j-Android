@@ -11,6 +11,8 @@ import java.math.BigInteger;
 import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 
@@ -174,6 +176,7 @@ public class NetworkSetting {
                 int dozeTime = getDozeTime() + dozeSeconds;
                 updateDozeTime(dozeTime);
                 logger.debug("updateRunningTime dozeTime::{}s", dozeSeconds);
+                TauDaemon.getInstance(MainApplication.getInstance()).newActionEvent();
             }
         }
         lastElapsedRealTime = currentElapsedRealTime;
@@ -250,7 +253,7 @@ public class NetworkSetting {
         Context context = MainApplication.getInstance();
         long usage = TrafficUtil.getMeteredTrafficTotal();
         long limit =  getMeteredLimit();
-        long availableData = 0;
+        BigInteger availableData = BigInteger.ZERO;
 
         BigInteger bigUnit = new BigInteger("1024");
         BigInteger bigLimit = BigInteger.valueOf(limit).multiply(bigUnit).multiply(bigUnit);
@@ -260,11 +263,27 @@ public class NetworkSetting {
                 bigLimit.longValue(), bigUsage, bigLimit.compareTo(bigUsage));
 
         if (bigLimit.compareTo(bigUsage) > 0) {
-            availableData = bigLimit.subtract(bigUsage).longValue();
+            availableData = bigLimit.subtract(bigUsage);
         }
-        settingsRepo.setLongValue(context.getString(R.string.pref_key_metered_available_data), availableData);
+        int rate = 100;
+        if (isMeteredNetwork()) {
+            if (bigLimit.compareTo(BigInteger.ZERO) > 0) {
+                rate = availableData.multiply(Constants.PERCENTAGE).divide(bigLimit).intValue();
+            }
+            updateDataAvailableRate(rate);
+        }
+        settingsRepo.setLongValue(context.getString(R.string.pref_key_metered_available_data), availableData.longValue());
+        logger.debug("updateSpeedLimit meteredLimit::{}, meteredUsage::{}, availableData::{}, rate::{}",
+                bigLimit.longValue(), bigUsage, availableData.longValue(), rate);
     }
 
+    /**
+     * 更新流量剩余可用率
+     */
+    public static void updateDataAvailableRate(int rate) {
+        Context context = MainApplication.getInstance();
+        TauDaemon.getInstance(context).setDataAvailableRate(rate);
+    }
 
     /**
      * 更新WiFi网络网速限制值
@@ -273,18 +292,26 @@ public class NetworkSetting {
         Context context = MainApplication.getInstance();
         long usage = TrafficUtil.getWifiTrafficTotal();
         long limit = getWiFiLimit();
-        long availableData = 0;
+        BigInteger availableData = BigInteger.ZERO;
 
         BigInteger bigUnit = new BigInteger("1024");
         BigInteger bigLimit = BigInteger.valueOf(limit).multiply(bigUnit).multiply(bigUnit);
         BigInteger bigUsage = BigInteger.valueOf(usage);
-        logger.debug("updateSpeedLimit wifiLimit::{}, wifiUsage::{}, compareTo::{}",
-                bigLimit.longValue(), bigUsage, bigLimit.compareTo(bigUsage));
 
         if (bigLimit.compareTo(bigUsage) > 0) {
-            availableData = bigLimit.subtract(bigUsage).longValue();
+            availableData = bigLimit.subtract(bigUsage);
         }
-        settingsRepo.setLongValue(context.getString(R.string.pref_key_wifi_available_data), availableData);
+        int rate = 100;
+        if (!isMeteredNetwork()) {
+            if (bigLimit.compareTo(BigInteger.ZERO) > 0) {
+                rate = availableData.multiply(Constants.PERCENTAGE).divide(bigLimit).intValue();
+            }
+            updateDataAvailableRate(rate);
+        }
+        settingsRepo.setLongValue(context.getString(R.string.pref_key_wifi_available_data), availableData.longValue());
+
+        logger.debug("updateSpeedLimit wifiLimit::{}, wifiUsage::{}, availableData::{}, rate::{}",
+                bigLimit.longValue(), bigUsage, availableData.longValue(), rate);
     }
 
     /**
@@ -314,5 +341,10 @@ public class NetworkSetting {
             isHaveAvailableData = getWiFiAvailableData() > 0;
         }
         return isHaveAvailableData;
+    }
+
+    public static void updateTauDozeTime(int i) {
+        Context context = MainApplication.getInstance();
+        settingsRepo.getLongValue(context.getString(R.string.pref_key_tau_doze_time));
     }
 }

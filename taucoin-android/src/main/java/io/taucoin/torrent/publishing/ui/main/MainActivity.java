@@ -125,6 +125,7 @@ public class MainActivity extends ScanTriggerActivity {
         subscribeAddCommunity();
         LocationManagerUtil.requestLocationPermissions(this);
         WorkloadManager.startWakeUpWorker(getApplicationContext());
+        TauDaemon.getInstance(getApplicationContext()).newActionEvent();
         RootUtil.checkRoot();
     }
 

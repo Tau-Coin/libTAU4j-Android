@@ -199,15 +199,9 @@ public interface SettingsRepository {
      */
     void setFiltersSelected(Set<String> filters);
 
-    /**
-     * 设置电池电量
-     * @param level 电量百分比
-     */
-    void setBatteryLevel(int level);
+    void setTauDozeTime(long time);
 
-    /**
-     * 获取电池电量
-     * @return 电量百分比
-     */
-    int getBatteryLevel();
+    void updateTauDozeTime(long time);
+
+    long getTauDozeTime();
 }

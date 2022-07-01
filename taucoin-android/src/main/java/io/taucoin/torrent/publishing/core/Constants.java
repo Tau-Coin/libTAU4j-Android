@@ -50,7 +50,7 @@ public class Constants {
 
     // 自动更新账户周期（1天）（给自己发转账交易）
     public static final int AUTO_RENEWAL_PERIOD_BLOCKS = 288;
-    
+
     // 默认社区链平均出块时间，单位:s
     public static final int BLOCK_IN_AVG = 300;
 
@@ -75,5 +75,7 @@ public class Constants {
     public static final String TAU_TESTING_COMMUNITY = "tauchain:?dn=278ac0c475551b4aTAU%20Testing" +
             "&bs=a13e3563ad23048e388ecbaa8e384a83d08c88e77ee79b1b3ba42fd17f736968" +
             "&bs=bbdef2cfbdd9d3576e1f28deb99e002a32576dd05ab7ff29131c3bf10cf74445";
+
+    public static final BigInteger PERCENTAGE = new BigInteger("100", 10);
 
 }
