@@ -9,7 +9,7 @@ android {
         targetSdkVersion 29
         versionCode 13
         versionName "1.6.6"
-        flavorDimensions("default")
+        flavorDimensions("default", "id")
 
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -96,31 +96,350 @@ android {
 
     productFlavors {
         develop {
+//            flavorDimensions
+            dimension 'default'
             buildConfigField "String", "SPLASH_APP_NAME", "\"TAU App Develop\""     // 启动页文案
             buildConfigField "Boolean", "DISPLAY_DEBUG_VIEW", "true"
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "10000"             // Level.DEBUG
-            buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "7"                // TauLogLevel.DEBUG
+            buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "7"
+            // TauLogLevel.DEBUG
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://6e6170b970bae896803ecb1051653" +
                     "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:7882\""
         }
 
         beta {
+            dimension 'default'
             buildConfigField "String", "SPLASH_APP_NAME", "\"TAU App Beta\""        // 启动页文案
             buildConfigField "Boolean", "DISPLAY_DEBUG_VIEW", "false"
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "20000"             // Level.INFO
-            buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "6"                // TauLogLevel.INFO
+            buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "6"
+            // TauLogLevel.INFO
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://83024767468B8BF8DB868F336596C" +
                     "63561265D553833E5C0BF3E4767659B826B@13.229.53.249:6882\""
         }
 
         official {
+            dimension 'default'
             buildConfigField "String", "SPLASH_APP_NAME", "\"TAU App\""             // 启动页文案
             buildConfigField "Boolean", "DISPLAY_DEBUG_VIEW", "false"
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "30000"             // Level.WARN
-            buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "4"                // TauLogLevel.WARN
+            buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "4"
+            // TauLogLevel.WARN
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://83024767468B8BF8DB868F336596C" +
                     "63561265D553833E5C0BF3E4767659B826B@13.229.53.249:6882\""
         }
+
+        id00 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing"
+            resValue "string", "app_name", "TAU"
+        }
+
+        id01 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing01"
+            resValue "string", "app_name", "TAU01"
+        }
+
+        id02 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing02"
+            resValue "string", "app_name", "TAU02"
+        }
+
+        id03 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing03"
+            resValue "string", "app_name", "TAU03"
+        }
+
+        id04 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing04"
+            resValue "string", "app_name", "TAU04"
+        }
+
+        id05 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing05"
+            resValue "string", "app_name", "TAU05"
+        }
+
+        id06 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing06"
+            resValue "string", "app_name", "TAU06"
+        }
+
+        id07 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing07"
+            resValue "string", "app_name", "TAU07"
+        }
+
+        id08 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing08"
+            resValue "string", "app_name", "TAU08"
+        }
+
+        id09 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing09"
+            resValue "string", "app_name", "TAU09"
+        }
+
+        id10 {
+            dimension 'id'
+            applicationId "io.taucoin.torrent.publishing10"
+            resValue "string", "app_name", "TAU10"
+        }
+
+//        id11 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing11"
+//            resValue "string", "app_name", "TAU11"
+//        }
+//
+//        id12 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing12"
+//            resValue "string", "app_name", "TAU12"
+//        }
+//
+//        id13 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing13"
+//            resValue "string", "app_name", "TAU13"
+//        }
+//
+//        id14 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing14"
+//            resValue "string", "app_name", "TAU14"
+//        }
+//
+//        id15 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing15"
+//            resValue "string", "app_name", "TAU15"
+//        }
+//
+//        id16 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing16"
+//            resValue "string", "app_name", "TAU16"
+//        }
+//
+//        id17 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing17"
+//            resValue "string", "app_name", "TAU17"
+//        }
+//
+//        id18 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing18"
+//            resValue "string", "app_name", "TAU18"
+//        }
+//
+//        id19 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing19"
+//            resValue "string", "app_name", "TAU19"
+//        }
+//
+//        id20 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing20"
+//            resValue "string", "app_name", "TAU20"
+//        }
+//
+//        id21 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing21"
+//            resValue "string", "app_name", "TAU21"
+//        }
+//
+//        id22 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing22"
+//            resValue "string", "app_name", "TAU22"
+//        }
+//
+//        id23 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing23"
+//            resValue "string", "app_name", "TAU23"
+//        }
+//
+//        id24 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing24"
+//            resValue "string", "app_name", "TAU24"
+//        }
+//
+//        id25 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing25"
+//            resValue "string", "app_name", "TAU25"
+//        }
+//
+//        id26 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing26"
+//            resValue "string", "app_name", "TAU26"
+//        }
+//
+//        id27 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing27"
+//            resValue "string", "app_name", "TAU27"
+//        }
+//
+//        id28 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing28"
+//            resValue "string", "app_name", "TAU28"
+//        }
+//
+//        id29 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing29"
+//            resValue "string", "app_name", "TAU29"
+//        }
+//
+//        id30 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing30"
+//            resValue "string", "app_name", "TAU30"
+//        }
+//
+//        id31 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing31"
+//            resValue "string", "app_name", "TAU31"
+//        }
+//
+//        id32 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing32"
+//            resValue "string", "app_name", "TAU32"
+//        }
+//
+//        id33 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing33"
+//            resValue "string", "app_name", "TAU33"
+//        }
+//
+//        id34 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing34"
+//            resValue "string", "app_name", "TAU34"
+//        }
+//
+//        id35 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing35"
+//            resValue "string", "app_name", "TAU35"
+//        }
+//
+//        id36 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing36"
+//            resValue "string", "app_name", "TAU36"
+//        }
+//
+//        id37 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing37"
+//            resValue "string", "app_name", "TAU37"
+//        }
+//
+//        id38 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing38"
+//            resValue "string", "app_name", "TAU38"
+//        }
+//
+//        id39 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing39"
+//            resValue "string", "app_name", "TAU39"
+//        }
+//
+//        id40 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing40"
+//            resValue "string", "app_name", "TAU40"
+//        }
+//
+//        id41 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing41"
+//            resValue "string", "app_name", "TAU41"
+//        }
+//
+//        id42 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing42"
+//            resValue "string", "app_name", "TAU42"
+//        }
+//
+//        id43 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing43"
+//            resValue "string", "app_name", "TAU43"
+//        }
+//
+//        id44 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing44"
+//            resValue "string", "app_name", "TAU44"
+//        }
+//
+//        id45 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing45"
+//            resValue "string", "app_name", "TAU45"
+//        }
+//
+//        id46 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing46"
+//            resValue "string", "app_name", "TAU46"
+//        }
+//
+//        id47 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing47"
+//            resValue "string", "app_name", "TAU47"
+//        }
+//
+//        id48 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing48"
+//            resValue "string", "app_name", "TAU48"
+//        }
+//
+//        id49 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing49"
+//            resValue "string", "app_name", "TAU49"
+//        }
+//
+//        id50 {
+//            dimension 'id'
+//            applicationId "io.taucoin.torrent.publishing50"
+//            resValue "string", "app_name", "TAU50"
+//        }
+
+    }
+
+    dexOptions {
+        incremental true
+        javaMaxHeapSize "4g"
     }
 }
 
