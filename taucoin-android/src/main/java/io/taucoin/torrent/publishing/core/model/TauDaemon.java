@@ -380,6 +380,9 @@ public abstract class TauDaemon {
                 }
             }
         }
+        if (tauDozeManager.isDozeMode()) {
+            resumeService();
+        }
         tauDozeManager.setDozeMode(false);
         startTauDozeTimer(TauDozeManager.TAU_UP_TIME);
     }
@@ -408,11 +411,32 @@ public abstract class TauDaemon {
                         }
                         if (dozeTime > 0) {
                             // TAU处于Doze Mode中，重建创建定时器等待doze结束
+                            pauseService();
                             tauDozeManager.setDozeMode(true);
                             startTauDozeTimer(dozeTime);
                         }
                     }
                 });
+    }
+
+    /**
+     * 暂停区块链服务
+     */
+    private void pauseService() {
+        if (isRunning) {
+            sessionManager.pauseService();
+        }
+        logger.info("pauseService isRunning::{}", isRunning);
+    }
+
+    /**
+     * 恢复区块链服务
+     */
+    private void resumeService() {
+        if (isRunning) {
+            sessionManager.resumeService();
+        }
+        logger.info("resumeService isRunning::{}", isRunning);
     }
 
     /**

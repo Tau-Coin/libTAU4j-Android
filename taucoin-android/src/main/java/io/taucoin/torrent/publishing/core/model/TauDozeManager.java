@@ -82,13 +82,13 @@ class TauDozeManager {
         if (rate >= 90) {
             dozeTime = 0;
         } else if (rate >= 70) {
-            dozeTime = 3 * 1000 * 60;
+            dozeTime = 3 * 60 * 1000;
         } else if (rate >= 50) {
-            dozeTime = 6 * 1000 * 60;
+            dozeTime = 6 * 60 * 1000;
         } else if (rate >= 30) {
-            dozeTime = 12 * 1000 * 60;
+            dozeTime = 12 * 60 * 1000;
         } else {
-            dozeTime = 24 * 100 * 60;
+            dozeTime = 24 * 60 * 100;
         }
         if (reset) {
             this.dozeTime = dozeTime;
