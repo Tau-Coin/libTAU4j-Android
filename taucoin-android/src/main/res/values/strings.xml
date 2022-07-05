@@ -289,6 +289,7 @@
     <string name="setting_fore_running_time">Foreground Time</string>
     <string name="setting_bg_running_time">Background Time</string>
     <string name="setting_doze_running_time">Doze Time</string>
+    <string name="setting_tau_doze_running_time">TAU Doze Time</string>
     <string name="setting_survival_mode">Survival Mode</string>
     <string name="setting_doze_time">Doze time: %1$s</string>
     <string name="setting_running_time_hours">%1$s hours</string>

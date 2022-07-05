@@ -62,6 +62,13 @@
                         app:lineVisibility="false"
                         app:lineLeftText="@string/setting_doze_running_time"/>
 
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/tv_tau_doze_running_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:lineVisibility="false"
+                        app:lineLeftText="@string/setting_tau_doze_running_time"/>
+
                 </LinearLayout>
 
                 <LinearLayout

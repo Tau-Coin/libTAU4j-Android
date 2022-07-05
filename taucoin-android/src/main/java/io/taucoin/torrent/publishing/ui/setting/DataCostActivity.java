@@ -108,6 +108,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         refreshAllData();
         handleSettingsChanged(getString(R.string.pref_key_background_running_time));
         handleSettingsChanged(getString(R.string.pref_key_doze_running_time));
+        handleSettingsChanged(getString(R.string.pref_key_tau_doze_time));
         disposables.add(settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -171,6 +172,10 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             int dozeTime = NetworkSetting.getDozeTime();
             String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
             binding.tvDozeRunningTime.setRightText(dozeTimeStr);
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_tau_doze_time))) {
+            long dozeTime = settingsRepo.getTauDozeTime();
+            String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
+            binding.tvTauDozeRunningTime.setRightText(dozeTimeStr);
         }
     }
 
