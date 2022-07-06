@@ -52,17 +52,15 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private FragmentCommunityBinding binding;
     private CommunityViewModel communityViewModel;
     private SettingsRepository settingsRepo;
-    private CompositeDisposable disposables = new CompositeDisposable();
-    private CommunityTabFragment[] fragments = new CommunityTabFragment[3];
+    private final CompositeDisposable disposables = new CompositeDisposable();
+    private final CommunityTabFragment[] fragments = new CommunityTabFragment[3];
     private String chainID;
     private boolean isJoined = false;
     private boolean isOnChain = false;
     private boolean isNoBalance = true;
-    private BlockStatistics blockStatistics;
     private Statistics memberStatistics;
     private AccessList accessList;
     private long nodes = 0;
-    private CommonDialog helpDialog;
 
     @Nullable
     @Override
@@ -130,7 +128,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
     }
 
-    private TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+    private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
 
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
@@ -192,30 +190,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         }
         if (isJoined) {
             // 已加入社区
-            if (nodes > 0) {
-                // 如果社区成员就自己一个, 或者区块总数为0
-                boolean isMiningAlone = (memberStatistics != null && memberStatistics.getTotal() == 1) ||
-                        (blockStatistics != null && blockStatistics.getTotal() == 0);
-                // 显示help, 区块总数为0，社区只有自己一个成员的话不显示
-                boolean isShowHelp = blockStatistics != null && blockStatistics.getTotal() == 0;
-                if (!isMiningAlone) {
-                    long latestTime = TauDaemon.daemonStartTime;
-                    if (blockStatistics != null && blockStatistics.getMaxCreateTime() > latestTime) {
-                        latestTime = blockStatistics.getMaxCreateTime();
-                    }
-                    // 30分钟内无Total Blocks无变化为mining alone
-                    float minutes = DateUtil.timeDiffMinutes(latestTime, DateUtil.getMillisTime());
-                    isMiningAlone = minutes > 30;
-                    if (!isShowHelp) {
-                        isShowHelp = isMiningAlone;
-                    }
-                }
-                subtitle.append(isMiningAlone ? getString(R.string.community_users_mining_alone) :
-                        getString(R.string.community_users_mining));
-                binding.ivHelp.setVisibility(isShowHelp ? View.VISIBLE : View.GONE);
-            } else {
-                subtitle.append(getString(R.string.community_users_discovering));
-            }
+            subtitle.append(nodes > 0 ? getString(R.string.community_users_mining) : getString(R.string.community_users_discovering));
         } else {
             // 未加入社区
             int length = subtitle.length();
@@ -236,9 +211,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     public void onStop() {
         super.onStop();
         disposables.clear();
-        if (helpDialog != null && helpDialog.isShowing()) {
-            helpDialog.closeDialog();
-        }
     }
 
     @Override
@@ -282,7 +254,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(statistics -> {
-                    this.blockStatistics = statistics;
                     showCommunitySubtitle();
                     binding.tvBlocksStatistics.setText(getString(R.string.community_blocks_stats,
                             statistics.getTotal(), statistics.getOnChain()));
@@ -322,9 +293,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
                 break;
-            case R.id.iv_help:
-                showHelpDialog();
-                break;
         }
     }
 
@@ -336,23 +304,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 fragment.onFragmentResult(requestCode, resultCode, data);
             }
         }
-    }
-
-    private void showHelpDialog() {
-        if (helpDialog != null && helpDialog.isShowing()) {
-            helpDialog.closeDialog();
-        }
-        ViewDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
-                R.layout.view_dialog, null, false);
-        dialogBinding.tvMsg.setTextColor(getResources().getColor(R.color.color_black));
-        dialogBinding.tvMsg.setText(R.string.community_peers_help);
-        dialogBinding.ivClose.setVisibility(View.GONE);
-        helpDialog = new CommonDialog.Builder(activity)
-                .setContentView(dialogBinding.getRoot())
-                .setCanceledOnTouchOutside(true)
-                .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss())
-                .create();
-        helpDialog.show();
     }
 
     private CommunityTabFragment createFragmentView(int position) {
