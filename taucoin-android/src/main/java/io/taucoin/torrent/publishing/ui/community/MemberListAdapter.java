@@ -66,7 +66,8 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberL
             holder.binding.tvName.setText(showName);
             holder.binding.leftView.setImageBitmap(UsersUtil.getHeadPic(member.user));
 
-            holder.binding.tvNonMember.setVisibility(member.onChain() ? View.VISIBLE : View.GONE);
+//            holder.binding.tvNonMember.setVisibility(member.onChain() ? View.VISIBLE : View.GONE);
+            holder.binding.tvNonMember.setVisibility(View.VISIBLE);
 
             holder.binding.getRoot().setOnClickListener(v -> {
                 if (listener != null) {

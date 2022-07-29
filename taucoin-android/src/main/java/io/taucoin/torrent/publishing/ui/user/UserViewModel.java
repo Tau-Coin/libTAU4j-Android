@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -44,13 +45,19 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
-import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
 import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
+import io.taucoin.torrent.publishing.core.model.data.UserEvent;
+import io.taucoin.torrent.publishing.core.model.data.UserHeadPic;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
@@ -59,7 +66,10 @@ import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.EditTextInhibitInput;
 import io.taucoin.torrent.publishing.core.utils.FileUtil;
+import io.taucoin.torrent.publishing.core.utils.HashUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
@@ -86,6 +96,7 @@ import io.taucoin.torrent.publishing.ui.customviews.GuideDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
+import io.taucoin.torrent.publishing.ui.transaction.TxViewModel;
 
 /**
  * 用户相关的ViewModel
@@ -94,27 +105,29 @@ public class UserViewModel extends AndroidViewModel {
 
     private static final Logger logger = LoggerFactory.getLogger("UserViewModel");
     private static final String QR_CODE_NAME = "QRCode%s.jpg";
-    private UserRepository userRepo;
-    private FriendRepository friendRepo;
-    private SettingsRepository settingsRepo;
-    private TxRepository txRepo;
-    private MemberRepository memRepo;
-    private CompositeDisposable disposables = new CompositeDisposable();
-    private MutableLiveData<String> changeResult = new MutableLiveData<>();
-    private MutableLiveData<Result> addFriendResult = new MutableLiveData<>();
-    private MutableLiveData<Boolean> editRemarkResult = new MutableLiveData<>();
-    private MutableLiveData<List<User>> blackList = new MutableLiveData<>();
-    private MutableLiveData<Result> editBlacklistResult = new MutableLiveData<>();
-    private MutableLiveData<UserAndFriend> userDetail = new MutableLiveData<>();
-    private MutableLiveData<QRContent> qrContent = new MutableLiveData<>();
-    private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
-    private MutableLiveData<Bitmap> qrBlurBitmap = new MutableLiveData<>();
-    private MutableLiveData<List<UserAndFriend>> userList = new MutableLiveData<>();
+    private final UserRepository userRepo;
+    private final FriendRepository friendRepo;
+    private final SettingsRepository settingsRepo;
+    private final TxRepository txRepo;
+    private final MemberRepository memRepo;
+    private final CommunityRepository communityRepo;
+    private final CompositeDisposable disposables = new CompositeDisposable();
+    private final MutableLiveData<String> changeResult = new MutableLiveData<>();
+    private final MutableLiveData<Result> addFriendResult = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> editRemarkResult = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> editProfileResult = new MutableLiveData<>();
+    private final MutableLiveData<List<User>> blackList = new MutableLiveData<>();
+    private final MutableLiveData<Result> editBlacklistResult = new MutableLiveData<>();
+    private final MutableLiveData<UserAndFriend> userDetail = new MutableLiveData<>();
+    private final MutableLiveData<QRContent> qrContent = new MutableLiveData<>();
+    private final MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
+    private final MutableLiveData<Bitmap> qrBlurBitmap = new MutableLiveData<>();
+    private final MutableLiveData<List<UserAndFriend>> userList = new MutableLiveData<>();
     private CommonDialog commonDialog;
     private CommonDialog editNameDialog;
     private GuideDialog guideDialog;
-    private TauDaemon daemon;
-    private ChatViewModel chatViewModel;
+    private final TauDaemon daemon;
+    private final ChatViewModel chatViewModel;
     private Disposable clearDisposable;
     public UserViewModel(@NonNull Application application) {
         super(application);
@@ -123,6 +136,7 @@ public class UserViewModel extends AndroidViewModel {
         txRepo = RepositoryHelper.getTxRepository(getApplication());
         friendRepo = RepositoryHelper.getFriendsRepository(getApplication());
         memRepo = RepositoryHelper.getMemberRepository(getApplication());
+        communityRepo = RepositoryHelper.getCommunityRepository(getApplication());
         daemon = TauDaemon.getInstance(application);
         chatViewModel = new ChatViewModel(application);
     }
@@ -261,6 +275,7 @@ public class UserViewModel extends AndroidViewModel {
                     if (StringUtil.isNotEmpty(name)) {
                         newUser.nickname = name;
                         newUser.updateNNTime = daemon.getSessionTime() / 1000;
+                        daemon.updateUserInfo(newUser);
                     }
                     newUser.seed = seed;
                     newUser.isCurrentUser = true;
@@ -284,7 +299,7 @@ public class UserViewModel extends AndroidViewModel {
                 List<FriendAndUser> friends = friendRepo.queryFriendsByUserPk(newUser.publicKey);
                 if (friends != null && friends.size() > 0) {
                     for (FriendAndUser fau : friends) {
-                        boolean isSuccess = daemon.updateFriendInfo(fau.user);
+                        boolean isSuccess = daemon.addNewFriend(fau.user.publicKey);
                         logger.info("importSeed updateFriendInfo::{}, isSuccess::{}, size::{}",
                                 fau.friendPK, isSuccess, friends.size());
                     }
@@ -453,6 +468,10 @@ public class UserViewModel extends AndroidViewModel {
         return editRemarkResult;
     }
 
+    public MutableLiveData<Boolean> getEditProfileResult() {
+        return editProfileResult;
+    }
+
     public MutableLiveData<List<UserAndFriend>> getUserList() {
         return userList;
     }
@@ -473,6 +492,59 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     /**
+     * 获取在黑名单的社区用户列表
+     */
+    public void getCommunityUsersInBlacklist() {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<List<User>>) emitter -> {
+            List<User> list = userRepo.getCommunityUsersInBlacklist();
+            emitter.onNext(list);
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list -> blackList.postValue(list));
+        disposables.add(disposable);
+    }
+
+    /**
+     * 设置用户是否加入黑名单
+     * @param publicKey 用户publicKey
+     * @param blacklist 是否加入黑名单
+     */
+    public void setCommunityUserBlacklist(String publicKey, boolean blacklist) {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
+            Result result = new Result();
+            userRepo.setCommunityUserBlacklist(publicKey, blacklist);
+            if (blacklist) {
+                // 拉黑社区用户，给同在的社区发notes消息
+                String memberPk = HashUtil.hashMiddleHide(publicKey);
+                String userPk = MainApplication.getInstance().getPublicKey();
+                List<Community> communities = communityRepo.getSameCommunity(userPk, publicKey);
+                if (communities != null && communities.size() > 0) {
+                    int txType = TxType.NOTE_TX.getType();
+                    Context context = getApplication();
+                    String banMsg = context.getString(R.string.ban_member_msg, memberPk);
+                    for (Community community : communities) {
+                        Tx tx = new Tx(community.chainID, 0L, txType, banMsg);
+                        TxViewModel.createTransaction(context, tx, false);
+                    }
+                }
+            }
+            result.setMsg(DateUtil.getDateTime());
+            result.setSuccess(true);
+            emitter.onNext(result);
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                    editBlacklistResult.postValue(result);
+                    submitDataSetChanged();
+                });
+        disposables.add(disposable);
+    }
+
+    /**
      * 设置用户是否加入黑名单
      * @param publicKey 用户publicKey
      * @param blacklist 是否加入黑名单
@@ -485,7 +557,7 @@ public class UserViewModel extends AndroidViewModel {
                 isSuccess = daemon.deleteFriend(publicKey);
             } else {
                 User friend = userRepo.getFriend(publicKey);
-                isSuccess = daemon.updateFriendInfo(friend);
+                isSuccess = daemon.addNewFriend(friend.publicKey);
             }
             if (isSuccess) {
                 userRepo.setUserBlacklist(publicKey, blacklist);
@@ -541,13 +613,17 @@ public class UserViewModel extends AndroidViewModel {
                 if (StringUtil.isNotEmpty(name)) {
                     user.nickname = name;
                     user.updateNNTime = daemon.getSessionTime() / 1000;
+                    // 更新自己的信息
+                    if (StringUtil.isEmpty(publicKey)) {
+                        daemon.updateUserInfo(user);
+                    }
                 }
                 String currentUserPk = userRepo.getCurrentUser().publicKey;
                 userRepo.updateUser(user);
                 Friend friend = friendRepo.queryFriend(currentUserPk, publicKey);
                 // 必须是朋友关系，才能更新朋友
                 if (friend != null && friend.status != FriendStatus.DISCOVERED.getStatus()) {
-                    daemon.updateFriendInfo(user);
+                    daemon.addNewFriend(user.publicKey);
                 }
             }
             emitter.onNext(true);
@@ -581,7 +657,7 @@ public class UserViewModel extends AndroidViewModel {
                 Friend friend = friendRepo.queryFriend(currentUserPk, publicKey);
                 // 必须是朋友关系，才能更新朋友
                 if (friend != null && friend.status != FriendStatus.DISCOVERED.getStatus()) {
-                    daemon.updateFriendInfo(user);
+                    daemon.addNewFriend(user.publicKey);
                 }
             }
             emitter.onNext(true);
@@ -647,7 +723,7 @@ public class UserViewModel extends AndroidViewModel {
      * @param publicKey
      * @param airdropUrl
      */
-    public void addAirdropFriend(String publicKey, AirdropUrl airdropUrl) {
+    public void addAirdropFriend(String publicKey, LinkUtil.Link airdropUrl) {
         addFriend(publicKey, null, null, airdropUrl);
     }
 
@@ -665,7 +741,7 @@ public class UserViewModel extends AndroidViewModel {
         addFriend(publicKey, null, remark, null);
     }
 
-    private void addFriend(String publicKey, String nickname, String remark, AirdropUrl airdropUrl) {
+    private void addFriend(String publicKey, String nickname, String remark, LinkUtil.Link airdropUrl) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             Result result = addFriendTask(publicKey, nickname, remark, airdropUrl);
 
@@ -679,7 +755,7 @@ public class UserViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private Result addFriendTask(String publicKey, String nickname, String remark, AirdropUrl airdropUrl) {
+    private Result addFriendTask(String publicKey, String nickname, String remark, LinkUtil.Link airdropUrl) {
         logger.info("AddFriendsLocally, publicKey::{}, nickname::{}", publicKey, nickname);
         Result result = new Result();
         result.setKey(publicKey);
@@ -715,7 +791,7 @@ public class UserViewModel extends AndroidViewModel {
         Friend friend = friendRepo.queryFriend(userPK, publicKey);
 
         // 更新libTAU朋友信息
-        boolean isSuccess = daemon.updateFriendInfo(user);
+        boolean isSuccess = daemon.addNewFriend(user.publicKey);
         logger.info("AddFriendsLocally, libTAU updateFriendInfo success::{}", isSuccess);
         boolean isExist = false;
         if (null == friend) {
@@ -763,12 +839,12 @@ public class UserViewModel extends AndroidViewModel {
         return result;
     }
 
-    private void sendDefaultMessage(String friendPk, AirdropUrl airdropUrl) {
+    private void sendDefaultMessage(String friendPk, LinkUtil.Link airdropUrl) {
         String msg;
         String chainID = null;
         int type;
         if (airdropUrl != null) {
-            chainID = airdropUrl.getChainID();
+            chainID = airdropUrl.getData();
             String communityName = ChainIDUtil.getName(chainID);
             msg = getApplication().getString(R.string.contacts_accepting_airdrop, communityName);
             type = MessageType.AIRDROP.getType();
@@ -779,7 +855,7 @@ public class UserViewModel extends AndroidViewModel {
         String senderPk = MainApplication.getInstance().getPublicKey();
         chatViewModel.syncSendMessageTask(senderPk, friendPk, msg, type, chainID);
         if (airdropUrl != null) {
-            String link = airdropUrl.getAirdropUrl();
+            String link = airdropUrl.getLink();
             chatViewModel.syncSendMessageTask(senderPk, friendPk, link, MessageType.TEXT.getType(), null);
         }
         logger.info("AddFriendsLocally, syncSendMessageTask::{}", msg);
@@ -813,6 +889,9 @@ public class UserViewModel extends AndroidViewModel {
         ContactsDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.contacts_dialog, null, false);
         binding.etPublicKey.setHint(R.string.user_new_name_hint);
+        // 社区名字禁止输入#特殊符号
+        binding.etPublicKey.setFilters(new InputFilter[]{
+                new EditTextInhibitInput(EditTextInhibitInput.NICKNAME_REGEX, false)});
         binding.ivClose.setOnClickListener(v -> {
             if (editNameDialog != null) {
                 editNameDialog.closeDialog();
@@ -915,7 +994,7 @@ public class UserViewModel extends AndroidViewModel {
      */
     public void showBanDialog(BaseActivity activity, String publicKey, String showName) {
         if (settingsRepo.doNotShowBanDialog()) {
-            setUserBlacklist(publicKey, true);
+            setCommunityUserBlacklist(publicKey, true);
             return;
         }
         BanDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
@@ -933,7 +1012,7 @@ public class UserViewModel extends AndroidViewModel {
                     settingsRepo.doNotShowBanDialog(true);
                 }
             }
-            setUserBlacklist(publicKey, true);
+            setCommunityUserBlacklist(publicKey, true);
         });
         commonDialog = new CommonDialog.Builder(activity)
                 .setContentView(binding.getRoot())
@@ -1033,14 +1112,17 @@ public class UserViewModel extends AndroidViewModel {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Bitmap>) emitter -> {
             try {
                 String publicKey = null;
+                String content = "";
                 if (qrContent instanceof SeedQRContent) {
                     String seed = ((SeedQRContent) qrContent).getSeed();
                     Pair<byte[], byte[]> keypair = Ed25519.createKeypair(ByteUtil.toByte(seed));
                     publicKey = ByteUtil.toHexString(keypair.first);
+                    content = new Gson().toJson(qrContent);
                 } else if (qrContent instanceof PublicKeyQRContent) {
                     publicKey = ((PublicKeyQRContent) qrContent).getPublicKey();
+                    content = LinkUtil.encodeFriend(publicKey, qrContent.getNickName());
                 }
-                String content = new Gson().toJson(qrContent);
+
                 int bgColor = Utils.getGroupColor(publicKey);
                 String firstLettersName = UsersUtil.getQRCodeName(qrContent.getNickName());
                 Bitmap logoBitmap = BitmapUtil.createLogoBitmap(bgColor, firstLettersName);
@@ -1118,8 +1200,11 @@ public class UserViewModel extends AndroidViewModel {
                 String userPk = MainApplication.getInstance().getPublicKey();
                 Friend friend = friendRepo.queryFriend(userPk, friendPK);
                 if (friend != null) {
-                    if (friend.msgUnread != status) {
+                    if (friend.msgUnread != status || (!isAutoAdd && friend.focused != 0)) {
                         friend.msgUnread = status;
+                        if (!isAutoAdd) {
+                            friend.focused = 0;
+                        }
                         friendRepo.updateFriend(friend);
                     }
                 } else {
@@ -1207,6 +1292,16 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     /**
+     * 关注朋友
+     */
+    public void focusFriend(String friendPk) {
+        if (StringUtil.isNotEmpty(friendPk)) {
+            UserEvent event = new UserEvent(UserEvent.Event.FOCUS_FRIEND, null);
+            daemon.sendToPeer(friendPk, event.getEncoded());
+        }
+    }
+
+    /**
      * 请求更新朋友信息
      */
     public void requestFriendInfo(String friendPk) {
@@ -1222,7 +1317,10 @@ public class UserViewModel extends AndroidViewModel {
             if (headPic != null) {
                 user.headPic = headPic;
                 user.updateHPTime = daemon.getSessionTime() / 1000;
-                daemon.updateFriendInfo(user);
+                logger.debug("updateHeadPic headPic::{}", headPic.length);
+                UserHeadPic userHeadPic = new UserHeadPic(user.headPic, user.updateHPTime);
+                logger.debug("updateHeadPic Encoded::{}", userHeadPic.getEncoded().length);
+                daemon.pubUserHeadPic(user.publicKey, userHeadPic.getEncoded());
                 userRepo.updateUser(user);
             }
             MediaUtil.deleteAllCacheImageFile();
@@ -1230,6 +1328,22 @@ public class UserViewModel extends AndroidViewModel {
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
+        disposables.add(disposable);
+    }
+
+    public void updatePersonalProfile(String profile) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            User user = userRepo.getCurrentUser();
+            user.profile = profile;
+            user.updatePFTime= daemon.getSessionTime() / 1000;
+            logger.debug("updatePersonalProfile profile");
+            daemon.updateUserInfo(user);
+            userRepo.updateUser(user);
+            emitter.onNext(true);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(editProfileResult::postValue);
         disposables.add(disposable);
     }
 }

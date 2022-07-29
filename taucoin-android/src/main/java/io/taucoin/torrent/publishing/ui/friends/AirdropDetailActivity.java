@@ -7,10 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -22,7 +18,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.UrlUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
@@ -46,7 +42,6 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
     private Member member;
     private Disposable airdropDisposable;
     private String airdropLink;
-    private String airdropLink1Bs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +64,10 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
         communityViewModel.getAirdropResult().observe(this, result -> {
             this.finish();
         });
+
+        String airdropPeer = MainApplication.getInstance().getPublicKey();
+        airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID);
+        binding.tauLink.setText(airdropLink);
     }
 
     private void updateAirdropDetail(Member member) {
@@ -143,17 +142,6 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::updateAirdropDetail));
 
-        // 获取3个社区成员的公钥
-        disposables.add(communityViewModel.getCommunityMembersLimit(chainID, Constants.AIRDROP_LINK_BS_LIMIT)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
-                    if (StringUtil.isNotEmpty(chainID)) {
-                        String airdropPeer = MainApplication.getInstance().getPublicKey();
-                        airdropLink = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, list);
-                        airdropLink1Bs = UrlUtil.encodeOnePeerAirdropUrl(airdropPeer, chainID, list);
-                        binding.tauLink.setText(airdropLink);
-                    }
-                }));
     }
 
     @Override
@@ -176,13 +164,13 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
                 ToastUtils.showShortToast(R.string.copy_link_successfully);
                 break;
             case R.id.ll_share:
-                if (StringUtil.isEmpty(airdropLink1Bs)) {
+                if (StringUtil.isEmpty(airdropLink)) {
                     return;
                 }
                 String communityName = ChainIDUtil.getName(chainID);
                 String shareTitle = getString(R.string.bot_share_airdrop_link_title);
                 String text = getString(R.string.bot_share_airdrop_link_content,
-                        communityName, Constants.APP_HOME_URL, communityName, airdropLink1Bs);
+                        communityName, Constants.APP_HOME_URL, communityName, airdropLink);
                 ActivityUtil.shareText(this, shareTitle, text);
                 break;
         }

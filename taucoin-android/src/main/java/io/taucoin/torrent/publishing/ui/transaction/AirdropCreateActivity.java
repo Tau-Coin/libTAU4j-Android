@@ -16,16 +16,15 @@ import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
-import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityAirdropCoinsBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
@@ -122,11 +121,9 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
                     isClickPaste = false;
                     String content = binding.etLink.getEditableText().toString();
                     if (StringUtil.isNotEmpty(content)) {
-                        AirdropUrl airdropUrl = UrlUtil.decodeAirdropUrl(content);
-                        if (airdropUrl != null) {
-                            String newUrl = UrlUtil.encodeOnePeerAirdropUrl(airdropUrl.getAirdropPeer(),
-                                    airdropUrl.getChainID(), airdropUrl.getPeers());
-                            binding.etLink.setText(newUrl);
+                        LinkUtil.Link link = LinkUtil.decode(content);
+                        if (link.isAirdropLink()) {
+                            binding.etLink.setText(content);
                         }
                     }
                 }

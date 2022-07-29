@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.ui.user;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -10,15 +11,17 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndTime;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.databinding.ItemUserCommunityBinding;
 
 /**
  * 用户加入社区的列表的Adapter
  */
-public class UserCommunityListAdapter extends ListAdapter<Member, UserCommunityListAdapter.ViewHolder> {
+public class UserCommunityListAdapter extends ListAdapter<MemberAndTime, UserCommunityListAdapter.ViewHolder> {
     private ClickListener clickListener;
 
     UserCommunityListAdapter(ClickListener clickListener) {
@@ -55,7 +58,7 @@ public class UserCommunityListAdapter extends ListAdapter<Member, UserCommunityL
             this.listener = listener;
         }
 
-        void bind(ViewHolder holder, Member member) {
+        void bind(ViewHolder holder, MemberAndTime member) {
             if(null == holder || null == member){
                 return;
             }
@@ -63,9 +66,11 @@ public class UserCommunityListAdapter extends ListAdapter<Member, UserCommunityL
             holder.binding.tvName.setText(communityName);
 
             String balance = FmtMicrometer.fmtBalance(member.balance);
-            String power = FmtMicrometer.fmtLong(member.power);
-            String balancePower = context.getString(R.string.main_balance_power, balance, power);
-            holder.binding.tvBalancePower.setText(balancePower);
+            String balancePower = context.getString(R.string.main_balance, balance);
+            holder.binding.tvBalance.setText(balancePower);
+            long latestTime = Math.max(member.latestTxTime, member.latestMiningTime);
+            holder.binding.tvLatestTime.setVisibility(latestTime > 0 ? View.VISIBLE : View.GONE);
+            holder.binding.tvLatestTime.setText(DateUtil.format(latestTime, DateUtil.pattern5));
 
             holder.binding.getRoot().setOnClickListener(v -> {
                 if(listener != null){
@@ -79,14 +84,14 @@ public class UserCommunityListAdapter extends ListAdapter<Member, UserCommunityL
         void onItemClicked(Member member);
     }
 
-    private static final DiffUtil.ItemCallback<Member> diffCallback = new DiffUtil.ItemCallback<Member>() {
+    private static final DiffUtil.ItemCallback<MemberAndTime> diffCallback = new DiffUtil.ItemCallback<MemberAndTime>() {
         @Override
-        public boolean areContentsTheSame(@NonNull Member oldItem, @NonNull Member newItem) {
+        public boolean areContentsTheSame(@NonNull MemberAndTime oldItem, @NonNull MemberAndTime newItem) {
             return oldItem.equals(newItem);
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull Member oldItem, @NonNull Member newItem) {
+        public boolean areItemsTheSame(@NonNull MemberAndTime oldItem, @NonNull MemberAndTime newItem) {
             return oldItem.equals(newItem);
         }
     };

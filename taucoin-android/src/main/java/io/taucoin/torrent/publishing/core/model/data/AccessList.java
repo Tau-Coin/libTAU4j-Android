@@ -7,7 +7,6 @@ import java.util.List;
  */
 public class AccessList {
     private List<String> connected;       // 访问列表
-    private List<String> gossip;          // gossip列表
 
     public int getConnectedSize() {
         return null == connected ? 0 : connected.size();
@@ -17,19 +16,7 @@ public class AccessList {
         this.connected = connected;
     }
 
-    public int getGossipSize() {
-        return null == gossip ? 0 : gossip.size();
-    }
-
-    public void setGossip(List<String> gossip) {
-        this.gossip = gossip;
-    }
-
     public List<String> getConnected() {
         return connected;
-    }
-
-    public List<String> getGossip() {
-        return gossip;
     }
 }

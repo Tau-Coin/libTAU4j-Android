@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+            android:id="@+id/et_personal_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minLines="7"
+            android:textSize="@dimen/font_size_14"
+            android:gravity="start"
+            android:hint="@string/setting_personal_profile"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:layout_marginStart="@dimen/widget_size_10"
+            android:layout_marginEnd="@dimen/widget_size_10"
+            android:padding="@dimen/widget_size_10"
+            android:background="@drawable/white_rect_round_bg"/>
+    </LinearLayout>
+</layout>

@@ -94,13 +94,13 @@ public interface CommunityRepository {
      */
     Flowable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum);
 
-    /**
-     * 观察链上Power前topNum的成员
-     * @param chainID 链ID
-     * @param topNum 查询数目
-     * @return Observable<List<Member>>
-     */
-    Flowable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum);
-
     Flowable<List<CommunityAndMember>> observeCommunities();
+
+    /**
+     * 获取和朋友的共同社区
+     * @param userPk
+     * @param friendPk
+     * @return
+     */
+    List<Community> getSameCommunity(String userPk, String friendPk);
 }

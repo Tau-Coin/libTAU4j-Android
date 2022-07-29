@@ -8,25 +8,12 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
  */
 public class CommunityAndMember extends Community {
     public long balance;
-    public long power;
     public long nonce;
-    public long blockNumber;
     public int joined;
     public int msgUnread;
 
     public CommunityAndMember(@NonNull String chainID, @NonNull String communityName) {
         super(chainID, communityName);
-    }
-
-    /**
-     * 判断社区成员是否是read only
-     * 判断条件：
-     * 1、区块余额和power都小于等于0
-     * 2、最新区块和成员状态时的区块相差Constants.BLOCKS_NOT_PERISHABLE
-     * @return read only
-     */
-    public boolean onChain() {
-        return power > 0 && blockNumber >= tailBlock;
     }
 
     public boolean noBalance() {
@@ -35,5 +22,9 @@ public class CommunityAndMember extends Community {
 
     public boolean isJoined() {
         return joined == 1;
+    }
+
+    public boolean onChain() {
+        return balance > 0 || nonce > 0;
     }
 }

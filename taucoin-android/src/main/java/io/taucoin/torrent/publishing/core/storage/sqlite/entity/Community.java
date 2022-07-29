@@ -26,7 +26,6 @@ public class Community implements Parcelable {
     public long consensusBlock;             // 共识点区块
     public boolean isBanned = false;        // 社区是否被用户拉入黑名单
     public String forkPoint;                // 社区分叉点区块号
-    public String topConsensus;             // 社区前3个投票共识点
 
     public Community(@NonNull String chainID, @NonNull String communityName){
         this.communityName = communityName;
@@ -43,7 +42,6 @@ public class Community implements Parcelable {
         consensusBlock = in.readLong();
         isBanned = in.readByte() != 0;
         forkPoint = in.readString();
-        topConsensus = in.readString();
     }
 
     @Override
@@ -56,7 +54,6 @@ public class Community implements Parcelable {
         dest.writeLong(consensusBlock);
         dest.writeByte((byte) (isBanned ? 1 : 0));
         dest.writeString(forkPoint);
-        dest.writeString(topConsensus);
     }
 
     @Override

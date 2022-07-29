@@ -19,7 +19,6 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import org.libTAU4j.ChainURL;
 import org.libTAU4j.Ed25519;
 import com.google.gson.Gson;
 import com.google.zxing.qrcode.QRCodeReader;
@@ -46,8 +45,7 @@ import io.taucoin.torrent.publishing.core.camera.MyHandler;
 import io.taucoin.torrent.publishing.core.camera.Size;
 import io.taucoin.torrent.publishing.core.camera.Utilities;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.Utils;
@@ -56,6 +54,7 @@ import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
 import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
+import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.user.SeedActivity;
@@ -101,6 +100,8 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
     private int scannerLineMoveDistance;
     // 扫描线颜色
     private int laserColor;
+
+    private CommonDialog longTimeCreateDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -269,10 +270,14 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
         try {
             if (StringUtil.isNotEmpty(scanResult)) {
                 logger.info("scanResult::{}", scanResult);
-                ChainURL decode = ChainUrlUtil.decode(scanResult);
-                if (decode != null) {
-                    String chainID = decode.getChainID();
-                    openChainLink(chainID, scanResult);
+                LinkUtil.Link decode = LinkUtil.decode(scanResult);
+                if (decode.isChainLink()) {
+                    String chainID = decode.getData();
+                    openChainLink(chainID, decode);
+                    return;
+                } else if (decode.isFriendLink() && ByteUtil.toByte(decode.getPeer()).length == Ed25519.PUBLIC_KEY_SIZE) {
+                    String nickname = decode.getData();
+                    openFriendLink(nickname, decode);
                     return;
                 }
                 SeedQRContent content = new Gson().fromJson(scanResult, SeedQRContent.class);
@@ -290,6 +295,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
                     }
                     return;
                 }
+                // 兼容老版本
                 PublicKeyQRContent publicKeyQRContent = new Gson().fromJson(scanResult, PublicKeyQRContent.class);
                 if (publicKeyQRContent != null &&
                         ByteUtil.toByte(publicKeyQRContent.getPublicKey()).length == Ed25519.PUBLIC_KEY_SIZE) {
@@ -299,7 +305,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
                 }
             }
         } catch (Exception e){
-            logger.error("handleScanResult::{}", e);
+            logger.error("handleScanResult::{}", e.getMessage());
         }
         if (cameraView != null && cameraView.getCameraSession() != null) {
             cameraView.getCameraSession().resume();
@@ -359,6 +365,10 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
         if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
         }
+
+        if (longTimeCreateDialog != null && longTimeCreateDialog.isShowing()) {
+            longTimeCreateDialog.closeDialog();
+        }
     }
 
     private void subscribeAddCommunity(){
@@ -417,8 +427,48 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
      * 打开chain link
      * @param chainID
      */
-    private void openChainLink(String chainID, String chainLink) {
-        communityViewModel.addCommunity(chainID, chainLink);
+    private void openChainLink(String chainID, LinkUtil.Link link) {
+        if (longTimeCreateDialog != null && longTimeCreateDialog.isShowing()) {
+            longTimeCreateDialog.closeDialog();
+        }
+        longTimeCreateDialog = communityViewModel.showLongTimeCreateDialog(this, link,
+                new CommonDialog.ClickListener() {
+                    @Override
+                    public void proceed() {
+                        // 加朋友
+                        userViewModel.addFriend(link.getPeer(), null);
+                        communityViewModel.addCommunity(chainID, link);
+                    }
+
+                    @Override
+                    public void close() {
+                        ScanQRCodeActivity.this.finish();
+                    }
+        });
+    }
+
+    /**
+     * 打开Friend link
+     * @param nickname
+     */
+    private void openFriendLink(String nickname, LinkUtil.Link link) {
+        if (longTimeCreateDialog != null && longTimeCreateDialog.isShowing()) {
+            longTimeCreateDialog.closeDialog();
+        }
+        longTimeCreateDialog = communityViewModel.showLongTimeCreateDialog(this, link,
+                new CommonDialog.ClickListener() {
+                    @Override
+                    public void proceed() {
+                        // 加朋友
+                        friendPk = link.getPeer();
+                        userViewModel.addFriend(friendPk, nickname);
+                    }
+
+                    @Override
+                    public void close() {
+                        ScanQRCodeActivity.this.finish();
+                    }
+                });
     }
 
     /**

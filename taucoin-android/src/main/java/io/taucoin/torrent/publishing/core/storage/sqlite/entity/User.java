@@ -27,6 +27,9 @@ public class User implements Parcelable {
     public long updateHPTime;               // 更新头像图片时间
     public boolean isCurrentUser = false;   // 是否是当前用户
     public boolean isBanned = false;        // 用户是否被用户拉入黑名单
+    public boolean isMemBanned = false;     // 社区成员是否被用户拉入黑名单
+    public String profile;                  // 用户简介
+    public long updatePFTime;               // 更新用户简介时间
 
     public User(@NonNull String publicKey, String seed, String nickname, boolean isCurrentUser){
         this.publicKey = publicKey;
@@ -55,6 +58,7 @@ public class User implements Parcelable {
         updateNNTime = in.readLong();
         isCurrentUser = in.readByte() != 0;
         isBanned = in.readByte() != 0;
+        isMemBanned = in.readByte() != 0;
         longitude = in.readDouble();
         latitude = in.readDouble();
         updateLocationTime = in.readLong();
@@ -63,6 +67,8 @@ public class User implements Parcelable {
             this.headPic = new byte[length];
             in.readByteArray(this.headPic);
         }
+        profile = in.readString();
+        updatePFTime = in.readLong();
     }
 
     @Override
@@ -74,6 +80,7 @@ public class User implements Parcelable {
         dest.writeLong(updateNNTime);
         dest.writeByte((byte) (isCurrentUser ? 1 : 0));
         dest.writeByte((byte) (isBanned ? 1 : 0));
+        dest.writeByte((byte) (isMemBanned ? 1 : 0));
         dest.writeDouble(longitude);
         dest.writeDouble(latitude);
         dest.writeLong(updateLocationTime);
@@ -82,6 +89,8 @@ public class User implements Parcelable {
         if (length > 0) {
             dest.writeByteArray(headPic);
         }
+        dest.writeString(profile);
+        dest.writeLong(updatePFTime);
     }
 
     @Override

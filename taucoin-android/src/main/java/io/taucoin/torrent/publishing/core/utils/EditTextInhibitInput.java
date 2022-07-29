@@ -11,7 +11,8 @@ import java.util.regex.Pattern;
  */
 public class EditTextInhibitInput implements InputFilter {
     public static final String WELL_REGEX = "^[#]+$";
-    public static final String NAME_REGEX = "^[A-Za-z0-9\\s-]+$"; // 字母、数字、空格、-
+    public static final String COMMUNITY_NAME_REGEX = "^[A-Za-z0-9\\s-]+$"; // 字母、数字、空格、-
+    public static final String NICKNAME_REGEX = "^[%&]+$"; // 禁止%，&
     private String regex;
     private boolean isCanInput;
 

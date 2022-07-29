@@ -40,7 +40,9 @@ public interface BlockDao {
             " ON a.chainID = c.chainID" +
             " LEFT JOIN (SELECT mm.chainID, count(*) totalPeers, SUM(balance) AS totalCoin FROM Members mm" +
             " LEFT JOIN Communities cc ON mm.chainID = cc.chainID" +
-            " WHERE mm.chainID = :chainID AND "+ MemberDao.WHERE_ON_CHAIN +") AS d" +
+            " WHERE mm.chainID = :chainID" +
+//            " AND "+ MemberDao.WHERE_ON_CHAIN +
+            ") AS d" +
             " ON a.chainID = d.chainID" +
             " LEFT JOIN (SELECT chainID, publicKey, balance FROM Members WHERE chainID = :chainID" +
             " AND publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")) AS e" +

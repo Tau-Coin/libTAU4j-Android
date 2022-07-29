@@ -15,6 +15,7 @@ import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndTime;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
@@ -25,7 +26,7 @@ import io.taucoin.torrent.publishing.core.utils.DateUtil;
 /**
  * CommunityRepository接口实现
  */
-public class MemberRepositoryImpl implements MemberRepository{
+public class MemberRepositoryImpl implements MemberRepository {
 
     private Context appContext;
     private AppDatabase db;
@@ -189,7 +190,7 @@ public class MemberRepositoryImpl implements MemberRepository{
     }
 
     @Override
-    public List<Member> getUnJoinedExpiredCommunityList(String userPk) {
-        return db.memberDao().getUnJoinedExpiredCommunityList(userPk);
+    public List<MemberAndTime> getJoinedCommunityList(String userPk) {
+        return db.memberDao().getJoinedCommunityList(userPk);
     }
 }

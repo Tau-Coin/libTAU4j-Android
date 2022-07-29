@@ -11,6 +11,7 @@ import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
+import io.taucoin.torrent.publishing.core.model.data.MemberAndTime;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
@@ -103,5 +104,5 @@ public interface MemberRepository {
      */
     List<Member> getJoinedUnexpiredCommunityList(String userPk);
 
-    List<Member> getUnJoinedExpiredCommunityList(String publicKey);
+    List<MemberAndTime> getJoinedCommunityList(String publicKey);
 }

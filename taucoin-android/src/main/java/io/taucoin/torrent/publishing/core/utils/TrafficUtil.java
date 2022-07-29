@@ -9,6 +9,7 @@ import java.util.Date;
 
 import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 
@@ -142,6 +143,8 @@ public class TrafficUtil {
         NetworkSetting.updateForegroundRunningTime(0);
         NetworkSetting.updateBackgroundRunningTime(0);
         NetworkSetting.updateDozeTime(0);
+        Context context = MainApplication.getInstance();
+        TauDaemon.getInstance(context).resetDozeStartTime();
         settingsRepo.setTauDozeTime(0);
         NetworkSetting.updateDataAvailableRate(100);
         NetworkSetting.clearWifiPromptLimit();

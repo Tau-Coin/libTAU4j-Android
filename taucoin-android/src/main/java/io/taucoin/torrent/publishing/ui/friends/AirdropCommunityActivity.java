@@ -8,28 +8,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import org.libTAU4j.ChainURL;
-
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
-import io.taucoin.torrent.publishing.core.model.data.AirdropUrl;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
-import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityAirdropCommunityBinding;
 import io.taucoin.torrent.publishing.databinding.ExternalAirdropLinkDialogBinding;
@@ -51,7 +44,6 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private CommunityViewModel communityViewModel;
     private UserViewModel userViewModel;
     private AirdropListAdapter adapter;
-    private Disposable linkDisposable;
     private CommonDialog linkDialog;
     private CompositeDisposable disposables = new CompositeDisposable();
     private boolean linksSelector = false;
@@ -139,21 +131,13 @@ public class AirdropCommunityActivity extends BaseActivity implements
             if (member != null) {
                 AirdropStatus status = AirdropStatus.valueOf(member.airdropStatus);
                 if (status == AirdropStatus.ON) {
-                    if (linkDisposable != null && !linkDisposable.isDisposed()) {
-                        linkDisposable.dispose();
-                    }
                     String chainID = member.chainID;
-                    linkDisposable = communityViewModel.getCommunityMembersLimit(member.chainID,
-                            Constants.AIRDROP_TX_BS_LIMIT)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
-                        String airdropPeer = MainApplication.getInstance().getPublicKey();
-                        String airdropLink = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, list);
-                        Intent intent = new Intent();
-                        intent.putExtra(IntentExtra.AIRDROP_LINK, airdropLink);
-                        setResult(RESULT_OK, intent);
-                        this.finish();
-                    });
+                    String airdropPeer = MainApplication.getInstance().getPublicKey();
+                    String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID);
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.AIRDROP_LINK, airdropLink);
+                    setResult(RESULT_OK, intent);
+                    this.finish();
                 } else {
                     ToastUtils.showShortToast(R.string.tx_airdrop_setup);
                 }
@@ -185,9 +169,6 @@ public class AirdropCommunityActivity extends BaseActivity implements
     @Override
     protected void onStop() {
         super.onStop();
-        if (linkDisposable != null && !linkDisposable.isDisposed()) {
-            linkDisposable.dispose();
-        }
     }
 
     @Override
@@ -201,18 +182,11 @@ public class AirdropCommunityActivity extends BaseActivity implements
 
     @Override
     public void onShare(String chainID) {
-        if (linkDisposable != null && !linkDisposable.isDisposed()) {
-            linkDisposable.dispose();
+        if (StringUtil.isNotEmpty(chainID)) {
+            String airdropPeer = MainApplication.getInstance().getPublicKey();
+            String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID);
+            shareAirdropLink(chainID, airdropLink);
         }
-        linkDisposable = communityViewModel.getCommunityMembersLimit(chainID, Constants.AIRDROP_TX_BS_LIMIT)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
-                    if (StringUtil.isNotEmpty(chainID)) {
-                        String airdropPeer = MainApplication.getInstance().getPublicKey();
-                        String airdropLink = UrlUtil.encodeAirdropUrl(airdropPeer, chainID, list);
-                        shareAirdropLink(chainID, airdropLink);
-                    }
-                });
     }
 
     private void shareAirdropLink(String chainID, String airdropLink) {
@@ -236,38 +210,53 @@ public class AirdropCommunityActivity extends BaseActivity implements
      * 显示打开外部chain url的对话框（来自剪切板或外部链接）
      */
     private boolean showOpenExternalLinkDialog(String url) {
-        AirdropUrl airdropUrl = UrlUtil.decodeAirdropUrl(url);
-        if (airdropUrl != null) {
+        LinkUtil.Link link = LinkUtil.decode(url);
+        if (link.isAirdropLink()) {
             if (StringUtil.isEquals(MainApplication.getInstance().getPublicKey(),
-                    airdropUrl.getAirdropPeer())) {
+                    link.getPeer())) {
                 showErrorLinkDialog(true);
                 return false;
             }
-            ExternalAirdropLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
-                    R.layout.external_airdrop_link_dialog, null, false);
-            String airdropPeerName = UsersUtil.getShowName(null, airdropUrl.getAirdropPeer());
-            String airdropPeerTip = getString(R.string.main_airdrop_link_peer, airdropPeerName);
-            dialogBinding.tvPeer.setText(Html.fromHtml(airdropPeerTip));
-            dialogBinding.tvSkip.setOnClickListener(v -> {
-                if (linkDialog != null) {
-                    linkDialog.closeDialog();
+            communityViewModel.showLongTimeCreateDialog(this, link,
+                    new CommonDialog.ClickListener() {
+                @Override
+                public void proceed() {
+                    showJoinDialog(link);
+                }
+
+                @Override
+                public void close() {
+
                 }
             });
-            dialogBinding.tvJoin.setOnClickListener(v -> {
-                if (linkDialog != null) {
-                    linkDialog.closeDialog();
-                }
-                openExternalAirdropLink(airdropUrl.getAirdropUrl());
-            });
-            linkDialog = new CommonDialog.Builder(this)
-                    .setContentView(dialogBinding.getRoot())
-                    .setCanceledOnTouchOutside(false)
-                    .create();
-            linkDialog.show();
             return true;
         }
         showErrorLinkDialog(false);
         return false;
+    }
+
+    private void showJoinDialog(LinkUtil.Link link) {
+        ExternalAirdropLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
+                R.layout.external_airdrop_link_dialog, null, false);
+        String airdropPeerName = UsersUtil.getShowName(null, link.getPeer());
+        String airdropPeerTip = getString(R.string.main_airdrop_link_peer, airdropPeerName);
+        dialogBinding.tvPeer.setText(Html.fromHtml(airdropPeerTip));
+        dialogBinding.tvSkip.setOnClickListener(v -> {
+            if (linkDialog != null) {
+                linkDialog.closeDialog();
+            }
+        });
+        dialogBinding.tvJoin.setOnClickListener(v -> {
+            if (linkDialog != null) {
+                linkDialog.closeDialog();
+            }
+            openExternalAirdropLink(link);
+        });
+        linkDialog = new CommonDialog.Builder(this)
+                .setContentView(dialogBinding.getRoot())
+                .setCanceledOnTouchOutside(false)
+                .create();
+        linkDialog.show();
     }
 
     private void showErrorLinkDialog(boolean isMyself) {
@@ -290,30 +279,24 @@ public class AirdropCommunityActivity extends BaseActivity implements
 
     /**
      * 打开外部Airdrop link
-     * @param link Airdrop link
+     * @param link
      */
-    private void openExternalAirdropLink(String link) {
-        AirdropUrl decode = UrlUtil.decodeAirdropUrl(link);
-        if (decode != null) {
+    private void openExternalAirdropLink(LinkUtil.Link link) {
+        if (link.isAirdropLink()) {
             // 加朋友
-            String airdropPeer = decode.getAirdropPeer();
-            userViewModel.addAirdropFriend(airdropPeer, decode);
-            // 加入社区
-            String chainUrl = decode.getChainUrl();
-            openExternalChainLink(airdropPeer, chainUrl);
+            String airdropPeer = link.getPeer();
+            userViewModel.addAirdropFriend(airdropPeer, link);
+            openExternalChainLink(link);
         }
     }
 
     /**
      * 打开外部chain link
-     * @param link chain link
+     * @param link
      */
-    private void openExternalChainLink(String airdropPeer, String link) {
-        ChainURL decode = ChainUrlUtil.decode(link);
-        if (decode != null) {
-            String chainID = decode.getChainID();
-            communityViewModel.addCommunity(airdropPeer, chainID, link);
-        }
+    private void openExternalChainLink(LinkUtil.Link link) {
+        String chainID = link.getData();
+        communityViewModel.addCommunity(link.getPeer(), chainID, link);
     }
 
     /**

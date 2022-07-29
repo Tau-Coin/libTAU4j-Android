@@ -25,6 +25,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
@@ -129,6 +130,9 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
     public void onStart() {
         super.onStart();
         subscribeCurrentUser();
+        TauDaemon.getInstance(getApplicationContext()).getChainStoppedSet().observe(this, o -> {
+            ToastUtils.showShortToast("size=" + o.size());
+        });
     }
 
     @Override
@@ -183,6 +187,9 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
             case R.id.item_updates:
                 showProgressDialog(getString(R.string.app_upgrade_checking));
                 downloadViewModel.checkAppVersion(this, true);
+                break;
+            case R.id.item_personal_profile:
+                ActivityUtil.startActivity(this, PersonalProfileActivity.class);
                 break;
         }
     }

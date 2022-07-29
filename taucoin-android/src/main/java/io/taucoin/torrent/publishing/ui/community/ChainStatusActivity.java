@@ -168,13 +168,6 @@ public class ChainStatusActivity extends BaseActivity {
         switch (view.getId()) {
             case R.id.item_top_peers:
                 Intent intent = new Intent();
-                intent.putExtra(IntentExtra.TYPE, ChainTopActivity.TOP_PEERS);
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                ActivityUtil.startActivity(intent, this, ChainTopActivity.class);
-                break;
-            case R.id.item_chain_votes:
-                intent = new Intent();
-                intent.putExtra(IntentExtra.TYPE, ChainTopActivity.TOP_VOTES);
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, ChainTopActivity.class);
                 break;
@@ -202,12 +195,6 @@ public class ChainStatusActivity extends BaseActivity {
                 intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 intent.putExtra(IntentExtra.TYPE, AccessListActivity.ACCESS_LIST_TYPE);
-                ActivityUtil.startActivity(intent, this, AccessListActivity.class);
-                break;
-            case R.id.item_gossip_list:
-                intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                intent.putExtra(IntentExtra.TYPE, AccessListActivity.GOSSIP_LIST_TYPE);
                 ActivityUtil.startActivity(intent, this, AccessListActivity.class);
                 break;
         }

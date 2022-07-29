@@ -163,19 +163,19 @@ public class CommunityRepositoryImpl implements CommunityRepository{
         return db.communityDao().observeChainTopCoinMembers(chainID, topNum);
     }
 
-    /**
-     * 观察链上Power前topNum的成员
-     * @param chainID 链ID
-     * @param topNum 查询数目
-     * @return Observable<List<Member>>
-     */
-    @Override
-    public Flowable<List<Member>> observeChainTopPowerMembers(String chainID, int topNum) {
-        return db.communityDao().observeChainTopPowerMembers(chainID, topNum);
-    }
-
     @Override
     public Flowable<List<CommunityAndMember>> observeCommunities() {
         return db.communityDao().observeCommunities();
+    }
+
+    /**
+     * 获取和朋友的共同社区
+     * @param userPk
+     * @param friendPk
+     * @return
+     */
+    @Override
+    public List<Community> getSameCommunity(String userPk, String friendPk) {
+        return db.communityDao().getSameCommunity(userPk, friendPk);
     }
 }

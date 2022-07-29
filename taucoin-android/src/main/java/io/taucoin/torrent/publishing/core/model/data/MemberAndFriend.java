@@ -18,8 +18,4 @@ public class MemberAndFriend extends Member {
     public MemberAndFriend(@NonNull String chainID, @NonNull String publicKey) {
         super(chainID, publicKey);
     }
-
-    public boolean onChain() {
-        return power <=0 || blockNumber < tailBlock;
-    }
 }

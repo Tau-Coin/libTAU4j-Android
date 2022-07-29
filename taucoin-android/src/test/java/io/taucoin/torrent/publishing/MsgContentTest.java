@@ -9,7 +9,7 @@ public class MsgContentTest {
     @Test
     public void test() {
         MsgContent content = MsgContent.createTextContent("122222222122222222122222222122222222",
-                "test".getBytes());
+                "test".getBytes(), "");
         byte[] encoded = content.getEncoded();
         System.out.println("encoded : " + encoded + ", length : " + encoded.length);
 

@@ -49,7 +49,7 @@
                 android:padding="@dimen/widget_size_5"
                 android:contentDescription="@null"
                 android:onClick="@{listener::onClick}"
-                android:src="@mipmap/icon_warning_orange"/>
+                android:src="@mipmap/icon_warning_white"/>
 
         </LinearLayout>
 

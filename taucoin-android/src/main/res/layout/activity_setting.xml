@@ -125,6 +125,35 @@
 
                 </LinearLayout>
 
+                <include
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/widget_size_1"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    layout="@layout/view_line" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/color_white"
+                    android:paddingTop="@dimen/widget_size_0"
+                    android:paddingBottom="@dimen/widget_size_0">
+
+                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                        android:id="@+id/item_personal_profile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/widget_size_7"
+                        android:paddingBottom="@dimen/widget_size_7"
+                        android:gravity="center_vertical"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:onClick="onClick"
+                        app:leftImage="@mipmap/icon_profile"
+                        app:rightImage="@mipmap/icon_arrow"
+                        app:rightText="@string/setting_personal_profile"/>
+
+                </LinearLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

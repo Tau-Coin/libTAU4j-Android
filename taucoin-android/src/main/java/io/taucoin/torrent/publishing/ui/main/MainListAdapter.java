@@ -105,12 +105,11 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 String firstLetters = StringUtil.getFirstLettersOfName(communityName);
                 binding.leftView.setText(firstLetters);
                 String balance = FmtMicrometer.fmtBalance(bean.balance);
-                boolean readOnly = bean.isReadOnly();
-                if (readOnly) {
+                boolean onChain = bean.onChain();
+                if (onChain) {
                     binding.tvBalancePower.setText(context.getString(R.string.main_community_non_member));
                 } else {
-                    String power = FmtMicrometer.fmtLong(bean.power);
-                    binding.tvBalancePower.setText(context.getString(R.string.main_balance_power, balance, power));
+                    binding.tvBalancePower.setText(context.getString(R.string.main_balance, balance));
                 }
 
                 binding.tvUserMessage.setVisibility(StringUtil.isNotEmpty(bean.memo) ?
@@ -143,7 +142,12 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                     binding.tvMsgLastTime.setText(null);
                     binding.tvMsgLastTime.setVisibility(View.GONE);
                 }
-                binding.msgUnread.setVisibility(bean.msgUnread > 0 ? View.VISIBLE : View.GONE);
+                boolean isShowPoint = bean.msgUnread > 0 || bean.focused > 0;
+                binding.msgUnread.setVisibility(isShowPoint ? View.VISIBLE : View.GONE);
+                if (isShowPoint) {
+                    binding.msgUnread.setBackgroundResource(bean.msgUnread > 0 ?
+                            R.drawable.circle_red : R.drawable.circle_yellow);
+                }
                 ivLongPress = binding.ivLongPress;
             }
             holder.binding.getRoot().setOnClickListener(v -> {
@@ -195,12 +199,12 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                             oldItem.msgUnread == newItem.msgUnread &&
                             oldItem.stickyTop == newItem.stickyTop &&
                             oldItem.balance == newItem.balance &&
-                            oldItem.power == newItem.power &&
                             StringUtil.isEquals(oldItem.memo, newItem.memo);
                 } else {
                     isSame = oldItem.timestamp == newItem.timestamp &&
                             oldItem.msgUnread == newItem.msgUnread &&
                             oldItem.stickyTop == newItem.stickyTop &&
+                            oldItem.focused == newItem.focused &&
                             Arrays.equals(oldItem.msg, newItem.msg) &&
                             StringUtil.isEquals(oldItem.friend != null ? oldItem.friend.remark : null,
                                     newItem.friend != null ? newItem.friend.remark : null) &&

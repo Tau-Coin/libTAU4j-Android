@@ -20,19 +20,6 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_height="@dimen/widget_size_40"
-            android:layout_width="match_parent"
-            app:tabMode="fixed"
-            app:tabTextAppearance="@style/TabLayout"
-            app:tabIndicatorHeight="@dimen/widget_size_0"
-            app:tabIndicatorColor="@color/color_transparent"
-            app:tabSelectedTextColor="@color/gray_dark"
-            app:tabTextColor="@color/color_white"
-            app:tabBackground="@drawable/tab_background"
-            app:tabRippleColor="@color/color_transparent"/>
-
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -70,8 +57,8 @@
 
         <include layout="@layout/view_line"/>
 
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/view_pager"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>

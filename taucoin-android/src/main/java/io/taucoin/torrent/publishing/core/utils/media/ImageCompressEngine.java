@@ -23,7 +23,7 @@ import io.taucoin.torrent.publishing.core.utils.MultimediaUtil;
  * 图片压缩引擎
  */
 public class ImageCompressEngine implements CompressEngine {
-    private Logger logger = LoggerFactory.getLogger("ImageCompress");
+    private final Logger logger = LoggerFactory.getLogger("ImageCompress");
 
     @Override
     public void onCompress(Context context, List<LocalMedia> compressData, OnCallbackListener<List<LocalMedia>> listener) {

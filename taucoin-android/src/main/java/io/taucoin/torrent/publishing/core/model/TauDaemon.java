@@ -20,11 +20,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -38,6 +40,7 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.log.LogUtil;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
+import io.taucoin.torrent.publishing.core.model.data.message.DataKey;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
@@ -49,6 +52,7 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.FileUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
 import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
@@ -56,6 +60,7 @@ import io.taucoin.torrent.publishing.core.utils.SessionStatistics;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.TrafficUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
+import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.receiver.ConnectionReceiver;
 import io.taucoin.torrent.publishing.receiver.PowerReceiver;
 import io.taucoin.torrent.publishing.service.SystemServiceManager;
@@ -87,6 +92,7 @@ public abstract class TauDaemon {
     private Disposable updateLocationTimer;          // 更新位置信息定时任务
     private Disposable noRemainingDataTimer;         // 触发无剩余流量的提示定时任务
     private Disposable libTauDozeTimer;              // 触发libTAU休眠定时任务
+    private Disposable onlineTimer;                  // 触发在线信号定时任务
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
     private final TxQueueManager txQueueManager;     // 交易队列管理
     private final TauDozeManager tauDozeManager;     // tau休息模式管理
@@ -144,7 +150,9 @@ public abstract class TauDaemon {
                     isRunning = true;
                     handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
                     // 更新当前用户自己的信息
-                    updateCurrentUserInfo();
+                    updateCurrentUserInfo(true);
+                    // 启动在线信号定时任务
+                    startOnlineTimer();
                     // 更新用户跟随的社区和其账户状态
                     updateChainsAndAccountInfo();
                     // 账户自动更新
@@ -256,6 +264,9 @@ public abstract class TauDaemon {
         if (updateLocationTimer != null && !updateLocationTimer.isDisposed()) {
             updateLocationTimer.dispose();
         }
+        if (onlineTimer != null && !onlineTimer.isDisposed()) {
+            onlineTimer.dispose();
+        }
         if (updateBootstrapIntervalTimer != null && !updateBootstrapIntervalTimer.isDisposed()) {
             updateBootstrapIntervalTimer.dispose();
         }
@@ -348,6 +359,17 @@ public abstract class TauDaemon {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
             logger.info("SettingsChanged, UPnP mapped::{}", settingsRepo.isUPnpMapped());
+        } else if (key.equals(appContext.getString(R.string.pref_key_dht_nodes))) {
+            long nodes = settingsRepo.getLongValue(key, 0);
+            logger.info("SettingsChanged, nodes::{}", nodes);
+
+            if (nodes > 0) {
+                newActionEvent();
+            } else {
+                stopTauDozeTimer();
+                // 无网络直接定24小时任务，等待有网恢复
+                startTauDozeTimer(TauDozeManager.HOURS24_TIME);
+            }
         }
     }
 
@@ -368,6 +390,28 @@ public abstract class TauDaemon {
      */
     public void newActionEvent() {
         logger.debug("TauDoze newActionEvent");
+        String nodesKey = appContext.getString(R.string.pref_key_dht_nodes);
+        long nodes = settingsRepo.getLongValue(nodesKey, 0);
+        if (nodes > 0) {
+            stopTauDozeTimer();
+            startTauDozeTimer(TauDozeManager.TAU_UP_TIME);
+        }
+    }
+
+    /**
+     * 重置libTAU Doze开始时间
+     */
+    public void resetDozeStartTime() {
+        if (tauDozeManager.isDozeMode()) {
+            tauDozeManager.resetDozeStartTime();
+        }
+    }
+
+    /**
+     * 停止Tau doze定时任务
+     */
+    private void stopTauDozeTimer() {
+        logger.debug("TauDoze stop timer");
         if (libTauDozeTimer != null && !libTauDozeTimer.isDisposed()) {
             libTauDozeTimer.dispose();
             // TAU还处于doze mode中，强制唤醒后计算doze时间
@@ -384,7 +428,6 @@ public abstract class TauDaemon {
             resumeService();
         }
         tauDozeManager.setDozeMode(false);
-        startTauDozeTimer(TauDozeManager.TAU_UP_TIME);
     }
 
     /**
@@ -392,6 +435,7 @@ public abstract class TauDaemon {
      * @param interval 单位s
      */
     private void startTauDozeTimer(long interval) {
+        logger.debug("TauDoze start timer");
         libTauDozeTimer = ObservableUtil.intervalSeconds(interval)
                 .subscribeOn(Schedulers.io())
                 .subscribe(l -> {
@@ -550,23 +594,39 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 更新当前用户信息
+     * 启动在线信号定时任务
      */
-    public void updateCurrentUserInfo() {
+    public void startOnlineTimer() {
+        if (null == onlineTimer || onlineTimer.isDisposed()) {
+            onlineTimer = ObservableUtil.intervalSeconds(12 * 60 * 60)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe( l -> updateCurrentUserInfo(false));
+        }
+    }
+
+    /**
+     * 更新当前用户信息
+     * @param isUpdateLocation 是否只更新位置信息
+     */
+    public void updateCurrentUserInfo(boolean isUpdateLocation) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             UserRepository userRepo = RepositoryHelper.getUserRepository(appContext);
             User user = userRepo.getCurrentUser();
             if (user != null) {
-                double longitude = locationManager.getLongitude();
-                double latitude = locationManager.getLatitude();
-                if ((longitude > 0 && user.longitude != longitude) ||
-                        (latitude > 0 && user.latitude != latitude)) {
-                    user.longitude = longitude;
-                    user.latitude = latitude;
-                    user.updateLocationTime = getSessionTime() / 1000;
-                    userRepo.updateUser(user);
+                if (isUpdateLocation) {
+                    double longitude = locationManager.getLongitude();
+                    double latitude = locationManager.getLatitude();
+                    if ((longitude > 0 && user.longitude != longitude) ||
+                            (latitude > 0 && user.latitude != latitude)) {
+                        user.longitude = longitude;
+                        user.latitude = latitude;
+                        user.updateLocationTime = getSessionTime() / 1000;
+                        userRepo.updateUser(user);
+                    }
+                } else {
+                    updateUserInfo(user);
                 }
-                updateFriendInfo(user);
             }
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
@@ -591,7 +651,10 @@ public abstract class TauDaemon {
                         localChains.size(), tauChains.size());
                 // 0、添加默认TAU Testing Community
                 if (localChains.size() == 0) {
-                    tauDaemonAlertHandler.addCommunity(Constants.TAU_TESTING_COMMUNITY);
+                    String peer = "a13e3563ad23048e388ecbaa8e384a83d08c88e77ee79b1b3ba42fd17f736968";
+                    String chainID = "278ac0c475551b4aTAU Testing";
+                    String tauTesting = LinkUtil.encodeChain(peer, chainID);
+                    tauDaemonAlertHandler.addCommunity(tauTesting);
                 }
                 // 1、处理本地跟随的chains, libTAU未跟随的情况
                 for (String chainID : localChains) {
@@ -637,11 +700,96 @@ public abstract class TauDaemon {
      * 请求更新朋友信息
      */
     public void requestFriendInfo(String friendPk) {
+        subFriendInfo(friendPk);
+        subFriendHeadPic(friendPk);
+    }
+
+    public void pubUserInfo(String publicKey, byte[] value) {
         if (isRunning) {
-            if (StringUtil.isNotEmpty(friendPk)) {
-                sessionManager.requestFriendInfo(friendPk);
-                logger.info("requestFriendInfo::{}", friendPk);
+            byte[] keySrc = ByteUtil.toByte(publicKey);
+            byte[] key = DataKey.getKey(keySrc, DataKey.Suffix.INFO);
+            sessionManager.publishData(key, value);
+            logger.info("pubUserInfo userPk::{}, key.length::{}", publicKey, key.length);
+        }
+    }
+
+    public void subFriendInfo(String publicKey) {
+        if (isRunning) {
+            byte[] keySrc = ByteUtil.toByte(publicKey);
+            byte[] key = DataKey.getKey(keySrc, DataKey.Suffix.INFO);
+            sessionManager.subscribeFromPeer(keySrc, key);
+            logger.info("subFriendInfo peer::{}, key.length::{}", publicKey, key.length);
+        }
+    }
+
+    public void pubUserHeadPic(String publicKey, byte[] value) {
+        if (isRunning) {
+            byte[] keySrc = ByteUtil.toByte(publicKey);
+            byte[] key = DataKey.getKey(keySrc, DataKey.Suffix.PIC);
+            sessionManager.publishData(key, value);
+            logger.info("pubUserHeadPic userPk::{}, key.length::{}", publicKey, key.length);
+        }
+    }
+
+    public void subFriendHeadPic(String publicKey) {
+        if (isRunning) {
+            byte[] keySrc = ByteUtil.toByte(publicKey);
+            byte[] key = DataKey.getKey(keySrc, DataKey.Suffix.PIC);
+            logger.info("subFriendHeadPic peer::{}, key.length::{}", publicKey, key.length);
+        }
+    }
+
+    /**
+     * 直接给peer(朋友)发信息
+     * @param publicKey 公钥
+     * @param data 信息数据
+     */
+    public void sendToPeer(String publicKey, byte[] data) {
+        if (isRunning) {
+            byte[] peer = ByteUtil.toByte(publicKey);
+            sessionManager.sendToPeer(peer, data);
+            logger.info("sendToPeer peer::{}", peer);
+        }
+    }
+
+    /**
+     * 重启失败停止的链
+     * @param chainID 链ID
+     */
+    public void restartFailedChain(String chainID) {
+        if (isRunning) {
+            boolean isSuccess = sessionManager.startChain(ChainIDUtil.encode(chainID));
+            if (isSuccess) {
+                tauDaemonAlertHandler.restartFailedChain(chainID);
             }
+            logger.info("restartFailedChain chainID::{}, isSuccess::{}", chainID, isSuccess);
+        }
+    }
+
+    public MutableLiveData<CopyOnWriteArraySet<String>> getChainStoppedSet() {
+        return tauDaemonAlertHandler.getChainStoppedSet();
+    }
+
+    /**
+     * 请求peer发布区块数据
+     * @param publicKey 公钥
+     * @param chainID 链ID
+     */
+    public void requestChainData(String publicKey, String chainID) {
+        if (isRunning) {
+            sessionManager.requestChainData(ChainIDUtil.encode(chainID), publicKey);
+            logger.info("requestChainData peer::{}, chainID::{}", publicKey, chainID);
+        }
+    }
+
+    /**
+     * publish链的数据
+     * @param chainID 链ID
+     */
+    public void pubChainData(String chainID) {
+        if (isRunning) {
+            sessionManager.putAllChainData(ChainIDUtil.encode(chainID));
+            logger.info("pubChainData chainID::{}", chainID);
         }
     }
 
@@ -694,18 +842,6 @@ public abstract class TauDaemon {
         logger.info("getCommunityAccessList isRunning::{}", isRunning);
         if (isRunning) {
             return sessionManager.getAccessList(chainID);
-        }
-        return null;
-    }
-
-    /**
-     * 获取社区Gossip列表
-     * @return Gossip列表
-     */
-    public ArrayList<String> getGossipList(byte[] chainID) {
-        logger.info("getGossipList isRunning::{}", isRunning);
-        if (isRunning) {
-            return sessionManager.getGossipList(chainID);
         }
         return null;
     }
@@ -830,10 +966,11 @@ public abstract class TauDaemon {
 
     /**
      *  更新libTAU朋友信息
-     *  包含加朋友和朋友信息
-     * @param friend 朋友对象
+     * @param user 朋友对象
      */
-    public abstract boolean updateFriendInfo(User friend);
+    public abstract boolean updateUserInfo(User user);
+
+    public abstract boolean addNewFriend(String friendPk);
 
     /**
      * 删除朋友
@@ -849,14 +986,14 @@ public abstract class TauDaemon {
     /**
      * 创建新的社区
      */
-    public abstract boolean createNewCommunity(byte[] chainID, Map<String, Account> accounts);
+    public abstract boolean createNewCommunity(byte[] chainID, Set<Account> accounts);
 
     /**
      * 创建新的社区链ID
      * @param communityName 社区名称
      * @return chainID
      */
-    public abstract String createNewChainID(String communityName);
+    public abstract String createNewChainID(String type, String communityName);
 
     /**
      * 获取账户信息

@@ -24,7 +24,7 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 /**
  * UserRepository接口实现
  */
-public class UserRepositoryImpl implements UserRepository{
+public class UserRepositoryImpl implements UserRepository {
 
     private PublishSubject<String> dataSetChangedPublish = PublishSubject.create();
     private ExecutorService sender = Executors.newSingleThreadExecutor();
@@ -107,14 +107,26 @@ public class UserRepositoryImpl implements UserRepository{
         return db.userDao().getUsersInBlacklist();
     }
 
+    @Override
+    public List<User> getCommunityUsersInBlacklist(){
+        return db.userDao().getCommunityUsersInBlacklist();
+    }
+
+
     /**
      * 设置用户是否加入黑名单
      * @param publicKey 公钥
      * @param blacklist 是否加入黑名单
      */
     @Override
-    public void setUserBlacklist(String publicKey, boolean blacklist){
+    public void setUserBlacklist(String publicKey, boolean blacklist) {
         db.userDao().setUserBlacklist(publicKey, blacklist ? 1 : 0);
+        submitDataSetChanged();
+    }
+
+    @Override
+    public void setCommunityUserBlacklist(String publicKey, boolean blacklist) {
+        db.userDao().setCommunityUserBlacklist(publicKey, blacklist ? 1 : 0);
         submitDataSetChanged();
     }
 

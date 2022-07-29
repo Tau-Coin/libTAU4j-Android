@@ -499,9 +499,6 @@ public class TxUtils {
 
         boolean isHaveTx = payload != null && payload.length > 0;
         String blockReward = FmtMicrometer.fmtBalance(tx.getFee());
-        if (block.getBlockNumber() <= 0) {
-            blockReward = FmtMicrometer.fmtBalance(block.getMinerBalance());
-        }
         String chainID = ChainIDUtil.decode(block.getChainID());
         blockReward += " " + ChainIDUtil.getCoinName(chainID);
 

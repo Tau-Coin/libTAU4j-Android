@@ -30,7 +30,7 @@ public interface TxDao {
             " WHERE tx.chainID = :chainID AND tx.txID = :txID";
 
     String QUERY_GET_TXS_ORDER =
-            " AND tx.senderPk IN " + UserDao.QUERY_GET_USER_PKS_IN_WHITE_LIST +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
@@ -80,19 +80,19 @@ public interface TxDao {
 
     // SQL:查询社区里的置顶交易(所有，排除WIRING Tx)
     String QUERY_GET_NOTE_PINNED_TXS = QUERY_GET_NOTES_SELECT +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里的置顶交易(MARKET交易，排除Trust Tx, 并且上链)
     String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " AND tx.txType IN (3, 5, 6) AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里的置顶交易(上链)
     String QUERY_GET_CHAIN_PINNED_TXS = QUERY_GET_CHAIN_TXS_SELECT +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
@@ -146,7 +146,7 @@ public interface TxDao {
     String QUERY_GET_FAVORITE_TXS = "SELECT tx.*, 0 AS trusts" +
             " FROM Txs AS tx" +
             " WHERE favoriteTime > 0 " +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " ORDER BY tx.favoriteTime DESC";
 
     String QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH = "SELECT * FROM Txs" +

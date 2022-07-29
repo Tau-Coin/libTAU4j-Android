@@ -13,8 +13,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 public class CommunityAndFriend implements Parcelable {
     // 社区相关数据
     public long balance;                    // 成员在此社区的balance
-    public long power;                      // 成员在此社区的power
-    public long blockNumber;                // 成员状态改变的区块号
+    public long nonce;                      // 成员在此社区的nonce
     public long headBlock;                  // 社区头区块号
     public long tailBlock;                  // 社区尾区块号
     public int joined;                      // 是否加入此社区
@@ -28,6 +27,7 @@ public class CommunityAndFriend implements Parcelable {
     public int type;                        // 消息类型 0: 社区， 1：朋友
     public int msgUnread;                   // 消息是否未读
     public int stickyTop;                   // 是否置顶
+    public int focused;                     // 是否被关注
     public byte[] msg;                      // 交易备注信息
     public String memo;                     // 交易备注信息
     public long timestamp;                  // 交易时间戳
@@ -46,11 +46,6 @@ public class CommunityAndFriend implements Parcelable {
         return o instanceof CommunityAndFriend && (o == this || ID.equals(((CommunityAndFriend)o).ID));
     }
 
-    public boolean isReadOnly() {
-        return power <=0 || blockNumber < tailBlock;
-    }
-
-
     public CommunityAndFriend() {
 
     }
@@ -58,8 +53,6 @@ public class CommunityAndFriend implements Parcelable {
     @Ignore
     protected CommunityAndFriend(Parcel in) {
         balance = in.readLong();
-        power = in.readLong();
-        blockNumber = in.readLong();
         headBlock = in.readLong();
         tailBlock = in.readLong();
         joined = in.readInt();
@@ -78,8 +71,6 @@ public class CommunityAndFriend implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(balance);
-        dest.writeLong(power);
-        dest.writeLong(blockNumber);
         dest.writeLong(headBlock);
         dest.writeLong(tailBlock);
         dest.writeInt(joined);
@@ -111,4 +102,8 @@ public class CommunityAndFriend implements Parcelable {
             return new CommunityAndFriend[size];
         }
     };
+
+    public boolean onChain() {
+        return balance > 0 || nonce > 0;
+    }
 }

@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -28,8 +27,8 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.databinding.ItemTextBinding;
@@ -194,10 +193,12 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             tvMsg.setText(contentStr);
 
             Linkify.addLinks(tvMsg, Linkify.WEB_URLS);
-            Pattern airdrop = Pattern.compile(UrlUtil.AIRDROP_PATTERN, 0);
+            Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
             Linkify.addLinks(tvMsg, airdrop, null);
-            Pattern chain = Pattern.compile(UrlUtil.CHAIN_PATTERN, 0);
+            Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
             Linkify.addLinks(tvMsg, chain, null);
+            Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
+            Linkify.addLinks(tvMsg, friend, null);
 
             tvMsg.setAutoLinkListener(new AutoLinkTextView.AutoLinkListener() {
 

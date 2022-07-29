@@ -15,11 +15,10 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityFriendsBinding;
@@ -242,12 +241,9 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
      * 显示联系平台的对话框
      */
     private void showShareDialog() {
-        disposables.add(communityViewModel.getCommunityMembersLimit(chainID, Constants.CHAIN_LINK_BS_LIMIT)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(list -> {
-                    String chainUrl = ChainUrlUtil.encode(chainID, list);
-                    ActivityUtil.shareText(this, getString(R.string.contacts_share_link_via), chainUrl);
-                }));
+        String userPk = MainApplication.getInstance().getPublicKey();
+        String chainUrl = LinkUtil.encodeChain(userPk, chainID);
+        ActivityUtil.shareText(this, getString(R.string.contacts_share_link_via), chainUrl);
     }
 
     @Override

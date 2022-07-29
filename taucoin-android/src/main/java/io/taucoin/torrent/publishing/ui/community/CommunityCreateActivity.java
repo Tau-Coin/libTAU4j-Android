@@ -68,7 +68,7 @@ public class CommunityCreateActivity extends BaseActivity {
         binding.tvTotalCoin.setText(totalCoin);
         // 社区名字禁止输入#特殊符号
         binding.etCommunityName.setFilters(new InputFilter[]{
-                new EditTextInhibitInput(EditTextInhibitInput.NAME_REGEX)});
+                new EditTextInhibitInput(EditTextInhibitInput.COMMUNITY_NAME_REGEX)});
         binding.etCommunityName.addTextChangedListener(mTextWatcher);
 
         loadFragment();

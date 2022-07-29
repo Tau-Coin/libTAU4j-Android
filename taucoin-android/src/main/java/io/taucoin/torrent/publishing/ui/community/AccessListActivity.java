@@ -19,7 +19,6 @@ import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 public class AccessListActivity extends BaseActivity implements AccessListAdapter.ClickListener{
 
     protected static final int ACCESS_LIST_TYPE = 0x01;
-    protected static final int GOSSIP_LIST_TYPE = 0x02;
     private CompositeDisposable disposables = new CompositeDisposable();
     private ActivityListBinding binding;
     private AccessListAdapter adapter;
@@ -52,8 +51,7 @@ public class AccessListActivity extends BaseActivity implements AccessListAdapte
      */
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(currentType == ACCESS_LIST_TYPE ?
-                R.string.chain_access_list : R.string.chain_gossip_list);
+        binding.toolbarInclude.toolbar.setTitle(R.string.chain_access_list);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 

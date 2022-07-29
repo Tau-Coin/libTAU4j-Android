@@ -9,26 +9,26 @@ import org.libTAU4j.Message;
 import org.libTAU4j.Pair;
 import org.libTAU4j.PortmapTransport;
 import org.libTAU4j.Transaction;
-import org.libTAU4j.Vote;
 import org.libTAU4j.alerts.Alert;
+import org.libTAU4j.alerts.BlockChainFailToGetChainDataAlert;
 import org.libTAU4j.alerts.BlockChainForkPointBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewConsensusPointBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewHeadBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewTailBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewTransactionAlert;
 import org.libTAU4j.alerts.BlockChainRollbackBlockAlert;
-import org.libTAU4j.alerts.BlockChainStateAlert;
+import org.libTAU4j.alerts.BlockChainStateArrayAlert;
 import org.libTAU4j.alerts.BlockChainSyncingBlockAlert;
 import org.libTAU4j.alerts.BlockChainSyncingHeadBlockAlert;
-import org.libTAU4j.alerts.BlockChainTopThreeVotesAlert;
 import org.libTAU4j.alerts.BlockChainTxArrivedAlert;
 import org.libTAU4j.alerts.BlockChainTxSentAlert;
 import org.libTAU4j.alerts.CommConfirmRootAlert;
-import org.libTAU4j.alerts.CommFriendInfoAlert;
 import org.libTAU4j.alerts.CommLastSeenAlert;
 import org.libTAU4j.alerts.CommMsgArrivedAlert;
 import org.libTAU4j.alerts.CommNewMsgAlert;
 import org.libTAU4j.alerts.CommSyncMsgAlert;
+import org.libTAU4j.alerts.CommUserEventAlert;
+import org.libTAU4j.alerts.CommUserInfoAlert;
 import org.libTAU4j.alerts.ListenSucceededAlert;
 import org.libTAU4j.alerts.PortmapAlert;
 import org.libTAU4j.alerts.PortmapErrorAlert;
@@ -37,15 +37,21 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
+import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.FriendInfo;
+import io.taucoin.torrent.publishing.core.model.data.UserEvent;
+import io.taucoin.torrent.publishing.core.model.data.UserHeadPic;
+import io.taucoin.torrent.publishing.core.model.data.UserInfo;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
+import io.taucoin.torrent.publishing.core.model.data.message.DataKey;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
+import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
@@ -54,13 +60,14 @@ import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 class TauDaemonAlertHandler {
 
     private static final Logger logger = LoggerFactory.getLogger("libTAU");
-    private MsgAlertHandler msgListenHandler;
-    private TauListenHandler tauListenHandler;
-    private SettingsRepository settingsRepo;
-    private Context appContext;
-    private TauDaemon daemon;
+    private final MsgAlertHandler msgListenHandler;
+    private final TauListenHandler tauListenHandler;
+    private final SettingsRepository settingsRepo;
+    private final Context appContext;
+    private final TauDaemon daemon;
+    private final MutableLiveData<CopyOnWriteArraySet<String>> chainStoppedSet = new MutableLiveData<>();
 
-    TauDaemonAlertHandler(Context appContext, TauDaemon daemon){
+    TauDaemonAlertHandler(Context appContext, TauDaemon daemon) {
         this.appContext = appContext;
         this.daemon = daemon;
         this.msgListenHandler = new MsgAlertHandler(appContext, daemon);
@@ -95,9 +102,13 @@ class TauDaemonAlertHandler {
                 // 多设备新的DeviceID
                 onDiscoverFriend(alert, alertAndUser.getUserPk());
                 break;
-            case COMM_FRIEND_INFO:
-                // 朋友信息
-                onFriendInfo(alert, alertAndUser.getUserPk());
+            case COMM_USER_INFO:
+                // 用户信息
+                onUserInfo(alert, alertAndUser.getUserPk());
+                break;
+            case COMM_USER_EVENT:
+                // 对方点击等事件
+                onUserEvent(alert, alertAndUser.getUserPk());
                 break;
             case COMM_NEW_MSG:
                 // 新消息
@@ -139,17 +150,17 @@ class TauDaemonAlertHandler {
             case BLOCK_CHAIN_FORK_POINT:
                 onNewForkPoint(alert);
                 break;
-            case BLOCK_CHAIN_TOP_THREE_VOTES:
-                onNewTopVotes(alert);
-                break;
-            case BLOCK_CHAIN_STATE:
-                onAccountState(alert, alertAndUser.getUserPk());
-                break;
             case BLOCK_CHAIN_TX_SENT:
                 onTxSent(alert);
                 break;
             case BLOCK_CHAIN_TX_ARRIVED:
                 onTxArrived(alert);
+                break;
+            case BLOCK_CHAIN_STATE_ARRAY:
+                onStateArray(alert);
+                break;
+            case BLOCK_CHAIN_FAIL_TO_GET_CHAIN_DATA:
+                onGetChainDataFailed(alert);
                 break;
             default:
                 logger.warn("Unknown alert");
@@ -224,16 +235,40 @@ class TauDaemonAlertHandler {
     /**
      * 更新本地朋友信息
      * @param alert libTAU上报
-     * @param userPk 当前用户公钥
      */
-    private void onFriendInfo(Alert alert, String userPk) {
-        CommFriendInfoAlert friendInfoAlert = (CommFriendInfoAlert) alert;
-        logger.info(friendInfoAlert.get_message());
-        byte[] friendInfo = friendInfoAlert.get_friend_info();
-        if (friendInfo.length > 0) {
-            FriendInfo bean = new FriendInfo(friendInfo);
-            // 更新朋友信息
-            msgListenHandler.onFriendInfo(userPk, bean);
+    private void onUserInfo(Alert alert, String userPk) {
+        CommUserInfoAlert infoAlert = (CommUserInfoAlert) alert;
+        logger.info(infoAlert.get_message());
+        byte[] peer = infoAlert.get_peer();
+        byte[] data = infoAlert.get_user_info();
+        byte[] key = infoAlert.get_key();
+        DataKey.Suffix suffix = DataKey.getSuffix(key);
+        switch (suffix) {
+            case INFO:
+                UserInfo userInfo = new UserInfo(data);
+                msgListenHandler.onUserInfo(userPk, peer, userInfo);
+                break;
+            case PIC:
+                UserHeadPic headPic = new UserHeadPic(data);
+                msgListenHandler.onUserHeadPic(peer, headPic);
+                break;
+            case UNKNOWN:
+                break;
+        }
+    }
+
+    /**
+     * 处理朋友事件逻辑
+     * @param alert libTAU上报
+     */
+    private void onUserEvent(Alert alert, String userPk) {
+        CommUserEventAlert eventAlert = (CommUserEventAlert) alert;
+        logger.info(eventAlert.get_message());
+        byte[] peer = eventAlert.get_peer();
+        UserEvent userEvent = new UserEvent(eventAlert.get_user_event());
+        UserEvent.Event event = UserEvent.Event.parse(userEvent.getEvent());
+        if (event == UserEvent.Event.FOCUS_FRIEND) {
+            msgListenHandler.onUserEvent(userPk, peer);
         }
     }
 
@@ -410,30 +445,6 @@ class TauDaemonAlertHandler {
     }
 
     /**
-     * libTAU上报节点投票
-     * @param alert libTAU上报
-     */
-    private void onNewTopVotes(Alert alert) {
-        BlockChainTopThreeVotesAlert a = (BlockChainTopThreeVotesAlert) alert;
-        logger.info(a.get_message());
-        List<Vote> votes = a.get_votes();
-        byte[] chainID = a.get_chain_id();
-        tauListenHandler.handleNewTopVotes(chainID, votes);
-    }
-
-    /**
-     * libTAU上报节点账户状态
-     * @param alert libTAU上报
-     */
-    private void onAccountState(Alert alert, String userPk) {
-        BlockChainStateAlert a = (BlockChainStateAlert) alert;
-        logger.info(a.get_message());
-        Account account = a.get_account();
-        byte[] chainID = a.get_chain_id();
-        tauListenHandler.onAccountState(chainID, userPk, account);
-    }
-
-    /**
      * Sent to Internet 桔黄色 (traversal complete > 1)
      * @param alert libTAU上报
      */
@@ -453,6 +464,52 @@ class TauDaemonAlertHandler {
         logger.info(a.get_message());
         byte[] txID = a.getArrived_tx_hash();
         tauListenHandler.onTxArrived(txID);
+    }
+
+    /**
+     * 上报社区账户数组
+     * @param alert libTAU上报
+     */
+    private void onStateArray(Alert alert) {
+        BlockChainStateArrayAlert a = (BlockChainStateArrayAlert) alert;
+        logger.info(a.get_message());
+        byte[] chainId = a.get_chain_id();
+        List<Account> accounts = a.get_accounts();
+        tauListenHandler.onStateArray(chainId, accounts);
+    }
+
+    /**
+     * 底层获取区块链数据失败
+     * @param alert libTAU上报
+     */
+    private void onGetChainDataFailed(Alert alert) {
+        BlockChainFailToGetChainDataAlert a = (BlockChainFailToGetChainDataAlert) alert;
+        logger.info(a.get_message());
+        String chainId = ChainIDUtil.decode(a.get_chain_id());
+        logger.info("onGetChainDataFailed chainID::{}", chainId);
+        CopyOnWriteArraySet<String> set = chainStoppedSet.getValue();
+        if (null == set) {
+            set = new CopyOnWriteArraySet<>();
+        }
+        set.add(chainId);
+        chainStoppedSet.postValue(set);
+    }
+
+    public MutableLiveData<CopyOnWriteArraySet<String>> getChainStoppedSet() {
+        return chainStoppedSet;
+    }
+
+    /**
+     * 重启失败停止的链
+     * @param chainId 链ID
+     */
+    void restartFailedChain(String chainId) {
+        logger.info("restartChain chainID::{}", chainId);
+        CopyOnWriteArraySet<String> set = chainStoppedSet.getValue();
+        if (set != null) {
+            set.remove(chainId);
+            chainStoppedSet.postValue(set);
+        }
     }
 
     /**

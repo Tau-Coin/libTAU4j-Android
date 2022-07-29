@@ -21,8 +21,8 @@ import io.taucoin.torrent.publishing.core.model.data.TxLogStatus;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ItemLeftNoteBinding;
 import io.taucoin.torrent.publishing.databinding.ItemRightNoteBinding;
@@ -146,10 +146,12 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
             tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NOTES));
             // 添加link解析
             Linkify.addLinks(tvMsg, Linkify.WEB_URLS);
-            Pattern airdrop = Pattern.compile(UrlUtil.AIRDROP_PATTERN, 0);
+            Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
             Linkify.addLinks(tvMsg, airdrop, null);
-            Pattern chain = Pattern.compile(UrlUtil.CHAIN_PATTERN, 0);
+            Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
             Linkify.addLinks(tvMsg, chain, null);
+            Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
+            Linkify.addLinks(tvMsg, friend, null);
 
             setClickListener(tvMsg, tx);
             setLeftViewClickListener(headView, tx);

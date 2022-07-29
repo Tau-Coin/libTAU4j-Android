@@ -14,7 +14,8 @@ import java.util.List;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
-import io.taucoin.torrent.publishing.core.model.data.FriendInfo;
+import io.taucoin.torrent.publishing.core.model.data.UserHeadPic;
+import io.taucoin.torrent.publishing.core.model.data.UserInfo;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
@@ -25,12 +26,14 @@ import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.ChatMsgLog;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Device;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.ChatRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.DeviceRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
@@ -41,7 +44,6 @@ import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
-import io.taucoin.torrent.publishing.core.utils.rlp.CryptoUtil;
 import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 
@@ -50,14 +52,15 @@ import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
  */
 class MsgAlertHandler {
     private static final Logger logger = LoggerFactory.getLogger("MsgAlertHandler");
-    private ChatRepository chatRepo;
-    private FriendRepository friendRepo;
-    private DeviceRepository deviceRepo;
-    private UserRepository userRepo;
-    private TxQueueRepository txQueueRepo;
-    private MemberRepository memberRepo;
-    private TauDaemon daemon;
-    private Context appContext;
+    private final ChatRepository chatRepo;
+    private final FriendRepository friendRepo;
+    private final DeviceRepository deviceRepo;
+    private final UserRepository userRepo;
+    private final TxQueueRepository txQueueRepo;
+    private final MemberRepository memberRepo;
+    private final CommunityRepository communityRepo;
+    private final TauDaemon daemon;
+    private final Context appContext;
 
     MsgAlertHandler(Context appContext, TauDaemon daemon) {
         this.appContext = appContext;
@@ -68,6 +71,7 @@ class MsgAlertHandler {
         userRepo = RepositoryHelper.getUserRepository(appContext);
         txQueueRepo = RepositoryHelper.getTxQueueRepository(appContext);
         memberRepo = RepositoryHelper.getMemberRepository(appContext);
+        communityRepo = RepositoryHelper.getCommunityRepository(appContext);
     }
     /**
      * 处理新的消息
@@ -133,7 +137,7 @@ class MsgAlertHandler {
                     }
                 } else {
                     // 更新libTAU朋友信息
-                    boolean isSuccess = daemon.updateFriendInfo(user);
+                    boolean isSuccess = daemon.addNewFriend(user.publicKey);
                     if (isSuccess) {
                         // 发送默认消息
                         String msg = appContext.getString(R.string.contacts_have_added);
@@ -334,7 +338,7 @@ class MsgAlertHandler {
         Friend friend = friendRepo.queryFriend(userPk, friendPk);
         if (null == friend) {
             // 更新libTAU朋友信息
-            boolean isSuccess = daemon.updateFriendInfo(user);
+            boolean isSuccess = daemon.addNewFriend(user.publicKey);
             if (isSuccess) {
                 // 发送默认消息
                 String msg = appContext.getString(R.string.contacts_have_added);
@@ -389,49 +393,52 @@ class MsgAlertHandler {
     }
 
     /**
-     * 多设备或者朋友信息同步
-     * @param userPk 当前用户的公钥
+     * 节点用户信息
+     * @param peer 节点用户信息
      * @param bean 朋友信息
      */
-    void onFriendInfo(String userPk, FriendInfo bean) {
-        if (StringUtil.isEmpty(userPk)) {
+    void onUserInfo(String userPk, byte[] peer, UserInfo bean) {
+        if (null == peer) {
             return;
         }
-        String friendPkStr = ByteUtil.toHexString(bean.getPubKey());
+        String friendPkStr = ByteUtil.toHexString(peer);
         String nickname = Utils.textBytesToString(bean.getNickname());
-        byte[] headPic = bean.getHeadPic();
+        long onlineTime = bean.getOnlineTime().longValue();
         double longitude = bean.getLongitude();
         double latitude = bean.getLatitude();
         long updateNNTime = bean.getUpdateNNTime().longValue();
-        long updateHPTime = bean.getUpdateHPTime().longValue();
         long updateLocationTime = bean.getUpdateLocationTime().longValue();
-        logger.info("onFriendInfo userPk::{}, friendPk::{}, updaterNNTime::{}, nickname::{}, longitude::{}, latitude::{}," +
-                        " updateHPTime::{}, headPic.size::{}", userPk, friendPkStr, updateNNTime, nickname,
-                longitude, latitude, updateHPTime, headPic != null ? headPic.length : 0);
+        String profile = Utils.textBytesToString(bean.getProfile());
+        long updateProfileTime = bean.getUpdateProfileTime().longValue();
+        List<byte[]> communities = bean.getCommunities();
+        logger.info("onUserInfo friendPk::{}, updaterNNTime::{}, nickname::{}, longitude::{}, " +
+                        "latitude::{}, updateProfileTime::{}, communities::{}",
+                friendPkStr, updateNNTime, nickname, longitude, latitude, updateProfileTime, communities.size());
         User user = userRepo.getUserByPublicKey(friendPkStr);
 
-        boolean isNeedUpdate = false;
+        // 更新last time
+        Friend friend = friendRepo.queryFriend(userPk, friendPkStr);
+        if (friend != null && (friend.lastSeenTime == 0 || onlineTime > friend.lastSeenTime)) {
+            friend.lastSeenTime = onlineTime;
+            friendRepo.updateFriend(friend);
+        }
+
         // 多设备朋友同步
         if (null == user) {
             user = new User(friendPkStr);
             user.nickname = nickname;
             user.updateNNTime = updateNNTime;
-            user.headPic = headPic;
-            user.updateHPTime = updateHPTime;
             user.longitude = longitude;
             user.latitude = latitude;
             user.updateLocationTime = updateLocationTime;
+            user.profile = profile;
+            user.updatePFTime = updateProfileTime;
             userRepo.addUser(user);
-            isNeedUpdate = true;
         } else {
+            boolean isNeedUpdate = false;
             if (updateNNTime > user.updateNNTime) {
                 user.nickname = nickname;
                 user.updateNNTime = updateNNTime;
-                isNeedUpdate = true;
-            }
-            if (updateHPTime > user.updateHPTime) {
-                user.headPic = headPic;
-                user.updateHPTime = updateHPTime;
                 isNeedUpdate = true;
             }
             if (updateLocationTime > user.updateLocationTime) {
@@ -440,19 +447,73 @@ class MsgAlertHandler {
                 user.updateLocationTime = updateLocationTime;
                 isNeedUpdate = true;
             }
+            if (updateProfileTime > user.updatePFTime) {
+                user.profile = profile;
+                user.updatePFTime = updateProfileTime;
+                isNeedUpdate = true;
+            }
             if (isNeedUpdate) {
                 userRepo.updateUser(user);
             }
         }
-        if (isNeedUpdate) {
-            daemon.updateFriendInfo(user);
+        // 添加朋友的社区到本地
+        for (byte[] chainIDBytes : communities) {
+            String chainID = ChainIDUtil.decode(chainIDBytes);
+            Community community = communityRepo.getCommunityByChainID(chainID);
+            if (null == community) {
+                String communityName = ChainIDUtil.getName(chainID);
+                community = new Community(chainID, communityName);
+                communityRepo.addCommunity(community);
+            }
+            Member member = memberRepo.getMemberByChainIDAndPk(chainID, friendPkStr);
+            if (null == member) {
+                member = new Member(chainID, friendPkStr);
+                memberRepo.addMember(member);
+            }
         }
-
         // 如果是自己的信息，添加设备ID
         boolean isMyself = StringUtil.isEquals(userPk, friendPkStr);
         if (isMyself) {
             byte[] deviceID = bean.getDeviceID();
             addNewDeviceID(Utils.textBytesToString(deviceID), userPk);
+        }
+    }
+
+    /**
+     * 节点用户信息
+     * @param peer 节点用户信息
+     * @param bean 朋友信息
+     */
+    void onUserHeadPic(byte[] peer, UserHeadPic bean) {
+        String friendPkStr = ByteUtil.toHexString(peer);
+        long updateHPTime = bean.getUpdateHPTime().longValue();
+        logger.info("onUserInfo friendPk::{}, updateHPTime::{}", friendPkStr, updateHPTime);
+        User user = userRepo.getUserByPublicKey(friendPkStr);
+
+        // 多设备朋友同步
+        if (null == user) {
+            user = new User(friendPkStr);
+            user.updateHPTime = updateHPTime;
+            userRepo.addUser(user);
+        } else {
+            if (updateHPTime > user.updateHPTime) {
+               user.headPic = bean.getHeadPic();
+                userRepo.updateUser(user);
+            }
+        }
+    }
+    /**
+     * 处理朋友事件逻辑
+     * @param peer 节点用户信息
+     */
+    void onUserEvent(String userPk, byte[] peer) {
+        String friendPkStr = ByteUtil.toHexString(peer);
+        logger.info("onUserEvent friendPk::{}", friendPkStr);
+        Friend friend = friendRepo.queryFriend(userPk, friendPkStr);
+        if (friend != null) {
+            friend.focused = 1;
+            friend.lastSeenTime = DateUtil.getTime();
+            friendRepo.updateFriend(friend);
         }
     }
 }

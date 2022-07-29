@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 class TauDozeManager {
     private static final Logger logger = LoggerFactory.getLogger("TauDozeManager");
     protected static final long TAU_UP_TIME = 3 * 60;
+    protected static final long HOURS24_TIME = 24 * 60 * 60;
     private final TauDaemon daemon;
     private boolean chargingState = false;
     private int batteryLevel = 100;
@@ -102,8 +103,13 @@ class TauDozeManager {
     public long calculateRealDozeTime() {
         if (isDozeMode) {
             long dozeEndTime = SystemClock.uptimeMillis();
-            return (dozeEndTime - dozeStartTime) / 1000;
+            long realDozeTime = (dozeEndTime - dozeStartTime) / 1000;
+            return Math.max(realDozeTime, 0);
         }
         return 0;
+    }
+
+    public void resetDozeStartTime() {
+        this.dozeStartTime = SystemClock.uptimeMillis();
     }
 }

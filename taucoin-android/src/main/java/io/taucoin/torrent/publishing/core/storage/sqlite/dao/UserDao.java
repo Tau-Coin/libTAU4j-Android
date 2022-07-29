@@ -12,7 +12,6 @@ import androidx.room.Update;
 import io.reactivex.Flowable;
 import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 
 /**
@@ -25,6 +24,7 @@ public interface UserDao {
     String QUERY_GET_CURRENT_USER_PK = "SELECT publicKey FROM Users WHERE isCurrentUser = 1";
     String QUERY_GET_USER_LIST = "SELECT * FROM Users";
     String QUERY_GET_USERS_IN_BAN_LIST = "SELECT * FROM Users where isBanned = 1 and isCurrentUser != 1";
+    String QUERY_GET_COMMUNITY_USERS_IN_BAN_LIST = "SELECT * FROM Users where isMemBanned = 1 and isCurrentUser != 1";
 
     // 查询所有用户数据的条件
     String QUERY_ALL_USERS_WHERE = " WHERE u.isBanned = 0 AND u.isCurrentUser != 1 AND" +
@@ -65,6 +65,7 @@ public interface UserDao {
 
     String QUERY_SET_CURRENT_USER = "UPDATE Users SET isCurrentUser = :isCurrentUser WHERE publicKey = :publicKey";
     String QUERY_ADD_USER_BLACKLIST = "UPDATE Users SET isBanned = :isBanned WHERE publicKey = :publicKey";
+    String QUERY_ADD_COMMUNITY_USER_BLACKLIST = "UPDATE Users SET isMemBanned = :isBanned WHERE publicKey = :publicKey";
     String QUERY_SEED_HISTORY_LIST = "SELECT * FROM Users WHERE seed not null";
     String QUERY_USER_BY_PUBLIC_KEY = "SELECT * FROM Users WHERE publicKey = :publicKey";
 
@@ -75,7 +76,7 @@ public interface UserDao {
             " where u.publicKey = :publicKey";
 
     String QUERY_GET_USER_PKS_IN_BAN_LIST = " (SELECT publicKey FROM Users WHERE isBanned == 1 and isCurrentUser != 1) ";
-    String QUERY_GET_USER_PKS_IN_WHITE_LIST = " (SELECT publicKey FROM Users WHERE isBanned == 0 OR isCurrentUser = 1) ";
+    String QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST = " (SELECT publicKey FROM Users WHERE isMemBanned == 1 and isCurrentUser != 1) ";
 
     String QUERY_FRIEND_BY_PUBLIC_KEY = "SELECT * FROM Friends" +
             " where friendPk =:friendPk and userPK = (" + QUERY_GET_CURRENT_USER_PK + ")";
@@ -130,11 +131,20 @@ public interface UserDao {
     @Query(QUERY_GET_USERS_IN_BAN_LIST)
     List<User> getUsersInBlacklist();
 
+    @Query(QUERY_GET_COMMUNITY_USERS_IN_BAN_LIST)
+    List<User> getCommunityUsersInBlacklist();
+
     /**
      * 设置用户是否加入黑名单
      */
     @Query(QUERY_ADD_USER_BLACKLIST)
     void setUserBlacklist(String publicKey, int isBanned);
+
+    /**
+     * 设置社区用户是否加入黑名单
+     */
+    @Query(QUERY_ADD_COMMUNITY_USER_BLACKLIST)
+    void setCommunityUserBlacklist(String publicKey, int isBanned);
 
     /**
      * 观察Sees历史列表

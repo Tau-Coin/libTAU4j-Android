@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.databinding.ItemChainBinding;
 import io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView;
 
@@ -67,11 +67,13 @@ public class ChainListAdapter extends ListAdapter<UserAndTx, ChainListAdapter.Vi
             binding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_CHAIN));
             // 添加link解析
             Linkify.addLinks(binding.tvMsg, Linkify.WEB_URLS);
-            Pattern airdrop = Pattern.compile(UrlUtil.AIRDROP_PATTERN, 0);
+            Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
             Linkify.addLinks(binding.tvMsg, airdrop, null);
-            Pattern chain = Pattern.compile(UrlUtil.CHAIN_PATTERN, 0);
+            Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
             Linkify.addLinks(binding.tvMsg, chain, null);
-//            Pattern hash = Pattern.compile(UrlUtil.HASH_PATTERN, 0);
+            Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
+            Linkify.addLinks(binding.tvMsg, friend, null);
+//            Pattern hash = Pattern.compile(LinkUtil.HASH_PATTERN, 0);
 //            Linkify.addLinks(binding.tvMsg, hash, null);
 
             setClickListener(binding.tvMsg, tx);

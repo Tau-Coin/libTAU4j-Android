@@ -57,6 +57,8 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         initParam();
         initView();
         initData();
+        userViewModel.requestFriendInfo(publicKey);
+        userViewModel.focusFriend(publicKey);
     }
 
     /**
@@ -65,6 +67,7 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
     private void initParam() {
         if (getIntent() != null) {
             type = getIntent().getIntExtra(IntentExtra.TYPE, TYPE_COMMUNITY);
+            publicKey = getIntent().getStringExtra(IntentExtra.PUBLIC_KEY);
         }
     }
 
@@ -72,9 +75,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
      * 初始化布局
      */
     private void initView() {
-        if (getIntent() != null) {
-            publicKey = getIntent().getStringExtra(IntentExtra.PUBLIC_KEY);
-        }
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle("");
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
@@ -130,10 +130,10 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         userViewModel.getEditRemarkResult().observe(this, result -> {
             userViewModel.getUserDetail(publicKey);
         });
-        communityViewModel.getJoinedUnexpiredCommunityList(publicKey);
-        communityViewModel.getJoinedUnexpiredList().observe(this, members -> {
+        communityViewModel.getJoinedCommunityList(publicKey);
+        communityViewModel.getJoinedCommunity().observe(this, members -> {
             if (adapter != null) {
-                if(members != null) {
+                if (members != null) {
                     adapter.submitList(members);
                     if (members.size() > 0) {
                         binding.llMutualCommunities.setVisibility(View.VISIBLE);
@@ -169,6 +169,10 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
         binding.tvPublicKey.setOnClickListener(v -> {
             copyPublicKey(user.publicKey);
         });
+
+        boolean isHaveProfile = StringUtil.isNotEmpty(user.profile);
+        binding.llPersonalProfile.setVisibility(isHaveProfile ? View.VISIBLE : View.GONE);
+        binding.tvPersonalProfile.setText(user.profile);
     }
 
     /**

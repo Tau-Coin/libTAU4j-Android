@@ -118,18 +118,16 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         long balance = 0;
         boolean onChain = false;
         if (member != null) {
-            onChain = member.onChain();
-            power = member.power;
             balance = member.balance;
-            long currentTime = DateUtil.getTime();
-            long expiryBlocks = member.headBlock - member.blockNumber + 1;
-            expiryBlocks = Constants.BLOCKS_NOT_PERISHABLE - expiryBlocks;
-            long expiryDate = expiryBlocks * Constants.BLOCK_IN_AVG + currentTime;
-            binding.itemExpiryDate.setRightText(DateUtil.formatTime(expiryDate, DateUtil.pattern4));
-
-            long renewalDate = (expiryBlocks - Constants.AUTO_RENEWAL_MAX_BLOCKS)
-                    * Constants.BLOCK_IN_AVG + currentTime;
-            binding.itemRenewalDate.setRightText(DateUtil.formatTime(renewalDate, DateUtil.pattern4));
+//            long currentTime = DateUtil.getTime();
+//            long expiryBlocks = member.headBlock - member.blockNumber + 1;
+//            expiryBlocks = Constants.BLOCKS_NOT_PERISHABLE - expiryBlocks;
+//            long expiryDate = expiryBlocks * Constants.BLOCK_IN_AVG + currentTime;
+//            binding.itemExpiryDate.setRightText(DateUtil.formatTime(expiryDate, DateUtil.pattern4));
+//
+//            long renewalDate = (expiryBlocks - Constants.AUTO_RENEWAL_MAX_BLOCKS)
+//                    * Constants.BLOCK_IN_AVG + currentTime;
+//            binding.itemRenewalDate.setRightText(DateUtil.formatTime(renewalDate, DateUtil.pattern4));
         }
         binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(balance));
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));

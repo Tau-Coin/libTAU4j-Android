@@ -44,7 +44,7 @@ public class BlackListAdapter extends ListAdapter<Parcelable, BlackListAdapter.V
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ViewDataBinding binding;
-        if (StringUtil.isEquals(type, BlacklistActivity.TYPE_USERS)) {
+        if (StringUtil.isNotEquals(type, BlacklistActivity.TYPE_COMMUNITIES)) {
             binding = DataBindingUtil.inflate(inflater,
                     R.layout.item_user_blacklist,
                     parent,

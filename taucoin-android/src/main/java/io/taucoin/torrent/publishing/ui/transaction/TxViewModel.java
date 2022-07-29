@@ -38,7 +38,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.TxLogStatus;
@@ -55,8 +54,8 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
-import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
@@ -425,7 +424,8 @@ public class TxViewModel extends AndroidViewModel {
                 }
             } else if (type == AIRDROP_TX.getType()) {
                 AirdropTxContent txContent = new AirdropTxContent(tx.content);
-                if (!UrlUtil.verifyAirdropUrl(txContent.getLink())) {
+                LinkUtil.Link link = LinkUtil.decode(txContent.getLink());
+                if (!link.isAirdropLink()) {
                     ToastUtils.showShortToast(R.string.tx_error_invalid_airdrop_link);
                     return false;
                 }

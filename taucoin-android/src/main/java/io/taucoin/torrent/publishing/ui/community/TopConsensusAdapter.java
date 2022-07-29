@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.torrent.publishing.core.utils.HashUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
@@ -61,11 +60,7 @@ public class TopConsensusAdapter extends ListAdapter<Object, TopConsensusAdapter
                 return;
             }
             holder.binding.tvCol1.setText(String.valueOf(pos + 1));
-            if (obj instanceof ConsensusInfo) {
-                ConsensusInfo info = (ConsensusInfo) obj;
-                holder.binding.tvCol2.setText(String.valueOf(info.getNumber()));
-                holder.binding.tvCol3.setText(HashUtil.hashMiddleHide(info.getHash()));
-            } else if (obj instanceof BlockInfo) {
+            if (obj instanceof BlockInfo) {
                 BlockInfo info = (BlockInfo) obj;
                 holder.binding.tvCol2.setText(String.valueOf(info.blockNumber));
                 holder.binding.tvCol3.setText(HashUtil.hashMiddleHide(info.blockHash));
@@ -78,9 +73,7 @@ public class TopConsensusAdapter extends ListAdapter<Object, TopConsensusAdapter
     private static final DiffUtil.ItemCallback<Object> diffCallback = new DiffUtil.ItemCallback<Object>() {
         @Override
         public boolean areContentsTheSame(@NonNull Object oldItem, @NonNull Object newItem) {
-            if (oldItem instanceof ConsensusInfo) {
-                return ((ConsensusInfo)oldItem).equals(newItem);
-            } else if (oldItem instanceof BlockInfo) {
+            if (oldItem instanceof BlockInfo) {
                 return ((BlockInfo)oldItem).equals(newItem);
             }
             return true;
@@ -88,9 +81,7 @@ public class TopConsensusAdapter extends ListAdapter<Object, TopConsensusAdapter
 
         @Override
         public boolean areItemsTheSame(@NonNull Object oldItem, @NonNull Object newItem) {
-            if (oldItem instanceof ConsensusInfo) {
-                return ((ConsensusInfo)oldItem).equals(newItem);
-            } else if (oldItem instanceof BlockInfo) {
+            if (oldItem instanceof BlockInfo) {
                 return ((BlockInfo)oldItem).equals(newItem);
             }
             return oldItem.equals(newItem);

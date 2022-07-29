@@ -9,7 +9,7 @@ import org.libTAU4j.Transaction;
 import org.libTAU4j.alerts.Alert;
 import org.libTAU4j.alerts.AlertType;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
@@ -19,13 +19,17 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
-import io.taucoin.torrent.publishing.core.model.data.FriendInfo;
+import io.taucoin.torrent.publishing.core.model.data.UserHeadPic;
+import io.taucoin.torrent.publishing.core.model.data.UserInfo;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
+import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.DeviceUtils;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.Utils;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
@@ -131,25 +135,27 @@ public class TauDaemonImpl extends TauDaemon {
                         AlertType.PORTMAP_ERROR.swig(),
                         AlertType.LISTEN_SUCCEEDED.swig(),
                         AlertType.LISTEN_FAILED.swig(),
-                        AlertType.COMM_FRIEND_INFO.swig(),
                         AlertType.COMM_NEW_MSG.swig(),
                         AlertType.COMM_SYNC_MSG.swig(),
                         AlertType.COMM_MSG_ARRIVED.swig(),
                         AlertType.COMM_CONFIRM_ROOT.swig(),
                         AlertType.COMM_LAST_SEEN.swig(),
+                        AlertType.COMM_USER_INFO.swig(),
+                        AlertType.COMM_USER_EVENT.swig(),
                         AlertType.BLOCK_CHAIN_HEAD_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_TAIL_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_CONSENSUS_POINT_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_ROLLBACK_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_NEW_TX.swig(),
                         AlertType.BLOCK_CHAIN_FORK_POINT.swig(),
-                        AlertType.BLOCK_CHAIN_TOP_THREE_VOTES.swig(),
                         AlertType.BLOCK_CHAIN_STATE.swig(),
                         AlertType.BLOCK_CHAIN_SYNCING_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_SYNCING_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_SYNCING_HEAD_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_TX_SENT.swig(),
                         AlertType.BLOCK_CHAIN_TX_ARRIVED.swig(),
+                        AlertType.BLOCK_CHAIN_STATE_ARRAY.swig(),
+                        AlertType.BLOCK_CHAIN_FAIL_TO_GET_CHAIN_DATA.swig(),
                     };
                 }
 
@@ -223,26 +229,44 @@ public class TauDaemonImpl extends TauDaemon {
     }
 
     /**
-     *  更新libTAU朋友信息
-     *  包含加朋友和朋友信息
-     * @param friend 朋友对象
+     * 更新libTAU自己的缓存信息
+     * @param user 用户对象
      */
     @Override
-    public boolean updateFriendInfo(User friend) {
+    public boolean updateUserInfo(User user) {
         boolean isSuccess = false;
-        if (friend != null) {
-            String friendPk = friend.publicKey;
+        if (user != null) {
+            String userPk = user.publicKey;
             // 添加新朋友
-            isSuccess = addNewFriend(friend.publicKey);
+            isSuccess = addNewFriend(userPk);
             String deviceID = DeviceUtils.getCustomDeviceID(appContext);
-            FriendInfo friendInfo = new FriendInfo(deviceID, friend);
+            long onlineTime = getSessionTime() / 1000;
+            MemberRepository memRepo = RepositoryHelper.getMemberRepository(appContext);
+            List<String> communities = memRepo.queryFollowedCommunities(user.publicKey);
+            UserInfo friendInfo = new UserInfo(deviceID, user, communities, onlineTime);
             byte[] encoded = friendInfo.getEncoded();
-            logger.info("updateFriendInfo publicKey::{}, nickname::{}, longitude::{}, " +
-                            "latitude::{}, isSuccess::{}, encoded.length::{}",
-                    friend.publicKey, friend.nickname, friend.longitude,
-                    friend.latitude, isSuccess, encoded.length);
-            // 更新朋友信息
-            updateFriendInfo(friendPk, encoded);
+            if (encoded.length >= 1000) {
+                int size = communities.size();
+                for (int i = 0; i < communities.size(); i++) {
+                    List<String> newCommunities = communities.subList(0, size - 1);
+                    friendInfo = new UserInfo(deviceID, user, newCommunities, onlineTime);
+                    encoded = friendInfo.getEncoded();
+                    if (encoded.length < 1000) {
+                        logger.info("updateUserInfo publicKey::{}, newCommunities::{}",
+                                userPk, null == newCommunities ? 0 : newCommunities.size());
+                        break;
+                    }
+                }
+            }
+            logger.info("updateUserInfo publicKey::{}, nickname::{}, longitude::{}, " +
+                            "latitude::{}, isSuccess::{}, encoded.length::{}, communities::{}",
+                    userPk, user.nickname, user.longitude, user.latitude, isSuccess, encoded.length,
+                    null == communities ? 0 : communities.size());
+            // 更新用户信息
+            pubUserInfo(userPk, encoded);
+            // 更新用户头像
+            UserHeadPic userHeadPic = new UserHeadPic(user.headPic, user.updateHPTime);
+            pubUserHeadPic(userPk, userHeadPic.getEncoded());
         }
         return isSuccess;
     }
@@ -251,7 +275,7 @@ public class TauDaemonImpl extends TauDaemon {
      * 添加新的朋友
      * @param friendPk 朋友公钥
      */
-    private boolean addNewFriend(String friendPk) {
+    public boolean addNewFriend(String friendPk) {
         boolean isSuccess = false;
         if (isRunning) {
             isSuccess = sessionManager.addNewFriend(friendPk);
@@ -275,20 +299,6 @@ public class TauDaemonImpl extends TauDaemon {
     }
 
     /**
-     * 更新朋友信息
-     * @param friendPk 朋友公钥
-     * @param friendInfo 朋友信息
-     */
-    private boolean updateFriendInfo(String friendPk, byte[] friendInfo) {
-        boolean isSuccess = false;
-        if (isRunning) {
-            isSuccess = sessionManager.updateFriendInfo(friendPk, friendInfo);
-            logger.info("updateFriendInfo friendPk::{}, isSuccess::{}", friendPk, isSuccess);
-        }
-        return isSuccess;
-    }
-
-    /**
      * 添加新消息
      */
     @Override
@@ -308,13 +318,13 @@ public class TauDaemonImpl extends TauDaemon {
      * @return boolean 是否创建成功
      */
     @Override
-    public boolean createNewCommunity(byte[] chainID, Map<String, Account> accounts) {
+    public boolean createNewCommunity(byte[] chainID, Set<Account> accounts) {
         if (isRunning) {
             boolean isAddSuccess = sessionManager.createNewCommunity(chainID, accounts);
             logger.info("createNewCommunity success::{}", isAddSuccess);
             return isAddSuccess;
         }
-        return false;
+        return true;
     }
 
     /**
@@ -323,15 +333,17 @@ public class TauDaemonImpl extends TauDaemon {
      * @return chainID
      */
     @Override
-    public String createNewChainID(String communityName) {
+    public String createNewChainID(String type, String communityName) {
         String newChainID = null;
         if (isRunning) {
-            byte[] chainID = sessionManager.createChainID(communityName);
-            logger.debug("createNewChainID Byte length::{}", chainID.length);
+            byte[] typeBytes = Utils.textStringToBytes(type);
+            byte[] chainID = sessionManager.createChainID(typeBytes, communityName);
+            logger.debug("createNewChainID typeBytes::{} nameBytes::{}, communityName::{}",
+                    null == typeBytes ? 0 : typeBytes.length, chainID.length, communityName);
             newChainID = ChainIDUtil.decode(chainID);
             logger.debug("createNewChainID String length::{}", newChainID.length());
         }
-        logger.info("createNewChainID isRunning::{}, chainID::{}", isRunning, newChainID);
+        logger.info("createNewChainID isRunning::{}, type::{}, chainID::{}", isRunning, type, newChainID);
         return newChainID;
     }
 
@@ -347,8 +359,7 @@ public class TauDaemonImpl extends TauDaemon {
         Account account = null;
         if (isRunning) {
             account = sessionManager.getAccountInfo(chainID, publicKey);
-            logger.info("getAccountInfo balance::{}, power::{}, nonce::{}", account.getBalance(),
-                    account.getEffectivePower(), account.getNonce());
+            logger.info("getAccountInfo balance::{}, nonce::{}", account.getBalance(), account.getNonce());
         }
         return account;
     }

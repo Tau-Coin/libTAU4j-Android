@@ -326,6 +326,9 @@
             android:name=".ui.setting.FontSizeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
+        <activity android:name=".ui.setting.PersonalProfileActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
         <activity
             android:name=".ui.friends.BotsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>

@@ -55,12 +55,21 @@ public interface UserRepository {
      */
     List<User> getUsersInBlacklist();
 
+    List<User> getCommunityUsersInBlacklist();
+
     /**
      * 设置用户是否加入黑名单
      * @param publicKey 公钥
      * @param blacklist 是否加入黑名单
      */
     void setUserBlacklist(String publicKey, boolean blacklist);
+
+    /**
+     * 设置社区用户是否加入黑名单
+     * @param publicKey 公钥
+     * @param blacklist 是否加入黑名单
+     */
+    void setCommunityUserBlacklist(String publicKey, boolean blacklist);
 
     /**
      * 观察Sees历史列表

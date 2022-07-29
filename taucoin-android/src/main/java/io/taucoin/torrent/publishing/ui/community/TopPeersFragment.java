@@ -38,8 +38,6 @@ import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
  */
 public class TopPeersFragment extends BaseFragment implements TopPeersAdapter.ClickListener {
 
-    static final int TOP_COIN = 0x01;
-    static final int TOP_POWER = 0x02;
     private static final Logger logger = LoggerFactory.getLogger("TopPeersFragment");
     private BaseActivity activity;
     private FragmentMemberBinding binding;
@@ -48,7 +46,6 @@ public class TopPeersFragment extends BaseFragment implements TopPeersAdapter.Cl
     private TopPeersAdapter adapter;
 
     private String chainID;
-    private int type;
 
     @Nullable
     @Override
@@ -75,7 +72,6 @@ public class TopPeersFragment extends BaseFragment implements TopPeersAdapter.Cl
     private void initParameter() {
         if(getArguments() != null){
             chainID = getArguments().getString(IntentExtra.CHAIN_ID);
-            type = getArguments().getInt(IntentExtra.TYPE, TOP_COIN);
         }
     }
 
@@ -83,8 +79,8 @@ public class TopPeersFragment extends BaseFragment implements TopPeersAdapter.Cl
      * 初始化视图
      */
     private void initView() {
-        logger.debug("chainID::{}, type::{}", chainID, type);
-        adapter = new TopPeersAdapter(this, type);
+        logger.debug("chainID::{}, type::{}", chainID);
+        adapter = new TopPeersAdapter(this);
         DefaultItemAnimator animator = new DefaultItemAnimator() {
             @Override
             public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
@@ -108,12 +104,7 @@ public class TopPeersFragment extends BaseFragment implements TopPeersAdapter.Cl
     @Override
     public void onStart() {
         super.onStart();
-        Flowable<List<Member>> observable;
-        if (type == TOP_COIN) {
-            observable = communityViewModel.observeChainTopCoinMembers(chainID, 10);
-        } else {
-            observable = communityViewModel.observeChainTopPowerMembers(chainID, 10);
-        }
+        Flowable<List<Member>> observable = communityViewModel.observeChainTopCoinMembers(chainID, 10);
         disposables.add(observable.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(list -> adapter.submitList(list)));

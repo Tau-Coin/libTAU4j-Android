@@ -7,13 +7,11 @@ import com.google.gson.Gson;
 
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
-import org.libTAU4j.ChainURL;
 import org.libTAU4j.Transaction;
-import org.libTAU4j.Vote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +23,6 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
-import io.taucoin.torrent.publishing.core.model.data.ConsensusInfo;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.model.data.TxLogStatus;
 import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
@@ -53,7 +50,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -67,16 +64,16 @@ import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
  */
 public class TauListenHandler {
     private static final Logger logger = LoggerFactory.getLogger("TauListenHandler");
-    private UserRepository userRepo;
-    private MemberRepository memberRepo;
-    private TxRepository txRepo;
-    private TxQueueRepository txQueueRepo;
-    private CommunityRepository communityRepo;
-    private BlockRepository blockRepository;
-    private SettingsRepository settingsRepo;
-    private TauDaemon daemon;
+    private final UserRepository userRepo;
+    private final MemberRepository memberRepo;
+    private final TxRepository txRepo;
+    private final TxQueueRepository txQueueRepo;
+    private final CommunityRepository communityRepo;
+    private final BlockRepository blockRepository;
+    private final SettingsRepository settingsRepo;
+    private final TauDaemon daemon;
     private Disposable autoRenewalDisposable;
-    private Context appContext;
+    private final Context appContext;
 
     public enum BlockStatus {
         ROLL_BACK,
@@ -228,12 +225,7 @@ public class TauListenHandler {
             String miner = ByteUtil.toHexString(block.getMiner());
             long difficulty = block.getCumulativeDifficulty().longValue();
             Transaction transaction = block.getTx();
-            long rewards;
-            if (block.getBlockNumber() <= 0) {
-                rewards = block.getMinerBalance();
-            } else {
-                rewards = null == transaction ? 0L : transaction.getFee();
-            }
+            long rewards = null == transaction ? 0L : transaction.getFee();
             // 第一次创建
             int status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
             long timestamp = block.getTimestamp();
@@ -482,32 +474,27 @@ public class TauListenHandler {
         Member member = memberRepo.getMemberByChainIDAndPk(chainIDStr, publicKey);
         Account account = daemon.getAccountInfo(chainID, publicKey);
         long balance = 0;
-        long power = 0;
-        long blockNumber = 0;
         long nonce = 0;
         if (account != null) {
             balance = account.getBalance();
-            power = account.getEffectivePower();
-            blockNumber = account.getBlockNumber();
             nonce = account.getNonce();
         }
 
         if (null == member) {
-            member = new Member(chainIDStr, publicKey, balance, power, nonce, blockNumber);
+            member = new Member(chainIDStr, publicKey, balance, nonce);
             memberRepo.addMember(member);
-            logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}, power::{}",
-                    chainIDStr, publicKey, balance, power);
+            logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}",
+                    chainIDStr, publicKey, balance);
         } else {
-            // 防止和初始上报的onAccountState冲突
-            if (blockNumber > 0 || balance > 0) {
+            // 防止和初始上报的onAccountState冲突 TODO: 待优化
+//            if (blockNumber > 0 || balance > 0) {
+            if (balance > 0) {
                 member.balance = balance;
             }
-            member.power = power;
-            member.blockNumber = blockNumber;
             member.nonce = nonce;
             memberRepo.updateMember(member);
             logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
-                    "balance::{}, power::{}", chainIDStr, publicKey, member.balance, member.power);
+                    "balance::{}", chainIDStr, publicKey, member.balance);
         }
     }
 
@@ -583,32 +570,6 @@ public class TauListenHandler {
     }
 
     /**
-     * 处理libTAU上报节点投票
-     * @param chainID 链的ID
-     * @param votes 投票结果
-     */
-    void handleNewTopVotes(byte[] chainID, List<Vote> votes) {
-        logger.info("handleNewTopVotes");
-        String chainIDStr = ChainIDUtil.decode(chainID);
-        Community community = communityRepo.getCommunityByChainID(chainIDStr);
-        if (community != null) {
-            List<ConsensusInfo> list = new ArrayList<>();
-            for (Vote vote : votes) {
-                Block block = vote.getBlock();
-                String hash = block.Hash();
-                long number = block.getBlockNumber();
-                long count = vote.getVoteCount();
-                ConsensusInfo info = new ConsensusInfo(hash, number, count);
-                list.add(info);
-            }
-            community.topConsensus = new Gson().toJson(list);
-            communityRepo.updateCommunity(community);
-            logger.info("handleNewTopVotes chainID::{}, topConsensus::{}", chainIDStr,
-                    community.topConsensus);
-        }
-    }
-
-    /**
      * 账户自动更新
      */
     void accountAutoRenewal() {
@@ -678,31 +639,6 @@ public class TauListenHandler {
     }
 
     /**
-     * 节点账户状态
-     * @param chainIDBytes 链ID
-     * @param userPk 用户公钥
-     * @param account 账户状态
-     */
-    void onAccountState(byte[] chainIDBytes, String userPk, Account account) {
-        String chainID = ChainIDUtil.decode(chainIDBytes);
-        if (account != null) {
-            Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-            if (null == member) {
-                member = new Member(chainID, userPk);
-                member.balance = account.getBalance();
-                memberRepo.addMember(member);
-            } else {
-                if (member.blockNumber == 0) {
-                    member.balance = account.getBalance();
-                    memberRepo.updateMember(member);
-                }
-            }
-            logger.info("onAccountState chainID::{}, userPk::{}, newBalance::{}, balance::{}, blockNumber::{}",
-                    chainID, userPk, account.getBalance(), member.balance, member.blockNumber);
-        }
-    }
-
-    /**
      * Sent to Internet 桔黄色 (traversal complete > 1)
      * @param txHash 交易Hash
      */
@@ -745,12 +681,10 @@ public class TauListenHandler {
         if (StringUtil.isEmpty(chainURL)) {
             return;
         }
-        ChainURL url = ChainUrlUtil.decode(chainURL);
-        if (null == url) {
-            return;
-        }
-        String chainID = url.getChainID();
-        Set<String> peers = url.getPeers();
+        LinkUtil.Link url = LinkUtil.decode(chainURL);
+        String chainID = url.getData();
+        Set<String> peers = new HashSet<>();
+        peers.add(url.getPeer());
         boolean isSuccess = daemon.followChain(chainID, peers);
         if (isSuccess) {
             Community community = new Community(chainID, ChainIDUtil.getName(chainID));
@@ -759,10 +693,38 @@ public class TauListenHandler {
             String userPK = MainApplication.getInstance().getPublicKey();
             saveUserInfo(userPK);
             addMemberInfo(ChainIDUtil.encode(chainID), userPK);
-            if (peers != null) {
-                for (String peer : peers) {
+            for (String peer : peers) {
+                saveUserInfo(peer);
+                addMemberInfo(ChainIDUtil.encode(chainID), peer);
+            }
+        }
+    }
+
+    /**
+     * 处理用户状态
+     * @param chainIDBytes 链ID
+     * @param accounts 账户列表
+     */
+    public void onStateArray(byte[] chainIDBytes, List<Account> accounts) {
+        String chainID = ChainIDUtil.decode(chainIDBytes);
+        int accountSize = null == accounts ? 0 : accounts.size();
+        logger.info("onStateArray chainID::{}, accounts::{}", chainID, accountSize);
+        if (accountSize > 0) {
+            for (Account account : accounts) {
+                String peer = ByteUtil.toHexString(account.getPeer());
+                Member member = memberRepo.getMemberByChainIDAndPk(chainID, peer);
+                if (member != null) {
+                    if (member.balance == 0 && member.nonce == 0) {
+                        member.balance = account.getBalance();
+                        member.nonce = account.getNonce();
+                        memberRepo.updateMember(member);
+                    }
+                } else {
                     saveUserInfo(peer);
-                    addMemberInfo(ChainIDUtil.encode(chainID), peer);
+                    member = new Member(chainID, peer);
+                    member.balance = account.getBalance();
+                    member.nonce = account.getNonce();
+                    memberRepo.addMember(member);
                 }
             }
         }

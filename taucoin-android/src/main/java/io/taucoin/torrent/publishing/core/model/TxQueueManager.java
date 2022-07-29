@@ -155,8 +155,7 @@ class TxQueueManager {
             if (null == account) {
                 return true;
             }
-            logger.info("sendTxQueue account nonce::{}, balance::{}, blockNumber::{}", account.getNonce(),
-                    account.getBalance(), account.getBlockNumber());
+            logger.info("sendTxQueue account nonce::{}, balance::{}", account.getNonce(), account.getBalance());
 
             if (txQueue.amount + txQueue.fee > account.getBalance()) {
                 logger.info("sendWiringTx amount({}) + fee({}) > balance({})", txQueue.amount,

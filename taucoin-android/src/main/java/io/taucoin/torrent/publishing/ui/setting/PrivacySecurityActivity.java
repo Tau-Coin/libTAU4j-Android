@@ -62,6 +62,11 @@ public class PrivacySecurityActivity extends BaseActivity implements View.OnClic
                 intent.putExtra(IntentExtra.TYPE, BlacklistActivity.TYPE_COMMUNITIES);
                 ActivityUtil.startActivity(intent, this, BlacklistActivity.class);
                 break;
+            case R.id.tv_blacklist_community_users:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.TYPE, BlacklistActivity.TYPE_COMMUNITY_USERS);
+                ActivityUtil.startActivity(intent, this, BlacklistActivity.class);
+                break;
             case R.id.ll_seeds:
                 ActivityUtil.startActivity(this, SeedActivity.class);
                 break;

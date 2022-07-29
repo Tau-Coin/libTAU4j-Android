@@ -15,6 +15,7 @@
     <string name="common_slant">(%1$d/%2$d)</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_submit">Submit</string>
+    <string name="common_restart">Restart</string>
     <string name="common_report">Report</string>
     <string name="common_report_exit">Report and Exit</string>
     <string name="common_percent">%1$d%%</string>
@@ -50,7 +51,7 @@
     <string name="main_empty_create_communities">Create Coin Community</string>
     <string name="main_exit">Click again to exit the application!</string>
     <string name="main_community_name">%1$s community (%2$s)</string>
-    <string name="main_balance_power">Balance %1$s, Mining Power %2$s</string>
+    <string name="main_balance">Balance %1$s</string>
     <string name="main_community_non_member">Non Member</string>
     <string name="main_error_link">Invalid link!</string>
     <string name="main_error_link_yourself">Airdrop link published by yourself!</string>
@@ -128,7 +129,6 @@
     <string name="community_input_hint">Message</string>
     <string name="community_title">%1$s(%2$d)</string>
     <string name="community_users_stats_m">members&#160;%1$d,&#160;</string>
-    <string name="community_users_stats_g">g&#160;%1$d,&#160;</string>
     <string name="community_users_stats_c">c&#160;%1$d,&#160;</string>
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">discovering</string>
@@ -189,25 +189,22 @@
     <string name="chain_mining_time_tips">Your remaining time to win the current mining slot.</string>
     <string name="chain_mining_time_min_seconds">%1$dmin&#160;%2$ds</string>
     <string name="chain_mining_time_seconds">%1$ds</string>
+    <string name="chain_link_long_time_hour_min">This link or QR code has been created for %1$d hours %2$d minutes. Do you want to continue?</string>
+    <string name="chain_link_long_time_min">This link or QR code has been created for %1$d minutes. Do you want to continue?</string>
     <string name="chain_difficulty">Difficulty</string>
     <string name="chain_total_peers">Total Peers</string>
     <string name="chain_peers_blocks">Blocks Self-mined</string>
     <string name="chain_total_coins">Total Coins</string>
     <string name="chain_access_list">Connected List</string>
-    <string name="chain_gossip_list">Gossip List</string>
     <string name="chain_top_peers">Top 10 peers</string>
-    <string name="chain_votes">Votes</string>
     <string name="chain_current_fork">Recent Fork Out</string>
     <string name="chain_block_number">Block Number</string>
     <string name="chain_block">Block</string>
     <string name="chain_block_and_number">Block %1$s</string>
     <string name="chain_block_hash">Hash</string>
-    <string name="chain_top_tab_coin">Coin</string>
-    <string name="chain_top_tab_power">Mining Power</string>
-    <string name="chain_top_tab_consensus">Consensus</string>
-    <string name="chain_top_tab_head">Head</string>
     <string name="chain_top_tab_rank">Rank</string>
     <string name="chain_top_tab_peer">Peer</string>
+    <string name="chain_top_tab_coin">Coin</string>
 
     <string name="error_community_name_empty">Community name cannot be empty!</string>
     <string name="error_community_name_too_long">Community name is too long!</string>
@@ -221,6 +218,7 @@
     <string name="community_favorite_delete_successfully">Delete favorite successfully</string>
     <string name="community_added_successfully">Create Community Successful!</string>
     <string name="community_added_failed">Failed to add community!</string>
+    <string name="community_stopped_running">Failed to obtain consensus blocks for many times, and the blockchain business has stopped running.</string>
     <string name="community_join">Join</string>
     <string name="community_open">Open</string>
     <string name="community_added_members">Add Members</string>
@@ -257,6 +255,9 @@
     <string name="setting_import_seed">Import secret key to change address</string>
     <string name="setting_username_app">Nickname in app</string>
     <string name="setting_privacy_security">Privacy and Security</string>
+    <string name="setting_personal_profile">Personal Profile</string>
+    <string name="setting_personal_profile_result">Personal Profile saved successfully</string>
+    <string name="setting_personal_profile_too_long">Personal profile is too long</string>
     <string name="setting_community_setting">Community Setting</string>
     <string name="setting_journal">Journal</string>
     <string name="setting_font_size">Font Size</string>
@@ -320,6 +321,7 @@
     <string name="setting_privacy">Privacy</string>
     <string name="setting_blacklist_users">Banned Users</string>
     <string name="setting_blacklist_communities">Banned Communities</string>
+    <string name="setting_blacklist_community_users">Banned Community Users</string>
     <string name="setting_Unblock">&#160;Unblock&#160;</string>
     <string name="setting_security">Security</string>
     <string name="setting_seeds">Keys</string>
@@ -368,6 +370,7 @@
     <string name="blacklist_failed">Blacklist failed</string>
     <string name="ban_successfully">Ban successfully</string>
     <string name="ban_failed">Ban failed</string>
+    <string name="ban_member_msg">Ban Member: %s</string>
     <string name="favourite_successfully">Added favourite successfully</string>
     <string name="share_link_successfully">Share successfully</string>
 
@@ -516,9 +519,9 @@
     <string name="bot_airdrop_coins_total_value">Total&#160;%1$s&#160;coins</string>
     <string name="bot_airdrop_participants_progress">Participants Progress</string>
     <string name="bot_airdrop_coins_usage">Coins Usage</string>
-    <string name="bot_airdrop_tau_link">Android Link</string>
+    <string name="bot_airdrop_tau_link">Airdrop Link</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
-    <string name="bot_share_airdrop_link_title">Share android link</string>
+    <string name="bot_share_airdrop_link_title">Share Airdrop link</string>
     <string name="bot_share_airdrop_link_content">Hello, I am sending you some %1$s community coins.\n1.
         Please download decentral server-less TAU app(size 24Mb) to join us.\n\n%2$s\n\n2.
         To receive your %3$s coins, copy this FULL message and paste to TAU app airdrop function.\n\n%4$s</string>

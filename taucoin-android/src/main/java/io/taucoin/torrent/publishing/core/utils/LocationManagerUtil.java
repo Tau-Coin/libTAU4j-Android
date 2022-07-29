@@ -134,7 +134,7 @@ public class LocationManagerUtil {
             latitude = location.getLatitude();
             longitude = FmtMicrometer.formatDecimal(longitude, 6);
             latitude = FmtMicrometer.formatDecimal(latitude, 6);
-            TauDaemon.getInstance(appContext).updateCurrentUserInfo();
+            TauDaemon.getInstance(appContext).updateCurrentUserInfo(false);
             logger.debug("update location provider::{}, Longitude::{}, Latitude::{}",
                     location.getProvider(), location.getLongitude(), location.getLatitude());
 

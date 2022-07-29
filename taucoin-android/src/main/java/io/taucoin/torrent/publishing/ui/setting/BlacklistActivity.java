@@ -23,6 +23,7 @@ public class BlacklistActivity extends BaseActivity implements BlackListAdapter.
 
     static final String TYPE_USERS = "users";
     static final String TYPE_COMMUNITIES = "communities";
+    static final String TYPE_COMMUNITY_USERS = "communityUser";
     private ActivityBlacklistBinding binding;
     private BlackListAdapter adapter;
     private UserViewModel userViewModel;
@@ -56,13 +57,19 @@ public class BlacklistActivity extends BaseActivity implements BlackListAdapter.
     private void initView() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         int titleRes = R.string.setting_blacklist_users;
-        if(StringUtil.isEquals(currentType, TYPE_COMMUNITIES)){
+        if (StringUtil.isEquals(currentType, TYPE_COMMUNITIES)) {
             titleRes = R.string.setting_blacklist_communities;
             communityViewModel.getCommunitiesInBlacklist();
             communityViewModel.getBlackList().observe(this, list -> {
                 adapter.setCommunityList(list);
             });
-        }else {
+        } else if (StringUtil.isEquals(currentType, TYPE_COMMUNITY_USERS)) {
+            titleRes = R.string.setting_blacklist_community_users;
+            userViewModel.getCommunityUsersInBlacklist();
+            userViewModel.getBlackList().observe(this, list -> {
+                adapter.setUserList(list);
+            });
+        } else {
             userViewModel.getUsersInBlacklist();
             userViewModel.getBlackList().observe(this, list -> {
                 adapter.setUserList(list);
@@ -87,10 +94,14 @@ public class BlacklistActivity extends BaseActivity implements BlackListAdapter.
     @Override
     public void onUnblock(int pos) {
         Parcelable item = adapter.getItemKey(pos);
-        if(item instanceof Community){
+        if (item instanceof Community) {
             communityViewModel.setCommunityBlacklist(((Community) item).chainID, false);
-        }else if(item instanceof User){
-            userViewModel.setUserBlacklist(((User) item).publicKey, false);
+        } else if(item instanceof User) {
+            if (StringUtil.isEquals(currentType, TYPE_COMMUNITY_USERS)) {
+                userViewModel.setCommunityUserBlacklist(((User) item).publicKey, false);
+            } else {
+                userViewModel.setUserBlacklist(((User) item).publicKey, false);
+            }
         }
         adapter.deleteItem(pos);
     }

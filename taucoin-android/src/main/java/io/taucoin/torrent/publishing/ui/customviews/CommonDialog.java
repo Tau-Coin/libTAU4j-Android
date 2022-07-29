@@ -258,4 +258,9 @@ public class CommonDialog extends Dialog {
     public void closeDialog(){
         dismiss();
     }
+
+    public interface ClickListener {
+        void proceed();
+        void close();
+    }
 }

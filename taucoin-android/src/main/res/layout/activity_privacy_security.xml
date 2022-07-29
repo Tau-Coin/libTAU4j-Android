@@ -75,6 +75,23 @@
                         app:lineLeftText="@string/setting_blacklist_communities"
                         app:lineVisibility="false"/>
 
+                    <include
+                        layout="@layout/view_line"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/widget_size_1"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginEnd="@dimen/widget_size_20"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/tv_blacklist_community_users"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        android:onClick="onClick"
+                        app:lineRightImage="@mipmap/icon_arrow"
+                        app:lineLeftText="@string/setting_blacklist_community_users"
+                        app:lineVisibility="false"/>
+
                 </LinearLayout>
 
                 <TextView

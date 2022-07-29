@@ -102,6 +102,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         initParameter();
         initLayout();
         userViewModel.requestFriendInfo(friendPK);
+        userViewModel.focusFriend(friendPK);
     }
 
     /**

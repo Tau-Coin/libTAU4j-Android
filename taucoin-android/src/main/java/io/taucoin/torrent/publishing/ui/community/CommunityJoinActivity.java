@@ -5,12 +5,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.libTAU4j.ChainURL;
-
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.utils.ChainUrlUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
@@ -18,6 +16,7 @@ import io.taucoin.torrent.publishing.databinding.ActivityCommunityJoinBinding;
 import io.taucoin.torrent.publishing.databinding.ExternalErrorLinkDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
+import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
  * 社区加入页面
@@ -26,6 +25,7 @@ public class CommunityJoinActivity extends BaseActivity {
 
     private ActivityCommunityJoinBinding binding;
     private CommunityViewModel communityViewModel;
+    private UserViewModel userViewModel;
     private CommonDialog linkDialog;
 
     @Override
@@ -33,6 +33,7 @@ public class CommunityJoinActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
         communityViewModel = provider.get(CommunityViewModel.class);
+        userViewModel = provider.get(UserViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_community_join);
         initLayout();
         subscribeAddCommunity();
@@ -86,10 +87,22 @@ public class CommunityJoinActivity extends BaseActivity {
     }
 
     private void handleCommunityLink(String url) {
-        ChainURL decode = ChainUrlUtil.decode(url);
-        if (decode != null) {
-            String chainID = decode.getChainID();
-            communityViewModel.addCommunity(chainID, url);
+        LinkUtil.Link decode = LinkUtil.decode(url);
+        if (decode.isChainLink()) {
+            communityViewModel.showLongTimeCreateDialog(this, decode, new CommonDialog.ClickListener() {
+                @Override
+                public void proceed() {
+                    // 加朋友
+                    userViewModel.addFriend(decode.getPeer(), null);
+                    String chainID = decode.getData();
+                    communityViewModel.addCommunity(chainID, decode);
+                }
+
+                @Override
+                public void close() {
+
+                }
+            });
         } else {
             showErrorLinkDialog();
         }

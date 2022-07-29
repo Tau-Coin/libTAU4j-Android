@@ -1,7 +1,9 @@
 package io.taucoin.torrent.publishing.ui.community;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,18 +22,18 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.AccessList;
-import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.UsersUtil;
+import io.taucoin.torrent.publishing.databinding.EditFeeDialogBinding;
+import io.taucoin.torrent.publishing.databinding.ExternalAirdropLinkDialogBinding;
 import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
-import io.taucoin.torrent.publishing.databinding.ViewDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.customviews.FragmentStatePagerAdapter;
@@ -61,6 +63,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private Statistics memberStatistics;
     private AccessList accessList;
     private long nodes = 0;
+    private CommonDialog chainStoppedDialog;
 
     @Nullable
     @Override
@@ -126,6 +129,16 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.viewPager.setOffscreenPageLimit(3);
         binding.tabLayout.setupWithViewPager(binding.viewPager);
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
+
+        // 检测区块链是否因为获取数据失败而停止
+        TauDaemon.getInstance(activity.getApplicationContext()).getChainStoppedSet()
+                .observe(this.getViewLifecycleOwner(), set -> {
+                    if (set != null && set.contains(chainID)) {
+                        binding.ivHelp.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.ivHelp.setVisibility(View.INVISIBLE);
+                    }
+        });
     }
 
     private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -179,10 +192,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             }
         }
         if (accessList != null) {
-            long gossip = accessList.getGossipSize();
-            if (gossip > 0) {
-                subtitle.append(getString(R.string.community_users_stats_g, gossip));
-            }
             long connected = accessList.getConnectedSize();
             if (connected > 0) {
                 subtitle.append(getString(R.string.community_users_stats_c, connected));
@@ -217,6 +226,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     public void onDestroy() {
         super.onDestroy();
         binding.tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+        if (chainStoppedDialog != null && chainStoppedDialog.isShowing()) {
+            chainStoppedDialog.closeDialog();
+        }
     }
 
     /**
@@ -293,7 +305,41 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
                 break;
+            case R.id.iv_help:
+                showChainStoppedDialog();
+                break;
         }
+    }
+
+    /**
+     * 显示链停止的对话框
+     */
+    private void showChainStoppedDialog() {
+        if (chainStoppedDialog != null && chainStoppedDialog.isShowing()) {
+            return;
+        }
+        Context context = activity.getApplicationContext();
+        ExternalAirdropLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
+                R.layout.external_airdrop_link_dialog, null, false);
+        dialogBinding.tvPeer.setText(R.string.community_stopped_running);
+        dialogBinding.tvPeer.setTextColor(context.getResources().getColor(R.color.color_black));
+        dialogBinding.tvJoin.setText(R.string.common_restart);
+        dialogBinding.tvSkip.setOnClickListener(view -> {
+            if (chainStoppedDialog != null) {
+                chainStoppedDialog.closeDialog();
+            }
+        });
+        dialogBinding.tvJoin.setOnClickListener(view -> {
+            if (chainStoppedDialog != null) {
+                chainStoppedDialog.closeDialog();
+            }
+            TauDaemon.getInstance(activity.getApplicationContext()).restartFailedChain(chainID);
+        });
+        chainStoppedDialog = new CommonDialog.Builder(activity)
+                .setContentView(dialogBinding.getRoot())
+                .setCanceledOnTouchOutside(false)
+                .create();
+        chainStoppedDialog.show();
     }
 
     @Override

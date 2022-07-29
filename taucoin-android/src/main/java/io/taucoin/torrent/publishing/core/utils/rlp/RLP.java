@@ -1147,6 +1147,14 @@ public class RLP {
         return encodeList(elements);
     }
 
+    public static byte[] encodeList(List<byte[]> list) {
+        byte[][] elements = new byte[list.size()][];
+        for (int i = 0; i < list.size(); i++) {
+            elements[i] = encodeElement(list.get(i));
+        }
+        return encodeList(elements);
+    }
+
     public static byte[] encodeList(byte[]... elements) {
 
         if (elements == null) {

@@ -17,7 +17,8 @@ class DatabaseMigration {
         return new Migration[] {
                 MIGRATION_1_2,
                 MIGRATION_2_3,
-                MIGRATION_3_4
+                MIGRATION_3_4,
+                MIGRATION_4_5
         };
     }
 
@@ -54,6 +55,17 @@ class DatabaseMigration {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             // 创建交易日志表
             database.execSQL("CREATE TABLE IF NOT EXISTS TxLogs (`hash` TEXT NOT NULL, `status` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`hash`, `status`, `timestamp`))");
+        }
+    };
+
+    private static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // 添加社区成员是否被拉黑字段
+            database.execSQL("ALTER TABLE Users ADD COLUMN isMemBanned INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE Users ADD COLUMN profile TEXT");
+            database.execSQL("ALTER TABLE Users ADD COLUMN updatePFTime INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE Friends ADD COLUMN focused INTEGER NOT NULL DEFAULT 0");
         }
     };
 }

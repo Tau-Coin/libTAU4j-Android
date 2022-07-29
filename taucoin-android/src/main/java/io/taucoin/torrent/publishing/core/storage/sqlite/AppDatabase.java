@@ -49,7 +49,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
         ChatMsgLog.class,
         Device.class,
         Statistic.class
-    }, version = 4)
+    }, version = 5)
 public abstract class AppDatabase extends RoomDatabase {
     private static final Logger logger = LoggerFactory.getLogger("AppDatabase");
     private static final String DATABASE_NAME = "tau.db";
@@ -107,6 +107,7 @@ public abstract class AppDatabase extends RoomDatabase {
                         queryPragma(db, "PRAGMA cache_size");
                         queryPragma(db, "PRAGMA cache_spill");
                         queryPragma(db, "PRAGMA page_size");
+                        queryPragma(db, "PRAGMA page_count");
                         queryPragma(db, "PRAGMA temp_store");
                         queryPragma(db, "PRAGMA auto_vacuum");
                         queryPragma(db, "PRAGMA synchronous");

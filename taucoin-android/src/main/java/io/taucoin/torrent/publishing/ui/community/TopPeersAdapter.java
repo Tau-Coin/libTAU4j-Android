@@ -19,13 +19,11 @@ import io.taucoin.torrent.publishing.databinding.ItemChainTopBinding;
  * 社区排名的Adapter
  */
 public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHolder> {
-    private ClickListener listener;
-    private int type;
+    private final ClickListener listener;
 
-    TopPeersAdapter(ClickListener listener, int type) {
+    TopPeersAdapter(ClickListener listener) {
         super(diffCallback);
         this.listener = listener;
-        this.type = type;
     }
 
     @NonNull
@@ -37,7 +35,7 @@ public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHol
                 parent,
                 false);
 
-        return new ViewHolder(binding, listener, type);
+        return new ViewHolder(binding, listener);
     }
 
     @Override
@@ -46,15 +44,13 @@ public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHol
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private ItemChainTopBinding binding;
-        private ClickListener listener;
-        private int type;
+        private final ItemChainTopBinding binding;
+        private final ClickListener listener;
 
-        ViewHolder(ItemChainTopBinding binding, ClickListener listener, int type) {
+        ViewHolder(ItemChainTopBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
-            this.type = type;
         }
 
         void bind(ViewHolder holder, Member member, int pos) {
@@ -62,28 +58,18 @@ public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHol
                 return;
             }
             holder.binding.tvCol1.setText(String.valueOf(pos + 1));
-            if (type == TopPeersFragment.TOP_COIN) {
-                String midHideName = UsersUtil.getMidHideName(member.publicKey, 6);
-                holder.binding.tvCol2.setText(midHideName);
-                holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_yellow));
-                holder.binding.tvCol3.setText(FmtMicrometer.fmtBalance(member.balance));
-            } else if (type == TopPeersFragment.TOP_POWER) {
-                String midHideName = UsersUtil.getMidHideName(member.publicKey, 6);
-                holder.binding.tvCol2.setText(midHideName);
-                holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_yellow));
-                holder.binding.tvCol3.setText(String.valueOf(member.power));
-            }
+            String midHideName = UsersUtil.getMidHideName(member.publicKey, 6);
+            holder.binding.tvCol2.setText(midHideName);
+            holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_yellow));
+            holder.binding.tvCol3.setText(FmtMicrometer.fmtBalance(member.balance));
 
             ViewUtils.updateViewWeight(binding.tvCol2, 3);
             ViewUtils.updateViewWeight(binding.tvCol3, 2);
-
-            if (type == TopPeersFragment.TOP_COIN || type == TopPeersFragment.TOP_POWER) {
-                holder.binding.tvCol2.setOnClickListener(v -> {
-                    if(listener != null){
-                        listener.onItemClicked(member.publicKey);
-                    }
-                });
-            }
+            holder.binding.tvCol2.setOnClickListener(v -> {
+                if(listener != null){
+                    listener.onItemClicked(member.publicKey);
+                }
+            });
         }
     }
 

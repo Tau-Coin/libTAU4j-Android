@@ -127,7 +127,9 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
         disposables.add(viewModel.observeHomeChanged()
                 .subscribeOn(Schedulers.io())
-                .subscribe(o -> dataChanged = true));
+                .subscribe(o -> {
+                    dataChanged = true;
+                }));
 
         disposables.add(ObservableUtil.interval(500)
                 .subscribeOn(Schedulers.io())

@@ -18,8 +18,8 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.UrlUtil;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ItemFavoriteBinding;
 import io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView;
@@ -85,10 +85,12 @@ public class FavoriteListAdapter extends PagedListAdapter<UserAndTx,
             favoriteBinding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NOTES));
             // 添加link解析
             Linkify.addLinks(favoriteBinding.tvMsg, Linkify.WEB_URLS);
-            Pattern airdrop = Pattern.compile(UrlUtil.AIRDROP_PATTERN, 0);
+            Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
             Linkify.addLinks(favoriteBinding.tvMsg, airdrop, null);
-            Pattern chain = Pattern.compile(UrlUtil.CHAIN_PATTERN, 0);
+            Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
             Linkify.addLinks(favoriteBinding.tvMsg, chain, null);
+            Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
+            Linkify.addLinks(favoriteBinding.tvMsg, friend, null);
 
             favoriteBinding.ivHeadPic.setOnClickListener(view ->{
                 if (listener != null) {
