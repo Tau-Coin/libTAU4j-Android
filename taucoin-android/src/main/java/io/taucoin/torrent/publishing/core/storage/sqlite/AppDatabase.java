@@ -112,6 +112,8 @@ public abstract class AppDatabase extends RoomDatabase {
                         queryPragma(db, "PRAGMA auto_vacuum");
                         queryPragma(db, "PRAGMA synchronous");
                         queryPragma(db, "PRAGMA soft_heap_limit");
+                        queryPragma(db, "PRAGMA mmap_size");
+                        queryPragma(db, "PRAGMA locking_mode");
                     }
 
                     void queryPragma(SupportSQLiteDatabase db, String query) {

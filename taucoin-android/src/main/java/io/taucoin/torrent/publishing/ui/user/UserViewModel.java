@@ -614,7 +614,7 @@ public class UserViewModel extends AndroidViewModel {
                     user.nickname = name;
                     user.updateNNTime = daemon.getSessionTime() / 1000;
                     // 更新自己的信息
-                    if (StringUtil.isEmpty(publicKey)) {
+                    if (StringUtil.isEquals(MainApplication.getInstance().getPublicKey(), user.publicKey)) {
                         daemon.updateUserInfo(user);
                     }
                 }

@@ -735,6 +735,7 @@ public abstract class TauDaemon {
         if (isRunning) {
             byte[] keySrc = ByteUtil.toByte(publicKey);
             byte[] key = DataKey.getKey(keySrc, DataKey.Suffix.PIC);
+            sessionManager.subscribeFromPeer(keySrc, key);
             logger.info("subFriendHeadPic peer::{}, key.length::{}", publicKey, key.length);
         }
     }
@@ -748,7 +749,7 @@ public abstract class TauDaemon {
         if (isRunning) {
             byte[] peer = ByteUtil.toByte(publicKey);
             sessionManager.sendToPeer(peer, data);
-            logger.info("sendToPeer peer::{}", peer);
+            logger.info("sendToPeer peer::{}", publicKey);
         }
     }
 

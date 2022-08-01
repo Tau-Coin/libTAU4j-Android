@@ -37,9 +37,9 @@ public class UserHeadPic {
         RLPList params = RLP.decode2(this.rlpEncoded);
         RLPList list = (RLPList) params.get(0);
 
-        byte[] hpTimeBytes = list.get(2).getRLPData();
+        byte[] hpTimeBytes = list.get(0).getRLPData();
         this.updateHPTime = (null == hpTimeBytes) ? BigInteger.ZERO: new BigInteger(1, hpTimeBytes);
-        this.headPic = list.get(3).getRLPData();
+        this.headPic = list.get(1).getRLPData();
     }
 
     /**

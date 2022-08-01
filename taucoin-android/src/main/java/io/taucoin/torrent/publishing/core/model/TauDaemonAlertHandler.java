@@ -267,6 +267,7 @@ class TauDaemonAlertHandler {
         byte[] peer = eventAlert.get_peer();
         UserEvent userEvent = new UserEvent(eventAlert.get_user_event());
         UserEvent.Event event = UserEvent.Event.parse(userEvent.getEvent());
+        logger.debug("onUserEvent::{}", event.name());
         if (event == UserEvent.Event.FOCUS_FRIEND) {
             msgListenHandler.onUserEvent(userPk, peer);
         }
