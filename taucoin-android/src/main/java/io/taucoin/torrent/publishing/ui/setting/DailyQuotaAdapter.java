@@ -18,18 +18,18 @@ import io.taucoin.torrent.publishing.databinding.ItemDailyQuotaBinding;
 public class DailyQuotaAdapter extends ListAdapter<Integer, DailyQuotaAdapter.ViewHolder> {
     static final int TYPE_METERED = 0x01;
     static final int TYPE_WIFI = 0x02;
-    private int selectLimit;
+    private int selectPos;
     private int type;
     private OnCheckedChangeListener listener;
-    DailyQuotaAdapter(OnCheckedChangeListener listener, int type, int limit) {
+    DailyQuotaAdapter(OnCheckedChangeListener listener, int type, int pos) {
         super(diffCallback);
-        this.selectLimit = limit;
+        this.selectPos = pos;
         this.listener = listener;
         this.type = type;
     }
 
-    public void updateSelectLimit(int selectLimit) {
-        this.selectLimit = selectLimit;
+    public void updateSelectLimitPos(int pos) {
+        this.selectPos = pos;
         notifyDataSetChanged();
     }
 
@@ -47,7 +47,7 @@ public class DailyQuotaAdapter extends ListAdapter<Integer, DailyQuotaAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(holder, getItem(position));
+        holder.bind(holder, getItem(position), position);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -62,7 +62,7 @@ public class DailyQuotaAdapter extends ListAdapter<Integer, DailyQuotaAdapter.Vi
             this.adapter = adapter;
         }
 
-        void bind(ViewHolder holder, Integer limit) {
+        void bind(ViewHolder holder, Integer limit, int pos) {
             if(null == holder){
                 return;
             }
@@ -73,15 +73,15 @@ public class DailyQuotaAdapter extends ListAdapter<Integer, DailyQuotaAdapter.Vi
                 limitStr = context.getString(R.string.setting_daily_quota_unit_m, limit);
             }
             holder.binding.tvData.setText(limitStr);
-            boolean isSelected = adapter.selectLimit == limit;
+            boolean isSelected = adapter.selectPos == pos;
             holder.binding.ivSelector.setImageResource(isSelected ? R.mipmap.icon_radio_button_on :
                     R.mipmap.icon_radio_button_off);
             holder.binding.getRoot().setOnClickListener(v -> {
                 if (!isSelected) {
                     if (adapter.listener != null) {
-                        adapter.listener.onCheckedChanged(adapter.type, limit);
+                        adapter.listener.onCheckedChanged(adapter.type, pos);
                     }
-                    adapter.selectLimit = limit;
+                    adapter.selectPos = pos;
                     adapter.notifyDataSetChanged();
                 }
             });
@@ -89,7 +89,7 @@ public class DailyQuotaAdapter extends ListAdapter<Integer, DailyQuotaAdapter.Vi
     }
 
     public interface OnCheckedChangeListener {
-        void onCheckedChanged(int type, int limit);
+        void onCheckedChanged(int type, int pos);
     }
 
     private static final DiffUtil.ItemCallback<Integer> diffCallback = new DiffUtil.ItemCallback<Integer>() {

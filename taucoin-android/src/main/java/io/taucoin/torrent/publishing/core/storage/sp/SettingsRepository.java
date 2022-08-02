@@ -146,10 +146,6 @@ public interface SettingsRepository {
      */
     long getMemoryUsage();
 
-    void setAverageHeapSize(long heapSize);
-
-    long getAverageHeapSize();
-
     /**
      * 获取网络接口
      */

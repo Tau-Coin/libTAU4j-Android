@@ -11,6 +11,7 @@
     <string name="common_install_browser">Please install mobile browser first!</string>
     <string name="common_parentheses">(%1$s)</string>
     <string name="common_proceed">Proceed</string>
+    <string name="common_unlimited">Unlimited</string>
     <string name="common_back">Back</string>
     <string name="common_slant">(%1$d/%2$d)</string>
     <string name="common_confirm">Confirm</string>

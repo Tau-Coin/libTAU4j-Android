@@ -205,6 +205,7 @@
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/widget_size_10"
                         android:gravity="center_vertical">
 
                         <TextView
@@ -227,11 +228,12 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/ll_wifi_daily_quota"
                         android:orientation="vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/widget_size_20"
-                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:layout_marginTop="@dimen/widget_size_0"
                         android:gravity="center_vertical">
 
                         <TextView

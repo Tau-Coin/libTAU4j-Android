@@ -505,9 +505,11 @@ public abstract class TauDaemon {
 
     /**
      * 根据当前的流量包的使用，判断是否给用户更换流量包的提示
+     * 发达国家使用wifi网络时不限量
      */
     void handleNoRemainingDataTips() {
-        if (!isRunning || !NetworkSetting.isForegroundRunning()) {
+        if (!isRunning || !NetworkSetting.isForegroundRunning() || (!NetworkSetting.isMeteredNetwork()
+                && NetworkSetting.isDevelopCountry())) {
             return;
         }
         // 判断有无网络连接

@@ -58,19 +58,22 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         layoutManagerMetered.setOrientation(RecyclerView.HORIZONTAL);
         binding.rvMeteredDailyQuota.setLayoutManager(layoutManagerMetered);
         adapterMetered = new DailyQuotaAdapter(this,
-                DailyQuotaAdapter.TYPE_METERED, NetworkSetting.getMeteredLimit());
+                DailyQuotaAdapter.TYPE_METERED, NetworkSetting.getMeteredLimitPos());
         binding.rvMeteredDailyQuota.setAdapter(adapterMetered);
-        int[] meteredLimits = getResources().getIntArray(R.array.metered_limit);
+        int[] meteredLimits = NetworkSetting.getMeteredLimits();
         List<Integer> meteredList = Ints.asList(meteredLimits);
         adapterMetered.submitList(meteredList);
 
+        if (NetworkSetting.isDevelopCountry()) {
+            binding.llWifiDailyQuota.setVisibility(View.GONE);
+        }
         LinearLayoutManager layoutManagerWiFi = new LinearLayoutManager(this);
         layoutManagerWiFi.setOrientation(RecyclerView.HORIZONTAL);
         binding.rvWifiDailyQuota.setLayoutManager(layoutManagerWiFi);
         adapterWiFi = new DailyQuotaAdapter(this,
-                DailyQuotaAdapter.TYPE_WIFI, NetworkSetting.getWiFiLimit());
+                DailyQuotaAdapter.TYPE_WIFI, NetworkSetting.getWiFiLimitPos());
         binding.rvWifiDailyQuota.setAdapter(adapterWiFi);
-        int[] wifiLimits = getResources().getIntArray(R.array.wifi_limit);
+        int[] wifiLimits =  NetworkSetting.getWifiLimits();
         List<Integer> wifiList = Ints.asList(wifiLimits);
         adapterWiFi.submitList(wifiList);
 
@@ -91,12 +94,12 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
     }
 
     @Override
-    public void onCheckedChanged(int type, int limit) {
+    public void onCheckedChanged(int type, int pos) {
         if (type == DailyQuotaAdapter.TYPE_METERED) {
-            NetworkSetting.setMeteredLimit(limit, true);
+            NetworkSetting.setMeteredLimitPos(pos, true);
             NetworkSetting.updateMeteredSpeedLimit();
         } else if (type == DailyQuotaAdapter.TYPE_WIFI) {
-            NetworkSetting.setWiFiLimit(limit, true);
+            NetworkSetting.setWiFiLimitPos(pos, true);
             NetworkSetting.updateWiFiSpeedLimit();
         }
     }
@@ -149,16 +152,20 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();
             binding.tvMeteredAvailableData.setText(availableDataStr);
         } else if (key.equals(getString(R.string.pref_key_wifi_available_data))) {
-            long availableData = NetworkSetting.getWiFiAvailableData();
-            String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();
-            binding.tvWifiAvailableData.setText(availableDataStr);
+            if (NetworkSetting.isDevelopCountry()) {
+                binding.tvWifiAvailableData.setText(R.string.common_unlimited);
+            } else {
+                long availableData = NetworkSetting.getWiFiAvailableData();
+                String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();
+                binding.tvWifiAvailableData.setText(availableDataStr);
+            }
         } else if (key.equals(getString(R.string.pref_key_metered_limit)) ||
                 key.equals(getString(R.string.pref_key_metered_prompt_limit))) {
-            adapterMetered.updateSelectLimit(NetworkSetting.getMeteredLimit());
+            adapterMetered.updateSelectLimitPos(NetworkSetting.getMeteredLimitPos());
             NetworkSetting.updateMeteredSpeedLimit();
         } else if (key.equals(getString(R.string.pref_key_wifi_limit)) ||
                 key.equals(getString(R.string.pref_key_wifi_prompt_limit))) {
-            adapterWiFi.updateSelectLimit(NetworkSetting.getWiFiLimit());
+            adapterWiFi.updateSelectLimitPos(NetworkSetting.getWiFiLimitPos());
             NetworkSetting.updateWiFiSpeedLimit();
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_foreground_running_time))) {
             int foregroundTime = NetworkSetting.getForegroundRunningTime();

@@ -275,32 +275,11 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public void setCurrentHeapSize(long heapSize) {
         edit.putLong(appContext.getString(R.string.pref_key_current_heap_size), heapSize)
                 .apply();
-        setAverageHeapSize(heapSize);
     }
 
     @Override
     public long getCurrentHeapSize() {
         return pref.getLong(appContext.getString(R.string.pref_key_current_heap_size), 0);
-    }
-
-    @Override
-    public void setAverageHeapSize(long heapSize) {
-        String key = appContext.getString(R.string.pref_key_average_heap_size);
-        long average = pref.getLong(key, 0);
-        // 上次堆大小平均值大于最大限制值，并且当前堆大小小于最大限制值，直接用当前堆大小
-        if ((average > NetworkSetting.HEAP_SIZE_LIMIT && heapSize <= NetworkSetting.HEAP_SIZE_LIMIT)
-            || average <= 0 ) {
-            average = heapSize;
-        } else {
-            average = (average * Default.heap_sample + heapSize) / (Default.heap_sample + 1);
-        }
-        edit.putLong(key, average).apply();
-    }
-
-    @Override
-    public long getAverageHeapSize() {
-        String key = appContext.getString(R.string.pref_key_average_heap_size);
-        return pref.getLong(key, 0);
     }
 
     /**
@@ -326,7 +305,6 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         setNATPMPMapped(false);
         setNetworkInterfaces("");
         edit.putFloat(appContext.getString(R.string.pref_key_cpu_usage), 0).apply();
-        edit.putLong(appContext.getString(R.string.pref_key_average_heap_size), 0).apply();
         edit.putLong(appContext.getString(R.string.pref_key_current_heap_size), 0).apply();
         // 初始化主循环频率
 

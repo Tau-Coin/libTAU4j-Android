@@ -139,9 +139,9 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
     private String getDataLimit(boolean isMetered) {
         int dataLimit;
         if (isMetered) {
-            dataLimit = NetworkSetting.getMeteredLimit();
+            dataLimit = NetworkSetting.getMeteredLimitValue();
         } else {
-            dataLimit = NetworkSetting.getWiFiLimit();
+            dataLimit = NetworkSetting.getWiFiLimitValue();
         }
         if (dataLimit >= 1024) {
             return getString(R.string.setting_daily_quota_unit_g, dataLimit / 1024);

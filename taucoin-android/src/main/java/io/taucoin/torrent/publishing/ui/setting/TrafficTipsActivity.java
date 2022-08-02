@@ -70,22 +70,22 @@ public class TrafficTipsActivity extends BaseActivity {
         if (isProceed) {
             boolean meteredNetwork = NetworkSetting.isMeteredNetwork();
             if (meteredNetwork) {
-                int meteredLimit = NetworkSetting.getMeteredLimit();
-                int[] meteredLimits = getResources().getIntArray(R.array.metered_limit);
+                int pos = NetworkSetting.getMeteredLimitPos();
+                int[] meteredLimits = NetworkSetting.getMeteredLimits();
                 for (int i = 0; i < meteredLimits.length; i++) {
-                    if (meteredLimit == meteredLimits[i] && i < meteredLimits.length - 1) {
-                        NetworkSetting.setMeteredLimit(meteredLimits[i + 1], false);
+                    if (pos == i && i < meteredLimits.length - 1) {
+                        NetworkSetting.setMeteredLimitPos(i + 1, false);
                         NetworkSetting.updateMeteredSpeedLimit();
                         updateDailyDataLimit = true;
                         break;
                     }
                 }
             } else {
-                int wifiLimit = NetworkSetting.getWiFiLimit();
-                int[] wifiLimits = getResources().getIntArray(R.array.wifi_limit);
+                int pos = NetworkSetting.getWiFiLimitPos();
+                int[] wifiLimits = NetworkSetting.getWifiLimits();
                 for (int i = 0; i < wifiLimits.length; i++) {
-                    if (wifiLimit == wifiLimits[i] && i < wifiLimits.length - 1) {
-                        NetworkSetting.setWiFiLimit(wifiLimits[i + 1], false);
+                    if (pos == i && i < wifiLimits.length - 1) {
+                        NetworkSetting.setWiFiLimitPos(i + 1, false);
                         NetworkSetting.updateWiFiSpeedLimit();
                         updateDailyDataLimit = true;
                         break;
