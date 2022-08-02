@@ -53,4 +53,81 @@
         <item>70</item>
         <item>100</item>
     </integer-array>
+
+<!--    发达地区：北美洲所有国家，整体欧盟，英国，北欧，阿联酋，新加坡，日韩台香港澳门，澳洲 -->
+<!--    https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes -->
+    <string-array name="developedCountryCodes" >
+        <!-- 北美洲所有国家：美国、加拿大、墨西哥、危地马拉、伯利兹、萨尔瓦多、洪都拉斯、巴拿马、巴哈马、古巴、牙买加、
+        海地、多米尼加、哥斯达黎加、圣基茨和尼维斯、安提瓜和巴布达、多米尼克、圣卢西亚、圣文森特和格林纳丁斯、
+        巴巴多斯、格林纳达、特立尼达和多巴哥、尼加拉瓜 -->
+        <item>840,US</item> <!-- 美国 -->
+        <item>124,CA</item> <!-- 加拿大 -->
+        <item>484,MX</item> <!-- 墨西哥 -->
+        <item>320,GT</item> <!-- 危地马拉 -->
+        <item>084,BZ</item> <!-- 伯利兹 -->
+        <item>222,SV</item> <!-- 萨尔瓦多 -->
+        <item>340,HN</item> <!-- 洪都拉斯 -->
+        <item>591,PA</item> <!-- 巴拿马 -->
+        <item>044,BS</item> <!-- 巴哈马 -->
+        <item>192,CU</item> <!-- 古巴 -->
+        <item>388,JM</item> <!-- 牙买加 -->
+        <item>332,HT</item> <!-- 海地 -->
+        <item>212,DM</item> <!-- 多米尼加 -->
+        <item>188,CR</item> <!-- 哥斯达黎加 -->
+        <item>659,KN</item> <!-- 圣基茨和尼维斯 -->
+        <item>028,AG</item> <!-- 安提瓜和巴布达 -->
+        <item>214,DO</item> <!-- 多米尼克 -->
+        <item>662,LC</item> <!-- 圣卢西亚 -->
+        <item>670,VC</item> <!-- 圣文森特和格林纳丁斯 -->
+        <item>052,BB</item> <!-- 巴巴多斯 -->
+        <item>308,GD</item> <!-- 格林纳达 -->
+        <item>780,TT</item> <!-- 特立尼达和多巴哥 -->
+        <item>558,NI</item> <!-- 尼加拉瓜 -->
+
+        <!-- 整体欧盟：奥地利、比利时、保加利亚、塞浦路斯、捷克、克罗地亚、丹麦、爱沙尼亚、芬兰、法国、德国、希腊、
+        匈牙利、爱尔兰、意大利、拉脱维亚、罗马尼亚、立陶宛、卢森堡、马耳他、荷兰、波兰、葡萄牙、斯洛伐克、斯洛文尼亚
+        西班牙、瑞典 -->
+        <item>040,AT</item> <!-- 奥地利 -->
+        <item>056,BE</item> <!-- 比利时 -->
+        <item>100,BG</item> <!-- 保加利亚 -->
+        <item>196,CY</item> <!-- 塞浦路斯 -->
+        <item>203,CZ</item> <!-- 捷克 -->
+        <item>191,HR</item> <!-- 克罗地亚 -->
+        <item>208,DK</item> <!-- 丹麦 -->
+        <item>233,EE</item> <!-- 爱沙尼亚 -->
+        <item>246,FI</item> <!-- 芬兰 -->
+        <item>250,FR</item> <!-- 法国 -->
+        <item>276,DE</item> <!-- 德国 -->
+        <item>300,GR</item> <!-- 希腊 -->
+        <item>348,HU</item> <!-- 匈牙利 -->
+        <item>372,IE</item> <!-- 爱尔兰 -->
+        <item>380,IT</item> <!-- 意大利 -->
+        <item>428,LV</item> <!-- 拉脱维亚 -->
+        <item>642,RO</item> <!-- 罗马尼亚 -->
+        <item>440,LT</item> <!-- 立陶宛 -->
+        <item>442,LU</item> <!-- 卢森堡 -->
+        <item>470,MT</item> <!-- 马耳他 -->
+        <item>528,NL</item> <!-- 荷兰 -->
+        <item>616,PL</item> <!-- 波兰 -->
+        <item>620,PT</item> <!-- 葡萄牙 -->
+        <item>703,SK</item> <!-- 斯洛伐克 -->
+        <item>705,SI</item> <!-- 斯洛文尼亚 -->
+        <item>724,ES</item> <!-- 西班牙 -->
+        <item>752,SE</item> <!-- 瑞典 -->
+
+        <!-- 北欧：丹麦、挪威、瑞典、芬兰和冰岛 -->
+        <!-- 部分和欧盟重复 -->
+        <item>578,NO</item> <!-- 挪威 -->
+        <item>352,IS</item> <!-- 冰岛 -->
+
+        <item>826,GB</item> <!-- 英国 -->
+        <item>784,AE</item> <!-- 阿联酋 -->
+        <item>702,SG</item> <!-- 新加坡 -->
+        <item>392,JP</item> <!-- 日本 -->
+        <item>410,KR</item> <!-- 韩国 -->
+        <item>158,TW</item> <!-- 台湾 -->
+        <item>344,HK</item> <!-- 香港 -->
+        <item>446,MO</item> <!-- 澳门 -->
+        <item>036,AU</item> <!-- 澳洲 -->
+    </string-array>
 </resources>

@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -22,6 +23,8 @@ import android.util.TypedValue;
 
 import org.libTAU4j.Ed25519;
 import org.libTAU4j.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +47,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -502,6 +506,28 @@ public class Utils {
                 return true;
             }
         }
+        return false;
+    }
+
+    /**
+     * 判断当前是否是发达国家
+     */
+    public static boolean isDevelopedCountry() {
+        try {
+            Context context = MainApplication.getInstance();
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            String countryISOCode = tm.getNetworkCountryIso().toUpperCase(Locale.CHINA);
+            if (StringUtil.isEmpty(countryISOCode)) { // when not connected fall back to the SIM's country
+                countryISOCode = tm.getSimCountryIso().toUpperCase(Locale.CHINA);
+            }
+            String[] rl = context.getResources().getStringArray(R.array.developedCountryCodes);
+            for (String s : rl) {
+                String[] g = s.split(",");
+                if (g[1].trim().equals(countryISOCode.trim())) {
+                    return true;
+                }
+            }
+        } catch (Exception ignore) {}
         return false;
     }
 }
