@@ -21,7 +21,6 @@ import org.libTAU4j.alerts.BlockChainStateArrayAlert;
 import org.libTAU4j.alerts.BlockChainSyncingBlockAlert;
 import org.libTAU4j.alerts.BlockChainSyncingHeadBlockAlert;
 import org.libTAU4j.alerts.BlockChainTxArrivedAlert;
-import org.libTAU4j.alerts.BlockChainTxSentAlert;
 import org.libTAU4j.alerts.CommConfirmRootAlert;
 import org.libTAU4j.alerts.CommLastSeenAlert;
 import org.libTAU4j.alerts.CommMsgArrivedAlert;
@@ -151,9 +150,6 @@ public class TauDaemonAlertHandler {
                 break;
             case BLOCK_CHAIN_FORK_POINT:
                 onNewForkPoint(alert);
-                break;
-            case BLOCK_CHAIN_TX_SENT:
-                onTxSent(alert);
                 break;
             case BLOCK_CHAIN_TX_ARRIVED:
                 onTxArrived(alert);
@@ -437,17 +433,6 @@ public class TauDaemonAlertHandler {
         logger.info(a.get_message());
         Block block = a.get_new_block();
         tauListenHandler.handleNewForkPoint(block);
-    }
-
-    /**
-     * Sent to Internet 桔黄色 (traversal complete > 1)
-     * @param alert libTAU上报
-     */
-    private void onTxSent(Alert alert) {
-        BlockChainTxSentAlert a = (BlockChainTxSentAlert) alert;
-        logger.info(a.get_message());
-        byte[] txID = a.getSent_tx_hash();
-        tauListenHandler.onTxSent(txID);
     }
 
     /**

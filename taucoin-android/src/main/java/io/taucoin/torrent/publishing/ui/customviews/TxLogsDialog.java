@@ -188,8 +188,6 @@ public class TxLogsDialog extends Dialog {
                 if (status == TxLogStatus.ARRIVED_SWARM) {
                     isShowResend = false;
                     timePointRes = R.mipmap.icon_msg_swarm;
-                } else if (status == TxLogStatus.SENT_INTERNET) {
-                    timePointRes = R.mipmap.icon_msg_internet;
                 } else {
                     timePointRes = R.mipmap.icon_msg_waitting;
                 }

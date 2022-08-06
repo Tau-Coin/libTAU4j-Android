@@ -171,8 +171,6 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
             TxLog log = msg.logs.get(0);
             if (log.status == TxLogStatus.ARRIVED_SWARM.getStatus()) {
                 return R.mipmap.icon_msg_swarm;
-            } else if (log.status == TxLogStatus.SENT_INTERNET.getStatus()) {
-                return R.mipmap.icon_msg_internet;
             } else {
                 return R.mipmap.icon_msg_waitting;
             }

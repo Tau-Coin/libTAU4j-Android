@@ -550,20 +550,6 @@ public class TauListenHandler {
     }
 
     /**
-     * Sent to Internet 桔黄色 (traversal complete > 1)
-     * @param txHash 交易Hash
-     */
-    void onTxSent(byte[] txHash) {
-        String hash = ByteUtil.toHexString(txHash);
-        TxLog log = txRepo.getTxLog(hash, TxLogStatus.SENT_INTERNET.getStatus());
-        logger.info("onTxSent txID::{}, exist::{}", hash, log != null);
-        if (null == log) {
-            log = new TxLog(hash, TxLogStatus.SENT_INTERNET.getStatus(), DateUtil.getMillisTime());
-            txRepo.addTxLog(log);
-        }
-    }
-
-    /**
      * Arrived Prefix Swarm 绿色(等价网络节点>1)
      * @param txHash 交易Hash
      */

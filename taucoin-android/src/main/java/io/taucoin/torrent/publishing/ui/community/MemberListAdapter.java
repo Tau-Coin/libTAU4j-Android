@@ -66,8 +66,7 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberL
             holder.binding.tvName.setText(showName);
             holder.binding.leftView.setImageBitmap(UsersUtil.getHeadPic(member.user));
 
-//            holder.binding.tvNonMember.setVisibility(member.onChain() ? View.VISIBLE : View.GONE);
-            holder.binding.tvNonMember.setVisibility(View.VISIBLE);
+            holder.binding.tvNonMember.setVisibility(!member.onChain() ? View.VISIBLE : View.GONE);
 
             holder.binding.getRoot().setOnClickListener(v -> {
                 if (listener != null) {
@@ -84,7 +83,7 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberL
     private static final DiffUtil.ItemCallback<MemberAndFriend> diffCallback = new DiffUtil.ItemCallback<MemberAndFriend>() {
         @Override
         public boolean areContentsTheSame(@NonNull MemberAndFriend oldItem, @NonNull MemberAndFriend newItem) {
-            return oldItem.equals(newItem);
+            return oldItem.equals(newItem) && oldItem.balance == newItem.balance && oldItem.nonce == newItem.nonce;
         }
 
         @Override

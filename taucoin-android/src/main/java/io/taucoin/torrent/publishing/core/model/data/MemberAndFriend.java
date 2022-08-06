@@ -17,4 +17,8 @@ public class MemberAndFriend extends Member {
     public MemberAndFriend(@NonNull String chainID, @NonNull String publicKey) {
         super(chainID, publicKey);
     }
+
+    public boolean onChain() {
+        return nonce > 0 || balance > 0;
+    }
 }
