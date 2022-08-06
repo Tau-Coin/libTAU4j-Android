@@ -151,8 +151,6 @@ public abstract class TauDaemon {
                     startOnlineTimer();
                     // 更新用户跟随的社区和其账户状态
                     updateChainsAndAccountInfo();
-                    // 账户自动更新
-                    accountAutoRenewal();
                     // 防止Crash后重启 初始化来不及设置新的日志等级
                     setLogLevel(LogUtil.getTauLogLevel());
                 }
@@ -910,13 +908,6 @@ public abstract class TauDaemon {
             sessionManager.sqlTest();
         }
         logger.warn("sqlTest isRunning::{}", isRunning);
-    }
-
-    /**
-     * 账户自动更新
-     */
-    public void accountAutoRenewal() {
-        tauDaemonAlertHandler.accountAutoRenewal();
     }
 
     /**

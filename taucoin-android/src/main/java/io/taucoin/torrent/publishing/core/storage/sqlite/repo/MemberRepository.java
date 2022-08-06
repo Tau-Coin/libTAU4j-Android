@@ -14,9 +14,7 @@ import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndTime;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
-import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
 
 /**
  * 提供操作Member数据的接口

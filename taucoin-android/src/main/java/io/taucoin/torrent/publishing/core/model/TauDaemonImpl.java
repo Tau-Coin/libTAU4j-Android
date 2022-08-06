@@ -445,12 +445,4 @@ public class TauDaemonImpl extends TauDaemon {
         }
         return null;
     }
-
-    /**
-     * 账户自动更新
-     */
-    @Override
-    public void accountAutoRenewal() {
-        tauDaemonAlertHandler.accountAutoRenewal();
-    }
 }

@@ -20,7 +20,6 @@ import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
-import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 
 /**

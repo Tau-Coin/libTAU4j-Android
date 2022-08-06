@@ -585,13 +585,6 @@ public class TauDaemonAlertHandler {
         }
     }
 
-    /**
-     * 账户自动更新
-     */
-    void accountAutoRenewal() {
-        tauListenHandler.accountAutoRenewal();
-    }
-
     void handleBlockData(Block block, TauListenHandler.BlockStatus status) {
         tauListenHandler.handleBlockData(block, status);
     }
