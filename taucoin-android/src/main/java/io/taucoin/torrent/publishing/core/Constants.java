@@ -45,12 +45,6 @@ public class Constants {
     // 区块未过期的数目（半年）
     public static final int BLOCKS_NOT_PERISHABLE = 288 * 30;
 
-    // 自动更新账户开始点（7天）
-    public static final int AUTO_RENEWAL_MAX_BLOCKS = 288 * 7;
-
-    // 自动更新账户周期（1天）（给自己发转账交易）
-    public static final int AUTO_RENEWAL_PERIOD_BLOCKS = 288;
-
     // 默认社区链平均出块时间，单位:s
     public static final int BLOCK_IN_AVG = 300;
 

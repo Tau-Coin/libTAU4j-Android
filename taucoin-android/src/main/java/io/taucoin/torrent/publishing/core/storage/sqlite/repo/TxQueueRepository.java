@@ -43,5 +43,4 @@ public interface TxQueueRepository {
 
     Flowable<List<AirdropHistory>> observeAirdropHistoryOnChain(String chainID, String senderPk, long currentTime);
 
-    TxQueueAndStatus getAccountRenewalTxQueue(String chainID, String currentPk);
 }

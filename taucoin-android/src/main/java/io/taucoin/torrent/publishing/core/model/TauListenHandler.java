@@ -16,16 +16,9 @@ import java.util.List;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
-import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.model.data.TxLogStatus;
-import io.taucoin.torrent.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
@@ -34,9 +27,7 @@ import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
-import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
-import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
@@ -52,7 +43,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
-import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.torrent.publishing.ui.TauNotifier;
@@ -71,7 +61,6 @@ public class TauListenHandler {
     private final CommunityRepository communityRepo;
     private final BlockRepository blockRepository;
     private final TauDaemon daemon;
-    private Disposable autoRenewalDisposable;
     private final Context appContext;
 
     public enum BlockStatus {
@@ -149,12 +138,6 @@ public class TauListenHandler {
         handleBlockData(block, BlockStatus.NEW_BLOCK);
 
         updateTxQueue(block);
-        // 每个账户自动更新周期，检测是否需要更新账户信息
-        if (block.getBlockNumber() % Constants.AUTO_RENEWAL_PERIOD_BLOCKS == 0) {
-            logger.info("accountAutoRenewal chainID::{}, block number::{}",
-                    ChainIDUtil.decode(block.getChainID()), block.getBlockNumber());
-            accountAutoRenewal();
-        }
     }
 
     /**
@@ -567,75 +550,6 @@ public class TauListenHandler {
     }
 
     /**
-     * 账户自动更新
-     */
-    void accountAutoRenewal() {
-        if (autoRenewalDisposable != null && !autoRenewalDisposable.isDisposed()) {
-            autoRenewalDisposable.dispose();
-        }
-        autoRenewalDisposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
-            List<MemberAutoRenewal> members = memberRepo.queryAutoRenewalAccounts();
-            logger.debug("accountAutoRenewal, members size::{}",
-                    members != null ? members.size() : 0);
-            if (members != null) {
-                for (int i = 0; i < members.size(); i++) {
-                    MemberAutoRenewal member = members.get(i);
-                    if (emitter.isDisposed()) {
-                        break;
-                    }
-                    if (member.balance <= 0) {
-                        logger.debug("accountAutoRenewal chainID::{}, publicKey::{}, Insufficient Balance::{}",
-                                member.chainID, member.publicKey, FmtMicrometer.fmtBalance(member.balance));
-                        continue;
-                    }
-                    long medianTxFree = Constants.WIRING_MIN_FEE.longValue();
-                    long txFree = medianTxFree;
-                    TxQueueAndStatus txQueue = txQueueRepo.getAccountRenewalTxQueue(member.chainID,
-                            member.publicKey);
-                    if (txQueue != null) {
-                        float hours = DateUtil.timeDiffHours(txQueue.timestamp, DateUtil.getMillisTime());
-                        // 一天内只发一次
-                        if (hours < 24) {
-                            logger.debug("accountAutoRenewal, chainID::{}, publicKey::{}, Balance::{}, Hours::{}",
-                                    member.chainID, member.publicKey, FmtMicrometer.fmtBalance(member.balance), hours);
-                            continue;
-                        }
-                        txFree += txQueue.fee;
-                    }
-                    if (member.balance <= txFree) {
-                        txFree = member.balance;
-                    }
-                    long amount = 0;
-                    logger.info("accountAutoRenewal chainID::{}, publicKey::{} (balance::{}, " +
-                                    "amount::{}, fee::{}), medianTxFree::{}",
-                            member.chainID, member.publicKey, FmtMicrometer.fmtBalance(member.balance),
-                            FmtMicrometer.fmtBalance(amount), FmtMicrometer.fmtFeeValue(txFree),
-                            FmtMicrometer.fmtFeeValue(medianTxFree));
-                    if (null == txQueue) {
-                        String memo = appContext.getString(R.string.tx_memo_auto_renewal);
-                        TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
-                        TxQueue tx = new TxQueue(member.chainID, member.publicKey, member.publicKey,
-                                amount, txFree, 2, TxType.WIRING_TX.getType(), txContent.getEncoded());
-                        txQueueRepo.addQueue(tx);
-                        ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.INSERT);
-                        daemon.updateTxQueue(tx.chainID);
-                        logger.info("accountAutoRenewal updateTxQueue");
-                    } else {
-                        txQueue.amount = amount;
-                        txQueue.fee = txFree;
-                        txQueueRepo.updateQueue(txQueue);
-                        ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.UPDATE);
-                        daemon.updateTxQueue(txQueue.chainID);
-                        logger.info("accountAutoRenewal resendTxQueue txFree::{}", txFree);
-                    }
-                }
-            }
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.io())
-                .subscribe();
-    }
-
-    /**
      * Sent to Internet 桔黄色 (traversal complete > 1)
      * @param txHash 交易Hash
      */
@@ -664,10 +578,6 @@ public class TauListenHandler {
     }
 
     public void onCleared() {
-        if (autoRenewalDisposable != null && !autoRenewalDisposable.isDisposed()) {
-            autoRenewalDisposable.dispose();
-        }
-        autoRenewalDisposable = null;
     }
 
     /**

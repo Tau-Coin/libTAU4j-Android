@@ -17,7 +17,6 @@ import io.taucoin.torrent.publishing.core.model.data.MemberAndTime;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
-import io.taucoin.torrent.publishing.core.model.data.MemberAutoRenewal;
 
 /**
  * Room:Member操作接口
@@ -78,18 +77,6 @@ public interface MemberDao {
             " ON a.chainID = b.chainID";
 
     String QUERY_DELETE_COMMUNITY_MEMBERS = "DELETE FROM Members where chainID =:chainID";
-
-    // 查询当前设备可以自动更新的账户信息
-    // 计算是否还有7天过期，触发auto renewal
-    // headBlock - blockNumber >= Constants.BLOCKS_NOT_PERISHABLE - Constants.AUTO_RENEWAL_MAX_BLOCKS
-    String QUERY_AUTO_RENEWAL_ACCOUNTS = "SELECT m.*, u.seed" +
-            " FROM Members m" +
-            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " LEFT JOIN Users u ON m.publicKey = u.publicKey" +
-            " WHERE c.isBanned = 0 AND u.seed NOT NULL";
-//            " AND " + WHERE_ON_CHAIN +
-//            " AND (c.headBlock - m.blockNumber >= " +
-//            (Constants.BLOCKS_NOT_PERISHABLE - Constants.AUTO_RENEWAL_MAX_BLOCKS) + ")";
 
     // 获取跟随的社区列表
     String QUERY_FOLLOWED_COMMUNITIES = "SELECT m.chainID" +
@@ -182,12 +169,6 @@ public interface MemberDao {
 
     @Query(QUERY_DELETE_COMMUNITY_MEMBERS)
     void deleteCommunityMembers(String chainID);
-
-    /**
-     * 查询当前设备可以自动更新的账户信息
-     */
-    @Query(QUERY_AUTO_RENEWAL_ACCOUNTS)
-    List<MemberAutoRenewal> queryAutoRenewalAccounts();
 
     /**
      * 获取跟随的社区列表

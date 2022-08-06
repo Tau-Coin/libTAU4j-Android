@@ -161,14 +161,6 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     /**
-     * 获取社区成员统计
-     */
-    @Override
-    public List<MemberAutoRenewal> queryAutoRenewalAccounts() {
-        return db.memberDao().queryAutoRenewalAccounts();
-    }
-
-    /**
      * 获取跟随的社区列表
      */
     @Override

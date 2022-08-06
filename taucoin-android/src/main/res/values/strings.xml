@@ -447,7 +447,6 @@
     <string name="tx_nonce">Nonce:</string>
     <string name="tx_block_number">Blocknumber:</string>
     <string name="tx_memo_airdrop">Airdrop coins</string>
-    <string name="tx_memo_auto_renewal">Auto renewal</string>
     <string name="tx_give_trust">Give a trust</string>
     <string name="tx_give_trust_tip" formatted="false"><Data><![CDATA[Seller <font color="#000000">%1$s</font> happy to receive your trust!]]></Data></string>
     <string name="tx_give_trust_info">%s %s give %s a trust</string>

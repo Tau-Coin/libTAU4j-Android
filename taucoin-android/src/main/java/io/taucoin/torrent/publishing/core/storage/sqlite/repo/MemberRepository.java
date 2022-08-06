@@ -88,11 +88,6 @@ public interface MemberRepository {
     void submitDataSetChanged();
 
     /**
-     * 获取社区成员统计
-     */
-    List<MemberAutoRenewal> queryAutoRenewalAccounts();
-
-    /**
      * 获取跟随的社区列表
      */
     List<String> queryFollowedCommunities(String publicKey);
