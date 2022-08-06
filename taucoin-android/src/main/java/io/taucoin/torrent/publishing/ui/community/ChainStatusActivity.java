@@ -24,7 +24,6 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -84,7 +83,6 @@ public class ChainStatusActivity extends BaseActivity {
      */
     private ChainStatus mStatus;
     private String headBlockHash;
-    private String tailBlockHash;
     private String consensusBlockHash;
     private void loadChainStatusData(ChainStatus status) {
         if (null == status) {
@@ -99,13 +97,10 @@ public class ChainStatusActivity extends BaseActivity {
         if (null == mStatus || mStatus.headBlock != status.headBlock) {
             binding.tvHeadBlock.setText(FmtMicrometer.fmtLong(status.headBlock));
         }
-        if (null == mStatus || mStatus.tailBlock != status.tailBlock) {
-            binding.tvTailBlock.setText(FmtMicrometer.fmtLong(status.tailBlock));
-        }
         if (null == mStatus || mStatus.consensusBlock != status.consensusBlock) {
             binding.tvConsensusBlock.setText(FmtMicrometer.fmtLong(status.consensusBlock));
         }
-        blockDisposables.add(getBlockByNumber(chainID, status.headBlock, status.tailBlock, status.consensusBlock)
+        blockDisposables.add(getBlockByNumber(chainID, status.headBlock, status.consensusBlock)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(blocksMap -> {
@@ -113,11 +108,6 @@ public class ChainStatusActivity extends BaseActivity {
                     if (block != null && StringUtil.isNotEquals(headBlockHash, block.Hash())) {
                         headBlockHash = block.Hash();
                         loadBlockDetailData(binding.headBlock, block);
-                    }
-                    block = blocksMap.get(status.tailBlock);
-                    if (block != null && StringUtil.isNotEquals(tailBlockHash, block.Hash())) {
-                        tailBlockHash = block.Hash();
-                        loadBlockDetailData(binding.tailBlock, block);
                     }
                     block = blocksMap.get(status.consensusBlock);
                     if (block != null && StringUtil.isNotEquals(consensusBlockHash, block.Hash())) {
@@ -173,9 +163,6 @@ public class ChainStatusActivity extends BaseActivity {
                 break;
             case R.id.item_head_block:
                 showBlockDetail(binding.headBlock, binding.ivHeadDetail);
-                break;
-            case R.id.item_tail_block:
-                showBlockDetail(binding.tailBlock, binding.ivTailDetail);
                 break;
             case R.id.item_consensus_block:
                 showBlockDetail(binding.consensusBlock, binding.ivConsensusDetail);

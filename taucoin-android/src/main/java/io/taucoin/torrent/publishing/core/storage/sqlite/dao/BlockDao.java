@@ -27,7 +27,7 @@ public interface BlockDao {
     String QUERY_BLOCKS = "SELECT * FROM Blocks " +
             " WHERE chainID = :chainID and blockNumber= :blockNumber";
 
-    String QUERY_CHAIN_STATUS = "SELECT a.syncingHeadBlock, a.headBlock, a.tailBlock, a.consensusBlock, a.difficulty, a.forkPoint," +
+    String QUERY_CHAIN_STATUS = "SELECT a.syncingHeadBlock, a.headBlock, a.consensusBlock, a.difficulty, a.forkPoint," +
             " c.peerBlocks, c.totalRewards, d.totalPeers, d.totalCoin, e.balance" +
             " FROM Communities a" +
             " LEFT JOIN (SELECT bb.chainID, count(*) AS peerBlocks, SUM(rewards) AS totalRewards" +
@@ -36,7 +36,8 @@ public interface BlockDao {
             " WHERE bb.chainID = :chainID AND bb.blockNumber > 0" +
             " AND miner =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND status = 1" +
-            " AND (cc.tailBlock <= bb.blockNumber)) AS c " +
+//            " AND (cc.tailBlock <= bb.blockNumber)" +
+            ") AS c " +
             " ON a.chainID = c.chainID" +
             " LEFT JOIN (SELECT mm.chainID, count(*) totalPeers, SUM(balance) AS totalCoin FROM Members mm" +
             " LEFT JOIN Communities cc ON mm.chainID = cc.chainID" +

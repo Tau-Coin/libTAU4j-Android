@@ -143,7 +143,6 @@ public class TauDaemonImpl extends TauDaemon {
                         AlertType.COMM_USER_INFO.swig(),
                         AlertType.COMM_USER_EVENT.swig(),
                         AlertType.BLOCK_CHAIN_HEAD_BLOCK.swig(),
-                        AlertType.BLOCK_CHAIN_TAIL_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_CONSENSUS_POINT_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_ROLLBACK_BLOCK.swig(),
                         AlertType.BLOCK_CHAIN_NEW_TX.swig(),
@@ -156,6 +155,7 @@ public class TauDaemonImpl extends TauDaemon {
                         AlertType.BLOCK_CHAIN_TX_ARRIVED.swig(),
                         AlertType.BLOCK_CHAIN_STATE_ARRAY.swig(),
                         AlertType.BLOCK_CHAIN_FAIL_TO_GET_CHAIN_DATA.swig(),
+                        AlertType.BLOCK_CHAIN_ONLINE_PEER.swig(),
                     };
                 }
 
@@ -434,6 +434,14 @@ public class TauDaemonImpl extends TauDaemon {
     public Block getBlockByNumber(String chainID, long blockNumber) {
         if (isRunning) {
             return sessionManager.getBlockByNumber(ChainIDUtil.encode(chainID), blockNumber);
+        }
+        return null;
+    }
+
+    @Override
+    public Block getBlockByHash(String chainID, String blockHash) {
+        if (isRunning) {
+            return sessionManager.getBlockByHash(ChainIDUtil.encode(chainID), blockHash);
         }
         return null;
     }

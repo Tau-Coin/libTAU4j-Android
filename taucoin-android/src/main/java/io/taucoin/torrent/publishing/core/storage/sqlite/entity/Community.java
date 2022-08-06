@@ -22,7 +22,6 @@ public class Community implements Parcelable {
     public long syncingHeadBlock;           // 正在同步（下载）的头部区块
     public long headBlock;                  // 真实的头部区块号
     public long difficulty;                 // 社区最大难度值
-    public long tailBlock;                  // 尾部区块号
     public long consensusBlock;             // 共识点区块
     public boolean isBanned = false;        // 社区是否被用户拉入黑名单
     public String forkPoint;                // 社区分叉点区块号
@@ -38,7 +37,6 @@ public class Community implements Parcelable {
         communityName = in.readString();
         syncingHeadBlock = in.readLong();
         headBlock = in.readLong();
-        tailBlock = in.readLong();
         consensusBlock = in.readLong();
         isBanned = in.readByte() != 0;
         forkPoint = in.readString();
@@ -50,7 +48,6 @@ public class Community implements Parcelable {
         dest.writeString(communityName);
         dest.writeLong(syncingHeadBlock);
         dest.writeLong(headBlock);
-        dest.writeLong(tailBlock);
         dest.writeLong(consensusBlock);
         dest.writeByte((byte) (isBanned ? 1 : 0));
         dest.writeString(forkPoint);

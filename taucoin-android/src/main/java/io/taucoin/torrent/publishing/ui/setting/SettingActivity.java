@@ -130,9 +130,6 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
     public void onStart() {
         super.onStart();
         subscribeCurrentUser();
-        TauDaemon.getInstance(getApplicationContext()).getChainStoppedSet().observe(this, o -> {
-            ToastUtils.showShortToast("size=" + o.size());
-        });
     }
 
     @Override

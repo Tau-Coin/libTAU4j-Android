@@ -21,6 +21,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.TauDaemonAlertHandler;
 import io.taucoin.torrent.publishing.core.model.data.AccessList;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -61,7 +62,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private boolean isOnChain = false;
     private boolean isNoBalance = true;
     private Statistics memberStatistics;
-    private AccessList accessList;
+    private int onlinePeers;
     private long nodes = 0;
     private CommonDialog chainStoppedDialog;
 
@@ -85,6 +86,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.toolbarInclude.setListener(this);
         initParameter();
         initLayout();
+        communityViewModel.sendOnlineSignal(chainID);
     }
 
     /**
@@ -100,6 +102,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
      * 初始化布局
      */
     private void initLayout() {
+        Context context = activity.getApplicationContext();
+        TauDaemonAlertHandler tauDaemonHandler = TauDaemon.getInstance(context).getTauDaemonHandler();
+        this.onlinePeers = tauDaemonHandler.getOnlinePeersCount(chainID);
         binding.tvBlocksStatistics.setText(getString(R.string.community_blocks_stats, 0, 0));
         showCommunityTitle();
         showCommunitySubtitle();
@@ -131,7 +136,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
 
         // 检测区块链是否因为获取数据失败而停止
-        TauDaemon.getInstance(activity.getApplicationContext()).getChainStoppedSet()
+        tauDaemonHandler.getChainStoppedSet()
                 .observe(this.getViewLifecycleOwner(), set -> {
                     if (set != null && set.contains(chainID)) {
                         binding.ivHelp.setVisibility(View.VISIBLE);
@@ -139,6 +144,15 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                         binding.ivHelp.setVisibility(View.INVISIBLE);
                     }
         });
+
+        tauDaemonHandler.getOnlinePeerMap()
+                .observe(this.getViewLifecycleOwner(), set -> {
+                    int peers = tauDaemonHandler.getOnlinePeersCount(chainID);
+                    if (this.onlinePeers != peers) {
+                        this.onlinePeers = peers;
+                        showCommunitySubtitle();
+                    }
+                });
     }
 
     private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -191,11 +205,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 subtitle.append(getString(R.string.community_users_stats_m, members));
             }
         }
-        if (accessList != null) {
-            long connected = accessList.getConnectedSize();
-            if (connected > 0) {
-                subtitle.append(getString(R.string.community_users_stats_c, connected));
-            }
+        if (onlinePeers > 0) {
+            subtitle.append(getString(R.string.community_users_stats_c, onlinePeers));
         }
         if (isJoined) {
             // 已加入社区
@@ -271,14 +282,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                             statistics.getTotal(), statistics.getOnChain()));
                 })
         );
-
-        disposables.add(communityViewModel.observeAccessList(chainID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> {
-                    this.accessList = list;
-                    showCommunitySubtitle();
-                }));
 
         disposables.add(communityViewModel.observerCurrentMember(chainID)
                 .subscribeOn(Schedulers.io())

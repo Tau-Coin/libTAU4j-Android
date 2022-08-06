@@ -8,7 +8,6 @@ import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
-import io.taucoin.torrent.publishing.core.model.data.UserAndTx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
 
 /**

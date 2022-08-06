@@ -966,43 +966,15 @@ public class CommunityViewModel extends AndroidViewModel {
         });
     }
 
-    Observable<List<String>> observerCommunityAccessList(String chainID, int type) {
-        return Observable.create(emitter -> {
-            while (!emitter.isDisposed()) {
-                List<String> list = null;
-                if (type == AccessListActivity.ACCESS_LIST_TYPE) {
-                    list = daemon.getCommunityAccessList(ChainIDUtil.encode(chainID));
-                }
-                if (null == list) {
-                    list = new ArrayList<>();
-                }
-                logger.debug("getCommunityAccessList::{}, type::{}, chainID::{}, isRunning::{}",
-                        type, list.size(), chainID, daemon.isRunning());
-                emitter.onNext(list);
-                try {
-                    if (list.size() > 0) {
-                        Thread.sleep(10000);
-                    } else {
-                        Thread.sleep(1000);
-                    }
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-            emitter.onComplete();
-        });
-    }
-
     Flowable<Float> reloadChain(String chainID) {
         return Flowable.create(emitter -> {
             Community community = communityRepo.getCommunityByChainID(chainID);
             if (community != null) {
                 long headBlock = community.headBlock;
-                long tailBlock = community.tailBlock;
-                logger.debug("reloadChain chainID::{}, tailBlock::{}, headBlock::{}",
-                        chainID, tailBlock, headBlock);
+                long consensusBlock = community.consensusBlock;
+                logger.debug("reloadChain chainID::{}, headBlock::{}", chainID, headBlock);
                 Block block;
-                for (long i = headBlock; i >= tailBlock; i--) {
+                for (long i = headBlock; i >= consensusBlock; i--) {
                     if (emitter.isCancelled()) {
                         break;
                     }
@@ -1035,8 +1007,8 @@ public class CommunityViewModel extends AndroidViewModel {
                     } else {
                         daemon.handleBlockData(block, TauListenHandler.BlockStatus.ON_CHAIN);
                     }
-                    if (headBlock > tailBlock && !emitter.isCancelled()) {
-                        float progress = (headBlock - i) * 100f / (headBlock - tailBlock);
+                    if (headBlock > consensusBlock && !emitter.isCancelled()) {
+                        float progress = (headBlock - i) * 100f / (headBlock - consensusBlock);
                         emitter.onNext(progress);
                         logger.debug("reloadChain chainID::{}, blockNumber::{}, localBlocks size::{}, progress::{}",
                                 chainID, i, null == localBlocks ? 0 : localBlocks.size(), progress);
@@ -1145,48 +1117,6 @@ public class CommunityViewModel extends AndroidViewModel {
                 .subscribe();
     }
 
-    Observable<AccessList> observeAccessList(String chainID) {
-        return Observable.create(emitter -> {
-            AccessList oldList = new AccessList();
-            AccessList newList = new AccessList();
-            if (StringUtil.isNotEmpty(chainID)) {
-                byte[] chainIDBytes = ChainIDUtil.encode(chainID);
-                String userPk = MainApplication.getInstance().getPublicKey();
-                while (!emitter.isDisposed()) {
-                    Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-                    logger.debug("getAccessList non member::{}",  null == member);
-                    if (member != null) {
-                        Account account = daemon.getAccountInfo(chainIDBytes, userPk);
-                        if (account != null && (account.getBalance() != member.balance ||
-                                account.getNonce() != member.nonce)) {
-                            member.balance = account.getBalance();
-                            member.nonce = account.getNonce();
-                            memberRepo.updateMember(member);
-                        }
-                        logger.debug("getAccessList balance::{}, nonce::{}", member.balance, member.nonce);
-                        List<String> connected = daemon.getCommunityAccessList(chainIDBytes);
-                        newList.setConnected(connected);
-                        if (oldList.getConnectedSize() != newList.getConnectedSize()) {
-                            oldList = newList;
-                        }
-                        logger.debug("getAccessList connectedSize::{}", newList.getConnectedSize());
-                        emitter.onNext(oldList);
-                    }
-                    try {
-                        if (oldList.getConnectedSize() > 0) {
-                            Thread.sleep(10000);
-                        } else {
-                            Thread.sleep(1000);
-                        }
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-            }
-            emitter.onComplete();
-        });
-    }
-
     public CommonDialog showLongTimeCreateDialog(FragmentActivity activity, LinkUtil.Link link,
                                           CommonDialog.ClickListener listener) {
         if (link.getTimestamp() <= 0) {
@@ -1235,5 +1165,13 @@ public class CommunityViewModel extends AndroidViewModel {
             }
         });
         return longTimeCreateDialog;
+    }
+
+    /**
+     * 关注链时，发送在线信号
+     * @param chainID 链ID
+     */
+    public void sendOnlineSignal(String chainID) {
+        daemon.sendOnlineSignal(chainID);
     }
 }

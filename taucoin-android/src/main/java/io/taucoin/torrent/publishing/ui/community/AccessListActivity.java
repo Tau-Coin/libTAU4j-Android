@@ -1,6 +1,9 @@
 package io.taucoin.torrent.publishing.ui.community;
 
+import android.content.Context;
 import android.os.Bundle;
+
+import java.util.List;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -9,6 +12,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.TauDaemonAlertHandler;
 import io.taucoin.torrent.publishing.databinding.ActivityListBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
@@ -59,15 +64,18 @@ public class AccessListActivity extends BaseActivity implements AccessListAdapte
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(adapter);
+
+        TauDaemonAlertHandler tauDaemonHandler = TauDaemon.getInstance(getApplicationContext()).getTauDaemonHandler();
+        adapter.submitList(tauDaemonHandler.getOnlinePeersList(chainID));
+        tauDaemonHandler.getOnlinePeerMap()
+                .observe(this, set -> {
+                    adapter.submitList(tauDaemonHandler.getOnlinePeersList(chainID));
+                });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        disposables.add(communityViewModel.observerCommunityAccessList(chainID, currentType)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> adapter.submitList(list)));
     }
 
     @Override

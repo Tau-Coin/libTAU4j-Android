@@ -14,8 +14,8 @@ import org.libTAU4j.alerts.BlockChainFailToGetChainDataAlert;
 import org.libTAU4j.alerts.BlockChainForkPointBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewConsensusPointBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewHeadBlockAlert;
-import org.libTAU4j.alerts.BlockChainNewTailBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewTransactionAlert;
+import org.libTAU4j.alerts.BlockChainOnlinePeerAlert;
 import org.libTAU4j.alerts.BlockChainRollbackBlockAlert;
 import org.libTAU4j.alerts.BlockChainStateArrayAlert;
 import org.libTAU4j.alerts.BlockChainSyncingBlockAlert;
@@ -36,7 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import androidx.lifecycle.MutableLiveData;
@@ -52,12 +55,13 @@ import io.taucoin.torrent.publishing.core.model.data.message.DataKey;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
  * TauDaemonListener处理程序
  */
-class TauDaemonAlertHandler {
+public class TauDaemonAlertHandler {
 
     private static final Logger logger = LoggerFactory.getLogger("libTAU");
     private final MsgAlertHandler msgListenHandler;
@@ -65,7 +69,8 @@ class TauDaemonAlertHandler {
     private final SettingsRepository settingsRepo;
     private final Context appContext;
     private final TauDaemon daemon;
-    private final MutableLiveData<CopyOnWriteArraySet<String>> chainStoppedSet = new MutableLiveData<>();
+    public final MutableLiveData<CopyOnWriteArraySet<String>> chainStoppedSet = new MutableLiveData<>();
+    private final MutableLiveData<ConcurrentHashMap<String, ConcurrentHashMap<String, Long>>> onlinePeerMap = new MutableLiveData<>();
 
     TauDaemonAlertHandler(Context appContext, TauDaemon daemon) {
         this.appContext = appContext;
@@ -129,9 +134,6 @@ class TauDaemonAlertHandler {
             case BLOCK_CHAIN_HEAD_BLOCK:
                 onNewHeadBlock(alert);
                 break;
-            case BLOCK_CHAIN_TAIL_BLOCK:
-                onNewTailBlock(alert);
-                break;
             case BLOCK_CHAIN_CONSENSUS_POINT_BLOCK:
                 onNewConsensusBlock(alert);
                 break;
@@ -161,6 +163,9 @@ class TauDaemonAlertHandler {
                 break;
             case BLOCK_CHAIN_FAIL_TO_GET_CHAIN_DATA:
                 onGetChainDataFailed(alert);
+                break;
+            case BLOCK_CHAIN_ONLINE_PEER:
+                onlinePeer(alert);
                 break;
             default:
                 logger.warn("Unknown alert");
@@ -402,17 +407,6 @@ class TauDaemonAlertHandler {
     }
 
     /**
-     * libTAU上报新的Tail区块
-     * @param alert libTAU上报
-     */
-    private void onNewTailBlock(Alert alert) {
-        BlockChainNewTailBlockAlert a = (BlockChainNewTailBlockAlert) alert;
-        logger.info(a.get_message());
-        Block block = a.get_new_block();
-        tauListenHandler.handleNewTailBlock(block);
-    }
-
-    /**
      * libTAU上报当前共识点区块
      * @param alert libTAU上报
      */
@@ -498,6 +492,84 @@ class TauDaemonAlertHandler {
 
     public MutableLiveData<CopyOnWriteArraySet<String>> getChainStoppedSet() {
         return chainStoppedSet;
+    }
+
+    /**
+     * 在线Peer
+     * @param alert libTAU上报
+     */
+    private void onlinePeer(Alert alert) {
+        BlockChainOnlinePeerAlert a = (BlockChainOnlinePeerAlert) alert;
+        logger.info(a.get_message());
+        String chainId = ChainIDUtil.decode(a.get_chain_id());
+        String peer = ByteUtil.toHexString(a.get_peer());
+        long time = a.get_time();
+        logger.info("onlinePeer chainID::{}, peer::{}, time::{}", chainId, peer, time);
+        ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> chainMap = onlinePeerMap.getValue();
+        if (null == chainMap) {
+            chainMap = new ConcurrentHashMap<>();
+        }
+        ConcurrentHashMap<String, Long> peerMap = null;
+        if (chainMap.containsKey(chainId)) {
+            peerMap = chainMap.get(chainId);
+        }
+        if (null == peerMap) {
+            peerMap = new ConcurrentHashMap<>();
+        }
+        peerMap.put(peer, time);
+        chainMap.put(chainId, peerMap);
+        onlinePeerMap.postValue(chainMap);
+    }
+
+    /**
+     * 获取社区在线节点数
+     * @param chainID
+     * @return
+     */
+    public int getOnlinePeersCount(String chainID) {
+        ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> chainMap = onlinePeerMap.getValue();
+        if (chainMap != null && chainMap.containsKey(chainID)) {
+            ConcurrentHashMap<String, Long> peerMap = chainMap.get(chainID);
+            if (peerMap != null) {
+                clearExpiredPeers(peerMap);
+                return peerMap.size();
+            }
+        }
+        return 0;
+    }
+
+    public List<String> getOnlinePeersList(String chainID) {
+        ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> chainMap = onlinePeerMap.getValue();
+        if (chainMap != null && chainMap.containsKey(chainID)) {
+            ConcurrentHashMap<String, Long> peerMap = chainMap.get(chainID);
+            if (peerMap != null) {
+                clearExpiredPeers(peerMap);
+                return new ArrayList<>(peerMap.keySet());
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 清除超过5分钟的数据
+     * @param peerMap
+     */
+    private void clearExpiredPeers(ConcurrentHashMap<String, Long> peerMap) {
+        if (peerMap != null) {
+            Set<String> keys = peerMap.keySet();
+            long currentTime = DateUtil.getTime();
+            long expiredTime = 5 * 60;
+            for (String peer : keys) {
+                Long time = peerMap.get(peer);
+                if (time != null && currentTime > time + expiredTime) {
+                    peerMap.remove(peer);
+                }
+            }
+        }
+    }
+
+    public MutableLiveData<ConcurrentHashMap<String, ConcurrentHashMap<String, Long>>> getOnlinePeerMap() {
+        return onlinePeerMap;
     }
 
     /**

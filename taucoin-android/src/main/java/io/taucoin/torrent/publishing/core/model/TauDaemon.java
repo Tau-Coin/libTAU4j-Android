@@ -6,7 +6,6 @@ import android.content.Intent;
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
 import org.libTAU4j.Message;
-import org.libTAU4j.SessionHandle;
 import org.libTAU4j.SessionManager;
 import org.libTAU4j.SessionParams;
 import org.libTAU4j.Transaction;
@@ -18,15 +17,12 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -235,6 +231,7 @@ public abstract class TauDaemon {
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir) // 数据库目录
                 .setDumpfileDir(FileUtil.getDumpfileDir())  // Dump File目录
                 .setDhtNonReferable(true)
+                .setDhtAutoRelay(NetworkSetting.isDevelopCountry())
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)
                 .setLogLevel(LogUtil.getTauLogLevel())
@@ -499,6 +496,7 @@ public abstract class TauDaemon {
         } else {
             SystemServiceManager.getInstance().getNetworkAddress();
             sessionManager.reopenNetworkSockets();
+            setAutoRelay(NetworkSetting.isDevelopCountry());
             logger.info("Network change reopen network sockets...");
         }
     }
@@ -769,8 +767,8 @@ public abstract class TauDaemon {
         }
     }
 
-    public MutableLiveData<CopyOnWriteArraySet<String>> getChainStoppedSet() {
-        return tauDaemonAlertHandler.getChainStoppedSet();
+    public TauDaemonAlertHandler getTauDaemonHandler() {
+        return tauDaemonAlertHandler;
     }
 
     /**
@@ -802,9 +800,32 @@ public abstract class TauDaemon {
     public void setNonReferable(boolean nonReferable) {
         if (isRunning) {
             if (this.sessionManager != null) {
-                (new SessionHandle(sessionManager.swig())).setNonReferrable(nonReferable);
+                sessionManager.setNonReferrable(nonReferable);
                 logger.info("setNonReferable::{}", nonReferable);
             }
+        }
+    }
+
+    /**
+     *  设置libTAU auto relay
+     */
+    public void setAutoRelay(boolean autoRelay) {
+        if (isRunning) {
+            if (this.sessionManager != null) {
+                sessionManager.setAutoRelay(autoRelay);
+                logger.info("setAutoRelay::{}", autoRelay);
+            }
+        }
+    }
+
+    /**
+     * 关注链时，发送在线信号
+     * @param chainID 链ID
+     */
+    public void sendOnlineSignal(String chainID) {
+        if (isRunning) {
+            sessionManager.sendOnlineSignal(ChainIDUtil.encode(chainID));
+            logger.info("sendOnlineSignal chainID::{}", chainID);
         }
     }
 
@@ -835,18 +856,6 @@ public abstract class TauDaemon {
 
     public boolean isRunning() {
         return isRunning;
-    }
-
-    /**
-     * 获取社区访问列表
-     * @return 访问列表
-     */
-    public ArrayList<String> getCommunityAccessList(byte[] chainID) {
-        logger.info("getCommunityAccessList isRunning::{}", isRunning);
-        if (isRunning) {
-            return sessionManager.getAccessList(chainID);
-        }
-        return null;
     }
 
     /**
@@ -1036,4 +1045,11 @@ public abstract class TauDaemon {
      * @param blockNumber 区块号
      */
     public abstract Block getBlockByNumber(String chainID, long blockNumber);
+
+    /**
+     * 通过区块Hash查询区块
+     * @param chainID 链ID
+     * @param blockHash 区块Hash
+     */
+    public abstract Block getBlockByHash(String chainID, String blockHash);
 }

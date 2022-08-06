@@ -70,7 +70,6 @@ public class TauListenHandler {
     private final TxQueueRepository txQueueRepo;
     private final CommunityRepository communityRepo;
     private final BlockRepository blockRepository;
-    private final SettingsRepository settingsRepo;
     private final TauDaemon daemon;
     private Disposable autoRenewalDisposable;
     private final Context appContext;
@@ -92,7 +91,6 @@ public class TauListenHandler {
         txQueueRepo = RepositoryHelper.getTxQueueRepository(appContext);
         communityRepo = RepositoryHelper.getCommunityRepository(appContext);
         blockRepository = RepositoryHelper.getBlockRepository(appContext);
-        settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
     }
 
     /**
@@ -138,8 +136,13 @@ public class TauListenHandler {
         if (community != null) {
             community.headBlock = block.getBlockNumber();
             community.difficulty = block.getCumulativeDifficulty().longValue();
-            logger.info("onNewHeadBlock, chainID::{}, difficulty::{}, blockNumber::{}, blockHash::{}",
-                    chainID, community.difficulty, block.getBlockNumber(), block.Hash());
+            String consensusBlockHash = ByteUtil.toHexString(block.getGenerationSignature());
+            Block consensusBlock = daemon.getBlockByHash(chainID, consensusBlockHash);
+            if (consensusBlock != null) {
+                community.consensusBlock = consensusBlock.getBlockNumber();
+            }
+            logger.info("onNewHeadBlock, chainID::{}, difficulty::{}, headBlock::{}, consensusBlock::{}",
+                    chainID, community.difficulty, community.headBlock, community.consensusBlock);
             communityRepo.updateCommunity(community);
         }
 
@@ -160,6 +163,18 @@ public class TauListenHandler {
      */
     void handleRollbackBlock(Block block) {
         logger.info("handleRollBack");
+        String chainID = ChainIDUtil.decode(block.getChainID());
+        Community community = communityRepo.getCommunityByChainID(chainID);
+        if (community != null) {
+            String consensusBlockHash = ByteUtil.toHexString(block.getGenerationSignature());
+            Block consensusBlock = daemon.getBlockByHash(chainID, consensusBlockHash);
+            if (consensusBlock != null && community.consensusBlock != consensusBlock.getBlockNumber()) {
+                community.consensusBlock = consensusBlock.getBlockNumber();
+                logger.info("handleRollBack chainID::{}, difficulty::{}, headBlock::{}, consensusBlock::{}",
+                        chainID, community.difficulty, community.headBlock, community.consensusBlock);
+                communityRepo.updateCommunity(community);
+            }
+        }
         handleBlockData(block, BlockStatus.ROLL_BACK);
     }
 
@@ -496,24 +511,6 @@ public class TauListenHandler {
             logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
                     "balance::{}", chainIDStr, publicKey, member.balance);
         }
-    }
-
-    /**
-     * libTAU上报新的Tail区块
-     * @param block tail block
-     */
-    void handleNewTailBlock(Block block) {
-        logger.info("handleNewTailBlock");
-        String chainID = ChainIDUtil.decode(block.getChainID());
-        Community community = communityRepo.getCommunityByChainID(chainID);
-        if (community != null) {
-            community.tailBlock = block.getBlockNumber();
-            logger.info("handleNewTailBlock, chainID::{}, blockNumber::{}, blockHash::{}",
-                    chainID, block.getBlockNumber(), block.Hash());
-            communityRepo.updateCommunity(community);
-        }
-
-        handleBlockData(block, BlockStatus.ON_CHAIN);
     }
 
     /**

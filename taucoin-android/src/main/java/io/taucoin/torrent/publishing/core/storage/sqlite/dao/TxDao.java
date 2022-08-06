@@ -108,7 +108,7 @@ public interface TxDao {
             " AND txStatus = 1" +
             " AND (senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " OR receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
-            " AND blockNumber >= (SELECT tailBlock FROM Communities WHERE chainID = :chainID)" +
+//            " AND blockNumber >= (SELECT tailBlock FROM Communities WHERE chainID = :chainID)" +
             " ORDER BY timestamp DESC";
 
     // SQL:查询未上链并且已过期的条件语句

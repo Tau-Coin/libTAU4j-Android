@@ -13,7 +13,6 @@ public class MemberAndFriend extends Member {
     @Relation(parentColumn = "publicKey", entityColumn = "publicKey")
     public User user;
     public long headBlock;
-    public long tailBlock;
 
     public MemberAndFriend(@NonNull String chainID, @NonNull String publicKey) {
         super(chainID, publicKey);

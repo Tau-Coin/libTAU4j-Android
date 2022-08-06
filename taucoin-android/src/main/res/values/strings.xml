@@ -234,7 +234,6 @@
     <string name="community_reload_chain">Reload Chain</string>
     <string name="community_reloading">Reloading&#8230;</string>
     <string name="community_head_block">Head Block</string>
-    <string name="community_tail_block">Tail Block</string>
     <string name="community_consensus_block">Consensus Block</string>
     <string name="community_tip_block_txs">Transaction:&#160;</string>
     <string name="community_tip_block_txs_nothing">nothing</string>

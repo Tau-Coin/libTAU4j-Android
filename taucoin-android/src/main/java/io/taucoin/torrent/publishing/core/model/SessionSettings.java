@@ -106,6 +106,16 @@ class SessionSettings {
         }
 
         /**
+         * set dht auto relay
+         * @param autoRelay auto relay
+         */
+        SessionParamsBuilder setDhtAutoRelay(boolean autoRelay) {
+            logger.debug("setDhtAutoRelay::{}", autoRelay);
+            sp.set_bool(settings_pack.bool_types.auto_relay.swigValue(), autoRelay);
+            return this;
+        }
+
+        /**
          * set dht ping interval
          * @param interval 时间间隔 单位：s
          */

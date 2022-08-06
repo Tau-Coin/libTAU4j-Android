@@ -15,7 +15,6 @@ public class CommunityAndFriend implements Parcelable {
     public long balance;                    // 成员在此社区的balance
     public long nonce;                      // 成员在此社区的nonce
     public long headBlock;                  // 社区头区块号
-    public long tailBlock;                  // 社区尾区块号
     public int joined;                      // 是否加入此社区
 
     // 朋友相关数据
@@ -54,7 +53,6 @@ public class CommunityAndFriend implements Parcelable {
     protected CommunityAndFriend(Parcel in) {
         balance = in.readLong();
         headBlock = in.readLong();
-        tailBlock = in.readLong();
         joined = in.readInt();
         senderPk = in.readString();
         receiverPk = in.readString();
@@ -72,7 +70,6 @@ public class CommunityAndFriend implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(balance);
         dest.writeLong(headBlock);
-        dest.writeLong(tailBlock);
         dest.writeInt(joined);
         dest.writeString(senderPk);
         dest.writeString(receiverPk);

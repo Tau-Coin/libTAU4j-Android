@@ -37,7 +37,7 @@ public interface MemberDao {
     String QUERY_GET_MEMBER_BY_CHAIN_ID_PK = "SELECT * FROM Members WHERE chainID = :chainID AND publicKey = :publicKey";
     String QUERY_GET_MEMBERS_BY_CHAIN_ID = "SELECT * FROM Members WHERE chainID = :chainID";
 
-    String QUERY_GET_MEMBERS_IN_COMMUNITY = "SELECT m.*, c.headBlock, c.tailBlock" +
+    String QUERY_GET_MEMBERS_IN_COMMUNITY = "SELECT m.*, c.headBlock" +
             " FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
             " WHERE m.chainID = :chainID" +
