@@ -12,7 +12,6 @@ import org.libTAU4j.Transaction;
 import org.libTAU4j.alerts.Alert;
 import org.libTAU4j.alerts.BlockChainFailToGetChainDataAlert;
 import org.libTAU4j.alerts.BlockChainForkPointBlockAlert;
-import org.libTAU4j.alerts.BlockChainNewConsensusPointBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewHeadBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewTransactionAlert;
 import org.libTAU4j.alerts.BlockChainOnlinePeerAlert;
@@ -132,9 +131,6 @@ public class TauDaemonAlertHandler {
                 break;
             case BLOCK_CHAIN_HEAD_BLOCK:
                 onNewHeadBlock(alert);
-                break;
-            case BLOCK_CHAIN_CONSENSUS_POINT_BLOCK:
-                onNewConsensusBlock(alert);
                 break;
             case BLOCK_CHAIN_SYNCING_BLOCK:
                 onSyncingBlock(alert);
@@ -400,17 +396,6 @@ public class TauDaemonAlertHandler {
         logger.info(a.get_message());
         Block block = a.get_new_block();
         tauListenHandler.onNewHeadBlock(block);
-    }
-
-    /**
-     * libTAU上报当前共识点区块
-     * @param alert libTAU上报
-     */
-    private void onNewConsensusBlock(Alert alert) {
-        BlockChainNewConsensusPointBlockAlert a = (BlockChainNewConsensusPointBlockAlert) alert;
-        logger.info(a.get_message());
-        Block block = a.get_new_block();
-        tauListenHandler.handleNewConsensusBlock(block);
     }
 
     /**

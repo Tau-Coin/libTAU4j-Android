@@ -125,7 +125,7 @@ public class TauListenHandler {
         if (community != null) {
             community.headBlock = block.getBlockNumber();
             community.difficulty = block.getCumulativeDifficulty().longValue();
-            String consensusBlockHash = ByteUtil.toHexString(block.getGenerationSignature());
+            String consensusBlockHash = block.GenesisBlockHash();
             Block consensusBlock = daemon.getBlockByHash(chainID, consensusBlockHash);
             if (consensusBlock != null) {
                 community.consensusBlock = consensusBlock.getBlockNumber();
@@ -149,7 +149,7 @@ public class TauListenHandler {
         String chainID = ChainIDUtil.decode(block.getChainID());
         Community community = communityRepo.getCommunityByChainID(chainID);
         if (community != null) {
-            String consensusBlockHash = ByteUtil.toHexString(block.getGenerationSignature());
+            String consensusBlockHash = block.GenesisBlockHash();
             Block consensusBlock = daemon.getBlockByHash(chainID, consensusBlockHash);
             if (consensusBlock != null && community.consensusBlock != consensusBlock.getBlockNumber()) {
                 community.consensusBlock = consensusBlock.getBlockNumber();
@@ -494,23 +494,6 @@ public class TauListenHandler {
             logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
                     "balance::{}", chainIDStr, publicKey, member.balance);
         }
-    }
-
-    /**
-     * libTAU上报当前共识点区块
-     * @param block 共识点区块
-     */
-    void handleNewConsensusBlock(Block block) {
-        logger.info("handleNewConsensusBlock");
-        String chainID = ChainIDUtil.decode(block.getChainID());
-        Community community = communityRepo.getCommunityByChainID(chainID);
-        if (community != null) {
-            community.consensusBlock = block.getBlockNumber();
-            logger.info("handleNewConsensusBlock, chainID::{}, blockNumber::{}, blockHash::{}",
-                    chainID, block.getBlockNumber(), block.Hash());
-            communityRepo.updateCommunity(community);
-        }
-        handleBlockData(block, BlockStatus.ON_CHAIN);
     }
 
     /**

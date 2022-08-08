@@ -274,7 +274,7 @@ public class ChainStatusActivity extends BaseActivity {
             disposables.add(communityViewModel.observerCommunityMiningTime(chainID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::loadMiningTime));
+                    .subscribe(this::loadMiningTime, it->{}));
         }
     }
 
