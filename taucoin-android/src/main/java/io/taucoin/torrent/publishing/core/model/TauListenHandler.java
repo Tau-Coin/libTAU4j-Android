@@ -17,10 +17,13 @@ import java.util.Set;
 
 import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
+import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.TxLogStatus;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.AnnouncementContent;
+import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.torrent.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TrustContent;
@@ -28,11 +31,13 @@ import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.BlockRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.TxRepository;
@@ -59,7 +64,8 @@ public class TauListenHandler {
     private final TxRepository txRepo;
     private final TxQueueRepository txQueueRepo;
     private final CommunityRepository communityRepo;
-    private final BlockRepository blockRepository;
+    private final BlockRepository blockRepo;
+    private final FriendRepository friendRepo;
     private final TauDaemon daemon;
     private final Context appContext;
 
@@ -79,7 +85,8 @@ public class TauListenHandler {
         txRepo = RepositoryHelper.getTxRepository(appContext);
         txQueueRepo = RepositoryHelper.getTxQueueRepository(appContext);
         communityRepo = RepositoryHelper.getCommunityRepository(appContext);
-        blockRepository = RepositoryHelper.getBlockRepository(appContext);
+        blockRepo = RepositoryHelper.getBlockRepository(appContext);
+        friendRepo = RepositoryHelper.getFriendsRepository(appContext);
     }
 
     /**
@@ -217,7 +224,7 @@ public class TauListenHandler {
     private void saveBlockInfo(Block block, BlockStatus blockStatus) {
         String chainID = ChainIDUtil.decode(block.getChainID());
         String blockHash = block.Hash();
-        BlockInfo blockInfo = blockRepository.getBlock(chainID, blockHash);
+        BlockInfo blockInfo = blockRepo.getBlock(chainID, blockHash);
         if (null == blockInfo) {
             long blockNumber = block.getBlockNumber();
             String miner = ByteUtil.toHexString(block.getMiner());
@@ -234,7 +241,7 @@ public class TauListenHandler {
             String txID = isTransactionEmpty(transaction) ? null : transaction.getTxID().to_hex();
             blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty, 
                     status, timestamp, previousBlockHash, txID);
-            blockRepository.addBlock(blockInfo);
+            blockRepo.addBlock(blockInfo);
             logger.info("Save Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}, " +
                             "txID::{}, status::{}",
                     chainID, blockHash, blockNumber, rewards, txID, status);
@@ -248,7 +255,7 @@ public class TauListenHandler {
                 status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
             }
             blockInfo.status = status;
-            blockRepository.updateBlock(blockInfo);
+            blockRepo.updateBlock(blockInfo);
             logger.info("Update Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}, status::{}",
                     chainID, blockInfo.blockHash, blockInfo.blockNumber, blockInfo.rewards, status);
         }
@@ -463,6 +470,28 @@ public class TauListenHandler {
     }
 
     /**
+     * 添加朋友任务
+     */
+    private void addFriendTask(String friendPk) {
+        // 更新libTAU朋友信息
+        boolean isSuccess = daemon.addNewFriend(friendPk);
+        if (isSuccess) {
+            // 发送默认消息
+            String userPk = MainApplication.getInstance().getPublicKey();
+            String msg = appContext.getString(R.string.contacts_have_added);
+            logger.info("AddFriendsLocally, syncSendMessageTask userPk::{}, friendPk::{}, msg::{}",
+                    userPk, friendPk, msg);
+            ChatViewModel.syncSendMessageTask(appContext, userPk, friendPk, msg, MessageType.TEXT.getType());
+            // 更新本地朋友关系
+            Friend friend = new Friend(userPk, friendPk);
+            friend.status = FriendStatus.ADDED.getStatus();
+            friendRepo.addFriend(friend);
+            // 更新朋友信息
+            daemon.requestFriendInfo(friendPk);
+        }
+    }
+
+    /**
      * 添加社区成员到本地
      * @param publicKey 公钥
      * @param chainID chainID
@@ -559,8 +588,9 @@ public class TauListenHandler {
         }
         LinkUtil.Link url = LinkUtil.decode(chainURL);
         String chainID = url.getData();
+        String peer = url.getPeer();
         Set<String> peers = new HashSet<>();
-        peers.add(url.getPeer());
+        peers.add(peer);
         boolean isSuccess = daemon.followChain(chainID, peers);
         if (isSuccess) {
             Community community = new Community(chainID, ChainIDUtil.getName(chainID));
@@ -569,10 +599,11 @@ public class TauListenHandler {
             String userPK = MainApplication.getInstance().getPublicKey();
             saveUserInfo(userPK);
             addMemberInfo(ChainIDUtil.encode(chainID), userPK);
-            for (String peer : peers) {
-                saveUserInfo(peer);
-                addMemberInfo(ChainIDUtil.encode(chainID), peer);
-            }
+
+            saveUserInfo(peer);
+            addMemberInfo(ChainIDUtil.encode(chainID), peer);
+
+            addFriendTask(url.getPeer());
         }
     }
 
