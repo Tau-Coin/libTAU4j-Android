@@ -649,8 +649,8 @@ public abstract class TauDaemon {
                         localChains.size(), tauChains.size());
                 // 0、添加默认TAU Testing Community
                 if (localChains.size() == 0) {
-                    String peer = "a13e3563ad23048e388ecbaa8e384a83d08c88e77ee79b1b3ba42fd17f736968";
-                    String chainID = "278ac0c475551b4aTAU Testing";
+                    String peer = "2c53034bef58f115212f8e493e39a67e817cce29fee5e956415e8f6c318f85f2";
+                    String chainID = "5231afac30303030Cambridge Coin Airdrop";
                     String tauTesting = LinkUtil.encodeChain(peer, chainID);
                     tauDaemonAlertHandler.addCommunity(tauTesting);
                 }
