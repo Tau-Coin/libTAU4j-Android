@@ -68,7 +68,8 @@ public class UserCommunityListAdapter extends ListAdapter<MemberAndTime, UserCom
             String balance = FmtMicrometer.fmtBalance(member.balance);
             String balancePower = context.getString(R.string.main_balance, balance);
             holder.binding.tvBalance.setText(balancePower);
-            long latestTime = Math.max(member.latestTxTime, member.latestMiningTime);
+
+            long latestTime = Math.max(member.latestTxTime, member.latestMiningTime * 1000);
             holder.binding.tvLatestTime.setVisibility(latestTime > 0 ? View.VISIBLE : View.GONE);
             holder.binding.tvLatestTime.setText(DateUtil.format(latestTime, DateUtil.pattern5));
 
