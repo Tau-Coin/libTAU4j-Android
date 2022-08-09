@@ -185,6 +185,40 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             return false;
         });
 
+        chatViewModel.observerChatMessages().observe(this.getViewLifecycleOwner(), messages -> {
+            List<ChatMsgAndLog> currentList = new ArrayList<>(messages);
+            if (currentPos == 0) {
+                adapter.submitList(currentList, handleUpdateAdapter);
+            } else {
+                currentList.addAll(adapter.getCurrentList());
+                adapter.submitList(currentList, handlePullAdapter);
+            }
+            binding.refreshLayout.setRefreshing(false);
+            binding.refreshLayout.setEnabled(messages.size() != 0 && messages.size() % Page.PAGE_SIZE == 0);
+
+            userViewModel.clearMsgUnread(friendPK);
+            logger.debug("messages.size::{}", messages.size());
+            closeProgressDialog();
+            TauNotifier.getInstance().cancelNotify(friendPK);
+        });
+
+        chatViewModel.getChatResult().observe(this.getViewLifecycleOwner(), result -> {
+            if (!result.isSuccess()) {
+                ToastUtils.showShortToast(result.getMsg());
+            }
+        });
+
+        chatViewModel.getResentResult().observe(this.getViewLifecycleOwner(), result -> {
+            if (!result.isSuccess()) {
+                ToastUtils.showShortToast(R.string.chatting_resend_failed);
+            } else {
+                ToastUtils.showShortToast(R.string.tx_resend_successful);
+                int pos = StringUtil.getIntString(result.getMsg());
+                if (pos >= 0 && pos < adapter.getCurrentList().size()) {
+                    adapter.notifyItemChanged(pos);
+                }
+            }
+        });
     }
 
     private void updateFriendInfo(User friend) {
@@ -296,41 +330,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                         loadData(0);
                     }
                 }));
-
-        chatViewModel.observerChatMessages().observe(this, messages -> {
-            List<ChatMsgAndLog> currentList = new ArrayList<>(messages);
-            if (currentPos == 0) {
-                adapter.submitList(currentList, handleUpdateAdapter);
-            } else {
-                currentList.addAll(adapter.getCurrentList());
-                adapter.submitList(currentList, handlePullAdapter);
-            }
-            binding.refreshLayout.setRefreshing(false);
-            binding.refreshLayout.setEnabled(messages.size() != 0 && messages.size() % Page.PAGE_SIZE == 0);
-
-            userViewModel.clearMsgUnread(friendPK);
-            logger.debug("messages.size::{}", messages.size());
-            closeProgressDialog();
-            TauNotifier.getInstance().cancelNotify(friendPK);
-        });
-
-        chatViewModel.getChatResult().observe(this, result -> {
-            if (!result.isSuccess()) {
-                ToastUtils.showShortToast(result.getMsg());
-            }
-        });
-
-        chatViewModel.getResentResult().observe(this, result -> {
-            if (!result.isSuccess()) {
-                ToastUtils.showShortToast(R.string.chatting_resend_failed);
-            } else {
-                ToastUtils.showShortToast(R.string.tx_resend_successful);
-                int pos = StringUtil.getIntString(result.getMsg());
-                if (pos >= 0 && pos < adapter.getCurrentList().size()) {
-                    adapter.notifyItemChanged(pos);
-                }
-            }
-        });
     }
 
     @Override

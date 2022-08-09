@@ -603,7 +603,7 @@ public class TauListenHandler {
             saveUserInfo(peer);
             addMemberInfo(ChainIDUtil.encode(chainID), peer);
 
-            addFriendTask(url.getPeer());
+//            addFriendTask(url.getPeer());
         }
     }
 
