@@ -250,9 +250,12 @@
 
                     </LinearLayout>
 
-                    <include layout="@layout/view_line"/>
+                    <include
+                        android:id="@+id/ll_wifi_line"
+                        layout="@layout/view_line"/>
 
                     <LinearLayout
+                        android:id="@+id/ll_wifi_available_data"
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

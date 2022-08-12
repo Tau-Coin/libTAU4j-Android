@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
+import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.databinding.ItemBlockListBinding;
@@ -72,11 +73,15 @@ public class BlockListAdapter extends ListAdapter<BlockAndTx, BlockListAdapter.V
             binding.itemBlock.setOnClickListener(clickListener);
             if (binding.llBlockDetail.getVisibility() == View.VISIBLE) {
                 binding.tvBlockDetail.setText(TxUtils.createBlockSpan(block, false));
+                boolean isMessage = false;
                 if (block.tx != null) {
+                    isMessage = block.tx.txType == TxType.NOTE_TX.getType();
                     binding.tvMsg.setText(TxUtils.createBlockTxSpan(block.tx));
                 } else {
                     binding.tvMsg.setText(nothing);
                 }
+                binding.txTitle.setText(isMessage ? R.string.community_tip_block_msg_title :
+                        R.string.community_tip_block_txs_title);
             }
             binding.tvOnChain.setVisibility(block.status == 1 ? View.VISIBLE : View.INVISIBLE);
             binding.tvBlockDetail.setOnLongClickListener(longListener);

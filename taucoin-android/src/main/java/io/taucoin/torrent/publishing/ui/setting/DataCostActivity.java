@@ -64,9 +64,8 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         List<Integer> meteredList = Ints.asList(meteredLimits);
         adapterMetered.submitList(meteredList);
 
-        if (NetworkSetting.isDevelopCountry()) {
-            binding.llWifiDailyQuota.setVisibility(View.GONE);
-        }
+        developCountryChanged();
+
         LinearLayoutManager layoutManagerWiFi = new LinearLayoutManager(this);
         layoutManagerWiFi.setOrientation(RecyclerView.HORIZONTAL);
         binding.rvWifiDailyQuota.setLayoutManager(layoutManagerWiFi);
@@ -78,6 +77,18 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         adapterWiFi.submitList(wifiList);
 
         refreshAllData();
+
+        NetworkSetting.getDevelopCountry().observe(this, developed -> {
+            developCountryChanged();
+        });
+    }
+
+    private void developCountryChanged() {
+        boolean isDevelopedCountry = NetworkSetting.isDevelopCountry();
+        binding.llWifiDailyQuota.setVisibility(isDevelopedCountry ? View.GONE : View.VISIBLE);
+        binding.llWifiAvailableData.setVisibility(isDevelopedCountry ? View.GONE : View.VISIBLE);
+        binding.llWifiLine.setVisibility(isDevelopedCountry ? View.GONE : View.VISIBLE);
+
     }
 
     private void refreshAllData() {
@@ -152,13 +163,9 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();
             binding.tvMeteredAvailableData.setText(availableDataStr);
         } else if (key.equals(getString(R.string.pref_key_wifi_available_data))) {
-            if (NetworkSetting.isDevelopCountry()) {
-                binding.tvWifiAvailableData.setText(R.string.common_unlimited);
-            } else {
-                long availableData = NetworkSetting.getWiFiAvailableData();
-                String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();
-                binding.tvWifiAvailableData.setText(availableDataStr);
-            }
+            long availableData = NetworkSetting.getWiFiAvailableData();
+            String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();
+            binding.tvWifiAvailableData.setText(availableDataStr);
         } else if (key.equals(getString(R.string.pref_key_metered_limit)) ||
                 key.equals(getString(R.string.pref_key_metered_prompt_limit))) {
             adapterMetered.updateSelectLimitPos(NetworkSetting.getMeteredLimitPos());

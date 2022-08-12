@@ -39,6 +39,7 @@ class TauDozeManager {
     }
 
     public void setChargingState(boolean chargingState) {
+        chargingState = false;
         if (this.chargingState != chargingState) {
             logger.debug("setChargingState::{}", chargingState);
             this.chargingState = chargingState;
@@ -47,6 +48,7 @@ class TauDozeManager {
     }
 
     public void setBatteryLevel(int batteryLevel) {
+        batteryLevel = 20;
         if (this.batteryLevel != batteryLevel) {
             logger.debug("setBatteryLevel::{}", batteryLevel);
             this.batteryLevel = batteryLevel;

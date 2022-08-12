@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
@@ -29,15 +30,17 @@ public class NetworkSetting {
     private static SettingsRepository settingsRepo;
     private static long lastElapsedRealTime = 0;
     private static long lastUptime = 0;
-    private static boolean IS_DEVELOP_COUNTRY;
+    private static MutableLiveData<Boolean> developCountry = new MutableLiveData<>(false);
     static {
         Context context = MainApplication.getInstance();
         settingsRepo = RepositoryHelper.getSettingsRepository(context);
         METERED_LIMITED = context.getResources().getIntArray(R.array.metered_limit);
         DEVELOPED_METERED_LIMITED = context.getResources().getIntArray(R.array.developed_metered_limit);
         WIFI_LIMITED = context.getResources().getIntArray(R.array.wifi_limit);
-        IS_DEVELOP_COUNTRY = Utils.isDevelopedCountry();
+        developCountry.postValue(Utils.isDevelopedCountry());
     }
+
+
 
     /**
      * 获取计费网络流量限制值
@@ -55,7 +58,7 @@ public class NetworkSetting {
 
     public static int getMeteredLimitValue() {
         int pos = getMeteredLimitPos();
-        if (IS_DEVELOP_COUNTRY) {
+        if (isDevelopCountry()) {
             if (pos >= DEVELOPED_METERED_LIMITED.length) {
                 pos = DEVELOPED_METERED_LIMITED.length - 1;
             }
@@ -68,12 +71,32 @@ public class NetworkSetting {
         }
     }
 
+    public static MutableLiveData<Boolean> getDevelopCountry() {
+        return developCountry;
+    }
+
     public static boolean isDevelopCountry() {
-        return IS_DEVELOP_COUNTRY;
+        return isDevelopCountry(false);
+    }
+
+    public static boolean isDevelopCountry(boolean isNeedUpdate) {
+        boolean isDevelopCountry = false;
+        Boolean developCountryObj = developCountry.getValue();
+        if (developCountryObj != null) {
+            isDevelopCountry = developCountryObj;
+        }
+        if (isNeedUpdate) {
+            boolean isNewDevelopCountry = Utils.isDevelopedCountry();
+            if (isDevelopCountry != isNewDevelopCountry) {
+                isDevelopCountry = isNewDevelopCountry;
+                developCountry.postValue(isDevelopCountry);
+            }
+        }
+        return isDevelopCountry;
     }
 
     public static int[] getMeteredLimits() {
-        if (IS_DEVELOP_COUNTRY) {
+        if (isDevelopCountry()) {
             return DEVELOPED_METERED_LIMITED;
         } else {
             return METERED_LIMITED;

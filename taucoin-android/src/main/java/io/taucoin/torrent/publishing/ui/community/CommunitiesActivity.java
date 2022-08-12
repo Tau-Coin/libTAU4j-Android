@@ -22,6 +22,7 @@ import io.taucoin.torrent.publishing.databinding.ActivityCommunitiesBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
+import io.taucoin.torrent.publishing.ui.transaction.TransactionCreateActivity;
 
 /**
  * 社区信息页面
@@ -159,6 +160,11 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                 Intent intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, TransactionsActivity.class);
+                break;
+            case R.id.rl_pay_people:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
                 break;
         }
     }

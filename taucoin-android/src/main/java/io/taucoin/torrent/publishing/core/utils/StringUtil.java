@@ -282,7 +282,7 @@ public class StringUtil {
                 }
             }
         }
-        return firstLetters.toString();
+        return firstLetters.toString().toUpperCase();
     }
 
     /**

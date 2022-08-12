@@ -11,7 +11,6 @@
     <string name="common_install_browser">Please install mobile browser first!</string>
     <string name="common_parentheses">(%1$s)</string>
     <string name="common_proceed">Proceed</string>
-    <string name="common_unlimited">Unlimited</string>
     <string name="common_back">Back</string>
     <string name="common_slant">(%1$d/%2$d)</string>
     <string name="common_confirm">Confirm</string>
@@ -130,7 +129,7 @@
     <string name="community_input_hint">Message</string>
     <string name="community_title">%1$s(%2$d)</string>
     <string name="community_users_stats_m">members&#160;%1$d,&#160;</string>
-    <string name="community_users_stats_c">c&#160;%1$d,&#160;</string>
+    <string name="community_users_stats_c">connected&#160;%1$d,&#160;</string>
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">discovering</string>
     <string name="community_users_mining">mining</string>
@@ -236,7 +235,10 @@
     <string name="community_head_block">Head Block</string>
     <string name="community_consensus_block">Consensus Block</string>
     <string name="community_tip_block_txs">Transaction:&#160;</string>
-    <string name="community_tip_block_txs_nothing">nothing</string>
+    <string name="community_tip_block_txs_title">Transaction</string>
+    <string name="community_tip_block_msg_title">Message</string>
+    <string name="community_tip_block_txs_nothing">No Transaction</string>
+    <string name="community_tip_block_txs_message">Message - %s</string>
     <string name="community_tip_block_timestamp">Timestamp:&#160;</string>
     <string name="community_tip_block_miner">Mined by:&#160;</string>
     <string name="community_tip_block_hash">Hash:&#160;</string>
@@ -255,9 +257,9 @@
     <string name="setting_import_seed">Import secret key to change address</string>
     <string name="setting_username_app">Nickname in app</string>
     <string name="setting_privacy_security">Privacy and Security</string>
-    <string name="setting_personal_profile">Personal Profile</string>
-    <string name="setting_personal_profile_result">Personal Profile saved successfully</string>
-    <string name="setting_personal_profile_too_long">Personal profile is too long</string>
+    <string name="setting_personal_profile">Public Profile</string>
+    <string name="setting_personal_profile_result">Public Profile saved successfully</string>
+    <string name="setting_personal_profile_too_long">Public profile is too long</string>
     <string name="setting_community_setting">Community Setting</string>
     <string name="setting_journal">Journal</string>
     <string name="setting_font_size">Font Size</string>
@@ -319,9 +321,9 @@
 
     <!-- Strings used for privacy and security -->
     <string name="setting_privacy">Privacy</string>
-    <string name="setting_blacklist_users">Banned Users</string>
+    <string name="setting_blacklist_users">Banned Friends</string>
     <string name="setting_blacklist_communities">Banned Communities</string>
-    <string name="setting_blacklist_community_users">Banned Community Users</string>
+    <string name="setting_blacklist_community_users">Banned Community Members</string>
     <string name="setting_Unblock">&#160;Unblock&#160;</string>
     <string name="setting_security">Security</string>
     <string name="setting_seeds">Keys</string>

@@ -141,7 +141,6 @@ public class CommunityViewModel extends AndroidViewModel {
         blockRepo = RepositoryHelper.getBlockRepository(getApplication());
         txRepo = RepositoryHelper.getTxRepository(getApplication());
         daemon = TauDaemon.getInstance(getApplication());
-        txViewModel = new TxViewModel(getApplication());
     }
 
     public void observeNeedStartDaemon () {
@@ -338,7 +337,7 @@ public class CommunityViewModel extends AndroidViewModel {
     void addCommunity(@NonNull Community community, Map<String, String> selectedMap) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             // TauController:创建Community社区
-            Result result = createCommunity(community, selectedMap);
+            Result result = createCommunity(getApplication(), community, selectedMap);
             emitter.onNext(result);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
@@ -348,15 +347,20 @@ public class CommunityViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private Result createCommunity(Community community, Map<String, String> selectedMap) {
+    public static  Result createCommunity(Context appContext, Community community, Map<String, String> selectedMap) {
         Result result = new Result();
         try {
+            TauDaemon daemon = TauDaemon.getInstance(appContext);
+            UserRepository userRepo = RepositoryHelper.getUserRepository(appContext);
+            CommunityRepository communityRepo = RepositoryHelper.getCommunityRepository(appContext);
+            MemberRepository memberRepo = RepositoryHelper.getMemberRepository(appContext);
             // chainID为空，再次尝试创建一次
             if (StringUtil.isEmpty(community.chainID)) {
-                community.chainID = createNewChainID(community.communityName);
+                String type = "0000";
+                community.chainID = daemon.createNewChainID(type, community.communityName);
             }
             if (StringUtil.isEmpty(community.chainID)) {
-                result.setFailMsg(getApplication().getString(R.string.community_creation_failed));
+                result.setFailMsg(appContext.getString(R.string.community_creation_failed));
                 return result;
             }
             result.setMsg(community.chainID);
@@ -374,7 +378,7 @@ public class CommunityViewModel extends AndroidViewModel {
             byte[] chainID = ChainIDUtil.encode(community.chainID);
             boolean isCreateSuccess = daemon.createNewCommunity(chainID, accounts);
             if (!isCreateSuccess) {
-                result.setFailMsg(getApplication().getString(R.string.community_creation_failed));
+                result.setFailMsg(appContext.getString(R.string.community_creation_failed));
                 return result;
             }
 
@@ -397,15 +401,17 @@ public class CommunityViewModel extends AndroidViewModel {
 
             // 自动发送一笔Sell交易
             String coinName = ChainIDUtil.getCoinName(community.chainID);
-            String description = getApplication().getString(R.string.tx_community_creator_selling, coinName);
+            String description = appContext.getString(R.string.tx_community_creator_selling, coinName);
             SellTxContent sellContent = new SellTxContent(coinName, 0, null, null, description);
             TxQueue sellTxQueue = new TxQueue(community.chainID, currentUser.publicKey, currentUser.publicKey, 0L,
                     Constants.NEWS_MIN_FEE.longValue(), TxType.SELL_TX, sellContent.getEncoded());
+
+            TxViewModel txViewModel = new TxViewModel(MainApplication.getInstance());
             txViewModel.addTransactionTask(sellTxQueue, null, DateUtil.getMillisTime());
 
             // 发送通知
             if (accounts.size() > 0) {
-                String memo = getApplication().getString(R.string.community_added_members);
+                String memo = appContext.getString(R.string.community_added_members);
                 TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
                 byte[] content = txContent.getEncoded();
                 for (Account acc : accounts) {
@@ -413,7 +419,7 @@ public class CommunityViewModel extends AndroidViewModel {
                     long amount = acc.getBalance();
                     TxQueue txQueue = new TxQueue(community.chainID, currentUser.publicKey, key,
                             amount, 0L, TxType.WIRING_TX, content);
-                    ChatViewModel.syncSendMessageTask(getApplication(), txQueue, QueueOperation.ON_CHAIN);
+                    ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.ON_CHAIN);
                 }
             }
         } catch (Exception e) {
@@ -1029,7 +1035,7 @@ public class CommunityViewModel extends AndroidViewModel {
                     String communityName = name + (i + 1);
                     String chainID = createNewChainID(communityName);
                     Community community = new Community(chainID, communityName);
-                    createCommunity(community, null);
+                    createCommunity(getApplication(), community, null);
                     emitter.onNext(i + 1);
                 }
             }

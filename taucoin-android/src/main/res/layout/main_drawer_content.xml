@@ -134,15 +134,15 @@
                     android:layout_height="wrap_content">
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_wallet"
+                        android:id="@+id/item_airdrop_coins"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:layout_marginTop="@dimen/widget_size_5"
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_mining"
-                        app:rightText="@string/drawer_wallet"/>
+                        app:leftImage="@mipmap/icon_airdrop_coins"
+                        app:rightText="@string/drawer_send_and_airdrop_coins"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:visibility="visible"
@@ -156,15 +156,14 @@
                         app:rightText="@string/drawer_new_community"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
-                        android:visibility="visible"
-                        android:id="@+id/item_airdrop_coins"
+                        android:id="@+id/item_wallet"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_airdrop_coins"
-                        app:rightText="@string/drawer_send_and_airdrop_coins"/>
+                        app:leftImage="@mipmap/icon_mining"
+                        app:rightText="@string/drawer_wallet"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_contacts"

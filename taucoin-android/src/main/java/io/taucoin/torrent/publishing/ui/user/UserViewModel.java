@@ -125,7 +125,6 @@ public class UserViewModel extends AndroidViewModel {
     private final MutableLiveData<List<UserAndFriend>> userList = new MutableLiveData<>();
     private CommonDialog commonDialog;
     private CommonDialog editNameDialog;
-    private GuideDialog guideDialog;
     private final TauDaemon daemon;
     private final ChatViewModel chatViewModel;
     private Disposable clearDisposable;
@@ -159,10 +158,6 @@ public class UserViewModel extends AndroidViewModel {
         if (editNameDialog != null) {
             editNameDialog.closeDialog();
             editNameDialog = null;
-        }
-        if (guideDialog != null) {
-            guideDialog.closeDialog();
-            guideDialog = null;
         }
         if (clearDisposable != null && !clearDisposable.isDisposed()) {
             clearDisposable.dispose();
@@ -1083,23 +1078,14 @@ public class UserViewModel extends AndroidViewModel {
         boolean isForeground = AppUtil.isForeground(activity, permissionsActivity, mainActivity);
         // 如果APP是第一次启动, 并且MainActivity也在前台
         if (isFirstStart && isForeground) {
-            GuideDialog.Builder builder = new GuideDialog.Builder(activity);
-            builder.setCanceledOnTouchOutside(false);
-            builder.setGuideListener(() -> {
-                // 如果用户没有nickname
-                settingsRepo.setBooleanValue(firstStartKey, false);
-                String showName = UsersUtil.getCurrentUserName(user);
-                String defaultName = UsersUtil.getDefaultName(user.publicKey);
-                logger.info("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
-                if (StringUtil.isEquals(showName, defaultName)) {
-                    showEditNameDialog(activity, user.publicKey);
-                }
-            });
-            if (guideDialog != null && guideDialog.isShowing()) {
-                guideDialog.closeDialog();
+            // 如果用户没有nickname
+            settingsRepo.setBooleanValue(firstStartKey, false);
+            String showName = UsersUtil.getCurrentUserName(user);
+            String defaultName = UsersUtil.getDefaultName(user.publicKey);
+            logger.info("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
+            if (StringUtil.isEquals(showName, defaultName)) {
+                showEditNameDialog(activity, user.publicKey);
             }
-            guideDialog = builder.create();
-            guideDialog.show();
         }
     }
 

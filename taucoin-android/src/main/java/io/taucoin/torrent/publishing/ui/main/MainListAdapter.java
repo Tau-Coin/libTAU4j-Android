@@ -106,7 +106,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 binding.leftView.setText(firstLetters);
                 String balance = FmtMicrometer.fmtBalance(bean.balance);
                 boolean onChain = bean.onChain();
-                if (onChain) {
+                if (!onChain) {
                     binding.tvBalancePower.setText(context.getString(R.string.main_community_non_member));
                 } else {
                     binding.tvBalancePower.setText(context.getString(R.string.main_balance, balance));
@@ -199,6 +199,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                             oldItem.msgUnread == newItem.msgUnread &&
                             oldItem.stickyTop == newItem.stickyTop &&
                             oldItem.balance == newItem.balance &&
+                            oldItem.nonce == newItem.nonce &&
                             StringUtil.isEquals(oldItem.memo, newItem.memo);
                 } else {
                     isSame = oldItem.timestamp == newItem.timestamp &&
