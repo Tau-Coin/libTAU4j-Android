@@ -43,6 +43,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.UserEvent;
@@ -54,6 +55,7 @@ import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
 
 /**
@@ -67,6 +69,8 @@ public class TauDaemonAlertHandler {
     private final SettingsRepository settingsRepo;
     private final Context appContext;
     private final TauDaemon daemon;
+    private final Disposable clearExpiredPeersDis;
+    private final int peersExpiredTime = 5 * 60;    // 单位：s
     public final MutableLiveData<CopyOnWriteArraySet<String>> chainStoppedSet = new MutableLiveData<>();
     private final MutableLiveData<ConcurrentHashMap<String, ConcurrentHashMap<String, Long>>> onlinePeerMap = new MutableLiveData<>();
 
@@ -76,6 +80,7 @@ public class TauDaemonAlertHandler {
         this.msgListenHandler = new MsgAlertHandler(appContext, daemon);
         this.tauListenHandler = new TauListenHandler(appContext, daemon);
         settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
+        clearExpiredPeersDis = clearExpiredPeersTask();
     }
 
     /**
@@ -528,15 +533,35 @@ public class TauDaemonAlertHandler {
         if (peerMap != null) {
             Set<String> keys = peerMap.keySet();
             long currentTime = DateUtil.getTime();
-            long expiredTime = 5 * 60;
             for (String peer : keys) {
                 Long time = peerMap.get(peer);
-                if (time != null && currentTime > time + expiredTime) {
+                if (time != null && currentTime > time + peersExpiredTime) {
                     peerMap.remove(peer);
                 }
             }
         }
     }
+
+    /**
+     * 定时5分钟清理一次过期在线peers
+     */
+    private Disposable clearExpiredPeersTask() {
+        return ObservableUtil.intervalSeconds(peersExpiredTime)
+                .subscribeOn(Schedulers.io())
+                .subscribe( l -> {
+                    ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> chainMap = onlinePeerMap.getValue();
+                    if (chainMap != null && chainMap.size() > 0) {
+                        Set<String> keys = chainMap.keySet();
+                        for (String key : keys) {
+                            try {
+                                clearExpiredPeers(chainMap.get(key));
+                            } catch (Exception ignore) {}
+                        }
+                        onlinePeerMap.postValue(chainMap);
+                    }
+                });
+    }
+
 
     public MutableLiveData<ConcurrentHashMap<String, ConcurrentHashMap<String, Long>>> getOnlinePeerMap() {
         return onlinePeerMap;
@@ -561,6 +586,9 @@ public class TauDaemonAlertHandler {
 
     public void onCleared() {
         tauListenHandler.onCleared();
+        if (clearExpiredPeersDis != null && !clearExpiredPeersDis.isDisposed()) {
+            clearExpiredPeersDis.dispose();
+        }
     }
 
     /**
