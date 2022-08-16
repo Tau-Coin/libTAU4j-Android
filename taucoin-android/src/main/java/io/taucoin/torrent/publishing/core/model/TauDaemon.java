@@ -2,6 +2,7 @@ package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.SystemClock;
 
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
@@ -125,7 +126,7 @@ public abstract class TauDaemon {
         deviceID = DeviceUtils.getCustomDeviceID(appContext);
         sessionManager = new SessionManager(true);
         txQueueManager = new TxQueueManager(this);
-        tauDozeManager = new TauDozeManager(this);
+        tauDozeManager = new TauDozeManager(this, settingsRepo);
 
         observeTauDaemon();
         initLocalParam();
@@ -274,6 +275,7 @@ public abstract class TauDaemon {
         sessionManager.stop();
         tauDaemonAlertHandler.onCleared();
         txQueueManager.onCleared();
+        tauDozeManager.onCleared();
         sessionStopOver();
     }
 
@@ -359,14 +361,7 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_dht_nodes))) {
             long nodes = settingsRepo.getLongValue(key, 0);
             logger.info("SettingsChanged, nodes::{}", nodes);
-
-            if (nodes > 0) {
-                newActionEvent();
-            } else {
-                stopTauDozeTimer();
-                // 无网络直接定24小时任务，等待有网恢复
-                startTauDozeTimer(TauDozeManager.HOURS24_TIME);
-            }
+            tauDozeManager.setNodesChanged(nodes);
         }
     }
 
@@ -382,88 +377,21 @@ public abstract class TauDaemon {
         tauDozeManager.setChargingState(on);
     }
 
+    public void resetDozeStartTime() {
+        tauDozeManager.resetDozeStartTime();
+    }
+
     /**
      * 用户新的操作时间
      */
-    public void newActionEvent() {
-        logger.debug("TauDoze newActionEvent");
-        String nodesKey = appContext.getString(R.string.pref_key_dht_nodes);
-        long nodes = settingsRepo.getLongValue(nodesKey, 0);
-        if (nodes > 0) {
-            stopTauDozeTimer();
-            startTauDozeTimer(TauDozeManager.TAU_UP_TIME);
-        }
-    }
-
-    /**
-     * 重置libTAU Doze开始时间
-     */
-    public void resetDozeStartTime() {
-        if (tauDozeManager.isDozeMode()) {
-            tauDozeManager.resetDozeStartTime();
-        }
-    }
-
-    /**
-     * 停止Tau doze定时任务
-     */
-    private void stopTauDozeTimer() {
-        logger.debug("TauDoze stop timer");
-        if (libTauDozeTimer != null && !libTauDozeTimer.isDisposed()) {
-            libTauDozeTimer.dispose();
-            // TAU还处于doze mode中，强制唤醒后计算doze时间
-            if (tauDozeManager.isDozeMode()) {
-                long realDozeTime = tauDozeManager.calculateRealDozeTime();
-                if (realDozeTime > 0) {
-                    settingsRepo.updateTauDozeTime(realDozeTime);
-                    logger.debug("TauDoze totalDozeTime::{}, realDozeTime::{}",
-                            settingsRepo.getTauDozeTime(), realDozeTime);
-                }
-            }
-        }
-        if (tauDozeManager.isDozeMode()) {
-            resumeService();
-        }
-        tauDozeManager.setDozeMode(false);
-    }
-
-    /**
-     * 开始Tau doze定时任务
-     * @param interval 单位s
-     */
-    private void startTauDozeTimer(long interval) {
-        logger.debug("TauDoze start timer");
-        libTauDozeTimer = ObservableUtil.intervalSeconds(interval)
-                .subscribeOn(Schedulers.io())
-                .subscribe(l -> {
-                    if (tauDozeManager.isDozeMode()) {
-                        settingsRepo.updateTauDozeTime(interval);
-                        logger.debug("TauDoze totalDozeTime::{}, realDozeTime::{}",
-                                settingsRepo.getTauDozeTime(), interval);
-                        if (!libTauDozeTimer.isDisposed()) {
-                            libTauDozeTimer.dispose();
-                        }
-                        newActionEvent();
-                    } else {
-                        long dozeTime = tauDozeManager.calculateDozeTime(true);
-                        logger.debug("TauDoze start dozeTime::{}", dozeTime);
-                        if (!libTauDozeTimer.isDisposed()) {
-                            libTauDozeTimer.dispose();
-                        }
-                        if (dozeTime > 0) {
-                            // TAU处于Doze Mode中，重建创建定时器等待doze结束
-                            pauseService();
-                            tauDozeManager.setDozeMode(true);
-                            startTauDozeTimer(dozeTime);
-                        }
-                    }
-                });
+    public void newActionEvent(DozeEvent event) {
+        tauDozeManager.newActionEvent(event);
     }
 
     /**
      * 暂停区块链服务
      */
-    private void pauseService() {
+    protected void pauseService() {
         if (isRunning) {
             sessionManager.pauseService();
         }
@@ -473,7 +401,7 @@ public abstract class TauDaemon {
     /**
      * 恢复区块链服务
      */
-    private void resumeService() {
+    protected void resumeService() {
         if (isRunning) {
             sessionManager.resumeService();
         }

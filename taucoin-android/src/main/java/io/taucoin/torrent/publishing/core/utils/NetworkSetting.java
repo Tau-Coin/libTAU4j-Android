@@ -13,6 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.DozeEvent;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -241,7 +242,7 @@ public class NetworkSetting {
                 int dozeTime = getDozeTime() + dozeSeconds;
                 updateDozeTime(dozeTime);
                 logger.debug("updateRunningTime dozeTime::{}s", dozeSeconds);
-                TauDaemon.getInstance(MainApplication.getInstance()).newActionEvent();
+                TauDaemon.getInstance(MainApplication.getInstance()).newActionEvent(DozeEvent.SYS_DOZE_END);
             }
         }
         lastElapsedRealTime = currentElapsedRealTime;

@@ -5,17 +5,9 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.taucoin.torrent.publishing.BuildConfig;
+import io.taucoin.torrent.publishing.core.model.DozeEvent;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
-import io.taucoin.torrent.publishing.core.utils.ChineseFilter;
-import io.taucoin.torrent.publishing.ui.BaseActivity;
 
 /**
  * 过滤中文输入框
@@ -57,7 +49,7 @@ public class FilterEditText extends EditText {
     private final TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            TauDaemon.getInstance(getContext().getApplicationContext()).newActionEvent();
+            TauDaemon.getInstance(getContext().getApplicationContext()).newActionEvent(DozeEvent.TEXT_INPUT);
         }
 
         @Override

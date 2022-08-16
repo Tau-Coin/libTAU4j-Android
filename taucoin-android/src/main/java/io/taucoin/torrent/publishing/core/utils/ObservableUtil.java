@@ -18,6 +18,7 @@ public class ObservableUtil {
                     break;
                 }
             }
+            emitter.onComplete();
         });
     }
 

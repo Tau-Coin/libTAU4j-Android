@@ -42,7 +42,6 @@ import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
-import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.CopyManager;
 import io.taucoin.torrent.publishing.core.utils.LocationManagerUtil;
@@ -122,7 +121,6 @@ public class MainActivity extends ScanTriggerActivity {
         subscribeAddCommunity();
         LocationManagerUtil.requestLocationPermissions(this);
         WorkloadManager.startWakeUpWorker(getApplicationContext());
-        TauDaemon.getInstance(getApplicationContext()).newActionEvent();
         RootUtil.checkRoot();
     }
 
