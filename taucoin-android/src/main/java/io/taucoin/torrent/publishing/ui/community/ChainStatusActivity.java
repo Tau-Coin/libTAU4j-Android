@@ -22,6 +22,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -57,6 +58,7 @@ public class ChainStatusActivity extends BaseActivity {
         initParameter();
         initLayout();
         loadChainStatusData(new ChainStatus());
+        loadBlockStatistics(new BlockStatistics());
     }
 
     /**
@@ -149,6 +151,17 @@ public class ChainStatusActivity extends BaseActivity {
             }
         }
         mStatus = status;
+    }
+
+    private BlockStatistics mStatistics;
+    private void loadBlockStatistics(BlockStatistics statistics) {
+        if (null == mStatistics || mStatistics.getOnChain() != statistics.getOnChain()) {
+            binding.itemOnChainBlocks.setRightText(FmtMicrometer.fmtLong(statistics.getOnChain()));
+        }
+        if (null == mStatistics || mStatistics.getTotal() != statistics.getTotal()) {
+            binding.itemTotalBlocks.setRightText(FmtMicrometer.fmtLong(statistics.getTotal()));
+        }
+        this.mStatistics = statistics;
     }
 
     /**
@@ -275,6 +288,12 @@ public class ChainStatusActivity extends BaseActivity {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::loadMiningTime, it->{}));
+
+            disposables.add(communityViewModel.getBlocksStatistics(chainID)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::loadBlockStatistics)
+            );
         }
     }
 

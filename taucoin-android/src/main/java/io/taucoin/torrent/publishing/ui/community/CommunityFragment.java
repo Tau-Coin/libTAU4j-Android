@@ -105,7 +105,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         Context context = activity.getApplicationContext();
         TauDaemonAlertHandler tauDaemonHandler = TauDaemon.getInstance(context).getTauDaemonHandler();
         this.onlinePeers = tauDaemonHandler.getOnlinePeersCount(chainID);
-        binding.tvBlocksStatistics.setText(getString(R.string.community_blocks_stats, 0, 0));
         showCommunityTitle();
         showCommunitySubtitle();
         binding.toolbarInclude.ivBack.setOnClickListener(v -> {
@@ -139,9 +138,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         tauDaemonHandler.getChainStoppedSet()
                 .observe(this.getViewLifecycleOwner(), set -> {
                     if (set != null && set.contains(chainID)) {
-                        binding.ivHelp.setVisibility(View.VISIBLE);
+                        binding.llWarning.setVisibility(View.VISIBLE);
                     } else {
-                        binding.ivHelp.setVisibility(View.INVISIBLE);
+                        binding.llWarning.setVisibility(View.GONE);
                     }
         });
 
@@ -273,16 +272,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     showCommunitySubtitle();
                 }));
 
-        disposables.add(communityViewModel.getBlocksStatistics(chainID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(statistics -> {
-                    showCommunitySubtitle();
-                    binding.tvBlocksStatistics.setText(getString(R.string.community_blocks_stats,
-                            statistics.getTotal(), statistics.getOnChain()));
-                })
-        );
-
         disposables.add(communityViewModel.observerCurrentMember(chainID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -308,7 +297,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             case R.id.tv_join:
                 communityViewModel.joinCommunity(chainID);
                 break;
-            case R.id.iv_help:
+            case R.id.ll_warning:
                 showChainStoppedDialog();
                 break;
         }

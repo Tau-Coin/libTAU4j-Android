@@ -19,42 +19,38 @@
 
         <LinearLayout
             android:layout_below="@+id/toolbar_include"
-            android:id="@+id/ll_top_statistics"
-            android:orientation="horizontal"
+            android:visibility="gone"
+            android:id="@+id/ll_warning"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            android:layout_height="@dimen/widget_size_40"
+            android:background="@color/color_red_bg"
+            android:onClick="@{listener::onClick}"
             android:paddingStart="@dimen/widget_size_10"
             android:paddingEnd="@dimen/widget_size_10"
-            android:background="@color/gray_light">
-
-            <TextView
-                android:id="@+id/tv_blocks_statistics"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/widget_size_7"
-                android:layout_marginBottom="@dimen/widget_size_7"
-                android:text="@string/community_blocks_stats"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:textColor="@color/color_white"
-                android:textAppearance="@style/TextAppearanceBody3"/>
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
-                android:visibility="gone"
-                android:id="@+id/iv_help"
-                android:layout_width="@dimen/widget_size_30"
-                android:layout_height="@dimen/widget_size_30"
-                android:padding="@dimen/widget_size_5"
-                android:contentDescription="@null"
-                android:onClick="@{listener::onClick}"
-                android:src="@mipmap/icon_warning_white"/>
+                android:layout_width="@dimen/widget_size_20"
+                android:layout_height="@dimen/widget_size_20"
+                android:src="@mipmap/icon_warning"
+                android:contentDescription="@null"/>
 
+            <TextView
+                android:id="@+id/tv_warning"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="@string/community_stopped_running_tips"
+                android:textColor="@color/gray_dark"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:textAppearance="@style/TextAppearanceBody2"/>
         </LinearLayout>
 
         <com.google.android.material.tabs.TabLayout
-            android:layout_below="@+id/ll_top_statistics"
+            android:layout_below="@+id/ll_warning"
             android:id="@+id/tab_layout"
             android:layout_height="@dimen/widget_size_40"
             android:layout_width="match_parent"

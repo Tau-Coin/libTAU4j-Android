@@ -133,7 +133,6 @@
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">discovering</string>
     <string name="community_users_mining">mining</string>
-    <string name="community_blocks_stats">Total blocks:%1$d, on-chain blocks:%2$d</string>
     <string name="common_loading">loading&#8230;</string>
 
     <string name="community_community_name">Name(required)</string>
@@ -192,6 +191,8 @@
     <string name="chain_link_long_time_hour_min">This link or QR code has been created for %1$d hours %2$d minutes. Do you want to continue?</string>
     <string name="chain_link_long_time_min">This link or QR code has been created for %1$d minutes. Do you want to continue?</string>
     <string name="chain_difficulty">Difficulty</string>
+    <string name="chain_total_blocks">Total blocks</string>
+    <string name="chain_on_chain_blocks">On-chain blocks</string>
     <string name="chain_total_peers">Total Peers</string>
     <string name="chain_peers_blocks">Blocks Self-mined</string>
     <string name="chain_total_coins">Total Coins</string>
@@ -219,6 +220,7 @@
     <string name="community_added_successfully">Create Community Successful!</string>
     <string name="community_added_failed">Failed to add community!</string>
     <string name="community_stopped_running">Failed to obtain consensus blocks for many times, and the blockchain business has stopped running.</string>
+    <string name="community_stopped_running_tips">The blockchain has stopped running.</string>
     <string name="community_join">Join</string>
     <string name="community_open">Open</string>
     <string name="community_added_members">Add Members</string>
