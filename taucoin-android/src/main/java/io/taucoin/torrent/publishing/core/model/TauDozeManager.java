@@ -71,7 +71,6 @@ class TauDozeManager {
     }
 
     public void setBatteryLevel(int batteryLevel) {
-        batteryLevel = 20;
         if (this.batteryLevel != batteryLevel) {
             logger.debug("setBatteryLevel::{}", batteryLevel);
             this.batteryLevel = batteryLevel;
@@ -140,7 +139,7 @@ class TauDozeManager {
 
     /**
      * 有nodes和无nodes触发一次
-     * @param nodes
+     * @param nodes 节点数
      */
     public void setNodesChanged(long nodes) {
         if (this.nodes > 0 && nodes <= 0) {
