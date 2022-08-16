@@ -50,7 +50,7 @@
     <string name="main_empty_add_friends">Add Friend</string>
     <string name="main_empty_create_communities">Create Coin Community</string>
     <string name="main_exit">Click again to exit the application!</string>
-    <string name="main_community_name">%1$s community (%2$s)</string>
+    <string name="main_community_name">%1$s Community (%2$s)</string>
     <string name="main_balance">Balance %1$s</string>
     <string name="main_community_non_member">Non Member</string>
     <string name="main_error_link">Invalid link!</string>

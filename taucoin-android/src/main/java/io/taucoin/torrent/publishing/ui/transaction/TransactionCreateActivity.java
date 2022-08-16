@@ -11,14 +11,20 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
+import io.taucoin.torrent.publishing.ui.community.MembersAddAdapter;
+import io.taucoin.torrent.publishing.ui.community.MembersAddFragment;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -29,15 +35,18 @@ import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityTransactionCreateBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
  * 交易创建页面页面
  */
-public class TransactionCreateActivity extends BaseActivity implements View.OnClickListener {
+public class TransactionCreateActivity extends BaseActivity implements View.OnClickListener,
+        MembersAdapter.ClickListener {
 
     private static final int REQUEST_CODE = 0x01;
     private ActivityTransactionCreateBinding binding;
 
+    private UserViewModel userViewModel;
     private TxViewModel txViewModel;
     private CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
@@ -47,6 +56,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
+        userViewModel = provider.get(UserViewModel.class);
         txViewModel = provider.get(TxViewModel.class);
         txViewModel.observeNeedStartDaemon();
         binding = DataBindingUtil.setContentView(this, R.layout.activity_transaction_create);
@@ -107,6 +117,28 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
             binding.tvFee.setText(Html.fromHtml(txFreeHtml));
             binding.tvFee.setTag(txFeeStr);
         }
+
+        if (null == txQueue) {
+            MembersAdapter adapter = new MembersAdapter(this);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            binding.recyclerList.setLayoutManager(layoutManager);
+            binding.recyclerList.setItemAnimator(null);
+            binding.recyclerList.setAdapter(adapter);
+
+            userViewModel.loadUsersList(0, true, null);
+            userViewModel.getUserList().observe(this, friends -> {
+                if (friends != null) {
+                    adapter.submitList(friends);
+                }
+            });
+        } else {
+            binding.llMembersSelect.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onSelectClicked(String publicKey) {
+        binding.etPublicKey.setText(publicKey);
     }
 
     @Override
