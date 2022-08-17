@@ -14,16 +14,42 @@ import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 
 /**
- * tau休息模式管理
+ * TAU休息模式
  *
- * 如果3分钟内（固定参数）用户和TAU app没有“鼠标键盘手指交互”和“doze过”就进入“TAU 休息模式”。TAU休息模式时，
- * app根据电池和网络流量剩余来间歇工作（根据两个指标较低剩余百分比90%（包括充电状态），70%，50%，30%，10%可以定休眠时间长度），
- * 目前先就先采用“区块链业务进程挂起”相应0，3，6，12，24分钟策略。当用户从休眠状态启动交互，区块链模块要被唤醒。
+ * APP会根据电量和网络流量剩余来间歇工作，来达到节能和节约流量的目的。其中“区块链模块”挂起时间计算策略为：
+ * 根据两个指标较低剩余百分比90%（包括充电状态）、70%、50%、30%、10%对应为0、3、6、12、24分钟。
+ * "TAU休息模式"的两种方式：
+ * 第一种方式：
+ * 进入条件：
+ *
+ * APP在3分钟（固定参数）未发生以下情况：
+ *
+ * 鼠标键盘手指交互；
+ * Android Doze结束；
+ * 前后台切换；
+ * 充电断电、电量百分比变化和可用流量百分比变化时重新计算TAU的挂起时间，与上次的计算挂起时间不一致；
+ * 退出条件：
+ *
+ * APP在处于"TAU休息模式"时发生以下情况：
+ *
+ * 鼠标键盘手指交互；
+ * Android Doze结束；
+ * 前后台切换；
+ * 充电断电、电量百分比变化和可用流量百分比变化时重新计算TAU的挂起时间，与上次的计算挂起时间不一致；
+ * 第二种方式：
+ * 进入条件：
+ *
+ * DHT节点数为0（如果当前处于doze休息模式，继续保持；否则立即进入）
+ * 退出条件：
+ *
+ * DHT节点数大于0
+ *
+ * @see <a href="https://github.com/Tau-Coin/libTAU4j-Android/blob/main/docs/tau_doze_mode.md">TAU休息模式</a>
  */
 class TauDozeManager {
     private static final Logger logger = LoggerFactory.getLogger("TauDozeManager");
-    protected static final long TAU_UP_TIME = 3 * 60;
-    protected static final long HOURS24_TIME = 24 * 60 * 60;
+    protected static final long TAU_UP_TIME = 3 * 60;           // 单位：s
+    protected static final long HOURS24_TIME = 24 * 60 * 60;    // 单位：s
     private final TauDaemon daemon;
     private final SettingsRepository settingsRepo;
     private final LinkedBlockingQueue<DozeEvent> eventsQueue = new LinkedBlockingQueue<>();
@@ -155,6 +181,24 @@ class TauDozeManager {
         }
     }
 
+    /**
+     * 设置当前是否是处于前台
+     * 这里防止第一次启动造成多余处理
+     * @param isForeground 否是前台
+     */
+    private boolean isForeground = true;                // 是否是前台
+    public void setForeground(boolean isForeground) {
+        if (this.isForeground != isForeground) {
+            // 无nodes
+            this.isForeground = isForeground;
+            newActionEvent(DozeEvent.FORE_BACK);
+        }
+    }
+
+    public boolean isForegroundRunning() {
+        return isForeground;
+    }
+
     public void newActionEvent(DozeEvent event) {
         long currentTime = DateUtil.getMillisTime();
         // 15s内非doze模式的事件忽略，处于doze模式要唤醒
@@ -163,7 +207,7 @@ class TauDozeManager {
             this.eventTime = currentTime;
         }
         // 只有有nodes的时候事件才入队列，无nodes
-        boolean isEnterQueue = (nodes > 0 && !isIgnore) || event == DozeEvent.DOZE_INIT ||
+        boolean isEnterQueue = (nodes > 0 && !isIgnore) || event == DozeEvent.FORE_BACK ||
                 event == DozeEvent.NODES_CHANGED;
         logger.debug("TauDoze newActionEvent::{}, isEnterQueue::{}", event.name(), isEnterQueue);
         if (isEnterQueue) {
@@ -171,12 +215,13 @@ class TauDozeManager {
         }
     }
 
-    private long eventTime;
-    private long waitTime;
-    private boolean isWaitTimeout;
-    private boolean isDirectDoze = false;
-    private long nodes = 0;
-    private final Object taskLock = new Object();
+    private long eventTime;                         // 上一次事件时间
+    private long waitTime;                          // 下一次线程等待时间
+    private boolean isWaitTimeout;                  // 是否是线程等待超时
+    private boolean isDirectDoze = false;           // 是否直接进入tau doze模式（主要针对无网络）
+    private boolean isForeDozeTime = false;         // 更新doze时间，判断是否是前台时间
+    private long nodes = 0;                         // nodes数
+    private final Object taskLock = new Object();   // 线程处理任务锁
 
     public Disposable createEventObserver() {
         return Observable.create(emitter -> {
@@ -186,9 +231,13 @@ class TauDozeManager {
                     DozeEvent event = eventsQueue.take();
                     logger.debug("TauDoze newActionEvent::{}, eventsQueue::{}", event.name(), eventsQueue.size());
                     synchronized (taskLock) {
+                        isForeDozeTime = isForegroundRunning();
                         if (event == DozeEvent.NODES_CHANGED) {
                             isDirectDoze = nodes <= 0;
+                        } else if (event == DozeEvent.FORE_BACK) {
+                            isForeDozeTime = !isForegroundRunning();
                         }
+                        logger.debug("TauDoze newActionEvent::{}, isForeDozeTime::{}", event.name(), isForeDozeTime);
                         isWaitTimeout = false;
                         taskLock.notifyAll();
                     }
@@ -217,10 +266,10 @@ class TauDozeManager {
                             // 计算真实进入doze模式的时间
                             long realDozeTime = calculateRealDozeTime();
                             if (realDozeTime > 0) {
-                                settingsRepo.updateTauDozeTime(realDozeTime);
+                                settingsRepo.updateTauDozeTime(realDozeTime, isForeDozeTime);
                             }
-                            logger.debug("TauDoze end totalDozeTime::{}s, realDozeTime::{}s",
-                                    settingsRepo.getTauDozeTime(), realDozeTime);
+                            logger.debug("TauDoze end totalDozeTime::{}s, realDozeTime::{}s, isForeDozeTime::{}",
+                                    settingsRepo.getTauDozeTime(isForeDozeTime), realDozeTime, isForeDozeTime);
                             if (!isDirectDoze) {
                                 daemon.resumeService();
                                 waitTime = TauDozeManager.TAU_UP_TIME;
@@ -230,6 +279,8 @@ class TauDozeManager {
                                 resetDozeStartTime();
                                 logger.debug("TauDoze continue doze::{}s", waitTime);
                             }
+                            // 恢复由于前后台切换设置的值
+                            isForeDozeTime = isForegroundRunning();
                         } else {
                             // 等待进入doze模式的时间（3分钟）完成，并且dozeTime大于0（满足进入doze模式的条件）
                             // 才能进入doze模式

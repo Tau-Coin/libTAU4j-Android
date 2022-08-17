@@ -28,10 +28,10 @@ public class NetworkSetting {
     private static final int[] DEVELOPED_METERED_LIMITED;                         // 单位MB
     private static final int[] WIFI_LIMITED;                                      // 单位MB
 
-    private static SettingsRepository settingsRepo;
+    private static final SettingsRepository settingsRepo;
     private static long lastElapsedRealTime = 0;
     private static long lastUptime = 0;
-    private static MutableLiveData<Boolean> developCountry = new MutableLiveData<>(false);
+    private static final MutableLiveData<Boolean> developCountry = new MutableLiveData<>(false);
     static {
         Context context = MainApplication.getInstance();
         settingsRepo = RepositoryHelper.getSettingsRepository(context);
@@ -213,7 +213,7 @@ public class NetworkSetting {
     public static boolean isForegroundRunning() {
         Context appContext = MainApplication.getInstance();
         String foregroundRunningKey = appContext.getString(R.string.pref_key_foreground_running);
-        return settingsRepo.getBooleanValue(foregroundRunningKey);
+        return settingsRepo.getBooleanValue(foregroundRunningKey, true);
     }
 
     /**
@@ -407,10 +407,5 @@ public class NetworkSetting {
             isHaveAvailableData = getWiFiAvailableData() > 0;
         }
         return isHaveAvailableData;
-    }
-
-    public static void updateTauDozeTime(int i) {
-        Context context = MainApplication.getInstance();
-        settingsRepo.getLongValue(context.getString(R.string.pref_key_tau_doze_time));
     }
 }

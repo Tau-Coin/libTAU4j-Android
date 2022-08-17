@@ -23,7 +23,8 @@
     <string name="pref_key_foreground_running_time" translatable="false">pref_key_foreground_running_time</string>
     <string name="pref_key_background_running_time" translatable="false">pref_key_background_running_time</string>
     <string name="pref_key_doze_running_time" translatable="false">pref_key_doze_running_time</string>
-    <string name="pref_key_tau_doze_time" translatable="false">pref_key_tau_doze_time</string>
+    <string name="pref_key_tau_fore_doze_time" translatable="false">pref_key_tau_fore_doze_time</string>
+    <string name="pref_key_tau_back_doze_time" translatable="false">pref_key_tau_back_doze_time</string>
 
     <string name="pref_key_first_start" translatable="false">pref_key_first_start</string>
 

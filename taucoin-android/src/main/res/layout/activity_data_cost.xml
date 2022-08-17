@@ -50,6 +50,12 @@
                         app:lineLeftText="@string/setting_fore_running_time"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                        android:id="@+id/tv_fore_doze_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:lineLeftText="@string/setting_fore_doze_time"/>
+
+                    <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_bg_running_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -59,15 +65,15 @@
                         android:id="@+id/tv_doze_running_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:lineVisibility="false"
+                        app:lineVisibility="true"
                         app:lineLeftText="@string/setting_doze_running_time"/>
 
                     <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-                        android:id="@+id/tv_tau_doze_running_time"
+                        android:id="@+id/tv_back_doze_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:lineVisibility="false"
-                        app:lineLeftText="@string/setting_tau_doze_running_time"/>
+                        app:lineLeftText="@string/setting_back_doze_time"/>
 
                 </LinearLayout>
 

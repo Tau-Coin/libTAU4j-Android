@@ -1,7 +1,7 @@
 package io.taucoin.torrent.publishing.core.model;
 
 public enum  DozeEvent {
-    DOZE_INIT,                  // doze初始化
+    FORE_BACK,                  // 前台和后台切换
     NODES_CHANGED,              // nodes数变化
     DOZE_TIME_CHANGED,          // doze时间变化
     SYS_DOZE_END,               // 系统doze模式结束

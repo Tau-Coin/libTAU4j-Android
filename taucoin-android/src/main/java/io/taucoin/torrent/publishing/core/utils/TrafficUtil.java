@@ -145,7 +145,8 @@ public class TrafficUtil {
         NetworkSetting.updateDozeTime(0);
         Context context = MainApplication.getInstance();
         TauDaemon.getInstance(context).resetDozeStartTime();
-        settingsRepo.setTauDozeTime(0);
+        settingsRepo.setTauDozeTime(0, true);
+        settingsRepo.setTauDozeTime(0, false);
         NetworkSetting.updateDataAvailableRate(100);
         NetworkSetting.clearWifiPromptLimit();
         NetworkSetting.clearMeteredPromptLimit();
