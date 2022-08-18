@@ -86,6 +86,7 @@ import io.taucoin.torrent.publishing.ui.ScanTriggerActivity;
 import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
 import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
@@ -593,7 +594,7 @@ public class UserViewModel extends AndroidViewModel {
     /**
      * 保存用户名
      */
-    private void saveUserName(String publicKey, String name) {
+    private void saveUserName(String publicKey, String name, boolean isCreateCommunity) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
             User user;
             if (StringUtil.isNotEmpty(publicKey)) {
@@ -617,6 +618,11 @@ public class UserViewModel extends AndroidViewModel {
                 if (friend != null && friend.status != FriendStatus.DISCOVERED.getStatus()) {
                     daemon.addNewFriend(user.publicKey);
                 }
+            }
+            // 创建昵称的社区
+            if (isCreateCommunity && StringUtil.isNotEmpty(name)) {
+                Community community = new Community("", name);
+                CommunityViewModel.createCommunity(getApplication(), community, null);
             }
             emitter.onNext(true);
             emitter.onComplete();
@@ -878,12 +884,19 @@ public class UserViewModel extends AndroidViewModel {
      * 显示编辑名字的对话框
      */
     public void showEditNameDialog(AppCompatActivity activity, String publicKey) {
+        showEditNameDialog(activity, publicKey, false);
+    }
+
+    public void showEditNameDialog(AppCompatActivity activity, String publicKey, boolean isCreateCommunity) {
         ContactsDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.contacts_dialog, null, false);
         binding.etPublicKey.setHint(R.string.user_new_name_hint);
         // 社区名字禁止输入#特殊符号
         binding.etPublicKey.setFilters(new InputFilter[]{
-                new EditTextInhibitInput(EditTextInhibitInput.NICKNAME_REGEX, false)});
+                new EditTextInhibitInput(EditTextInhibitInput.COMMUNITY_NAME_REGEX)});
+        if (isCreateCommunity) {
+            binding.ivClose.setVisibility(View.INVISIBLE);
+        }
         binding.ivClose.setOnClickListener(v -> {
             if (editNameDialog != null) {
                 editNameDialog.closeDialog();
@@ -897,7 +910,7 @@ public class UserViewModel extends AndroidViewModel {
                 if (nicknameLength > Constants.NICKNAME_LENGTH) {
                     ToastUtils.showShortToast(R.string.user_new_name_too_long);
                 } else {
-                    saveUserName(publicKey, newName);
+                    saveUserName(publicKey, newName, isCreateCommunity);
                     if (editNameDialog != null) {
                         editNameDialog.closeDialog();
                     }
@@ -1081,7 +1094,7 @@ public class UserViewModel extends AndroidViewModel {
             String defaultName = UsersUtil.getDefaultName(user.publicKey);
             logger.info("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
             if (StringUtil.isEquals(showName, defaultName)) {
-                showEditNameDialog(activity, user.publicKey);
+                showEditNameDialog(activity, user.publicKey, true);
             }
         }
     }

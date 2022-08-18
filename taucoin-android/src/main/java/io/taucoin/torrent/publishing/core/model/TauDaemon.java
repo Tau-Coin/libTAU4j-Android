@@ -2,7 +2,6 @@ package io.taucoin.torrent.publishing.core.model;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.SystemClock;
 
 import org.libTAU4j.Account;
 import org.libTAU4j.Block;
@@ -40,7 +39,6 @@ import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.model.data.message.DataKey;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
@@ -64,7 +62,6 @@ import io.taucoin.torrent.publishing.receiver.PowerReceiver;
 import io.taucoin.torrent.publishing.service.SystemServiceManager;
 import io.taucoin.torrent.publishing.service.TauService;
 import io.taucoin.torrent.publishing.ui.TauNotifier;
-import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.setting.TrafficTipsActivity;
 
 /**
@@ -598,9 +595,6 @@ public abstract class TauDaemon {
                     String peer = "2c53034bef58f115212f8e493e39a67e817cce29fee5e956415e8f6c318f85f2";
                     String tauTesting = LinkUtil.encodeChain(peer, testChainID);
                     tauDaemonAlertHandler.addCommunity(tauTesting);
-
-                    Community community = new Community("", "My Coins");
-                    CommunityViewModel.createCommunity(appContext, community, null);
                 }
                 // 1、处理本地跟随的chains, libTAU未跟随的情况
                 for (String chainID : localChains) {
