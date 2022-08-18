@@ -154,28 +154,6 @@
                     app:lineLeftText="@string/chain_difficulty"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_expiry_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    app:lineLeftTextColor="@color/gray_dark"
-                    app:lineLeftText="@string/community_expiry_date"
-                    app:lineRightTextColor="@color/color_yellow"
-                    app:lineVisibility="false"/>
-
-                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_renewal_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    app:lineLeftTextColor="@color/gray_dark"
-                    app:lineLeftText="@string/community_renewal_date"
-                    app:lineRightTextColor="@color/color_yellow"
-                    app:lineVisibility="false"/>
-
                 <TextView
                     android:id="@+id/tv_join"
                     android:layout_width="match_parent"
