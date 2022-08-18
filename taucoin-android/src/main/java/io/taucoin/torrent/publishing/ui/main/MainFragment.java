@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -240,13 +239,12 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     public class StateAdapter extends FragmentStateAdapter {
 
         private final int count;
-        public StateAdapter(@NonNull @NotNull Fragment fragment, int count) {
+        public StateAdapter(@NonNull Fragment fragment, int count) {
             super(fragment);
             this.count = count;
         }
 
         @NonNull
-        @NotNull
         @Override
         public Fragment createFragment(int position) {
             return createFragmentView(position);

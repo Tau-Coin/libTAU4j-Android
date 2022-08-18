@@ -30,7 +30,7 @@ public abstract class BaseFragment extends Fragment implements
     }
 
     @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (getArguments() != null) {
             customTag = getArguments().getString(IntentExtra.CUSTOM_TAG, null);

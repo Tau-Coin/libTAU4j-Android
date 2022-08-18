@@ -10,8 +10,6 @@ import android.view.ViewGroup;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-import org.jetbrains.annotations.NotNull;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -381,7 +379,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         }
 
         @NonNull
-        @NotNull
         @Override
         public Fragment createFragment(int position) {
             return createFragmentView(position);
