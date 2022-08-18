@@ -297,6 +297,7 @@
     <string name="setting_back_doze_time">TAU Background Doze</string>
     <string name="setting_survival_mode">Survival Mode</string>
     <string name="setting_doze_time">Doze time: %1$s</string>
+    <string name="setting_network_switch">Network</string>
     <string name="setting_running_time_hours">%1$s hours</string>
     <string name="setting_running_time_minutes">%1$s minutes</string>
     <string name="setting_running_time_seconds">%1$s seconds</string>

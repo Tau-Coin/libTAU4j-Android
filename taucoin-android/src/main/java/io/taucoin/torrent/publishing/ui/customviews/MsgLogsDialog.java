@@ -205,8 +205,6 @@ public class MsgLogsDialog extends Dialog {
                     isShowResend = false;
                 } else if (status == ChatMsgStatus.ARRIVED_SWARM) {
                     timePointRes = R.mipmap.icon_msg_swarm;
-                } else if (status == ChatMsgStatus.SENT_INTERNET) {
-                    timePointRes = R.mipmap.icon_msg_internet;
                 } else {
                     timePointRes = R.mipmap.icon_msg_waitting;
                 }
@@ -221,7 +219,7 @@ public class MsgLogsDialog extends Dialog {
                 binding.timePoint.setImageResource(timePointRes);
 
                 if (currentLog != null) {
-                    String time = DateUtil.format(currentLog.timestamp, DateUtil.pattern9);
+                    String time = DateUtil.formatTime(currentLog.timestamp, DateUtil.pattern6);
                     binding.tvTime.setText(time);
                     binding.tvTime.setVisibility(View.VISIBLE);
                     binding.tvTime.setTextColor(blackColor);

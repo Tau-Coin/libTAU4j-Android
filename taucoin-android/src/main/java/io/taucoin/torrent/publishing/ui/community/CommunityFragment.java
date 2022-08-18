@@ -86,7 +86,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.toolbarInclude.setListener(this);
         initParameter();
         initLayout();
-        communityViewModel.sendOnlineSignal(chainID);
+        communityViewModel.connectChain(chainID);
     }
 
     /**

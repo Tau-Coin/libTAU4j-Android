@@ -134,7 +134,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
 
             String time = "";
             if (order == 0 && user.lastSeenTime > 0) {
-                time = DateUtil.format(user.lastSeenTime, DateUtil.pattern6);
+                time = DateUtil.formatTime(user.lastSeenTime, DateUtil.pattern6);
 //                time = context.getResources().getString(R.string.contacts_last_seen, time);
             } else if (order != 0 && user.lastCommTime > 0) {
                 time = DateUtil.format(user.lastCommTime, DateUtil.pattern6);

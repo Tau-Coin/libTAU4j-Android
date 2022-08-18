@@ -18,6 +18,7 @@
     <string name="pref_key_metered_available_data" translatable="false">pref_key_metered_available_data</string>
     <string name="pref_key_wifi_available_data" translatable="false">pref_key_wifi_available_data</string>
     <string name="pref_key_is_metered_network" translatable="false">pref_key_is_metered_network</string>
+    <string name="pref_key_network_switch" translatable="false">pref_key_network_switch</string>
 
     <string name="pref_key_foreground_running" translatable="false">pref_key_foreground_running</string>
     <string name="pref_key_foreground_running_time" translatable="false">pref_key_foreground_running_time</string>

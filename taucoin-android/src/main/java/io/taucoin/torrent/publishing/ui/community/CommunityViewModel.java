@@ -1181,10 +1181,10 @@ public class CommunityViewModel extends AndroidViewModel {
     }
 
     /**
-     * 关注链时，发送在线信号
+     * 关注链时，尝试连接链
      * @param chainID 链ID
      */
-    public void sendOnlineSignal(String chainID) {
-        daemon.sendOnlineSignal(chainID);
+    public void connectChain(String chainID) {
+        daemon.connectChain(chainID);
     }
 }

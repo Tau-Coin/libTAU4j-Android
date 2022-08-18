@@ -5,9 +5,8 @@ package io.taucoin.torrent.publishing.core.model.data;
  */
 public enum ChatMsgStatus {
     SENT(0, "Try to Send"),
-    SENT_INTERNET(1, "Sent to Internet"),
-    ARRIVED_SWARM(2, "Arrived on Receiver Swarm"),
-    CONFIRMED(3, "Showed on Receiver Device");
+    ARRIVED_SWARM(1, "Arrived on Receiver Swarm"),
+    CONFIRMED(2, "Showed on Receiver Device");
 
     private int status;
     private String statusInfo;

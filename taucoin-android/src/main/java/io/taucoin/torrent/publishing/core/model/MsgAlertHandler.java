@@ -226,37 +226,6 @@ class MsgAlertHandler {
     }
 
     /**
-     * Sent to Internet 桔黄色 (traversal complete > 1)
-     * @param msgHash 消息hash
-     * @param timestamp 时间
-     * @param userPk 用户公钥
-     */
-    void onMsgSync(byte[] msgHash, BigInteger timestamp, String userPk) {
-        try {
-            String hash = ByteUtil.toHexString(msgHash);
-            ChatMsg msg = chatRepo.queryChatMsg(hash);
-            String senderPk = msg != null ? msg.senderPk : null;
-            String receiverPk = msg != null ? msg.receiverPk : null;
-            if (StringUtil.isNotEquals(senderPk, userPk)) {
-                logger.info("onMsgSync MessageHash::{}, senderPk::{}, not mine", hash, senderPk);
-                return;
-            }
-            ChatMsgLog msgLog = chatRepo.queryChatMsgLog(hash,
-                    ChatMsgStatus.SENT_INTERNET.getStatus());
-            logger.info("onMsgSync MessageHash::{}, exist::{}", hash, msgLog != null);
-            if (null == msgLog) {
-                msgLog = new ChatMsgLog(hash, ChatMsgStatus.SENT_INTERNET.getStatus(),
-                        timestamp.longValue());
-                chatRepo.addChatMsgLogs(receiverPk, msgLog);
-            }
-
-        } catch (SQLiteConstraintException ignore) {
-        } catch (Exception e) {
-            logger.error("onMsgSync error", e);
-        }
-    }
-
-    /**
      * Arrived Prefix Swarm 绿色(等价网络节点>1)
      * @param msgHash 消息hash
      * @param timestamp 时间
@@ -506,9 +475,9 @@ class MsgAlertHandler {
      * 处理朋友事件逻辑
      * @param peer 节点用户信息
      */
-    void onUserEvent(String userPk, byte[] peer) {
+    void onPeerAttention(String userPk, byte[] peer) {
         String friendPkStr = ByteUtil.toHexString(peer);
-        logger.info("onUserEvent friendPk::{}", friendPkStr);
+        logger.info("onPeerAttention friendPk::{}", friendPkStr);
         Friend friend = friendRepo.queryFriend(userPk, friendPkStr);
         if (friend != null) {
             friend.focused = 1;

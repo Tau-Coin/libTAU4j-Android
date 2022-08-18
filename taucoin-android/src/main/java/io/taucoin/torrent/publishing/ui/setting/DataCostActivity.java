@@ -14,6 +14,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -31,7 +32,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
 
     private ActivityDataCostBinding binding;
     private SettingsRepository settingsRepo;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private DailyQuotaAdapter adapterMetered;
     private DailyQuotaAdapter adapterWiFi;
 
@@ -78,6 +79,19 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
 
         refreshAllData();
 
+        String networkKey = getString(R.string.pref_key_network_switch);
+        boolean networkSwitch = settingsRepo.getBooleanValue(networkKey, true);
+        binding.switchNetwork.setChecked(networkSwitch);
+        TauDaemon daemon = TauDaemon.getInstance(getApplicationContext());
+        binding.switchNetwork.setOnCheckedChangeListener((compoundButton, checked) -> {
+            if (checked) {
+                daemon.reconnectNetwork();
+            } else {
+                daemon.disconnectNetwork();
+            }
+            settingsRepo.setBooleanValue(networkKey, checked);
+        });
+
         NetworkSetting.getDevelopCountry().observe(this, developed -> {
             developCountryChanged();
         });
@@ -92,7 +106,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
     }
 
     private void refreshAllData() {
-        handleSettingsChanged(getString(R.string.pref_key_is_metered_network));
+        handleSettingsChanged(getString(R.string.pref_key_network_switch));
         handleSettingsChanged(getString(R.string.pref_key_current_speed));
         handleSettingsChanged(getString(R.string.pref_key_foreground_running_time));
 

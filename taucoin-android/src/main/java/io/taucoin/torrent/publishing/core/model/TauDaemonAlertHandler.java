@@ -24,8 +24,8 @@ import org.libTAU4j.alerts.CommConfirmRootAlert;
 import org.libTAU4j.alerts.CommLastSeenAlert;
 import org.libTAU4j.alerts.CommMsgArrivedAlert;
 import org.libTAU4j.alerts.CommNewMsgAlert;
+import org.libTAU4j.alerts.CommPeerAttentionAlert;
 import org.libTAU4j.alerts.CommSyncMsgAlert;
-import org.libTAU4j.alerts.CommUserEventAlert;
 import org.libTAU4j.alerts.CommUserInfoAlert;
 import org.libTAU4j.alerts.ListenSucceededAlert;
 import org.libTAU4j.alerts.PortmapAlert;
@@ -46,7 +46,6 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.UserEvent;
 import io.taucoin.torrent.publishing.core.model.data.UserHeadPic;
 import io.taucoin.torrent.publishing.core.model.data.UserInfo;
 import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
@@ -114,17 +113,13 @@ public class TauDaemonAlertHandler {
                 // 用户信息
                 onUserInfo(alert, alertAndUser.getUserPk());
                 break;
-            case COMM_USER_EVENT:
+            case COMM_PEER_ATTENTION:
                 // 对方点击等事件
-                onUserEvent(alert, alertAndUser.getUserPk());
+                onPeerAttention(alert, alertAndUser.getUserPk());
                 break;
             case COMM_NEW_MSG:
                 // 新消息
                 onNewMessage(alert, alertAndUser.getUserPk());
-                break;
-            case COMM_SYNC_MSG:
-                // Sent to Internet 桔黄色 (traversal complete > 1)
-                onMsgSync(alert, alertAndUser.getUserPk());
                 break;
             case COMM_MSG_ARRIVED:
                 // Arrived Prefix Swarm 绿色(等价网络节点>1)
@@ -182,20 +177,6 @@ public class TauDaemonAlertHandler {
         long lastSeenTime = lastSeenAlert.get_last_seen();
         msgListenHandler.onDiscoveryFriend(ByteUtil.toHexString(friendPk), lastSeenTime, userPk);
     }
-
-    /**
-     * Sent to Internet 桔黄色 (traversal complete > 1)
-     * @param alert libTAU上报
-     * @param userPk 当前用户公钥
-     */
-    private void onMsgSync(Alert alert, String userPk) {
-        CommSyncMsgAlert msgSyncAlert = (CommSyncMsgAlert) alert;
-        logger.info(msgSyncAlert.get_message());
-        long timestamp = msgSyncAlert.get_timestamp();
-        byte[] msgHash = msgSyncAlert.getSyncing_msg_hash();
-        msgListenHandler.onMsgSync(msgHash, BigInteger.valueOf(timestamp), userPk);
-    }
-
 
     /**
      * Arrived Prefix Swarm 绿色(等价网络节点>1)
@@ -260,19 +241,14 @@ public class TauDaemonAlertHandler {
     }
 
     /**
-     * 处理朋友事件逻辑
+     * 处理朋友关注事件
      * @param alert libTAU上报
      */
-    private void onUserEvent(Alert alert, String userPk) {
-        CommUserEventAlert eventAlert = (CommUserEventAlert) alert;
+    private void onPeerAttention(Alert alert, String userPk) {
+        CommPeerAttentionAlert eventAlert = (CommPeerAttentionAlert) alert;
         logger.info(eventAlert.get_message());
         byte[] peer = eventAlert.get_peer();
-        UserEvent userEvent = new UserEvent(eventAlert.get_user_event());
-        UserEvent.Event event = UserEvent.Event.parse(userEvent.getEvent());
-        logger.debug("onUserEvent::{}", event.name());
-        if (event == UserEvent.Event.FOCUS_FRIEND) {
-            msgListenHandler.onUserEvent(userPk, peer);
-        }
+        msgListenHandler.onPeerAttention(userPk, peer);
     }
 
     /**

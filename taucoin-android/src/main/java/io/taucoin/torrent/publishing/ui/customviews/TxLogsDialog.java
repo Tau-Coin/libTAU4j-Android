@@ -37,7 +37,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.torrent.publishing.core.model.data.TxLogStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
@@ -179,7 +178,7 @@ public class TxLogsDialog extends Dialog {
                 binding.tvStatus.setText(status.getStatusInfo());
                 binding.timeLineBottom.setVisibility(pos == size - 1 ? View.GONE : View.VISIBLE);
 
-                int latestStatus = ChatMsgStatus.SENT.getStatus();
+                int latestStatus = TxLogStatus.SENT.getStatus();
                 if (logs.size() > 0) {
                     latestStatus = logs.get(0).status;
                 }

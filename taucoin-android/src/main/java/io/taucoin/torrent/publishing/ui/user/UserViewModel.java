@@ -49,13 +49,11 @@ import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.FriendStatus;
 import io.taucoin.torrent.publishing.core.model.data.Result;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
-import io.taucoin.torrent.publishing.core.model.data.UserEvent;
 import io.taucoin.torrent.publishing.core.model.data.UserHeadPic;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.FriendRepository;
@@ -92,7 +90,6 @@ import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
 import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
-import io.taucoin.torrent.publishing.ui.customviews.GuideDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.core.model.data.message.MessageType;
 import io.taucoin.torrent.publishing.core.utils.rlp.ByteUtil;
@@ -1282,8 +1279,7 @@ public class UserViewModel extends AndroidViewModel {
      */
     public void focusFriend(String friendPk) {
         if (StringUtil.isNotEmpty(friendPk)) {
-            UserEvent event = new UserEvent(UserEvent.Event.FOCUS_FRIEND, null);
-            daemon.sendToPeer(friendPk, event.getEncoded());
+            daemon.focusFriend(friendPk);
         }
     }
 

@@ -249,8 +249,6 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             return R.mipmap.icon_msg_displayed;
         } else if (log.status == ChatMsgStatus.ARRIVED_SWARM.getStatus()) {
             return R.mipmap.icon_msg_swarm;
-        } else if (log.status == ChatMsgStatus.SENT_INTERNET.getStatus()) {
-            return R.mipmap.icon_msg_internet;
         } else {
             return R.mipmap.icon_msg_waitting;
         }

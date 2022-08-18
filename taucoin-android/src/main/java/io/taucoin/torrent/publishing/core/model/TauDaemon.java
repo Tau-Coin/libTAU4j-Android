@@ -156,6 +156,8 @@ public abstract class TauDaemon {
                     updateChainsAndAccountInfo();
                     // 防止Crash后重启 初始化来不及设置新的日志等级
                     setLogLevel(LogUtil.getTauLogLevel());
+                    // 查看当前网络开关是否关闭
+                    checkNetworkSwitch();
                 }
             }
         });
@@ -168,6 +170,18 @@ public abstract class TauDaemon {
         disposables.add(tauInfoProvider.observeCPUStatistics()
                 .subscribeOn(Schedulers.io())
                 .subscribe());
+    }
+
+    /**
+     * 检查网络开关
+     */
+    private void checkNetworkSwitch() {
+        String networkKey = appContext.getString(R.string.pref_key_network_switch);
+        boolean networkSwitch = settingsRepo.getBooleanValue(networkKey, true);
+        logger.info("Check network switch::{}", networkSwitch);
+        if (!networkSwitch) {
+            disconnectNetwork();
+        }
     }
 
     /**
@@ -673,15 +687,14 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 直接给peer(朋友)发信息
+     * 关注节点
      * @param publicKey 公钥
-     * @param data 信息数据
      */
-    public void sendToPeer(String publicKey, byte[] data) {
+    public void focusFriend(String publicKey) {
         if (isRunning) {
             byte[] peer = ByteUtil.toByte(publicKey);
-            sessionManager.sendToPeer(peer, data);
-            logger.info("sendToPeer peer::{}", publicKey);
+            sessionManager.payAttenToPeer(peer);
+            logger.info("focusFriend peer::{}", publicKey);
         }
     }
 
@@ -755,13 +768,13 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 关注链时，发送在线信号
+     * 关注链时，尝试连接链
      * @param chainID 链ID
      */
-    public void sendOnlineSignal(String chainID) {
+    public void connectChain(String chainID) {
         if (isRunning) {
-            sessionManager.sendOnlineSignal(ChainIDUtil.encode(chainID));
-            logger.info("sendOnlineSignal chainID::{}", chainID);
+            sessionManager.connectChain(ChainIDUtil.encode(chainID));
+            logger.info("connectChain chainID::{}", chainID);
         }
     }
 
@@ -816,6 +829,26 @@ public abstract class TauDaemon {
             return isSuccess;
         }
         return false;
+    }
+
+    /**
+     * 主动断网
+     */
+    public void disconnectNetwork() {
+        if (isRunning) {
+            sessionManager.disconnectNetwork();
+        }
+        logger.info("disconnectNetwork isRunning::{}", isRunning);
+    }
+
+    /**
+     * 重连网络
+     */
+    public void reconnectNetwork() {
+        if (isRunning) {
+            sessionManager.reconnectNetwork();
+        }
+        logger.info("reconnectNetwork isRunning::{}", isRunning);
     }
 
     /**

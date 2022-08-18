@@ -353,7 +353,7 @@ public class ChatViewModel extends AndroidViewModel {
                     }
                     // 确认接收的时间精确到秒
                     chatMsgLogs[nonce] = new ChatMsgLog(hash,
-                            status.getStatus(), currentTime);
+                            status.getStatus(), currentTime / 1000);
                 }
                 // 批量添加到数据库
                 chatRepo.addChatMsgLogs(friendPk, chatMsgLogs);
