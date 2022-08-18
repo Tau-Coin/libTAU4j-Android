@@ -307,8 +307,10 @@ public class ChainStatusActivity extends BaseActivity {
             } else {
                 binding.itemMiningTime.setRightText(getString(R.string.chain_mining_time_seconds, seconds));
             }
+        } else if (time == -100) {
+            binding.itemMiningTime.setRightText(getString(R.string.chain_mining_time_doze));
         }
-        binding.llMiningTime.setVisibility(time >= 0 ? View.VISIBLE : View.GONE);
+        binding.llMiningTime.setVisibility(time >= 0 || time == -100 ? View.VISIBLE : View.GONE);
     }
 
     @Override

@@ -188,6 +188,7 @@
     <string name="chain_mining_time_tips">Your remaining time to win the current mining slot.</string>
     <string name="chain_mining_time_min_seconds">%1$dmin&#160;%2$ds</string>
     <string name="chain_mining_time_seconds">%1$ds</string>
+    <string name="chain_mining_time_doze">Doze</string>
     <string name="chain_link_long_time_hour_min">This link or QR code has been created for %1$d hours %2$d minutes. Do you want to continue?</string>
     <string name="chain_link_long_time_min">This link or QR code has been created for %1$d minutes. Do you want to continue?</string>
     <string name="chain_difficulty">Difficulty</string>

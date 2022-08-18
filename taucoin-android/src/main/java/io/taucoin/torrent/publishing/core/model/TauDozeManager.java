@@ -46,7 +46,7 @@ import io.taucoin.torrent.publishing.core.utils.DateUtil;
  *
  * @see <a href="https://github.com/Tau-Coin/libTAU4j-Android/blob/main/docs/tau_doze_mode.md">TAU休息模式</a>
  */
-class TauDozeManager {
+public class TauDozeManager {
     private static final Logger logger = LoggerFactory.getLogger("TauDozeManager");
     protected static final long TAU_UP_TIME = 3 * 60;           // 单位：s
     protected static final long HOURS24_TIME = 24 * 60 * 60;    // 单位：s

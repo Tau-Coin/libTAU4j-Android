@@ -703,6 +703,10 @@ public abstract class TauDaemon {
         return tauDaemonAlertHandler;
     }
 
+    public TauDozeManager getTauDozeManager() {
+        return tauDozeManager;
+    }
+
     /**
      * 请求peer发布区块数据
      * @param publicKey 公钥
