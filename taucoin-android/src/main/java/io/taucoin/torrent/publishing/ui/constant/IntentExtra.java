@@ -24,4 +24,5 @@ public class IntentExtra {
     public static final String AIRDROP_LINK = "airdropLink";
     public static final String TIMESTAMP = "timestamp";
     public static final String OPEN_COMMUNITY = "openCommunity";
+    public static final String CUSTOM_TAG = "customTag";
 }

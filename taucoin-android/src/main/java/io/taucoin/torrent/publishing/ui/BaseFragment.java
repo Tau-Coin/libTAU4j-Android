@@ -2,25 +2,39 @@ package io.taucoin.torrent.publishing.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
 
-import org.slf4j.LoggerFactory;
-
-import java.util.logging.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.taucoin.torrent.publishing.core.utils.FixMemLeak;
+import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 
 public abstract class BaseFragment extends Fragment implements
         SwipeRefreshLayout.OnRefreshListener {
     private BaseActivity baseActivity;
     private String className = getClass().getSimpleName();
+    private String customTag;
 
     @Override
     public void onRefresh() {
 
+    }
+
+    public String getCustomTag() {
+        return customTag;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (getArguments() != null) {
+            customTag = getArguments().getString(IntentExtra.CUSTOM_TAG, null);
+        }
     }
 
     @Override

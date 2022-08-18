@@ -9,6 +9,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +23,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -36,7 +41,6 @@ import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
-import io.taucoin.torrent.publishing.ui.customviews.FragmentStatePagerAdapter;
 import io.taucoin.torrent.publishing.ui.setting.TrafficTipsActivity;
 
 /**
@@ -79,13 +83,24 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         });
 
         //自定义的Adapter继承自FragmentPagerAdapter
-        StateAdapter stateAdapter = new StateAdapter(getChildFragmentManager(),
+        StateAdapter stateAdapter = new StateAdapter(this,
                 binding.tabLayout.getTabCount());
         // ViewPager设置Adapter
         binding.viewPager.setAdapter(stateAdapter);
         binding.viewPager.setOffscreenPageLimit(3);
 
-        binding.tabLayout.setupWithViewPager(binding.viewPager);
+        TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(binding.tabLayout,
+                binding.viewPager, (tab, position) -> {
+                    if (position == 1) {
+                        tab.setText(getString(R.string.main_tab_community));
+                    } else if (position == 2) {
+                        tab.setText(getString(R.string.main_tab_personal));
+                    } else {
+                        tab.setText(getString(R.string.main_tab_all));
+                    }
+                });
+        tabLayoutMediator.attach();
+
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
 
         for (int i = 0; i < binding.tabLayout.getTabCount(); i++ ) {
@@ -222,28 +237,24 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
-    public class StateAdapter extends FragmentStatePagerAdapter {
+    public class StateAdapter extends FragmentStateAdapter {
 
-        public StateAdapter(@NonNull FragmentManager fm, int count) {
-            super(fm, count);
+        private final int count;
+        public StateAdapter(@NonNull @NotNull Fragment fragment, int count) {
+            super(fragment);
+            this.count = count;
         }
 
         @NonNull
+        @NotNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             return createFragmentView(position);
         }
 
-        @Nullable
         @Override
-        public CharSequence getPageTitle(int position) {
-            if (position == 1) {
-                return getString(R.string.main_tab_community);
-            } else if (position == 2) {
-                return getString(R.string.main_tab_personal);
-            } else {
-                return getString(R.string.main_tab_all);
-            }
+        public int getItemCount() {
+            return count;
         }
     }
 
@@ -251,10 +262,16 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         int pos = binding.tabLayout.getSelectedTabPosition();
         FragmentManager fragmentManager = getChildFragmentManager();
         List<Fragment> fragments = fragmentManager.getFragments();
-        if (pos >= 0 && fragments!= null && pos < fragments.size()) {
-            Fragment currentFragment = fragments.get(pos);
-            if (currentFragment instanceof MainTabFragment) {
-                ((MainTabFragment)currentFragment).showDataList(getDataList(pos));
+        LoggerFactory.getLogger("showFragmentData").debug("fragments::{}", fragments.size());
+        if (pos >= 0 && pos < fragments.size()) {
+            for (Fragment fragment : fragments) {
+                if (fragment instanceof MainTabFragment) {
+                    MainTabFragment currentFragment = (MainTabFragment) fragment;
+                    if (StringUtil.isEquals(currentFragment.getCustomTag(), String.valueOf(pos))) {
+                        currentFragment.showDataList(getDataList(pos));
+                    }
+                }
+
             }
         }
     }
@@ -274,6 +291,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         int pos = position < binding.tabLayout.getTabCount() ? position : 0;
         MainTabFragment tab = new MainTabFragment();
         Bundle bundle = new Bundle();
+        bundle.putString(IntentExtra.CUSTOM_TAG, String.valueOf(pos));
         bundle.putParcelableArrayList(IntentExtra.BEAN, getDataList(pos));
         tab.setArguments(bundle);
         return tab;

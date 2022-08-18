@@ -91,7 +91,7 @@
             android:layout_height="@dimen/widget_size_2"
             android:background="@color/color_bg"/>
 
-        <androidx.viewpager.widget.ViewPager
+        <androidx.viewpager2.widget.ViewPager2
             android:layout_below="@+id/view_line"
             android:layout_above="@+id/fl_join"
             android:background="@color/color_chat_bg"

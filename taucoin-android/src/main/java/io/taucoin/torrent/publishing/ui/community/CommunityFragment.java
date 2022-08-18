@@ -3,26 +3,27 @@ package io.taucoin.torrent.publishing.ui.community;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
+import org.jetbrains.annotations.NotNull;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.TauDaemonAlertHandler;
-import io.taucoin.torrent.publishing.core.model.data.AccessList;
 import io.taucoin.torrent.publishing.core.model.data.Statistics;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
@@ -31,13 +32,10 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
-import io.taucoin.torrent.publishing.core.utils.UsersUtil;
-import io.taucoin.torrent.publishing.databinding.EditFeeDialogBinding;
 import io.taucoin.torrent.publishing.databinding.ExternalAirdropLinkDialogBinding;
 import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
-import io.taucoin.torrent.publishing.ui.customviews.FragmentStatePagerAdapter;
 import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
@@ -126,12 +124,23 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         });
 
         // 自定义的Adapter继承自FragmentPagerAdapter
-        StateAdapter stateAdapter = new StateAdapter(this.getChildFragmentManager(),
+        StateAdapter stateAdapter = new StateAdapter(this,
                 binding.tabLayout.getTabCount());
         // ViewPager设置Adapter
         binding.viewPager.setAdapter(stateAdapter);
         binding.viewPager.setOffscreenPageLimit(3);
-        binding.tabLayout.setupWithViewPager(binding.viewPager);
+        TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(binding.tabLayout,
+                binding.viewPager, (tab, position) -> {
+            if (position == 1) {
+                tab.setText(getString(R.string.community_chain_market));
+            } else if (position == 2) {
+                tab.setText(getString(R.string.community_on_chain));
+            } else {
+                tab.setText(getString(R.string.community_chain_note));
+            }
+        });
+        tabLayoutMediator.attach();
+
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
 
         // 检测区块链是否因为获取数据失败而停止
@@ -363,28 +372,24 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         return tab;
     }
 
-    public class StateAdapter extends FragmentStatePagerAdapter {
+    public class StateAdapter extends FragmentStateAdapter {
 
-        StateAdapter(@NonNull FragmentManager fm, int count) {
-            super(fm, count);
+        private final int count;
+        StateAdapter(@NonNull Fragment fm, int count) {
+            super(fm);
+            this.count = count;
         }
 
         @NonNull
+        @NotNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             return createFragmentView(position);
         }
 
-        @Nullable
         @Override
-        public CharSequence getPageTitle(int position) {
-            if (position == 1) {
-                return getString(R.string.community_chain_market);
-            } else if (position == 2) {
-                return getString(R.string.community_on_chain);
-            } else {
-                return getString(R.string.community_chain_note);
-            }
+        public int getItemCount() {
+            return count;
         }
     }
 }
