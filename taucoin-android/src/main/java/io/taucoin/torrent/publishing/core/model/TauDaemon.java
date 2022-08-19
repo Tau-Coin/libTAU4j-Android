@@ -590,7 +590,7 @@ public abstract class TauDaemon {
                 logger.info("checkAllChains localChain::{}, tauChains::{}",
                         localChains.size(), tauChains.size());
                 // 0、添加默认Cambridge Coin
-                String testChainID = "5244bc8730303030Cambridge Coin";
+                String testChainID = "39efa41130303030Cambridge Coin";
                 if (!localChains.contains(testChainID)) {
                     String peer = "2c53034bef58f115212f8e493e39a67e817cce29fee5e956415e8f6c318f85f2";
                     String tauTesting = LinkUtil.encodeChain(peer, testChainID);
