@@ -8,14 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -34,6 +33,7 @@ import io.taucoin.torrent.publishing.databinding.ExternalAirdropLinkDialogBindin
 import io.taucoin.torrent.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
+import io.taucoin.torrent.publishing.ui.customviews.FragmentStatePagerAdapter;
 import io.taucoin.torrent.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
@@ -122,22 +122,23 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         });
 
         // 自定义的Adapter继承自FragmentPagerAdapter
-        StateAdapter stateAdapter = new StateAdapter(this,
+        StateAdapter stateAdapter = new StateAdapter(this.getChildFragmentManager(),
                 binding.tabLayout.getTabCount());
         // ViewPager设置Adapter
         binding.viewPager.setAdapter(stateAdapter);
         binding.viewPager.setOffscreenPageLimit(3);
-        TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(binding.tabLayout,
-                binding.viewPager, (tab, position) -> {
-            if (position == 1) {
-                tab.setText(getString(R.string.community_chain_market));
-            } else if (position == 2) {
-                tab.setText(getString(R.string.community_on_chain));
-            } else {
-                tab.setText(getString(R.string.community_chain_note));
-            }
-        });
-        tabLayoutMediator.attach();
+        binding.tabLayout.setupWithViewPager(binding.viewPager);
+//        TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(binding.tabLayout,
+//                binding.viewPager, (tab, position) -> {
+//            if (position == 1) {
+//                tab.setText(getString(R.string.community_chain_market));
+//            } else if (position == 2) {
+//                tab.setText(getString(R.string.community_on_chain));
+//            } else {
+//                tab.setText(getString(R.string.community_chain_note));
+//            }
+//        });
+//        tabLayoutMediator.attach();
 
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
 
@@ -370,23 +371,28 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         return tab;
     }
 
-    public class StateAdapter extends FragmentStateAdapter {
+    public class StateAdapter extends FragmentStatePagerAdapter {
 
-        private final int count;
-        StateAdapter(@NonNull Fragment fm, int count) {
-            super(fm);
-            this.count = count;
+        StateAdapter(@NonNull FragmentManager fm, int count) {
+            super(fm, count);
         }
 
         @NonNull
         @Override
-        public Fragment createFragment(int position) {
+        public Fragment getItem(int position) {
             return createFragmentView(position);
         }
 
+        @Nullable
         @Override
-        public int getItemCount() {
-            return count;
+        public CharSequence getPageTitle(int position) {
+            if (position == 1) {
+                return getString(R.string.community_chain_market);
+            } else if (position == 2) {
+                return getString(R.string.community_on_chain);
+            } else {
+                return getString(R.string.community_chain_note);
+            }
         }
     }
 }
