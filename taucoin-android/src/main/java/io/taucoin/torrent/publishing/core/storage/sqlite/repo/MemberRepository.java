@@ -1,15 +1,12 @@
 package io.taucoin.torrent.publishing.core.storage.sqlite.repo;
 
-
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
-import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndTime;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndUser;
@@ -48,13 +45,6 @@ public interface MemberRepository {
     Flowable<Member> observeCommunityAirdropDetail(String chainID);
 
     DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID);
-
-    /**
-     * 获取和社区成员共在的社区数
-     * @param currentUserPk
-     * @param memberPk
-     */
-    Single<List<String>> getCommunityNumInCommon(String currentUserPk, String memberPk);
 
     /**
      * 获取社区limit个成员

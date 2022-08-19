@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
@@ -95,16 +94,6 @@ public class MemberRepositoryImpl implements MemberRepository {
     @Override
     public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID){
         return db.memberDao().queryCommunityMembers(chainID);
-    }
-
-    /**
-     * 获取和社区成员共在的社区数
-     * @param currentUserPk
-     * @param memberPk
-     */
-    @Override
-    public Single<List<String>> getCommunityNumInCommon(String currentUserPk, String memberPk){
-        return db.memberDao().getCommunityNumInCommon(currentUserPk, memberPk);
     }
 
     /**

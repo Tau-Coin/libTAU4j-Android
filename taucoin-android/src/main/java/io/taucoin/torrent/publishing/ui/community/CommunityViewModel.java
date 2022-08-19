@@ -2,7 +2,6 @@ package io.taucoin.torrent.publishing.ui.community;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -53,7 +52,6 @@ import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.TauListenHandler;
-import io.taucoin.torrent.publishing.core.model.data.AccessList;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
@@ -130,7 +128,6 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<UserAndFriend> largestCoinHolder = new MutableLiveData<>();
     private MutableLiveData<List<BlockAndTx>> chainBlocks = new MutableLiveData<>();
     private Disposable clearDisposable;
-    private TxViewModel txViewModel;
 
     public CommunityViewModel(@NonNull Application application) {
         super(application);
@@ -633,14 +630,6 @@ public class CommunityViewModel extends AndroidViewModel {
         return memberRepo.queryCommunityMembers(chainID);
     }
 
-    /**
-     * 获取和社区成员共在的社区数
-     * @param currentUserPk
-     * @param memberPk
-     */
-    public Single<List<String>> getCommunityNumInCommon(String currentUserPk, String memberPk) {
-        return memberRepo.getCommunityNumInCommon(currentUserPk, memberPk);
-    }
     /**
      * 获取社区limit个成员
      * @param chainID

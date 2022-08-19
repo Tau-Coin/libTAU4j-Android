@@ -3,16 +3,15 @@ package io.taucoin.torrent.publishing.core.storage.sp;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import java.util.Set;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposables;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 
 /**
  * SettingsRepository: 用户设置的接口的实现

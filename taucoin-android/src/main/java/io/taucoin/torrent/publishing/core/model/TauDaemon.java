@@ -39,8 +39,10 @@ import io.taucoin.torrent.publishing.core.model.data.AlertAndUser;
 import io.taucoin.torrent.publishing.core.model.data.message.DataKey;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.storage.sp.SettingsRepository;
+import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.torrent.publishing.core.utils.AppUtil;
@@ -87,7 +89,6 @@ public abstract class TauDaemon {
     private Disposable updateBootstrapIntervalTimer; // 更新BootstrapInterval定时任务
     private Disposable updateLocationTimer;          // 更新位置信息定时任务
     private Disposable noRemainingDataTimer;         // 触发无剩余流量的提示定时任务
-    private Disposable libTauDozeTimer;              // 触发libTAU休眠定时任务
     private Disposable onlineTimer;                  // 触发在线信号定时任务
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
     private final TxQueueManager txQueueManager;     // 交易队列管理
@@ -581,6 +582,7 @@ public abstract class TauDaemon {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             UserRepository userRepo = RepositoryHelper.getUserRepository(appContext);
             MemberRepository memberRepo = RepositoryHelper.getMemberRepository(appContext);
+            CommunityRepository communityRepo = RepositoryHelper.getCommunityRepository(appContext);
             User user = userRepo.getCurrentUser();
             if (user != null) {
                 String userPk = user.publicKey;
@@ -591,7 +593,8 @@ public abstract class TauDaemon {
                         localChains.size(), tauChains.size());
                 // 0、添加默认Cambridge Coin
                 String testChainID = "39efa41130303030Cambridge Coin";
-                if (!localChains.contains(testChainID)) {
+                Community community = communityRepo.getCommunityByChainID(testChainID);
+                if (null == community) {
                     String peer = "2c53034bef58f115212f8e493e39a67e817cce29fee5e956415e8f6c318f85f2";
                     String tauTesting = LinkUtil.encodeChain(peer, testChainID);
                     tauDaemonAlertHandler.addCommunity(tauTesting);

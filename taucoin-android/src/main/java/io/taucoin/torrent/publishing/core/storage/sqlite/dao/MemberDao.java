@@ -42,14 +42,6 @@ public interface MemberDao {
             " WHERE m.chainID = :chainID" +
             " ORDER BY m.balance DESC";
 
-    String QUERY_COMMUNITY_NUM_IN_COMMON = "SELECT chainID FROM " +
-            " (Select count(*) AS num, m.chainID FROM Members m" +
-            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " where (m.publicKey =:currentUserPk OR m.publicKey =:memberPk)" +
-//            " AND " + WHERE_ON_CHAIN +
-            " GROUP BY m.chainID)" +
-            " WHERE num >= 2";
-
     String QUERY_COMMUNITY_MEMBERS_LIMIT = "SELECT m.publicKey FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
             " WHERE m.chainID = :chainID" +
@@ -144,14 +136,6 @@ public interface MemberDao {
     @Query(QUERY_GET_MEMBERS_IN_COMMUNITY)
     @Transaction
     DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID);
-
-    /**
-     * 获取和社区成员共在的社区数
-     * @param currentUserPk
-     * @param memberPk
-     */
-    @Query(QUERY_COMMUNITY_NUM_IN_COMMON)
-    Single<List<String>> getCommunityNumInCommon(String currentUserPk, String memberPk);
 
     /**
      * 获取社区limit个成员
