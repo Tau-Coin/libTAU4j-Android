@@ -236,22 +236,17 @@ public class TauInfoProvider {
                         settingsRepo.setLongValue(nodesKey, sessionNodes);
                     }
                     long invokedRequests = daemon.getInvokedRequests();
-                    long requests = 0;
-                    long timeSeconds = 0;
-                    if (oldInvokedRequests == -1 || oldInvokedRequests != invokedRequests) {
-                        long currentInvokedTime = SystemClock.uptimeMillis();
-                        timeSeconds = (currentInvokedTime - oldInvokedTime) / 1000;
-                        if (invokedRequests < oldInvokedRequests) {
-                            requests = invokedRequests;
-                        } else {
-                            requests = invokedRequests - oldInvokedRequests;
-                        }
-                        settingsRepo.setLongValue(invokedKey, requests);
-                        oldInvokedRequests = invokedRequests;
-                        oldInvokedTime = currentInvokedTime;
+                    long requests;
+                    if (invokedRequests < oldInvokedRequests) {
+                        requests = invokedRequests;
+                    } else {
+                        requests = invokedRequests - oldInvokedRequests;
                     }
-                    logger.info("invokedRequests::{}, seconds::{}, requests::{}, sessionNodes::{}",
-                            invokedRequests, timeSeconds, requests, sessionNodes);
+                    settingsRepo.setLongValue(invokedKey, requests);
+                    oldInvokedRequests = invokedRequests;
+
+                    logger.info("invokedRequests::{} requests::{}, sessionNodes::{}",
+                            invokedRequests, requests, sessionNodes);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         logger.debug("deviceIdleMode::{}, interactive::{}, powerSaveMode::{}",
