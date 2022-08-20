@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Debug;
 import android.os.PowerManager;
-import android.os.SystemClock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,7 +182,6 @@ public class TauInfoProvider {
                 // nodes和invoked统计
                 long oldNodes = -1;
                 long oldInvokedRequests = -1;
-                long oldInvokedTime = 0;
                 String invokedKey = MainApplication.getInstance().getString(R.string.pref_key_dht_invoked_requests);
                 String nodesKey = MainApplication.getInstance().getString(R.string.pref_key_dht_nodes);
 
