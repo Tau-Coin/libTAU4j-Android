@@ -33,6 +33,7 @@ public abstract class BaseFragment extends Fragment implements
         if (getArguments() != null) {
             customTag = getArguments().getString(IntentExtra.CUSTOM_TAG, null);
         }
+        BaseActivity.logger.debug("{} onViewCreated", className);
     }
 
     @Override
@@ -41,6 +42,7 @@ public abstract class BaseFragment extends Fragment implements
         if(getActivity() != null && getActivity() instanceof BaseActivity){
             baseActivity = (BaseActivity) getActivity();
         }
+        BaseActivity.logger.debug("{} onAttach", className);
     }
 
     public void showProgressDialog(){
