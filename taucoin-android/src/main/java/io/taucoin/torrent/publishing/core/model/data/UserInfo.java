@@ -108,9 +108,16 @@ public class UserInfo {
         this.profile = list.get(7).getRLPData();
         byte[] profileTimeBytes = list.get(8).getRLPData();
         this.updateProfileTime = (null == profileTimeBytes) ? BigInteger.ZERO: new BigInteger(1, profileTimeBytes);
-        RLP.LList lList = RLP.decodeLazyList(list.get(9).getRLPData());
-        for (int i = 0; i < lList.size(); i++) {
-            this.communities.add(lList.getBytes(i));
+
+        byte[] communitiesBytes = list.get(9).getRLPData();
+        if (communitiesBytes != null) {
+            RLPList paramsList = RLP.decode2(communitiesBytes);
+            RLPList cList = (RLPList) paramsList.get(0);
+            if (cList != null) {
+                for (int i = 0; i < cList.size(); i++) {
+                    this.communities.add(cList.get(i).getRLPData());
+                }
+            }
         }
     }
 

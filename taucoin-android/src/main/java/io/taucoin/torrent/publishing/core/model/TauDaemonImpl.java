@@ -241,15 +241,15 @@ public class TauDaemonImpl extends TauDaemon {
             List<String> communities = memRepo.queryFollowedCommunities(user.publicKey);
             UserInfo friendInfo = new UserInfo(deviceID, user, communities, onlineTime);
             byte[] encoded = friendInfo.getEncoded();
-            if (encoded.length < 1000) {
+            if (encoded.length > 1000) {
                 int size = communities.size();
-                for (int i = 0; i < communities.size(); i++) {
-                    List<String> newCommunities = communities.subList(0, size - 1);
+                for (int i = 0; i < size; i++) {
+                    List<String> newCommunities = communities.subList(0, size - i);
                     friendInfo = new UserInfo(deviceID, user, newCommunities, onlineTime);
                     encoded = friendInfo.getEncoded();
                     if (encoded.length < 1000) {
-                        logger.info("updateUserInfo publicKey::{}, newCommunities::{}",
-                                userPk, null == newCommunities ? 0 : newCommunities.size());
+                        logger.info("updateUserInfo publicKey::{}, newCommunities::{}, encoded::{}",
+                                userPk, null == newCommunities ? 0 : newCommunities.size(), encoded.length);
                         break;
                     }
                 }
