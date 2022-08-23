@@ -38,15 +38,11 @@ public class Constants {
     // Chain link中bs默认数
     public static final int CHAIN_LINK_BS_LIMIT = 5;
 
-    public static final int AIRDROP_TX_BS_LIMIT = 1;
+    // 链的创建区块区块大小
+    public static int CHAIN_EPOCH_BLOCK_SIZE = 50;
 
-    public static final int AIRDROP_LINK_BS_LIMIT = 2;
-
-    // 区块未过期的数目（半年）
-    public static final int BLOCKS_NOT_PERISHABLE = 288 * 30;
-
-    // 默认社区链平均出块时间，单位:s
-    public static final int BLOCK_IN_AVG = 300;
+    // 社区在线最大账户数据
+    public static int MAX_ACCOUNT_SIZE = 688;
 
     // 最大在线统计次数
     public static final int MAX_ONLINE_COUNT = 99;
@@ -65,10 +61,6 @@ public class Constants {
 
     // 消息最大字节大小
     public static final int MSG_MAX_BYTE_SIZE = 821;
-
-    public static final String TAU_TESTING_COMMUNITY = "tauchain:?dn=278ac0c475551b4aTAU%20Testing" +
-            "&bs=a13e3563ad23048e388ecbaa8e384a83d08c88e77ee79b1b3ba42fd17f736968" +
-            "&bs=bbdef2cfbdd9d3576e1f28deb99e002a32576dd05ab7ff29131c3bf10cf74445";
 
     public static final BigInteger PERCENTAGE = new BigInteger("100", 10);
 

@@ -9,7 +9,6 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
@@ -68,7 +67,6 @@ public interface BlockDao {
             " LEFT JOIN " +
             " (SELECT chainID, COUNT(blockHash) AS onChain" +
             " FROM Blocks WHERE chainID =:chainID AND status == 1" +
-            " LIMIT " + Constants.BLOCKS_NOT_PERISHABLE +
             " ) AS a" +
             " ON a.chainID = b.chainID" +
             " LEFT JOIN " +
