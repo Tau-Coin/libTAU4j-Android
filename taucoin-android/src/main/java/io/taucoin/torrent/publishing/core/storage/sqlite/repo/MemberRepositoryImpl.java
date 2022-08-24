@@ -110,21 +110,12 @@ public class MemberRepositoryImpl implements MemberRepository {
         if (null == members) {
             members = new ArrayList<>();
         }
-        int offChainLimit = limit - members.size();
-        if (offChainLimit > 0) {
-            // 获取链下成员
-            List<String> offChainMembers = db.memberDao().queryCommunityOffChainMembersLimit(chainID,
-                    offChainLimit);
-            if (offChainMembers != null && offChainMembers.size() > 0) {
-                members.addAll(offChainMembers);
-            }
-        }
         return members;
     }
 
     @Override
     public Flowable<Statistics> getMembersStatistics(String chainID) {
-        return db.memberDao().getMembersStatistics(chainID);
+        return db.memberDao().getMembersStatistics(chainID, Constants.MAX_ACCOUNT_SIZE);
     }
 
     @Override
@@ -160,14 +151,6 @@ public class MemberRepositoryImpl implements MemberRepository {
     @Override
     public String getCommunityLargestCoinHolder(String chainID) {
         return db.memberDao().getCommunityLargestCoinHolder(chainID);
-    }
-
-    /**
-     * 获取自己加入的未过期社区列表
-     */
-    @Override
-    public List<Member> getJoinedUnexpiredCommunityList(String userPk) {
-        return db.memberDao().getJoinedUnexpiredCommunityList(userPk);
     }
 
     @Override

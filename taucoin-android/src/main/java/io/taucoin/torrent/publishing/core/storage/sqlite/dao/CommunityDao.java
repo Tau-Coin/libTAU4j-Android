@@ -147,7 +147,6 @@ public interface CommunityDao {
     String QUERY_CHAIN_TOP_COIN_MEMBERS = "SELECT m.* FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
             " WHERE m.chainID = :chainID" +
-//            " AND " + MemberDao.WHERE_ON_CHAIN  +
             " ORDER BY m.balance DESC LIMIT :topNum";
 
     String QUERY_COMMUNITIES = "SELECT c.*, m.balance, m.nonce, m.msgUnread," +

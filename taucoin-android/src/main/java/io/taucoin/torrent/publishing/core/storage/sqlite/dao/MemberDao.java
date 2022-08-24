@@ -23,16 +23,6 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
  */
 @Dao
 public interface MemberDao {
-//    String WHERE_NOT_PERISHABLE = " (blockNumber >= tailBlock)";
-//    String WHERE_ON_CHAIN = " (power > 0 AND" + WHERE_NOT_PERISHABLE + ")";
-//
-//    String WHERE_OFF_CHAIN = " (power <= 0 OR blockNumber < tailBlock)";
-
-    String WHERE_NOT_PERISHABLE = " ";
-    String WHERE_ON_CHAIN = " ";
-
-    String WHERE_OFF_CHAIN = " ";
-
     String QUERY_GET_MEMBER_BY_CHAIN_ID_PK = "SELECT * FROM Members WHERE chainID = :chainID AND publicKey = :publicKey";
     String QUERY_GET_MEMBERS_BY_CHAIN_ID = "SELECT * FROM Members WHERE chainID = :chainID";
 
@@ -48,25 +38,15 @@ public interface MemberDao {
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
             " WHERE m.chainID = :chainID" +
             " AND m.publicKey != '0000000000000000000000000000000000000000000000000000000000000000'" +
-            " ORDER BY m.balance DESC LIMIT :limit";
-
-    String QUERY_COMMUNITY_OFF_CHAIN_MEMBERS_LIMIT = "SELECT m.publicKey FROM Members m" +
-            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.chainID = :chainID" +
-            " AND m.publicKey != '0000000000000000000000000000000000000000000000000000000000000000'" +
-//            " AND " + WHERE_OFF_CHAIN +
-            " ORDER BY m.balance limit :limit";
+            " ORDER BY m.balance DESC, m.nonce DESC LIMIT :limit";
 
     String QUERY_MEMBERS_STATISTICS = "SELECT a.onChain, b.total" +
             " FROM " +
             " (SELECT chainID, COUNT(publicKey) AS total" +
             " FROM Members WHERE chainID =:chainID) AS b" +
             " LEFT JOIN " +
-            " (SELECT m.chainID, COUNT(m.publicKey) AS onChain" +
-            " FROM Members m" +
-            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.chainID =:chainID " +
-//            "and " + WHERE_ON_CHAIN +
+            " (SELECT chainID, COUNT(publicKey) AS onChain" +
+            " FROM (" + CommunityDao.QUERY_COMMUNITY_ACCOUNT_ORDER + " LIMIT :limit)" +
             ") AS a" +
             " ON a.chainID = b.chainID";
 
@@ -82,12 +62,6 @@ public interface MemberDao {
     String QUERY_LARGEST_COIN_HOLDER = "SELECT publicKey FROM Members" +
             " WHERE chainID = :chainID" +
             " ORDER BY balance DESC LIMIT 1";
-
-    String QUERY_JOINED_UNEXPIRED_COMMUNITY = "SELECT m.*" +
-            " FROM Members m" +
-            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.publicKey = :userPk AND c.isBanned = 0";
-//            " AND " + WHERE_ON_CHAIN;
 
     String QUERY_JOINED_COMMUNITY = "SELECT m.*, tx.latestTxTime, b.latestMiningTime" +
             " FROM Members m" +
@@ -147,11 +121,8 @@ public interface MemberDao {
     @Query(QUERY_COMMUNITY_MEMBERS_LIMIT)
     List<String> queryCommunityMembersLimit(String chainID, int limit);
 
-    @Query(QUERY_COMMUNITY_OFF_CHAIN_MEMBERS_LIMIT)
-    List<String> queryCommunityOffChainMembersLimit(String chainID, int limit);
-
     @Query(QUERY_MEMBERS_STATISTICS)
-    Flowable<Statistics> getMembersStatistics(String chainID);
+    Flowable<Statistics> getMembersStatistics(String chainID, int limit);
 
     @Query(QUERY_DELETE_COMMUNITY_MEMBERS)
     void deleteCommunityMembers(String chainID);
@@ -167,12 +138,6 @@ public interface MemberDao {
      */
     @Query(QUERY_LARGEST_COIN_HOLDER)
     String getCommunityLargestCoinHolder(String chainID);
-
-    /**
-     * 获取自己加入的未过期社区列表
-     */
-    @Query(QUERY_JOINED_UNEXPIRED_COMMUNITY)
-    List<Member> getJoinedUnexpiredCommunityList(String userPk);
 
     /**
      * 获取自己未加入的或者过期社区列表

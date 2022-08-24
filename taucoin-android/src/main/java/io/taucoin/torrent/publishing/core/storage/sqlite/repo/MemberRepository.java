@@ -82,10 +82,5 @@ public interface MemberRepository {
 
     String getCommunityLargestCoinHolder(String chainID);
 
-    /**
-     * 获取自己加入的未过期社区列表
-     */
-    List<Member> getJoinedUnexpiredCommunityList(String userPk);
-
     List<MemberAndTime> getJoinedCommunityList(String publicKey);
 }

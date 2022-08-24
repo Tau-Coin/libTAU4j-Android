@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -565,7 +566,16 @@ public class CommunityViewModel extends AndroidViewModel {
      */
     public void getJoinedUnexpiredCommunityList(String userPk) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<List<Member>>) emitter -> {
-            List<Member> list = memberRepo.getJoinedUnexpiredCommunityList(userPk);
+            List<Member> list = new ArrayList<>();
+            CopyOnWriteArraySet<String> set = daemon.getMyAccountManager().getNotExpiredChain().getValue();
+            if (set != null && set.size() > 0) {
+                for (String chainID : set) {
+                    Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
+                    if (member != null) {
+                        list.add(member);
+                    }
+                }
+            }
             emitter.onNext(list);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)

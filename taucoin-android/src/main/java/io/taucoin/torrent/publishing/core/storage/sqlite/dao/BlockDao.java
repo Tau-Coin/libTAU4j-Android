@@ -51,8 +51,6 @@ public interface BlockDao {
 
     String QUERY_CHAIN_SYNC_STATUS = "SELECT * FROM Blocks" +
             " WHERE chainID = :chainID AND status = 0" +
-//            " AND blockNumber >" +
-//            " (SELECT headBlock FROM Communities WHERE chainID = :chainID)" +
             " ORDER BY blockNumber";
 
     String QUERY_COMMUNITY_BLOCKS = "SELECT * FROM Blocks" +
