@@ -308,6 +308,9 @@ public class UserViewModel extends AndroidViewModel {
                                 peers.size(), isSuccess, communities.size());
                     }
                 }
+
+                // 6、更新我的账户管理
+                daemon.getMyAccountManager().reset();
             } catch (Exception e){
                 result = getApplication().getString(R.string.user_seed_invalid);
                 logger.warn("import seed error::{}", result);

@@ -93,6 +93,7 @@ public abstract class TauDaemon {
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
     private final TxQueueManager txQueueManager;     // 交易队列管理
     private final TauDozeManager tauDozeManager;     // tau休息模式管理
+    private final MyAccountManager myAccountManager; // 社区我的账户管理
     volatile boolean isRunning = false;
     private volatile boolean trafficTips = true;     // 剩余流量用完提示
     volatile String seed;
@@ -125,6 +126,7 @@ public abstract class TauDaemon {
         sessionManager = new SessionManager(true);
         txQueueManager = new TxQueueManager(this);
         tauDozeManager = new TauDozeManager(this, settingsRepo);
+        myAccountManager = new MyAccountManager();
 
         observeTauDaemon();
         initLocalParam();
@@ -290,6 +292,7 @@ public abstract class TauDaemon {
         tauDaemonAlertHandler.onCleared();
         txQueueManager.onCleared();
         tauDozeManager.onCleared();
+        myAccountManager.onCleared();
         sessionStopOver();
     }
 
@@ -717,6 +720,10 @@ public abstract class TauDaemon {
 
     public TauDozeManager getTauDozeManager() {
         return tauDozeManager;
+    }
+
+    public MyAccountManager getMyAccountManager() {
+        return myAccountManager;
     }
 
     /**

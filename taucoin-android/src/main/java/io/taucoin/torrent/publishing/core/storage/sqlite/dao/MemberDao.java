@@ -36,9 +36,11 @@ public interface MemberDao {
     String QUERY_GET_MEMBER_BY_CHAIN_ID_PK = "SELECT * FROM Members WHERE chainID = :chainID AND publicKey = :publicKey";
     String QUERY_GET_MEMBERS_BY_CHAIN_ID = "SELECT * FROM Members WHERE chainID = :chainID";
 
-    String QUERY_GET_MEMBERS_IN_COMMUNITY = "SELECT m.*, c.headBlock" +
+    String QUERY_GET_MEMBERS_IN_COMMUNITY = "SELECT m.*, " +
+            " (CASE WHEN rank.publicKey IS NULL THEN 0 ELSE 1 END) AS notExpired" +
             " FROM Members m" +
-            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+            " LEFT JOIN (" + CommunityDao.QUERY_COMMUNITY_ACCOUNT_ORDER + " LIMIT :limit) AS rank" +
+            " ON m.chainID = rank.chainID AND m.publicKey = rank.publicKey" +
             " WHERE m.chainID = :chainID" +
             " ORDER BY m.balance DESC";
 
@@ -135,7 +137,7 @@ public interface MemberDao {
      */
     @Query(QUERY_GET_MEMBERS_IN_COMMUNITY)
     @Transaction
-    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID);
+    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID, int limit);
 
     /**
      * 获取社区limit个成员

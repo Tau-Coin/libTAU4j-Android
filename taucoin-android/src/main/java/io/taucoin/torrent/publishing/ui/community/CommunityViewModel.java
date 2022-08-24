@@ -55,6 +55,7 @@ import io.taucoin.torrent.publishing.core.model.TauListenHandler;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
 import io.taucoin.torrent.publishing.core.model.data.DrawBean;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
@@ -121,7 +122,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> airdropResult = new MutableLiveData<>();
     private MutableLiveData<Result> joinedResult = new MutableLiveData<>();
     private MutableLiveData<List<Community>> blackList = new MutableLiveData<>();
-    private MutableLiveData<List<CommunityAndMember>> joinedList = new MutableLiveData<>();
+    private MutableLiveData<List<CommunityAndAccount>> joinedList = new MutableLiveData<>();
     private MutableLiveData<List<Member>> joinedUnexpiredList = new MutableLiveData<>();
     private MutableLiveData<List<MemberAndTime>> joinedCommunity = new MutableLiveData<>();
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
@@ -155,7 +156,7 @@ public class CommunityViewModel extends AndroidViewModel {
         return airdropResult;
     }
 
-    MutableLiveData<List<CommunityAndMember>> getJoinedList() {
+    MutableLiveData<List<CommunityAndAccount>> getJoinedList() {
         return joinedList;
     }
 
@@ -548,8 +549,8 @@ public class CommunityViewModel extends AndroidViewModel {
      * 获取用户加入的社区列表
      */
     void getJoinedCommunityList() {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<List<CommunityAndMember>>) emitter -> {
-            List<CommunityAndMember> list = communityRepo.getJoinedCommunityList();
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<List<CommunityAndAccount>>) emitter -> {
+            List<CommunityAndAccount> list = communityRepo.getJoinedCommunityList();
             emitter.onNext(list);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
@@ -600,7 +601,7 @@ public class CommunityViewModel extends AndroidViewModel {
     /**
      * 观察社区信息变化
      */
-    public Flowable<List<CommunityAndMember>> observeCommunities() {
+    public Flowable<List<CommunityAndAccount>> observeCommunities() {
         return communityRepo.observeCommunities();
     }
 

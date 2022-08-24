@@ -44,6 +44,9 @@ public class Constants {
     // 社区在线最大账户数据
     public static int MAX_ACCOUNT_SIZE = 688;
 
+    // 社区在线接近过期账户数据
+    public static int NEAR_EXPIRED_ACCOUNT_SIZE = MAX_ACCOUNT_SIZE - 100;
+
     // 最大在线统计次数
     public static final int MAX_ONLINE_COUNT = 99;
 

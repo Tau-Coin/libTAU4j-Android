@@ -10,6 +10,7 @@ import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
@@ -113,17 +114,34 @@ public interface CommunityDao {
     String QUERY_JOINED_COMMUNITY = "SELECT c.*, m.balance, m.nonce, m.msgUnread," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
             " FROM Communities c" +
-            " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" +
-            UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " WHERE isBanned = 0";
+
+    String QUERY_ALL_JOINED_COMMUNITY = "SELECT c.*" +
+            " FROM Communities c" +
+            " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " WHERE m.publicKey IS NOT NULL";
 
     String QUERY_CLEAR_COMMUNITY_STATE = "UPDATE Communities SET headBlock = 0" +
             " WHERE chainID = :chainID";
 
+    String QUERY_COMMUNITY_ACCOUNT_ORDER = "SELECT chainID, publicKey FROM Members" +
+            " WHERE chainID = :chainID AND (balance > 0 OR nonce > 0)" +
+            " ORDER BY balance DESC, nonce DESC, publicKey COLLATE UNICODE DESC";
+
+    String QUERY_COMMUNITY_ACCOUNT_EXPIRED = "SELECT rank.publicKey FROM (" + QUERY_COMMUNITY_ACCOUNT_ORDER + " LIMIT :limit) AS rank" +
+            " WHERE rank.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
+
     String QUERY_CURRENT_COMMUNITY_MEMBER = "SELECT c.*, m.balance, m.nonce, m.msgUnread," +
-            " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
+            " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined, " +
+            " (CASE WHEN order1.publicKey IS NULL THEN 0 ELSE 1 END) AS notExpired," +
+            " (CASE WHEN order2.publicKey IS NULL THEN 1 ELSE 0 END) AS nearExpired" +
             " FROM Communities c" +
             " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = :publicKey" +
+            " LEFT JOIN (" + QUERY_COMMUNITY_ACCOUNT_ORDER + " LIMIT :expiredLimit) AS order1 " +
+            " ON c.chainID = order1.chainID AND order1.publicKey = :publicKey" +
+            " LEFT JOIN (" + QUERY_COMMUNITY_ACCOUNT_ORDER + " LIMIT :nearLimit) AS order2 " +
+            " ON c.chainID = order2.chainID AND order2.publicKey = :publicKey" +
             " WHERE c.chainID = :chainID";
 
     String QUERY_CHAIN_TOP_COIN_MEMBERS = "SELECT m.* FROM Members m" +
@@ -135,8 +153,7 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES = "SELECT c.*, m.balance, m.nonce, m.msgUnread," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
             " FROM Communities c" +
-            " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" +
-            UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " WHERE isBanned = 0";
 
     String QUERY_GET_SAME_COMMUNITY = "SELECT c.*" +
@@ -202,7 +219,10 @@ public interface CommunityDao {
      * 获取用户加入的社区列表
      */
     @Query(QUERY_JOINED_COMMUNITY)
-    List<CommunityAndMember> getJoinedCommunityList();
+    List<CommunityAndAccount> getJoinedCommunityList();
+
+    @Query(QUERY_ALL_JOINED_COMMUNITY)
+    List<Community> getAllJoinedCommunityList();
 
     /**
      * 根据chainID查询社区
@@ -218,7 +238,11 @@ public interface CommunityDao {
     void clearCommunityState(String chainID);
 
     @Query(QUERY_CURRENT_COMMUNITY_MEMBER)
-    Flowable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey);
+    Flowable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey,
+                                                       int expiredLimit, int nearLimit);
+
+    @Query(QUERY_COMMUNITY_ACCOUNT_EXPIRED)
+    String queryCommunityAccountExpired(String chainID, int limit);
 
     /**
      * 观察链上币量前topNum的成员
@@ -227,7 +251,7 @@ public interface CommunityDao {
     Flowable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum);
 
     @Query(QUERY_COMMUNITIES)
-    Flowable<List<CommunityAndMember>> observeCommunities();
+    Flowable<List<CommunityAndAccount>> observeCommunities();
 
     @Query(QUERY_GET_SAME_COMMUNITY)
     List<Community> getSameCommunity(String userPk, String friendPk);

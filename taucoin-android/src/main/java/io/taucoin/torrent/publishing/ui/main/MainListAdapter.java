@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.utils.BitmapUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
@@ -75,12 +76,14 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
         private ViewDataBinding binding;
         private ClickListener listener;
         private Context context;
+        private TauDaemon daemon;
 
         ViewHolder(ViewDataBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
             this.context = binding.getRoot().getContext();
             this.listener = listener;
+            this.daemon = TauDaemon.getInstance(this.context.getApplicationContext());
         }
 
         void bind(ViewHolder holder, CommunityAndFriend bean) {
@@ -105,7 +108,8 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 String firstLetters = StringUtil.getFirstLettersOfName(communityName);
                 binding.leftView.setText(firstLetters);
                 String balance = FmtMicrometer.fmtBalance(bean.balance);
-                boolean onChain = bean.onChain();
+                boolean isNotExpired = daemon.getMyAccountManager().isNotExpired(bean.ID);
+                boolean onChain = bean.onChain() && isNotExpired;
                 if (!onChain) {
                     binding.tvBalancePower.setText(context.getString(R.string.main_community_non_member));
                 } else {

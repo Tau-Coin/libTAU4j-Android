@@ -145,6 +145,9 @@ public class TauListenHandler {
         handleBlockData(block, BlockStatus.NEW_BLOCK);
 
         updateTxQueue(block);
+
+        // 更新社区用户账户信息
+        daemon.getMyAccountManager().update(chainID);
     }
 
     /**

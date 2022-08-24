@@ -10,6 +10,8 @@ import androidx.room.RxRoom;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.Constants;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
@@ -67,6 +69,7 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     public Flowable<List<CommunityAndFriend>> observeCommunitiesAndFriends() {
         int sdkVersion = Build.VERSION.SDK_INT;
         // android11中SQLite版本为3.28.0, group by取第一条记录，低版本取最后一条记录
+
         if (sdkVersion >= 30) {
             return db.communityDao().observeCommunitiesAndFriendsDESC();
         } else {
@@ -115,8 +118,15 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     /**
      * 获取用户加入的社区列表
      */
-    public List<CommunityAndMember> getJoinedCommunityList(){
+    public List<CommunityAndAccount> getJoinedCommunityList(){
         return db.communityDao().getJoinedCommunityList();
+    }
+
+    /**
+     * 获取用户加入的所有社区列表
+     */
+    public List<Community> getAllJoinedCommunityList() {
+        return db.communityDao().getAllJoinedCommunityList();
     }
 
     /**
@@ -149,7 +159,13 @@ public class CommunityRepositoryImpl implements CommunityRepository{
 
     @Override
     public Flowable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey) {
-        return db.communityDao().observerCurrentMember(chainID, publicKey);
+        return db.communityDao().observerCurrentMember(chainID, publicKey, Constants.MAX_ACCOUNT_SIZE,
+                Constants.NEAR_EXPIRED_ACCOUNT_SIZE);
+    }
+
+    @Override
+    public String queryCommunityAccountExpired(String chainID) {
+        return db.communityDao().queryCommunityAccountExpired(chainID, Constants.MAX_ACCOUNT_SIZE);
     }
 
     /**
@@ -164,7 +180,7 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     }
 
     @Override
-    public Flowable<List<CommunityAndMember>> observeCommunities() {
+    public Flowable<List<CommunityAndAccount>> observeCommunities() {
         return db.communityDao().observeCommunities();
     }
 

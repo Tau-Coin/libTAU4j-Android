@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.databinding.ItemBalanceBinding;
@@ -17,7 +17,7 @@ import io.taucoin.torrent.publishing.databinding.ItemBalanceBinding;
 /**
  * 余额列表的Adapter
  */
-public class BalanceAdapter extends ListAdapter<CommunityAndMember, BalanceAdapter.ViewHolder> {
+public class BalanceAdapter extends ListAdapter<CommunityAndAccount, BalanceAdapter.ViewHolder> {
 
     BalanceAdapter() {
         super(diffCallback);
@@ -37,7 +37,7 @@ public class BalanceAdapter extends ListAdapter<CommunityAndMember, BalanceAdapt
 
     @Override
     public void onBindViewHolder(@NonNull BalanceAdapter.ViewHolder holder, int position) {
-        CommunityAndMember community = getItem(position);
+        CommunityAndAccount community = getItem(position);
         holder.bindCommunity(community);
     }
 
@@ -49,7 +49,7 @@ public class BalanceAdapter extends ListAdapter<CommunityAndMember, BalanceAdapt
             this.binding = binding;
         }
 
-        void bindCommunity(CommunityAndMember community) {
+        void bindCommunity(CommunityAndAccount community) {
             String communityName = ChainIDUtil.getName(community.chainID);
             String balance = FmtMicrometer.fmtBalance(community.balance);
             binding.tvName.setText(communityName);
@@ -57,15 +57,15 @@ public class BalanceAdapter extends ListAdapter<CommunityAndMember, BalanceAdapt
         }
     }
 
-    private static final DiffUtil.ItemCallback<CommunityAndMember> diffCallback = new DiffUtil.ItemCallback<CommunityAndMember>() {
+    private static final DiffUtil.ItemCallback<CommunityAndAccount> diffCallback = new DiffUtil.ItemCallback<CommunityAndAccount>() {
         @Override
-        public boolean areContentsTheSame(@NonNull CommunityAndMember oldItem, @NonNull CommunityAndMember newItem) {
+        public boolean areContentsTheSame(@NonNull CommunityAndAccount oldItem, @NonNull CommunityAndAccount newItem) {
             return oldItem.equals(newItem) &&
                     oldItem.balance == newItem.balance;
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull CommunityAndMember oldItem, @NonNull CommunityAndMember newItem) {
+        public boolean areItemsTheSame(@NonNull CommunityAndAccount oldItem, @NonNull CommunityAndAccount newItem) {
             return oldItem.equals(newItem);
         }
     };

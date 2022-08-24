@@ -12,6 +12,7 @@ import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.MemberAndTime;
@@ -93,7 +94,7 @@ public class MemberRepositoryImpl implements MemberRepository {
      */
     @Override
     public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID){
-        return db.memberDao().queryCommunityMembers(chainID);
+        return db.memberDao().queryCommunityMembers(chainID, Constants.MAX_ACCOUNT_SIZE);
     }
 
     /**

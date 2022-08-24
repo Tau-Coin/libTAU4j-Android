@@ -5,6 +5,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.BlockInfo;
@@ -58,7 +59,12 @@ public interface CommunityRepository {
     /**
      * 获取用户加入的社区列表
      */
-    List<CommunityAndMember> getJoinedCommunityList();
+    List<CommunityAndAccount> getJoinedCommunityList();
+
+    /**
+     * 获取用户加入的所有社区列表
+     */
+    List<Community> getAllJoinedCommunityList();
 
     /**
      * 根据chainID查询社区
@@ -86,6 +92,8 @@ public interface CommunityRepository {
      */
     Flowable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey);
 
+    String queryCommunityAccountExpired(String chainID);
+
     /**
      * 观察链上币量前topNum的成员
      * @param chainID 链ID
@@ -94,7 +102,7 @@ public interface CommunityRepository {
      */
     Flowable<List<Member>> observeChainTopCoinMembers(String chainID, int topNum);
 
-    Flowable<List<CommunityAndMember>> observeCommunities();
+    Flowable<List<CommunityAndAccount>> observeCommunities();
 
     /**
      * 获取和朋友的共同社区

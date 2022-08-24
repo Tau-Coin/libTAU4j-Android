@@ -10,14 +10,14 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.torrent.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.databinding.ItemCommunityChooseBinding;
 
 /**
  * 社区选择列表的Adapter
  */
-public class ChooseListAdapter extends ListAdapter<CommunityAndMember, ChooseListAdapter.ViewHolder> {
+public class ChooseListAdapter extends ListAdapter<CommunityAndAccount, ChooseListAdapter.ViewHolder> {
     ChooseListAdapter() {
         super(diffCallback);
     }
@@ -36,7 +36,7 @@ public class ChooseListAdapter extends ListAdapter<CommunityAndMember, ChooseLis
 
     @Override
     public void onBindViewHolder(@NonNull ChooseListAdapter.ViewHolder holder, int position) {
-        CommunityAndMember community = getItem(position);
+        CommunityAndAccount community = getItem(position);
         holder.bindCommunity(community);
     }
 
@@ -53,7 +53,7 @@ public class ChooseListAdapter extends ListAdapter<CommunityAndMember, ChooseLis
         /**
          * 绑定社区数据
          */
-        void bindCommunity(CommunityAndMember community) {
+        void bindCommunity(CommunityAndAccount community) {
             if(null == community){
                 return;
             }
@@ -66,14 +66,14 @@ public class ChooseListAdapter extends ListAdapter<CommunityAndMember, ChooseLis
         }
     }
 
-    private static final DiffUtil.ItemCallback<CommunityAndMember> diffCallback = new DiffUtil.ItemCallback<CommunityAndMember>() {
+    private static final DiffUtil.ItemCallback<CommunityAndAccount> diffCallback = new DiffUtil.ItemCallback<CommunityAndAccount>() {
         @Override
-        public boolean areContentsTheSame(@NonNull CommunityAndMember oldItem, @NonNull CommunityAndMember newItem) {
+        public boolean areContentsTheSame(@NonNull CommunityAndAccount oldItem, @NonNull CommunityAndAccount newItem) {
             return oldItem.equals(newItem);
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull CommunityAndMember oldItem, @NonNull CommunityAndMember newItem) {
+        public boolean areItemsTheSame(@NonNull CommunityAndAccount oldItem, @NonNull CommunityAndAccount newItem) {
             return oldItem.equals(newItem);
         }
     };

@@ -11,6 +11,8 @@ public class CommunityAndMember extends Community {
     public long nonce;
     public int joined;
     public int msgUnread;
+    public int notExpired;
+    public int nearExpired;
 
     public CommunityAndMember(@NonNull String chainID, @NonNull String communityName) {
         super(chainID, communityName);
@@ -25,6 +27,10 @@ public class CommunityAndMember extends Community {
     }
 
     public boolean onChain() {
-        return balance > 0 || nonce > 0;
+        return (balance > 0 || nonce > 0) && notExpired == 1;
+    }
+
+    public boolean nearExpired() {
+        return onChain() && nearExpired == 1;
     }
 }

@@ -222,8 +222,8 @@
     <string name="community_added_failed">Failed to add community!</string>
     <string name="community_stopped_running">Failed to obtain consensus blocks for many times, and the blockchain business has stopped running.</string>
     <string name="community_stopped_running_tips">The blockchain has stopped running.</string>
-    <string name="community_expiry_tips">The account is about to expire.</string>
-    <string name="community_expiry">The account is about to expire. You can increase the balance to ensure that the account does not expire</string>
+    <string name="community_near_expiry_tips">The account is about to expire.</string>
+    <string name="community_near_expiry">The account is about to expire. You can increase the balance to ensure that the account does not expire</string>
     <string name="community_join">Join</string>
     <string name="community_open">Open</string>
     <string name="community_added_members">Add Members</string>

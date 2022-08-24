@@ -54,8 +54,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private final CompositeDisposable disposables = new CompositeDisposable();
     private final CommunityTabFragment[] fragments = new CommunityTabFragment[3];
     private String chainID;
+    private boolean nearExpired = false;
+    private boolean chainStopped = false;
     private boolean isJoined = false;
-    private boolean isOnChain = false;
     private boolean isNoBalance = true;
     private Statistics memberStatistics;
     private int onlinePeers;
@@ -128,29 +129,18 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.viewPager.setAdapter(stateAdapter);
         binding.viewPager.setOffscreenPageLimit(3);
         binding.tabLayout.setupWithViewPager(binding.viewPager);
-//        TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(binding.tabLayout,
-//                binding.viewPager, (tab, position) -> {
-//            if (position == 1) {
-//                tab.setText(getString(R.string.community_chain_market));
-//            } else if (position == 2) {
-//                tab.setText(getString(R.string.community_on_chain));
-//            } else {
-//                tab.setText(getString(R.string.community_chain_note));
-//            }
-//        });
-//        tabLayoutMediator.attach();
 
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
 
         // 检测区块链是否因为获取数据失败而停止
         tauDaemonHandler.getChainStoppedSet()
                 .observe(this.getViewLifecycleOwner(), set -> {
-                    if (set != null && set.contains(chainID)) {
-                        binding.llWarning.setVisibility(View.VISIBLE);
-                    } else {
-                        binding.llWarning.setVisibility(View.GONE);
+                    boolean chainStopped = set != null && set.contains(chainID);
+                    if (this.chainStopped != chainStopped) {
+                        this.chainStopped = chainStopped;
+                        showWarningView();
                     }
-        });
+                });
 
         tauDaemonHandler.getOnlinePeerMap()
                 .observe(this.getViewLifecycleOwner(), set -> {
@@ -189,6 +179,18 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
             nodes = settingsRepo.getLongValue(key, 0);
             showCommunitySubtitle();
+        }
+    }
+
+    /**
+     * 显示顶部警告视图
+     */
+    private void showWarningView() {
+        binding.llWarning.setVisibility(chainStopped || nearExpired ? View.VISIBLE : View.GONE);
+        if (chainStopped) {
+            binding.tvWarning.setText(R.string.community_stopped_running_tips);
+        } else if (nearExpired) {
+            binding.tvWarning.setText(R.string.community_near_expiry_tips);
         }
     }
 
@@ -285,10 +287,10 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
                     isJoined = member.isJoined();
-                    if (isOnChain != member.onChain()) {
-                        showCommunitySubtitle();
+                    if (nearExpired != member.nearExpired()) {
+                        nearExpired = member.nearExpired();
+                        showWarningView();
                     }
-                    isOnChain = member.onChain();
                     isNoBalance = member.noBalance();
                     for (CommunityTabFragment fragment: fragments) {
                         if (fragment != null) {
@@ -306,24 +308,30 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 communityViewModel.joinCommunity(chainID);
                 break;
             case R.id.ll_warning:
-                showChainStoppedDialog();
+                showWarningDialog();
                 break;
         }
     }
 
     /**
-     * 显示链停止的对话框
+     * 显示警告的对话框
      */
-    private void showChainStoppedDialog() {
+    private void showWarningDialog() {
         if (chainStoppedDialog != null && chainStoppedDialog.isShowing()) {
             return;
         }
         Context context = activity.getApplicationContext();
         ExternalAirdropLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
                 R.layout.external_airdrop_link_dialog, null, false);
-        dialogBinding.tvPeer.setText(R.string.community_stopped_running);
+        if (chainStopped) {
+            dialogBinding.tvPeer.setText(R.string.community_stopped_running);
+            dialogBinding.tvJoin.setText(R.string.common_restart);
+        } else {
+            dialogBinding.tvPeer.setText(R.string.community_near_expiry);
+            dialogBinding.tvJoin.setVisibility(View.GONE);
+        }
+
         dialogBinding.tvPeer.setTextColor(context.getResources().getColor(R.color.color_black));
-        dialogBinding.tvJoin.setText(R.string.common_restart);
         dialogBinding.tvSkip.setOnClickListener(view -> {
             if (chainStoppedDialog != null) {
                 chainStoppedDialog.closeDialog();
