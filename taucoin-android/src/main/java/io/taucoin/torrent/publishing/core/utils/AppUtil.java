@@ -72,8 +72,8 @@ public class AppUtil {
         if (list != null && list.size() > 0) {
             ComponentName cpn = list.get(0).topActivity;
             String topClassName = cpn.getClassName();
-            for (String className: classNames) {
-                if (StringUtil.isEquals(className, topClassName)) {
+            for (String className : classNames) {
+                if (StringUtil.isNotEmpty(topClassName) && topClassName.contains(className)) {
                     return true;
                 }
             }

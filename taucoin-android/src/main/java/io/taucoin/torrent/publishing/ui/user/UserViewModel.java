@@ -930,6 +930,7 @@ public class UserViewModel extends AndroidViewModel {
                 .setCanceledOnTouchOutside(false)
                 .setButtonWidth(R.dimen.widget_size_240)
                 .create();
+        editNameDialog.setCancelable(!isCreateCommunity);
         editNameDialog.show();
     }
 
@@ -1086,9 +1087,10 @@ public class UserViewModel extends AndroidViewModel {
     public void promptUserFirstStartApp(AppCompatActivity activity, User user) {
         String firstStartKey = activity.getString(R.string.pref_key_first_start);
         boolean isFirstStart = settingsRepo.getBooleanValue(firstStartKey, true);
-        String permissionsActivity = "com.android.permissioncontroller.permission.ui.GrantPermissionsActivity";
+        String permissionsActivity = "GrantPermissionsActivity";
         String mainActivity = MainActivity.class.getName();
         boolean isForeground = AppUtil.isForeground(activity, permissionsActivity, mainActivity);
+        logger.info("promptUserFirstStart isFirstStart::{}, isForeground::{}", isFirstStart, isForeground);
         // 如果APP是第一次启动, 并且MainActivity也在前台
         if (isFirstStart && isForeground) {
             // 如果用户没有nickname
