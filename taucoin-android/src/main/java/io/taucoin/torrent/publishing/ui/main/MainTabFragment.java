@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
+import io.taucoin.torrent.publishing.core.model.MyAccountManager;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
@@ -72,8 +73,9 @@ public class MainTabFragment extends BaseFragment implements MainListAdapter.Cli
                 adapter.submitList(list);
             }
         }
-        TauDaemon daemon = TauDaemon.getInstance(activity.getApplicationContext());
-        daemon.getMyAccountManager().getNotExpiredChain().observe(activity, set -> {
+        Context context = activity.getApplicationContext();
+        MyAccountManager myAccountManager = TauDaemon.getInstance(context).getMyAccountManager();
+        myAccountManager.getNotExpiredChain().observe(this.getViewLifecycleOwner(), set -> {
                     adapter.notifyDataSetChanged();
         });
     }
