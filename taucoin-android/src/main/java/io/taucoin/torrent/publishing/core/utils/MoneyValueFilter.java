@@ -25,7 +25,7 @@ import android.text.method.DigitsKeyListener;
  *
  */
 public class MoneyValueFilter extends DigitsKeyListener {
-    private int digits = FmtMicrometer.mScale;
+    private int digits = 2;
     private boolean isEndSpace = false;
 
     public MoneyValueFilter() {

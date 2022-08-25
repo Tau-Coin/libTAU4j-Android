@@ -7,23 +7,19 @@ import java.math.BigInteger;
  */
 public class Constants {
     // 1 COIN
-    public static final BigInteger COIN = new BigInteger("100000000", 10);
+    public static final BigInteger COIN = new BigInteger("1", 10);
     // 默认社区链总共的coin值 1000000 COIN
     public static final BigInteger TOTAL_COIN = new BigInteger("1000000", 10).multiply(COIN);
     // 给朋友空投币的数量 10 COIN
     public static final BigInteger AIRDROP_COIN = new BigInteger("10", 10).multiply(COIN);
     // 创建新社区空投币的数量 1000 TOTAL_COIN
     public static final BigInteger CREATION_AIRDROP_COIN = new BigInteger("1000", 10).multiply(COIN);
-    // 小数保留2位(0.01 COIN), 最大为8
-    public static final int COIN_DECIMAL = 2;
-    // 最小值交易费 0.01 COIN
-    public static final BigInteger MIN_FEE = COIN.divide(new BigInteger("10", 10).pow(COIN_DECIMAL));
+    // 最小值交易费 1 COIN
+    public static final BigInteger MIN_FEE = COIN;
     // 转账交易最小为1 COIN
     public static final BigInteger WIRING_MIN_FEE = COIN;
     // 消息交易最小为10 COIN
     public static final BigInteger NEWS_MIN_FEE = new BigInteger("10", 10).multiply(COIN);
-    // note交易最小为0.01 COIN
-    public static final BigInteger NOTES_MIN_FEE = MIN_FEE;
 
     // 社区名最大字节长度
     public static final int MAX_COMMUNITY_NAME_LENGTH = 24;

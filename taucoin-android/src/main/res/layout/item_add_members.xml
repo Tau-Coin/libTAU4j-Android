@@ -49,7 +49,7 @@
             android:layout_marginStart="@dimen/widget_size_5"
             android:hint="@string/community_custom_coins_tips"
             android:gravity="center"
-            android:inputType="numberDecimal|number"
+            android:inputType="number"
             android:autofillHints="@string/community_custom_coins_tips"
             android:textAppearance="@style/TextAppearanceBody2"/>
     </RelativeLayout>

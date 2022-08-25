@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.media.MediaUtil;
 
@@ -134,7 +133,6 @@ public class UsersUtil {
      * @return 余额显示
      */
     public static String getShowBalance(long balance) {
-        balance = FmtMicrometer.fmtAmount(balance);
         if (balance >= 1000000) {
             return (int)(balance / 1000000) + "m";
         } else if(balance >= 1000) {

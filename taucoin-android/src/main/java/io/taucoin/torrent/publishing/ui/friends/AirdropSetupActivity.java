@@ -3,11 +3,10 @@ package io.taucoin.torrent.publishing.ui.friends;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
 
-import java.math.BigInteger;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,7 +18,6 @@ import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.KeyboardUtils;
-import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityAirdropSetupBinding;
@@ -54,7 +52,8 @@ public class AirdropSetupActivity extends BaseActivity {
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        binding.etCoins.setFilters(new InputFilter[]{new MoneyValueFilter()});
+//        binding.etCoins.setFilters(new InputFilter[]{new MoneyValueFilter()});
+        binding.etCoins.setInputType(InputType.TYPE_CLASS_NUMBER);
         int[] referralBonuses = getResources().getIntArray(R.array.referral_bonus);
         adapter = new ReferralBonusAdapter(referralBonuses);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);

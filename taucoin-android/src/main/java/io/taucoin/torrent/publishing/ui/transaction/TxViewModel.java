@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.text.Html;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.widget.TextView;
 
@@ -55,7 +56,6 @@ import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.LinkUtil;
-import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
@@ -483,7 +483,8 @@ public class TxViewModel extends AndroidViewModel {
         String fee = tvFee.getTag().toString();
         String medianFee = tvFee.getTag(R.id.median_fee).toString();
         editFeeBinding.etFee.setText(fee);
-        editFeeBinding.etFee.setFilters(new InputFilter[]{new MoneyValueFilter()});
+//        editFeeBinding.etFee.setFilters(new InputFilter[]{new MoneyValueFilter()});
+        editFeeBinding.etFee.setInputType(InputType.TYPE_CLASS_NUMBER);
         editFeeBinding.tvMedianFee.setText(activity.getString(R.string.tx_median_fee_tips,
                 FmtMicrometer.fmtFeeValue(medianFee), ChainIDUtil.getCoinName(chainID)));
         editFeeDialog = new CommonDialog.Builder(activity)
@@ -512,8 +513,6 @@ public class TxViewModel extends AndroidViewModel {
         long free;
         if (type == WIRING_TX) {
             free = Constants.WIRING_MIN_FEE.longValue();
-        } else if (type == NOTE_TX) {
-            free = Constants.NOTES_MIN_FEE.longValue();
         } else {
             free = Constants.NEWS_MIN_FEE.longValue();
         }

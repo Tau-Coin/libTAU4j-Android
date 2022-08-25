@@ -3,7 +3,7 @@ package io.taucoin.torrent.publishing.ui.transaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.InputFilter;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +19,6 @@ import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.core.utils.MoneyValueFilter;
 import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -82,7 +81,8 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        binding.etAmount.setFilters(new InputFilter[]{new MoneyValueFilter()});
+//        binding.etAmount.setFilters(new InputFilter[]{new MoneyValueFilter()});
+        binding.etAmount.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         if (StringUtil.isNotEmpty(chainID)) {
             long txFee = 0;
