@@ -18,6 +18,11 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
+import cn.bingoogolapple.refreshlayout.BGAStickinessRefreshViewHolder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
@@ -26,12 +31,14 @@ import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.databinding.FragmentMembersAddBinding;
 import io.taucoin.torrent.publishing.databinding.ViewConfirmDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.customviews.CommonDialog;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 import io.taucoin.torrent.publishing.ui.transaction.TxViewModel;
@@ -40,7 +47,7 @@ import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 /**
  * 社区成员添加页面
  */
-public class MembersAddFragment extends BaseFragment {
+public class MembersAddFragment extends BaseFragment implements BGARefreshLayout.BGARefreshLayoutDelegate {
 
     public static final int PAGE_COMMUNITY_CREATION = 0x01;
     public static final int PAGE_ADD_MEMBERS = 0x02;
@@ -55,6 +62,10 @@ public class MembersAddFragment extends BaseFragment {
     private long airdropCoin;
     private int page;
     private List<User> friends;
+    private final CompositeDisposable disposables = new CompositeDisposable();
+    private boolean dataChanged = false;
+    private int currentPos = 0;
+    private boolean isLoadMore = false;
 
     @Nullable
     @Override
@@ -120,11 +131,16 @@ public class MembersAddFragment extends BaseFragment {
         binding.recyclerList.setAdapter(adapter);
 
         if (page == PAGE_COMMUNITY_CREATION) {
-            userViewModel.loadUsersList(0, true, null);
             userViewModel.getUserList().observe(getViewLifecycleOwner(), friends -> {
                 if (friends != null) {
+                    if (currentPos == 0) {
+                        this.friends.clear();
+                    }
                     this.friends.addAll(friends);
                     adapter.submitFriendList(this.friends, false);
+                    int size = friends.size();
+                    isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
+                    binding.refreshLayout.endLoadingMore();
                     calculateTotalCoins();
                 }
             });
@@ -132,6 +148,19 @@ public class MembersAddFragment extends BaseFragment {
             adapter.submitFriendList(friends, true);
             calculateTotalCoins();
         }
+        initRefreshLayout();
+    }
+
+    private void initRefreshLayout() {
+        binding.refreshLayout.setDelegate(this);
+        BGAStickinessRefreshViewHolder refreshViewHolder = new BGAStickinessRefreshViewHolder(activity, true);
+        refreshViewHolder.setRotateImage(R.mipmap.ic_launcher_foreground);
+        refreshViewHolder.setStickinessColor(R.color.color_yellow);
+
+        refreshViewHolder.setLoadingMoreText(getString(R.string.common_loading));
+        binding.refreshLayout.setPullDownRefreshEnable(false);
+
+        binding.refreshLayout.setRefreshViewHolder(refreshViewHolder);
     }
 
     private void calculateTotalCoins() {
@@ -238,6 +267,61 @@ public class MembersAddFragment extends BaseFragment {
         closeProgressDialog();
         if (confirmDialog != null) {
             confirmDialog.closeDialog();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (page == PAGE_COMMUNITY_CREATION) {
+            loadData(0);
+            disposables.add(userViewModel.observeUsersChanged()
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(o -> dataChanged = true));
+
+            disposables.add(ObservableUtil.interval(500)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(o -> {
+                        if (dataChanged) {
+                            loadData(0);
+                            dataChanged = false;
+                        }
+                    }));
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposables.clear();
+    }
+
+    private int getItemCount() {
+        int count = 0;
+        if (adapter != null) {
+            count = adapter.getItemCount();
+        }
+        return count;
+    }
+
+    protected void loadData(int pos) {
+        this.currentPos = pos;
+        userViewModel.loadUsersList(pos, getItemCount());
+    }
+
+    @Override
+    public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout refreshLayout) {
+    }
+
+    @Override
+    public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout refreshLayout) {
+        if (isLoadMore) {
+            loadData(getItemCount());
+            return true;
+        } else {
+            refreshLayout.endLoadingMore();
+            return false;
         }
     }
 }

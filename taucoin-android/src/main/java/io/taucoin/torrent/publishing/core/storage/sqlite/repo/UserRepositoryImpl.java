@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
+import androidx.room.RxRoom;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -16,7 +17,6 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
@@ -159,19 +159,6 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     /**
-     * 观察不在黑名单的用户数
-     * @param isAll
-     */
-    @Override
-    public int getNumUsers(boolean isAll, String friendPk) {
-        if (isAll) {
-            return db.userDao().getNumAllUsers(friendPk);
-        } else {
-            return db.userDao().getNumConnectedUsers(friendPk);
-        }
-    }
-
-    /**
      * 观察不在黑名单的用户列表
      */
     @Override
@@ -201,6 +188,20 @@ public class UserRepositoryImpl implements UserRepository {
         return list;
     }
 
+    @Override
+    public List<UserAndFriend> getUsers(int order, @NonNull String friendPk, int pos, int pageSize) {
+        List<UserAndFriend> list;
+        if (order == 0) {
+            list = db.userDao().queryUserListByLastSeenTime(friendPk, pos, pageSize);
+        } else {
+            list = db.userDao().queryUserListByLastCommTime(friendPk, pos, pageSize);
+        }
+        if (null == list) {
+            list = new ArrayList<>();
+        }
+        return list;
+    }
+
     /**
      * 获取用户和朋友的信息
      */
@@ -221,6 +222,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Observable<String> observeDataSetChanged() {
         return dataSetChangedPublish;
+    }
+
+    @Override
+    public Flowable<Object> observeUsersChanged() {
+        String[] tables = new String[]{"Users", "Friends","Members"};
+        return RxRoom.createFlowable(db, tables);
     }
 
     @Override

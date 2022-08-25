@@ -30,8 +30,8 @@ import io.taucoin.torrent.publishing.databinding.ItemAddMembersBinding;
  */
 public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewHolder> {
     private ClickListener listener;
-    private long airdropCoin;
-    private Map<String, String> selectedMap = new HashMap<>();
+    private final long airdropCoin;
+    private final Map<String, String> selectedMap = new HashMap<>();
 
     MembersAddAdapter(long airdropCoin) {
         super(diffCallback);
@@ -39,16 +39,16 @@ public class MembersAddAdapter extends ListAdapter<User, MembersAddAdapter.ViewH
     }
 
     void submitFriendList(@NonNull List<User> list, boolean isSelected) {
-        Map<String, String> selectedMap = new HashMap<>();
         if (isSelected) {
+            Map<String, String> selectedMap = new HashMap<>();
             for (User user : list) {
                 String key = user.publicKey;
                 String value = getInputCoins(this.selectedMap, key, airdropCoin);
                 selectedMap.put(key, value);
             }
+            this.selectedMap.clear();
+            this.selectedMap.putAll(selectedMap);
         }
-        this.selectedMap.clear();
-        this.selectedMap.putAll(selectedMap);
         submitList(list);
     }
 

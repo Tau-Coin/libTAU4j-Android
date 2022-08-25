@@ -87,6 +87,7 @@ import io.taucoin.torrent.publishing.ui.TauNotifier;
 import io.taucoin.torrent.publishing.ui.chat.ChatViewModel;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
+import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.constant.PublicKeyQRContent;
 import io.taucoin.torrent.publishing.ui.constant.SeedQRContent;
 import io.taucoin.torrent.publishing.ui.constant.QRContent;
@@ -126,6 +127,7 @@ public class UserViewModel extends AndroidViewModel {
     private final TauDaemon daemon;
     private final ChatViewModel chatViewModel;
     private Disposable clearDisposable;
+    private Disposable loadUsersDisposable;
     public UserViewModel(@NonNull Application application) {
         super(application);
         userRepo = RepositoryHelper.getUserRepository(getApplication());
@@ -160,7 +162,9 @@ public class UserViewModel extends AndroidViewModel {
         if (clearDisposable != null && !clearDisposable.isDisposed()) {
             clearDisposable.dispose();
         }
-
+        if (loadUsersDisposable != null && !loadUsersDisposable.isDisposed()) {
+            loadUsersDisposable.dispose();
+        }
     }
 
     /**
@@ -681,22 +685,45 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     /**
-     * 查询用户列表
-     * @return DataSource
-     * @param order 排序字段
-     * @param isAll 是否查询所有用户
-     * @param scannedFriendPk 扫描的朋友公钥
+     * 加载用户列表
+     * @param pos 开始位置
+     * @param initSize 初始加载大小
      */
-    public void loadUsersList(int order, boolean isAll, String scannedFriendPk) {
-        Disposable disposable = Observable.create((ObservableOnSubscribe<List<UserAndFriend>>) emitter -> {
+    public void loadUsersList(int pos, int initSize) {
+        loadUsersList(0, null, pos, initSize);
+    }
+
+    /**
+     * 加载用户列表
+     * @param order 0：last seen; 1: last communication
+     * @param scannedFriendPk 扫描的朋友公钥
+     * @param pos 开始位置
+     * @param initSize 初始加载大小
+     */
+    public void loadUsersList(int order, String scannedFriendPk, int pos, int initSize) {
+        if (loadUsersDisposable != null && !loadUsersDisposable.isDisposed()) {
+            loadUsersDisposable.dispose();
+        }
+        loadUsersDisposable = Observable.create((ObservableOnSubscribe<List<UserAndFriend>>) emitter -> {
             List<UserAndFriend> users = new ArrayList<>();
             try {
-                String friendPk = StringUtil.isEmpty(scannedFriendPk) ? "" : scannedFriendPk;
                 long startTime = System.currentTimeMillis();
-                users = userRepo.getUsers(isAll, order, friendPk);
+                int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
+                // 只能是朋友公钥
+                String friendPk = StringUtil.isEmpty(scannedFriendPk) ? "" : scannedFriendPk;
+                if (StringUtil.isNotEmpty(friendPk)) {
+                    UserAndFriend userAndFriend = userRepo.getFriend(friendPk);
+                    if (userAndFriend != null) {
+                        users.add(0, userAndFriend);
+                    }
+                }
+                users = userRepo.getUsers(order, friendPk, pos, pageSize);
                 long getUsersTime = System.currentTimeMillis();
-                logger.debug("loadUsersList getUsers::{}ms, users.size::{}",
-                        getUsersTime - startTime, users.size());
+                logger.debug("loadUsersList getUsers::{}, pos::{}, pageSize::{}, order::{}, friendPk::{}, time::{}ms",
+                        users.size(), pos, pageSize, order, friendPk, getUsersTime - startTime);
             } catch (Exception e) {
                 logger.error("loadUsersList error::", e);
             }
@@ -707,7 +734,6 @@ public class UserViewModel extends AndroidViewModel {
                 .subscribe(users -> {
                     userList.postValue(users);
                 });
-        disposables.add(disposable);
     }
 
     /**
@@ -1263,17 +1289,8 @@ public class UserViewModel extends AndroidViewModel {
         }
     }
 
-    public Observable<String> observeUserDataSetChanged() {
-        return userRepo.observeDataSetChanged();
-    }
-
-    public Observable<String> observeMemberDataSetChanged() {
-
-        return memRepo.observeDataSetChanged();
-    }
-
-    public Observable<String> observeFriendDataSetChanged() {
-        return friendRepo.observeDataSetChanged();
+    public Flowable<Object> observeUsersChanged() {
+        return userRepo.observeUsersChanged();
     }
 
     public Observable<Integer> batchAddFriends(String name, int num) {

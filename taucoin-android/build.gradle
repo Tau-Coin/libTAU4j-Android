@@ -472,6 +472,8 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview-selection:1.2.0-alpha01'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01'
+    implementation 'cn.bingoogolapple:bga-refreshlayout:1.1.8@aar'
+
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation "androidx.room:room-runtime:$ROOM_VERSION"
     implementation "androidx.room:room-rxjava2:$ROOM_VERSION"

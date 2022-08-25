@@ -89,15 +89,14 @@ public interface UserRepository {
     long[] addUsers(User... user);
 
     /**
-     * 观察不在黑名单的用户数
-     * @param isAll
+     * 观察不在黑名单的用户列表
      */
-    int getNumUsers(boolean isAll, String friendPk);
+    List<UserAndFriend> getUsers(boolean isAll, int order, @NonNull String friendPk);
 
     /**
      * 观察不在黑名单的用户列表
      */
-    List<UserAndFriend> getUsers(boolean isAll, int order, @NonNull String friendPk);
+    List<UserAndFriend> getUsers(int order, @NonNull String friendPk, int pos, int pageSize);
 
     /**
      * 获取用户和朋友的信息
@@ -113,6 +112,8 @@ public interface UserRepository {
      * 观察用户的消息的变化
      */
     Observable<String> observeDataSetChanged();
+
+    Flowable<Object> observeUsersChanged();
 
     /**
      * 提交数据变化

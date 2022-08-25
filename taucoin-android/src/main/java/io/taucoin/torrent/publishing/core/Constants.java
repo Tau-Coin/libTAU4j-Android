@@ -38,7 +38,7 @@ public class Constants {
     public static int CHAIN_EPOCH_BLOCK_SIZE = 50;
 
     // 社区在线最大账户数据
-    public static int MAX_ACCOUNT_SIZE = 688;
+    public static int MAX_ACCOUNT_SIZE = 860;
 
     // 社区在线接近过期账户数据
     public static int NEAR_EXPIRED_ACCOUNT_SIZE = MAX_ACCOUNT_SIZE - 100;

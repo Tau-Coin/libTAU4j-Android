@@ -9,42 +9,54 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
+import cn.bingoogolapple.refreshlayout.BGAStickinessRefreshViewHolder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
+import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.message.TxContent;
 import io.taucoin.torrent.publishing.core.model.data.message.TxType;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.torrent.publishing.core.utils.ChainIDUtil;
-import io.taucoin.torrent.publishing.ui.friends.FriendsActivity;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
+import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
 import io.taucoin.torrent.publishing.databinding.ActivityTransactionCreateBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
  * 交易创建页面页面
  */
 public class TransactionCreateActivity extends BaseActivity implements View.OnClickListener,
-        MembersAdapter.ClickListener {
+        MembersAdapter.ClickListener, BGARefreshLayout.BGARefreshLayoutDelegate{
 
     private static final int REQUEST_CODE = 0x01;
     private ActivityTransactionCreateBinding binding;
 
     private UserViewModel userViewModel;
     private TxViewModel txViewModel;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
     private TxQueue txQueue;
+    private MembersAdapter adapter;
+    private boolean dataChanged = false;
+    private int currentPos = 0;
+    private boolean isLoadMore = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +69,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         binding.setListener(this);
         initParameter();
         initLayout();
+        initRefreshLayout();
     }
 
     /**
@@ -114,21 +127,42 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         }
 
         if (null == txQueue) {
-            MembersAdapter adapter = new MembersAdapter(this);
+            adapter = new MembersAdapter(this);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             binding.recyclerList.setLayoutManager(layoutManager);
             binding.recyclerList.setItemAnimator(null);
             binding.recyclerList.setAdapter(adapter);
 
-            userViewModel.loadUsersList(0, true, null);
             userViewModel.getUserList().observe(this, friends -> {
                 if (friends != null) {
-                    adapter.submitList(friends);
+                    if (currentPos == 0) {
+                        adapter.submitList(friends);
+                    } else {
+                        List<UserAndFriend> currentList = new ArrayList<>();
+                        currentList.addAll(adapter.getCurrentList());
+                        currentList.addAll(friends);
+                        adapter.submitList(currentList);
+                    }
+                    int size = friends.size();
+                    isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
+                    binding.refreshLayout.endLoadingMore();
                 }
             });
         } else {
             binding.llMembersSelect.setVisibility(View.GONE);
         }
+    }
+
+    private void initRefreshLayout() {
+        binding.refreshLayout.setDelegate(this);
+        BGAStickinessRefreshViewHolder refreshViewHolder = new BGAStickinessRefreshViewHolder(this, true);
+        refreshViewHolder.setRotateImage(R.mipmap.ic_launcher_foreground);
+        refreshViewHolder.setStickinessColor(R.color.color_yellow);
+
+        refreshViewHolder.setLoadingMoreText(getString(R.string.common_loading));
+        binding.refreshLayout.setPullDownRefreshEnable(false);
+
+        binding.refreshLayout.setRefreshViewHolder(refreshViewHolder);
     }
 
     @Override
@@ -147,6 +181,22 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
                 onBackPressed();
             }
         });
+        if (null == txQueue) {
+            loadData(0);
+            disposables.add(userViewModel.observeUsersChanged()
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(o -> dataChanged = true));
+
+            disposables.add(ObservableUtil.interval(500)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(o -> {
+                        if (dataChanged) {
+                            loadData(0);
+                            dataChanged = false;
+                        }
+                    }));
+        }
     }
 
     @Override
@@ -205,11 +255,6 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
             case R.id.tv_fee:
                 txViewModel.showEditFeeDialog(this, binding.tvFee, chainID);
                 break;
-            case R.id.iv_select_pk:
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_SELECT_CONTACT);
-                ActivityUtil.startActivityForResult(intent, this, FriendsActivity.class, REQUEST_CODE);
-                break;
         }
     }
 
@@ -223,6 +268,34 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
                     binding.etPublicKey.setText(publicKey);
                 }
             }
+        }
+    }
+
+    private int getItemCount() {
+        int count = 0;
+        if (adapter != null) {
+            count = adapter.getItemCount();
+        }
+        return count;
+    }
+
+    protected void loadData(int pos) {
+        this.currentPos = pos;
+        userViewModel.loadUsersList(pos, getItemCount());
+    }
+
+    @Override
+    public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout refreshLayout) {
+    }
+
+    @Override
+    public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout refreshLayout) {
+        if (isLoadMore) {
+            loadData(getItemCount());
+            return true;
+        } else {
+            refreshLayout.endLoadingMore();
+            return false;
         }
     }
 }

@@ -26,42 +26,26 @@ public interface UserDao {
     String QUERY_GET_USERS_IN_BAN_LIST = "SELECT * FROM Users where isBanned = 1 and isCurrentUser != 1";
     String QUERY_GET_COMMUNITY_USERS_IN_BAN_LIST = "SELECT * FROM Users where isMemBanned = 1 and isCurrentUser != 1";
 
-    // 查询所有用户数据的条件
-    String QUERY_ALL_USERS_WHERE = " WHERE u.isBanned = 0 AND u.isCurrentUser != 1 AND" +
-            " u.publicKey != :friendPK";
-    // 查询所有用户数据
-    String QUERY_NUM_ALL_USERS = "SELECT count(*) FROM Users u" +
-            QUERY_ALL_USERS_WHERE;
-
     // 查询所有用户数据的详细sql
     String QUERY_GET_USERS_NOT_IN_BAN_LIST = "SELECT u.*, f.lastCommTime AS lastCommTime," +
             " f.lastSeenTime AS lastSeenTime, f.status, f.onlineCount" +
             " FROM Users u" +
             " LEFT JOIN Friends f ON u.publicKey = f.friendPK AND f.userPK = (" +
             UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            QUERY_ALL_USERS_WHERE;
+            " WHERE (u.isBanned = 0 OR u.isCurrentUser = 1) AND" +
+            " u.publicKey != :friendPK";
 
     String QUERY_USERS_ORDER_BY_LAST_SEEN_TIME = QUERY_GET_USERS_NOT_IN_BAN_LIST +
             " ORDER BY f.lastSeenTime DESC";
+
+    String QUERY_USER_LIST_BY_LAST_SEEN_TIME = QUERY_GET_USERS_NOT_IN_BAN_LIST +
+            " ORDER BY f.lastSeenTime DESC LIMIT :pageSize OFFSET :pos";
+
     String QUERY_USERS_ORDER_BY_LAST_COMM_TIME = QUERY_GET_USERS_NOT_IN_BAN_LIST +
             " ORDER BY f.lastCommTime DESC";
 
-    String QUERY_CONNECTED_USERS_WHERE = " AND (f.status = 2 || f.status = 1)";
-
-    // 统计所有用户数据的详细sql
-    String QUERY_NUM_CONNECTED_USERS = "SELECT count(*)" +
-            " FROM Users u" +
-            " LEFT JOIN Friends f ON u.publicKey = f.friendPK AND f.userPK = (" +
-            UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            QUERY_ALL_USERS_WHERE +
-            QUERY_CONNECTED_USERS_WHERE;
-
-    String QUERY_GET_USERS_STATUS_NOT_IN_BAN_LIST = QUERY_GET_USERS_NOT_IN_BAN_LIST +
-            QUERY_CONNECTED_USERS_WHERE;
-    String QUERY_USERS_STATUS_ORDER_BY_LAST_SEEN_TIME = QUERY_GET_USERS_STATUS_NOT_IN_BAN_LIST +
-            " ORDER BY f.lastSeenTime DESC";
-    String QUERY_USERS_STATUS_ORDER_BY_LAST_COMM_TIME = QUERY_GET_USERS_STATUS_NOT_IN_BAN_LIST +
-            " ORDER BY f.lastCommTime DESC";
+    String QUERY_USER_LIST_BY_LAST_COMM_TIME = QUERY_GET_USERS_NOT_IN_BAN_LIST +
+            " ORDER BY f.lastCommTime DESC LIMIT :pageSize OFFSET :pos";
 
     String QUERY_SET_CURRENT_USER = "UPDATE Users SET isCurrentUser = :isCurrentUser WHERE publicKey = :publicKey";
     String QUERY_ADD_USER_BLACKLIST = "UPDATE Users SET isBanned = :isBanned WHERE publicKey = :publicKey";
@@ -161,18 +145,6 @@ public interface UserDao {
     User getUserByPublicKey(String publicKey);
 
     /**
-     * 获取不在黑名单的用户数
-     */
-    @Query(QUERY_NUM_ALL_USERS)
-    int getNumAllUsers(String friendPK);
-
-    /**
-     * 获取不在黑名单并且已经互加好友的用户数
-     */
-    @Query(QUERY_NUM_CONNECTED_USERS)
-    int getNumConnectedUsers(String friendPK);
-
-    /**
      * 观察不在黑名单的列表中
      */
     @Transaction
@@ -183,13 +155,16 @@ public interface UserDao {
     @Query(QUERY_USERS_ORDER_BY_LAST_SEEN_TIME)
     List<UserAndFriend> queryUsersOrderByLastSeenTime(@NonNull String friendPK);
 
+    /**
+     * 观察不在黑名单的列表中
+     */
     @Transaction
-    @Query(QUERY_USERS_STATUS_ORDER_BY_LAST_COMM_TIME)
-    List<UserAndFriend> queryUsersByStatusOrderByLastCommTime(@NonNull String friendPK);
+    @Query(QUERY_USER_LIST_BY_LAST_COMM_TIME)
+    List<UserAndFriend> queryUserListByLastCommTime(@NonNull String friendPK, int pos, int pageSize);
 
     @Transaction
-    @Query(QUERY_USERS_STATUS_ORDER_BY_LAST_SEEN_TIME)
-    List<UserAndFriend> queryUsersByStatusOrderByLastSeenTime(@NonNull String friendPK);
+    @Query(QUERY_USER_LIST_BY_LAST_SEEN_TIME)
+    List<UserAndFriend> queryUserListByLastSeenTime(@NonNull String friendPK, int pos, int pageSize);
 
     /**
      * 获取用户和朋友的信息

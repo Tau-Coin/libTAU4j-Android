@@ -29,16 +29,16 @@ import io.taucoin.torrent.publishing.databinding.ItemFriendListBinding;
  * 显示的联系人列表的Adapter
  */
 public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAdapter.ViewHolder> {
-    private ClickListener listener;
-    private Map<String, UserAndFriend> selectedList = new HashMap<>();
-    private int page;
+    private final ClickListener listener;
+    private final Map<String, UserAndFriend> selectedList = new HashMap<>();
+    private final int pageType;
+    private final String friendPk;
     private int order;
-    private String friendPk;
 
-    FriendsListAdapter(ClickListener listener, int type, int order, String friendPk) {
+    FriendsListAdapter(ClickListener listener, int pageType, int order, String friendPk) {
         super(diffCallback);
         this.listener = listener;
-        this.page = type;
+        this.pageType = pageType;
         this.order = order;
         this.friendPk = friendPk;
     }
@@ -57,7 +57,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
                 parent,
                 false);
 
-        return new ViewHolder(binding, listener, page, selectedList, friendPk);
+        return new ViewHolder(binding, listener, pageType, selectedList, friendPk);
     }
 
     @Override
@@ -70,20 +70,20 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private ItemFriendListBinding binding;
-        private ClickListener listener;
-        private Context context;
-        private int type;
-        private Map<String, UserAndFriend> selectedMap;
-        private String friendPk;
+        private final ItemFriendListBinding binding;
+        private final ClickListener listener;
+        private final Context context;
+        private final int pageType;
+        private final Map<String, UserAndFriend> selectedMap;
+        private final String friendPk;
 
-        ViewHolder(ItemFriendListBinding binding, ClickListener listener, int type,
+        ViewHolder(ItemFriendListBinding binding, ClickListener listener, int pageType,
                    Map<String, UserAndFriend> selectedMap, String friendPk) {
             super(binding.getRoot());
             this.binding = binding;
             this.context = binding.getRoot().getContext();
             this.listener = listener;
-            this.type = type;
+            this.pageType = pageType;
             this.selectedMap = selectedMap;
             this.friendPk = friendPk;
         }
@@ -92,7 +92,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
             if(null == holder || null == user){
                 return;
             }
-            boolean isShowSelect = type == FriendsActivity.PAGE_ADD_MEMBERS;
+            boolean isShowSelect = pageType == FriendsActivity.PAGE_ADD_MEMBERS;
             holder.binding.cbSelect.setVisibility(isShowSelect ? View.VISIBLE : View.GONE);
             if (isShowSelect) {
                 holder.binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -106,7 +106,7 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
             }
             SpanUtils showNameBuilder = new SpanUtils();
             String showName;
-            if (type == FriendsActivity.PAGE_FRIENDS_LIST) {
+            if (pageType == FriendsActivity.PAGE_FRIENDS_LIST) {
                 showName = UsersUtil.getShowNameWithYourself(user, user.publicKey);
                 showNameBuilder.append(showName);
                 if (user.isDiscovered()) {
@@ -145,7 +145,9 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
 
             User currentUser = MainApplication.getInstance().getCurrentUser();
             String distance = null;
+            String userPk = null;
             if (currentUser != null) {
+                userPk = currentUser.publicKey;
                 if (user.longitude != 0 && user.latitude != 0 &&
                         currentUser.longitude != 0 && currentUser.latitude != 0) {
                     distance = GeoUtils.getDistanceStr(user.longitude, user.latitude,
@@ -166,7 +168,12 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
             // 新朋友高亮显示
             boolean isNewScanFriend = StringUtil.isEquals(friendPk, user.publicKey);
             int bgColor = isNewScanFriend ? R.color.color_bg : R.color.color_white;
-            holder.binding.getRoot().setBackgroundColor(context.getResources().getColor(bgColor));
+            View rootView = holder.binding.getRoot();
+            rootView.setBackgroundColor(context.getResources().getColor(bgColor));
+            boolean isShowMyself = pageType != FriendsActivity.PAGE_FRIENDS_LIST || StringUtil.isNotEquals(userPk, user.publicKey);
+            ViewGroup.LayoutParams layoutParams = rootView.getLayoutParams();
+            layoutParams.height = isShowMyself ? ViewGroup.LayoutParams.WRAP_CONTENT : 0;
+            rootView.setLayoutParams(layoutParams);
         }
     }
 

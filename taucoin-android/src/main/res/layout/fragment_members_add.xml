@@ -41,15 +41,24 @@
 
         <include layout="@layout/view_line"/>
 
-        <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
-            android:background="@color/color_white"
-            android:id="@+id/recycler_list"
+        <cn.bingoogolapple.refreshlayout.BGARefreshLayout
+            android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/widget_size_10"
-            android:clipToPadding="false"
-            android:scrollbars="none"
-            android:focusable="true"
-            android:scrollbarStyle="outsideOverlay" />
+            android:layout_height="match_parent">
+
+            <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                android:background="@color/color_white"
+                android:id="@+id/recycler_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/widget_size_10"
+                android:clipToPadding="false"
+                android:scrollbars="none"
+                android:focusable="true"
+                android:scrollbarStyle="outsideOverlay" />
+
+        </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
+
     </LinearLayout>
 </layout>

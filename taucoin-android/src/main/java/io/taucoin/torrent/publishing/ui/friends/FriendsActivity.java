@@ -6,10 +6,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
+import cn.bingoogolapple.refreshlayout.BGAStickinessRefreshViewHolder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -19,13 +24,15 @@ import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.LinkUtil;
+import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
+import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityFriendsBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
-import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.community.MembersAddActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.constant.Page;
 import io.taucoin.torrent.publishing.ui.qrcode.UserQRCodeActivity;
 import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
@@ -34,20 +41,21 @@ import io.taucoin.torrent.publishing.ui.user.UserViewModel;
  * 连接的对等点
  */
 public class FriendsActivity extends BaseActivity implements FriendsListAdapter.ClickListener,
-        View.OnClickListener {
+        View.OnClickListener, BGARefreshLayout.BGARefreshLayoutDelegate {
     public static final int PAGE_FRIENDS_LIST = 0;
-    public static final int PAGE_SELECT_CONTACT = 1;
-    public static final int PAGE_ADD_MEMBERS = 2;
+    public static final int PAGE_ADD_MEMBERS = 1;
     private ActivityFriendsBinding binding;
     private UserViewModel userViewModel;
-    private CommunityViewModel communityViewModel;
     private FriendsListAdapter adapter;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
     // 代表不同的入口页面
-    private int page;
+    private int pageType;
     private String scannedFriendPk; // 新扫描的朋友的公钥
     private int order = 0; // 0:last seen, 1:last communication
+    private boolean dataChanged = false;
+    private boolean isLoadMore = false;
+    private int currentPos = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +64,8 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         binding.setListener(this);
         ViewModelProvider provider = new ViewModelProvider(this);
         userViewModel = provider.get(UserViewModel.class);
-        communityViewModel = provider.get(CommunityViewModel.class);
         initParameter(getIntent());
         initView();
-        onRefresh();
     }
 
     @Override
@@ -68,7 +74,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         initParameter(intent);
         initView();
         subscribeUserList();
-        onRefresh();
+        initData();
     }
 
     /**
@@ -77,8 +83,10 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     private void initParameter(Intent intent) {
         if (intent != null) {
             chainID = intent.getStringExtra(IntentExtra.CHAIN_ID);
-            page = intent.getIntExtra(IntentExtra.TYPE, PAGE_FRIENDS_LIST);
+            pageType = intent.getIntExtra(IntentExtra.TYPE, PAGE_FRIENDS_LIST);
             scannedFriendPk = intent.getStringExtra(IntentExtra.PUBLIC_KEY);
+            scannedFriendPk = StringUtil.isEquals(MainApplication.getInstance().getPublicKey(),
+                    scannedFriendPk) ? "" : scannedFriendPk;
         }
     }
 
@@ -91,22 +99,33 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        binding.refreshLayout.setRefreshing(false);
-        binding.refreshLayout.setEnabled(false);
-        adapter = new FriendsListAdapter(this, page, order, scannedFriendPk);
+        adapter = new FriendsListAdapter(this, pageType, order, scannedFriendPk);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.recyclerList.setLayoutManager(layoutManager);
         binding.recyclerList.setItemAnimator(null);
         binding.recyclerList.setAdapter(adapter);
 
-        if (page != PAGE_FRIENDS_LIST) {
+        if (pageType != PAGE_FRIENDS_LIST) {
             binding.llYourself.setVisibility(View.GONE);
             binding.tvYourselfTip.setVisibility(View.GONE);
         }
+        initRefreshLayout();
+    }
+
+    private void initRefreshLayout() {
+        binding.refreshLayout.setDelegate(this);
+        BGAStickinessRefreshViewHolder refreshViewHolder = new BGAStickinessRefreshViewHolder(this, true);
+        refreshViewHolder.setRotateImage(R.mipmap.ic_launcher_foreground);
+        refreshViewHolder.setStickinessColor(R.color.color_yellow);
+
+        refreshViewHolder.setLoadingMoreText(getString(R.string.common_loading));
+        binding.refreshLayout.setPullDownRefreshEnable(false);
+
+        binding.refreshLayout.setRefreshViewHolder(refreshViewHolder);
     }
 
     private void updateMyselfInfo(User user) {
-        if(null == user){
+        if (null == user) {
             return;
         }
         String showName = UsersUtil.getCurrentUserName(user);
@@ -115,24 +134,40 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     }
 
     private void subscribeUserList() {
-        disposables.add(userViewModel.observeUserDataSetChanged()
+        disposables.add(userViewModel.observeUsersChanged()
+                .subscribeOn(Schedulers.io())
+                .subscribe(o -> dataChanged = true));
+
+        disposables.add(ObservableUtil.interval(500)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> onRefresh()));
-        disposables.add(userViewModel.observeMemberDataSetChanged()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> onRefresh()));
-        disposables.add(userViewModel.observeFriendDataSetChanged()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> onRefresh()));
+                .subscribe(o -> {
+                    if (dataChanged) {
+                        initData();
+                        dataChanged = false;
+                    }
+                }));
+
         userViewModel.getUserList().observe(this, list -> {
             adapter.setOrder(order);
-            adapter.submitList(list);
+            if (currentPos == 0) {
+                adapter.submitList(list);
+                int size = list.size();
+                if (StringUtil.isNotEmpty(scannedFriendPk) && size > 0) {
+                    size -= 1;
+                }
+                isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
+            } else {
+                List<UserAndFriend> currentList = new ArrayList<>();
+                currentList.addAll(adapter.getCurrentList());
+                currentList.addAll(list);
+                adapter.submitList(currentList);
+                isLoadMore = list.size() != 0 && list.size() % Page.PAGE_SIZE == 0;
+            }
+            binding.refreshLayout.endLoadingMore();
         });
 
-        if (page == PAGE_FRIENDS_LIST) {
+        if (pageType == PAGE_FRIENDS_LIST) {
             disposables.add(userViewModel.observeCurrentUser()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -143,7 +178,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     @Override
     public void onStart() {
         super.onStart();
-        onRefresh();
+        initData();
         subscribeUserList();
 
         userViewModel.getAddFriendResult().observe(this, result -> {
@@ -152,7 +187,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
             } else {
                 userViewModel.closeDialog();
                 scannedFriendPk = result.getMsg();
-                adapter = new FriendsListAdapter(this, page, order, scannedFriendPk);
+                adapter = new FriendsListAdapter(this, pageType, order, scannedFriendPk);
                 binding.recyclerList.setAdapter(adapter);
                 subscribeUserList();
             }
@@ -179,9 +214,9 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         MenuItem menuItem = menu.findItem(R.id.menu_done);
         MenuItem menuRankC = menu.findItem(R.id.menu_rank_c);
         MenuItem menuRankA = menu.findItem(R.id.menu_rank_a);
-        menuItem.setVisible(page == PAGE_ADD_MEMBERS);
-        menuRankC.setVisible(page == PAGE_FRIENDS_LIST && order == 0);
-        menuRankA.setVisible(page == PAGE_FRIENDS_LIST && order != 0);
+        menuItem.setVisible(pageType == PAGE_ADD_MEMBERS);
+        menuRankC.setVisible(pageType == PAGE_FRIENDS_LIST && order == 0);
+        menuRankA.setVisible(pageType == PAGE_FRIENDS_LIST && order != 0);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -203,12 +238,12 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
             order = 1;
             invalidateOptionsMenu();
             ToastUtils.showShortToast(R.string.menu_rank_a);
-            onRefresh();
+            initData();
         } else if (item.getItemId() == R.id.menu_rank_a) {
             order = 0;
             invalidateOptionsMenu();
             ToastUtils.showShortToast(R.string.menu_rank_c);
-            onRefresh();
+            initData();
         }
         return true;
     }
@@ -219,17 +254,17 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     }
 
     private void onItemClicked(@NonNull String publicKey) {
-        if (page == PAGE_SELECT_CONTACT) {
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.PUBLIC_KEY, publicKey);
-            setResult(RESULT_OK, intent);
-            onBackPressed();
-        } else {
+//        if (page == PAGE_SELECT_CONTACT) {
+//            Intent intent = new Intent();
+//            intent.putExtra(IntentExtra.PUBLIC_KEY, publicKey);
+//            setResult(RESULT_OK, intent);
+//            onBackPressed();
+//        } else {
             Intent intent = new Intent();
             intent.putExtra(IntentExtra.PUBLIC_KEY, publicKey);
             intent.putExtra(IntentExtra.TYPE, UserDetailActivity.TYPE_FRIEND_LIST);
             ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
-        }
+//        }
     }
 
     @Override
@@ -259,9 +294,40 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         }
     }
 
-    @Override
-    public void onRefresh() {
+    private void initData() {
         // 立即执行刷新
-        userViewModel.loadUsersList(order, page != PAGE_FRIENDS_LIST, scannedFriendPk);
+        loadData(0);
+    }
+
+    private int getItemCount() {
+        int count = 0;
+        if (adapter != null) {
+            count = adapter.getItemCount();
+        }
+        if (count > 1 && StringUtil.isNotEmpty(scannedFriendPk)) {
+            count -= 1;
+        }
+        return count;
+    }
+
+    protected void loadData(int pos) {
+        this.currentPos = pos;
+        userViewModel.loadUsersList(order, scannedFriendPk, pos, getItemCount());
+    }
+
+    @Override
+    public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout refreshLayout) {
+    }
+
+    @Override
+    public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout refreshLayout) {
+        logger.debug("LoadingMore isLoadMore::{}", isLoadMore);
+        if (isLoadMore) {
+            loadData(getItemCount());
+            return true;
+        } else {
+            refreshLayout.endLoadingMore();
+            return false;
+        }
     }
 }
