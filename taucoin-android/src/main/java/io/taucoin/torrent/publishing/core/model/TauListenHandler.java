@@ -510,21 +510,22 @@ public class TauListenHandler {
             nonce = account.getNonce();
         }
 
+        logger.info("UpdateMember chainID::{}, publicKey::{}, balance::{}, nonce::{}",
+                chainID, publicKey, balance, nonce);
+
         if (null == member) {
             member = new Member(chainIDStr, publicKey, balance, nonce);
             memberRepo.addMember(member);
             logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}",
                     chainIDStr, publicKey, balance);
         } else {
-            // 防止和初始上报的onAccountState冲突 TODO: 待优化
-//            if (blockNumber > 0 || balance > 0) {
-            if (balance > 0) {
+            if (member.balance != balance || member.nonce != nonce) {
                 member.balance = balance;
+                member.nonce = nonce;
+                memberRepo.updateMember(member);
+                logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
+                        "balance::{}", chainIDStr, publicKey, member.balance);
             }
-            member.nonce = nonce;
-            memberRepo.updateMember(member);
-            logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
-                    "balance::{}", chainIDStr, publicKey, member.balance);
         }
     }
 
@@ -622,9 +623,11 @@ public class TauListenHandler {
         if (accountSize > 0) {
             for (Account account : accounts) {
                 String peer = ByteUtil.toHexString(account.getPeer());
+                logger.info("UpdateMember onStateArray chainID::{}, publicKey::{}, balance::{}, nonce::{}",
+                        chainID, peer, account.getBalance(), account.getNonce());
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, peer);
                 if (member != null) {
-                    if (member.balance == 0 && member.nonce == 0) {
+                    if (member.balance != account.getBalance() || member.nonce != account.getNonce()) {
                         member.balance = account.getBalance();
                         member.nonce = account.getNonce();
                         memberRepo.updateMember(member);
