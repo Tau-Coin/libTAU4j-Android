@@ -705,29 +705,32 @@ public class UserViewModel extends AndroidViewModel {
             loadUsersDisposable.dispose();
         }
         loadUsersDisposable = Observable.create((ObservableOnSubscribe<List<UserAndFriend>>) emitter -> {
-            List<UserAndFriend> users = new ArrayList<>();
+            List<UserAndFriend> list = new ArrayList<>();
             try {
                 long startTime = System.currentTimeMillis();
                 int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
                 if (pos == 0 && initSize > pageSize) {
                     pageSize = initSize;
                 }
-                // 只能是朋友公钥
                 String friendPk = StringUtil.isEmpty(scannedFriendPk) ? "" : scannedFriendPk;
-                if (StringUtil.isNotEmpty(friendPk)) {
-                    UserAndFriend userAndFriend = userRepo.getFriend(friendPk);
-                    if (userAndFriend != null) {
-                        users.add(0, userAndFriend);
+                if (pos == 0) {
+                    // 只能是朋友公钥
+                    if (StringUtil.isNotEmpty(friendPk)) {
+                        UserAndFriend userAndFriend = userRepo.getFriend(friendPk);
+                        if (userAndFriend != null) {
+                            list.add(0, userAndFriend);
+                        }
                     }
                 }
-                users = userRepo.getUsers(order, friendPk, pos, pageSize);
+                List<UserAndFriend> users = userRepo.getUsers(order, friendPk, pos, pageSize);
+                list.addAll(users);
                 long getUsersTime = System.currentTimeMillis();
                 logger.debug("loadUsersList getUsers::{}, pos::{}, pageSize::{}, order::{}, friendPk::{}, time::{}ms",
-                        users.size(), pos, pageSize, order, friendPk, getUsersTime - startTime);
+                        list.size(), pos, pageSize, order, friendPk, getUsersTime - startTime);
             } catch (Exception e) {
                 logger.error("loadUsersList error::", e);
             }
-            emitter.onNext(users);
+            emitter.onNext(list);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

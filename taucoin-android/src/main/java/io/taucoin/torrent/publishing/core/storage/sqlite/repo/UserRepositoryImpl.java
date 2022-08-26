@@ -13,23 +13,21 @@ import androidx.room.RxRoom;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
-import io.taucoin.torrent.publishing.core.utils.StringUtil;
 
 /**
  * UserRepository接口实现
  */
 public class UserRepositoryImpl implements UserRepository {
 
-    private PublishSubject<String> dataSetChangedPublish = PublishSubject.create();
-    private ExecutorService sender = Executors.newSingleThreadExecutor();
+    private final PublishSubject<String> dataSetChangedPublish = PublishSubject.create();
+    private final ExecutorService sender = Executors.newSingleThreadExecutor();
     private Context appContext;
-    private AppDatabase db;
+    private final AppDatabase db;
 
     /**
      * CommunityRepositoryImpl 构造函数
@@ -156,36 +154,6 @@ public class UserRepositoryImpl implements UserRepository {
         long[] result = db.userDao().addUsers(user);
         submitDataSetChanged();
         return result;
-    }
-
-    /**
-     * 观察不在黑名单的用户列表
-     */
-    @Override
-    public List<UserAndFriend> getUsers(boolean isAll, int order, @NonNull String friendPk) {
-        List<UserAndFriend> list;
-        if (order == 0) {
-            list = db.userDao().queryUsersOrderByLastSeenTime(friendPk);
-        } else {
-            list = db.userDao().queryUsersOrderByLastCommTime(friendPk);
-        }
-        if (null == list) {
-            list = new ArrayList<>();
-        }
-        String mySelf = MainApplication.getInstance().getPublicKey();
-        if (StringUtil.isNotEmpty(friendPk) && StringUtil.isNotEquals(friendPk, mySelf)) {
-            UserAndFriend userAndFriend = getFriend(friendPk);
-            if (userAndFriend != null) {
-                list.add(0, userAndFriend);
-            }
-        }
-        if (isAll) {
-            UserAndFriend self = getFriend(mySelf);
-            if (mySelf != null) {
-                list.add(0, self);
-            }
-        }
-        return list;
     }
 
     @Override

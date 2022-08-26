@@ -7,7 +7,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.torrent.publishing.core.model.data.FriendAndUser;
 import io.taucoin.torrent.publishing.core.model.data.UserAndFriend;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 
 /**
@@ -87,11 +86,6 @@ public interface UserRepository {
      * 添加新的多个User
      */
     long[] addUsers(User... user);
-
-    /**
-     * 观察不在黑名单的用户列表
-     */
-    List<UserAndFriend> getUsers(boolean isAll, int order, @NonNull String friendPk);
 
     /**
      * 观察不在黑名单的用户列表

@@ -150,9 +150,10 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
 
         userViewModel.getUserList().observe(this, list -> {
             adapter.setOrder(order);
+            int size;
             if (currentPos == 0) {
                 adapter.submitList(list);
-                int size = list.size();
+                size = list.size();
                 if (StringUtil.isNotEmpty(scannedFriendPk) && size > 0) {
                     size -= 1;
                 }
