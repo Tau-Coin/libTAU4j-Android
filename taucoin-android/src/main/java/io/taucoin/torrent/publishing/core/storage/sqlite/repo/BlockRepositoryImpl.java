@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.DataChanged;
@@ -104,7 +105,7 @@ public class BlockRepositoryImpl implements BlockRepository{
      */
     @Override
     public ChainStatus queryChainStatus(String chainID) {
-        return db.blockDao().queryChainStatus(chainID);
+        return db.blockDao().queryChainStatus(chainID, Constants.MAX_ACCOUNT_SIZE);
     }
 
     @Override

@@ -26,6 +26,10 @@ public interface BlockDao {
     String QUERY_BLOCKS = "SELECT * FROM Blocks " +
             " WHERE chainID = :chainID and blockNumber= :blockNumber";
 
+    String QUERY_COMMUNITY_PUBLIC_KEY_ORDER = "SELECT publicKey FROM Members" +
+            " WHERE chainID = :chainID AND (balance > 0 OR nonce > 0)" +
+            " ORDER BY balance DESC, nonce DESC, publicKey COLLATE UNICODE DESC";
+
     String QUERY_CHAIN_STATUS = "SELECT a.syncingHeadBlock, a.headBlock, a.consensusBlock, a.difficulty, a.forkPoint," +
             " c.peerBlocks, c.totalRewards, d.totalPeers, d.totalCoin, e.balance" +
             " FROM Communities a" +
@@ -39,9 +43,7 @@ public interface BlockDao {
             ") AS c " +
             " ON a.chainID = c.chainID" +
             " LEFT JOIN (SELECT mm.chainID, count(*) totalPeers, SUM(balance) AS totalCoin FROM Members mm" +
-            " LEFT JOIN Communities cc ON mm.chainID = cc.chainID" +
-            " WHERE mm.chainID = :chainID" +
-//            " AND "+ MemberDao.WHERE_ON_CHAIN +
+            " WHERE mm.chainID = :chainID AND mm.publicKey IN (" + QUERY_COMMUNITY_PUBLIC_KEY_ORDER + " LIMIT :limit)" +
             ") AS d" +
             " ON a.chainID = d.chainID" +
             " LEFT JOIN (SELECT chainID, publicKey, balance FROM Members WHERE chainID = :chainID" +
@@ -99,7 +101,7 @@ public interface BlockDao {
      * 观察链上状态信息
      */
     @Query(QUERY_CHAIN_STATUS)
-    ChainStatus queryChainStatus(String chainID);
+    ChainStatus queryChainStatus(String chainID, int limit);
 
     /**
      * 观察链上同步状态信息
