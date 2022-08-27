@@ -26,6 +26,7 @@ import io.taucoin.torrent.publishing.core.utils.StringUtil;
 public class MyAccountManager {
     private static final Logger logger = LoggerFactory.getLogger("MyAccountManager");
     private final LinkedBlockingQueue<String> chainsQueue = new LinkedBlockingQueue<>();
+    private final CopyOnWriteArraySet<String> chainSet = new CopyOnWriteArraySet<>();
     public final MutableLiveData<CopyOnWriteArraySet<String>> notExpiredChain = new MutableLiveData<>();
     private final Disposable handlerDisposable;
     private final CommunityRepository communityRepo;
@@ -34,23 +35,26 @@ public class MyAccountManager {
         Context appContext = MainApplication.getInstance();
         communityRepo = RepositoryHelper.getCommunityRepository(appContext);
         handlerDisposable = createNotExpiredChainObserver();
-        CopyOnWriteArraySet<String> set = new CopyOnWriteArraySet<>();
-        notExpiredChain.postValue(set);
+        notExpiredChain.postValue(chainSet);
     }
 
     public MutableLiveData<CopyOnWriteArraySet<String>> getNotExpiredChain() {
         return notExpiredChain;
     }
 
+    public CopyOnWriteArraySet<String> getSet() {
+        return chainSet;
+    }
+
     public boolean isNotExpired(String chainID) {
-        CopyOnWriteArraySet<String> set = notExpiredChain.getValue();
-        return set != null && set.contains(chainID);
+        logger.debug("chainID::{}, isNotExpired::{}, size::{}", chainID, chainSet.contains(chainID),
+                chainSet.size());
+        return chainSet.contains(chainID);
     }
 
     void onCleared() {
-        if (notExpiredChain.getValue() != null) {
-            notExpiredChain.getValue().clear();
-        }
+        chainSet.clear();
+        notExpiredChain.postValue(chainSet);
         if (handlerDisposable != null && !handlerDisposable.isDisposed()) {
             handlerDisposable.dispose();
         }
@@ -74,9 +78,8 @@ public class MyAccountManager {
         logger.debug("reset all chain");
         // 清除所有待检查的链
         chainsQueue.clear();
-        if (notExpiredChain.getValue() != null) {
-            notExpiredChain.getValue().clear();
-        }
+        chainSet.clear();
+        notExpiredChain.postValue(chainSet);
         updateAllCommunities();
     }
 
@@ -98,20 +101,19 @@ public class MyAccountManager {
                     String publicKey = communityRepo.queryCommunityAccountExpired(chainID);
                     boolean onChain = StringUtil.isNotEmpty(publicKey);
                     logger.debug("check chain::{}, onChain::{}, eventsQueue::{}", chainID, onChain, chainsQueue.size());
-                    CopyOnWriteArraySet<String> set = notExpiredChain.getValue();
-                    if (null == set) {
-                        set = new CopyOnWriteArraySet<>();
-                    }
-                    boolean contains = set.contains(chainID);
+                    logger.debug("set::-----------::{}", chainSet.size());
+                    boolean contains = chainSet.contains(chainID);
+                    logger.debug("add chain::{}, contains::{}, size::{}", chainID, contains, chainSet.size());
                     if (onChain) {
                         if (!contains) {
-                            set.add(chainID);
-                            notExpiredChain.postValue(set);
+                            chainSet.add(chainID);
+                            notExpiredChain.postValue(chainSet);
+                            logger.debug("add chain::{}, size::{}", chainID, chainSet.size());
                         }
                     } else {
                         if (contains) {
-                            set.remove(chainID);
-                            notExpiredChain.postValue(set);
+                            chainSet.remove(chainID);
+                            notExpiredChain.postValue(chainSet);
                         }
                     }
                 } catch (InterruptedException ignore) {

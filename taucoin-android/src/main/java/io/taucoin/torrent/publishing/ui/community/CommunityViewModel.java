@@ -567,7 +567,7 @@ public class CommunityViewModel extends AndroidViewModel {
     public void getJoinedUnexpiredCommunityList(String userPk) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<List<Member>>) emitter -> {
             List<Member> list = new ArrayList<>();
-            CopyOnWriteArraySet<String> set = daemon.getMyAccountManager().getNotExpiredChain().getValue();
+            CopyOnWriteArraySet<String> set = daemon.getMyAccountManager().getSet();
             if (set != null && set.size() > 0) {
                 for (String chainID : set) {
                     Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);

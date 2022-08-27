@@ -70,8 +70,11 @@ public class TauDaemonAlertHandler {
     private final TauDaemon daemon;
     private final Disposable clearExpiredPeersDis;
     private final int peersExpiredTime = 5 * 60;    // 单位：s
-    public final MutableLiveData<CopyOnWriteArraySet<String>> chainStoppedSet = new MutableLiveData<>();
-    private final MutableLiveData<ConcurrentHashMap<String, ConcurrentHashMap<String, Long>>> onlinePeerMap = new MutableLiveData<>();
+
+    private final CopyOnWriteArraySet<String> chainStoppedSet = new CopyOnWriteArraySet<>();
+    public final MutableLiveData<CopyOnWriteArraySet<String>> chainStoppedData = new MutableLiveData<>();
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> onlinePeerMap = new ConcurrentHashMap<>();
+    private final MutableLiveData<ConcurrentHashMap<String, ConcurrentHashMap<String, Long>>> onlinePeerData = new MutableLiveData<>();
 
     TauDaemonAlertHandler(Context appContext, TauDaemon daemon) {
         this.appContext = appContext;
@@ -433,16 +436,12 @@ public class TauDaemonAlertHandler {
         logger.info(a.get_message());
         String chainId = ChainIDUtil.decode(a.get_chain_id());
         logger.info("onGetChainDataFailed chainID::{}", chainId);
-        CopyOnWriteArraySet<String> set = chainStoppedSet.getValue();
-        if (null == set) {
-            set = new CopyOnWriteArraySet<>();
-        }
-        set.add(chainId);
-        chainStoppedSet.postValue(set);
+        chainStoppedSet.add(chainId);
+        chainStoppedData.postValue(chainStoppedSet);
     }
 
-    public MutableLiveData<CopyOnWriteArraySet<String>> getChainStoppedSet() {
-        return chainStoppedSet;
+    public MutableLiveData<CopyOnWriteArraySet<String>> getChainStoppedData() {
+        return chainStoppedData;
     }
 
     /**
@@ -456,20 +455,16 @@ public class TauDaemonAlertHandler {
         String peer = ByteUtil.toHexString(a.get_peer());
         long time = a.get_time();
         logger.info("onlinePeer chainID::{}, peer::{}, time::{}", chainId, peer, time);
-        ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> chainMap = onlinePeerMap.getValue();
-        if (null == chainMap) {
-            chainMap = new ConcurrentHashMap<>();
-        }
         ConcurrentHashMap<String, Long> peerMap = null;
-        if (chainMap.containsKey(chainId)) {
-            peerMap = chainMap.get(chainId);
+        if (onlinePeerMap.containsKey(chainId)) {
+            peerMap = onlinePeerMap.get(chainId);
         }
         if (null == peerMap) {
             peerMap = new ConcurrentHashMap<>();
         }
         peerMap.put(peer, time);
-        chainMap.put(chainId, peerMap);
-        onlinePeerMap.postValue(chainMap);
+        onlinePeerMap.put(chainId, peerMap);
+        onlinePeerData.postValue(onlinePeerMap);
     }
 
     /**
@@ -478,9 +473,8 @@ public class TauDaemonAlertHandler {
      * @return
      */
     public int getOnlinePeersCount(String chainID) {
-        ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> chainMap = onlinePeerMap.getValue();
-        if (chainMap != null && chainMap.containsKey(chainID)) {
-            ConcurrentHashMap<String, Long> peerMap = chainMap.get(chainID);
+        if (onlinePeerMap.containsKey(chainID)) {
+            ConcurrentHashMap<String, Long> peerMap = onlinePeerMap.get(chainID);
             if (peerMap != null) {
                 clearExpiredPeers(peerMap);
                 return peerMap.size();
@@ -490,9 +484,8 @@ public class TauDaemonAlertHandler {
     }
 
     public List<String> getOnlinePeersList(String chainID) {
-        ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> chainMap = onlinePeerMap.getValue();
-        if (chainMap != null && chainMap.containsKey(chainID)) {
-            ConcurrentHashMap<String, Long> peerMap = chainMap.get(chainID);
+        if (onlinePeerMap.containsKey(chainID)) {
+            ConcurrentHashMap<String, Long> peerMap = onlinePeerMap.get(chainID);
             if (peerMap != null) {
                 clearExpiredPeers(peerMap);
                 return new ArrayList<>(peerMap.keySet());
@@ -525,22 +518,20 @@ public class TauDaemonAlertHandler {
         return ObservableUtil.intervalSeconds(peersExpiredTime)
                 .subscribeOn(Schedulers.io())
                 .subscribe( l -> {
-                    ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> chainMap = onlinePeerMap.getValue();
-                    if (chainMap != null && chainMap.size() > 0) {
-                        Set<String> keys = chainMap.keySet();
+                    if (onlinePeerMap.size() > 0) {
+                        Set<String> keys = onlinePeerMap.keySet();
                         for (String key : keys) {
                             try {
-                                clearExpiredPeers(chainMap.get(key));
+                                clearExpiredPeers(onlinePeerMap.get(key));
                             } catch (Exception ignore) {}
                         }
-                        onlinePeerMap.postValue(chainMap);
+                        onlinePeerData.postValue(onlinePeerMap);
                     }
                 });
     }
 
-
-    public MutableLiveData<ConcurrentHashMap<String, ConcurrentHashMap<String, Long>>> getOnlinePeerMap() {
-        return onlinePeerMap;
+    public MutableLiveData<ConcurrentHashMap<String, ConcurrentHashMap<String, Long>>> getOnlinePeerData() {
+        return onlinePeerData;
     }
 
     /**
@@ -549,11 +540,8 @@ public class TauDaemonAlertHandler {
      */
     void restartFailedChain(String chainId) {
         logger.info("restartChain chainID::{}", chainId);
-        CopyOnWriteArraySet<String> set = chainStoppedSet.getValue();
-        if (set != null) {
-            set.remove(chainId);
-            chainStoppedSet.postValue(set);
-        }
+        chainStoppedSet.remove(chainId);
+        chainStoppedData.postValue(chainStoppedSet);
     }
 
     void handleBlockData(Block block, TauListenHandler.BlockStatus status) {

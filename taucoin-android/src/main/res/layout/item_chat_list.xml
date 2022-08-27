@@ -94,8 +94,10 @@
 
             <ImageView
                 android:id="@+id/iv_long_press"
-                android:layout_width="@dimen/widget_size_20"
+                android:layout_width="@dimen/widget_size_30"
                 android:layout_height="@dimen/widget_size_20"
+                android:paddingStart="@dimen/widget_size_5"
+                android:paddingEnd="@dimen/widget_size_5"
                 android:layout_gravity="end"
                 android:contentDescription="@null"
                 android:src="@mipmap/icon_long_press"/>

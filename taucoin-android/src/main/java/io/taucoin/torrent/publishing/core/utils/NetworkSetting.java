@@ -31,6 +31,7 @@ public class NetworkSetting {
     private static final SettingsRepository settingsRepo;
     private static long lastElapsedRealTime = 0;
     private static long lastUptime = 0;
+    private static boolean isDevelopCountry = false;
     private static final MutableLiveData<Boolean> developCountry = new MutableLiveData<>(false);
     static {
         Context context = MainApplication.getInstance();
@@ -38,7 +39,8 @@ public class NetworkSetting {
         METERED_LIMITED = context.getResources().getIntArray(R.array.metered_limit);
         DEVELOPED_METERED_LIMITED = context.getResources().getIntArray(R.array.developed_metered_limit);
         WIFI_LIMITED = context.getResources().getIntArray(R.array.wifi_limit);
-        developCountry.postValue(Utils.isDevelopedCountry());
+        isDevelopCountry = Utils.isDevelopedCountry();
+        developCountry.postValue(isDevelopCountry);
     }
 
 
@@ -81,11 +83,6 @@ public class NetworkSetting {
     }
 
     public static boolean isDevelopCountry(boolean isNeedUpdate) {
-        boolean isDevelopCountry = false;
-        Boolean developCountryObj = developCountry.getValue();
-        if (developCountryObj != null) {
-            isDevelopCountry = developCountryObj;
-        }
         if (isNeedUpdate) {
             boolean isNewDevelopCountry = Utils.isDevelopedCountry();
             if (isDevelopCountry != isNewDevelopCountry) {

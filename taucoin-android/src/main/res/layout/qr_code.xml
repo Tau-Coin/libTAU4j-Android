@@ -30,6 +30,8 @@
                 android:id="@+id/tv_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingTop="@dimen/widget_size_0"
+                android:paddingBottom="@dimen/widget_size_5"
                 android:includeFontPadding="false"
                 android:drawablePadding="@dimen/widget_size_2"
                 android:onClick="@{listener::onClick}"
@@ -50,7 +52,6 @@
             android:id="@+id/tv_qr_code"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_5"
             android:layout_marginStart="@dimen/widget_size_5"
             android:layout_marginEnd="@dimen/widget_size_5"
             android:includeFontPadding="false"
@@ -62,8 +63,7 @@
         <RelativeLayout
             android:id="@+id/rl_qr_code"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_5">
+            android:layout_height="wrap_content">
 
             <io.taucoin.torrent.publishing.ui.customviews.SquareImageView
                 android:background="@color/color_white"

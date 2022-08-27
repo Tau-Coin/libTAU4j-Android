@@ -27,6 +27,7 @@
             android:id="@+id/ll_public_key_hint"
             android:layout_below="@+id/iv_close"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
@@ -40,12 +41,12 @@
 
             <ImageView
                 android:id="@+id/iv_public_key_copy"
-                android:layout_width="@dimen/widget_size_14"
-                android:layout_height="@dimen/widget_size_14"
-                android:layout_marginTop="@dimen/widget_size_3"
+                android:layout_width="@dimen/widget_size_25"
+                android:layout_height="@dimen/widget_size_25"
+                android:padding="@dimen/widget_size_5"
+                android:layout_marginTop="@dimen/widget_size_2"
                 android:contentDescription="@null"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/widget_size_5"
                 android:src="@mipmap/icon_copy_text"/>
 
         </LinearLayout>

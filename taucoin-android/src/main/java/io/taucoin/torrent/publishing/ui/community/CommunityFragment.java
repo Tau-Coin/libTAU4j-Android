@@ -133,7 +133,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
 
         // 检测区块链是否因为获取数据失败而停止
-        tauDaemonHandler.getChainStoppedSet()
+        tauDaemonHandler.getChainStoppedData()
                 .observe(this.getViewLifecycleOwner(), set -> {
                     boolean chainStopped = set != null && set.contains(chainID);
                     if (this.chainStopped != chainStopped) {
@@ -142,7 +142,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     }
                 });
 
-        tauDaemonHandler.getOnlinePeerMap()
+        tauDaemonHandler.getOnlinePeerData()
                 .observe(this.getViewLifecycleOwner(), set -> {
                     int peers = tauDaemonHandler.getOnlinePeersCount(chainID);
                     if (this.onlinePeers != peers) {

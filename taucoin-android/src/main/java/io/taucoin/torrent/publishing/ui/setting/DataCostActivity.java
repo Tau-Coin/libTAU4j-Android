@@ -109,6 +109,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         handleSettingsChanged(getString(R.string.pref_key_network_switch));
         handleSettingsChanged(getString(R.string.pref_key_current_speed));
         handleSettingsChanged(getString(R.string.pref_key_foreground_running_time));
+        handleSettingsChanged(getString(R.string.pref_key_is_metered_network));
 
         // 先更新，再显示
         NetworkSetting.updateMeteredSpeedLimit();

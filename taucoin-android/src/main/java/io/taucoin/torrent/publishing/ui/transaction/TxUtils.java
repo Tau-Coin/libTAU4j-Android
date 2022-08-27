@@ -251,22 +251,22 @@ public class TxUtils {
     }
 
     public static SpannableStringBuilder createSpanTxQueue(TxQueue tx, QueueOperation operation) {
-        if (operation == QueueOperation.INSERT) {
-            SpanUtils msg = new SpanUtils();
-            String coinName = ChainIDUtil.getCoinName(tx.chainID);
-            String communityName = ChainIDUtil.getName(tx.chainID);
-            if (tx.txType == TxType.WIRING_TX.getType()) {
-                msg.append("I am sending you ");
-                msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName);
-            } else {
-                msg.append("I am posting news ");
-            }
-            msg.append(" of ").append(communityName);
-            msg.append(" community with ");
-            msg.append(FmtMicrometer.fmtFeeValue(tx.fee)).append(" ").append(coinName);
-            msg.append(" as miner fee.");
-            return msg.create();
-        }
+//        if (operation == QueueOperation.INSERT) {
+//            SpanUtils msg = new SpanUtils();
+//            String coinName = ChainIDUtil.getCoinName(tx.chainID);
+//            String communityName = ChainIDUtil.getName(tx.chainID);
+//            if (tx.txType == TxType.WIRING_TX.getType()) {
+//                msg.append("I am sending you ");
+//                msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName);
+//            } else {
+//                msg.append("I am posting news ");
+//            }
+//            msg.append(" of ").append(communityName);
+//            msg.append(" community with ");
+//            msg.append(FmtMicrometer.fmtFeeValue(tx.fee)).append(" ").append(coinName);
+//            msg.append(" as miner fee.");
+//            return msg.create();
+//        }
         return createSpanTxQueue(tx, 0, false, operation);
     }
 
@@ -279,7 +279,13 @@ public class TxUtils {
             int txType = txContent.getType();
             if (operation != null) {
                 msg.append("Funds update: ");
-                if (operation == QueueOperation.UPDATE) {
+                if (operation == QueueOperation.INSERT) {
+                    if (tx.txType == TxType.WIRING_TX.getType()) {
+                        msg.append("a wiring transaction is sent.");
+                    } else {
+                        msg.append("a news transaction is posted.");
+                    }
+                } else if (operation == QueueOperation.UPDATE) {
                     msg.append("transaction pending on settlement");
                 } else if (operation == QueueOperation.DELETE) {
                     msg.append("sender cancels wiring");

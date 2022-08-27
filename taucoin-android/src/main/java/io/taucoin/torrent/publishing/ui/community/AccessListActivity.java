@@ -67,7 +67,7 @@ public class AccessListActivity extends BaseActivity implements AccessListAdapte
 
         TauDaemonAlertHandler tauDaemonHandler = TauDaemon.getInstance(getApplicationContext()).getTauDaemonHandler();
         adapter.submitList(tauDaemonHandler.getOnlinePeersList(chainID));
-        tauDaemonHandler.getOnlinePeerMap()
+        tauDaemonHandler.getOnlinePeerData()
                 .observe(this, set -> {
                     adapter.submitList(tauDaemonHandler.getOnlinePeersList(chainID));
                 });
