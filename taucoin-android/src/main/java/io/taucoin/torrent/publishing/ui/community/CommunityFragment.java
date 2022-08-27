@@ -286,7 +286,10 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
-                    isJoined = member.isJoined();
+                    if (isJoined != member.isJoined()) {
+                        isJoined = member.isJoined();
+                        showCommunitySubtitle();
+                    }
                     if (nearExpired != member.nearExpired()) {
                         nearExpired = member.nearExpired();
                         showWarningView();

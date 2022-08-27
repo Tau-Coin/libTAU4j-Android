@@ -27,7 +27,7 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
 
     private ActivityWorkingConditionBinding binding;
     private SettingsRepository settingsRepo;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,12 +96,6 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_is_metered_network))) {
             boolean isMeteredNetwork = NetworkSetting.isMeteredNetwork();
             binding.tvNetworkType.setText(isMeteredNetwork ? R.string.setting_metered : R.string.setting_wifi);
-
-            handleSettingsChanged(getString(R.string.pref_key_wifi_limit));
-        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_wifi_limit)) ||
-                StringUtil.isEquals(key, getString(R.string.pref_key_metered_limit))) {
-            String wifiLimitStr = getDataLimit(NetworkSetting.isMeteredNetwork());
-            binding.tvDataLimit.setText(wifiLimitStr);
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_network_interfaces))) {
             String networkInterfaces = settingsRepo.getStringValue(key, "");
             if (StringUtil.isEquals(networkInterfaces, "0.0.0.0")) {
