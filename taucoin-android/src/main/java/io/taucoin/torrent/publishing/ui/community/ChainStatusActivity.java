@@ -26,6 +26,7 @@ import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
 import io.taucoin.torrent.publishing.core.model.data.ChainStatus;
 import io.taucoin.torrent.publishing.core.model.data.ForkPoint;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.databinding.ActivityChainStatusBinding;
@@ -41,8 +42,8 @@ import io.taucoin.torrent.publishing.ui.transaction.TxUtils;
 public class ChainStatusActivity extends BaseActivity {
     private ActivityChainStatusBinding binding;
     private CommunityViewModel communityViewModel;
-    private CompositeDisposable disposables = new CompositeDisposable();
-    private CompositeDisposable blockDisposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable blockDisposables = new CompositeDisposable();
     private String chainID;
     private TauDaemon tauDaemon;
     private Disposable reloadChainDisposable;
@@ -133,8 +134,12 @@ public class ChainStatusActivity extends BaseActivity {
             binding.itemTotalCoins.setRightText(FmtMicrometer.fmtBalance(status.totalCoin));
         }
 
-        if (null == mStatus || mStatus.balance != status.balance) {
-            binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(status.balance));
+        if (null == mStatus || mStatus.balUpdateTime != status.balUpdateTime) {
+            String balance = FmtMicrometer.fmtBalance(status.balance);
+            String time = DateUtil.formatTime(status.balUpdateTime, DateUtil.pattern14);
+            String balanceAndTime = getResources().getString(R.string.drawer_balance_time_no_title,
+                    balance, time);
+            binding.itemBalance.setRightText(balanceAndTime);
         }
         if (null == mStatus || StringUtil.isNotEquals(mStatus.forkPoint, status.forkPoint)) {
             if (StringUtil.isNotEmpty(status.forkPoint)) {

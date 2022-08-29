@@ -532,8 +532,8 @@ public class MainActivity extends ScanTriggerActivity {
             newFragment = new EmptyFragment();
         }
         newFragment.setArguments(bundle);
-        updateViewChanged();
         loadFragmentView(R.id.main_right_fragment, newFragment);
+        updateViewChanged();
     }
 
     /**

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndAccount;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.databinding.ItemCommunityChooseBinding;
 
@@ -60,9 +61,11 @@ public class ChooseListAdapter extends ListAdapter<CommunityAndAccount, ChooseLi
             String communityName = community.communityName + " chain";
             binding.tvName.setText(communityName);
 
-            String balance = context.getResources().getString(R.string.drawer_balance);
-            balance += " " + FmtMicrometer.fmtBalance(community.balance);
-            binding.tvBalance.setText(balance);
+            String balance = FmtMicrometer.fmtBalance(community.balance);
+            String time = DateUtil.formatTime(community.balUpdateTime, DateUtil.pattern14);
+            String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time,
+                    balance, time);
+            binding.tvBalance.setText(balanceAndTime);
         }
     }
 

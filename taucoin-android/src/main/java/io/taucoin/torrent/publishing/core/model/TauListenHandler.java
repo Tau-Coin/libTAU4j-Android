@@ -514,13 +514,17 @@ public class TauListenHandler {
                 chainID, publicKey, balance, nonce);
 
         if (null == member) {
-            member = new Member(chainIDStr, publicKey, balance, nonce);
+            member = new Member(chainIDStr, publicKey);
+            member.balance = balance;
+            member.balUpdateTime = DateUtil.getTime();
+            member.nonce = nonce;
             memberRepo.addMember(member);
             logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}",
                     chainIDStr, publicKey, balance);
         } else {
-            if (member.balance != balance || member.nonce != nonce) {
+            if (member.balUpdateTime == 0 || member.balance != balance || member.nonce != nonce) {
                 member.balance = balance;
+                member.balUpdateTime = DateUtil.getTime();
                 member.nonce = nonce;
                 memberRepo.updateMember(member);
                 logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
@@ -627,8 +631,9 @@ public class TauListenHandler {
                         chainID, peer, account.getBalance(), account.getNonce());
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, peer);
                 if (member != null) {
-                    if (member.balance != account.getBalance() || member.nonce != account.getNonce()) {
+                    if (member.balUpdateTime == 0 || member.balance != account.getBalance() || member.nonce != account.getNonce()) {
                         member.balance = account.getBalance();
+                        member.balUpdateTime = DateUtil.getTime();
                         member.nonce = account.getNonce();
                         memberRepo.updateMember(member);
                     }
@@ -636,6 +641,7 @@ public class TauListenHandler {
                     saveUserInfo(peer);
                     member = new Member(chainID, peer);
                     member.balance = account.getBalance();
+                    member.balUpdateTime = DateUtil.getTime();
                     member.nonce = account.getNonce();
                     memberRepo.addMember(member);
                 }

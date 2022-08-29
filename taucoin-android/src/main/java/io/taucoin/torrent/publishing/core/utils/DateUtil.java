@@ -52,13 +52,14 @@ public class DateUtil {
     public static final String pattern11 = "yyyy-MM-dd \'at\' HH:mm";
     public static final String pattern12 = "yyyyMMdd";
     public static final String pattern13 = "MM-dd HH:mm";
+    public static final String pattern14 = "MMM-dd";
 
-    private static String[] weeks = {"Sun", "Mon","Tue","Wed","Thu","Fri","Sat"};
+    private static final String[] weeks = {"Sun", "Mon","Tue","Wed","Thu","Fri","Sat"};
     private static final ThreadLocal<SimpleDateFormat> tlFormat = new ThreadLocal<>();
 
     public static SimpleDateFormat getSimpleDateFormat() {
         if (null == tlFormat.get()) {
-            tlFormat.set(new SimpleDateFormat(pattern6, Locale.CHINA));
+            tlFormat.set(new SimpleDateFormat(pattern6, Locale.ENGLISH));
         }
         return tlFormat.get();
     }

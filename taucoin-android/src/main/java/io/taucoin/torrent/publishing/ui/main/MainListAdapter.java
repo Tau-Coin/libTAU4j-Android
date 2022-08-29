@@ -31,7 +31,7 @@ import io.taucoin.torrent.publishing.databinding.ItemGroupListBinding;
  * 主页显示的群组列表的Adapter
  */
 public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAdapter.ViewHolder> {
-    private ClickListener listener;
+    private final ClickListener listener;
 
     MainListAdapter(ClickListener listener) {
         super(diffCallback);
@@ -107,13 +107,16 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                         communityName, communityCode));
                 String firstLetters = StringUtil.getFirstLettersOfName(communityName);
                 binding.leftView.setText(firstLetters);
-                String balance = FmtMicrometer.fmtBalance(bean.balance);
                 boolean isNotExpired = daemon.getMyAccountManager().isNotExpired(bean.ID);
                 boolean onChain = bean.onChain() && isNotExpired;
                 if (!onChain) {
                     binding.tvBalancePower.setText(context.getString(R.string.main_community_non_member));
                 } else {
-                    binding.tvBalancePower.setText(context.getString(R.string.main_balance, balance));
+                    String balance = FmtMicrometer.fmtBalance(bean.balance);
+                    String time = DateUtil.formatTime(bean.balUpdateTime, DateUtil.pattern14);
+                    String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time,
+                            balance, time);
+                    binding.tvBalancePower.setText(balanceAndTime);
                 }
 
                 binding.tvUserMessage.setVisibility(StringUtil.isNotEmpty(bean.memo) ?
@@ -214,7 +217,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                     isSame = oldItem.timestamp == newItem.timestamp &&
                             oldItem.msgUnread == newItem.msgUnread &&
                             oldItem.stickyTop == newItem.stickyTop &&
-                            oldItem.balance == newItem.balance &&
+                            oldItem.balUpdateTime == newItem.balUpdateTime &&
                             oldItem.nonce == newItem.nonce &&
                             StringUtil.isEquals(oldItem.memo, newItem.memo);
                 } else {

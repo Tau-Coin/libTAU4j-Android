@@ -1,5 +1,6 @@
 package io.taucoin.torrent.publishing.ui.community;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.torrent.publishing.core.utils.DateUtil;
 import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
@@ -46,10 +48,12 @@ public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHol
     static class ViewHolder extends RecyclerView.ViewHolder {
         private final ItemChainTopBinding binding;
         private final ClickListener listener;
+        private Context appContext;
 
         ViewHolder(ItemChainTopBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
+            this.appContext = binding.getRoot().getContext().getApplicationContext();
             this.listener = listener;
         }
 
@@ -61,7 +65,12 @@ public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHol
             String midHideName = UsersUtil.getMidHideName(member.publicKey, 6);
             holder.binding.tvCol2.setText(midHideName);
             holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_yellow));
-            holder.binding.tvCol3.setText(FmtMicrometer.fmtBalance(member.balance));
+
+            String balance = FmtMicrometer.fmtBalance(member.balance);
+            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
+            String balanceAndTime = appContext.getResources().getString(R.string.drawer_balance_time_no_title,
+                    balance, time);
+            holder.binding.tvCol3.setText(balanceAndTime);
 
             ViewUtils.updateViewWeight(binding.tvCol2, 3);
             ViewUtils.updateViewWeight(binding.tvCol3, 2);

@@ -85,6 +85,8 @@
     <string name="drawer_airdrop_links">Airdrop Coins</string>
     <string name="drawer_send_and_airdrop_coins">Send and Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
+    <string name="drawer_balance_time">Balance %1$s %2$s</string>
+    <string name="drawer_balance_time_no_title">%1$s %2$s</string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Contacts</string>
     <string name="drawer_wallet">Wallet</string>

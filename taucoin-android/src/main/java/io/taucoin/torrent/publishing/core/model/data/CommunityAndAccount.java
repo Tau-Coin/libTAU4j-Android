@@ -8,6 +8,7 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Community;
  */
 public class CommunityAndAccount extends Community {
     public long balance;
+    public long balUpdateTime;
     public long nonce;
     public int joined;
     public int msgUnread;

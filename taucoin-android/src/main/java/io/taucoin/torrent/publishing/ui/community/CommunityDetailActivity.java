@@ -42,7 +42,7 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
     private static final Logger logger = LoggerFactory.getLogger("CommunityDetailActivity");
     private ActivityCommunityDetailBinding binding;
     private CommunityViewModel communityViewModel;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private Disposable memberDisposable;
     private MemberListAdapter adapter;
     private String chainID;
