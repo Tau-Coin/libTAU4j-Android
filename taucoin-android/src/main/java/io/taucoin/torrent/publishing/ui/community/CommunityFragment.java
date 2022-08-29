@@ -61,6 +61,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private Statistics memberStatistics;
     private int onlinePeers;
     private long nodes = 0;
+    private long miningTime = -1;
     private CommonDialog chainStoppedDialog;
 
     @Nullable
@@ -147,7 +148,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     int peers = tauDaemonHandler.getOnlinePeersCount(chainID);
                     if (this.onlinePeers != peers) {
                         this.onlinePeers = peers;
-                        showCommunitySubtitle();
+//                        showCommunitySubtitle();
                     }
                 });
     }
@@ -178,7 +179,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private void handleSettingsChanged(String key) {
         if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
             nodes = settingsRepo.getLongValue(key, 0);
-            showCommunitySubtitle();
+//            showCommunitySubtitle();
         }
     }
 
@@ -219,7 +220,23 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         }
         if (isJoined) {
             // 已加入社区
-            subtitle.append(nodes > 0 ? getString(R.string.community_users_mining) : getString(R.string.community_users_discovering));
+            if (nodes > 0) {
+                if (miningTime >= 0) {
+                    long minutes = miningTime / 60;
+                    long seconds = miningTime % 60;
+                    subtitle.append(getString(R.string.community_users_mining));
+                    if (minutes > 0) {
+                        subtitle.append(getString(R.string.chain_mining_time_min_seconds,
+                                minutes, seconds));
+                    } else {
+                        subtitle.append(getString(R.string.chain_mining_time_seconds, seconds));
+                    }
+                } else if (miningTime == -100) {
+                    subtitle.append(getString(R.string.community_users_doze));
+                }
+            } else {
+                subtitle.append(getString(R.string.community_users_discovering));
+            }
         } else {
             // 未加入社区
             int length = subtitle.length();
@@ -261,11 +278,19 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             }
         });
 
-        // 60s更新检查一次
-        disposables.add(ObservableUtil.intervalSeconds(60)
+        disposables.add(communityViewModel.observerCommunityMiningTime(chainID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(l -> showCommunitySubtitle()));
+                .subscribe(time -> {
+                    this.miningTime = time;
+                    showCommunitySubtitle();
+                }, it->{}));
+
+//        // 60s更新检查一次
+//        disposables.add(ObservableUtil.intervalSeconds(60)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(l -> showCommunitySubtitle()));
 
         nodes = settingsRepo.getLongValue(getString(R.string.pref_key_dht_nodes), 0);
         disposables.add(settingsRepo.observeSettingsChanged()
@@ -279,7 +304,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .subscribe(statistics -> {
                     this.memberStatistics = statistics;
                     showCommunityTitle();
-                    showCommunitySubtitle();
+//                    showCommunitySubtitle();
                 }));
 
         disposables.add(communityViewModel.observerCurrentMember(chainID)
@@ -288,7 +313,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .subscribe(member -> {
                     if (isJoined != member.isJoined()) {
                         isJoined = member.isJoined();
-                        showCommunitySubtitle();
+//                        showCommunitySubtitle();
                     }
                     if (nearExpired != member.nearExpired()) {
                         nearExpired = member.nearExpired();

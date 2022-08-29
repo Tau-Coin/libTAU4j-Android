@@ -72,7 +72,7 @@ public class TauDaemonAlertHandler {
     private final int peersExpiredTime = 5 * 60;    // 单位：s
 
     private final CopyOnWriteArraySet<String> chainStoppedSet = new CopyOnWriteArraySet<>();
-    public final MutableLiveData<CopyOnWriteArraySet<String>> chainStoppedData = new MutableLiveData<>();
+    private final MutableLiveData<CopyOnWriteArraySet<String>> chainStoppedData = new MutableLiveData<>();
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> onlinePeerMap = new ConcurrentHashMap<>();
     private final MutableLiveData<ConcurrentHashMap<String, ConcurrentHashMap<String, Long>>> onlinePeerData = new MutableLiveData<>();
 
@@ -438,6 +438,10 @@ public class TauDaemonAlertHandler {
         logger.info("onGetChainDataFailed chainID::{}", chainId);
         chainStoppedSet.add(chainId);
         chainStoppedData.postValue(chainStoppedSet);
+    }
+
+    public boolean isChainStopped(String chainID) {
+        return chainStoppedSet.contains(chainID);
     }
 
     public MutableLiveData<CopyOnWriteArraySet<String>> getChainStoppedData() {

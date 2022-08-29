@@ -52,6 +52,7 @@ import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
+import io.taucoin.torrent.publishing.core.model.TauDaemonAlertHandler;
 import io.taucoin.torrent.publishing.core.model.TauListenHandler;
 import io.taucoin.torrent.publishing.core.model.data.BlockAndTx;
 import io.taucoin.torrent.publishing.core.model.data.BlockStatistics;
@@ -958,11 +959,15 @@ public class CommunityViewModel extends AndroidViewModel {
 
     Observable<Long> observerCommunityMiningTime(String chainID) {
         return Observable.create(emitter -> {
+            TauDaemonAlertHandler tauDaemonHandler = TauDaemon.getInstance(getApplication()).getTauDaemonHandler();
             while (!emitter.isDisposed()) {
+                boolean isStopped = tauDaemonHandler.isChainStopped(chainID);
                 boolean isTauDozeMode = daemon.getTauDozeManager().isDozeMode();
                 long time;
                 if (isTauDozeMode) {
                     time = -100;
+                } else if (isStopped) {
+                    time = -1;
                 } else {
                     time = daemon.getMiningTime(ChainIDUtil.encode(chainID));
                 }
