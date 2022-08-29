@@ -189,8 +189,12 @@
     <string name="chain_mining_time_min_seconds">%1$dmin&#160;%2$ds</string>
     <string name="chain_mining_time_seconds">%1$ds</string>
     <string name="chain_mining_time_doze">Doze</string>
-    <string name="chain_link_long_time_hour_min">This link or QR code has been created for %1$d hours %2$d minutes. Do you want to continue?</string>
-    <string name="chain_link_long_time_min">This link or QR code has been created for %1$d minutes. Do you want to continue?</string>
+<!--    The airdrop was created 3 minutes ago. Do you want to continue?-->
+    <string name="airdrop_link_long_time">The airdrop was created %1$d minutes ago. Do you want to continue?</string>
+    <string name="chain_link_long_time">The community\'s link was created %1$d minutes ago. Do you want to continue?</string>
+    <string name="chain_qr_long_time">The community\'s QR code was created %1$d minutes ago. Do you want to continue?</string>
+    <string name="friend_link_long_time">The friend\'s link was created %1$d minutes ago. Do you want to continue?</string>
+    <string name="friend_qr_long_time">The friend\'s QR code was created %1$d minutes ago. Do you want to continue?</string>
     <string name="chain_difficulty">Difficulty</string>
     <string name="chain_total_blocks">Total blocks</string>
     <string name="chain_on_chain_blocks">On-chain blocks</string>
@@ -530,9 +534,9 @@
     <string name="bot_airdrop_tau_link">Airdrop Link</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share Airdrop link</string>
-    <string name="bot_share_airdrop_link_content">Hello, I am sending you some %1$s community coins.\n1.
-        Please download decentral server-less TAU app(size 24Mb) to join us.\n\n%2$s\n\n2.
-        To receive your %3$s coins, copy this FULL message and paste to TAU app airdrop function.\n\n%4$s</string>
+    <string name="bot_share_airdrop_link_content">Hi, I am sending you \"%1$s\" community crypto coins.\n1.
+        We user taucoin.io wallet, which is a safe and secure server-less app.\n2.
+        Paste this FULL message to TAU app airdrop function.\n%2$s</string>
     <string name="bot_hello_world">HelloWorld</string>
 
     <!-- Strings used for QRCode -->

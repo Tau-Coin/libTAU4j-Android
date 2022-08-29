@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import io.reactivex.disposables.CompositeDisposable;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
@@ -45,7 +44,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private UserViewModel userViewModel;
     private AirdropListAdapter adapter;
     private CommonDialog linkDialog;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private boolean linksSelector = false;
 
     @Override
@@ -192,8 +191,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private void shareAirdropLink(String chainID, String airdropLink) {
         String communityName = ChainIDUtil.getName(chainID);
         String shareTitle = getString(R.string.bot_share_airdrop_link_title);
-        String text = getString(R.string.bot_share_airdrop_link_content,
-                communityName, Constants.APP_HOME_URL, communityName, airdropLink);
+        String text = getString(R.string.bot_share_airdrop_link_content, communityName, airdropLink);
         ActivityUtil.shareText(this, shareTitle, text);
     }
 

@@ -431,7 +431,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
         if (longTimeCreateDialog != null && longTimeCreateDialog.isShowing()) {
             longTimeCreateDialog.closeDialog();
         }
-        longTimeCreateDialog = communityViewModel.showLongTimeCreateDialog(this, link,
+        longTimeCreateDialog = communityViewModel.showLongTimeCreateDialog(this, link, true,
                 new CommonDialog.ClickListener() {
                     @Override
                     public void proceed() {
@@ -455,7 +455,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
         if (longTimeCreateDialog != null && longTimeCreateDialog.isShowing()) {
             longTimeCreateDialog.closeDialog();
         }
-        longTimeCreateDialog = communityViewModel.showLongTimeCreateDialog(this, link,
+        longTimeCreateDialog = communityViewModel.showLongTimeCreateDialog(this, link, true,
                 new CommonDialog.ClickListener() {
                     @Override
                     public void proceed() {

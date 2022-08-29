@@ -15,7 +15,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
-import io.taucoin.torrent.publishing.core.Constants;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.LinkUtil;
@@ -37,7 +36,7 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
 
     private ActivityAirdropDetailBinding binding;
     private CommunityViewModel communityViewModel;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
     private Member member;
     private Disposable airdropDisposable;
@@ -169,8 +168,7 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
                 }
                 String communityName = ChainIDUtil.getName(chainID);
                 String shareTitle = getString(R.string.bot_share_airdrop_link_title);
-                String text = getString(R.string.bot_share_airdrop_link_content,
-                        communityName, Constants.APP_HOME_URL, communityName, airdropLink);
+                String text = getString(R.string.bot_share_airdrop_link_content, communityName, airdropLink);
                 ActivityUtil.shareText(this, shareTitle, text);
                 break;
         }

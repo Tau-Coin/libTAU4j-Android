@@ -1,6 +1,7 @@
 package io.taucoin.torrent.publishing.ui.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import io.taucoin.torrent.publishing.core.model.MyAccountManager;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
+import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.bus.HomeAllData;
 import io.taucoin.torrent.publishing.core.utils.bus.HomeCommunitiesData;
@@ -31,6 +33,7 @@ import io.taucoin.torrent.publishing.databinding.FragmentMainTabBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
+import io.taucoin.torrent.publishing.ui.user.UserDetailActivity;
 import io.taucoin.torrent.publishing.ui.user.UserViewModel;
 
 /**
@@ -122,6 +125,14 @@ public class MainTabFragment extends BaseFragment implements MainListAdapter.Cli
             operationsMenu.setOnItemClickListener(null);
             operationsMenu.dismiss();
         }
+    }
+
+    @Override
+    public void onFriendClicked(CommunityAndFriend item) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.PUBLIC_KEY, item.ID);
+        intent.putExtra(IntentExtra.TYPE, UserDetailActivity.TYPE_CHAT_PAGE);
+        ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
     }
 
     /**

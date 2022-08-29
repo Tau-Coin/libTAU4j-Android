@@ -1131,7 +1131,12 @@ public class CommunityViewModel extends AndroidViewModel {
     }
 
     public CommonDialog showLongTimeCreateDialog(FragmentActivity activity, LinkUtil.Link link,
-                                          CommonDialog.ClickListener listener) {
+                                                 CommonDialog.ClickListener listener) {
+        return showLongTimeCreateDialog(activity, link, false, listener);
+    }
+
+    public CommonDialog showLongTimeCreateDialog(FragmentActivity activity, LinkUtil.Link link,
+                                  boolean isQrCode, CommonDialog.ClickListener listener) {
         if (link.getTimestamp() <= 0) {
             if (listener != null) {
                 listener.proceed();
@@ -1149,14 +1154,15 @@ public class CommunityViewModel extends AndroidViewModel {
         Context context = activity.getApplicationContext();
         ExternalAirdropLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
                 R.layout.external_airdrop_link_dialog, null, false);
-        long hours = createTime / 60;
-        long minutes = createTime % 60;
-        if (hours > 0) {
-            dialogBinding.tvPeer.setText(activity.getString(R.string.chain_link_long_time_hour_min,
-                    minutes, hours));
+        int contentRid;
+        if (link.isAirdropLink()) {
+            contentRid = R.string.airdrop_link_long_time;
+        } else if (link.isChainLink()) {
+            contentRid = isQrCode ? R.string.chain_qr_long_time : R.string.chain_link_long_time;
         } else {
-            dialogBinding.tvPeer.setText(activity.getString(R.string.chain_link_long_time_min, minutes));
+            contentRid = isQrCode ? R.string.friend_qr_long_time : R.string.friend_link_long_time;
         }
+        dialogBinding.tvPeer.setText(activity.getString(contentRid, createTime));
         dialogBinding.tvPeer.setTextColor(context.getResources().getColor(R.color.color_black));
         dialogBinding.tvJoin.setText(R.string.common_proceed);
         CommonDialog longTimeCreateDialog = new CommonDialog.Builder(activity)

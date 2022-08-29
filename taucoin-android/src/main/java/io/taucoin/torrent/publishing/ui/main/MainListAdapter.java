@@ -153,6 +153,17 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                             R.drawable.circle_red : R.drawable.circle_yellow);
                 }
                 ivLongPress = binding.ivLongPress;
+
+                binding.leftView.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onFriendClicked(bean);
+                    }
+                });
+                binding.tvGroupName.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onFriendClicked(bean);
+                    }
+                });
             }
             holder.binding.getRoot().setOnClickListener(v -> {
                 if (listener != null) {
@@ -189,6 +200,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
     }
 
     public interface ClickListener {
+        void onFriendClicked(CommunityAndFriend item);
         void onItemClicked(CommunityAndFriend item);
         void onItemLongClicked(CommunityAndFriend item);
     }
