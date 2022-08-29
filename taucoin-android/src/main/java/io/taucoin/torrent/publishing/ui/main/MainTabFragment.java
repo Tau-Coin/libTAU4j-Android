@@ -23,6 +23,10 @@ import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
+import io.taucoin.torrent.publishing.core.utils.bus.HomeAllData;
+import io.taucoin.torrent.publishing.core.utils.bus.HomeCommunitiesData;
+import io.taucoin.torrent.publishing.core.utils.bus.HomeFriendsData;
+import io.taucoin.torrent.publishing.core.utils.bus.RxBus2;
 import io.taucoin.torrent.publishing.databinding.FragmentMainTabBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.community.CommunityViewModel;
@@ -68,9 +72,22 @@ public class MainTabFragment extends BaseFragment implements MainListAdapter.Cli
         binding.groupList.setItemAnimator(null);
         binding.groupList.setAdapter(adapter);
         if (getArguments() != null) {
-            List<CommunityAndFriend> list = getArguments().getParcelableArrayList(IntentExtra.BEAN);
-            if (list != null) {
-                adapter.submitList(list);
+            String tag = getCustomTag();
+            if (StringUtil.isEquals(tag, String.valueOf(1))) {
+                HomeCommunitiesData data = RxBus2.getInstance().getStickyOnce(HomeCommunitiesData.class);
+                if (data != null) {
+                    showDataList(data.getList());
+                }
+            } else if (StringUtil.isEquals(tag, String.valueOf(2))) {
+                HomeFriendsData data = RxBus2.getInstance().getStickyOnce(HomeFriendsData.class);
+                if (data != null) {
+                    showDataList(data.getList());
+                }
+            } else {
+                HomeAllData data = RxBus2.getInstance().getStickyOnce(HomeAllData.class);
+                if (data != null) {
+                    showDataList(data.getList());
+                }
             }
         }
         Context context = activity.getApplicationContext();

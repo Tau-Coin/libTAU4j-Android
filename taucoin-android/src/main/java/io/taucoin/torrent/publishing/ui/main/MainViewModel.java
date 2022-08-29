@@ -22,6 +22,10 @@ import io.taucoin.torrent.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.torrent.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
 import io.taucoin.torrent.publishing.core.utils.DateUtil;
+import io.taucoin.torrent.publishing.core.utils.bus.HomeAllData;
+import io.taucoin.torrent.publishing.core.utils.bus.HomeCommunitiesData;
+import io.taucoin.torrent.publishing.core.utils.bus.HomeFriendsData;
+import io.taucoin.torrent.publishing.core.utils.bus.RxBus2;
 
 /**
  * 主页的ViewModel
@@ -29,8 +33,8 @@ import io.taucoin.torrent.publishing.core.utils.DateUtil;
 public class MainViewModel extends AndroidViewModel {
 
     private final static Logger logger = LoggerFactory.getLogger("MainViewModel");
-    private CommunityRepository communityRepo;
-    private TauDaemon daemon;
+    private final CommunityRepository communityRepo;
+    private final TauDaemon daemon;
     private MutableLiveData<ArrayList<CommunityAndFriend>> homeAllData = new MutableLiveData<>();
     private MutableLiveData<ArrayList<CommunityAndFriend>> homeCommunityData = new MutableLiveData<>();
     private MutableLiveData<ArrayList<CommunityAndFriend>> homeFriendData = new MutableLiveData<>();

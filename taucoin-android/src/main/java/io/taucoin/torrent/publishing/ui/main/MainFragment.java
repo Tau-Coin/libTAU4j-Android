@@ -37,6 +37,10 @@ import io.taucoin.torrent.publishing.core.utils.NetworkSetting;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ViewUtils;
+import io.taucoin.torrent.publishing.core.utils.bus.HomeAllData;
+import io.taucoin.torrent.publishing.core.utils.bus.HomeCommunitiesData;
+import io.taucoin.torrent.publishing.core.utils.bus.HomeFriendsData;
+import io.taucoin.torrent.publishing.core.utils.bus.RxBus2;
 import io.taucoin.torrent.publishing.databinding.FragmentMainBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
@@ -52,7 +56,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private FragmentMainBinding binding;
     private MainViewModel viewModel;
     private SettingsRepository settingsRepo;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private boolean dataChanged = false;
 
     @Nullable
@@ -113,7 +117,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
-    private TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+    private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
 
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
@@ -290,8 +294,15 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         MainTabFragment tab = new MainTabFragment();
         Bundle bundle = new Bundle();
         bundle.putString(IntentExtra.CUSTOM_TAG, String.valueOf(pos));
-        bundle.putParcelableArrayList(IntentExtra.BEAN, getDataList(pos));
+//        bundle.putParcelableArrayList(IntentExtra.BEAN, getDataList(pos));
         tab.setArguments(bundle);
+        if (pos == 1) {
+            RxBus2.getInstance().postSticky(new HomeCommunitiesData(getDataList(pos)));
+        } else if (pos == 2) {
+            RxBus2.getInstance().postSticky(new HomeFriendsData(getDataList(pos)));
+        } else {
+            RxBus2.getInstance().postSticky(new HomeAllData(getDataList(pos)));
+        }
         return tab;
     }
 }

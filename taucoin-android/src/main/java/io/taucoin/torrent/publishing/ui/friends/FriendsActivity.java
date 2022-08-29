@@ -25,6 +25,8 @@ import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.core.utils.ActivityUtil;
 import io.taucoin.torrent.publishing.core.utils.LinkUtil;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
+import io.taucoin.torrent.publishing.core.utils.bus.Members;
+import io.taucoin.torrent.publishing.core.utils.bus.RxBus2;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
 import io.taucoin.torrent.publishing.core.utils.UsersUtil;
@@ -230,8 +232,9 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
             if (adapter.getSelectedList().size() == 0) {
                 ToastUtils.showShortToast(R.string.community_added_members_empty);
             } else {
+                RxBus2.getInstance().postSticky(new Members(adapter.getSelectedList()));
                 Intent intent = new Intent();
-                intent.putParcelableArrayListExtra(IntentExtra.BEAN, adapter.getSelectedList());
+//                intent.putParcelableArrayListExtra(IntentExtra.BEAN, adapter.getSelectedList());
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, MembersAddActivity.class);
             }

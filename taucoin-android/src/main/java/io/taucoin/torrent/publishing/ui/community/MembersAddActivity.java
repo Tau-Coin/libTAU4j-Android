@@ -4,14 +4,12 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.ArrayList;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.Constants;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.torrent.publishing.databinding.ActivityMembersAddBinding;
 import io.taucoin.torrent.publishing.ui.BaseActivity;
 import io.taucoin.torrent.publishing.ui.constant.IntentExtra;
@@ -53,7 +51,6 @@ public class MembersAddActivity extends BaseActivity {
     }
 
     private void loadFragment() {
-        ArrayList<User> friends = getIntent().getParcelableArrayListExtra(IntentExtra.BEAN);
         if (null == currentFragment) {
             FragmentManager fm = getSupportFragmentManager();
             if (fm.isDestroyed()) {
@@ -63,7 +60,6 @@ public class MembersAddActivity extends BaseActivity {
             Bundle bundle = new Bundle();
             bundle.putString(IntentExtra.CHAIN_ID, chainID);
             bundle.putLong(IntentExtra.AIRDROP_COIN, Constants.AIRDROP_COIN.longValue());
-            bundle.putParcelableArrayList(IntentExtra.BEAN, friends);
             currentFragment.setArguments(bundle);
             FragmentTransaction transaction = fm.beginTransaction();
             // Replace whatever is in the fragment container view with this fragment,

@@ -34,6 +34,8 @@ import io.taucoin.torrent.publishing.core.utils.FmtMicrometer;
 import io.taucoin.torrent.publishing.core.utils.ObservableUtil;
 import io.taucoin.torrent.publishing.core.utils.StringUtil;
 import io.taucoin.torrent.publishing.core.utils.ToastUtils;
+import io.taucoin.torrent.publishing.core.utils.bus.Members;
+import io.taucoin.torrent.publishing.core.utils.bus.RxBus2;
 import io.taucoin.torrent.publishing.databinding.FragmentMembersAddBinding;
 import io.taucoin.torrent.publishing.databinding.ViewConfirmDialogBinding;
 import io.taucoin.torrent.publishing.ui.BaseFragment;
@@ -61,7 +63,7 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
     private String medianFee;
     private long airdropCoin;
     private int page;
-    private List<User> friends;
+    private final List<User> friends = new ArrayList<>();
     private final CompositeDisposable disposables = new CompositeDisposable();
     private boolean dataChanged = false;
     private int currentPos = 0;
@@ -93,14 +95,9 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
     private void initParameter() {
         if (getArguments() != null) {
             chainID = getArguments().getString(IntentExtra.CHAIN_ID);
-            friends = getArguments().getParcelableArrayList(IntentExtra.BEAN);
             airdropCoin = getArguments().getLong(IntentExtra.AIRDROP_COIN,
                     Constants.AIRDROP_COIN.longValue());
             page = getArguments().getInt(IntentExtra.TYPE, PAGE_ADD_MEMBERS);
-            if (null == friends) {
-                friends = new ArrayList<>();
-            }
-
         }
     }
 
@@ -144,9 +141,6 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
                     calculateTotalCoins();
                 }
             });
-        } else {
-            adapter.submitFriendList(friends, true);
-            calculateTotalCoins();
         }
         initRefreshLayout();
     }
@@ -268,6 +262,7 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
         if (confirmDialog != null) {
             confirmDialog.closeDialog();
         }
+        RxBus2.getInstance().removeStickyEvent(Members.class);
     }
 
     @Override
@@ -288,6 +283,12 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
                             dataChanged = false;
                         }
                     }));
+        } else {
+            disposables.add(RxBus2.getInstance().registerStickyEvent(Members.class, members -> {
+                this.friends.addAll(members.getList());
+                adapter.submitFriendList(friends, true);
+                calculateTotalCoins();
+            }));
         }
     }
 
