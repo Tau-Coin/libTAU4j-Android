@@ -210,7 +210,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
      * 显示打开外部chain url的对话框（来自剪切板或外部链接）
      */
     private boolean showOpenExternalLinkDialog(String url) {
-        LinkUtil.Link link = LinkUtil.decode(url);
+        LinkUtil.Link link = LinkUtil.decodeAirdropLink(url);
         if (link.isAirdropLink()) {
             if (StringUtil.isEquals(MainApplication.getInstance().getPublicKey(),
                     link.getPeer())) {

@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import io.taucoin.torrent.publishing.core.utils.base.Base58;
@@ -31,6 +33,44 @@ public class LinkUtil {
 
     public static boolean isTauUrl(String url) {
         return StringUtil.isNotEmpty(url) && url.startsWith("tau");
+    }
+
+    /**
+     * Airdrop link 解码
+     * @param link 链link
+     * @return Link
+     */
+    public static Link decodeAirdropLink(String link) {
+        try {
+            Pattern airdrop = Pattern.compile(AIRDROP_PATTERN);
+            Matcher matcher = airdrop.matcher(link);
+            logger.debug("link::{}", link);
+            String newLink = link;
+            if (matcher.find()) {
+                logger.debug("group::{}", matcher.group());
+                newLink = matcher.group();
+            }
+            Matcher newMatcher = airdrop.matcher(newLink);
+            if (newMatcher.matches()) {
+                return decode(newLink);
+            }
+        } catch (Exception ignore) {
+        }
+        return decode(link);
+    }
+
+    public static boolean verifyAirdropUrl(String url) {
+        try {
+            if (StringUtil.isNotEmpty(url)) {
+                Pattern airdrop = Pattern.compile(AIRDROP_PATTERN);
+                Matcher matcher = airdrop.matcher(url);
+                Logger logger = LoggerFactory.getLogger("decodeAirdropUrl");
+                logger.debug("url::{}", url);
+                return matcher.matches();
+            }
+        } catch (Exception ignore) {
+        }
+        return false;
     }
 
     /**
