@@ -89,11 +89,10 @@ public class MainActivity extends ScanTriggerActivity {
     private ActionBarDrawerToggle toggle;
 
     private UserViewModel userViewModel;
-    private MainViewModel mainViewModel;
     private CommunityViewModel communityViewModel;
     private DownloadViewModel downloadViewModel;
-    private CompositeDisposable disposables = new CompositeDisposable();
-    private Subject<Integer> mBackClick = PublishSubject.create();
+    private final CompositeDisposable disposables = new CompositeDisposable();
+    private final Subject<Integer> mBackClick = PublishSubject.create();
     private CommonDialog seedDialog;
     private CommonDialog linkDialog;
     private CommonDialog joinDialog;
@@ -109,7 +108,7 @@ public class MainActivity extends ScanTriggerActivity {
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
         userViewModel = provider.get(UserViewModel.class);
-        mainViewModel = provider.get(MainViewModel.class);
+        MainViewModel mainViewModel = provider.get(MainViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
         downloadViewModel = provider.get(DownloadViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_drawer);
@@ -209,7 +208,8 @@ public class MainActivity extends ScanTriggerActivity {
         if (Utils.isTablet(this)) {
             updateViewChanged();
         } else {
-            ViewUtils.updateViewWeight(binding.mainRightFragment, 0);
+            binding.mainRightFragment.setVisibility(View.GONE);
+//            ViewUtils.updateViewWeight(binding.mainRightFragment, 0);
         }
     }
 
@@ -453,12 +453,16 @@ public class MainActivity extends ScanTriggerActivity {
                 float leftWeight = calculateLeftWeight();
                 ViewUtils.updateViewWeight(binding.rlMainLeft, leftWeight);
                 ViewUtils.updateViewWeight(binding.mainRightFragment, 10 - leftWeight);
+                binding.rlMainLeft.setVisibility(View.VISIBLE);
+                binding.mainRightFragment.setVisibility(View.VISIBLE);
             } else {
                 if (isEmptyView()) {
                     nextAndBackChange(true);
                 } else {
-                    ViewUtils.updateViewWeight(binding.rlMainLeft, 0F);
-                    ViewUtils.updateViewWeight(binding.mainRightFragment, 1.0F);
+                    binding.rlMainLeft.setVisibility(View.GONE);
+                    binding.mainRightFragment.setVisibility(View.VISIBLE);
+//                    ViewUtils.updateViewWeight(binding.rlMainLeft, 0F);
+//                    ViewUtils.updateViewWeight(binding.mainRightFragment, 1.0F);
                 }
             }
         } else {
@@ -484,8 +488,11 @@ public class MainActivity extends ScanTriggerActivity {
     }
 
     private void nextAndBackChange(boolean isBack) {
-       ViewUtils.updateViewWeight(binding.rlMainLeft, isBack ? 1F : 0F);
-        ViewUtils.updateViewWeight(binding.mainRightFragment, isBack ? 0F : 1F);
+
+       binding.rlMainLeft.setVisibility(isBack ? View.VISIBLE : View.GONE);
+       binding.mainRightFragment.setVisibility(isBack ? View.GONE : View.VISIBLE);
+//       ViewUtils.updateViewWeight(binding.rlMainLeft, isBack ? 1F : 0F);
+//        ViewUtils.updateViewWeight(binding.mainRightFragment, isBack ? 0F : 1F);
     }
 
     public void goBack() {
@@ -525,8 +532,8 @@ public class MainActivity extends ScanTriggerActivity {
             newFragment = new EmptyFragment();
         }
         newFragment.setArguments(bundle);
-        loadFragmentView(R.id.main_right_fragment, newFragment);
         updateViewChanged();
+        loadFragmentView(R.id.main_right_fragment, newFragment);
     }
 
     /**
