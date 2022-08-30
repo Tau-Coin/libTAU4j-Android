@@ -24,6 +24,7 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.log.LogConfigurator;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
+import io.taucoin.tauapp.publishing.core.utils.ObservableUtil;
 import io.taucoin.tauapp.publishing.core.utils.PermissionUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivitySplashBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
@@ -70,7 +71,7 @@ public class SplashActivity extends BaseActivity {
             requestWriteLogPermissions();
 
             // delay 3 seconds jump
-            disposables.add(Observable.timer(3, TimeUnit.SECONDS)
+            disposables.add(ObservableUtil.interval(1500)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(aLong -> splashJump()));

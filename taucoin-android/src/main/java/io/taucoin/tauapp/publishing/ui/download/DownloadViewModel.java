@@ -107,7 +107,7 @@ public class DownloadViewModel extends AndroidViewModel {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Error::Check app version", e);
+                logger.error("Error::Check app version::{}", e.getMessage());
             }
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
