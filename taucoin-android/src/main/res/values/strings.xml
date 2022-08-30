@@ -138,6 +138,8 @@
     <string name="community_users_doze">doze</string>
     <string name="common_loading">loading&#8230;</string>
 
+    <string name="community_create_tips" formatted="false"><Data><![CDATA[As creator, please keep phone <font color="#000000">ON CHARGING</font>
+    as much as possible to supply data to participants.]]></Data></string>
     <string name="community_community_name">Name(required)</string>
     <string name="community_community_name_tips">Only accept letters, numbers, space and “-“ sign.</string>
     <string name="community_name">Community Name</string>
@@ -185,7 +187,7 @@
     <string name="community_view_announcement">Announcement</string>
     <string name="community_view_blocks">Blocks Explorer</string>
     <string name="community_view_own_txs">Own Wiring Transactions</string>
-    <string name="community_view_mining_pool">Mining Pool</string>
+    <string name="community_view_tx_history">Transaction History</string>
 
     <string name="chain_mining_time">Mining Time</string>
     <string name="chain_mining_time_tips">Your remaining time to win the current mining slot.</string>

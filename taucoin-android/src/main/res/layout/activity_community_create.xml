@@ -25,6 +25,18 @@
             android:layout_height="wrap_content"
             android:background="@color/color_white">
 
+            <TextView
+                android:id="@+id/tv_community_create_tips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_15"
+                android:layout_marginEnd="@dimen/widget_size_15"
+                android:layout_marginTop="@dimen/widget_size_10"
+                android:text="@string/community_create_tips"
+                android:textColor="@color/gray_dark"
+                android:lineSpacingExtra="@dimen/widget_size_3"
+                android:textAppearance="@style/TextAppearanceBody2" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

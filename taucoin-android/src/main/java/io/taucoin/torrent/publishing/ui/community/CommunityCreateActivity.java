@@ -63,6 +63,8 @@ public class CommunityCreateActivity extends BaseActivity {
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
+        binding.tvCommunityCreateTips.setText(Html.fromHtml(getString(R.string.community_create_tips)));
+
         String totalCoin = getString(R.string.community_total_coins,
                 FmtMicrometer.fmtBalance(Constants.TOTAL_COIN.longValue()));
         binding.tvTotalCoin.setText(totalCoin);

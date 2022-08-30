@@ -52,7 +52,7 @@ public class TransactionsTabFragment extends CommunityTabFragment {
 
         int[] spinnerItems = new int[] {R.string.community_view_blocks,
                 R.string.community_view_own_txs,
-                R.string.community_view_mining_pool};
+                R.string.community_view_tx_history};
 
         SpinnerAdapter adapter = new SpinnerAdapter(activity, spinnerItems);
         binding.viewSpinner.setSelection(0);
@@ -85,7 +85,7 @@ public class TransactionsTabFragment extends CommunityTabFragment {
     private void loadSpinnerView(int item) {
         if (item == R.string.community_view_own_txs) {
             currentFragment = new QueueTabFragment();
-        } else if (item == R.string.community_view_mining_pool) {
+        } else if (item == R.string.community_view_tx_history) {
             currentFragment = new ChainTabFragment();
         } else {
             currentFragment = new BlocksTabFragment();
