@@ -83,7 +83,7 @@
 
     <color name="color_transparent">#00000000</color>
 
-    <color name="ic_launcher_background">#f19322</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
 
     <color name="viewfinder_corner">#FF1FB3E2</color>
     <color name="viewfinder_frame">#7F1FB3E2</color>

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.R;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
@@ -38,9 +39,9 @@ public class TauNotifier {
     private static final Logger logger = LoggerFactory.getLogger(TAG);
 
     // 前台服务通知渠道ID
-    private static final String FOREGROUND_NOTIFY_CHANNEL_ID = "io.taucoin.torrent.publishing.FOREGROUND_NOTIFY_CHANNEL_ID";
+    private static final String FOREGROUND_NOTIFY_CHANNEL_ID = BuildConfig.APPLICATION_ID + ".FOREGROUND_NOTIFY_CHANNEL_ID";
     // 默认通知渠道ID
-    private static final String MSG_NOTIFY_CHANNEL_ID = "io.taucoin.torrent.publishing.MSG_NOTIFY_CHANNEL_ID";
+    private static final String MSG_NOTIFY_CHANNEL_ID = BuildConfig.APPLICATION_ID + ".MSG_NOTIFY_CHANNEL_ID";
 
     // 服务启动的通知ID
     private static final int SERVICE_STARTED_NOTIFICATION_ID = -1;

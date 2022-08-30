@@ -193,7 +193,7 @@
     <string name="chain_mining_time_seconds">&#160;%1$ds</string>
     <string name="chain_mining_time_doze">Doze</string>
 <!--    The airdrop was created 3 minutes ago. Do you want to continue?-->
-    <string name="airdrop_link_long_time">The airdrop was created %1$d minutes ago. Do you want to continue?</string>
+    <string name="airdrop_link_long_time">The airdrop link was created %1$d minutes ago. Do you want to continue?</string>
     <string name="chain_link_long_time">The community\'s link was created %1$d minutes ago. Do you want to continue?</string>
     <string name="chain_qr_long_time">The community\'s QR code was created %1$d minutes ago. Do you want to continue?</string>
     <string name="friend_link_long_time">The friend\'s link was created %1$d minutes ago. Do you want to continue?</string>

@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.room.Ignore;
 import androidx.room.Relation;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.Tx;
-import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxConfirm;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.torrent.publishing.core.storage.sqlite.entity.User;
 

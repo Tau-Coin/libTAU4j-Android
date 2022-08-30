@@ -40,7 +40,7 @@ public class DownloadViewModel extends AndroidViewModel {
 
     private static final Logger logger = LoggerFactory.getLogger("DownloadViewModel");
     private static final String BASE_URL = "https://taucoin.io/";
-    private static final String CHECK_VERSION_URL = BASE_URL + "versions/";
+    private static final String CHECK_VERSION_URL = BASE_URL + "updates/";
 
     private SettingsRepository settingsRepository;
     private LocalDownloadManager localDownloadManager;

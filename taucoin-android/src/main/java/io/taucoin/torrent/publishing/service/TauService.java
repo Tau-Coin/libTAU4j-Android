@@ -17,6 +17,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.MainApplication;
 import io.taucoin.torrent.publishing.core.model.TauDaemon;
 import io.taucoin.torrent.publishing.core.storage.RepositoryHelper;
@@ -35,7 +36,7 @@ public class TauService extends Service {
 
     private static final String TAG = TauService.class.getSimpleName();
     private static final Logger logger = LoggerFactory.getLogger(TAG);
-    public static final String ACTION_SHUTDOWN = "io.taucoin.torrent.publishing.service.ACTION_SHUTDOWN";
+    public static final String ACTION_SHUTDOWN = BuildConfig.APPLICATION_ID + ".service.ACTION_SHUTDOWN";
 
     // 是不是已经在运行
     private AtomicBoolean isAlreadyRunning = new AtomicBoolean(false);

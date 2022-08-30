@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import io.taucoin.torrent.publishing.BuildConfig;
 import io.taucoin.torrent.publishing.service.TauService;
 import io.taucoin.torrent.publishing.ui.main.MainActivity;
 
@@ -11,7 +12,7 @@ import io.taucoin.torrent.publishing.ui.main.MainActivity;
  * The receiver for actions of foreground notification, added by service.
  */
 public class NotificationReceiver extends BroadcastReceiver {
-    public static final String NOTIFY_ACTION_SHUTDOWN_APP = "io.taucoin.torrent.publishing.receiver.NotificationReceiver.NOTIFY_ACTION_SHUTDOWN_APP";
+    public static final String NOTIFY_ACTION_SHUTDOWN_APP = BuildConfig.APPLICATION_ID + ".receiver.NotificationReceiver.NOTIFY_ACTION_SHUTDOWN_APP";
 
     @Override
     public void onReceive(Context context, Intent intent) {
