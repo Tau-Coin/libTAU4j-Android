@@ -20,7 +20,7 @@
             android:contentDescription="@null"
             android:src="@mipmap/icon_close" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:layout_below="@+id/iv_close"
             android:visibility="visible"
             android:id="@+id/et_seed"
@@ -35,7 +35,7 @@
             android:textAppearance="@style/TextAppearanceBody2"
             android:autofillHints="@string/user_seed_import_hint" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:layout_below="@+id/et_seed"
             android:id="@+id/et_name"
             android:layout_width="match_parent"

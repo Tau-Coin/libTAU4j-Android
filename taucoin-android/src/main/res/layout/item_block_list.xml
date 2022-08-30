@@ -86,7 +86,7 @@
                 android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody3"/>
 
-            <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
+            <io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView
                 android:id="@+id/tv_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

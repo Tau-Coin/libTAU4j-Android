@@ -33,13 +33,13 @@
             android:layout_marginStart="@dimen/widget_size_10"
             android:gravity="top">
 
-            <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
+            <io.taucoin.tauapp.publishing.ui.customviews.RoundImageView
                 android:id="@+id/iv_head_pic"
                 android:layout_width="@dimen/widget_size_40"
                 android:layout_height="@dimen/widget_size_40"
                 android:scaleType="centerCrop"/>
 
-            <io.taucoin.torrent.publishing.ui.customviews.AutoLinkTextView
+            <io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView
                 android:id="@+id/tv_msg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

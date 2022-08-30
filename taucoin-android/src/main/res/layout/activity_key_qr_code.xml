@@ -41,7 +41,7 @@
                         android:id="@+id/qr_code"
                         layout="@layout/qr_code"/>
 
-                    <io.taucoin.torrent.publishing.ui.customviews.SquareTextView
+                    <io.taucoin.tauapp.publishing.ui.customviews.SquareTextView
                         android:id="@+id/tv_kept_secret"
                         android:layout_marginStart="@dimen/widget_size_40"
                         android:layout_marginEnd="@dimen/widget_size_40"

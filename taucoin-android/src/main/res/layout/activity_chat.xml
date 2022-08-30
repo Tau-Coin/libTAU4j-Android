@@ -18,7 +18,7 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+        <io.taucoin.tauapp.publishing.ui.customviews.EmptyRecyclerView
             android:background="@color/color_chat_bg"
             android:id="@+id/msg_list"
             android:layout_width="match_parent"
@@ -42,7 +42,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+            <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
                 android:id="@+id/et_message"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                 android:contentDescription="@null"/>
         </LinearLayout>
 
-        <io.taucoin.torrent.publishing.ui.customviews.ChatAddView
+        <io.taucoin.tauapp.publishing.ui.customviews.ChatAddView
             android:id="@+id/chat_add"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_280" />

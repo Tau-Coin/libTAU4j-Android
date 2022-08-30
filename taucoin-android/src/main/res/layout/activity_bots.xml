@@ -19,7 +19,7 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+        <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
             android:id="@+id/ll_airdrop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
             app:lineRightImage="@mipmap/icon_arrow"
             app:lineLeftText="@string/bot_airdrop"/>
 
-        <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+        <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
             android:visibility="gone"
             android:id="@+id/ll_hello_world"
             android:layout_width="match_parent"

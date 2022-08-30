@@ -14,7 +14,7 @@
         android:paddingStart="@dimen/widget_size_7"
         android:paddingEnd="@dimen/widget_size_0">
 
-        <io.taucoin.torrent.publishing.ui.customviews.RoundButton
+        <io.taucoin.tauapp.publishing.ui.customviews.RoundButton
             android:id="@+id/left_view"
             android:layout_width="@dimen/widget_size_40"
             android:layout_height="@dimen/widget_size_40"

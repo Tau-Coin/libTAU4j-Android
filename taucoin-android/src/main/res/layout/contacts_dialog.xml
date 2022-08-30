@@ -31,7 +31,7 @@
             android:layout_marginBottom="@dimen/widget_size_15"
             android:textAppearance="@style/TextAppearanceBody1"/>
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:layout_below="@+id/tv_title"
             android:visibility="gone"
             android:id="@+id/et_chat_name"
@@ -46,7 +46,7 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/user_seed_import_hint" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:layout_below="@+id/et_chat_name"
             android:id="@+id/et_public_key"
             android:layout_width="match_parent"

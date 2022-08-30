@@ -22,7 +22,7 @@
                 android:paddingBottom="@dimen/widget_size_5"
                 android:background="@color/color_chat_bg">
 
-                <io.taucoin.torrent.publishing.ui.customviews.RoundImageView
+                <io.taucoin.tauapp.publishing.ui.customviews.RoundImageView
                     android:id="@+id/round_button"
                     android:layout_width="@dimen/widget_size_55"
                     android:layout_height="@dimen/widget_size_55"
@@ -133,7 +133,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_airdrop_coins"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -144,7 +144,7 @@
                         app:leftImage="@mipmap/icon_airdrop_coins"
                         app:rightText="@string/drawer_send_and_airdrop_coins"/>
 
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
                         android:visibility="visible"
                         android:id="@+id/item_new_community"
                         android:layout_width="match_parent"
@@ -155,7 +155,7 @@
                         app:leftImage="@mipmap/icon_new_community"
                         app:rightText="@string/drawer_new_community"/>
 
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_wallet"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -165,7 +165,7 @@
                         app:leftImage="@mipmap/icon_mining"
                         app:rightText="@string/drawer_wallet"/>
 
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_contacts"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -175,7 +175,7 @@
                         app:leftImage="@mipmap/icon_friends"
                         app:rightText="@string/drawer_peers"/>
 
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_setting"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -188,7 +188,7 @@
 
                     <include layout="@layout/view_line"/>
 
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_share"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -200,7 +200,7 @@
 
                     <include layout="@layout/view_line"/>
 
-                    <io.taucoin.torrent.publishing.ui.customviews.ItemLineView
+                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_official_telegram"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

@@ -105,7 +105,7 @@
 
                 </RelativeLayout>
 
-                <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                <io.taucoin.tauapp.publishing.ui.customviews.EmptyRecyclerView
                     android:id="@+id/tx_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

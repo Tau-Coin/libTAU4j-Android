@@ -17,7 +17,7 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_item_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_item_name" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_link"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_link" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_quantity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_quantity" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_location" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -104,7 +104,7 @@
 
                 </RelativeLayout>
 
-                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_balance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -114,7 +114,7 @@
                     app:lineLeftText="@string/drawer_balance"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_mining_income"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
                     app:lineLeftText="@string/community_mining_income"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_mining_power"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -134,7 +134,7 @@
                     app:lineLeftText="@string/community_mining_power"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_last_block"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -144,7 +144,7 @@
                     app:lineLeftText="@string/community_head_block"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.torrent.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_difficulty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

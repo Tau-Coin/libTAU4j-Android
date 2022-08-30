@@ -117,7 +117,7 @@
                         android:layout_height="match_parent"
                         android:background="@color/color_chat_bg"/>
 
-                    <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+                    <io.taucoin.tauapp.publishing.ui.customviews.EmptyRecyclerView
                         android:layout_above="@+id/rl_bottom"
                         android:id="@+id/tx_list"
                         android:layout_width="match_parent"
@@ -128,7 +128,7 @@
                         android:focusable="true"
                         android:scrollbarStyle="outsideOverlay" />
 
-                    <io.taucoin.torrent.publishing.ui.customviews.ThemedSpeedDialView
+                    <io.taucoin.tauapp.publishing.ui.customviews.ThemedSpeedDialView
                         android:id="@+id/fab_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

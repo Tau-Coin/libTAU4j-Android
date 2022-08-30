@@ -46,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <io.taucoin.torrent.publishing.ui.customviews.EmptyRecyclerView
+            <io.taucoin.tauapp.publishing.ui.customviews.EmptyRecyclerView
                 android:background="@color/color_white"
                 android:id="@+id/recycler_list"
                 android:layout_width="match_parent"

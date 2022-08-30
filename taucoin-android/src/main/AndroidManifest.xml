@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="io.taucoin.torrent.publishing"
+    package="io.taucoin.tauapp.publishing"
     android:installLocation="auto">
 
     <!-- 访问网络权限 -->
@@ -191,7 +191,7 @@
             android:name=".receiver.NotificationReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="io.taucoin.torrent.publishing.receiver.NotificationReceiver.NOTIFY_ACTION_SHUTDOWN_APP" />
+                <action android:name="${applicationId}.receiver.NotificationReceiver.NOTIFY_ACTION_SHUTDOWN_APP" />
             </intent-filter>
         </receiver>
 

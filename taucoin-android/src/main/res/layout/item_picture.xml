@@ -30,7 +30,7 @@
             android:layout_marginStart="@dimen/widget_size_10"
             android:gravity="top">
 
-            <io.taucoin.torrent.publishing.ui.customviews.RoundButton
+            <io.taucoin.tauapp.publishing.ui.customviews.RoundButton
                 android:id="@+id/round_button"
                 android:layout_width="@dimen/widget_size_40"
                 android:layout_height="@dimen/widget_size_40"
@@ -43,7 +43,7 @@
                 app:btnSolidColor="@color/primary_light"
                 app:btnPressedRatio="1.5" />
 
-            <io.taucoin.torrent.publishing.ui.customviews.HashImageView
+            <io.taucoin.tauapp.publishing.ui.customviews.HashImageView
                 android:id="@+id/tv_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

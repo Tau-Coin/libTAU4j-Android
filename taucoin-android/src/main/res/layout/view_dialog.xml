@@ -22,7 +22,7 @@
             android:layout_gravity="end"
             android:src="@mipmap/icon_close" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.MultilineTextView
+        <io.taucoin.tauapp.publishing.ui.customviews.MultilineTextView
             android:id="@+id/tv_msg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

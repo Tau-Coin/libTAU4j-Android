@@ -17,7 +17,7 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_coin_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_invitation_title" />
 
-        <io.taucoin.torrent.publishing.ui.customviews.FilterEditText
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
