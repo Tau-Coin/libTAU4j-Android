@@ -791,7 +791,7 @@ public abstract class TauDaemon {
         if (updateBootstrapIntervalTimer != null && !updateBootstrapIntervalTimer.isDisposed()) {
             updateBootstrapIntervalTimer.dispose();
         }
-        updateBootstrapIntervalTimer = ObservableUtil.intervalSeconds(60)
+        updateBootstrapIntervalTimer = ObservableUtil.intervalSeconds(120)
                 .subscribeOn(Schedulers.io())
                 .subscribe(l -> updateBootstrapInterval(600));
     }
