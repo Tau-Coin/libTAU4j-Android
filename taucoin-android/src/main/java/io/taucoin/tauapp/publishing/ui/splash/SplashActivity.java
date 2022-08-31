@@ -36,7 +36,7 @@ public class SplashActivity extends BaseActivity {
 
     private static final Logger logger = LoggerFactory.getLogger("SplashActivity");
     private volatile boolean isAsk = false;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private CrashViewModel crashViewModel;
 
     @Override
@@ -71,7 +71,7 @@ public class SplashActivity extends BaseActivity {
             requestWriteLogPermissions();
 
             // delay 3 seconds jump
-            disposables.add(ObservableUtil.interval(1500)
+            disposables.add(Observable.timer(1500, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(aLong -> splashJump()));
