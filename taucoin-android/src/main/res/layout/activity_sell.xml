@@ -52,7 +52,8 @@
             android:layout_marginEnd="@dimen/widget_size_20"
             android:layout_marginTop="@dimen/widget_size_5"
             android:hint="@string/tx_quantity"
-            android:inputType="numberDecimal|number"
+            android:inputType="number"
+            android:maxLength="7"
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_quantity" />
 

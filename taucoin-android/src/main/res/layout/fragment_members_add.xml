@@ -22,8 +22,7 @@
 
             <TextView
                 android:id="@+id/tv_selected_friends"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/community_selected_friends"
                 android:textColor="@color/gray_dark"
@@ -31,7 +30,10 @@
 
             <TextView
                 android:id="@+id/tv_airdrop_coins"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/widget_size_15"
+                android:gravity="end"
                 android:layout_height="wrap_content"
                 android:text="@string/community_total_coins"
                 android:textColor="@color/gray_dark"

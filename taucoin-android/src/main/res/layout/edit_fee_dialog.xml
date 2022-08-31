@@ -28,7 +28,8 @@
             android:singleLine="true"
             android:gravity="center_horizontal|center"
             android:hint="@string/tx_fee_hint"
-            android:inputType="numberDecimal|number"
+            android:inputType="number"
+            android:maxLength="7"
             android:autofillHints="@string/tx_fee_hint"
             android:textAppearance="@style/TextAppearanceBody1"/>
 
