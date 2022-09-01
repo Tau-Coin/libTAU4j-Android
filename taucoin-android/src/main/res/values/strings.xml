@@ -501,7 +501,7 @@
     <string name="contacts_exchange_qr">Show QR code to add friend</string>
     <string name="contacts_import_friend_pk">Add friend\'s address</string>
     <string name="contacts_have_added">Hello.</string>
-    <string name="contacts_accepting_airdrop">Please send me %1$s community coins from the attached airdrop invitation.</string>
+    <string name="contacts_accepting_airdrop">Please send me %1$s community coins from the attached airdrop invitation.\n%2$s</string>
     <string name="contacts_yourself">&#160;-&#160;yourself</string>
     <string name="contacts_discovered">Discovered</string>
     <string name="contacts_added">Added</string>

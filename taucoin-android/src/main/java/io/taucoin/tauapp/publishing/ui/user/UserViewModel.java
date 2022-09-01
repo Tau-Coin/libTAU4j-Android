@@ -877,7 +877,8 @@ public class UserViewModel extends AndroidViewModel {
         if (airdropUrl != null) {
             chainID = airdropUrl.getData();
             String communityName = ChainIDUtil.getName(chainID);
-            msg = getApplication().getString(R.string.contacts_accepting_airdrop, communityName);
+            String link = airdropUrl.getLink();
+            msg = getApplication().getString(R.string.contacts_accepting_airdrop, communityName, link);
             type = MessageType.AIRDROP.getType();
         } else {
             msg = getApplication().getString(R.string.contacts_have_added);
@@ -885,10 +886,6 @@ public class UserViewModel extends AndroidViewModel {
         }
         String senderPk = MainApplication.getInstance().getPublicKey();
         chatViewModel.syncSendMessageTask(senderPk, friendPk, msg, type, chainID);
-        if (airdropUrl != null) {
-            String link = airdropUrl.getLink();
-            chatViewModel.syncSendMessageTask(senderPk, friendPk, link, MessageType.TEXT.getType(), null);
-        }
         logger.info("AddFriendsLocally, syncSendMessageTask::{}", msg);
     }
 
