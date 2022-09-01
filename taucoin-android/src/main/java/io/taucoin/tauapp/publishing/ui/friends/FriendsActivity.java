@@ -67,14 +67,14 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
         ViewModelProvider provider = new ViewModelProvider(this);
         userViewModel = provider.get(UserViewModel.class);
         initParameter(getIntent());
-        initView();
+        initView(false);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         initParameter(intent);
-        initView();
+        initView(true);
         subscribeUserList();
         initData();
     }
@@ -95,7 +95,7 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
     /**
      * 初始化布局
      */
-    private void initView() {
+    private void initView(boolean isNewIntent) {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(R.string.drawer_peers);
         setSupportActionBar(binding.toolbarInclude.toolbar);
@@ -111,7 +111,9 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
             binding.llYourself.setVisibility(View.GONE);
             binding.tvYourselfTip.setVisibility(View.GONE);
         }
-        initRefreshLayout();
+        if (!isNewIntent) {
+            initRefreshLayout();
+        }
     }
 
     private void initRefreshLayout() {
@@ -321,6 +323,8 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
 
     @Override
     public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout refreshLayout) {
+        refreshLayout.endRefreshing();
+        refreshLayout.setPullDownRefreshEnable(false);
     }
 
     @Override
