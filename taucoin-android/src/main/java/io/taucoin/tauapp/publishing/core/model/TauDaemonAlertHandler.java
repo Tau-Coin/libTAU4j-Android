@@ -84,6 +84,13 @@ public class TauDaemonAlertHandler {
         clearExpiredPeersDis = clearExpiredPeersTask();
     }
 
+    public void resetAllData() {
+        chainStoppedSet.clear();
+        chainStoppedData.postValue(chainStoppedSet);
+        onlinePeerMap.clear();
+        onlinePeerData.postValue(onlinePeerMap);
+    }
+
     /**
      * 处理AlertAndUser, 包含libTAU上报的alert， 还有当前用户信息
      * @param alertAndUser LibTAU上报的Alert事件

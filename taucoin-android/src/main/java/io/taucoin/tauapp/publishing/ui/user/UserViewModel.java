@@ -315,6 +315,7 @@ public class UserViewModel extends AndroidViewModel {
 
                 // 6、更新我的账户管理
                 daemon.getMyAccountManager().reset();
+                daemon.getTauDaemonHandler().resetAllData();
             } catch (Exception e){
                 result = getApplication().getString(R.string.user_seed_invalid);
                 logger.warn("import seed error::{}", result);
