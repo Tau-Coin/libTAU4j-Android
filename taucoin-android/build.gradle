@@ -99,7 +99,7 @@ android {
 //            flavorDimensions
             dimension 'default'
             buildConfigField "String", "SPLASH_APP_NAME", "\"TAU App Develop\""     // 启动页文案
-            buildConfigField "Boolean", "DISPLAY_DEBUG_VIEW", "true"
+            buildConfigField "Boolean", "DISPLAY_DEBUG_VIEW", "false"
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "10000"             // Level.DEBUG
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "7"
             // TauLogLevel.DEBUG

@@ -232,6 +232,12 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     }
                 } else if (miningTime == -100) {
                     subtitle.append(getString(R.string.community_users_doze));
+                } else {
+                    // 链业务已停止
+                    int length = subtitle.length();
+                    if (length > 0) {
+                        subtitle.delete(length - 2, length - 1);
+                    }
                 }
             } else {
                 subtitle.append(getString(R.string.community_users_discovering));
@@ -352,7 +358,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 R.layout.external_airdrop_link_dialog, null, false);
         if (chainStopped) {
             dialogBinding.tvPeer.setText(R.string.community_stopped_running);
-            dialogBinding.tvJoin.setText(R.string.common_restart);
+            dialogBinding.tvJoin.setText(R.string.common_retry);
         } else {
             dialogBinding.tvPeer.setText(R.string.community_near_expiry);
             dialogBinding.tvJoin.setVisibility(View.GONE);

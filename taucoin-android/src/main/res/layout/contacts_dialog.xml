@@ -62,7 +62,20 @@
             android:autofillHints="@string/user_nickname" />
 
         <TextView
+            android:visibility="gone"
             android:layout_below="@+id/et_public_key"
+            android:id="@+id/tv_nick_name_tips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:text="@string/community_community_name_tips"
+            android:textColor="@color/gray_dark"
+            android:textAppearance="@style/TextAppearanceBody3" />
+
+        <TextView
+            android:layout_below="@+id/tv_nick_name_tips"
             android:id="@+id/tv_submit"
             android:minWidth="@dimen/widget_size_240"
             android:layout_width="wrap_content"

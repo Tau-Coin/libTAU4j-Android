@@ -934,6 +934,7 @@ public class UserViewModel extends AndroidViewModel {
                 editNameDialog.closeDialog();
             }
         });
+        binding.tvNickNameTips.setVisibility(View.VISIBLE);
         binding.tvSubmit.setOnClickListener(v -> {
             String newName = StringUtil.getText(binding.etPublicKey);
             if (StringUtil.isNotEmpty(newName)) {

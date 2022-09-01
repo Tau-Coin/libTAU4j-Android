@@ -3,11 +3,15 @@ package io.taucoin.tauapp.publishing.ui.customviews;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.widget.EditText;
+
+import io.taucoin.tauapp.publishing.BuildConfig;
 import io.taucoin.tauapp.publishing.core.model.DozeEvent;
 import io.taucoin.tauapp.publishing.core.model.TauDaemon;
+import io.taucoin.tauapp.publishing.core.utils.ChineseFilter;
 
 /**
  * 过滤中文输入框
@@ -65,10 +69,10 @@ public class FilterEditText extends EditText {
 
     private void initFilters() {
         addTextChangedListener(textWatcher);
-//        if (BuildConfig.DEBUG) {
-//            return;
-//        }
-//        setFilters(new InputFilter[]{new ChineseFilter()});
+        if (BuildConfig.DEBUG) {
+            return;
+        }
+        setFilters(new InputFilter[]{new ChineseFilter()});
     }
 
     @Override

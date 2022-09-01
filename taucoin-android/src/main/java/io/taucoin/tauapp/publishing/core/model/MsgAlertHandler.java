@@ -163,7 +163,7 @@ class MsgAlertHandler {
 
                 // 创建通知栏消息
                 User friendUser = userRepo.getUserByPublicKey(senderPk);
-                if (friendUser != null && content != null) {
+                if (friendUser != null && !friendUser.isBanned && content != null) {
                     TauNotifier.getInstance().makeChatNotify(friendUser, Utils.textBytesToString(content));
                 }
             }
@@ -208,7 +208,7 @@ class MsgAlertHandler {
         }
         String memo = appContext.getString(R.string.tx_memo_airdrop);
         long amount = member.airdropCoins;
-        long fee = 0L;
+        long fee = Constants.WIRING_MIN_FEE.longValue();
         TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
         TxQueue tx = new TxQueue(chainID, currentPk, friendPk, amount, fee, 1,
                 TxType.WIRING_TX.getType(), txContent.getEncoded());

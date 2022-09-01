@@ -21,6 +21,7 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.ForkPoint;
 import io.taucoin.tauapp.publishing.core.model.data.FriendStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
+import io.taucoin.tauapp.publishing.core.model.data.UserAndFriend;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.MessageType;
@@ -388,9 +389,12 @@ public class TauListenHandler {
                     member.msgUnread = 1;
                     memberRepo.updateMember(member);
                 }
-                // 发送社区新交易通知
-                SpannableStringBuilder msg = TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
-                TauNotifier.getInstance().makeCommunityNotify(tx.chainID, msg);
+                UserAndFriend friend = userRepo.getFriend(tx.senderPk);
+                if (friend != null && !friend.isMemBanned) {
+                    // 发送社区新交易通知
+                    SpannableStringBuilder msg = TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
+                    TauNotifier.getInstance().makeCommunityNotify(tx.chainID, msg);
+                }
             }
         }
     }

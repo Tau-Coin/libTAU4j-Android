@@ -16,6 +16,7 @@
     <string name="common_confirm">Confirm</string>
     <string name="common_submit">Submit</string>
     <string name="common_restart">Restart</string>
+    <string name="common_retry">Retry</string>
     <string name="common_report">Report</string>
     <string name="common_report_exit">Report and Exit</string>
     <string name="common_percent">%1$d%%</string>
@@ -71,7 +72,7 @@
     <string name="main_insufficient_device_space">Insufficient device space</string>
 
     <string name="main_tab_all">All</string>
-    <string name="main_tab_community">Community</string>
+    <string name="main_tab_community">My Community</string>
     <string name="main_tab_personal">Personal</string>
     <string name="main_operation_mark_read">Mark as Read</string>
     <string name="main_operation_mark_unread">Mark as UnRead</string>
@@ -130,12 +131,12 @@
 
     <string name="community_input_hint">Message</string>
     <string name="community_title">%1$s(%2$d)</string>
-    <string name="community_users_stats_m">members&#160;%1$d,&#160;</string>
-    <string name="community_users_stats_c">connected&#160;%1$d,&#160;</string>
+    <string name="community_users_stats_m">Peer&#160;%1$d,&#160;</string>
+    <string name="community_users_stats_c">Linked&#160;%1$d,&#160;</string>
     <string name="community_users_stats_s">%1$s</string>
-    <string name="community_users_discovering">discovering</string>
-    <string name="community_users_mining">mining</string>
-    <string name="community_users_doze">doze</string>
+    <string name="community_users_discovering">Discovering</string>
+    <string name="community_users_mining">Mining</string>
+    <string name="community_users_doze">Doze</string>
     <string name="common_loading">loading&#8230;</string>
 
     <string name="community_create_tips" formatted="false"><Data><![CDATA[As creator, please keep phone <font color="#000000">ON CHARGING</font>
@@ -229,8 +230,8 @@
     <string name="community_favorite_delete_successfully">Delete favorite successfully</string>
     <string name="community_added_successfully">Create Community Successful!</string>
     <string name="community_added_failed">Failed to add community!</string>
-    <string name="community_stopped_running">Failed to obtain consensus blocks for many times, and the blockchain business has stopped running.</string>
-    <string name="community_stopped_running_tips">The blockchain has stopped running.</string>
+    <string name="community_stopped_running">Retry connecting blockchain?</string>
+    <string name="community_stopped_running_tips">Initial connection error. Click to retry.</string>
     <string name="community_near_expiry_tips">The account is about to expire.</string>
     <string name="community_near_expiry">The account is about to expire. You can increase the balance to ensure that the account does not expire</string>
     <string name="community_join">Join</string>
@@ -540,7 +541,7 @@
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share Airdrop link</string>
     <string name="bot_share_airdrop_link_content">Hi, I am sending you \"%1$s\" community crypto coins.\n1.
-        We user taucoin.io wallet, which is a safe and secure server-less app.\n2.
+        We use taucoin.io wallet, which is a safe and secure server-less app.\n2.
         Paste this FULL message to TAU app airdrop function.\n%2$s</string>
     <string name="bot_hello_world">HelloWorld</string>
 
