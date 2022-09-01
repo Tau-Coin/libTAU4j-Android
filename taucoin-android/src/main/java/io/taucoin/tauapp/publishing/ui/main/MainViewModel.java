@@ -85,7 +85,9 @@ public class MainViewModel extends AndroidViewModel {
                 list.addAll(dataList);
                 for(CommunityAndFriend data : dataList) {
                     if (data.type == 0) {
-                        communities.add(data);
+                        if (data.joined == 1) {
+                            communities.add(data);
+                        }
                     } else if (data.type == 1) {
                         friends.add(data);
                     }
