@@ -39,10 +39,17 @@ android {
     }
 
     signingConfigs {
-        myConfig {
+        debugConfig {
             storeFile file('debug.keystore')
             storePassword 'android'
             keyAlias 'AndroidDebugKey'
+            keyPassword 'android'
+        }
+
+        releaseConfig {
+            storeFile file('release.keystore')
+            storePassword 'android'
+            keyAlias 'AndroidReleaseKey'
             keyPassword 'android'
         }
     }
@@ -52,7 +59,7 @@ android {
             minifyEnabled false
             shrinkResources false
             zipAlignEnabled true
-            signingConfig signingConfigs.myConfig
+//            signingConfig signingConfigs.myConfig
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
@@ -60,7 +67,7 @@ android {
             minifyEnabled false
             shrinkResources false
             zipAlignEnabled true
-            signingConfig signingConfigs.myConfig
+            signingConfig null      // 防止出错
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -105,6 +112,7 @@ android {
             // TauLogLevel.DEBUG
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://6e6170b970bae896803ecb1051653" +
                     "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:7882\""
+            signingConfig signingConfigs.debugConfig
         }
 
         beta {
@@ -116,6 +124,7 @@ android {
             // TauLogLevel.INFO
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://83024767468B8BF8DB868F336596C" +
                     "63561265D553833E5C0BF3E4767659B826B@13.229.53.249:6882\""
+            signingConfig signingConfigs.releaseConfig
         }
 
         official {
@@ -127,6 +136,7 @@ android {
             // TauLogLevel.WARN
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://83024767468B8BF8DB868F336596C" +
                     "63561265D553833E5C0BF3E4767659B826B@13.229.53.249:6882\""
+            signingConfig signingConfigs.releaseConfig
         }
 
         id00 {
