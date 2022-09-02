@@ -232,21 +232,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     }
                 } else if (miningTime == -100) {
                     subtitle.append(getString(R.string.community_users_doze));
-                } else {
-                    // 链业务已停止
-                    int length = subtitle.length();
-                    if (length > 0) {
-                        subtitle.delete(length - 2, length - 1);
-                    }
                 }
             } else {
                 subtitle.append(getString(R.string.community_users_discovering));
-            }
-        } else {
-            // 未加入社区
-            int length = subtitle.length();
-            if (length > 0) {
-                subtitle.delete(length - 2, length - 1);
             }
         }
         binding.toolbarInclude.tvSubtitle.setText(subtitle);

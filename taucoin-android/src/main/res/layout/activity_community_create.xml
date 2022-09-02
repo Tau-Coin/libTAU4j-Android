@@ -35,7 +35,7 @@
                 android:text="@string/community_create_tips"
                 android:textColor="@color/gray_dark"
                 android:lineSpacingExtra="@dimen/widget_size_3"
-                android:textAppearance="@style/TextAppearanceBody2" />
+                android:textAppearance="@style/TextAppearanceBody1" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
