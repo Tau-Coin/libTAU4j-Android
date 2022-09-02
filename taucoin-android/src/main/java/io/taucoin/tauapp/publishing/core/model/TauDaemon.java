@@ -656,8 +656,8 @@ public abstract class TauDaemon {
         if (isRunning) {
             byte[] keySrc = ByteUtil.toByte(publicKey);
             byte[] key = DataKey.getKey(keySrc, DataKey.Suffix.INFO);
-            sessionManager.publishData(key, value);
-            logger.info("pubUserInfo userPk::{}, key.length::{}", publicKey, key.length);
+            boolean success = sessionManager.publishData(key, value);
+            logger.info("pubUserInfo userPk::{}, key.length::{}, success::{}", publicKey, key.length, success);
         }
     }
 

@@ -383,8 +383,6 @@ public class CommunityViewModel extends AndroidViewModel {
             }
 
             communityRepo.addCommunity(community);
-            // 更新用户在线信号
-            daemon.updateUserInfo(currentUser);
             logger.info("Add community to database: communityName={}, chainID={}",
                     community.communityName, community.chainID);
 
@@ -398,6 +396,9 @@ public class CommunityViewModel extends AndroidViewModel {
                 member = new Member(community.chainID, currentUser.publicKey, 0, 0);
             }
             memberRepo.addMember(member);
+
+            // 添加朋友信息后，更新用户在线信号
+            daemon.updateUserInfo(currentUser);
 
             // 自动发送一笔Sell交易
             String coinName = ChainIDUtil.getCoinName(community.chainID);
