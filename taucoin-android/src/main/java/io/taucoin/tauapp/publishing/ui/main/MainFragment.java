@@ -111,7 +111,13 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             if (tab != null) {
                 LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) tab.view.getLayoutParams();
                 layoutParams.width = 0;
-                layoutParams.weight = i == 0 ? 1.2f : 2f;
+                if (i == 0) {
+                    layoutParams.weight = 1.2f;
+                } else if (i == 1) {
+                    layoutParams.weight = 2.2f;
+                } else {
+                    layoutParams.weight = 1.8f;
+                }
                 tab.view.setLayoutParams(layoutParams);
             }
         }
