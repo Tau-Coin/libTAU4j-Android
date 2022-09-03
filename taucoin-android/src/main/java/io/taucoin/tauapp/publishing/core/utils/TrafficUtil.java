@@ -49,8 +49,11 @@ public class TrafficUtil {
         } else {
             long total = getWifiTrafficTotal();
             total += incrementalDown + incrementalUp;
-            settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI, total);
-            logger.debug("Save wifi traffic::::{}", total);
+            if (!NetworkSetting.isDevelopCountry()) {
+                settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI, total);
+            }
+            logger.debug("Save wifi traffic::::{}, isDevelopCountry::{}", total,
+                    NetworkSetting.isDevelopCountry());
         }
     }
 
