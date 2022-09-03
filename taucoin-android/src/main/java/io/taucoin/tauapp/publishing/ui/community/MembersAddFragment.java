@@ -38,7 +38,7 @@ import io.taucoin.tauapp.publishing.databinding.ViewConfirmDialogBinding;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
-import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
+import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.transaction.TxViewModel;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
@@ -54,7 +54,7 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
     private FragmentMembersAddBinding binding;
     private TxViewModel viewModel;
     private UserViewModel userViewModel;
-    private CommonDialog confirmDialog;
+    private ConfirmDialog confirmDialog;
     private MembersAddAdapter adapter;
     private String chainID;
     private String medianFee;
@@ -224,13 +224,15 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
 
         calculateConfirmCoins(binding);
 
-        confirmDialog = new CommonDialog.Builder(activity)
+        binding.tvConfirm.setOnClickListener(view -> {
+            showProgressDialog();
+            viewModel.addMembers(chainID, getSelectedMap(), medianFee);
+        });
+
+        confirmDialog = new ConfirmDialog.Builder(activity)
                 .setContentView(binding.getRoot())
-                .setButtonWidth(R.dimen.widget_size_240)
-                .setPositiveButton(R.string.common_confirm, (dialog, which) -> {
-                    showProgressDialog();
-                    viewModel.addMembers(chainID, getSelectedMap(), medianFee);
-                }).create();
+                .setWarpView(binding.recyclerList)
+                .create();
         confirmDialog.show();
     }
 

@@ -11,77 +11,82 @@
         android:layout_marginTop="@dimen/widget_size_20"
         android:background="@color/color_white"
         android:gravity="center_horizontal"
-        android:paddingStart="@dimen/widget_size_10"
-        android:paddingEnd="@dimen/widget_size_10"
+        android:paddingTop="@dimen/widget_size_25"
+        android:paddingStart="@dimen/widget_size_20"
+        android:paddingEnd="@dimen/widget_size_20"
+        android:paddingBottom="@dimen/widget_size_35"
         android:orientation="vertical">
 
-        <androidx.core.widget.NestedScrollView
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            style="@style/TextAppearanceBody2"
+            android:textColor="@color/gray_dark"
+            android:text="@string/community_custom_airdrop_tips"/>
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+        <io.taucoin.tauapp.publishing.ui.customviews.EmptyRecyclerView
+            android:background="@color/color_white"
+            android:id="@+id/recycler_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:layout_marginBottom="@dimen/widget_size_10"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:focusable="true"
+            android:scrollbarStyle="outsideOverlay" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/TextAppearanceBody2"
-                    android:textColor="@color/gray_dark"
-                    android:text="@string/community_custom_airdrop_tips"/>
+        <include layout="@layout/view_line"/>
 
-                <io.taucoin.tauapp.publishing.ui.customviews.EmptyRecyclerView
-                    android:background="@color/color_white"
-                    android:id="@+id/recycler_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:layout_marginBottom="@dimen/widget_size_10"
-                    android:clipToPadding="false"
-                    android:scrollbars="vertical"
-                    android:focusable="true"
-                    android:scrollbarStyle="outsideOverlay" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_5">
 
-                <include layout="@layout/view_line"/>
+            <TextView
+                android:id="@+id/tv_airdrop_peers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/community_airdrop_peers"
+                style="@style/TextAppearanceBody2" />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/widget_size_5">
+            <TextView
+                android:layout_toEndOf="@+id/tv_airdrop_peers"
+                android:id="@+id/tv_airdrop_coins"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:gravity="end"
+                android:text="@string/community_airdrop_coins"
+                style="@style/TextAppearanceBody2" />
 
-                    <TextView
-                        android:id="@+id/tv_airdrop_peers"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/community_airdrop_peers"
-                        style="@style/TextAppearanceBody2" />
+            <TextView
+                android:layout_below="@+id/tv_airdrop_coins"
+                android:layout_toEndOf="@+id/tv_airdrop_peers"
+                android:id="@+id/tv_airdrop_free"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:gravity="end"
+                android:text="@string/community_airdrop_fee"
+                style="@style/TextAppearanceBody2" />
 
-                    <TextView
-                        android:layout_toEndOf="@+id/tv_airdrop_peers"
-                        android:id="@+id/tv_airdrop_coins"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:gravity="end"
-                        android:text="@string/community_airdrop_coins"
-                        style="@style/TextAppearanceBody2" />
+        </RelativeLayout>
 
-                    <TextView
-                        android:layout_below="@+id/tv_airdrop_coins"
-                        android:layout_toEndOf="@+id/tv_airdrop_peers"
-                        android:id="@+id/tv_airdrop_free"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:gravity="end"
-                        android:text="@string/community_airdrop_fee"
-                        style="@style/TextAppearanceBody2" />
-
-                </RelativeLayout>
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+        <TextView
+            android:id="@+id/tv_confirm"
+            android:layout_width="wrap_content"
+            android:minWidth="@dimen/widget_size_240"
+            android:layout_height="@dimen/widget_size_44"
+            android:layout_marginTop="@dimen/widget_size_30"
+            android:maxLines="1"
+            android:textColor="@color/color_white"
+            android:gravity="center_vertical|center"
+            android:textAllCaps="false"
+            android:ellipsize="end"
+            android:text="@string/common_confirm"
+            android:background="@drawable/primary_rect_round_bg"
+            android:textAppearance="@style/TextAppearanceBody1"/>
 
     </LinearLayout>
 </layout>
