@@ -401,7 +401,8 @@ public class NetworkSetting {
         if (NetworkSetting.isMeteredNetwork()) {
             isHaveAvailableData = getMeteredAvailableData() > 0;
         } else {
-            isHaveAvailableData = getWiFiAvailableData() > 0;
+            // 发达国家WiFi网络流量不限制
+            isHaveAvailableData = isDevelopCountry() || getWiFiAvailableData() > 0;
         }
         return isHaveAvailableData;
     }

@@ -452,8 +452,7 @@ public abstract class TauDaemon {
      * 发达国家使用wifi网络时不限量
      */
     void handleNoRemainingDataTips() {
-        if (!isRunning || !NetworkSetting.isForegroundRunning() || (!NetworkSetting.isMeteredNetwork()
-                && NetworkSetting.isDevelopCountry())) {
+        if (!isRunning || !NetworkSetting.isForegroundRunning()) {
             return;
         }
         // 判断有无网络连接

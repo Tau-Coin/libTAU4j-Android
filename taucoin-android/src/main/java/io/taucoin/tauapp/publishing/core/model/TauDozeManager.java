@@ -12,6 +12,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
+import io.taucoin.tauapp.publishing.core.utils.NetworkSetting;
 
 /**
  * TAU休息模式
@@ -105,9 +106,14 @@ public class TauDozeManager {
     }
 
     public void setDataAvailableRate(int dataAvailableRate) {
-        if (this.dataAvailableRate != dataAvailableRate) {
-            logger.debug("setDataAvailableRate::{}", dataAvailableRate);
-            this.dataAvailableRate = dataAvailableRate;
+        int currentRate = dataAvailableRate;
+        // 发达国家WiFi网络流量不限制
+        if (NetworkSetting.isDevelopCountry()) {
+            currentRate = 100;
+        }
+        if (this.dataAvailableRate != currentRate) {
+            logger.debug("setDataAvailableRate::{}", currentRate);
+            this.dataAvailableRate = currentRate;
             checkDozeTime();
         }
     }
