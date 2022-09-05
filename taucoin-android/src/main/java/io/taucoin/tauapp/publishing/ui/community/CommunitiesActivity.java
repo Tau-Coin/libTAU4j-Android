@@ -108,14 +108,11 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
      * 加载社区当前登陆用户数据
      */
     private void loadMemberData(CommunityAndMember member) {
-        long power = 0;
         long balance = 0;
-        boolean onChain = false;
         if (member != null) {
             balance = member.balance;
         }
         binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(balance));
-        binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
     }
 
 //    /**
