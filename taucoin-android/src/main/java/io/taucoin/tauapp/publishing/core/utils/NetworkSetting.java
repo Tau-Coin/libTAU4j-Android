@@ -39,8 +39,7 @@ public class NetworkSetting {
         METERED_LIMITED = context.getResources().getIntArray(R.array.metered_limit);
         DEVELOPED_METERED_LIMITED = context.getResources().getIntArray(R.array.developed_metered_limit);
         WIFI_LIMITED = context.getResources().getIntArray(R.array.wifi_limit);
-        isDevelopCountry = Utils.isDevelopedCountry();
-        developCountry.postValue(isDevelopCountry);
+        updateDevelopCountry();
     }
 
 
@@ -61,7 +60,7 @@ public class NetworkSetting {
 
     public static int getMeteredLimitValue() {
         int pos = getMeteredLimitPos();
-        if (isDevelopCountry()) {
+        if (isUnlimitedNetwork()) {
             if (pos >= DEVELOPED_METERED_LIMITED.length) {
                 pos = DEVELOPED_METERED_LIMITED.length - 1;
             }
@@ -79,22 +78,28 @@ public class NetworkSetting {
     }
 
     public static boolean isDevelopCountry() {
-        return isDevelopCountry(false);
-    }
-
-    public static boolean isDevelopCountry(boolean isNeedUpdate) {
-        if (isNeedUpdate) {
-            boolean isNewDevelopCountry = Utils.isDevelopedCountry();
-            if (isDevelopCountry != isNewDevelopCountry) {
-                isDevelopCountry = isNewDevelopCountry;
-                developCountry.postValue(isDevelopCountry);
-            }
-        }
         return isDevelopCountry;
     }
 
+    public static void updateDevelopCountry() {
+        boolean isNewDevelopCountry = Utils.isDevelopedCountry();
+        if (isDevelopCountry != isNewDevelopCountry) {
+            isDevelopCountry = isNewDevelopCountry;
+            developCountry.postValue(isDevelopCountry);
+        }
+    }
+
+    public static void updateDevelopCountryTest() {
+        if (isDevelopCountry) {
+            isDevelopCountry = false;
+        } else {
+            isDevelopCountry = true;
+        }
+        developCountry.postValue(isDevelopCountry);
+    }
+
     public static int[] getMeteredLimits() {
-        if (isDevelopCountry()) {
+        if (isUnlimitedNetwork()) {
             return DEVELOPED_METERED_LIMITED;
         } else {
             return METERED_LIMITED;
@@ -172,11 +177,34 @@ public class NetworkSetting {
     }
 
     /**
+     * 设置当前是否为WiFi网络(存在计费和非计费的情况)
+     */
+    public static void setWiFiNetwork(boolean isWiFi) {
+        Context context = MainApplication.getInstance();
+        settingsRepo.setBooleanValue(context.getString(R.string.pref_key_is_wifi_network), isWiFi);
+    }
+
+    /**
+     * 返回当前是否为WiFi网络
+     */
+    public static boolean isWiFiNetwork() {
+        Context context = MainApplication.getInstance();
+        return settingsRepo.getBooleanValue(context.getString(R.string.pref_key_is_wifi_network), false);
+    }
+
+    /**
      * 设置当前是否为计费网络
      */
     public static void setMeteredNetwork(boolean isMetered) {
         Context context = MainApplication.getInstance();
         settingsRepo.setBooleanValue(context.getString(R.string.pref_key_is_metered_network), isMetered);
+    }
+
+    /**
+     * 返回是否限制网络（在发达国家，WiFi网络，并且不是计费网络不限制网络）
+     */
+    public static boolean isUnlimitedNetwork() {
+        return isDevelopCountry() && isWiFiNetwork() && !isMeteredNetwork();
     }
 
     /**
@@ -329,7 +357,7 @@ public class NetworkSetting {
             availableData = bigLimit.subtract(bigUsage);
         }
         int rate = 100;
-        if (isMeteredNetwork()) {
+        if (!isWiFiNetwork()) {
             if (bigLimit.compareTo(BigInteger.ZERO) > 0) {
                 rate = availableData.multiply(Constants.PERCENTAGE).divide(bigLimit).intValue();
             }
@@ -365,7 +393,7 @@ public class NetworkSetting {
             availableData = bigLimit.subtract(bigUsage);
         }
         int rate = 100;
-        if (!isMeteredNetwork()) {
+        if (isWiFiNetwork()) {
             if (bigLimit.compareTo(BigInteger.ZERO) > 0) {
                 rate = availableData.multiply(Constants.PERCENTAGE).divide(bigLimit).intValue();
             }
@@ -398,11 +426,11 @@ public class NetworkSetting {
      */
     public static boolean isHaveAvailableData() {
         boolean isHaveAvailableData;
-        if (NetworkSetting.isMeteredNetwork()) {
+        if (!NetworkSetting.isWiFiNetwork()) {
             isHaveAvailableData = getMeteredAvailableData() > 0;
         } else {
             // 发达国家WiFi网络流量不限制
-            isHaveAvailableData = isDevelopCountry() || getWiFiAvailableData() > 0;
+            isHaveAvailableData = isUnlimitedNetwork() || getWiFiAvailableData() > 0;
         }
         return isHaveAvailableData;
     }

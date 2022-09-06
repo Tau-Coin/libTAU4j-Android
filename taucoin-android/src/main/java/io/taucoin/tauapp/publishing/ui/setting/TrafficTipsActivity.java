@@ -68,7 +68,7 @@ public class TrafficTipsActivity extends BaseActivity {
     private void handleUserSelected(boolean isProceed) {
         boolean updateDailyDataLimit = false;
         if (isProceed) {
-            boolean meteredNetwork = NetworkSetting.isMeteredNetwork();
+            boolean meteredNetwork = !NetworkSetting.isWiFiNetwork();
             if (meteredNetwork) {
                 int pos = NetworkSetting.getMeteredLimitPos();
                 int[] meteredLimits = NetworkSetting.getMeteredLimits();

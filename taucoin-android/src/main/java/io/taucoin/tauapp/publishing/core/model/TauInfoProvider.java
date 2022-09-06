@@ -223,8 +223,8 @@ public class TauInfoProvider {
                     }
 
                     // 流量统计
-                    boolean isMetered = SystemServiceManager.getInstance().isNetworkMetered();
-                    NetworkSetting.setMeteredNetwork(isMetered);
+                    boolean isWiFi = SystemServiceManager.getInstance().isWiFi();
+                    NetworkSetting.setWiFiNetwork(isWiFi);
                     handlerTrafficStatistics(sessionStatistics);
 
                     // nodes和invoked统计
@@ -255,7 +255,7 @@ public class TauInfoProvider {
                     statistic.dataSize = sessionStatistics.getDownloadRate() + sessionStatistics.getUploadRate();
                     statistic.memorySize = samplerStatistics.totalMemory;
                     statistic.cpuUsageRate = samplerStatistics.cpuUsage;
-                    statistic.isMetered = NetworkSetting.isMeteredNetwork() ? 1 : 0;
+                    statistic.isMetered = NetworkSetting.isWiFiNetwork() ? 0 : 1;
                     statistic.nodes = sessionNodes;
                     statistic.invokedRequests = requests;
                     statisticRepo.addStatistic(statistic);

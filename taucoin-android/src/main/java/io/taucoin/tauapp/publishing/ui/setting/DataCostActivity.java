@@ -35,6 +35,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
     private final CompositeDisposable disposables = new CompositeDisposable();
     private DailyQuotaAdapter adapterMetered;
     private DailyQuotaAdapter adapterWiFi;
+    private Object isUnlimitedNetwork = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +66,7 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         List<Integer> meteredList = Ints.asList(meteredLimits);
         adapterMetered.submitList(meteredList);
 
-        developCountryChanged();
+        updateUnlimitedNetwork();
 
         LinearLayoutManager layoutManagerWiFi = new LinearLayoutManager(this);
         layoutManagerWiFi.setOrientation(RecyclerView.HORIZONTAL);
@@ -93,23 +94,36 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         });
 
         NetworkSetting.getDevelopCountry().observe(this, developed -> {
-            developCountryChanged();
+            updateUnlimitedNetwork();
+        });
+        binding.tvResetTime.setOnClickListener(view -> {
+            NetworkSetting.updateDevelopCountryTest();
         });
     }
 
-    private void developCountryChanged() {
-        boolean isDevelopedCountry = NetworkSetting.isDevelopCountry();
-        binding.llWifiDailyQuota.setVisibility(isDevelopedCountry ? View.GONE : View.VISIBLE);
-        binding.llWifiAvailableData.setVisibility(isDevelopedCountry ? View.GONE : View.VISIBLE);
-        binding.llWifiLine.setVisibility(isDevelopedCountry ? View.GONE : View.VISIBLE);
-
+    private void updateUnlimitedNetwork() {
+        boolean isUnlimitedNetwork = NetworkSetting.isUnlimitedNetwork();
+        if (null == this.isUnlimitedNetwork || Boolean.parseBoolean(this.isUnlimitedNetwork.toString()) != isUnlimitedNetwork) {
+            binding.llWifiDailyQuota.setVisibility(isUnlimitedNetwork ? View.GONE : View.VISIBLE);
+            binding.llWifiAvailableData.setVisibility(isUnlimitedNetwork ? View.GONE : View.VISIBLE);
+            binding.llWifiLine.setVisibility(isUnlimitedNetwork ? View.GONE : View.VISIBLE);
+            if (this.isUnlimitedNetwork != null) {
+                adapterMetered = new DailyQuotaAdapter(this,
+                        DailyQuotaAdapter.TYPE_METERED, NetworkSetting.getMeteredLimitPos());
+                binding.rvMeteredDailyQuota.setAdapter(adapterMetered);
+                int[] newMeteredLimits = NetworkSetting.getMeteredLimits();
+                List<Integer> newMeteredList = Ints.asList(newMeteredLimits);
+                adapterMetered.submitList(newMeteredList);
+            }
+            this.isUnlimitedNetwork = isUnlimitedNetwork;
+        }
     }
 
     private void refreshAllData() {
         handleSettingsChanged(getString(R.string.pref_key_network_switch));
         handleSettingsChanged(getString(R.string.pref_key_current_speed));
         handleSettingsChanged(getString(R.string.pref_key_foreground_running_time));
-        handleSettingsChanged(getString(R.string.pref_key_is_metered_network));
+        handleSettingsChanged(getString(R.string.pref_key_is_wifi_network));
 
         // 先更新，再显示
         NetworkSetting.updateMeteredSpeedLimit();
@@ -156,12 +170,12 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             String noSpeedStr = getString(R.string.setting_metered_network_limit_speed,
                     Formatter.formatFileSize(this, 0).toUpperCase());
             boolean internetState = settingsRepo.internetState();
-            boolean meteredNetwork = NetworkSetting.isMeteredNetwork();
+            boolean meteredNetwork = !NetworkSetting.isWiFiNetwork();
             binding.tvMeteredCurrentSpeed.setText(internetState && meteredNetwork ? currentSpeedStr : noSpeedStr);
             binding.tvWifiCurrentSpeed.setText(internetState && !meteredNetwork ? currentSpeedStr : noSpeedStr);
-        } else if (key.equals(getString(R.string.pref_key_is_metered_network))) {
+        } else if (key.equals(getString(R.string.pref_key_is_wifi_network))) {
             boolean internetState = settingsRepo.internetState();
-            boolean meteredNetwork = NetworkSetting.isMeteredNetwork();
+            boolean meteredNetwork = !NetworkSetting.isWiFiNetwork();
             binding.ivMeteredState.setVisibility(internetState && meteredNetwork ? View.VISIBLE : View.INVISIBLE);
             binding.ivWifiState.setVisibility(internetState && !meteredNetwork ? View.VISIBLE : View.INVISIBLE);
 
@@ -172,12 +186,14 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
                 binding.llRoot.removeView(binding.llWifi);
                 binding.llRoot.addView(binding.llWifi, 1);
             }
+            updateUnlimitedNetwork();
         } else if (key.equals(getString(R.string.pref_key_internet_state))) {
-            handleSettingsChanged(getString(R.string.pref_key_is_metered_network));
+            handleSettingsChanged(getString(R.string.pref_key_is_wifi_network));
         } else if (key.equals(getString(R.string.pref_key_metered_available_data))) {
             long availableData = NetworkSetting.getMeteredAvailableData();
             String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();
             binding.tvMeteredAvailableData.setText(availableDataStr);
+            updateUnlimitedNetwork();
         } else if (key.equals(getString(R.string.pref_key_wifi_available_data))) {
             long availableData = NetworkSetting.getWiFiAvailableData();
             String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();

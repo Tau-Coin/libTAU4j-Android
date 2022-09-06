@@ -62,7 +62,7 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
         handleSettingsChanged(getString(R.string.pref_key_internet_state));
         handleSettingsChanged(getString(R.string.pref_key_upnp_mapped));
         handleSettingsChanged(getString(R.string.pref_key_nat_pmp_mapped));
-        handleSettingsChanged(getString(R.string.pref_key_is_metered_network));
+        handleSettingsChanged(getString(R.string.pref_key_is_wifi_network));
         handleSettingsChanged(getString(R.string.pref_key_network_interfaces));
         handleSettingsChanged(getString(R.string.pref_key_dht_invoked_requests));
         handleSettingsChanged(getString(R.string.pref_key_dht_nodes));
@@ -93,8 +93,8 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_nat_pmp_mapped))) {
             boolean isMapped = settingsRepo.isNATPMPMapped();
             binding.tvNatPmp.setText(isMapped ? R.string.common_on : R.string.common_off);
-        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_is_metered_network))) {
-            boolean isMeteredNetwork = NetworkSetting.isMeteredNetwork();
+        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_is_wifi_network))) {
+            boolean isMeteredNetwork = !NetworkSetting.isWiFiNetwork();
             binding.tvNetworkType.setText(isMeteredNetwork ? R.string.setting_metered : R.string.setting_wifi);
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_network_interfaces))) {
             String networkInterfaces = settingsRepo.getStringValue(key, "");

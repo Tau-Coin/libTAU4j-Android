@@ -19,7 +19,7 @@ import io.taucoin.tauapp.publishing.service.SystemServiceManager;
  * The receiver for Network connection state changes state.
  */
 public class ConnectionReceiver extends BroadcastReceiver {
-    private Logger logger = LoggerFactory.getLogger("ConnectionReceiver");
+    private final static Logger logger = LoggerFactory.getLogger("ConnectionReceiver");
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction() == null){
@@ -29,13 +29,21 @@ public class ConnectionReceiver extends BroadcastReceiver {
         SettingsRepository settingsRepo = RepositoryHelper.getSettingsRepository(appContext);
         String action = intent.getAction();
         if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-            ConnectivityManager connectivityManager = (ConnectivityManager)
-                    appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            boolean isMetered = activeNetworkInfo != null && connectivityManager.isActiveNetworkMetered();
-            NetworkSetting.setMeteredNetwork(isMetered);
             int internetType = SystemServiceManager.getInstance().getInternetType();
             if (internetType >= 0) {
+                // 1、更新是否是计费网络
+                boolean isMetered = SystemServiceManager.getInstance().isNetworkMetered();
+                NetworkSetting.setMeteredNetwork(isMetered);
+
+                // 2、更新是否是WiFi
+                boolean isWiFi = SystemServiceManager.getInstance().isWiFi();
+                logger.debug("network wifi::{}, metered::{}", isWiFi, isMetered);
+                NetworkSetting.setWiFiNetwork(isWiFi);
+
+                // 3、更新是否为发达国家
+                NetworkSetting.updateDevelopCountry();
+
+                // 4、最后一步更新（保证上面三个条件判断的准确性）
                 logger.debug("network type::{}", internetType);
                 settingsRepo.internetState(true);
                 settingsRepo.setInternetType(internetType);

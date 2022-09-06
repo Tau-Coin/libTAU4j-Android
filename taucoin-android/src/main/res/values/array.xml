@@ -23,8 +23,8 @@
 
     <integer-array name="wifi_limit">
         <item>100</item>
-        <item>300</item>
-        <item>600</item>
+        <item>500</item>
+        <item>1024</item>
     </integer-array>
 
     <string-array name="font_scale_size">

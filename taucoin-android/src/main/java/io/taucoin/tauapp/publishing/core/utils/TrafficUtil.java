@@ -41,7 +41,7 @@ public class TrafficUtil {
     public static void saveTrafficTotal(@NonNull SessionStatistics statistics) {
         long incrementalDown = saveTrafficTotal(TRAFFIC_DOWN, statistics.getTotalDownload());
         long incrementalUp = saveTrafficTotal(TRAFFIC_UP, statistics.getTotalUpload());
-        if (NetworkSetting.isMeteredNetwork()) {
+        if (!NetworkSetting.isWiFiNetwork()) {
             long total = getMeteredTrafficTotal();
             total += incrementalDown + incrementalUp;
             settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, total);
@@ -49,11 +49,12 @@ public class TrafficUtil {
         } else {
             long total = getWifiTrafficTotal();
             total += incrementalDown + incrementalUp;
-            if (!NetworkSetting.isDevelopCountry()) {
+            boolean isUnlimitedNetwork = NetworkSetting.isUnlimitedNetwork();
+            if (!isUnlimitedNetwork) {
                 settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI, total);
             }
-            logger.debug("Save wifi traffic::::{}, isDevelopCountry::{}", total,
-                    NetworkSetting.isDevelopCountry());
+            logger.debug("Save wifi traffic::::{}, isDevelopCountry::{}, isUnlimitedNetwork::{}",
+                    total, NetworkSetting.isDevelopCountry(), isUnlimitedNetwork);
         }
     }
 

@@ -108,7 +108,7 @@ public class TauDozeManager {
     public void setDataAvailableRate(int dataAvailableRate) {
         int currentRate = dataAvailableRate;
         // 发达国家WiFi网络流量不限制
-        if (NetworkSetting.isDevelopCountry()) {
+        if (NetworkSetting.isUnlimitedNetwork()) {
             currentRate = 100;
         }
         if (this.dataAvailableRate != currentRate) {

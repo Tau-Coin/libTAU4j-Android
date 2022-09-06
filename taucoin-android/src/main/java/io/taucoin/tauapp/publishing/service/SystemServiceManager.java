@@ -119,6 +119,15 @@ public class SystemServiceManager {
     }
 
     /**
+     * 当前网络是否是WiFi
+     * @return boolean
+     */
+    public boolean isWiFi() {
+        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
+    /**
      * 是否在充电
      */
     public boolean isPlugged() {

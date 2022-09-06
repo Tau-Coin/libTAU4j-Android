@@ -248,7 +248,7 @@ public abstract class TauDaemon {
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir) // 数据库目录
                 .setDumpfileDir(FileUtil.getDumpfileDir())  // Dump File目录
                 .setDhtNonReferable(true)
-                .setDhtAutoRelay(NetworkSetting.isDevelopCountry())
+                .setDhtAutoRelay(NetworkSetting.isUnlimitedNetwork())
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)
                 .setLogLevel(LogUtil.getTauLogLevel())
@@ -346,6 +346,7 @@ public abstract class TauDaemon {
         settingsRepo.internetState(systemServiceManager.isHaveNetwork());
         settingsRepo.setInternetType(systemServiceManager.getInternetType());
         NetworkSetting.setMeteredNetwork(systemServiceManager.isNetworkMetered());
+        NetworkSetting.setWiFiNetwork(systemServiceManager.isWiFi());
         try {
             appContext.unregisterReceiver(connectionReceiver);
         } catch (IllegalArgumentException ignore) {
@@ -368,6 +369,8 @@ public abstract class TauDaemon {
             logger.info("SettingsChanged, charging state::{}", settingsRepo.chargingState());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
             logger.info("isMeteredNetwork::{}", NetworkSetting.isMeteredNetwork());
+        } else if (key.equals(appContext.getString(R.string.pref_key_is_wifi_network))) {
+            logger.info("isWiFiNetwork::{}", NetworkSetting.isWiFiNetwork());
         } else if (key.equals(appContext.getString(R.string.pref_key_foreground_running))) {
             boolean isForeground = settingsRepo.getBooleanValue(key);
             logger.info("foreground running::{}", isForeground);
@@ -442,7 +445,7 @@ public abstract class TauDaemon {
         } else {
             SystemServiceManager.getInstance().getNetworkAddress();
             sessionManager.reopenNetworkSockets();
-            setAutoRelay(NetworkSetting.isDevelopCountry(true));
+            setAutoRelay(NetworkSetting.isUnlimitedNetwork());
             logger.info("Network change reopen network sockets...");
         }
     }
