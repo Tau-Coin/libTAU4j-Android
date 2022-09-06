@@ -109,10 +109,13 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
      */
     private void loadMemberData(CommunityAndMember member) {
         long balance = 0;
+        long power = 0;
         if (member != null) {
             balance = member.balance;
+            power = member.nonce;
         }
         binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(balance));
+        binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
     }
 
 //    /**

@@ -51,7 +51,7 @@ public class ChainTopActivity extends BaseActivity {
         binding.tvCol3.setText(R.string.chain_top_tab_coin);
 
         ViewUtils.updateViewWeight(binding.tvCol2, 3 );
-        ViewUtils.updateViewWeight(binding.tvCol3, 2);
+        ViewUtils.updateViewWeight(binding.tvCol3, 4);
 
         Fragment fragment = new TopPeersFragment();
         Bundle chainBundle = new Bundle();

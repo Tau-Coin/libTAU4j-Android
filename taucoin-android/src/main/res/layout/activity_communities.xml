@@ -126,7 +126,6 @@
 
                 <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_mining_power"
-                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="@dimen/widget_size_44"

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import androidx.databinding.DataBindingUtil;
 import io.taucoin.tauapp.publishing.R;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 import io.taucoin.tauapp.publishing.databinding.ActivityFontSizeBinding;
@@ -53,7 +54,7 @@ public class FontSizeActivity extends BaseActivity {
         binding.seekBar.setFontScaleTitles(scaleTitles);
 
         String fontKey = getString(R.string.pref_key_font_scale_size);
-        float fontScaleSize = settingsRepo.getFloatValue(fontKey, 1.0f);
+        float fontScaleSize = settingsRepo.getFloatValue(fontKey, Constants.DEFAULT_FONT_SCALE_SIZE);
         binding.seekBar.setFontScaleSize(fontScaleSize);
         binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override

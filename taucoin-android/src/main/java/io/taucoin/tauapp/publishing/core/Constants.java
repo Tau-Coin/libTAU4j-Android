@@ -63,4 +63,7 @@ public class Constants {
 
     public static final BigInteger PERCENTAGE = new BigInteger("100", 10);
 
+    // 默认字体缩放大小
+    public static final float DEFAULT_FONT_SCALE_SIZE = 1.1f;
+
 }

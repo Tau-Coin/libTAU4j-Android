@@ -73,7 +73,7 @@ public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHol
             holder.binding.tvCol3.setText(balanceAndTime);
 
             ViewUtils.updateViewWeight(binding.tvCol2, 3);
-            ViewUtils.updateViewWeight(binding.tvCol3, 2);
+            ViewUtils.updateViewWeight(binding.tvCol3, 4);
             holder.binding.tvCol2.setOnClickListener(v -> {
                 if(listener != null){
                     listener.onItemClicked(member.publicKey);

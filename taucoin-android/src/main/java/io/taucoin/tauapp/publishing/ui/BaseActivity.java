@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.taucoin.tauapp.publishing.R;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.DozeEvent;
 import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
@@ -140,7 +141,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         DisplayMetrics dm = resources.getDisplayMetrics();
         SettingsRepository settingsRepo = RepositoryHelper.getSettingsRepository(this);
         String fontKey = resources.getString(R.string.pref_key_font_scale_size);
-        float fontScaleSize = settingsRepo.getFloatValue(fontKey, 1.0f);
+        float fontScaleSize = settingsRepo.getFloatValue(fontKey, Constants.DEFAULT_FONT_SCALE_SIZE);
         Configuration configuration = resources.getConfiguration();
         if (fontScaleSize > 0) {
             configuration.fontScale = fontScaleSize;

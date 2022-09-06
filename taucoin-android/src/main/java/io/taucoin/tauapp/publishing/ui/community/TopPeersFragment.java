@@ -41,7 +41,7 @@ public class TopPeersFragment extends BaseFragment implements TopPeersAdapter.Cl
     private BaseActivity activity;
     private FragmentMemberBinding binding;
     private CommunityViewModel communityViewModel;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private TopPeersAdapter adapter;
 
     private String chainID;
@@ -78,7 +78,7 @@ public class TopPeersFragment extends BaseFragment implements TopPeersAdapter.Cl
      * 初始化视图
      */
     private void initView() {
-        logger.debug("chainID::{}, type::{}", chainID);
+        logger.debug("chainID::{}", chainID);
         adapter = new TopPeersAdapter(this);
         DefaultItemAnimator animator = new DefaultItemAnimator() {
             @Override
@@ -103,7 +103,7 @@ public class TopPeersFragment extends BaseFragment implements TopPeersAdapter.Cl
     @Override
     public void onStart() {
         super.onStart();
-        Flowable<List<Member>> observable = communityViewModel.observeChainTopCoinMembers(chainID, 10);
+        Flowable<List<Member>> observable = communityViewModel.observeChainTopCoinMembers(chainID, 1000);
         disposables.add(observable.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(list -> adapter.submitList(list)));

@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 import androidx.work.Configuration;
 import androidx.work.WorkManager;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.log.LogConfigurator;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
@@ -159,7 +160,7 @@ public class MainApplication extends MultiDexApplication {
         DisplayMetrics dm = resources.getDisplayMetrics();
         settingsRepo = RepositoryHelper.getSettingsRepository(this);
         String fontKey = resources.getString(R.string.pref_key_font_scale_size);
-        float fontScaleSize = settingsRepo.getFloatValue(fontKey, 1.0f);
+        float fontScaleSize = settingsRepo.getFloatValue(fontKey, Constants.DEFAULT_FONT_SCALE_SIZE);
         android.content.res.Configuration configuration = resources.getConfiguration();
         if (fontScaleSize > 0) {
             configuration.fontScale = fontScaleSize;

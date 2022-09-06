@@ -115,7 +115,7 @@ public interface CommunityDao {
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
             " FROM Communities c" +
             " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " WHERE isBanned = 0";
+            " WHERE isBanned = 0 AND joined = 1";
 
     String QUERY_ALL_JOINED_COMMUNITY = "SELECT c.*" +
             " FROM Communities c" +
@@ -144,10 +144,9 @@ public interface CommunityDao {
             " ON c.chainID = order2.chainID AND order2.publicKey = :publicKey" +
             " WHERE c.chainID = :chainID";
 
-    String QUERY_CHAIN_TOP_COIN_MEMBERS = "SELECT m.* FROM Members m" +
-            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " WHERE m.chainID = :chainID" +
-            " ORDER BY m.balance DESC LIMIT :topNum";
+    String QUERY_CHAIN_TOP_COIN_MEMBERS = "SELECT * FROM Members" +
+            " WHERE chainID = :chainID" +
+            " ORDER BY balance DESC, nonce DESC, publicKey COLLATE UNICODE DESC LIMIT :topNum";
 
     String QUERY_COMMUNITIES = "SELECT c.*, m.balance, m.balUpdateTime, m.nonce, m.msgUnread," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
