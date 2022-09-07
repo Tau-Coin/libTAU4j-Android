@@ -14,6 +14,8 @@ import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
+import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Community;
@@ -53,12 +55,12 @@ public class CommunityRepositoryImpl implements CommunityRepository{
 
     @Override
     public Community getCommunityByChainID(@NonNull String chainID) {
-        return db.communityDao().getCommunityBychainID(chainID);
+        return db.communityDao().getCommunityByChainID(chainID);
     }
 
     @Override
     public Community getChatByFriendPk(@NonNull String friendPk) {
-        return db.communityDao().getCommunityBychainID(friendPk);
+        return db.communityDao().getCommunityByChainID(friendPk);
     }
 
     /**
@@ -118,8 +120,34 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     /**
      * 获取用户加入的社区列表
      */
-    public List<CommunityAndAccount> getJoinedCommunityList(){
-        return db.communityDao().getJoinedCommunityList();
+    public Flowable<MemberTips> observeMemberTips() {
+        return db.communityDao().observeMemberTips();
+    }
+
+    /**
+     * 获取用户加入的社区列表
+     */
+    public Flowable<List<MemberAndAmount>> observerJoinedCommunityList() {
+        int sdkVersion = Build.VERSION.SDK_INT;
+        // android11中SQLite版本为3.28.0, group by取第一条记录，低版本取最后一条记录
+
+        if (sdkVersion >= 30) {
+            return db.communityDao().observeJoinedCommunityListDESC();
+        } else {
+            return db.communityDao().observeJoinedCommunityListASC();
+        }
+    }
+
+    @Override
+    public Flowable<MemberAndAmount> observerMemberAndAmount(String chainID) {
+        int sdkVersion = Build.VERSION.SDK_INT;
+        // android11中SQLite版本为3.28.0, group by取第一条记录，低版本取最后一条记录
+
+        if (sdkVersion >= 30) {
+            return db.communityDao().observeMemberAndAmountDESC(chainID);
+        } else {
+            return db.communityDao().observeMemberAndAmountASC(chainID);
+        }
     }
 
     /**

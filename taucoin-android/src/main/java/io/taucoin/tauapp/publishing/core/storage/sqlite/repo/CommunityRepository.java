@@ -8,6 +8,8 @@ import io.reactivex.Single;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
+import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
@@ -59,7 +61,12 @@ public interface CommunityRepository {
     /**
      * 获取用户加入的社区列表
      */
-    List<CommunityAndAccount> getJoinedCommunityList();
+    Flowable<MemberTips> observeMemberTips();
+
+    /**
+     * 获取用户加入的社区列表
+     */
+    Flowable<List<MemberAndAmount>> observerJoinedCommunityList();
 
     /**
      * 获取用户加入的所有社区列表
@@ -91,6 +98,8 @@ public interface CommunityRepository {
      * @return
      */
     Flowable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey);
+
+    Flowable<MemberAndAmount> observerMemberAndAmount(String chainID);
 
     String queryCommunityAccountExpired(String chainID);
 

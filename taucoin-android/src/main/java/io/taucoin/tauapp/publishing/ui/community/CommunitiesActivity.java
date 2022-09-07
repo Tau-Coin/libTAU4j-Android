@@ -3,6 +3,7 @@ package io.taucoin.tauapp.publishing.ui.community;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
@@ -13,8 +14,10 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.ChainStatus;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
+import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
@@ -30,7 +33,7 @@ import io.taucoin.tauapp.publishing.ui.transaction.TransactionCreateActivity;
 public class CommunitiesActivity extends BaseActivity implements View.OnClickListener {
     private ActivityCommunitiesBinding binding;
     private CommunityViewModel viewModel;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
 
     @Override
@@ -85,7 +88,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                     .subscribe(this::loadChainStatusData));
 
             loadMemberData(null);
-            disposables.add(viewModel.observerCurrentMember(chainID)
+            disposables.add(viewModel.observerMemberAndAmount(chainID)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::loadMemberData));
@@ -107,14 +110,32 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
     /**
      * 加载社区当前登陆用户数据
      */
-    private void loadMemberData(CommunityAndMember member) {
+    private void loadMemberData(MemberAndAmount member) {
         long balance = 0;
         long power = 0;
+        long amount = 0;
+        long balUpdateTime = 0;
         if (member != null) {
             balance = member.balance;
+            balUpdateTime = member.balUpdateTime;
             power = member.nonce;
+            amount = member.amount;
         }
-        binding.itemBalance.setRightText(FmtMicrometer.fmtBalance(balance));
+
+        String balanceStr = FmtMicrometer.fmtBalance(balance);
+        String time = DateUtil.formatTime(balUpdateTime, DateUtil.pattern14);
+        String balanceShow;
+        if (amount > 0) {
+            String balancePending = FmtMicrometer.fmtBalance(amount);
+            balanceShow = getResources().getString(R.string.drawer_balance_time_pending,
+                    balanceStr, time, balancePending);
+            binding.itemBalance.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.widget_size_60));
+        } else {
+            balanceShow = getResources().getString(R.string.drawer_balance_time_no_title,
+                    balanceStr, time);
+            binding.itemBalance.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.widget_size_44));
+        }
+        binding.itemBalance.setRightText(Html.fromHtml(balanceShow));
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
     }
 
@@ -161,6 +182,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
     protected void onStart() {
         super.onStart();
         loadMiningInfo();
+        viewModel.clearCommunityAccountTips(chainID);
     }
 
 

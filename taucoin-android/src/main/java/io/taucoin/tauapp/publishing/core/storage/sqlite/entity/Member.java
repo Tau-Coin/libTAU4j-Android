@@ -19,6 +19,9 @@ public class Member implements Parcelable {
     public String publicKey;            // 成员的公钥
     public long balance;                // 成员的balance
     public long balUpdateTime;          // 成员的balance更新时间
+    public long rewardTime;             // 成员挖矿奖励时间
+    public long incomeTime;             // 成员收到转账收入时间
+    public long pendingTime;            // 成员收到朋友转账动作（未上链）
     public long nonce;                  // 成员的nonce
     public int airdropStatus;           // 发币开关状态
     public int airdropMembers;          // 总的发币成员数

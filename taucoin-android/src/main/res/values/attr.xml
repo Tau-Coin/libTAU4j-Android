@@ -287,6 +287,7 @@
         <attr name="rightText2" format="string" />
         <attr name="rightImage" format="reference" />
         <attr name="rightTextColor" format="color" />
+        <attr name="rightPoint" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="LeftRightLineView">

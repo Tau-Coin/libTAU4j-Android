@@ -208,14 +208,18 @@ public class TauListenHandler {
      */
     protected void handleBlockData(Block block, BlockStatus status) {
         String chainID = ChainIDUtil.decode(block.getChainID());
-        logger.info("handleBlockData:: chainID::{}，blockNum::{}, blockHash::{}", chainID,
-                block.getBlockNumber(), block.Hash());
+        String miner = ByteUtil.toHexString(block.getMiner());
+        logger.info("handleBlockData:: chainID::{}，blockNum::{}, blockHash::{}, miner::{}", chainID,
+                block.getBlockNumber(), block.Hash(), miner);
         // 更新区块信息
         saveBlockInfo(block, status);
         // 更新矿工的信息
-        saveUserInfo(block.getMiner());
+        saveUserInfo(miner);
         // 添加矿工为社区成员
-        addMemberInfo(block.getChainID(), block.getMiner());
+        Transaction tx = block.getTx();
+        long rewards = null == tx ? 0L : tx.getFee();
+        long rewardTime = rewards > 0 ? DateUtil.getMillisTime() : 0;
+        addMemberInfo(block.getChainID(), miner, rewardTime, 0, 0);
         // 处理交易信息
         handleTransactionData(block, status);
     }
@@ -291,7 +295,7 @@ public class TauListenHandler {
             // 处理用户信息
             handleUserInfo(txMsg);
             // 处理社区成员信息
-            handleMemberInfo(txMsg);
+            handleMemberInfo(txMsg, blockStatus);
 
             // 本地存在此交易, 更新交易状态值
             if (tx != null) {
@@ -424,19 +428,25 @@ public class TauListenHandler {
      * 处理社区成员信息
      * @param txMsg 交易
      */
-    private void handleMemberInfo(@NonNull Transaction txMsg) {
+    private void handleMemberInfo(@NonNull Transaction txMsg, BlockStatus status) {
         if (isTransactionEmpty(txMsg)) {
             logger.info("handleMemberInfo transaction empty");
             return;
         }
         TxContent txContent = new TxContent(txMsg.getPayload());
-        addMemberInfo(txMsg.getChainID(), txMsg.getSender());
+        addMemberInfo(txMsg.getChainID(), ByteUtil.toHexString(txMsg.getSender()));
         int txType = txContent.getType();
         if (txType == TxType.WIRING_TX.getType()) {
-            addMemberInfo(txMsg.getChainID(), txMsg.getReceiver());
+            long incomeTime = 0;
+            long pendingTime = 0;
+            if (txMsg.getAmount() > 0) {
+                incomeTime = status == BlockStatus.NEW_BLOCK ? DateUtil.getMillisTime() : 0;
+                pendingTime = status == BlockStatus.NEW_TX || status == BlockStatus.SYNCING ? DateUtil.getMillisTime() : 0;
+            }
+            addMemberInfo(txMsg.getChainID(), ByteUtil.toHexString(txMsg.getReceiver()), 0, incomeTime, pendingTime);
         } else if (txType == TxType.TRUST_TX.getType()) {
             TrustContent trustContent = new TrustContent(txMsg.getPayload());
-            addMemberInfo(txMsg.getChainID(), trustContent.getTrustedPk());
+            addMemberInfo(txMsg.getChainID(), ByteUtil.toHexString(trustContent.getTrustedPk()));
         }
     }
 
@@ -468,15 +478,6 @@ public class TauListenHandler {
     }
 
     /**
-     * 添加社区成员到本地
-     * @param publicKey 公钥
-     * @param chainID chainID
-     */
-    private void addMemberInfo(byte[] chainID, byte[] publicKey) {
-        addMemberInfo(chainID, ByteUtil.toHexString(publicKey));
-    }
-
-    /**
      * 添加朋友任务
      */
     private void addFriendTask(String friendPk) {
@@ -504,6 +505,15 @@ public class TauListenHandler {
      * @param chainID chainID
      */
     private void addMemberInfo(byte[] chainID, String publicKey) {
+        addMemberInfo(chainID, publicKey, 0, 0, 0);
+    }
+
+    /**
+     * 添加社区成员到本地
+     * @param publicKey 公钥
+     * @param chainID chainID
+     */
+    private void addMemberInfo(byte[] chainID, String publicKey, long rewardTime, long incomeTime, long pendingTime) {
         String chainIDStr = ChainIDUtil.decode(chainID);
         Member member = memberRepo.getMemberByChainIDAndPk(chainIDStr, publicKey);
         Account account = daemon.getAccountInfo(chainID, publicKey);
@@ -522,17 +532,48 @@ public class TauListenHandler {
             member.balance = balance;
             member.balUpdateTime = DateUtil.getTime();
             member.nonce = nonce;
+            if (rewardTime > 0) {
+                member.rewardTime = rewardTime;
+            }
+            if (incomeTime > 0) {
+                member.incomeTime = incomeTime;
+            }
+            if (pendingTime > 0) {
+                member.pendingTime = pendingTime;
+            }
             memberRepo.addMember(member);
-            logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}",
-                    chainIDStr, publicKey, balance);
+            logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}, rewardTime::{}," +
+                            " incomeTime::{} ", chainIDStr, publicKey, balance, rewardTime, incomeTime);
         } else {
+            boolean isUpdate = false;
             if (member.balUpdateTime == 0 || member.balance != balance || member.nonce != nonce) {
                 member.balance = balance;
                 member.balUpdateTime = DateUtil.getTime();
                 member.nonce = nonce;
-                memberRepo.updateMember(member);
+                isUpdate = true;
                 logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
                         "balance::{}", chainIDStr, publicKey, member.balance);
+            }
+            if (rewardTime > 0) {
+                member.rewardTime = rewardTime;
+                isUpdate = true;
+                logger.info("Update Member's rewardTime chainID::{}, publicKey::{}, " +
+                        "rewardTime::{}", chainIDStr, publicKey, member.rewardTime);
+            }
+            if (incomeTime > 0) {
+                member.incomeTime = incomeTime;
+                isUpdate = true;
+                logger.info("Update Member's incomeTime chainID::{}, publicKey::{}, " +
+                        "incomeTime::{}", chainIDStr, publicKey, member.incomeTime);
+            }
+            if (pendingTime > 0) {
+                member.pendingTime = pendingTime;
+                isUpdate = true;
+                logger.info("Update Member's pendingTime chainID::{}, publicKey::{}, " +
+                        "pendingTime::{}", chainIDStr, publicKey, member.pendingTime);
+            }
+            if (isUpdate) {
+                memberRepo.updateMember(member);
             }
         }
     }
@@ -552,6 +593,7 @@ public class TauListenHandler {
                 txID, txMsg.getTimestamp(), txMsg.getNonce(), tx != null, isTransactionEmpty(txMsg));
         if (null == tx) {
             handleUserInfo(txMsg);
+            handleMemberInfo(txMsg, BlockStatus.NEW_TX);
             handleTransactionData(0, null, txMsg, BlockStatus.NEW_TX);
         }
     }

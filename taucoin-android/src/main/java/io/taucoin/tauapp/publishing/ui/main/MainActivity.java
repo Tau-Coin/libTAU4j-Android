@@ -39,6 +39,7 @@ import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.TauDaemon;
+import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
@@ -285,6 +286,30 @@ public class MainActivity extends ScanTriggerActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleSettingsChanged));
+
+        disposables.add(communityViewModel.observeMemberTips()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleMemberTips));
+    }
+
+    private void handleMemberTips(MemberTips tips) {
+        boolean isShowTips = tips.incomeTime > 0 || tips.rewardTime > 0 || tips.pendingTime > 0;
+        int resId = -1;
+        if (isShowTips) {
+            resId = R.drawable.circle_pink;
+            if (tips.incomeTime > tips.rewardTime) {
+                resId = R.drawable.circle_red;
+                if (tips.pendingTime >= tips.incomeTime) {
+                    resId = R.drawable.circle_yellow;
+                }
+            } else {
+                if (tips.pendingTime >= tips.rewardTime) {
+                    resId = R.drawable.circle_yellow;
+                }
+            }
+        }
+        binding.drawer.itemWallet.setRightPoint(resId);
     }
 
     private void handleSettingsChanged(String key) {

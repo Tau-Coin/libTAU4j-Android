@@ -33,6 +33,7 @@ public class ItemLineView extends RelativeLayout {
     private int rightTextColor;
     private int leftImage;
     private int rightImage;
+    private int rightPoint;
     private ViewItemLineBinding binding;
 
     public ItemLineView(Context context) {
@@ -56,6 +57,7 @@ public class ItemLineView extends RelativeLayout {
         this.leftText = a.getString(R.styleable.ItemLineView_leftText);
         this.rightText = a.getString(R.styleable.ItemLineView_rightText);
         this.rightText2 = a.getString(R.styleable.ItemLineView_rightText2);
+        this.rightPoint = a.getResourceId(R.styleable.ItemLineView_rightPoint, -1);
         this.rightTextColor = a.getColor(R.styleable.ItemLineView_rightTextColor, getResources().getColor(R.color.color_black));
         a.recycle();
         loadView();
@@ -80,6 +82,10 @@ public class ItemLineView extends RelativeLayout {
             binding.tvRight2.setText(rightText2);
             binding.rlRight.setVisibility(VISIBLE);
         }
+        if(rightPoint != -1){
+            binding.rightPoint.setBackgroundResource(rightPoint);
+            binding.rightPoint.setVisibility(VISIBLE);
+        }
         binding.tvRight.setTextColor(rightTextColor);
     }
 
@@ -95,6 +101,18 @@ public class ItemLineView extends RelativeLayout {
         if(binding != null){
             binding.tvRight2.setText(rightText);
             binding.rlRight.setVisibility(VISIBLE);
+        }
+    }
+
+    public void setRightPoint(int resId) {
+        this.rightPoint = resId;
+        if(binding != null){
+            if (resId > 0) {
+                binding.rightPoint.setBackgroundResource(resId);
+                binding.rightPoint.setVisibility(VISIBLE);
+            } else {
+                binding.rightPoint.setVisibility(GONE);
+            }
         }
     }
 }

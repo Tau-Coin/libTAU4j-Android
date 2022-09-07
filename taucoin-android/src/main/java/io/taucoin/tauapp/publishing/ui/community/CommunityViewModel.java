@@ -61,9 +61,11 @@ import io.taucoin.tauapp.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.tauapp.publishing.core.model.data.DataChanged;
 import io.taucoin.tauapp.publishing.core.model.data.DrawBean;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndTime;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndUser;
+import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.model.data.Statistics;
 import io.taucoin.tauapp.publishing.core.model.data.Result;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
@@ -124,7 +126,6 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> airdropResult = new MutableLiveData<>();
     private MutableLiveData<Result> joinedResult = new MutableLiveData<>();
     private MutableLiveData<List<Community>> blackList = new MutableLiveData<>();
-    private MutableLiveData<List<CommunityAndAccount>> joinedList = new MutableLiveData<>();
     private MutableLiveData<List<Member>> joinedUnexpiredList = new MutableLiveData<>();
     private MutableLiveData<List<MemberAndTime>> joinedCommunity = new MutableLiveData<>();
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
@@ -156,10 +157,6 @@ public class CommunityViewModel extends AndroidViewModel {
 
     public MutableLiveData<Boolean> getAirdropResult() {
         return airdropResult;
-    }
-
-    MutableLiveData<List<CommunityAndAccount>> getJoinedList() {
-        return joinedList;
     }
 
     public MutableLiveData<List<Member>> getJoinedUnexpiredList() {
@@ -551,16 +548,15 @@ public class CommunityViewModel extends AndroidViewModel {
     /**
      * 获取用户加入的社区列表
      */
-    void getJoinedCommunityList() {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<List<CommunityAndAccount>>) emitter -> {
-            List<CommunityAndAccount> list = communityRepo.getJoinedCommunityList();
-            emitter.onNext(list);
-            emitter.onComplete();
-        }, BackpressureStrategy.LATEST)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> joinedList.postValue(list));
-        disposables.add(disposable);
+    Flowable<List<MemberAndAmount>> observerJoinedCommunityList() {
+        return communityRepo.observerJoinedCommunityList();
+    }
+
+    /**
+     * 获取用户加入的社区列表
+     */
+    public Flowable<MemberTips> observeMemberTips() {
+        return communityRepo.observeMemberTips();
     }
 
     /**
@@ -709,6 +705,15 @@ public class CommunityViewModel extends AndroidViewModel {
     public Flowable<CommunityAndMember> observerCurrentMember(String chainID) {
         String publicKey = MainApplication.getInstance().getPublicKey();
         return communityRepo.observerCurrentMember(chainID, publicKey);
+    }
+
+    /**
+     * 观察当前登陆的社区成员
+     * @param chainID
+     * @return
+     */
+    public Flowable<MemberAndAmount> observerMemberAndAmount(String chainID) {
+        return communityRepo.observerMemberAndAmount(chainID);
     }
 
     /**
@@ -1198,5 +1203,35 @@ public class CommunityViewModel extends AndroidViewModel {
      */
     public void connectChain(String chainID) {
         daemon.connectChain(chainID);
+    }
+
+    /**
+     * 获取用户加入的社区列表
+     */
+    void clearCommunityAccountTips(String chainID) {
+        if (clearDisposable != null && !clearDisposable.isDisposed()) {
+            return;
+        }
+        clearDisposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            try {
+                if (StringUtil.isNotEmpty(chainID)) {
+                    String userPk = MainApplication.getInstance().getPublicKey();
+                    Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
+                    if (member != null) {
+                        if (member.pendingTime > 0 || member.rewardTime > 0 || member.incomeTime > 0) {
+                            member.pendingTime = 0;
+                            member.rewardTime = 0;
+                            member.incomeTime = 0;
+                            memberRepo.updateMember(member);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("clearCommunityAccountTips error ", e);
+            }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 }
