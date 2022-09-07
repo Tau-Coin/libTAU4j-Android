@@ -32,6 +32,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.tauapp.publishing.BuildConfig;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.log.LogUtil;
@@ -599,10 +600,10 @@ public abstract class TauDaemon {
                 logger.info("checkAllChains localChain::{}, tauChains::{}",
                         localChains.size(), tauChains.size());
                 // 0、添加默认Cambridge Coin
-                String testChainID = "042674db30303030Cambridge Coin";
+                String testChainID = BuildConfig.TEST_CHAIN_ID;
                 Community community = communityRepo.getCommunityByChainID(testChainID);
                 if (null == community) {
-                    String peer = "283cb209f470b7916fc311a259b65dc2a3ca4a234bfd58ba6479509f0fceb66e";
+                    String peer = BuildConfig.TEST_CHAIN_PEER;
                     String tauTesting = LinkUtil.encodeChain(peer, testChainID);
                     tauDaemonAlertHandler.addCommunity(tauTesting);
                 }

@@ -112,6 +112,8 @@ android {
             // TauLogLevel.DEBUG
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://6e6170b970bae896803ecb1051653" +
                     "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:9886\""
+            buildConfigField "String", "TEST_CHAIN_ID", "\"042674db30303030Cambridge Coin\""
+            buildConfigField "String", "TEST_CHAIN_PEER", "\"283cb209f470b7916fc311a259b65dc2a3ca4a234bfd58ba6479509f0fceb66e\""
             signingConfig signingConfigs.debugConfig
         }
 
@@ -124,6 +126,8 @@ android {
             // TauLogLevel.INFO
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://58f39fc2243907dd122b9f32d551d" +
                     "bd2c5f24ed153b71be589ce9fb23b7c08d1@13.229.53.249:3882\""
+            buildConfigField "String", "TEST_CHAIN_ID", "\"042674db30303030Cambridge Coin\""
+            buildConfigField "String", "TEST_CHAIN_PEER", "\"283cb209f470b7916fc311a259b65dc2a3ca4a234bfd58ba6479509f0fceb66e\""
             signingConfig signingConfigs.releaseConfig
         }
 
@@ -136,6 +140,8 @@ android {
             // TauLogLevel.WARN
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://58f39fc2243907dd122b9f32d551d" +
                     "bd2c5f24ed153b71be589ce9fb23b7c08d1@13.229.53.249:3882\""
+            buildConfigField "String", "TEST_CHAIN_ID", "\"042674db30303030Cambridge Coin\""
+            buildConfigField "String", "TEST_CHAIN_PEER", "\"283cb209f470b7916fc311a259b65dc2a3ca4a234bfd58ba6479509f0fceb66e\""
             signingConfig signingConfigs.releaseConfig
         }
 
