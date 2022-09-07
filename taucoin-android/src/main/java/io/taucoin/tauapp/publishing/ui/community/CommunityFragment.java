@@ -61,6 +61,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private int onlinePeers;
     private long nodes = 0;
     private long miningTime = -1;
+    private boolean isConnectChain = true;
     private CommonDialog chainStoppedDialog;
 
     @Nullable
@@ -83,7 +84,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.toolbarInclude.setListener(this);
         initParameter();
         initLayout();
-        communityViewModel.connectChain(chainID);
     }
 
     /**
@@ -306,8 +306,11 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .subscribe(member -> {
                     if (isJoined != member.isJoined()) {
                         isJoined = member.isJoined();
+                        // 只有社区joined后触发
+                        connectChain(chainID);
 //                        showCommunitySubtitle();
                     }
+                    isConnectChain = false;
                     if (nearExpired != member.nearExpired()) {
                         nearExpired = member.nearExpired();
                         showWarningView();
@@ -320,6 +323,16 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     }
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
                 }, it -> {}));
+    }
+
+    /**
+     * 连接链（只触发一次）
+     * @param chainID 链ID
+     */
+    private void connectChain(String chainID) {
+        if (isConnectChain && isJoined) {
+            communityViewModel.connectChain(chainID);
+        }
     }
 
     @Override
