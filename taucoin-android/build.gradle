@@ -111,7 +111,7 @@ android {
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "7"
             // TauLogLevel.DEBUG
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://6e6170b970bae896803ecb1051653" +
-                    "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:7882\""
+                    "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:9886\""
             signingConfig signingConfigs.debugConfig
         }
 
