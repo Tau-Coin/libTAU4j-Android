@@ -73,34 +73,8 @@
                         android:id="@+id/tv_back_doze_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:lineVisibility="true"
+                        app:lineVisibility="false"
                         app:lineLeftText="@string/setting_back_doze_time"/>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:minHeight="@dimen/widget_size_44">
-
-                        <TextView
-                            android:id="@+id/tv_left1"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/widget_size_20"
-                            android:lineSpacingExtra="0dp"
-                            android:lineSpacingMultiplier="0.7"
-                            android:text="@string/setting_network_switch"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <Switch
-                            android:id="@+id/switch_network"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/widget_size_20"
-                            tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-                    </LinearLayout>
 
                 </LinearLayout>
 

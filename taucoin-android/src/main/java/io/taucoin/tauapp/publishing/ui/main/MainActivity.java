@@ -212,6 +212,19 @@ public class MainActivity extends ScanTriggerActivity {
             binding.mainRightFragment.setVisibility(View.GONE);
 //            ViewUtils.updateViewWeight(binding.mainRightFragment, 0);
         }
+
+        String networkKey = getString(R.string.pref_key_network_switch);
+        boolean networkSwitch = settingsRepo.getBooleanValue(networkKey, true);
+        binding.drawer.switchNetwork.setChecked(networkSwitch);
+        TauDaemon daemon = TauDaemon.getInstance(getApplicationContext());
+        binding.drawer.switchNetwork.setOnCheckedChangeListener((compoundButton, checked) -> {
+            if (checked) {
+                daemon.reconnectNetwork();
+            } else {
+                daemon.disconnectNetwork();
+            }
+            settingsRepo.setBooleanValue(networkKey, checked);
+        });
     }
 
     @Override
