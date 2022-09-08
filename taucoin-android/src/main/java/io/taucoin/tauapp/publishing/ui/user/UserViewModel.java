@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
@@ -1312,11 +1313,15 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     /**
-     * 关注朋友
+     * 关注朋友(1/3的概率发送)
      */
     public void focusFriend(String friendPk) {
         if (StringUtil.isNotEmpty(friendPk)) {
-            daemon.focusFriend(friendPk);
+            int num = new Random().nextInt(3);
+            logger.debug("focusFriend::{}, num::{}", friendPk, num);
+            if (num == 0) {
+                daemon.focusFriend(friendPk);
+            }
         }
     }
 
