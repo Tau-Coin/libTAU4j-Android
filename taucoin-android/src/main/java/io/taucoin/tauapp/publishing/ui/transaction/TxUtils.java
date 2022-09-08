@@ -24,6 +24,7 @@ import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.HashUtil;
+import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
@@ -315,6 +316,7 @@ public class TxUtils {
                 } else if (StringUtil.isNotEmpty(tx.memo)) {
                     msg.append("\n").append("Description: ").append(tx.memo);
                 }
+                msg.append("\n").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
             } else if (txType == TxType.AIRDROP_TX.getType()) {
                 AirdropTxContent content = new AirdropTxContent(tx.content);
                 msg.append("\n").append("Link: ").append(content.getLink());
@@ -377,16 +379,16 @@ public class TxUtils {
             msg.append("\n").append("Community: ")
                     .append(ChainIDUtil.getName(tx.chainID))
                     .append("\n").append("ID: ")
-                    .append(HashUtil.hashMiddleHide(String.valueOf(timestamp)))
-                    .append("\n");
+                    .append(HashUtil.hashMiddleHide(String.valueOf(timestamp)));
         }
         if (txType == TxType.WIRING_TX.getType()) {
-            msg.append("Amount: ").append(FmtMicrometer.fmtBalance(tx.amount))
-                    .append(" ").append(coinName)
-                    .append("\n");
+            msg.append("\n").append("Amount: ").append(FmtMicrometer.fmtBalance(tx.amount))
+                    .append(" ").append(coinName);
         }
-        msg.append("Fee: ").append(FmtMicrometer.fmtFeeValue(tx.fee))
-                .append(" ").append(coinName);
+        if (tx.fee > 0) {
+            msg.append("\n").append("Fee: ").append(FmtMicrometer.fmtFeeValue(tx.fee))
+                    .append(" ").append(coinName);
+        }
         if (txType == TxType.WIRING_TX.getType()) {
             if (null == operation) {
                 msg.append("\n").append("To: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
@@ -394,6 +396,7 @@ public class TxUtils {
             if (StringUtil.isNotEmpty(tx.memo)) {
                 msg.append("\n").append("Description: ").append(tx.memo);
             }
+            msg.append("\n").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
         } else if (txType == TxType.AIRDROP_TX.getType()) {
             msg.append("\n").append("Link: ").append(tx.link);
             if (StringUtil.isNotEmpty(tx.memo)) {

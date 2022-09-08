@@ -410,14 +410,12 @@ public class CommunityViewModel extends AndroidViewModel {
             // 发送通知
             if (accounts.size() > 0) {
                 String memo = appContext.getString(R.string.community_added_members);
-                TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
-                byte[] content = txContent.getEncoded();
                 for (Account acc : accounts) {
                     String key = ByteUtil.toHexString(acc.getPeer());
                     long amount = acc.getBalance();
-                    TxQueue txQueue = new TxQueue(community.chainID, currentUser.publicKey, key,
-                            amount, 0L, TxType.WIRING_TX, content);
-                    ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.ON_CHAIN);
+                    Tx tx = new Tx(community.chainID, key, amount, 0L, TxType.WIRING_TX.getType(), memo);
+                    tx.senderPk = currentUser.publicKey;
+                    ChatViewModel.syncSendMessageTask(appContext, tx, DateUtil.getMillisTime(), QueueOperation.ON_CHAIN);
                 }
             }
         } catch (Exception e) {
