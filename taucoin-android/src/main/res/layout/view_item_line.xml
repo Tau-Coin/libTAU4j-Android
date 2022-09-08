@@ -37,7 +37,7 @@
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/iv_left" >
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_toStartOf="@+id/rl_right"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -52,16 +52,17 @@
                     android:textAppearance="@style/TextAppearanceBody1" />
 
                 <View
+                    android:layout_toEndOf="@+id/tv_right"
                     android:visibility="gone"
                     android:id="@+id/right_point"
                     android:layout_width="@dimen/widget_size_6"
                     android:layout_height="@dimen/widget_size_6"
                     android:layout_marginStart="@dimen/widget_size_2"
                     android:layout_marginEnd="@dimen/widget_size_2"
-                    android:layout_marginTop="@dimen/widget_size_0"
+                    android:layout_marginTop="@dimen/widget_size_2"
                     android:background="@drawable/red_rect_round_bg"/>
 
-            </LinearLayout>
+            </RelativeLayout>
 
             <RelativeLayout
                 android:visibility="gone"
