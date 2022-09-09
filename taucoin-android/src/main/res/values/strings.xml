@@ -71,7 +71,7 @@
     <string name="main_insufficient_device_space">Insufficient device space</string>
 
     <string name="main_tab_all">All</string>
-    <string name="main_tab_community">My Communities</string>
+    <string name="main_tab_community">My Groups</string>
     <string name="main_tab_personal">Personal</string>
     <string name="main_operation_mark_read">Mark as Read</string>
     <string name="main_operation_mark_unread">Mark as UnRead</string>
