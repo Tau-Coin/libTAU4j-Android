@@ -103,16 +103,32 @@ public class DownloadViewModel extends AndroidViewModel {
                             String data = new Gson().toJson(dataResult.getData());
                             Version version = new Gson().fromJson(data, Version.class);
                             emitter.onNext(version);
+                        } else {
+                            emitter.onError(new Throwable("response body Gson error"));
                         }
+                    } else {
+                        emitter.onError(new Throwable("response body empty"));
                     }
+                } else {
+                    emitter.onError(new Throwable("response code != 200"));
                 }
             } catch (Exception e) {
                 logger.error("Error::Check app version::{}", e.getMessage());
+                Throwable throwable = e.getCause();
+                if (null == throwable) {
+                    throwable = new Throwable("Error::" + e.getMessage());
+                }
+                emitter.onError(throwable);
             }
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(version -> handleVersionUpgrade(activity, version, showNoUpdates));
+                .subscribe(version -> handleVersionUpgrade(activity, version, showNoUpdates), it -> {
+                    activity.closeProgressDialog();
+                    if (showNoUpdates) {
+                        ToastUtils.showShortToast(R.string.app_upgrade_failed);
+                    }
+                });
     }
 
     /**

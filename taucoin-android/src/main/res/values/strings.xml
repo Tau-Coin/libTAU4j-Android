@@ -578,6 +578,7 @@
     <string name="app_upgrade_retry">Retry</string>
     <string name="app_upgrade_checking">Checking&#8230;</string>
     <string name="app_upgrade_latest">No updates</string>
+    <string name="app_upgrade_failed">Failed to check for updates</string>
 
     <!--permission tip-->
     <string name="permission_tip_camera_denied">

@@ -13,11 +13,14 @@
         android:orientation="vertical">
 
         <ImageView
-            android:visibility="invisible"
             android:id="@+id/iv_close"
-            android:layout_width="@dimen/widget_size_18"
-            android:layout_height="@dimen/widget_size_18"
-            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_width="@dimen/widget_size_50"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/widget_size_5"
+            android:paddingStart="@dimen/widget_size_15"
+            android:paddingEnd="@dimen/widget_size_15"
+            android:paddingTop="@dimen/widget_size_15"
+            android:paddingBottom="@dimen/widget_size_10"
             android:contentDescription="@null"
             android:layout_gravity="end"
             android:src="@mipmap/icon_close" />
@@ -26,8 +29,9 @@
             android:id="@+id/tv_msg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_10"
-            android:layout_marginBottom="@dimen/widget_size_10"
+            android:layout_marginStart="@dimen/widget_size_30"
+            android:layout_marginEnd="@dimen/widget_size_30"
+            android:layout_marginBottom="@dimen/widget_size_30"
             android:gravity="center_horizontal"
             android:includeFontPadding="false"
             android:lineSpacingExtra="@dimen/widget_size_5"

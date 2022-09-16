@@ -16,10 +16,10 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.databinding.ActivityCommunityChooseBinding;
-import io.taucoin.tauapp.publishing.databinding.ViewDialogBinding;
+import io.taucoin.tauapp.publishing.databinding.ViewContentDialogBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
-import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
+import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.transaction.TxUtils;
 import io.taucoin.tauapp.publishing.ui.transaction.TxViewModel;
 
@@ -29,11 +29,11 @@ import io.taucoin.tauapp.publishing.ui.transaction.TxViewModel;
 public class TransactionsActivity extends BaseActivity {
 
     private ActivityCommunityChooseBinding binding;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private TxViewModel viewModel;
     private TransactionListAdapter adapter;
     private String chainID;
-    private CommonDialog txDialog;
+    private ConfirmDialog txDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,21 +77,17 @@ public class TransactionsActivity extends BaseActivity {
         if (txDialog != null && txDialog.isShowing()) {
             txDialog.closeDialog();
         }
-        ViewDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
-                R.layout.view_dialog, null, false);
+        ViewContentDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
+                R.layout.view_content_dialog, null, false);
         dialogBinding.tvMsg.setTextColor(getResources().getColor(R.color.color_black));
         dialogBinding.tvMsg.setText(TxUtils.createBlockTxSpan(tx));
         dialogBinding.tvMsg.setGravity(Gravity.START);
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) dialogBinding.tvMsg.getLayoutParams();
-        layoutParams.leftMargin = getResources().getDimensionPixelSize(R.dimen.widget_size_20);
-        layoutParams.rightMargin = getResources().getDimensionPixelSize(R.dimen.widget_size_20);
-        dialogBinding.tvMsg.setLayoutParams(layoutParams);
-        dialogBinding.ivClose.setVisibility(View.VISIBLE);
         dialogBinding.ivClose.setOnClickListener(v -> {
             txDialog.closeDialog();
         });
-        txDialog = new CommonDialog.Builder(this)
+        txDialog = new ConfirmDialog.Builder(this)
                 .setContentView(dialogBinding.getRoot())
+                .setWarpView(dialogBinding.tvMsg)
                 .setCanceledOnTouchOutside(true)
                 .create();
         txDialog.show();

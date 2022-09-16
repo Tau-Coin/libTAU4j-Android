@@ -61,7 +61,7 @@
                 android:includeFontPadding="false"
                 android:lineSpacingExtra="@dimen/widget_size_5"
                 android:textColorLink="@color/color_blue_link"
-                android:textAppearance="@style/TextAppearanceBody3" />
+                android:textAppearance="@style/TextAppearanceBody2" />
 
         </LinearLayout>
 
