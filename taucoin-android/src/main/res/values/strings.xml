@@ -97,7 +97,6 @@
     <string name="drawer_data_cost">Data Cost</string>
     <string name="drawer_working_condition">Dash Board</string>
     <string name="drawer_share">Share TAU App</string>
-    <string name="drawer_export_seed">Export Key</string>
 
     <!-- Strings used for menu -->
     <string name="menu_share">Share</string>
@@ -132,11 +131,10 @@
 
     <string name="community_input_hint">Message</string>
     <string name="community_title">%1$s(%2$d)</string>
-    <string name="community_users_stats_m">Peers&#160;%1$d&#160;</string>
     <string name="community_users_stats_c">Linked&#160;%1$d&#160;</string>
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">Discovering</string>
-    <string name="community_users_mining">Mining</string>
+    <string name="community_users_mining">Win-Mining in</string>
     <string name="community_users_doze">Doze</string>
     <string name="common_loading">loading&#8230;</string>
 
@@ -268,10 +266,9 @@
     <string name="community_transfer_from">Transfer from %s</string>
 
     <string name="setting_title">Settings</string>
-    <string name="setting_key_explain">Key is your private secret. Address is your open ID for friends.</string>
+    <string name="setting_key_explain">Key is private secret for your own; address is public and derived from key.</string>
     <string name="setting_account">Address</string>
     <string name="setting_nickname">Nickname</string>
-    <string name="setting_import_seed">Import secret key to change address</string>
     <string name="setting_username_app">Nickname in app</string>
     <string name="setting_privacy_security">Privacy and Security</string>
     <string name="setting_personal_profile">Public Profile</string>
@@ -553,7 +550,6 @@
     <string name="qr_code_two_steps">Two steps to connect a friend</string>
     <string name="qr_code_step_one">Share QR code to friends</string>
     <string name="qr_code_step_two">Scan friend’s QR code</string>
-    <string name="qr_code_scan_friend_qr">Scan Friend\'s QR Code</string>
     <string name="qr_code_scan_community_qr">Scan QR Code</string>
     <string name="qr_code_scan_key_qr">Scan secret key QR code</string>
     <string name="qr_code_scan_qr">Scan QR</string>

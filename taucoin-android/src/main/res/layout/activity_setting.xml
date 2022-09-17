@@ -161,30 +161,6 @@
                     android:layout_marginTop="@dimen/widget_size_7"
                     android:layout_marginBottom="@dimen/widget_size_7"
                     android:includeFontPadding="false"
-                    android:text="@string/setting_key_explain"
-                    android:textColor="@color/gray_dark"
-                    android:textAppearance="@style/TextAppearanceBody3"/>
-
-                <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
-                    android:id="@+id/tv_import_new_key"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/widget_size_7"
-                    android:paddingBottom="@dimen/widget_size_7"
-                    android:background="@color/color_white"
-                    android:gravity="center_vertical"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:onClick="onClick"
-                    app:leftImage="@mipmap/icon_import"
-                    app:rightText="@string/setting_import_seed"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_15"
-                    android:layout_marginTop="@dimen/widget_size_7"
-                    android:layout_marginBottom="@dimen/widget_size_7"
-                    android:includeFontPadding="false"
                     android:text="@string/setting_community"
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody1"/>
@@ -319,6 +295,41 @@
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_version_updates"
                         app:rightText="@string/setting_check_updates"/>
+
+                    <include
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/widget_size_1"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        layout="@layout/view_line"/>
+
+                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
+                        android:id="@+id/item_share"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:gravity="center_vertical"
+                        android:onClick="onClick"
+                        app:leftImage="@mipmap/icon_share"
+                        app:rightText="@string/drawer_share"/>
+
+                    <include
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/widget_size_1"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        layout="@layout/view_line"/>
+
+                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
+                        android:id="@+id/item_official_telegram"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="@dimen/widget_size_5"
+                        android:onClick="onClick"
+                        app:leftImage="@mipmap/icon_telegram"
+                        app:rightText="@string/drawer_official_telegram"/>
 
                     <include
                         android:layout_width="match_parent"

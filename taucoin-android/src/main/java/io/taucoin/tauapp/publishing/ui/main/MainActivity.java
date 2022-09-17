@@ -37,7 +37,6 @@ import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
-import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
@@ -58,7 +57,6 @@ import io.taucoin.tauapp.publishing.databinding.ActivityMainDrawerBinding;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.tauapp.publishing.databinding.ExternalErrorLinkDialogBinding;
 import io.taucoin.tauapp.publishing.databinding.PromptDialogBinding;
-import io.taucoin.tauapp.publishing.databinding.UserDialogBinding;
 import io.taucoin.tauapp.publishing.receiver.NotificationReceiver;
 import io.taucoin.tauapp.publishing.service.WorkloadManager;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
@@ -74,7 +72,6 @@ import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
 import io.taucoin.tauapp.publishing.ui.download.DownloadViewModel;
 import io.taucoin.tauapp.publishing.ui.friends.AirdropCommunityActivity;
 import io.taucoin.tauapp.publishing.ui.friends.FriendsActivity;
-import io.taucoin.tauapp.publishing.ui.qrcode.KeyQRCodeActivity;
 import io.taucoin.tauapp.publishing.ui.setting.FontSizeActivity;
 import io.taucoin.tauapp.publishing.ui.setting.SettingActivity;
 import io.taucoin.tauapp.publishing.ui.qrcode.UserQRCodeActivity;
@@ -94,7 +91,6 @@ public class MainActivity extends ScanTriggerActivity {
     private DownloadViewModel downloadViewModel;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private final Subject<Integer> mBackClick = PublishSubject.create();
-    private CommonDialog seedDialog;
     private CommonDialog linkDialog;
     private CommonDialog joinDialog;
     private User user;
@@ -344,9 +340,6 @@ public class MainActivity extends ScanTriggerActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (seedDialog != null) {
-            seedDialog.closeDialog();
-        }
         if (linkDialog != null) {
             linkDialog.closeDialog();
         }
@@ -373,15 +366,13 @@ public class MainActivity extends ScanTriggerActivity {
         }
         switch (view.getId()) {
             case R.id.iv_user_qr_code:
+            case R.id.tv_public_key:
+            case R.id.tv_public_key_title:
+            case R.id.tv_note_name:
                 ActivityUtil.startActivity(this, UserQRCodeActivity.class);
                 break;
             case R.id.round_button:
                 MediaUtil.openGalleryAndCamera(this);
-                break;
-            case R.id.tv_public_key:
-            case R.id.tv_public_key_title:
-            case R.id.tv_note_name:
-                showSeedDialog();
                 break;
             case R.id.iv_public_key_copy:
                 String publicKey = ViewUtils.getStringTag(view);
@@ -401,50 +392,13 @@ public class MainActivity extends ScanTriggerActivity {
                 ActivityUtil.startActivityForResult(this, SettingActivity.class,
                         FontSizeActivity.REQUEST_CODE_FONT_SIZE);
                 break;
-            case R.id.item_share:
-                ActivityUtil.shareText(this, getString(R.string.app_share), Constants.APP_SHARE_URL);
-                break;
             case R.id.item_airdrop_coins:
                 ActivityUtil.startActivity(this, AirdropCommunityActivity.class);
-                break;
-            case R.id.item_official_telegram:
-                ActivityUtil.openUri(Constants.OFFICIAL_TELEGRAM_URL);
                 break;
         }
         if (binding != null) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
         }
-    }
-
-    /**
-     * 显示用户Seed的对话框
-     */
-    private void showSeedDialog() {
-        if(null == user){
-            return;
-        }
-        UserDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
-                R.layout.user_dialog, null, false);
-        dialogBinding.tvPublicKey.setText(UsersUtil.getMidHideName(user.publicKey));
-        dialogBinding.ivClose.setOnClickListener(v -> {
-            if(seedDialog != null){
-                seedDialog.closeDialog();
-            }
-        });
-        dialogBinding.ivPublicKeyCopy.setOnClickListener(v -> {
-            CopyManager.copyText(user.publicKey);
-            ToastUtils.showShortToast(R.string.copy_public_key);
-        });
-        dialogBinding.llExportSeed.setOnClickListener(v -> {
-            seedDialog.closeDialog();
-            ActivityUtil.startActivity(this, KeyQRCodeActivity.class);
-        });
-        seedDialog = new CommonDialog.Builder(this)
-                .setContentView(dialogBinding.getRoot())
-                .enableWarpWidth(true)
-                .setCanceledOnTouchOutside(false)
-                .create();
-        seedDialog.show();
     }
 
     private void showErrorLinkDialog() {

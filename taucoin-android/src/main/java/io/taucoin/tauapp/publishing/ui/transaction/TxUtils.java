@@ -282,7 +282,10 @@ public class TxUtils {
                 msg.append("Funds update: ");
                 if (operation == QueueOperation.INSERT) {
                     if (tx.txType == TxType.WIRING_TX.getType()) {
-                        msg.append("a wiring transaction is sent.");
+                        msg.append(FmtMicrometer.fmtBalance(tx.amount))
+                                .append(" ")
+                                .append(coinName);
+                        msg.append(" is sent to you.");
                     } else {
                         msg.append("a news transaction is posted.");
                     }
@@ -316,7 +319,7 @@ public class TxUtils {
                 } else if (StringUtil.isNotEmpty(tx.memo)) {
                     msg.append("\n").append("Description: ").append(tx.memo);
                 }
-                msg.append("\n").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
+                msg.append("\n").append("Community Link ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
             } else if (txType == TxType.AIRDROP_TX.getType()) {
                 AirdropTxContent content = new AirdropTxContent(tx.content);
                 msg.append("\n").append("Link: ").append(content.getLink());
@@ -370,11 +373,11 @@ public class TxUtils {
             }
             if (operation == QueueOperation.ON_CHAIN) {
                 msg.append(prefix);
-                msg.append(" is on chain and settled");
+                msg.append(" is settled to your account onchain.");
             } else if (operation == QueueOperation.ROLL_BACK) {
                 msg.append(prefix);
                 msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
-                        .append(" were rolled back");
+                        .append(" was rolled back due to temporary mining fork.");
             }
             msg.append("\n").append("Community: ")
                     .append(ChainIDUtil.getName(tx.chainID))
@@ -396,7 +399,7 @@ public class TxUtils {
             if (StringUtil.isNotEmpty(tx.memo)) {
                 msg.append("\n").append("Description: ").append(tx.memo);
             }
-            msg.append("\n").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
+            msg.append("\n").append("Community Link ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
         } else if (txType == TxType.AIRDROP_TX.getType()) {
             msg.append("\n").append("Link: ").append(tx.link);
             if (StringUtil.isNotEmpty(tx.memo)) {

@@ -208,12 +208,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 
     private void showCommunitySubtitle() {
         StringBuilder subtitle = new StringBuilder();
-        if (memberStatistics != null) {
-            long members = memberStatistics.getOnChain();
-            if (members > 0) {
-                subtitle.append(getString(R.string.community_users_stats_m, members));
-            }
-        }
         if (onlinePeers > 0) {
             subtitle.append(getString(R.string.community_users_stats_c, onlinePeers));
         }
@@ -297,7 +291,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 .subscribe(statistics -> {
                     this.memberStatistics = statistics;
                     showCommunityTitle();
-//                    showCommunitySubtitle();
                 }));
 
         disposables.add(communityViewModel.observerCurrentMember(chainID)

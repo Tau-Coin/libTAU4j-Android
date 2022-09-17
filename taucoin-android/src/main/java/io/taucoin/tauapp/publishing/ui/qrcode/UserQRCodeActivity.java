@@ -61,10 +61,17 @@ public class UserQRCodeActivity extends ScanTriggerActivity implements View.OnCl
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        binding.llScanQrCode.setVisibility(type == TYPE_QR_DISPLAY ? View.VISIBLE : View.GONE);
+        binding.llExportKey.setVisibility(type == TYPE_QR_DISPLAY ? View.VISIBLE : View.GONE);
+        binding.llImportKey.setVisibility(type == TYPE_QR_DISPLAY ? View.VISIBLE : View.GONE);
         binding.qrCode.tvQrCode.setVisibility(View.GONE);
         binding.qrCode.ivCopy.setVisibility(View.GONE);
-        // 查询数据
+        loadQRCode();
+        userViewModel.getChangeResult().observe(this, result -> {
+            loadQRCode();
+        });
+    }
+
+    private void loadQRCode() {
         userViewModel.queryCurrentUserAndFriends();
         userViewModel.getQRContent().observe(this, this::showQRCOdeImage);
         userViewModel.getQRBitmap().observe(this, bitmap -> {
@@ -97,6 +104,8 @@ public class UserQRCodeActivity extends ScanTriggerActivity implements View.OnCl
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_qr_code, menu);
+        MenuItem scanMenu = menu.findItem(R.id.menu_scan);
+        scanMenu.setVisible(type == TYPE_QR_DISPLAY);
         return true;
     }
 
@@ -107,6 +116,8 @@ public class UserQRCodeActivity extends ScanTriggerActivity implements View.OnCl
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_share) {
             userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 480);
+        } else if (item.getItemId() == R.id.menu_scan) {
+            openScanQRActivity();
         }
         return true;
     }
@@ -116,8 +127,10 @@ public class UserQRCodeActivity extends ScanTriggerActivity implements View.OnCl
      */
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.ll_scan_qr_code) {
-            openScanQRActivity();
+        if (v.getId() == R.id.ll_export_key) {
+            ActivityUtil.startActivity(this, KeyQRCodeActivity.class);
+        } else if (v.getId() == R.id.ll_import_key) {
+            userViewModel.showSaveSeedDialog(this, false);
         } else if (v.getId() == R.id.tv_name) {
             String publicKey = StringUtil.getTag(binding.qrCode.tvName);
             CopyManager.copyText(publicKey);

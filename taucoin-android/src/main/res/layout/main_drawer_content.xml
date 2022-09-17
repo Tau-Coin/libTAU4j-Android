@@ -224,29 +224,6 @@
 
                     <include layout="@layout/view_line"/>
 
-                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_share"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical"
-                        android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_share"
-                        app:rightText="@string/drawer_share"/>
-
-                    <include layout="@layout/view_line"/>
-
-                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
-                        android:id="@+id/item_official_telegram"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="@dimen/widget_size_5"
-                        android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_telegram"
-                        app:rightText="@string/drawer_official_telegram"/>
-
                 </LinearLayout>
             </ScrollView>
 

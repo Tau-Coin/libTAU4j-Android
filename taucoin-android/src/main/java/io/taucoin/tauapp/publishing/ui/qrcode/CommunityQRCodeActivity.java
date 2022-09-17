@@ -93,6 +93,8 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_qr_code, menu);
+        MenuItem scanMenu = menu.findItem(R.id.menu_scan);
+        scanMenu.setVisible(true);
         return true;
     }
 
@@ -103,6 +105,8 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_share) {
             userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 480);
+        } else if (item.getItemId() == R.id.menu_scan) {
+            openScanQRActivityAndExit();
         }
         return true;
     }

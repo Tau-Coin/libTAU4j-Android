@@ -6,4 +6,10 @@
         app:showAsAction="always"
         android:icon="@mipmap/icon_share_white"
         android:title="@string/menu_share" />
+
+    <item android:id="@+id/menu_scan"
+        android:visible="false"
+        app:showAsAction="always"
+        android:icon="@mipmap/icon_scan"
+        android:title="@string/menu_scan" />
 </menu>

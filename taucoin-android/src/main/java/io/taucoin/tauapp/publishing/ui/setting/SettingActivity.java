@@ -25,6 +25,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.BuildConfig;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.AppUtil;
 import io.taucoin.tauapp.publishing.core.utils.BitmapUtil;
@@ -48,7 +49,7 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
     private ActivitySettingBinding binding;
     private UserViewModel viewModel;
     private DownloadViewModel downloadViewModel;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,9 +170,6 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
             case R.id.item_debug:
                 ActivityUtil.startActivity(this, DebugActivity.class);
                 break;
-            case R.id.tv_import_new_key:
-                viewModel.showSaveSeedDialog(this, false);
-                break;
             case R.id.tv_username:
             case R.id.tv_username_title:
                 String publicKey = MainApplication.getInstance().getPublicKey();
@@ -186,6 +184,12 @@ public class SettingActivity extends ScanTriggerActivity implements View.OnClick
                 break;
             case R.id.item_personal_profile:
                 ActivityUtil.startActivity(this, PersonalProfileActivity.class);
+                break;
+            case R.id.item_official_telegram:
+                ActivityUtil.openUri(Constants.OFFICIAL_TELEGRAM_URL);
+                break;
+            case R.id.item_share:
+                ActivityUtil.shareText(this, getString(R.string.app_share), Constants.APP_SHARE_URL);
                 break;
         }
     }
