@@ -35,11 +35,10 @@
                 android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/font_size_18"
                 android:singleLine="true"
                 android:ellipsize="middle"
                 android:textColor="@color/color_white"
-                android:textAppearance="@style/TextAppearanceHeadline5"/>
+                android:textAppearance="@style/TextAppearanceHeadline6"/>
 
             <TextView
                 android:visibility="gone"

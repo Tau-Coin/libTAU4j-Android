@@ -201,7 +201,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         }
         if (StringUtil.isNotEmpty(chainID)) {
             String communityName = ChainIDUtil.getName(chainID);
-            String communityTitle = getString(R.string.community_title, communityName, total);
+            String communityCode = ChainIDUtil.getCode(chainID);
+            String communityTitle = getString(R.string.main_community_name_total,
+                    communityName, communityCode, total);
             binding.toolbarInclude.tvTitle.setText(communityTitle);
         }
     }
