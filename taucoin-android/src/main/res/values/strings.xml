@@ -210,7 +210,6 @@
     <string name="chain_peers_blocks">Blocks Self-mined</string>
     <string name="chain_total_coins">Total Coins</string>
     <string name="chain_access_list">Connected List</string>
-    <string name="chain_top_peers">Top 1000 peers</string>
     <string name="chain_current_fork">Recent Fork Out</string>
     <string name="chain_block_number">Block Number</string>
     <string name="chain_block">Block</string>
@@ -263,6 +262,7 @@
     <string name="community_tip_block_reward">Block Reward:&#160;</string>
     <string name="community_tip_block_difficulty">Difficulty:&#160;</string>
     <string name="community_tip_block_size">Size: </string>
+    <string name="community_consensus_state">Consensus State</string>
     <string name="community_block_on_chain">Onchain</string>
     <string name="community_block_forking">Forking</string>
     <string name="community_transfer_to">Transfer to %s</string>

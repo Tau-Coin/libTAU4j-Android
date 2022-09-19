@@ -175,7 +175,7 @@ public class ChainStatusActivity extends BaseActivity {
      */
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.item_top_peers:
+            case R.id.item_consensus_state:
                 Intent intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, ChainTopActivity.class);

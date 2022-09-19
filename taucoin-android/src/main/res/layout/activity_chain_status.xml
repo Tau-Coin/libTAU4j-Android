@@ -277,12 +277,12 @@
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
                 <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_top_peers"
+                    android:id="@+id/item_consensus_state"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:onClick="onClick"
-                    app:lineLeftText="@string/chain_top_peers"
+                    app:lineLeftText="@string/community_consensus_state"
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
                 <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView

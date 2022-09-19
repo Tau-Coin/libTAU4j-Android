@@ -1,5 +1,6 @@
 package io.taucoin.tauapp.publishing.ui.community;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.style.URLSpan;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.BlockAndTx;
 import io.taucoin.tauapp.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.CopyManager;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityListBinding;
@@ -166,5 +168,12 @@ public class SyncStatusActivity extends BaseActivity implements BlockListAdapter
             }
         });
         operationsMenu.show(getPoint());
+    }
+
+    @Override
+    public void onConsensusStateClick() {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+        ActivityUtil.startActivity(intent, this, ChainTopActivity.class);
     }
 }
