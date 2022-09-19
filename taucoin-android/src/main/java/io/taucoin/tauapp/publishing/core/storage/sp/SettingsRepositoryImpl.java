@@ -106,18 +106,6 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public void doNotShowBanDialog(boolean isShow) {
-        String key = appContext.getString(R.string.pref_key_do_not_show_ban_dialog);
-        edit.putBoolean(key, isShow).apply();
-    }
-
-    @Override
-    public boolean doNotShowBanDialog() {
-        String key = appContext.getString(R.string.pref_key_do_not_show_ban_dialog);
-        return pref.getBoolean(key, Default.isShowBanDialog);
-    }
-
-    @Override
     public void setApkDownloadID(long downloadID) {
         String key = appContext.getString(R.string.pref_key_apk_download_id);
         edit.putLong(key, downloadID)

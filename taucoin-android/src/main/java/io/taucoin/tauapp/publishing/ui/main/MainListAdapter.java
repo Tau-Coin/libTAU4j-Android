@@ -1,6 +1,7 @@
 package io.taucoin.tauapp.publishing.ui.main;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,9 +115,9 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 } else {
                     String balance = FmtMicrometer.fmtBalance(bean.balance);
                     String time = DateUtil.formatTime(bean.balUpdateTime, DateUtil.pattern14);
-                    String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time,
+                    String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_color,
                             balance, time);
-                    binding.tvBalancePower.setText(balanceAndTime);
+                    binding.tvBalancePower.setText(Html.fromHtml(balanceAndTime));
                 }
 
                 binding.tvUserMessage.setVisibility(StringUtil.isNotEmpty(bean.memo) ?

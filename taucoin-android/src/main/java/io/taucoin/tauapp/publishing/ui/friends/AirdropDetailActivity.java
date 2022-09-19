@@ -163,12 +163,14 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
                 ToastUtils.showShortToast(R.string.copy_link_successfully);
                 break;
             case R.id.ll_share:
-                if (StringUtil.isEmpty(airdropLink)) {
+                if (StringUtil.isEmpty(airdropLink) || null == member) {
                     return;
                 }
+                String airdropCoinsStr = FmtMicrometer.fmtLong(member.airdropCoins);
                 String communityName = ChainIDUtil.getName(chainID);
                 String shareTitle = getString(R.string.bot_share_airdrop_link_title);
-                String text = getString(R.string.bot_share_airdrop_link_content, communityName, airdropLink);
+                String text = getString(R.string.bot_share_airdrop_link_content, airdropCoinsStr, communityName,
+                        airdropCoinsStr, communityName, airdropLink);
                 ActivityUtil.shareText(this, shareTitle, text);
                 break;
         }

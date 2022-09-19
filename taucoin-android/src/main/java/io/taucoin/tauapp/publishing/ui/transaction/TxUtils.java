@@ -296,7 +296,7 @@ public class TxUtils {
                 }
                 msg.append("\n").append("Community: ")
                     .append(ChainIDUtil.getName(tx.chainID))
-                    .append("\n").append("ID: ")
+                    .append("\n").append("Transmission ID: ")
                     .append(HashUtil.hashMiddleHide(String.valueOf(tx.queueTime)))
                     .append("\n");
             }
@@ -381,7 +381,7 @@ public class TxUtils {
             }
             msg.append("\n").append("Community: ")
                     .append(ChainIDUtil.getName(tx.chainID))
-                    .append("\n").append("ID: ")
+                    .append("\n").append("Transmission ID: ")
                     .append(HashUtil.hashMiddleHide(String.valueOf(timestamp)));
         }
         if (txType == TxType.WIRING_TX.getType()) {

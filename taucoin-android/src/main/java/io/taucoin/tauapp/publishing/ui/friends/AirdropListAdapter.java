@@ -1,6 +1,8 @@
 package io.taucoin.tauapp.publishing.ui.friends;
 
+import android.content.Context;
 import android.content.res.Resources;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,8 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
+import io.taucoin.tauapp.publishing.core.utils.DateUtil;
+import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.databinding.ItemAirdropBinding;
 
@@ -55,13 +59,15 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private ItemAirdropBinding binding;
-        private AirdropListAdapter adapter;
+        private final ItemAirdropBinding binding;
+        private final AirdropListAdapter adapter;
+        private final Context context;
 
         ViewHolder(AirdropListAdapter adapter, ItemAirdropBinding binding) {
             super(binding.getRoot());
             this.adapter = adapter;
             this.binding = binding;
+            this.context = binding.getRoot().getContext();
         }
 
         /**
@@ -87,7 +93,11 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
                     adapter.member = null;
                 }
             });
-            binding.tvLeft.setText(ChainIDUtil.getName(member.chainID));
+            String name = ChainIDUtil.getName(member.chainID);
+            String balance = FmtMicrometer.fmtBalance(member.balance);
+            String nameAndBalance = context.getResources().getString(R.string.drawer_balance_name_color,
+                    name, balance);
+            binding.tvLeft.setText(Html.fromHtml(nameAndBalance));
             AirdropStatus status = AirdropStatus.valueOf(member.airdropStatus);
             Resources resources = binding.getRoot().getResources();
             binding.tvRight.setText(resources.getString(status.getName()));
@@ -95,14 +105,14 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
 
             binding.tvShare.setOnClickListener(v -> {
                 if (adapter.listener != null) {
-                    adapter.listener.onShare(member.chainID);
+                    adapter.listener.onShare(member.chainID, member.airdropCoins);
                 }
             });
         }
     }
 
     interface OnClickListener {
-        void onShare(String chainID);
+        void onShare(String chainID, long airdropCoins);
     }
 
     private static final DiffUtil.ItemCallback<Member> diffCallback = new DiffUtil.ItemCallback<Member>() {

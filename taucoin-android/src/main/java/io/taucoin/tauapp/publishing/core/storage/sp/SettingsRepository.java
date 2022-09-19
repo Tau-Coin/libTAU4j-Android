@@ -61,16 +61,6 @@ public interface SettingsRepository {
     void lastTxFee(String chainID, long fee);
 
     /**
-     * 设置不显示ban对话框
-     */
-    void doNotShowBanDialog(boolean b);
-
-    /**
-     * 获取不显示ban对话框
-     */
-    boolean doNotShowBanDialog();
-
-    /**
      * 设置APK下载任务的ID
      */
     void setApkDownloadID(long downloadID);

@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.tauapp.publishing.core.utils.HashUtil;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.core.utils.Utils;
@@ -162,7 +163,7 @@ public class BlackListAdapter extends ListAdapter<Parcelable, BlackListAdapter.V
             userBinding.leftView.setImageBitmap(UsersUtil.getHeadPic(user));
 
             userBinding.tvName.setText(showName);
-            String publicKey = UsersUtil.getDefaultName(user.publicKey);
+            String publicKey = HashUtil.hashMiddleHide(user.publicKey);
             publicKey = binding.getRoot().getResources().getString(R.string.common_parentheses, publicKey);
             userBinding.tvPublicKey.setText(publicKey);
             userBinding.line.setVisibility(isShowLine ? View.VISIBLE : View.GONE);

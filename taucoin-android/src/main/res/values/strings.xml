@@ -86,9 +86,12 @@
     <string name="drawer_send_and_airdrop_coins">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
     <string name="drawer_balance_time">Balance %1$s on %2$s</string>
+    <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Balance <font color="#E1B447">%1$s</font> on %2$s]]></Data></string>
+    <string name="drawer_balance_name_color" formatted="false"><Data><![CDATA[%1$s(<font color="#E1B447">%2$s</font>)]]></Data></string>
     <string name="drawer_balance_pending">+%1$s pending</string>
     <string name="drawer_balance_time_no_title">%1$s on %2$s</string>
-    <string name="drawer_balance_time_pending" formatted="false"><Data><![CDATA[%1$s on %2$s<br/><font color="#f19322">+%3$s pending</font]]></Data></string>
+    <string name="drawer_balance_time_color_no_title" formatted="false"><Data><![CDATA[<font color="#E1B447">%1$s</font> on %2$s]]></Data></string>
+    <string name="drawer_balance_time_pending" formatted="false"><Data><![CDATA[%1$s on %2$s<br/><font color="#f19322">+%3$s pending</font>]]></Data></string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Contacts</string>
     <string name="drawer_wallet">Wallet and Pay</string>
@@ -539,9 +542,9 @@
     <string name="bot_airdrop_tau_link">Airdrop Link</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share Airdrop link</string>
-    <string name="bot_share_airdrop_link_content">Hi, I am sending you \"%1$s\" community crypto coins.\n1.
+    <string name="bot_share_airdrop_link_content">Hi, kindly receive %1$s free \"%2$s\" community crypto coins.\n1.
         We use taucoin.io wallet, which is a safe and secure server-less app.\n2.
-        Paste this FULL message to TAU app airdrop function.\n%2$s</string>
+        Paste this FULL message below to TAU app airdrop function so you receive your %3$s \"%4$s\" coins.\n\n%5$s</string>
     <string name="bot_hello_world">HelloWorld</string>
 
     <!-- Strings used for QRCode -->

@@ -1,6 +1,7 @@
 package io.taucoin.tauapp.publishing.ui.community;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,9 +66,9 @@ public class ChooseListAdapter extends ListAdapter<MemberAndAmount, ChooseListAd
 
             String balance = FmtMicrometer.fmtBalance(member.balance);
             String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
-            String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_no_title,
+            String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_color_no_title,
                     balance, time);
-            binding.tvBalance.setText(balanceAndTime);
+            binding.tvBalance.setText(Html.fromHtml(balanceAndTime));
             binding.tvBalancePending.setVisibility(member.amount > 0 ? View.VISIBLE : View.GONE);
             if (member.amount > 0) {
                 String balancePending = FmtMicrometer.fmtBalance(member.amount);

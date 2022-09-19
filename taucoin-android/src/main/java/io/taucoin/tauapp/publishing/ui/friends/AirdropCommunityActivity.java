@@ -18,6 +18,7 @@ import io.taucoin.tauapp.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
+import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.CopyManager;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
@@ -180,18 +181,20 @@ public class AirdropCommunityActivity extends BaseActivity implements
     }
 
     @Override
-    public void onShare(String chainID) {
+    public void onShare(String chainID, long airdropCoins) {
         if (StringUtil.isNotEmpty(chainID)) {
             String airdropPeer = MainApplication.getInstance().getPublicKey();
             String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID);
-            shareAirdropLink(chainID, airdropLink);
+            shareAirdropLink(chainID, airdropLink, airdropCoins);
         }
     }
 
-    private void shareAirdropLink(String chainID, String airdropLink) {
+    private void shareAirdropLink(String chainID, String airdropLink, long airdropCoins) {
+        String airdropCoinsStr = FmtMicrometer.fmtLong(airdropCoins);
         String communityName = ChainIDUtil.getName(chainID);
         String shareTitle = getString(R.string.bot_share_airdrop_link_title);
-        String text = getString(R.string.bot_share_airdrop_link_content, communityName, airdropLink);
+        String text = getString(R.string.bot_share_airdrop_link_content, airdropCoinsStr, communityName,
+                airdropCoinsStr, communityName, airdropLink);
         ActivityUtil.shareText(this, shareTitle, text);
     }
 
