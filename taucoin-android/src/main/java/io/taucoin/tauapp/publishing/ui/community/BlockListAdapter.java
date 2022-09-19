@@ -89,7 +89,7 @@ public class BlockListAdapter extends ListAdapter<BlockAndTx, BlockListAdapter.V
                     R.string.community_block_forking);
             binding.tvBlockDetail.setOnLongClickListener(longListener);
             binding.tvMsg.setOnLongClickListener(longListener);
-            boolean isShowState = block.blockNumber % Constants.CHAIN_EPOCH_BLOCK_SIZE == 0;
+            boolean isShowState = block.status == 1 && block.blockNumber % Constants.CHAIN_EPOCH_BLOCK_SIZE == 0;
             binding.tvConsensusState.setVisibility(isShowState ? View.VISIBLE : View.GONE);
             binding.tvConsensusState.setOnClickListener(view -> {
                 if (listener != null) {
