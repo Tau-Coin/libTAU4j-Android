@@ -107,10 +107,8 @@ public class DataDozeManager {
             dozeTime = 5 * 60;
         } else if (rate > 30) {
             dozeTime = 10 * 60;
-        } else if (rate > 10) {
-            dozeTime = 20 * 60;
         } else {
-            dozeTime = 30 * 60;
+            dozeTime = 20 * 60;
         }
         if (reset) {
             this.dozeTime = dozeTime;
