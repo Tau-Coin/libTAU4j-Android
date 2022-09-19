@@ -193,29 +193,29 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             NetworkSetting.updateWiFiSpeedLimit();
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_foreground_running_time))) {
             int foregroundTime = NetworkSetting.getForegroundRunningTime();
-            long dozeTime = settingsRepo.getTauDozeTime(true);
+            long dozeTime = settingsRepo.getDataDozeTime(true);
             long foreRun = foregroundTime - dozeTime;
             foreRun = foreRun < 0 ? 0 : foreRun;
             String foregroundTimeStr = DateUtil.getFormatTime(foreRun);
             binding.tvForeRunningTime.setRightText(foregroundTimeStr);
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_background_running_time))) {
             int backgroundTime = NetworkSetting.getBackgroundRunningTime();
-            long tauDoze = settingsRepo.getTauDozeTime(false);
+            long dataDoze = settingsRepo.getDataDozeTime(false);
             long androidDoze = NetworkSetting.getDozeTime();
-            long bgRun = backgroundTime - tauDoze - androidDoze;
+            long bgRun = backgroundTime - dataDoze - androidDoze;
             bgRun = bgRun < 0 ? 0 : bgRun;
             String backgroundTimeStr = DateUtil.getFormatTime(bgRun);
             binding.tvBgRunningTime.setRightText(backgroundTimeStr);
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_doze_running_time))) {
             int dozeTime = NetworkSetting.getDozeTime();
             String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
-            binding.tvDozeRunningTime.setRightText(dozeTimeStr);
+            binding.tvAndroidDoze.setRightText(dozeTimeStr);
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_tau_fore_doze_time))) {
-            long dozeTime = settingsRepo.getTauDozeTime(true);
+            long dozeTime = settingsRepo.getDataDozeTime(true);
             String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
             binding.tvForeDozeTime.setRightText(dozeTimeStr);
         } else if(StringUtil.isEquals(key, getString(R.string.pref_key_tau_back_doze_time))) {
-            long dozeTime = settingsRepo.getTauDozeTime(false);
+            long dozeTime = settingsRepo.getDataDozeTime(false);
             String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
             binding.tvBackDozeTime.setRightText(dozeTimeStr);
         }

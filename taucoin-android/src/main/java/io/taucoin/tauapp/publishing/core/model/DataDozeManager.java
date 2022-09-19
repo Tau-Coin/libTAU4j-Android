@@ -17,45 +17,31 @@ import io.taucoin.tauapp.publishing.core.utils.NetworkSetting;
 /**
  * TAU休息模式
  *
- * APP会根据电量和网络流量剩余来间歇工作，来达到节能和节约流量的目的。其中“区块链模块”挂起时间计算策略为：
- * 根据两个指标较低剩余百分比90%（包括充电状态）、70%、50%、30%、10%对应为0、3、6、12、24分钟。
- * "TAU休息模式"的两种方式：
- * 第一种方式：
+ * 1. Data Doze
+ * 大多数操作系统包括android和chromeOS都会对电池电源做精细管理，但是对流量一般不做控制。TAU考虑到非洲地区流量成本，增加这个模式
  * 进入条件：
+ * 1. 如果3分钟内（固定参数）用户和TAU app没有“鼠标键盘手指交互”并且没有“android doze过”就进入“TAU Doze”。
+ * 2. 没有网络时，节点为0
  *
- * APP在3分钟（固定参数）未发生以下情况：
+ * Data Doze模式：
+ * app根据网络流量剩余来间歇工作 >70%，>50%，>30%，>10%，就进入“区块链业务进程挂起”对应的0，5，10，20分钟策略。
  *
- * 鼠标键盘手指交互；
- * Android Doze结束；
- * 前后台切换；
- * 充电断电、电量百分比变化和可用流量百分比变化时重新计算TAU的挂起时间，与上次的计算挂起时间不一致；
- * 退出条件：
+ * 退出tau doze模式的条件：
+ * 1、鼠标键盘手指交互
+ * 2、网络任何变化
+ * 3、Android doze结束
+ * 4、切入前台 foreground
+ * 5、流量包选择变化
  *
- * APP在处于"TAU休息模式"时发生以下情况：
- *
- * 鼠标键盘手指交互；
- * Android Doze结束；
- * 前后台切换；
- * 充电断电、电量百分比变化和可用流量百分比变化时重新计算TAU的挂起时间，与上次的计算挂起时间不一致；
- * 第二种方式：
- * 进入条件：
- *
- * DHT节点数为0（如果当前处于doze休息模式，继续保持；否则立即进入）
- * 退出条件：
- *
- * DHT节点数大于0
- *
- * @see <a href="https://github.com/Tau-Coin/libTAU4j-Android/blob/main/docs/tau_doze_mode.md">TAU休息模式</a>
+ * @see <a href="https://github.com/Tau-Coin/libTAU4j-Android/blob/main/docs/data_doze_mode.md">Data Doze模式</a>
  */
-public class TauDozeManager {
-    private static final Logger logger = LoggerFactory.getLogger("TauDozeManager");
+public class DataDozeManager {
+    private static final Logger logger = LoggerFactory.getLogger("DataDozeManager");
     protected static final long TAU_UP_TIME = 3 * 60;           // 单位：s
     protected static final long HOURS24_TIME = 24 * 60 * 60;    // 单位：s
     private final TauDaemon daemon;
     private final SettingsRepository settingsRepo;
     private final LinkedBlockingQueue<DozeEvent> eventsQueue = new LinkedBlockingQueue<>();
-    private boolean chargingState = false;
-    private int batteryLevel = 100;
     private int dataAvailableRate = 100;
 
     private long dozeTime = 0;
@@ -64,10 +50,10 @@ public class TauDozeManager {
     private final Disposable handlerDisposable;
     private final Disposable observerDisposable;
 
-    TauDozeManager(TauDaemon daemon, SettingsRepository settingsRepo) {
+    DataDozeManager(TauDaemon daemon, SettingsRepository settingsRepo) {
         this.daemon = daemon;
         this.settingsRepo = settingsRepo;
-        handlerDisposable = createTauDozeHandler();
+        handlerDisposable = createDataDozeHandler();
         observerDisposable = createEventObserver();
     }
 
@@ -87,22 +73,6 @@ public class TauDozeManager {
 
     public void setDozeMode(boolean dozeMode) {
         this.isDozeMode = dozeMode;
-    }
-
-    public void setChargingState(boolean chargingState) {
-        if (this.chargingState != chargingState) {
-            logger.debug("setChargingState::{}", chargingState);
-            this.chargingState = chargingState;
-            checkDozeTime();
-        }
-    }
-
-    public void setBatteryLevel(int batteryLevel) {
-        if (this.batteryLevel != batteryLevel) {
-            logger.debug("setBatteryLevel::{}", batteryLevel);
-            this.batteryLevel = batteryLevel;
-            checkDozeTime();
-        }
     }
 
     public void setDataAvailableRate(int dataAvailableRate) {
@@ -129,30 +99,24 @@ public class TauDozeManager {
     }
 
     public long calculateDozeTime(boolean reset) {
-        int rate;
-        if (chargingState) {
-            rate = dataAvailableRate;
-        } else {
-            rate = Math.min(batteryLevel, dataAvailableRate);
-        }
+        int rate = dataAvailableRate;
         long dozeTime;
-        if (rate >= 90) {
+        if (rate > 70) {
             dozeTime = 0;
-        } else if (rate >= 70) {
-            dozeTime = 3 * 60;
-        } else if (rate >= 50) {
-            dozeTime = 6 * 60;
-        } else if (rate >= 30) {
-            dozeTime = 12 * 60;
+        } else if (rate > 50) {
+            dozeTime = 5 * 60;
+        } else if (rate > 30) {
+            dozeTime = 10 * 60;
+        } else if (rate > 10) {
+            dozeTime = 20 * 60;
         } else {
-            dozeTime = 24 * 60;
+            dozeTime = 30 * 60;
         }
         if (reset) {
             this.dozeTime = dozeTime;
         }
-        logger.debug("calculateDozeTime charging::{}, battery::{}%, data::{}%, reset::{}, " +
-                        "oldDozeTime::{}s, dozeTime::{}s",
-                chargingState, batteryLevel, dataAvailableRate, reset, this.dozeTime, dozeTime);
+        logger.debug("calculateDozeTime data::{}%, reset::{}, oldDozeTime::{}s, dozeTime::{}s",
+                dataAvailableRate, reset, this.dozeTime, dozeTime);
         return dozeTime;
     }
 
@@ -256,34 +220,34 @@ public class TauDozeManager {
                 .subscribe();
     }
 
-    public Disposable createTauDozeHandler() {
+    public Disposable createDataDozeHandler() {
         return Observable.create(emitter -> {
-            waitTime = TauDozeManager.TAU_UP_TIME;
+            waitTime = DataDozeManager.TAU_UP_TIME;
             synchronized (taskLock) {
                 while (!emitter.isDisposed()) {
                     try {
-                        logger.debug("TauDoze wait::{}s, isDozeMode::{}", waitTime, isDozeMode);
+                        logger.debug("DataDoze wait::{}s, isDozeMode::{}", waitTime, isDozeMode);
                         // 等待时间, 默认等待结束，有点击事件等会直接退出
                         isWaitTimeout = true;
                         taskLock.wait(waitTime * 1000);
-                        logger.debug("TauDoze isWaitTimeout::{}", isWaitTimeout);
+                        logger.debug("DataDoze isWaitTimeout::{}", isWaitTimeout);
                         // 等待结束
                         if (isDozeMode) {
                             // 计算真实进入doze模式的时间
                             long realDozeTime = calculateRealDozeTime();
                             if (realDozeTime > 0) {
-                                settingsRepo.updateTauDozeTime(realDozeTime, isForeDozeTime);
+                                settingsRepo.updateDataDozeTime(realDozeTime, isForeDozeTime);
                             }
-                            logger.debug("TauDoze end totalDozeTime::{}s, realDozeTime::{}s, isForeDozeTime::{}",
-                                    settingsRepo.getTauDozeTime(isForeDozeTime), realDozeTime, isForeDozeTime);
+                            logger.debug("DataDoze end totalDozeTime::{}s, realDozeTime::{}s, isForeDozeTime::{}",
+                                    settingsRepo.getDataDozeTime(isForeDozeTime), realDozeTime, isForeDozeTime);
                             if (!isDirectDoze) {
                                 daemon.resumeService();
-                                waitTime = TauDozeManager.TAU_UP_TIME;
+                                waitTime = DataDozeManager.TAU_UP_TIME;
                                 setDozeMode(false);
                             } else {
-                                waitTime = TauDozeManager.HOURS24_TIME;
+                                waitTime = DataDozeManager.HOURS24_TIME;
                                 resetDozeStartTime();
-                                logger.debug("TauDoze continue doze::{}s", waitTime);
+                                logger.debug("DataDoze continue doze::{}s", waitTime);
                             }
                             // 恢复由于前后台切换设置的值
                             isForeDozeTime = isForegroundRunning();
@@ -292,21 +256,21 @@ public class TauDozeManager {
                             // 才能进入doze模式
                             long dozeTime = calculateDozeTime(true);
                             if (isDirectDoze) {
-                                waitTime = TauDozeManager.HOURS24_TIME;
+                                waitTime = DataDozeManager.HOURS24_TIME;
                                 daemon.pauseService();
                                 setDozeMode(true);
                                 resetDozeStartTime();
-                                logger.debug("TauDoze direct doze::{}s", waitTime);
+                                logger.debug("DataDoze direct doze::{}s", waitTime);
                             } else if (isWaitTimeout && dozeTime > 0) {
                                 waitTime = dozeTime;
                                 daemon.pauseService();
                                 setDozeMode(true);
                                 resetDozeStartTime();
-                                logger.debug("TauDoze start doze::{}s", waitTime);
+                                logger.debug("DataDoze start doze::{}s", waitTime);
                             } else {
                                 // 重新等待3分钟，再次查看是否满足进入doze模式的条件
-                                waitTime = TauDozeManager.TAU_UP_TIME;
-                                logger.debug("TauDoze continue wait::{}s", waitTime);
+                                waitTime = DataDozeManager.TAU_UP_TIME;
+                                logger.debug("DataDoze continue wait::{}s", waitTime);
                             }
                         }
                     } catch (Exception e) {

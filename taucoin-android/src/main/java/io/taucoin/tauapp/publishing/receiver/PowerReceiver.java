@@ -9,7 +9,6 @@ import android.os.BatteryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 
@@ -31,17 +30,14 @@ public class PowerReceiver extends BroadcastReceiver {
         switch (action) {
             case Intent.ACTION_POWER_CONNECTED:
                 settingsRepo.chargingState(true);
-                TauDaemon.getInstance(appContext).setChargingState(true);
                 break;
             case Intent.ACTION_POWER_DISCONNECTED:
                 settingsRepo.chargingState(false);
-                TauDaemon.getInstance(appContext).setChargingState(false);
                 break;
             case Intent.ACTION_BATTERY_CHANGED:
                 int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
                 if (this.level != level) {
                     logger.debug("battery changed::{}", level);
-                    TauDaemon.getInstance(appContext).setBatteryLevel(level);
                 }
                 break;
         }

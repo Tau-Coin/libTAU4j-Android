@@ -63,7 +63,7 @@
                         app:lineLeftText="@string/setting_bg_running_time"/>
 
                     <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
-                        android:id="@+id/tv_doze_running_time"
+                        android:id="@+id/tv_android_doze"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:lineVisibility="true"

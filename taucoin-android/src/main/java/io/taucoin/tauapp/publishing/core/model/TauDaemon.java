@@ -93,7 +93,7 @@ public abstract class TauDaemon {
     private Disposable onlineTimer;                  // 触发在线信号定时任务
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
     private final TxQueueManager txQueueManager;     // 交易队列管理
-    private final TauDozeManager tauDozeManager;     // tau休息模式管理
+    private final DataDozeManager tauDozeManager;     // tau休息模式管理
     private final MyAccountManager myAccountManager; // 社区我的账户管理
     volatile boolean isRunning = false;
     private volatile boolean trafficTips = true;     // 剩余流量用完提示
@@ -126,7 +126,7 @@ public abstract class TauDaemon {
         deviceID = DeviceUtils.getCustomDeviceID(appContext);
         sessionManager = new SessionManager(true);
         txQueueManager = new TxQueueManager(this);
-        tauDozeManager = new TauDozeManager(this, settingsRepo);
+        tauDozeManager = new DataDozeManager(this, settingsRepo);
         myAccountManager = new MyAccountManager();
 
         observeTauDaemon();
@@ -326,12 +326,7 @@ public abstract class TauDaemon {
      * 电源充电状态切换广播接受器
      */
     private void switchPowerReceiver() {
-        boolean chargeState = systemServiceManager.isPlugged();
-        setChargingState(chargeState);
         settingsRepo.chargingState(systemServiceManager.isPlugged());
-
-        int batteryLevel = systemServiceManager.getBatteryLevel();
-        setBatteryLevel(batteryLevel);
         try {
             appContext.unregisterReceiver(powerReceiver);
         } catch (IllegalArgumentException ignore) {
@@ -387,16 +382,8 @@ public abstract class TauDaemon {
         }
     }
 
-    public void setBatteryLevel(int level) {
-        tauDozeManager.setBatteryLevel(level);
-    }
-
     public void setDataAvailableRate(int rate) {
         tauDozeManager.setDataAvailableRate(rate);
-    }
-
-    public void setChargingState(boolean on) {
-        tauDozeManager.setChargingState(on);
     }
 
     public void resetDozeStartTime() {
@@ -423,7 +410,7 @@ public abstract class TauDaemon {
     /**
      * 恢复区块链服务
      */
-    protected void resumeService() {
+    public void resumeService() {
         if (isRunning) {
             sessionManager.resumeService();
         }
@@ -721,7 +708,7 @@ public abstract class TauDaemon {
         return tauDaemonAlertHandler;
     }
 
-    public TauDozeManager getTauDozeManager() {
+    public DataDozeManager getTauDozeManager() {
         return tauDozeManager;
     }
 

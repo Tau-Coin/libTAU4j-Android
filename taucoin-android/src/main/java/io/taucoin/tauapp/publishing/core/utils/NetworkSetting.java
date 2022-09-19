@@ -267,7 +267,10 @@ public class NetworkSetting {
                 int dozeTime = getDozeTime() + dozeSeconds;
                 updateDozeTime(dozeTime);
                 logger.debug("updateRunningTime dozeTime::{}s", dozeSeconds);
-                TauDaemon.getInstance(MainApplication.getInstance()).newActionEvent(DozeEvent.SYS_DOZE_END);
+                TauDaemon tauDaemon = TauDaemon.getInstance(MainApplication.getInstance());
+                tauDaemon.newActionEvent(DozeEvent.SYS_DOZE_END);
+                // 防止因为Android doze引起libTAU不能出块
+                tauDaemon.resumeService();
             }
         }
         lastElapsedRealTime = currentElapsedRealTime;

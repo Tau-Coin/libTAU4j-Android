@@ -312,7 +312,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public void setTauDozeTime(long time, boolean isForeground) {
+    public void setDataDozeTime(long time, boolean isForeground) {
         String key;
         if (isForeground) {
             key = appContext.getString(R.string.pref_key_tau_fore_doze_time);
@@ -323,13 +323,13 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     @Override
-    public void updateTauDozeTime(long time, boolean isForeground) {
-        long dozeTime = getTauDozeTime(isForeground) + time;
-        setTauDozeTime(dozeTime, isForeground);
+    public void updateDataDozeTime(long time, boolean isForeground) {
+        long dozeTime = getDataDozeTime(isForeground) + time;
+        setDataDozeTime(dozeTime, isForeground);
     }
 
     @Override
-    public long getTauDozeTime(boolean isForeground) {
+    public long getDataDozeTime(boolean isForeground) {
         String key;
         if (isForeground) {
             key = appContext.getString(R.string.pref_key_tau_fore_doze_time);

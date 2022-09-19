@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import androidx.databinding.DataBindingUtil;
@@ -77,13 +78,13 @@ public class LeftRightLineView extends RelativeLayout {
         if (StringUtil.isNotEmpty(leftText)) {
             if (leftImage != -1) {
                 binding.tvLeft1.setText(leftText);
-                binding.tvLeft2.setVisibility(VISIBLE);
-                RelativeLayout.LayoutParams layoutParams = (LayoutParams) binding.tvLeft1.getLayoutParams();
+                binding.tvLeft2.setVisibility(GONE);
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) binding.tvLeft1.getLayoutParams();
                 layoutParams.leftMargin = lineLeftTextStartMargin;
                 binding.tvLeft1.setLayoutParams(layoutParams);
             } else {
                 binding.tvLeft2.setText(leftText);
-                binding.tvLeft1.setVisibility(VISIBLE);
+                binding.tvLeft1.setVisibility(GONE);
             }
         }
         if(StringUtil.isNotEmpty(rightText)){

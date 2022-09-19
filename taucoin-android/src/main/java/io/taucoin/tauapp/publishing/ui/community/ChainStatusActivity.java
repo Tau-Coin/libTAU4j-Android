@@ -28,6 +28,7 @@ import io.taucoin.tauapp.publishing.core.model.data.ForkPoint;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
+import io.taucoin.tauapp.publishing.core.utils.HashUtil;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.databinding.ActivityChainStatusBinding;
 import io.taucoin.tauapp.publishing.databinding.ReloadChainDialogBinding;
@@ -145,7 +146,7 @@ public class ChainStatusActivity extends BaseActivity {
             if (StringUtil.isNotEmpty(status.forkPoint)) {
                 ForkPoint point = new Gson().fromJson(status.forkPoint, ForkPoint.class);
                 if (point != null) {
-                    binding.itemForkBlockHash.setRightText(point.getHash());
+                    binding.itemForkBlockHash.setRightText(HashUtil.hashMiddleHide(point.getHash()));
                     binding.itemForkBlockNum.setRightText(String.valueOf(point.getNumber()));
                     binding.llForkPoint.setVisibility(View.VISIBLE);
                 } else {

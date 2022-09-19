@@ -185,9 +185,9 @@ public interface SettingsRepository {
      */
     void setFiltersSelected(Set<String> filters);
 
-    void setTauDozeTime(long time, boolean isForeground);
+    void setDataDozeTime(long time, boolean isForeground);
 
-    void updateTauDozeTime(long time, boolean isForeground);
+    void updateDataDozeTime(long time, boolean isForeground);
 
-    long getTauDozeTime(boolean isForeground);
+    long getDataDozeTime(boolean isForeground);
 }
