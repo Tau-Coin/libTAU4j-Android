@@ -160,13 +160,25 @@
                     android:layout_height="@dimen/widget_size_44"
                     android:background="@drawable/primary_rect_round_bg"
                     android:layout_marginTop="@dimen/widget_size_35"
-                    android:layout_marginBottom="@dimen/widget_size_10"
                     android:layout_marginStart="@dimen/widget_size_20"
                     android:layout_marginEnd="@dimen/widget_size_20"
                     android:gravity="center_horizontal|center"
                     android:onClick="@{listener::onClick}"
                     android:textColor="@color/color_white"
                     android:text="@string/community_open"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:layout_marginBottom="@dimen/widget_size_10"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_20"
+                    android:lineSpacingExtra="@dimen/widget_size_2"
+                    android:onClick="@{listener::onClick}"
+                    android:text="@string/community_info_tips"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
 
             </LinearLayout>
 

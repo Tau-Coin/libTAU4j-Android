@@ -87,11 +87,11 @@
     <string name="drawer_send_and_airdrop_coins">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
     <string name="drawer_balance_time">Balance %1$s on %2$s</string>
-    <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Balance <font color="#E1B447">%1$s</font> on %2$s]]></Data></string>
-    <string name="drawer_balance_name_color" formatted="false"><Data><![CDATA[%1$s(<font color="#E1B447">%2$s</font>)]]></Data></string>
+    <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Balance <font color="#f19322"><b>%1$s</b></font> on %2$s]]></Data></string>
+    <string name="drawer_balance_name_color" formatted="false"><Data><![CDATA[%1$s <font color="#f19322">%2$s</font>]]></Data></string>
     <string name="drawer_balance_pending">+%1$s pending</string>
     <string name="drawer_balance_time_no_title">%1$s on %2$s</string>
-    <string name="drawer_balance_time_color_no_title" formatted="false"><Data><![CDATA[<font color="#E1B447">%1$s</font> on %2$s]]></Data></string>
+    <string name="drawer_balance_time_color_no_title" formatted="false"><Data><![CDATA[<font color="#f19322"><b>%1$s</b></font> on %2$s]]></Data></string>
     <string name="drawer_balance_time_pending" formatted="false"><Data><![CDATA[%1$s on %2$s<br/><font color="#f19322">+%3$s pending</font>]]></Data></string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Contacts</string>
@@ -137,7 +137,7 @@
     <string name="community_users_stats_c">Linked&#160;%1$d&#160;</string>
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">Discovering</string>
-    <string name="community_users_mining">Win-Mining in</string>
+    <string name="community_users_mining">Win Mining in</string>
     <string name="community_users_doze">Doze</string>
     <string name="common_loading">loading&#8230;</string>
 
@@ -237,6 +237,9 @@
     <string name="community_near_expiry">The account is about to expire. You can increase the balance to ensure that the account does not expire</string>
     <string name="community_join">Join</string>
     <string name="community_open">Open</string>
+    <string name="community_info_tips">* Mining Power is your total transaction volumn;
+        the higher the faster you may generate block and get reward;
+        difficulty measures chain security level, the higher the better;</string>
     <string name="community_added_members">Add Members</string>
     <string name="community_added_members_empty">Please add or select friends first!</string>
     <string name="community_custom_airdrop_tips">Custom airdrop coins to friends</string>
