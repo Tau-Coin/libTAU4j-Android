@@ -73,11 +73,11 @@
                     android:id="@+id/tv_public_key"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/widget_size_5"
+                    android:paddingBottom="@dimen/widget_size_5"
                     android:includeFontPadding="false"
-                    android:layout_marginTop="@dimen/widget_size_5"
                     android:drawablePadding="@dimen/widget_size_5"
                     android:singleLine="true"
-                    android:onClick="@{listener::onClick}"
                     android:ellipsize="middle"
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody3" />

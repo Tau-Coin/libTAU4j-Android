@@ -95,11 +95,11 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(binding.tabLayout,
                 binding.viewPager, (tab, position) -> {
                     if (position == 1) {
-                        tab.setText(getString(R.string.main_tab_community));
-                    } else if (position == 2) {
                         tab.setText(getString(R.string.main_tab_personal));
-                    } else {
+                    } else if (position == 2) {
                         tab.setText(getString(R.string.main_tab_all));
+                    } else {
+                        tab.setText(getString(R.string.main_tab_community));
                     }
                 });
         tabLayoutMediator.attach();
@@ -112,11 +112,11 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) tab.view.getLayoutParams();
                 layoutParams.width = 0;
                 if (i == 0) {
-                    layoutParams.weight = 1.2f;
-                } else if (i == 1) {
-                    layoutParams.weight = 2.2f;
-                } else {
                     layoutParams.weight = 1.8f;
+                } else if (i == 1) {
+                    layoutParams.weight = 1.8f;
+                } else {
+                    layoutParams.weight = 1.2f;
                 }
                 tab.view.setLayoutParams(layoutParams);
             }
@@ -286,11 +286,11 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     private ArrayList<CommunityAndFriend> getDataList(int pos) {
         if (pos == 1) {
-            return viewModel.getHomeCommunityData().getValue();
-        } else if (pos == 2) {
             return viewModel.getHomeFriendData().getValue();
-        } else {
+        } else if (pos == 2) {
             return viewModel.getHomeAllData().getValue();
+        } else {
+            return viewModel.getHomeCommunityData().getValue();
         }
     }
 
@@ -303,11 +303,11 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 //        bundle.putParcelableArrayList(IntentExtra.BEAN, getDataList(pos));
         tab.setArguments(bundle);
         if (pos == 1) {
-            RxBus2.getInstance().postSticky(new HomeCommunitiesData(getDataList(pos)));
-        } else if (pos == 2) {
             RxBus2.getInstance().postSticky(new HomeFriendsData(getDataList(pos)));
-        } else {
+        } else if (pos == 2) {
             RxBus2.getInstance().postSticky(new HomeAllData(getDataList(pos)));
+        } else {
+            RxBus2.getInstance().postSticky(new HomeCommunitiesData(getDataList(pos)));
         }
         return tab;
     }

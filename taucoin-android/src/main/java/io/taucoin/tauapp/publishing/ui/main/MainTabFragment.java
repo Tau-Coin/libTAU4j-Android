@@ -77,17 +77,17 @@ public class MainTabFragment extends BaseFragment implements MainListAdapter.Cli
         if (getArguments() != null) {
             String tag = getCustomTag();
             if (StringUtil.isEquals(tag, String.valueOf(1))) {
-                HomeCommunitiesData data = RxBus2.getInstance().getStickyOnce(HomeCommunitiesData.class);
-                if (data != null) {
-                    showDataList(data.getList());
-                }
-            } else if (StringUtil.isEquals(tag, String.valueOf(2))) {
                 HomeFriendsData data = RxBus2.getInstance().getStickyOnce(HomeFriendsData.class);
                 if (data != null) {
                     showDataList(data.getList());
                 }
-            } else {
+            } else if (StringUtil.isEquals(tag, String.valueOf(2))) {
                 HomeAllData data = RxBus2.getInstance().getStickyOnce(HomeAllData.class);
+                if (data != null) {
+                    showDataList(data.getList());
+                }
+            } else {
+                HomeCommunitiesData data = RxBus2.getInstance().getStickyOnce(HomeCommunitiesData.class);
                 if (data != null) {
                     showDataList(data.getList());
                 }

@@ -79,18 +79,19 @@
 
                     <ImageView
                         android:id="@+id/iv_link_copy"
-                        android:layout_width="@dimen/widget_size_16"
-                        android:layout_height="@dimen/widget_size_16"
+                        android:layout_width="@dimen/widget_size_32"
+                        android:layout_height="@dimen/widget_size_32"
+                        android:padding="@dimen/widget_size_5"
                         android:layout_marginStart="@dimen/widget_size_5"
                         android:contentDescription="@null"
                         android:onClick="@{listener::onClick}"
-                        android:src="@mipmap/icon_copy"/>
+                        android:src="@mipmap/icon_copy_text"/>
 
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/tau_link"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/widget_size_10"
                     android:layout_marginStart="@dimen/widget_size_22"

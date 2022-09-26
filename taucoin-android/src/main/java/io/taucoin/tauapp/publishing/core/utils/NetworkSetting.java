@@ -53,7 +53,7 @@ public class NetworkSetting {
         Context context = MainApplication.getInstance();
         int pos = settingsRepo.getIntValue(context.getString(R.string.pref_key_metered_prompt_limit), -1);
         if (pos < 0) {
-            pos = settingsRepo.getIntValue(context.getString(R.string.pref_key_metered_limit), 1);
+            pos = settingsRepo.getIntValue(context.getString(R.string.pref_key_metered_limit), isUnlimitedNetwork() ? 1 : 0);
         }
         return pos;
     }

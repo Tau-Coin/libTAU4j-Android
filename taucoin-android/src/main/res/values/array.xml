@@ -10,9 +10,9 @@
     </array>
 
     <integer-array name="developed_metered_limit">
+        <item>100</item>
         <item>300</item>
         <item>600</item>
-        <item>1024</item>
     </integer-array>
 
     <integer-array name="metered_limit">

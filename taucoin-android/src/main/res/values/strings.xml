@@ -46,12 +46,13 @@
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
 
-    <string name="main_title">TAU Serverless</string>
+    <string name="main_title">TAU Phone Mining Coins</string>
     <string name="main_empty_title">Welcome to TAU</string>
     <string name="main_empty_add_friends">Add Friend</string>
     <string name="main_empty_create_communities">Create Coin Group</string>
     <string name="main_exit">Click again to exit the application!</string>
     <string name="main_community_name">%1$s - %2$s</string>
+    <string name="main_community_name_discovered">%1$s - %2$s - Discovered</string>
     <string name="main_community_name_total">%1$s - %2$s(%3$d)</string>
     <string name="main_community_non_member">Non Member</string>
     <string name="main_error_link">Invalid link!</string>
@@ -72,7 +73,7 @@
     <string name="main_insufficient_device_space">Insufficient device space</string>
 
     <string name="main_tab_all">All</string>
-    <string name="main_tab_community">My Groups</string>
+    <string name="main_tab_community">My Coins</string>
     <string name="main_tab_personal">Personal</string>
     <string name="main_operation_mark_read">Mark as Read</string>
     <string name="main_operation_mark_unread">Mark as UnRead</string>
@@ -82,7 +83,7 @@
     <string name="main_operation_ban_friend">Ban this friend</string>
 
     <!-- Strings used for main drawer content -->
-    <string name="drawer_new_community">Create Coin Group</string>
+    <string name="drawer_new_community">Create Coin</string>
     <string name="drawer_airdrop_links">Airdrop Coins</string>
     <string name="drawer_send_and_airdrop_coins">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
@@ -237,9 +238,9 @@
     <string name="community_near_expiry">The account is about to expire. You can increase the balance to ensure that the account does not expire</string>
     <string name="community_join">Join</string>
     <string name="community_open">Open</string>
-    <string name="community_info_tips">* Mining Power is your total transaction volumn;
-        the higher the faster you may generate block and get reward;
-        difficulty measures chain security level, the higher the better;</string>
+    <string name="community_info_tips">* Mining Power is your total number of blocks mined, the higher
+        the faster you may generate new blocks and get 10 coins reward. Any one can mine start with 0 power.\n*
+        Difficulty measures chain security level, the higher the better.</string>
     <string name="community_added_members">Add Members</string>
     <string name="community_added_members_empty">Please add or select friends first!</string>
     <string name="community_custom_airdrop_tips">Custom airdrop coins to friends</string>

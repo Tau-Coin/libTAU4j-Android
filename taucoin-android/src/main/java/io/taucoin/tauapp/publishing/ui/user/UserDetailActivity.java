@@ -198,10 +198,6 @@ public class UserDetailActivity extends BaseActivity implements View.OnClickList
             case R.id.tv_blacklist:
                 userViewModel.setUserBlacklist(publicKey, true);
                 break;
-            case R.id.iv_public_key_copy:
-                CopyManager.copyText(publicKey);
-                ToastUtils.showShortToast(R.string.copy_successfully);
-                break;
         }
     }
 

@@ -104,8 +104,8 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 }
                 String communityName = ChainIDUtil.getName(bean.ID);
                 String communityCode = ChainIDUtil.getCode(bean.ID);
-                binding.tvGroupName.setText(context.getString(R.string.main_community_name,
-                        communityName, communityCode));
+                int nameReId = bean.joined == 1 ? R.string.main_community_name : R.string.main_community_name_discovered;
+                binding.tvGroupName.setText(context.getString(nameReId, communityName, communityCode));
                 String firstLetters = StringUtil.getFirstLettersOfName(communityName);
                 binding.leftView.setText(firstLetters);
                 boolean isNotExpired = daemon.getMyAccountManager().isNotExpired(bean.ID);
@@ -220,6 +220,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                             oldItem.stickyTop == newItem.stickyTop &&
                             oldItem.balUpdateTime == newItem.balUpdateTime &&
                             oldItem.nonce == newItem.nonce &&
+                            oldItem.joined == newItem.joined &&
                             StringUtil.isEquals(oldItem.memo, newItem.memo);
                 } else {
                     isSame = oldItem.timestamp == newItem.timestamp &&
