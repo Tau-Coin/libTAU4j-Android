@@ -395,6 +395,9 @@ public class MainActivity extends ScanTriggerActivity {
             case R.id.item_airdrop_coins:
                 ActivityUtil.startActivity(this, AirdropCommunityActivity.class);
                 break;
+            case R.id.item_crypto_cities:
+                ActivityUtil.startActivity(this, CryptoCitiesActivity.class);
+                break;
         }
         if (binding != null) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);

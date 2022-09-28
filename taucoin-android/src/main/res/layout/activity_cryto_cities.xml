@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:background="@color/color_bg"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar_include"
+            layout="@layout/toolbar" />
+
+        <ScrollView
+            android:fillViewport="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/ll_root"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:layout_marginEnd="@dimen/widget_size_30"
+                    android:text="@string/london_pmc"
+                    android:textColor="@color/color_yellow"
+                    android:layout_gravity="end"
+                    android:textAppearance="@style/TextAppearanceHeadline5"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:layout_marginEnd="@dimen/widget_size_30"
+                    android:text="@string/london_phone_mining_coins"
+                    android:textColor="@color/gray_dark"
+                    android:layout_gravity="end"
+                    android:textAppearance="@style/TextAppearanceHeadline6"/>
+
+                <ImageView
+                    android:id="@+id/tv_pic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:src="@mipmap/icon_crypto_cities_dec"
+                    android:scaleType="fitXY"
+                    android:contentDescription="@null"/>
+
+                <TextView
+                    android:id="@+id/tv_london_pmc_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:layout_marginStart="@dimen/widget_size_20"
+                    android:layout_marginEnd="@dimen/widget_size_20"
+                    android:lineSpacingExtra="@dimen/widget_size_2"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</layout>

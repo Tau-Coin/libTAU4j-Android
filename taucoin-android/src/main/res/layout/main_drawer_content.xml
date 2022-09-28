@@ -142,7 +142,7 @@
                         android:layout_marginTop="@dimen/widget_size_5"
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_airdrop_coins"
+                        app:leftImage="@mipmap/icon_crypto_cities"
                         app:rightText="@string/drawer_crypto_cities"/>
 
                     <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView

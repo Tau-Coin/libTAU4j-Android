@@ -348,6 +348,10 @@
             android:name=".ui.friends.AirdropHistoryActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
+        <activity
+            android:name=".ui.main.CryptoCitiesActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
     </application>
 
 </manifest>
