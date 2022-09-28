@@ -137,7 +137,7 @@
     removed from \"setting>privacy>blacklist\".]]></Data></string>
 
     <string name="community_input_hint">Message</string>
-    <string name="community_users_stats_c">Linked&#160;%1$d&#160;</string>
+    <string name="community_users_stats_c">&#160;-&#160;Linked&#160;%1$d</string>
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">Discovering</string>
     <string name="community_users_mining">Win Mining in</string>

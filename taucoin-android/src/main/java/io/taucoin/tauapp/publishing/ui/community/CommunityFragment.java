@@ -210,9 +210,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 
     private void showCommunitySubtitle() {
         StringBuilder subtitle = new StringBuilder();
-        if (onlinePeers > 0) {
-            subtitle.append(getString(R.string.community_users_stats_c, onlinePeers));
-        }
         if (isJoined) {
             // 已加入社区
             if (nodes > 0) {
@@ -232,8 +229,12 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             } else {
                 subtitle.append(getString(R.string.community_users_discovering));
             }
+            if (onlinePeers > 0 && subtitle.length() > 0) {
+                subtitle.append(getString(R.string.community_users_stats_c, onlinePeers));
+            }
         }
         binding.toolbarInclude.tvSubtitle.setText(subtitle);
+        binding.toolbarInclude.tvSubtitle.setVisibility(subtitle.length() > 0 ? View.VISIBLE : View.GONE);
     }
 
     @Override

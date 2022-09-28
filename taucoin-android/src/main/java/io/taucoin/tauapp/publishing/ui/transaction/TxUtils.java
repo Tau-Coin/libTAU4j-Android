@@ -319,7 +319,9 @@ public class TxUtils {
                 } else if (StringUtil.isNotEmpty(tx.memo)) {
                     msg.append("\n").append("Description: ").append(tx.memo);
                 }
-                msg.append("\n").append("Community Link ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
+                if (operation == QueueOperation.INSERT) {
+                    msg.append("\n").append("Community Link ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
+                }
             } else if (txType == TxType.AIRDROP_TX.getType()) {
                 AirdropTxContent content = new AirdropTxContent(tx.content);
                 msg.append("\n").append("Link: ").append(content.getLink());
@@ -399,7 +401,6 @@ public class TxUtils {
             if (StringUtil.isNotEmpty(tx.memo)) {
                 msg.append("\n").append("Description: ").append(tx.memo);
             }
-            msg.append("\n").append("Community Link ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
         } else if (txType == TxType.AIRDROP_TX.getType()) {
             msg.append("\n").append("Link: ").append(tx.link);
             if (StringUtil.isNotEmpty(tx.memo)) {
