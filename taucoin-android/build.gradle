@@ -112,7 +112,7 @@ android {
             // TauLogLevel.DEBUG
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://6e6170b970bae896803ecb1051653" +
                     "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:9886\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"f5b52e7e30303030Test Coin\""
+            buildConfigField "String", "TEST_CHAIN_ID", "\"502c6aeb30303030PMCChain\""
             buildConfigField "String", "TEST_CHAIN_PEER", "\"602bc2c65f2c6e77c7e359339de7eb3d6d243a5eac4842d97b92e583d472690a\""
             signingConfig signingConfigs.debugConfig
         }
@@ -150,7 +150,7 @@ android {
             applicationId "io.taucoin.tauapp.publishing"
             resValue "string", "app_name", "TAU"
         }
-
+		/*
         id01 {
             dimension 'id'
             applicationId "io.taucoin.tauapp.publishing01"
@@ -210,7 +210,7 @@ android {
             applicationId "io.taucoin.tauapp.publishing10"
             resValue "string", "app_name", "TAU10"
         }
-
+		*/
 //        id11 {
 //            dimension 'id'
 //            applicationId "io.taucoin.tauapp.publishing11"
