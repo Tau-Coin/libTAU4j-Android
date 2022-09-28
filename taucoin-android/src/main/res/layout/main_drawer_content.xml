@@ -178,6 +178,16 @@
                         app:rightText="@string/drawer_wallet"/>
 
                     <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
+                        android:id="@+id/item_paste_link"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:onClick="onClick"
+                        app:leftImage="@mipmap/icon_copy_link"
+                        app:rightText="@string/drawer_paste_link"/>
+
+                    <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_contacts"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

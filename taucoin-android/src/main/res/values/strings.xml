@@ -99,6 +99,7 @@
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Contacts</string>
     <string name="drawer_wallet">Wallet and Pay</string>
+    <string name="drawer_paste_link">Paste Link</string>
     <string name="drawer_setting">Settings</string>
     <string name="drawer_official_telegram">Official Telegram</string>
     <string name="drawer_data_cost">Data Cost</string>

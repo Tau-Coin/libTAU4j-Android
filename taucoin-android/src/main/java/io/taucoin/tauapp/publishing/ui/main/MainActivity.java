@@ -62,6 +62,7 @@ import io.taucoin.tauapp.publishing.service.WorkloadManager;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
 import io.taucoin.tauapp.publishing.ui.ScanTriggerActivity;
 import io.taucoin.tauapp.publishing.ui.chat.ChatFragment;
+import io.taucoin.tauapp.publishing.ui.community.PasteLinkActivity;
 import io.taucoin.tauapp.publishing.ui.community.WalletActivity;
 import io.taucoin.tauapp.publishing.ui.community.CommunityFragment;
 import io.taucoin.tauapp.publishing.ui.ExternalLinkActivity;
@@ -397,6 +398,9 @@ public class MainActivity extends ScanTriggerActivity {
                 break;
             case R.id.item_crypto_cities:
                 ActivityUtil.startActivity(this, CryptoCitiesActivity.class);
+                break;
+            case R.id.item_paste_link:
+                ActivityUtil.startActivity(this, PasteLinkActivity.class);
                 break;
         }
         if (binding != null) {

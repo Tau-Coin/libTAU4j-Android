@@ -41,36 +41,40 @@ public class LinkUtil {
      * @return Link
      */
     public static Link decodeAirdropLink(String link) {
-        try {
-            Pattern airdrop = Pattern.compile(AIRDROP_PATTERN);
-            Matcher matcher = airdrop.matcher(link);
-            logger.debug("link::{}", link);
-            String newLink = link;
-            if (matcher.find()) {
-                logger.debug("group::{}", matcher.group());
-                newLink = matcher.group();
-            }
-            Matcher newMatcher = airdrop.matcher(newLink);
-            if (newMatcher.matches()) {
-                return decode(newLink);
-            }
-        } catch (Exception ignore) {
+        String newLink = matcherLink(link, AIRDROP_PATTERN);
+        if (StringUtil.isNotEmpty(newLink)) {
+            decode(newLink);
         }
         return decode(link);
     }
 
-    public static boolean verifyAirdropUrl(String url) {
+    private static String matcherLink(String link, String regex) {
         try {
-            if (StringUtil.isNotEmpty(url)) {
-                Pattern airdrop = Pattern.compile(AIRDROP_PATTERN);
-                Matcher matcher = airdrop.matcher(url);
-                Logger logger = LoggerFactory.getLogger("decodeAirdropUrl");
-                logger.debug("url::{}", url);
-                return matcher.matches();
+            Pattern airdrop = Pattern.compile(regex);
+            Matcher matcher = airdrop.matcher(link);
+            logger.debug("link::{}", link);
+            if (matcher.find()) {
+                String newLink = matcher.group();
+                logger.debug("group::{}", newLink);
+                Matcher newMatcher = airdrop.matcher(newLink);
+                if (newMatcher.matches()) {
+                    return newLink;
+                }
             }
         } catch (Exception ignore) {
         }
-        return false;
+        return null;
+    }
+
+    public static Link decodeLink(String link) {
+        String newLink = matcherLink(link, AIRDROP_PATTERN);
+        if (StringUtil.isEmpty(newLink)) {
+            newLink = matcherLink(link, CHAIN_PATTERN);
+        }
+        if (StringUtil.isNotEmpty(newLink)) {
+            return decode(newLink);
+        }
+        return decode(link);
     }
 
     /**
