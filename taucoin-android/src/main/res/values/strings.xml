@@ -85,10 +85,12 @@
     <!-- Strings used for main drawer content -->
     <string name="drawer_new_community">Create Coin</string>
     <string name="drawer_airdrop_links">Airdrop Coins</string>
+    <string name="drawer_crypto_cities">Crypto Cities</string>
     <string name="drawer_send_and_airdrop_coins">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
+    <string name="drawer_power">Power</string>
     <string name="drawer_balance_time">Balance %1$s on %2$s</string>
-    <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Balance <font color="#f19322"><b>%1$s</b></font> on %2$s]]></Data></string>
+    <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Power %1$s Balance <font color="#f19322"><b>%2$s</b></font> on %3$s]]></Data></string>
     <string name="drawer_balance_name_color" formatted="false"><Data><![CDATA[%1$s <font color="#f19322">%2$s</font>]]></Data></string>
     <string name="drawer_balance_pending">+%1$s pending</string>
     <string name="drawer_balance_time_no_title">%1$s on %2$s</string>

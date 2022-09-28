@@ -142,6 +142,10 @@ public class ChainStatusActivity extends BaseActivity {
                     balance, time);
             binding.itemBalance.setRightText(balanceAndTime);
         }
+
+        if (null == mStatus || mStatus.power != status.power) {
+            binding.itemPower.setRightText(FmtMicrometer.fmtLong(status.power));
+        }
         if (null == mStatus || StringUtil.isNotEquals(mStatus.forkPoint, status.forkPoint)) {
             if (StringUtil.isNotEmpty(status.forkPoint)) {
                 ForkPoint point = new Gson().fromJson(status.forkPoint, ForkPoint.class);

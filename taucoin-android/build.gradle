@@ -119,7 +119,7 @@ android {
 
         beta {
             dimension 'default'
-            buildConfigField "String", "SPLASH_APP_NAME", "\"TAU App Beta\""        // 启动页文案
+            buildConfigField "String", "SPLASH_APP_NAME", "\"Phone Mining\""        // 启动页文案
             buildConfigField "Boolean", "DISPLAY_DEBUG_VIEW", "false"
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "20000"             // Level.INFO
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "6"
@@ -133,7 +133,7 @@ android {
 
         official {
             dimension 'default'
-            buildConfigField "String", "SPLASH_APP_NAME", "\"TAU App\""             // 启动页文案
+            buildConfigField "String", "SPLASH_APP_NAME", "\"Phone Mining\""             // 启动页文案
             buildConfigField "Boolean", "DISPLAY_DEBUG_VIEW", "false"
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "30000"             // Level.WARN
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "4"

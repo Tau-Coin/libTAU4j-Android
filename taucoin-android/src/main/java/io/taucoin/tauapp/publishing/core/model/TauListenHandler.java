@@ -18,6 +18,7 @@ import java.util.Set;
 import androidx.annotation.NonNull;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.data.ForkPoint;
 import io.taucoin.tauapp.publishing.core.model.data.FriendStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
@@ -239,6 +240,7 @@ public class TauListenHandler {
             long difficulty = block.getCumulativeDifficulty().longValue();
             Transaction transaction = block.getTx();
             long rewards = null == transaction ? 0L : transaction.getFee();
+            rewards += Constants.MINING_REWARDS.longValue();
             // 第一次创建
             int status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
             long timestamp = block.getTimestamp();

@@ -10,7 +10,7 @@
     <dimen name="toolbar_height">50dp</dimen>
     <dimen name="preference_icon_space">72dp</dimen>
     <dimen name="splash_size">40dp</dimen>
-    <dimen name="splash_size_alpha">20dp</dimen>
+    <dimen name="splash_size_alpha">22dp</dimen>
 
     <!--   ********************Font******************** -->
     <dimen name="font_size_20">20sp</dimen>

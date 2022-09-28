@@ -20,6 +20,8 @@ public class Constants {
     public static final BigInteger WIRING_MIN_FEE = COIN;
     // 消息交易最小为1 COIN
     public static final BigInteger NEWS_MIN_FEE = COIN;
+    // 挖矿奖励
+    public static final BigInteger MINING_REWARDS = new BigInteger("10", 10).multiply(COIN);
 
     // 社区名最大字节长度
     public static final int MAX_COMMUNITY_NAME_LENGTH = 24;
