@@ -14,6 +14,7 @@ public class CommunityAndFriend implements Parcelable {
     // 社区相关数据
     public long balance;                    // 成员在此社区的balance
     public long balUpdateTime;              // 成员在此社区的balance更新时间
+    public long power;                      // 成员在此社区的power
     public long nonce;                      // 成员在此社区的nonce
     public long headBlock;                  // 社区头区块号
     public int joined;                      // 是否加入此社区

@@ -366,7 +366,7 @@ public class CommunityViewModel extends AndroidViewModel {
                 Collection<String> keys = selectedMap.keySet();
                 for (String key : keys) {
                     long balance = FmtMicrometer.fmtTxLongValue(selectedMap.get(key));
-                    Account account = new Account(ByteUtil.toByte(key), balance, 0);
+                    Account account = new Account(ByteUtil.toByte(key), balance, 0, 0);
                     accounts.add(account);
                 }
             }

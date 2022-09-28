@@ -31,7 +31,7 @@ public interface BlockDao {
             " ORDER BY balance DESC, nonce DESC, publicKey COLLATE UNICODE DESC";
 
     String QUERY_CHAIN_STATUS = "SELECT a.syncingHeadBlock, a.headBlock, a.consensusBlock, a.difficulty, a.forkPoint," +
-            " c.peerBlocks, c.totalRewards, d.totalPeers, d.totalCoin, e.balance, e.nonce AS power, e.balUpdateTime" +
+            " c.peerBlocks, c.totalRewards, d.totalPeers, d.totalCoin, e.balance, e.power, e.balUpdateTime" +
             " FROM Communities a" +
             " LEFT JOIN (SELECT bb.chainID, count(*) AS peerBlocks, SUM(rewards) AS totalRewards" +
             " FROM Blocks bb" +
@@ -46,7 +46,7 @@ public interface BlockDao {
             " WHERE mm.chainID = :chainID AND mm.publicKey IN (" + QUERY_COMMUNITY_PUBLIC_KEY_ORDER + " LIMIT :limit)" +
             ") AS d" +
             " ON a.chainID = d.chainID" +
-            " LEFT JOIN (SELECT chainID, publicKey, balance, nonce, balUpdateTime FROM Members WHERE chainID = :chainID" +
+            " LEFT JOIN (SELECT chainID, publicKey, balance, power, balUpdateTime FROM Members WHERE chainID = :chainID" +
             " AND publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")) AS e" +
             " ON a.chainID = e.chainID" +
             " WHERE a.chainID = :chainID";

@@ -52,7 +52,7 @@ public interface CommunityDao {
             " ORDER BY timestamp, logicMsgHash COLLATE UNICODE)" +
             " GROUP BY receiverPkTemp)";
 
-    String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.balUpdateTime, b.nonce," +
+    String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.balUpdateTime, b.power, b.nonce," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk," +
             " b.msgUnread AS msgUnread, b.stickyTop AS stickyTop, 0 AS focused, null AS msg, c.memo, c.timestamp" +
@@ -65,7 +65,7 @@ public interface CommunityDao {
             " ON a.chainID = c.chainID" +
             " WHERE isBanned == 0";
 
-    String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.balUpdateTime, b.nonce," +
+    String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.balUpdateTime, b.power, b.nonce," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk," +
             " b.msgUnread AS msgUnread, b.stickyTop AS stickyTop, 0 AS focused, null AS msg, c.memo, c.timestamp" +
@@ -79,7 +79,7 @@ public interface CommunityDao {
             " WHERE isBanned == 0";
 
     String QUERY_FRIENDS_ASC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS balance, 0 AS balUpdateTime," +
-            " 0 AS nonce, 0 AS joined, 1 AS type," +
+            " 0 AS power, 0 AS nonce, 0 AS joined, 1 AS type," +
             " cm.senderPk AS senderPk, cm.receiverPk AS receiverPk," +
             " f.msgUnread AS msgUnread, f.stickyTop AS stickyTop, f.focused AS focused," +
             " cm.content AS msg, '' AS memo, cm.timestamp AS timestamp" +
@@ -91,7 +91,7 @@ public interface CommunityDao {
             " AND f.friendPK NOT IN " + UserDao.QUERY_GET_USER_PKS_IN_BAN_LIST;
 
     String QUERY_FRIENDS_DESC = "SELECT f.friendPK AS ID, 0 AS headBlock, 0 AS balance, 0 AS balUpdateTime," +
-            " 0 AS nonce, 0 AS joined, 1 AS type," +
+            " 0 AS power, 0 AS nonce, 0 AS joined, 1 AS type," +
             " cm.senderPk AS senderPk, cm.receiverPk AS receiverPk," +
             " f.msgUnread AS msgUnread, f.stickyTop AS stickyTop, f.focused AS focused," +
             " cm.content AS msg, '' AS memo, cm.timestamp AS timestamp" +

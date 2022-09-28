@@ -118,7 +118,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         if (member != null) {
             balance = member.balance;
             balUpdateTime = member.balUpdateTime;
-            power = member.nonce;
+            power = member.power;
             amount = member.amount;
         }
 

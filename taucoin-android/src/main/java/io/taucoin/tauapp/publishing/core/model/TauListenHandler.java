@@ -520,20 +520,23 @@ public class TauListenHandler {
         Member member = memberRepo.getMemberByChainIDAndPk(chainIDStr, publicKey);
         Account account = daemon.getAccountInfo(chainID, publicKey);
         long balance = 0;
+        long power = 0;
         long nonce = 0;
         if (account != null) {
             balance = account.getBalance();
             nonce = account.getNonce();
+            power = account.getPower();
         }
 
-        logger.info("UpdateMember chainID::{}, publicKey::{}, balance::{}, nonce::{}",
-                chainID, publicKey, balance, nonce);
+        logger.info("UpdateMember chainID::{}, publicKey::{}, balance::{}, nonce::{}, power::{}",
+                chainID, publicKey, balance, nonce, power);
 
         if (null == member) {
             member = new Member(chainIDStr, publicKey);
             member.balance = balance;
             member.balUpdateTime = DateUtil.getTime();
             member.nonce = nonce;
+            member.power = power;
             if (rewardTime > 0) {
                 member.rewardTime = rewardTime;
             }
@@ -548,10 +551,11 @@ public class TauListenHandler {
                             " incomeTime::{} ", chainIDStr, publicKey, balance, rewardTime, incomeTime);
         } else {
             boolean isUpdate = false;
-            if (member.balUpdateTime == 0 || member.balance != balance || member.nonce != nonce) {
+            if (member.balUpdateTime == 0 || member.balance != balance || member.nonce != nonce || member.power != power) {
                 member.balance = balance;
                 member.balUpdateTime = DateUtil.getTime();
                 member.nonce = nonce;
+                member.power = power;
                 isUpdate = true;
                 logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
                         "balance::{}", chainIDStr, publicKey, member.balance);
@@ -675,14 +679,16 @@ public class TauListenHandler {
         if (accountSize > 0) {
             for (Account account : accounts) {
                 String peer = ByteUtil.toHexString(account.getPeer());
-                logger.info("UpdateMember onStateArray chainID::{}, publicKey::{}, balance::{}, nonce::{}",
-                        chainID, peer, account.getBalance(), account.getNonce());
+                logger.info("UpdateMember onStateArray chainID::{}, publicKey::{}, balance::{}, nonce::{}, power::{}",
+                        chainID, peer, account.getBalance(), account.getNonce(), account.getPower());
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, peer);
                 if (member != null) {
-                    if (member.balUpdateTime == 0 || member.balance != account.getBalance() || member.nonce != account.getNonce()) {
+                    if (member.balUpdateTime == 0 || member.balance != account.getBalance() ||
+                            member.nonce != account.getNonce() || member.power != account.getPower()) {
                         member.balance = account.getBalance();
                         member.balUpdateTime = DateUtil.getTime();
                         member.nonce = account.getNonce();
+                        member.power = account.getPower();
                         memberRepo.updateMember(member);
                     }
                 } else {
@@ -691,6 +697,7 @@ public class TauListenHandler {
                     member.balance = account.getBalance();
                     member.balUpdateTime = DateUtil.getTime();
                     member.nonce = account.getNonce();
+                    member.power = account.getPower();
                     memberRepo.addMember(member);
                 }
             }

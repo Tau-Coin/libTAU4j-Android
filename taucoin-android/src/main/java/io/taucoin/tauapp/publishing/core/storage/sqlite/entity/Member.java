@@ -19,6 +19,7 @@ public class Member implements Parcelable {
     public String publicKey;            // 成员的公钥
     public long balance;                // 成员的balance
     public long balUpdateTime;          // 成员的balance更新时间
+    public long power;                  // 成员的power
     public long rewardTime;             // 成员挖矿奖励时间
     public long incomeTime;             // 成员收到转账收入时间
     public long pendingTime;            // 成员收到朋友转账动作（未上链）
@@ -49,6 +50,7 @@ public class Member implements Parcelable {
         chainID = in.readString();
         publicKey = in.readString();
         balance = in.readLong();
+        power = in.readLong();
         balUpdateTime = in.readLong();
         nonce = in.readLong();
     }
@@ -58,6 +60,7 @@ public class Member implements Parcelable {
         dest.writeString(chainID);
         dest.writeString(publicKey);
         dest.writeLong(balance);
+        dest.writeLong(power);
         dest.writeLong(balUpdateTime);
         dest.writeLong(nonce);
     }
