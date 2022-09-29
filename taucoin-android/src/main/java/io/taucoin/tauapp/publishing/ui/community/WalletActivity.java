@@ -58,17 +58,6 @@ public class WalletActivity extends BaseActivity {
             ActivityUtil.startActivity(intent, this, CommunitiesActivity.class);
         });
         binding.joinedList.setAdapter(adapter);
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-        ItemCommunityChooseBinding headerBinding = DataBindingUtil.inflate(inflater,
-                R.layout.item_community_choose, null, false);
-        headerBinding.tvName.setText(R.string.community_paste_join);
-        headerBinding.viewTips.setVisibility(View.INVISIBLE);
-        View headerView = headerBinding.getRoot();
-        headerView.setOnClickListener(l -> {
-            ActivityUtil.startActivity(this, CommunityJoinActivity.class);
-        });
-        binding.joinedList.addHeaderView(headerView);
     }
 
     @Override

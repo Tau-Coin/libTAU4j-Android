@@ -112,7 +112,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 boolean isNotExpired = daemon.getMyAccountManager().isNotExpired(bean.ID);
                 boolean onChain = bean.onChain() && isNotExpired;
                 if (!onChain) {
-                    binding.tvBalancePower.setText(context.getString(R.string.main_community_non_member));
+                    binding.tvBalancePower.setText(context.getString(R.string.main_community_in_mining));
                 } else {
                     String power = FmtMicrometer.fmtLong(bean.power);
                     String balance = FmtMicrometer.fmtBalance(bean.balance);

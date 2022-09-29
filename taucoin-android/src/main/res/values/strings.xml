@@ -54,6 +54,7 @@
     <string name="main_community_name">%1$s - %2$s</string>
     <string name="main_community_name_discovered">%1$s - %2$s - Discovered</string>
     <string name="main_community_name_total">%1$s - %2$s(%3$d)</string>
+    <string name="main_community_in_mining">In Mining &#8230;</string>
     <string name="main_community_non_member">Non Member</string>
     <string name="main_error_link">Invalid link!</string>
     <string name="main_error_link_yourself">Airdrop link published by yourself!</string>
@@ -182,7 +183,6 @@
     <string name="community_sell_detail">Sell Detail</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
     <string name="community_create_success" formatted="false"><Data><![CDATA[Keep on <strong>WIFI</strong> and <strong>charging battery</strong> to best exchange data.]]></Data></string>
-    <string name="community_paste_join">Choose a community coin</string>
     <string name="community_paste_here">Paste link here</string>
     <string name="community_join_title">Join community</string>
     <string name="community_join_successfully">Successfully joined the community!</string>

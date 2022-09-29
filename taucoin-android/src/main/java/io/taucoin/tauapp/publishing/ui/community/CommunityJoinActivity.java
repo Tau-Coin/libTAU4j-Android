@@ -21,6 +21,7 @@ import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 /**
  * 社区加入页面
  */
+@Deprecated
 public class CommunityJoinActivity extends BaseActivity {
 
     private ActivityCommunityJoinBinding binding;
