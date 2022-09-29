@@ -15,6 +15,7 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import io.taucoin.tauapp.publishing.BuildConfig;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndFriend;
@@ -130,6 +131,10 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
 
                 binding.msgUnread.setVisibility(bean.msgUnread > 0 ? View.VISIBLE : View.GONE);
                 ivLongPress = binding.ivLongPress;
+
+                boolean isLondonPMC = StringUtil.isEquals(bean.ID, BuildConfig.TEST_CHAIN_ID);
+                binding.leftView.setVisibility(isLondonPMC ? View.GONE : View.VISIBLE);
+                binding.ivGroup.setVisibility(!isLondonPMC ? View.GONE : View.VISIBLE);
             } else if (holder.binding instanceof ItemChatListBinding) {
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;
                 String friendNickName = UsersUtil.getShowNameWithYourself(bean.friend, bean.ID);

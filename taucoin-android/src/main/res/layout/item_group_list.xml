@@ -20,22 +20,39 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true">
 
-            <io.taucoin.tauapp.publishing.ui.customviews.RoundButton
-                android:id="@+id/left_view"
-                android:layout_width="@dimen/widget_size_50"
-                android:layout_height="@dimen/widget_size_50"
-                android:layout_marginEnd="@dimen/widget_size_7"
-                android:layout_marginTop="@dimen/widget_size_5"
+            <FrameLayout
                 android:layout_centerVertical="true"
-                android:gravity="center"
-                android:textAllCaps="false"
-                android:textColor="@color/color_white"
-                android:textAppearance="@style/TextAppearanceHeadline6"
-                app:btnStrokeColor="@color/primary_light"
-                app:btnStrokeWidth="0dp"
-                app:btnCornerRadius="@dimen/widget_size_7"
-                app:btnSolidColor="@color/primary_light"
-                app:btnPressedRatio="1.5" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_group"
+                    android:layout_width="@dimen/widget_size_50"
+                    android:layout_height="@dimen/widget_size_50"
+                    android:layout_marginEnd="@dimen/widget_size_7"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:contentDescription="@null"
+                    android:scaleType="fitCenter"
+                    android:src="@mipmap/icon_london_pmc" />
+
+                <io.taucoin.tauapp.publishing.ui.customviews.RoundButton
+                    android:visibility="gone"
+                    android:id="@+id/left_view"
+                    android:layout_width="@dimen/widget_size_50"
+                    android:layout_height="@dimen/widget_size_50"
+                    android:layout_marginEnd="@dimen/widget_size_7"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:gravity="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/color_white"
+                    android:textAppearance="@style/TextAppearanceHeadline6"
+                    app:btnStrokeColor="@color/primary_light"
+                    app:btnStrokeWidth="0dp"
+                    app:btnCornerRadius="@dimen/widget_size_7"
+                    app:btnSolidColor="@color/primary_light"
+                    app:btnPressedRatio="1.5" />
+
+            </FrameLayout>
 
             <View
                 android:id="@+id/msg_unread"
