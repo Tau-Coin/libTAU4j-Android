@@ -7,8 +7,8 @@ android {
         applicationId "io.taucoin.tauapp.publishing"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 17
-        versionName "1.6.10"
+        versionCode 18
+        versionName "1.6.11"
         flavorDimensions("default", "id")
 
         vectorDrawables.useSupportLibrary = true
@@ -126,7 +126,7 @@ android {
             // TauLogLevel.INFO
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://58f39fc2243907dd122b9f32d551d" +
                     "bd2c5f24ed153b71be589ce9fb23b7c08d1@13.229.53.249:3882\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"042674db30303030Cambridge Coin\""
+            buildConfigField "String", "TEST_CHAIN_ID", "\"fdb4128330303030London PMC\""
             buildConfigField "String", "TEST_CHAIN_PEER", "\"283cb209f470b7916fc311a259b65dc2a3ca4a234bfd58ba6479509f0fceb66e\""
             signingConfig signingConfigs.releaseConfig
         }
