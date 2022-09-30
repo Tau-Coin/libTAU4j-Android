@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name_alpha">TAU App Beta</string>
     <string name="app_name_alpha_description">Freely Create Crypto Coins\nDecentral Serverless Network</string>
+    <string name="app_name_alpha_desc">Open Source</string>
     <string name="app_share">Share app link via</string>
     <string name="app_share_error">Can\'t find share component to share</string>
 
