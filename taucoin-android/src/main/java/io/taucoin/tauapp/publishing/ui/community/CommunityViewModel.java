@@ -977,7 +977,6 @@ public class CommunityViewModel extends AndroidViewModel {
                 }
                 logger.debug("Mining Time::{}, chainID::{}, isRunning::{}, isTauDozeMode::{}", time,
                         chainID, daemon.isRunning(), isTauDozeMode);
-                time = 0;
                 emitter.onNext(time);
                 try {
                     Thread.sleep(1000);
