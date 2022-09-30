@@ -315,7 +315,11 @@ public class ChainStatusActivity extends BaseActivity {
                 binding.itemMiningTime.setRightText(getString(R.string.chain_mining_time_min_seconds,
                         minutes, seconds));
             } else {
-                binding.itemMiningTime.setRightText(getString(R.string.chain_mining_time_seconds, seconds));
+                String secondsStr = getString(R.string.chain_mining_time_seconds, seconds);
+                if (seconds == 0) {
+                    secondsStr += getString(R.string.chain_mining_syncing);
+                }
+                binding.itemMiningTime.setRightText(secondsStr);
             }
         } else if (time == -100) {
             binding.itemMiningTime.setRightText(getString(R.string.chain_mining_time_doze));

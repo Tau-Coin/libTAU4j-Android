@@ -36,7 +36,7 @@ public interface BlockDao {
             " LEFT JOIN (SELECT bb.chainID, count(*) AS peerBlocks, SUM(rewards) AS totalRewards" +
             " FROM Blocks bb" +
             " LEFT JOIN Communities cc ON bb.chainID = cc.chainID" +
-            " WHERE bb.chainID = :chainID AND bb.blockNumber > 0" +
+            " WHERE bb.chainID = :chainID AND bb.blockNumber >= 0" +
             " AND miner =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND status = 1" +
 //            " AND (cc.tailBlock <= bb.blockNumber)" +

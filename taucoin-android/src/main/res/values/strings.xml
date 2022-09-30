@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name_alpha">TAU App Beta</string>
     <string name="app_name_alpha_description">Freely Create Crypto Coins\nDecentral Serverless Network</string>
+    <string name="app_name_alpha_desc">Open Source</string>
     <string name="app_share">Share app link via</string>
     <string name="app_share_error">Can\'t find share component to share</string>
 
@@ -139,7 +140,7 @@
     removed from \"setting>privacy>blacklist\".]]></Data></string>
 
     <string name="community_input_hint">Message</string>
-    <string name="community_users_stats_c">&#160;-&#160;Linked&#160;%1$d</string>
+    <string name="community_users_stats_c">&#160;-&#160;linked&#160;%1$d</string>
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">Discovering</string>
     <string name="community_users_mining">Win Mining in</string>
@@ -200,6 +201,7 @@
     <string name="chain_mining_time_tips">Your remaining time to win the current mining slot.</string>
     <string name="chain_mining_time_min_seconds">&#160;%1$dm%2$ds</string>
     <string name="chain_mining_time_seconds">&#160;%1$ds</string>
+    <string name="chain_mining_syncing">&#160;-&#160;syncing</string>
     <string name="chain_mining_time_doze">Doze</string>
 <!--    The airdrop was created 3 minutes ago. Do you want to continue?-->
     <string name="airdrop_link_long_time">The airdrop link was created %1$d minutes ago. Do you want to continue?</string>
