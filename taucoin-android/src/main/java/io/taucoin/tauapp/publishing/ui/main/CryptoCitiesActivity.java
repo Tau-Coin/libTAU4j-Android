@@ -1,16 +1,10 @@
 package io.taucoin.tauapp.publishing.ui.main;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
-import android.util.DisplayMetrics;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
-import io.taucoin.tauapp.publishing.core.utils.Utils;
 import io.taucoin.tauapp.publishing.databinding.ActivityCrytoCitiesBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 
@@ -46,7 +40,7 @@ public class CryptoCitiesActivity extends BaseActivity {
                 .append(" for early adopters.").append("\n")
                 .append("- TAU company reserves: ")
                 .append("40%").append("\n")
-                .append("4. Mining success reward: ")
+                .append("- Mining success reward: ")
                 .append("10")
                 .setForegroundColor(getResources().getColor(R.color.color_yellow))
                 .setBold()
@@ -58,7 +52,7 @@ public class CryptoCitiesActivity extends BaseActivity {
                 .append("- Only one London city in the world.").append("\n")
                 .append("- Limited initial coins volume.").append("\n")
                 .append("- Only 10 new coins added to the world each 5 minutes.").append("\n")
-                .append("- Only one coin for London GPS region embedded natively in the PMC app.").append("\n")
+                .append("- Only \"London PMC\" for London GPS region embedded natively in the PMC app.").append("\n")
                 .append("- Phones in London will auto join the London PMC network through TAU app.")
                 .create();
         binding.tvLondonPmcDesc.setText(spannableStringBuilder);

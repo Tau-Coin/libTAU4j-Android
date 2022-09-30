@@ -222,6 +222,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                                 minutes, seconds));
                     } else {
                         subtitle.append(getString(R.string.chain_mining_time_seconds, seconds));
+                        if (seconds == 0) {
+                            subtitle.append(getString(R.string.chain_mining_syncing));
+                        }
                     }
                 } else if (miningTime == -100) {
                     subtitle.append(getString(R.string.community_users_doze));
