@@ -240,6 +240,7 @@
                     app:lineLeftText="@string/chain_difficulty" />
 
                 <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                    android:visibility="gone"
                     android:id="@+id/item_total_peers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -284,12 +285,12 @@
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
                 <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_consensus_state"
+                    android:id="@+id/item_all_peers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:onClick="onClick"
-                    app:lineLeftText="@string/community_consensus_state"
+                    app:lineLeftText="@string/community_all_peers"
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
                 <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView

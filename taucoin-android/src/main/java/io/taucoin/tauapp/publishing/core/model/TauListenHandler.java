@@ -703,4 +703,15 @@ public class TauListenHandler {
             }
         }
     }
+
+    /**
+     * 在线peer（判断peer是否在本地存在）
+     * @param chainId 链ID
+     * @param peer 在线节点
+     */
+    public void onlinePeer(byte[] chainId, String peer) {
+        logger.info("onlinePeer chainID::{}, peer::{}", ChainIDUtil.decode(chainId), peer);
+        saveUserInfo(peer);
+        addMemberInfo(chainId, peer);
+    }
 }

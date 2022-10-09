@@ -123,9 +123,9 @@ public class ChainStatusActivity extends BaseActivity {
         if (null == mStatus || mStatus.difficulty != status.difficulty) {
             binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
         }
-        if (null == mStatus || mStatus.totalPeers != status.totalPeers) {
-            binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
-        }
+//        if (null == mStatus || mStatus.totalPeers != status.totalPeers) {
+//            binding.itemTotalPeers.setRightText(FmtMicrometer.fmtLong(status.totalPeers));
+//        }
 
         if (null == mStatus || mStatus.peerBlocks != status.peerBlocks) {
             binding.itemPeersBlocks.setRightText(FmtMicrometer.fmtLong(status.peerBlocks));
@@ -179,7 +179,7 @@ public class ChainStatusActivity extends BaseActivity {
      */
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.item_consensus_state:
+            case R.id.item_all_peers:
                 Intent intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, ChainTopActivity.class);

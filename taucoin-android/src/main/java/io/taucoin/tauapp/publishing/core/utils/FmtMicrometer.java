@@ -57,18 +57,10 @@ public class FmtMicrometer {
         return new BigInteger("0").toString();
     }
 
-    public static String fmtValue(double value) {
-        DecimalFormat df = getDecimalFormatInstance();
-        df.applyPattern("###,##0.##");
-        df.setRoundingMode(RoundingMode.FLOOR);
-        BigDecimal bigDecimal = new BigDecimal(value);
-        return df.format(bigDecimal);
-    }
-
-    public static String fmtDecimal(String value) {
+    private static String fmtDecimal(double value, String pattern) {
         try {
             DecimalFormat df = getDecimalFormatInstance();
-            df.applyPattern("###,##0.##");
+            df.applyPattern(pattern);
             df.setRoundingMode(RoundingMode.FLOOR);
             BigDecimal bigDecimal = new BigDecimal(value);
             return df.format(bigDecimal);
@@ -77,8 +69,12 @@ public class FmtMicrometer {
         return new BigInteger("0").toString();
     }
 
+    public static String fmtFixedDecimal(double value) {
+        return fmtDecimal(value, "###,##0.00");
+    }
+
     public static String fmtDecimal(double value) {
-        return fmtDecimal(String.valueOf(value));
+        return fmtDecimal(value, "###,##0.##");
     }
 
     static DecimalFormat getDecimalFormatInstance() {

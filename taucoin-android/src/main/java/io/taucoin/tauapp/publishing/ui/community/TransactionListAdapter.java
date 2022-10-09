@@ -78,7 +78,7 @@ public class TransactionListAdapter extends ListAdapter<UserAndTx, TransactionLi
             }
             stringBuilder.append(FmtMicrometer.fmtMiningIncome(tx.amount));
             binding.tvAmount.setText(stringBuilder.toString());
-            binding.tvTime.setText(DateUtil.formatTime(tx.timestamp, DateUtil.pattern13));
+            binding.tvTime.setText(DateUtil.formatTime(tx.timestamp / 1000, DateUtil.pattern13));
         }
     }
 

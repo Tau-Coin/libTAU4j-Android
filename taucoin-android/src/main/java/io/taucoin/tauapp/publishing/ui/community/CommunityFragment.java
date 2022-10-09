@@ -26,6 +26,7 @@ import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
+import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.databinding.ExternalAirdropLinkDialogBinding;
@@ -214,17 +215,15 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             // 已加入社区
             if (nodes > 0) {
                 if (miningTime >= 0) {
-                    long minutes = miningTime / 60;
-                    long seconds = miningTime % 60;
+                    int maxMiningTime = 600;
+                    if (miningTime > maxMiningTime) {
+                        miningTime = maxMiningTime;
+                    }
+                    double rate = (maxMiningTime - miningTime) * 100f / maxMiningTime;
                     subtitle.append(getString(R.string.community_users_mining));
-                    if (minutes > 0) {
-                        subtitle.append(getString(R.string.chain_mining_time_min_seconds,
-                                minutes, seconds));
-                    } else {
-                        subtitle.append(getString(R.string.chain_mining_time_seconds, seconds));
-                        if (seconds == 0) {
-                            subtitle.append(getString(R.string.chain_mining_syncing));
-                        }
+                    subtitle.append(" ").append(FmtMicrometer.fmtFixedDecimal(rate)).append("%");
+                    if (rate == 100) {
+                        subtitle.append(getString(R.string.chain_mining_syncing));
                     }
                 } else if (miningTime == -100) {
                     subtitle.append(getString(R.string.community_users_doze));

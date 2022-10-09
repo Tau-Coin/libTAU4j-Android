@@ -188,6 +188,9 @@ public class UsersUtil {
      * @return Bitmap
      */
     public static Bitmap getHeadPic(@NonNull User user) {
+        if (null == user) {
+            return null;
+        }
         Bitmap bitmap = null;
         if (user.headPic != null) {
             bitmap = MediaUtil.bytes2Bitmap(user.headPic);

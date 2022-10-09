@@ -73,7 +73,8 @@ public class TransactionsTabFragment extends CommunityTabFragment {
 
         loadSpinnerView(spinnerItems[0]);
 
-        binding.rlPayPeople.setVisibility(isJoined ? View.VISIBLE : View.GONE);
+//        binding.rlPayPeople.setVisibility(isJoined ? View.VISIBLE : View.GONE);
+        binding.rlPayPeople.setVisibility(View.GONE);
         binding.rlPayPeople.setOnClickListener(v -> {
             Intent intent = new Intent();
             intent.putExtra(IntentExtra.CHAIN_ID, chainID);
@@ -135,7 +136,7 @@ public class TransactionsTabFragment extends CommunityTabFragment {
         if (currentFragment != null) {
             currentFragment.handleMember(member);
         }
-        binding.rlPayPeople.setVisibility(isJoined ? View.VISIBLE : View.GONE);
+//        binding.rlPayPeople.setVisibility(isJoined ? View.VISIBLE : View.GONE);
     }
 
     @Override

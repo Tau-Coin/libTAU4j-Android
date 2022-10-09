@@ -475,6 +475,7 @@ public class TauDaemonAlertHandler {
         peerMap.put(peer, time);
         onlinePeerMap.put(chainId, peerMap);
         onlinePeerData.postValue(onlinePeerMap);
+        tauListenHandler.onlinePeer(a.get_chain_id(), peer);
     }
 
     /**

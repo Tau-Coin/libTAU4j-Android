@@ -104,7 +104,7 @@ public interface TxDao {
     // 查询钱包里上链账单列表
     String QUERY_GET_WALLET_TRANSACTIONS = "SELECT *, 0 AS trusts FROM Txs WHERE chainID = :chainID" +
             " AND txType = 2" +
-            " AND txStatus = 1" +
+//            " AND txStatus = 1" +
             " AND (senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " OR receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
 //            " AND blockNumber >= (SELECT tailBlock FROM Communities WHERE chainID = :chainID)" +
