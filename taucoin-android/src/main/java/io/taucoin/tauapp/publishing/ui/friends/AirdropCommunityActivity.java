@@ -193,8 +193,8 @@ public class AirdropCommunityActivity extends BaseActivity implements
         String airdropCoinsStr = FmtMicrometer.fmtLong(airdropCoins);
         String communityName = ChainIDUtil.getName(chainID);
         String shareTitle = getString(R.string.bot_share_airdrop_link_title);
-        String text = getString(R.string.bot_share_airdrop_link_content, airdropCoinsStr, communityName,
-                airdropCoinsStr, communityName, airdropLink);
+        String text = getString(R.string.bot_share_airdrop_link_content, airdropCoinsStr,
+                communityName, airdropLink);
         ActivityUtil.shareText(this, shareTitle, text);
     }
 

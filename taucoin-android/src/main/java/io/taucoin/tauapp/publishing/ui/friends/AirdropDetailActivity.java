@@ -169,8 +169,8 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
                 String airdropCoinsStr = FmtMicrometer.fmtLong(member.airdropCoins);
                 String communityName = ChainIDUtil.getName(chainID);
                 String shareTitle = getString(R.string.bot_share_airdrop_link_title);
-                String text = getString(R.string.bot_share_airdrop_link_content, airdropCoinsStr, communityName,
-                        airdropCoinsStr, communityName, airdropLink);
+                String text = getString(R.string.bot_share_airdrop_link_content, airdropCoinsStr,
+                        communityName, airdropLink);
                 ActivityUtil.shareText(this, shareTitle, text);
                 break;
         }
