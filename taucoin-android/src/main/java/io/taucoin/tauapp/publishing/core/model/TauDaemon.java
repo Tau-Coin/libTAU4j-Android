@@ -913,6 +913,10 @@ public abstract class TauDaemon {
         txQueueManager.updateTxQueue(chainID, isResendTx);
     }
 
+    public void updateChainTxStoppedTime(String chainID) {
+        txQueueManager.updateChainTxStoppedTime(chainID);
+    }
+
     public void sendTxQueue(TxQueue txQueue, long pinnedTime) {
         txQueueManager.sendTxQueue(txQueue, pinnedTime);
     }

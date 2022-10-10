@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -40,6 +41,7 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
+import io.taucoin.tauapp.publishing.core.utils.ObservableUtil;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
@@ -56,16 +58,19 @@ import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.WIRING
  */
 class TxQueueManager {
     private static final Logger logger = LoggerFactory.getLogger("TxQueueManager");
-    private TauDaemon daemon;
-    private TxQueueRepository txQueueRepos;
-    private UserRepository userRepos;
-    private TxRepository txRepo;
-    private UserRepository userRepo;
-    private MemberRepository memberRepo;
-    private LinkedBlockingQueue<String> chainIDQueue = new LinkedBlockingQueue<>();
-    private ConcurrentHashMap<String, Boolean> chainResendTx = new ConcurrentHashMap<>();
+    private final TauDaemon daemon;
+    private final TxQueueRepository txQueueRepos;
+    private final UserRepository userRepos;
+    private final TxRepository txRepo;
+    private final UserRepository userRepo;
+    private final MemberRepository memberRepo;
+    private final LinkedBlockingQueue<String> chainIDQueue = new LinkedBlockingQueue<>();
+    private final ConcurrentHashMap<String, Boolean> chainResendTx = new ConcurrentHashMap<>();
+    // 链发生回滚后1分钟内不触发发交易, 只有大于这个时间交易继续
+    private final ConcurrentHashMap<String, Long> chainTxStoppedTime = new ConcurrentHashMap<>();
     private Disposable queueDisposable;
-    private Context appContext;
+    private Disposable txRecoveryDisposable;
+    private final Context appContext;
 
     TxQueueManager(TauDaemon daemon) {
         this.daemon = daemon;
@@ -76,6 +81,28 @@ class TxQueueManager {
         userRepo = RepositoryHelper.getUserRepository(appContext);
         memberRepo = RepositoryHelper.getMemberRepository(appContext);
         createQueueConsumer();
+        txRecoveryHandler();
+    }
+
+    /**
+     * 交易恢复程序
+     * 20s检查一次，防止时间交叉错过
+     */
+    private void txRecoveryHandler() {
+        txRecoveryDisposable = ObservableUtil.interval(20 * 1000)
+                .subscribeOn(Schedulers.io()).subscribe( l -> {
+                    Set<String> keySet = chainTxStoppedTime.keySet();
+                    long currentTime = DateUtil.getMillisTime();
+                    for (String key : keySet) {
+                        Long stoppedTime = chainTxStoppedTime.get(key);
+                        logger.info("txRecoveryHandler chainID::{}, stoppedTime::{}, currentTime::{}",
+                                key, stoppedTime != null ? stoppedTime : 0, currentTime);
+                         if (stoppedTime != null && currentTime > stoppedTime) {
+                             chainTxStoppedTime.remove(key);
+                             updateTxQueue(key);
+                         }
+                    }
+                });
     }
 
     private void createQueueConsumer() {
@@ -111,7 +138,20 @@ class TxQueueManager {
             .subscribe();
     }
 
+    void updateChainTxStoppedTime(String chainID) {
+        long currentTime = DateUtil.getMillisTime();
+        currentTime += 60 * 1000;
+        chainTxStoppedTime.put(chainID, currentTime);
+        logger.info("updateTxQueue updateTxStoppedTime chainID::{}, time::{}", chainID, currentTime);
+    }
+
     void updateTxQueue(String chainID) {
+        // 链发生回滚，等待一分钟再发新交易
+        if (chainTxStoppedTime.containsKey(chainID)) {
+            chainIDQueue.remove(chainID);
+            logger.info("updateTxQueue tx waiting... chainID::{}", chainID);
+            return;
+        }
         if (!chainIDQueue.contains(chainID)) {
             chainIDQueue.offer(chainID);
             logger.info("updateTxQueue chainID::{}", chainID);
@@ -424,6 +464,9 @@ class TxQueueManager {
         chainIDQueue.clear();
         if (queueDisposable != null && !queueDisposable.isDisposed()) {
             queueDisposable.dispose();
+        }
+        if (txRecoveryDisposable != null && !txRecoveryDisposable.isDisposed()) {
+            txRecoveryDisposable.dispose();
         }
     }
 }

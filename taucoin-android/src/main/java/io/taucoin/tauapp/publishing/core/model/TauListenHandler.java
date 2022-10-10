@@ -171,6 +171,9 @@ public class TauListenHandler {
             }
         }
         handleBlockData(block, BlockStatus.ROLL_BACK);
+
+        daemon.updateChainTxStoppedTime(chainID);
+        logger.debug("updateChainTxStoppedTime chainID::{}", chainID);
     }
 
     /**
