@@ -16,25 +16,33 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 */
 package io.taucoin.tauapp.publishing.core.model.data.message;
 
+import io.taucoin.tauapp.publishing.R;
+
 /**
  * 交易类型
  */
 public enum TxType {
-    UNKNOWN(0),
-    NOTE_TX(1),
-    WIRING_TX(2),
-    SELL_TX(3),
-    TRUST_TX(4),
-    AIRDROP_TX(5),
-    ANNOUNCEMENT(6);
+    UNKNOWN(0, R.string.community_view_unknown),
+    NOTE_TX(1, R.string.community_view_note),
+    WIRING_TX(2, R.string.community_view_wiring),
+    SELL_TX(3, R.string.community_view_sell),
+    TRUST_TX(4, R.string.community_view_trust),
+    AIRDROP_TX(5, R.string.community_view_airdrop),
+    ANNOUNCEMENT(6, R.string.community_view_announcement);
 
-    private int type;
-    TxType(int type) {
+    private final int type;
+    private final int name;
+    TxType(int type, int name) {
         this.type = type;
+        this.name = name;
     }
 
     public int getType() {
         return type;
+    }
+
+    public int getName() {
+        return name;
     }
 
     public static TxType valueOf(int type) {

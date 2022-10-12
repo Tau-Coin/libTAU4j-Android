@@ -15,6 +15,7 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.ChainStatus;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
+import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
@@ -113,28 +114,18 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
     private void loadMemberData(MemberAndAmount member) {
         long balance = 0;
         long power = 0;
-        long amount = 0;
         long balUpdateTime = 0;
         if (member != null) {
             balance = member.balance;
             balUpdateTime = member.balUpdateTime;
             power = member.power;
-            amount = member.amount;
         }
 
         String balanceStr = FmtMicrometer.fmtBalance(balance);
         String time = DateUtil.formatTime(balUpdateTime, DateUtil.pattern14);
         String balanceShow;
-        if (amount > 0) {
-            String balancePending = FmtMicrometer.fmtBalance(amount);
-            balanceShow = getResources().getString(R.string.drawer_balance_time_pending,
-                    balanceStr, time, balancePending);
-            binding.itemBalance.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.widget_size_60));
-        } else {
-            balanceShow = getResources().getString(R.string.drawer_balance_time_no_title,
-                    balanceStr, time);
-            binding.itemBalance.setMinimumHeight(getResources().getDimensionPixelSize(R.dimen.widget_size_44));
-        }
+        balanceShow = getResources().getString(R.string.drawer_balance_time_no_title,
+                balanceStr, time);
         binding.itemBalance.setRightText(Html.fromHtml(balanceShow));
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
     }
@@ -182,9 +173,17 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
     protected void onStart() {
         super.onStart();
         loadMiningInfo();
-        viewModel.clearCommunityAccountTips(chainID);
+
+        disposables.add(viewModel.observeMemberTips()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleMemberTips));
     }
 
+    private void handleMemberTips(MemberTips tips) {
+        boolean isShowTips = tips.pendingTime > 0;
+        binding.viewTips.setVisibility(isShowTips ? View.VISIBLE : View.GONE);
+    }
 
     @Override
     protected void onStop() {

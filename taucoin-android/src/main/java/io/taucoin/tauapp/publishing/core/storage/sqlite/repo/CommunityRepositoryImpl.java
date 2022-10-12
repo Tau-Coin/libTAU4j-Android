@@ -128,26 +128,12 @@ public class CommunityRepositoryImpl implements CommunityRepository{
      * 获取用户加入的社区列表
      */
     public Flowable<List<MemberAndAmount>> observerJoinedCommunityList() {
-        int sdkVersion = Build.VERSION.SDK_INT;
-        // android11中SQLite版本为3.28.0, group by取第一条记录，低版本取最后一条记录
-
-        if (sdkVersion >= 30) {
-            return db.communityDao().observeJoinedCommunityListDESC();
-        } else {
-            return db.communityDao().observeJoinedCommunityListASC();
-        }
+        return db.communityDao().observeJoinedCommunityList();
     }
 
     @Override
     public Flowable<MemberAndAmount> observerMemberAndAmount(String chainID) {
-        int sdkVersion = Build.VERSION.SDK_INT;
-        // android11中SQLite版本为3.28.0, group by取第一条记录，低版本取最后一条记录
-
-        if (sdkVersion >= 30) {
-            return db.communityDao().observeMemberAndAmountDESC(chainID);
-        } else {
-            return db.communityDao().observeMemberAndAmountASC(chainID);
-        }
+        return db.communityDao().observeMemberAndAmount(chainID);
     }
 
     /**

@@ -74,7 +74,6 @@ import io.taucoin.tauapp.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.tauapp.publishing.core.model.data.AirdropHistory;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
@@ -1231,5 +1230,9 @@ public class CommunityViewModel extends AndroidViewModel {
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
+    }
+
+    public Observable<BlockInfo> observeBlockByHash(String chainID, String hash) {
+        return blockRepo.observeBlock(chainID, hash);
     }
 }

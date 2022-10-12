@@ -41,6 +41,8 @@ public interface BlockRepository {
      */
     BlockInfo getBlock(String chainID, String blockHash);
 
+    Observable<BlockInfo> observeBlock(String chainID, String blockHash);
+
     /**
      * 查询区块Blocks
      * @param chainID 链ID

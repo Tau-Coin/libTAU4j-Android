@@ -9,6 +9,7 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.taucoin.tauapp.publishing.core.model.data.BlockAndTx;
 import io.taucoin.tauapp.publishing.core.model.data.BlockStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.ChainStatus;
@@ -93,6 +94,9 @@ public interface BlockDao {
      */
     @Query(QUERY_BLOCK)
     BlockInfo getBlock(String chainID, String blockHash);
+
+    @Query(QUERY_BLOCK)
+    Observable<BlockInfo> observeBlock(String chainID, String blockHash);
 
     @Query(QUERY_BLOCKS)
     List<BlockInfo> getBlocks(String chainID, long blockNumber);

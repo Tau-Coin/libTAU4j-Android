@@ -29,7 +29,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
+import androidx.room.RxRoom;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -39,6 +41,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.core.model.data.DataChanged;
+import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.tauapp.publishing.core.model.data.Result;
 import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
@@ -103,6 +106,7 @@ public class TxViewModel extends AndroidViewModel {
     private Disposable addTxDisposable;
     private MutableLiveData<List<UserAndTx>> chainTxs = new MutableLiveData<>();
     private MutableLiveData<List<Tx>> trustTxs = new MutableLiveData<>();
+    private MutableLiveData<List<IncomeAndExpenditure>> walletTxs = new MutableLiveData<>();
     private MutableLiveData<Result> airdropState = new MutableLiveData<>();
     private MutableLiveData<String> addState = new MutableLiveData<>();
     private CommonDialog editFeeDialog;
@@ -138,6 +142,10 @@ public class TxViewModel extends AndroidViewModel {
 
     public MutableLiveData<List<Tx>> observerTrustTxs() {
         return trustTxs;
+    }
+
+    public MutableLiveData<List<IncomeAndExpenditure>> getWalletTxs() {
+        return walletTxs;
     }
 
     @Override
@@ -863,7 +871,38 @@ public class TxViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    public Observable<List<UserAndTx>> observeWalletTransactions(String chainID) {
-        return txRepo.observeWalletTransactions(chainID);
+    public void queryWalletIncomeAndExpenditure(String chainID, int pos, int initSize) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<List<IncomeAndExpenditure>>) emitter -> {
+            List<IncomeAndExpenditure> list = new ArrayList<>();
+            try {
+                int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
+                long startTime = System.currentTimeMillis();
+                list = txRepo.observeWalletTransactions(chainID, pos, pageSize);
+                long getMessagesTime = System.currentTimeMillis();
+                logger.debug("queryWalletIncomeAndExpenditure pos::{}, pageSize::{}, size::{}",
+                        pos, pageSize, list.size());
+                logger.debug("queryWalletIncomeAndExpenditure getMessagesTime::{}", getMessagesTime - startTime);
+            } catch (Exception e) {
+                logger.error("queryWalletIncomeAndExpenditure error::", e);
+            }
+            emitter.onNext(list);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list -> {
+                    walletTxs.postValue(list);
+                });
+        disposables.add(disposable);
+    }
+
+    public Flowable<Object> observeWalletChanged() {
+        return txRepo.observeWalletChanged();
+    }
+
+    public Observable<Tx> observeTxByTxID(String hash) {
+        return txRepo.observeTxByTxID(hash);
     }
 }

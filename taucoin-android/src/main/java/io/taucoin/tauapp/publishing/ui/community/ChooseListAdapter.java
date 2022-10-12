@@ -69,27 +69,24 @@ public class ChooseListAdapter extends ListAdapter<MemberAndAmount, ChooseListAd
             String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_color_no_title,
                     balance, time);
             binding.tvBalance.setText(Html.fromHtml(balanceAndTime));
-            binding.tvBalancePending.setVisibility(member.amount > 0 ? View.VISIBLE : View.GONE);
-            if (member.amount > 0) {
-                String balancePending = FmtMicrometer.fmtBalance(member.amount);
-                binding.tvBalancePending.setText(context.getResources().getString(R.string.drawer_balance_pending,
-                        balancePending));
-            }
+            binding.tvBalancePending.setVisibility(View.GONE);
 
-            boolean isShowTips = member.incomeTime > 0 || member.rewardTime > 0 || member.pendingTime > 0;
+//            boolean isShowTips = member.incomeTime > 0 || member.rewardTime > 0 || member.pendingTime > 0;
+            boolean isShowTips = member.pendingTime > 0;
             binding.viewTips.setVisibility(isShowTips ? View.VISIBLE : View.INVISIBLE);
             if (isShowTips) {
-                int resId = R.drawable.circle_pink;
-                if (member.incomeTime > member.rewardTime) {
-                    resId = R.drawable.circle_red;
-                    if (member.pendingTime >= member.incomeTime) {
-                        resId = R.drawable.circle_yellow;
-                    }
-                } else {
-                    if (member.pendingTime >= member.rewardTime) {
-                        resId = R.drawable.circle_yellow;
-                    }
-                }
+//                int resId = R.drawable.circle_pink;
+//                if (member.incomeTime > member.rewardTime) {
+//                    resId = R.drawable.circle_red;
+//                    if (member.pendingTime >= member.incomeTime) {
+//                        resId = R.drawable.circle_yellow;
+//                    }
+//                } else {
+//                    if (member.pendingTime >= member.rewardTime) {
+//                        resId = R.drawable.circle_yellow;
+//                    }
+//                }
+                int resId = R.drawable.circle_red;
                 binding.viewTips.setBackgroundResource(resId);
             }
         }
@@ -103,8 +100,7 @@ public class ChooseListAdapter extends ListAdapter<MemberAndAmount, ChooseListAd
                     oldItem.balUpdateTime == newItem.balUpdateTime &&
                     oldItem.pendingTime == newItem.pendingTime &&
                     oldItem.rewardTime == newItem.rewardTime &&
-                    oldItem.incomeTime == newItem.incomeTime &&
-                    oldItem.amount == newItem.amount;
+                    oldItem.incomeTime == newItem.incomeTime;
         }
 
         @Override

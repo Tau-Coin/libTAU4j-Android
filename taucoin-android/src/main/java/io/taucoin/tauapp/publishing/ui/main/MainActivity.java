@@ -304,21 +304,23 @@ public class MainActivity extends ScanTriggerActivity {
     }
 
     private void handleMemberTips(MemberTips tips) {
-        boolean isShowTips = tips.incomeTime > 0 || tips.rewardTime > 0 || tips.pendingTime > 0;
-        int resId = -1;
-        if (isShowTips) {
-            resId = R.drawable.circle_pink;
-            if (tips.incomeTime > tips.rewardTime) {
-                resId = R.drawable.circle_red;
-                if (tips.pendingTime >= tips.incomeTime) {
-                    resId = R.drawable.circle_yellow;
-                }
-            } else {
-                if (tips.pendingTime >= tips.rewardTime) {
-                    resId = R.drawable.circle_yellow;
-                }
-            }
-        }
+//        boolean isShowTips = tips.incomeTime > 0 || tips.rewardTime > 0 || tips.pendingTime > 0;
+//        int resId = -1;
+//        if (isShowTips) {
+//            resId = R.drawable.circle_pink;
+//            if (tips.incomeTime > tips.rewardTime) {
+//                resId = R.drawable.circle_red;
+//                if (tips.pendingTime >= tips.incomeTime) {
+//                    resId = R.drawable.circle_yellow;
+//                }
+//            } else {
+//                if (tips.pendingTime >= tips.rewardTime) {
+//                    resId = R.drawable.circle_yellow;
+//                }
+//            }
+//        }
+        boolean isShowTips = tips.pendingTime > 0;
+        int resId = isShowTips ? R.drawable.circle_red : -1;
         binding.drawer.itemWallet.setRightPoint(resId);
     }
 

@@ -120,59 +120,15 @@ public interface CommunityDao {
             " WHERE m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND c.isBanned = 0";
 
-    String QUERY_JOINED_COMMUNITY_DESC = "SELECT m.*, amount FROM Members m" +
+    String QUERY_JOINED_COMMUNITY = "SELECT m.* FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " LEFT JOIN (" +
-            " SELECT a.chainID, SUM(b.amount) AS amount from (" +
-            " SELECT chainID, senderPk, nonce, MAX(txStatus) txStatus" +
-            " From (SELECT chainID, senderPk, nonce, txStatus FROM Txs" +
-            " WHERE chainID IN (SELECT chainID FROM Members WHERE publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
-            " ORDER BY timestamp DESC)" +
-            " GROUP BY chainID, senderPk, nonce" +
-            " ) AS a LEFT JOIN (SELECT chainID, senderPk, nonce, amount FROM" +
-            " (SELECT chainID, senderPk, nonce, amount FROM Txs" +
-            " WHERE chainID IN (SELECT chainID FROM Members WHERE publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
-            " AND senderPk NOT IN  (" + UserDao.QUERY_GET_CURRENT_USER_PK + ") " +
-            " AND receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ") AND txType = 2" +
-            " ORDER BY timestamp DESC)" +
-            " GROUP BY chainID, senderPk, nonce) AS b" +
-            " ON a.chainID = b.chainID AND a.senderPk = b.senderPk AND a.nonce = b.nonce" +
-            " WHERE a.txStatus = 0" +
-            " GROUP BY a.chainID" +
-            " ) AS pending " +
-            " ON pending.chainID = m.chainID" +
             " WHERE m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND c.isBanned = 0";
 
-    String QUERY_JOINED_COMMUNITY_ASC = "SELECT m.*, amount FROM Members m" +
+    String QUERY_COMMUNITY_MEMBER = "SELECT m.* FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
-            " LEFT JOIN (" +
-            " SELECT a.chainID, SUM(b.amount) AS amount from (" +
-            " SELECT chainID, senderPk, nonce, MAX(txStatus) txStatus" +
-            " From (SELECT chainID, senderPk, nonce, txStatus FROM Txs" +
-            " WHERE chainID IN (SELECT chainID FROM Members WHERE publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
-            " ORDER BY timestamp ASC)" +
-            " GROUP BY chainID, senderPk, nonce" +
-            " ) AS a LEFT JOIN (SELECT chainID, senderPk, nonce, amount amount FROM" +
-            " (SELECT chainID, senderPk, nonce, amount FROM Txs" +
-            " WHERE chainID IN (SELECT chainID FROM Members WHERE publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
-            " AND senderPk NOT IN  (" + UserDao.QUERY_GET_CURRENT_USER_PK + ") " +
-            " AND receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ") AND txType = 2" +
-            " ORDER BY timestamp ASC)" +
-            " GROUP BY chainID, senderPk, nonce) AS b" +
-            " ON a.chainID = b.chainID AND a.senderPk = b.senderPk AND a.nonce = b.nonce" +
-            " WHERE a.txStatus = 0" +
-            " GROUP BY a.chainID" +
-            " ) AS pending " +
-            " ON pending.chainID = m.chainID" +
-            " WHERE m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " AND c.isBanned = 0";
-
-    String QUERY_COMMUNITY_MEMBER_DESC = "SELECT * FROM (" + QUERY_JOINED_COMMUNITY_DESC + ")" +
-            " WHERE chainID =:chainID limit 1";
-
-    String QUERY_COMMUNITY_MEMBER_ASC = "SELECT * FROM (" + QUERY_JOINED_COMMUNITY_ASC + ")" +
-            " WHERE chainID =:chainID limit 1";
+            " WHERE m.chainID =:chainID AND m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND c.isBanned = 0 limit 1";
 
     String QUERY_ALL_JOINED_COMMUNITY = "SELECT c.*" +
             " FROM Communities c" +
@@ -275,17 +231,11 @@ public interface CommunityDao {
     /**
      * 获取用户加入的社区列表
      */
-    @Query(QUERY_JOINED_COMMUNITY_DESC)
-    Flowable<List<MemberAndAmount>> observeJoinedCommunityListDESC();
+    @Query(QUERY_JOINED_COMMUNITY)
+    Flowable<List<MemberAndAmount>> observeJoinedCommunityList();
 
-    @Query(QUERY_JOINED_COMMUNITY_ASC)
-    Flowable<List<MemberAndAmount>> observeJoinedCommunityListASC();
-
-    @Query(QUERY_COMMUNITY_MEMBER_DESC)
-    Flowable<MemberAndAmount> observeMemberAndAmountDESC(String chainID);
-
-    @Query(QUERY_COMMUNITY_MEMBER_ASC)
-    Flowable<MemberAndAmount> observeMemberAndAmountASC(String chainID);
+    @Query(QUERY_COMMUNITY_MEMBER)
+    Flowable<MemberAndAmount> observeMemberAndAmount(String chainID);
 
     @Query(QUERY_ALL_JOINED_COMMUNITY)
     List<Community> getAllJoinedCommunityList();

@@ -94,6 +94,11 @@ public class BlockRepositoryImpl implements BlockRepository{
     }
 
     @Override
+    public Observable<BlockInfo> observeBlock(String chainID, String blockHash) {
+        return db.blockDao().observeBlock(chainID, blockHash);
+    }
+
+    @Override
     public List<BlockInfo> getBlocks(String chainID, long blockNumber) {
         return db.blockDao().getBlocks(chainID, blockNumber);
     }

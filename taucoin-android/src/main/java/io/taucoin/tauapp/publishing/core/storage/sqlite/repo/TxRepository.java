@@ -6,6 +6,7 @@ import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.tauapp.publishing.core.model.data.DataChanged;
+import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
@@ -62,6 +63,8 @@ public interface TxRepository {
      * @param txID 交易ID
      */
     Tx getTxByTxID(String txID);
+
+    Observable<Tx> observeTxByTxID(String txID);
 
     Tx getTxByQueueID(long queueID, long timestamp);
 
@@ -125,5 +128,7 @@ public interface TxRepository {
 
     Tx queryUnsentTx(long queueID);
 
-    Observable<List<UserAndTx>> observeWalletTransactions(String chainID);
+    List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize);
+
+    Flowable<Object> observeWalletChanged();
 }

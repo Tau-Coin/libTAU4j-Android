@@ -18,6 +18,7 @@ import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
@@ -498,6 +499,38 @@ public class TxUtils {
                      .append(HashUtil.hashMiddleHide(block.previousBlockHash));
          }
         msg.append("\n").append(context.getString(R.string.community_tip_block_hash))
+                .setForegroundColor(titleColor)
+                .append(HashUtil.hashMiddleHide(block.blockHash))
+                .append("\n").append(context.getString(R.string.community_tip_block_difficulty))
+                .setForegroundColor(titleColor)
+                .append(FmtMicrometer.fmtDecimal(block.difficulty));
+        return msg.create();
+    }
+
+    public static SpannableStringBuilder createBlockSpan(BlockInfo block) {
+        Context context = MainApplication.getInstance();
+        int titleColor = context.getResources().getColor(R.color.gray_dark);
+        SpanUtils msg = new SpanUtils()
+                .append(context.getString(R.string.community_tip_block_timestamp))
+                .setForegroundColor(titleColor)
+                .append(DateUtil.formatTime(block.timestamp, DateUtil.pattern6))
+                .append("\n").append(context.getString(R.string.community_tip_block_miner))
+                .setForegroundColor(titleColor)
+                .append(HashUtil.hashMiddleHide(block.miner))
+                .append("\n").append(context.getString(R.string.community_tip_block_reward))
+                .setForegroundColor(titleColor)
+                .append(FmtMicrometer.fmtMiningIncome(block.rewards)).append(" ").append(ChainIDUtil.getCoinName(block.chainID));
+        if (StringUtil.isNotEmpty(block.previousBlockHash)) {
+            String previousHash = block.previousBlockHash;
+            msg.append("\n").append(context.getString(R.string.community_tip_previous_hash))
+                    .setForegroundColor(titleColor)
+                    .append(HashUtil.hashMiddleHide(previousHash));
+        }
+
+        msg.append("\n").append(context.getString(R.string.community_tip_block_number))
+                .setForegroundColor(titleColor)
+                .append(FmtMicrometer.fmtLong(block.blockNumber))
+                .append("\n").append(context.getString(R.string.community_tip_block_hash))
                 .setForegroundColor(titleColor)
                 .append(HashUtil.hashMiddleHide(block.blockHash))
                 .append("\n").append(context.getString(R.string.community_tip_block_difficulty))

@@ -8,10 +8,12 @@ import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
 import androidx.paging.DataSource;
+import androidx.room.RxRoom;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.tauapp.publishing.core.model.data.DataChanged;
+import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
@@ -165,6 +167,11 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
+    public Observable<Tx> observeTxByTxID(String txID) {
+        return db.txDao().observeTxByTxID(txID);
+    }
+
+    @Override
     public Tx getTxByQueueID(long queueID, long timestamp) {
         return db.txDao().getTxByQueueID(queueID, timestamp);
     }
@@ -268,7 +275,13 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public Observable<List<UserAndTx>> observeWalletTransactions(String chainID) {
-        return db.txDao().observeWalletTransactions(chainID);
+    public List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize) {
+        return db.txDao().observeWalletTransactions(chainID, startPosition, loadSize);
+    }
+
+    @Override
+    public Flowable<Object> observeWalletChanged() {
+        String[] tables = new String[]{"Users", "Txs","Blocks"};
+        return RxRoom.createFlowable(db, tables);
     }
 }

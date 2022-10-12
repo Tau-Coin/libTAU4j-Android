@@ -2,8 +2,6 @@ package io.taucoin.tauapp.publishing.ui.community;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -15,7 +13,6 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.databinding.ActivityCommunityChooseBinding;
-import io.taucoin.tauapp.publishing.databinding.ItemCommunityChooseBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 

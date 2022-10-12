@@ -94,10 +94,8 @@
     <string name="drawer_balance_time">Balance %1$s on %2$s</string>
     <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Power %1$s Balance <font color="#f19322"><b>%2$s</b></font> on %3$s]]></Data></string>
     <string name="drawer_balance_name_color" formatted="false"><Data><![CDATA[%1$s <font color="#f19322">%2$s</font>]]></Data></string>
-    <string name="drawer_balance_pending">+%1$s pending</string>
     <string name="drawer_balance_time_no_title">%1$s on %2$s</string>
     <string name="drawer_balance_time_color_no_title" formatted="false"><Data><![CDATA[<font color="#f19322"><b>%1$s</b></font> on %2$s]]></Data></string>
-    <string name="drawer_balance_time_pending" formatted="false"><Data><![CDATA[%1$s on %2$s<br/><font color="#f19322">+%3$s pending</font>]]></Data></string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Contacts</string>
     <string name="drawer_wallet">Wallet and Pay</string>
@@ -192,6 +190,10 @@
     <string name="community_view_all">All</string>
     <string name="community_view_airdrop">Airdrop</string>
     <string name="community_view_sell">Sale</string>
+    <string name="community_view_trust">Trust</string>
+    <string name="community_view_wiring">Wiring</string>
+    <string name="community_view_note">Note</string>
+    <string name="community_view_unknown">Unknown</string>
     <string name="community_view_announcement">Announcement</string>
     <string name="community_view_blocks">Blocks Explorer</string>
     <string name="community_view_own_txs">Sent Transactions</string>
@@ -267,6 +269,7 @@
     <string name="community_tip_block_timestamp">Timestamp:&#160;</string>
     <string name="community_tip_block_miner">Mined by:&#160;</string>
     <string name="community_tip_block_hash">Hash:&#160;</string>
+    <string name="community_tip_block_number">Block Number:&#160;</string>
     <string name="community_tip_previous_hash">Previous Hash:&#160;</string>
     <string name="community_tip_block_reward">Block Reward:&#160;</string>
     <string name="community_tip_block_difficulty">Difficulty:&#160;</string>
@@ -277,6 +280,10 @@
     <string name="community_block_forking">Forking</string>
     <string name="community_transfer_to">Transfer to %s</string>
     <string name="community_transfer_from">Transfer from %s</string>
+    <string name="community_post_news">Post %s</string>
+    <string name="community_mining_rewards">Rewards for Block %s</string>
+    <string name="community_tx_pending">Pending&#8230;</string>
+    <string name="community_tx_confirm_rate" formatted="false"><Data><![CDATA[Confirm Rate <font color="#f19322">%1$d</font>]]></Data></string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_key_explain">Key is private secret for your own; address is public and derived from key.</string>

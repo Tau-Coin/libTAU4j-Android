@@ -11,6 +11,7 @@ import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
@@ -101,14 +102,30 @@ public interface TxDao {
             " ORDER BY timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
-    // 查询钱包里上链账单列表
-    String QUERY_GET_WALLET_TRANSACTIONS = "SELECT *, 0 AS trusts FROM Txs WHERE chainID = :chainID" +
-            " AND txType = 2" +
-//            " AND txStatus = 1" +
-            " AND (senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " OR receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
-//            " AND blockNumber >= (SELECT tailBlock FROM Communities WHERE chainID = :chainID)" +
-            " ORDER BY timestamp DESC";
+    // 查询钱包交易记录
+    String QUERY_GET_WALLET_TRANSACTIONS = "SELECT " +
+            " t.txID AS hash, t.senderPk AS senderOrMiner, t.receiverPk, -1 AS blockNumber, t.txType, t.amount, t.fee," +
+            " t.timestamp / 1000 AS createTime, b.timestamp AS onlineTime, t.txStatus AS onlineStatus" +
+            " FROM Txs AS t" +
+            " LEFT JOIN (SELECT txID, timestamp FROM Blocks WHERE chainID = :chainID" +
+            " AND txID IS NOT NULL AND status = 1 GROUP BY txID) AS b ON t.txID = b.txID" +
+            " WHERE t.chainID = :chainID" +
+            " AND (t.senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " OR t.receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
+            " AND t.txType IN (2, 3, 4, 5, 6)";
+
+    // 查询钱包挖矿记录
+    String QUERY_GET_BLOCK_MINED = "SELECT " +
+            " blockHash AS hash, miner AS senderOrMiner, '' AS receiverPk, blockNumber, -1 AS txType, rewards AS amount," +
+            " 0 AS fee, timestamp AS createTime, timestamp AS onlineTime, status AS onlineStatus" +
+            " FROM Blocks" +
+            " WHERE chainID = :chainID AND miner = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
+
+    // 查询钱包的收入和支出
+    String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = "SELECT * FROM" +
+            " (" + QUERY_GET_WALLET_TRANSACTIONS + " UNION ALL " + QUERY_GET_BLOCK_MINED +")" +
+            " ORDER BY createTime DESC" +
+            " LIMIT :loadSize OFFSET :startPosition";
 
     // SQL:查询未上链并且已过期的条件语句
     String QUERY_PENDING_TXS_NOT_EXPIRED_WHERE = " WHERE senderPk = :senderPk AND chainID = :chainID" +
@@ -232,8 +249,8 @@ public interface TxDao {
     List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPosition, int loadSize);
 
     @Transaction
-    @Query(QUERY_GET_WALLET_TRANSACTIONS)
-    Observable<List<UserAndTx>> observeWalletTransactions(String chainID);
+    @Query(QUERY_GET_WALLET_INCOME_AND_EXPENDITURE)
+    List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize);
 
     /**
      * 获取社区里用户未上链并且未过期的交易数
@@ -262,6 +279,9 @@ public interface TxDao {
      */
     @Query(QUERY_GET_TX_BY_TX_ID)
     Tx getTxByTxID(String txID);
+
+    @Query(QUERY_GET_TX_BY_TX_ID)
+    Observable<Tx> observeTxByTxID(String txID);
 
     @Query(QUERY_GET_TX_BY_TX_QUEUE)
     Tx getTxByQueueID(long queueID, long timestamp);
