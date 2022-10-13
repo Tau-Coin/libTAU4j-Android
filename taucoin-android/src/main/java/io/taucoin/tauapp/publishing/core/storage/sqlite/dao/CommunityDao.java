@@ -55,7 +55,8 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.balUpdateTime, b.power, b.nonce," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk," +
-            " b.msgUnread AS msgUnread, b.stickyTop AS stickyTop, 0 AS focused, null AS msg, c.memo, c.timestamp" +
+            " (CASE WHEN b.msgUnread = 1 THEN b.msgUnread ELSE b.newsUnread END) AS msgUnread," +
+            " b.stickyTop AS stickyTop, 0 AS focused, null AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
@@ -68,7 +69,8 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.balUpdateTime, b.power, b.nonce," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk," +
-            " b.msgUnread AS msgUnread, b.stickyTop AS stickyTop, 0 AS focused, null AS msg, c.memo, c.timestamp" +
+            " (CASE WHEN b.msgUnread = 1 THEN b.msgUnread ELSE b.newsUnread END) AS msgUnread," +
+            " b.stickyTop AS stickyTop, 0 AS focused, null AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
@@ -145,7 +147,7 @@ public interface CommunityDao {
     String QUERY_COMMUNITY_ACCOUNT_EXPIRED = "SELECT rank.publicKey FROM (" + QUERY_COMMUNITY_ACCOUNT_ORDER + " LIMIT :limit) AS rank" +
             " WHERE rank.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
 
-    String QUERY_CURRENT_COMMUNITY_MEMBER = "SELECT c.*, m.balance, m.nonce, m.msgUnread," +
+    String QUERY_CURRENT_COMMUNITY_MEMBER = "SELECT c.*, m.balance, m.nonce, m.msgUnread, m.newsUnread," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined, " +
             " (CASE WHEN order1.publicKey IS NULL THEN 0 ELSE 1 END) AS notExpired," +
             " (CASE WHEN order2.publicKey IS NULL THEN 1 ELSE 0 END) AS nearExpired" +

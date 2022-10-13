@@ -40,7 +40,7 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     private Handler handler = new Handler();
     private NotesListAdapter adapter;
     private FragmentTxsNotesTabBinding binding;
-
+    private boolean isVisibleToUser;
 
     @Nullable
     @Override
@@ -150,6 +150,16 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        this.isVisibleToUser = isVisibleToUser;
+        logger.debug("setUserVisibleHint0::{}", isVisibleToUser);
+        if (communityViewModel != null && isVisibleToUser) {
+            communityViewModel.clearMsgUnread(chainID);
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         txViewModel.getAddState().observe(this, result -> {
@@ -173,7 +183,10 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
             binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
 
             logger.debug("txs.size::{}", txs.size());
-            communityViewModel.clearMsgUnread(chainID);
+
+            if (isVisibleToUser) {
+                communityViewModel.clearMsgUnread(chainID);
+            }
             closeProgressDialog();
             TauNotifier.getInstance().cancelNotify(chainID);
         });

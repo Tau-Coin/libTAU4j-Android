@@ -14,7 +14,8 @@ class DatabaseMigration {
     static Migration[] getMigrations(@NonNull Context appContext) {
         return new Migration[] {
                 MIGRATION_1_2,
-                MIGRATION_2_3
+                MIGRATION_2_3,
+                MIGRATION_3_4
         };
     }
 
@@ -35,6 +36,14 @@ class DatabaseMigration {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             // 添加mining power
             database.execSQL("ALTER TABLE Members ADD COLUMN power INTEGER NOT NULL DEFAULT 0");
+        }
+    };
+
+    private static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // 添加mining power
+            database.execSQL("ALTER TABLE Members ADD COLUMN newsUnread INTEGER NOT NULL DEFAULT 0");
         }
     };
 }

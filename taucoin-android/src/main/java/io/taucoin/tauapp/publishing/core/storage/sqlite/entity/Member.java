@@ -20,8 +20,8 @@ public class Member implements Parcelable {
     public long balance;                // 成员的balance
     public long balUpdateTime;          // 成员的balance更新时间
     public long power;                  // 成员的power
-    public long rewardTime;             // 成员挖矿奖励时间
-    public long incomeTime;             // 成员收到转账收入时间
+    public long rewardTime;             // 成员挖矿奖励时间 TODO: 待删除
+    public long incomeTime;             // 成员收到转账收入时间 TODO: 待删除
     public long pendingTime;            // 成员收到朋友转账动作（未上链）
     public long nonce;                  // 成员的nonce
     public int airdropStatus;           // 发币开关状态
@@ -29,6 +29,7 @@ public class Member implements Parcelable {
     public long airdropCoins;           // 每次发币的coins
     public long airdropTime;            // 开始发币的时间
     public int msgUnread;               // 是否存在消息未读 0：已读，1：未读
+    public int newsUnread;              // 是否存在news未读 0：已读，1：未读
     public int stickyTop;               // 是否置顶 0：不置顶，1：置顶
 
     public Member(@NonNull String chainID, @NonNull String publicKey){

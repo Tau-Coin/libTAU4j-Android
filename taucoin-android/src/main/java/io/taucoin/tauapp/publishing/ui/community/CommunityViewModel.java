@@ -1069,14 +1069,18 @@ public class CommunityViewModel extends AndroidViewModel {
      * 清除社区的消息未读状态
      */
     public void clearMsgUnread(String chainID) {
-        markReadOrUnread(chainID, 0, false);
+        markReadOrUnread(chainID, 0, 0);
+    }
+
+    public void clearNewsUnread(String chainID) {
+        markReadOrUnread(chainID, 0, 1);
     }
 
     public void markReadOrUnread(String chainID, int status) {
-        markReadOrUnread(chainID, status, true);
+        markReadOrUnread(chainID, status, -1);
     }
 
-    private void markReadOrUnread(String chainID, int status, boolean isAutoAdd) {
+    private void markReadOrUnread(String chainID, int status, int type) {
         if (clearDisposable != null && !clearDisposable.isDisposed()) {
             return;
         }
@@ -1086,15 +1090,28 @@ public class CommunityViewModel extends AndroidViewModel {
                     String userPk = MainApplication.getInstance().getPublicKey();
                     Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
                     if (null == member) {
-                        if (isAutoAdd) {
+                        if (type == -1) {
                             member = new Member(chainID, userPk);
                             member.msgUnread = status;
+                            member.newsUnread = status;
                             memberRepo.addMember(member);
                         }
                     } else {
-                        logger.debug("markReadOrUnread::{}, status::{}", member.msgUnread, status);
-                        if (member.msgUnread != status) {
+                        boolean isUpdate = false;
+                        if (type == 0 && member.msgUnread != status) {
                             member.msgUnread = status;
+                            isUpdate = true;
+                        } else if (type == 1 && member.newsUnread != status) {
+                            member.newsUnread = status;
+                            isUpdate = true;
+                        } else if (type == -1 && (member.msgUnread != status || member.newsUnread != status)) {
+                            member.msgUnread = status;
+                            member.newsUnread = status;
+                            isUpdate = true;
+                        }
+                        logger.debug("markReadOrUnread msgUnread::{}, newsUnread::{}, status::{}",
+                                member.msgUnread, member.newsUnread, status);
+                        if (isUpdate) {
                             memberRepo.updateMember(member);
                         }
                     }
@@ -1215,10 +1232,11 @@ public class CommunityViewModel extends AndroidViewModel {
                     String userPk = MainApplication.getInstance().getPublicKey();
                     Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
                     if (member != null) {
-                        if (member.pendingTime > 0 || member.rewardTime > 0 || member.incomeTime > 0) {
+//                        if (member.pendingTime > 0 || member.rewardTime > 0 || member.incomeTime > 0) {
+                        if (member.pendingTime > 0) {
                             member.pendingTime = 0;
-                            member.rewardTime = 0;
-                            member.incomeTime = 0;
+//                            member.rewardTime = 0;
+//                            member.incomeTime = 0;
                             memberRepo.updateMember(member);
                         }
                     }

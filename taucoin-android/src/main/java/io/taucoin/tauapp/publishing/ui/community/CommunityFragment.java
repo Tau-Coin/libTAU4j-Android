@@ -7,7 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
+
+import org.slf4j.LoggerFactory;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -123,6 +126,20 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             ActivityUtil.startActivityForResult(intent, activity, CommunityDetailActivity.class, MEMBERS_REQUEST_CODE);
         });
 
+//        int[] tabs = new int[]{R.string.community_chain_note, R.string.community_chain_market, R.string.community_on_chain};
+//        for (int i = 0; i < tabs.length; i++) {
+//            TabViewBinding tabBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
+//                    R.layout.tab_view, null, false);
+//            tabBinding.tvTabTitle.setText(tabs[0]);
+//            tabBinding.ivTabRed.setVisibility(View.VISIBLE);
+//            TabLayout.Tab tab = binding.tabLayout.newTab();
+//            tab.setCustomView(tabBinding.getRoot());
+//            binding.tabLayout.addTab(tab);
+//        }
+
+        for (int i = 0; i < binding.tabLayout.getTabCount(); i++) {
+            updateTabBadgeDrawable(i, true, false);
+        }
         // 自定义的Adapter继承自FragmentPagerAdapter
         StateAdapter stateAdapter = new StateAdapter(this.getChildFragmentManager(),
                 binding.tabLayout.getTabCount());
@@ -151,6 +168,21 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 //                        showCommunitySubtitle();
                     }
                 });
+    }
+
+    private void updateTabBadgeDrawable(int index, boolean init, boolean visible) {
+        TabLayout.Tab tab = binding.tabLayout.getTabAt(index);
+        if (tab != null) {
+            BadgeDrawable badgeDrawable = tab.getOrCreateBadge();
+            if (init) {
+                int badgeOffset = getResources().getDimensionPixelSize(R.dimen.widget_size_5);
+                badgeDrawable.setHorizontalOffset(-badgeOffset);
+                badgeDrawable.setVerticalOffset(badgeOffset);
+                badgeDrawable.setBackgroundColor(getResources().getColor(R.color.color_red));
+            }
+            // 红点显示并且不在当前tab页
+            badgeDrawable.setVisible(visible && binding.tabLayout.getSelectedTabPosition() != index);
+        }
     }
 
     private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -319,7 +351,11 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                             fragment.handleMember(member);
                         }
                     }
+                    LoggerFactory.getLogger("updateTabBadgeDrawable")
+                            .debug("msgUnread::{}, newsUnread::{}", member.msgUnread, member.newsUnread);
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
+                    updateTabBadgeDrawable(0, false, member.msgUnread == 1);
+                    updateTabBadgeDrawable(1, false, member.newsUnread == 1);
                 }, it -> {}));
     }
 

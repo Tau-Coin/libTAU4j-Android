@@ -221,9 +221,9 @@ public class TauListenHandler {
         saveUserInfo(miner);
         // 添加矿工为社区成员
         Transaction tx = block.getTx();
-        long rewards = null == tx ? 0L : tx.getFee();
-        long rewardTime = rewards > 0 ? DateUtil.getMillisTime() : 0;
-        addMemberInfo(block.getChainID(), miner, rewardTime, 0, 0);
+//        long rewards = null == tx ? 0L : tx.getFee();
+//        long rewardTime = rewards > 0 ? DateUtil.getMillisTime() : 0;
+        addMemberInfo(block.getChainID(), miner, 0);
         // 处理交易信息
         handleTransactionData(block, status);
     }
@@ -394,9 +394,16 @@ public class TauListenHandler {
             // 不是自己发的交易
             if (StringUtil.isNotEmpty(userPk) && StringUtil.isNotEquals(tx.senderPk, userPk)) {
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-                if (member != null && member.msgUnread == 0) {
-                    member.msgUnread = 1;
-                    memberRepo.updateMember(member);
+                if (tx.txType == TxType.NOTE_TX.getType()) {
+                    if (member != null && member.msgUnread == 0) {
+                        member.msgUnread = 1;
+                        memberRepo.updateMember(member);
+                    }
+                } else {
+                    if (member != null && member.newsUnread == 0) {
+                        member.newsUnread = 1;
+                        memberRepo.updateMember(member);
+                    }
                 }
                 UserAndFriend friend = userRepo.getFriend(tx.senderPk);
                 if (friend != null && !friend.isMemBanned) {
@@ -442,13 +449,13 @@ public class TauListenHandler {
         addMemberInfo(txMsg.getChainID(), ByteUtil.toHexString(txMsg.getSender()));
         int txType = txContent.getType();
         if (txType == TxType.WIRING_TX.getType()) {
-            long incomeTime = 0;
+//            long incomeTime = 0;
             long pendingTime = 0;
             if (txMsg.getAmount() > 0) {
-                incomeTime = status == BlockStatus.NEW_BLOCK ? DateUtil.getMillisTime() : 0;
+//                incomeTime = status == BlockStatus.NEW_BLOCK ? DateUtil.getMillisTime() : 0;
                 pendingTime = status == BlockStatus.NEW_TX || status == BlockStatus.SYNCING ? DateUtil.getMillisTime() : 0;
             }
-            addMemberInfo(txMsg.getChainID(), ByteUtil.toHexString(txMsg.getReceiver()), 0, incomeTime, pendingTime);
+            addMemberInfo(txMsg.getChainID(), ByteUtil.toHexString(txMsg.getReceiver()), pendingTime);
         } else if (txType == TxType.TRUST_TX.getType()) {
             TrustContent trustContent = new TrustContent(txMsg.getPayload());
             addMemberInfo(txMsg.getChainID(), ByteUtil.toHexString(trustContent.getTrustedPk()));
@@ -510,7 +517,7 @@ public class TauListenHandler {
      * @param chainID chainID
      */
     private void addMemberInfo(byte[] chainID, String publicKey) {
-        addMemberInfo(chainID, publicKey, 0, 0, 0);
+        addMemberInfo(chainID, publicKey, 0);
     }
 
     /**
@@ -518,7 +525,7 @@ public class TauListenHandler {
      * @param publicKey 公钥
      * @param chainID chainID
      */
-    private void addMemberInfo(byte[] chainID, String publicKey, long rewardTime, long incomeTime, long pendingTime) {
+    private void addMemberInfo(byte[] chainID, String publicKey, long pendingTime) {
         String chainIDStr = ChainIDUtil.decode(chainID);
         Member member = memberRepo.getMemberByChainIDAndPk(chainIDStr, publicKey);
         Account account = daemon.getAccountInfo(chainID, publicKey);
@@ -540,18 +547,18 @@ public class TauListenHandler {
             member.balUpdateTime = DateUtil.getTime();
             member.nonce = nonce;
             member.power = power;
-            if (rewardTime > 0) {
-                member.rewardTime = rewardTime;
-            }
-            if (incomeTime > 0) {
-                member.incomeTime = incomeTime;
-            }
+//            if (rewardTime > 0) {
+//                member.rewardTime = rewardTime;
+//            }
+//            if (incomeTime > 0) {
+//                member.incomeTime = incomeTime;
+//            }
             if (pendingTime > 0) {
                 member.pendingTime = pendingTime;
             }
             memberRepo.addMember(member);
-            logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}, rewardTime::{}," +
-                            " incomeTime::{} ", chainIDStr, publicKey, balance, rewardTime, incomeTime);
+            logger.info("AddMemberInfo to local, chainID::{}, publicKey::{}, balance::{}, pendingTime::{}",
+                    chainIDStr, publicKey, balance, pendingTime);
         } else {
             boolean isUpdate = false;
             if (member.balUpdateTime == 0 || member.balance != balance || member.nonce != nonce || member.power != power) {
@@ -563,18 +570,18 @@ public class TauListenHandler {
                 logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
                         "balance::{}", chainIDStr, publicKey, member.balance);
             }
-            if (rewardTime > 0) {
-                member.rewardTime = rewardTime;
-                isUpdate = true;
-                logger.info("Update Member's rewardTime chainID::{}, publicKey::{}, " +
-                        "rewardTime::{}", chainIDStr, publicKey, member.rewardTime);
-            }
-            if (incomeTime > 0) {
-                member.incomeTime = incomeTime;
-                isUpdate = true;
-                logger.info("Update Member's incomeTime chainID::{}, publicKey::{}, " +
-                        "incomeTime::{}", chainIDStr, publicKey, member.incomeTime);
-            }
+//            if (rewardTime > 0) {
+//                member.rewardTime = rewardTime;
+//                isUpdate = true;
+//                logger.info("Update Member's rewardTime chainID::{}, publicKey::{}, " +
+//                        "rewardTime::{}", chainIDStr, publicKey, member.rewardTime);
+//            }
+//            if (incomeTime > 0) {
+//                member.incomeTime = incomeTime;
+//                isUpdate = true;
+//                logger.info("Update Member's incomeTime chainID::{}, publicKey::{}, " +
+//                        "incomeTime::{}", chainIDStr, publicKey, member.incomeTime);
+//            }
             if (pendingTime > 0) {
                 member.pendingTime = pendingTime;
                 isUpdate = true;

@@ -98,9 +98,9 @@ public class ChooseListAdapter extends ListAdapter<MemberAndAmount, ChooseListAd
             return oldItem.equals(newItem) &&
                     oldItem.balance == newItem.balance &&
                     oldItem.balUpdateTime == newItem.balUpdateTime &&
-                    oldItem.pendingTime == newItem.pendingTime &&
-                    oldItem.rewardTime == newItem.rewardTime &&
-                    oldItem.incomeTime == newItem.incomeTime;
+                    oldItem.pendingTime == newItem.pendingTime;
+//                    oldItem.rewardTime == newItem.rewardTime &&
+//                    oldItem.incomeTime == newItem.incomeTime;
         }
 
         @Override

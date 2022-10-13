@@ -40,6 +40,7 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
     private MarketListAdapter adapter;
     private int filterItem;
     private FragmentTxsMarketTabBinding binding;
+    private boolean isVisibleToUser;
 
     @Nullable
     @Override
@@ -167,6 +168,16 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        this.isVisibleToUser = isVisibleToUser;
+        logger.debug("setUserVisibleHint1::{}", isVisibleToUser);
+        if (communityViewModel != null && isVisibleToUser) {
+            communityViewModel.clearNewsUnread(chainID);
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         txViewModel.observerChainTxs().observe(this, txs -> {
@@ -180,7 +191,9 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
             }
             binding.refreshLayout.setRefreshing(false);
             binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
-            communityViewModel.clearMsgUnread(chainID);
+            if (isVisibleToUser) {
+                communityViewModel.clearNewsUnread(chainID);
+            }
             logger.debug("txs.size::{}", txs.size());
             closeProgressDialog();
             TauNotifier.getInstance().cancelNotify(chainID);

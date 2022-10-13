@@ -11,6 +11,7 @@ public class CommunityAndMember extends Community {
     public long nonce;
     public int joined;
     public int msgUnread;
+    public int newsUnread;
     public int notExpired;
     public int nearExpired;
 
