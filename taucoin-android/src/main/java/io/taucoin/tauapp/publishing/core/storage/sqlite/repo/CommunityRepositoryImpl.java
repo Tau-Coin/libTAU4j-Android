@@ -127,7 +127,7 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     /**
      * 获取用户加入的社区列表
      */
-    public Flowable<List<MemberAndAmount>> observerJoinedCommunityList() {
+    public Flowable<List<Member>> observerJoinedCommunityList() {
         return db.communityDao().observeJoinedCommunityList();
     }
 

@@ -66,7 +66,7 @@ public interface CommunityRepository {
     /**
      * 获取用户加入的社区列表
      */
-    Flowable<List<MemberAndAmount>> observerJoinedCommunityList();
+    Flowable<List<Member>> observerJoinedCommunityList();
 
     /**
      * 获取用户加入的所有社区列表

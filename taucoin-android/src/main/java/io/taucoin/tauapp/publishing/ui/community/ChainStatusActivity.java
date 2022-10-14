@@ -137,10 +137,10 @@ public class ChainStatusActivity extends BaseActivity {
 
         if (null == mStatus || mStatus.balUpdateTime != status.balUpdateTime) {
             String balance = FmtMicrometer.fmtBalance(status.balance);
-            String time = DateUtil.formatTime(status.balUpdateTime, DateUtil.pattern14);
-            String balanceAndTime = getResources().getString(R.string.drawer_balance_time_no_title,
-                    balance, time);
-            binding.itemBalance.setRightText(balanceAndTime);
+//            String time = DateUtil.formatTime(status.balUpdateTime, DateUtil.pattern14);
+//            String balanceAndTime = getResources().getString(R.string.drawer_balance_time_no_title,
+//                    balance, time);
+            binding.itemBalance.setRightText(balance);
         }
 
         if (null == mStatus || mStatus.power != status.power) {

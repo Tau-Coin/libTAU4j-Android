@@ -90,12 +90,13 @@
     <string name="drawer_crypto_cities">Crypto Cities</string>
     <string name="drawer_send_and_airdrop_coins">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
+    <string name="drawer_pending_balance">Pending Balance</string>
     <string name="drawer_power">Power</string>
-    <string name="drawer_balance_time">Balance %1$s on %2$s</string>
-    <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Power %1$s Balance <font color="#f19322"><b>%2$s</b></font> on %3$s]]></Data></string>
+    <string name="drawer_balance_time">Pending Balance %1$s</string>
+    <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Pending Balance <font color="#f19322"><b>%1$s</b></font> Power %2$s]]></Data></string>
     <string name="drawer_balance_name_color" formatted="false"><Data><![CDATA[%1$s <font color="#f19322">%2$s</font>]]></Data></string>
     <string name="drawer_balance_time_no_title">%1$s on %2$s</string>
-    <string name="drawer_balance_time_color_no_title" formatted="false"><Data><![CDATA[<font color="#f19322"><b>%1$s</b></font> on %2$s]]></Data></string>
+    <string name="drawer_balance_time_color_no_title" formatted="false"><Data><![CDATA[Pending Balance <font color="#f19322"><b>%1$s</b></font>]]></Data></string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Contacts</string>
     <string name="drawer_wallet">Wallet and Pay</string>
@@ -170,6 +171,7 @@
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>
     <string name="community_mining_income">Mining Income</string>
+    <string name="community_mining_income_pending">Mining Income Pending</string>
     <string name="community_filter_all">All</string>
     <string name="community_chain_note">Chat</string>
     <string name="community_chain_market">News</string>
@@ -216,6 +218,7 @@
     <string name="chain_on_chain_blocks">On-chain blocks</string>
     <string name="chain_total_peers">Total Peers</string>
     <string name="chain_peers_blocks">Blocks Self-mined</string>
+    <string name="chain_pending_balance">Pending Balance</string>
     <string name="chain_total_coins">Total Coins</string>
     <string name="chain_access_list">Connected List</string>
     <string name="chain_current_fork">Recent Fork Out</string>
@@ -283,7 +286,7 @@
     <string name="community_post_news">Post %s</string>
     <string name="community_mining_rewards">Rewards for Block %s</string>
     <string name="community_tx_pending">Pending&#8230;</string>
-    <string name="community_tx_confirm_rate" formatted="false"><Data><![CDATA[Confirm Rate <font color="#f19322">%1$d</font>]]></Data></string>
+    <string name="community_tx_confidence" formatted="false"><Data><![CDATA[Confidence <font color="#f19322">%1$d</font>]]></Data></string>
 
     <string name="setting_title">Settings</string>
     <string name="setting_key_explain">Key is private secret for your own; address is public and derived from key.</string>

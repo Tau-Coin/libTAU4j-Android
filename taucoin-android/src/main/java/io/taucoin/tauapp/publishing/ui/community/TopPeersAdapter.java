@@ -67,10 +67,10 @@ public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHol
             holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_yellow));
 
             String balance = FmtMicrometer.fmtBalance(member.balance);
-            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
-            String balanceAndTime = appContext.getResources().getString(R.string.drawer_balance_time_no_title,
-                    balance, time);
-            holder.binding.tvCol3.setText(balanceAndTime);
+//            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
+//            String balanceAndTime = appContext.getResources().getString(R.string.drawer_balance_time_no_title,
+//                    balance);
+            holder.binding.tvCol3.setText(balance);
 
             ViewUtils.updateViewWeight(binding.tvCol2, 3);
             ViewUtils.updateViewWeight(binding.tvCol3, 4);

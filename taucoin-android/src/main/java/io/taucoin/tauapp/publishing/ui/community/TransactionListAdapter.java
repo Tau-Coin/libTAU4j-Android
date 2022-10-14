@@ -65,7 +65,7 @@ public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, Tr
             this.listener = listener;
             Context context = binding.getRoot().getContext();
             resources = context.getResources();
-            confirmRate = resources.getString(R.string.community_tx_confirm_rate);
+            confirmRate = resources.getString(R.string.community_tx_confidence);
             pendingText = resources.getString(R.string.community_tx_pending);
             myPublicKey = MainApplication.getInstance().getPublicKey();
         }

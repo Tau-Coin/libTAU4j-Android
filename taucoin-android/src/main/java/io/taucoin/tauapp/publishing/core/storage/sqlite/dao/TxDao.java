@@ -119,7 +119,7 @@ public interface TxDao {
             " blockHash AS hash, miner AS senderOrMiner, '' AS receiverPk, blockNumber, -1 AS txType, rewards AS amount," +
             " 0 AS fee, timestamp AS createTime, timestamp AS onlineTime, status AS onlineStatus" +
             " FROM Blocks" +
-            " WHERE chainID = :chainID AND miner = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
+            " WHERE chainID = :chainID AND status = 1 AND miner = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
 
     // 查询钱包的收入和支出
     String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = "SELECT * FROM" +

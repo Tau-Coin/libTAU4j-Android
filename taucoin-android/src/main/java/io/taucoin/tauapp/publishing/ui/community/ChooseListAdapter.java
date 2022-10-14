@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.tauapp.publishing.R;
-import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
@@ -21,7 +21,7 @@ import io.taucoin.tauapp.publishing.databinding.ItemCommunityChooseBinding;
 /**
  * 社区选择列表的Adapter
  */
-public class ChooseListAdapter extends ListAdapter<MemberAndAmount, ChooseListAdapter.ViewHolder> {
+public class ChooseListAdapter extends ListAdapter<Member, ChooseListAdapter.ViewHolder> {
     ChooseListAdapter() {
         super(diffCallback);
     }
@@ -40,7 +40,7 @@ public class ChooseListAdapter extends ListAdapter<MemberAndAmount, ChooseListAd
 
     @Override
     public void onBindViewHolder(@NonNull ChooseListAdapter.ViewHolder holder, int position) {
-        MemberAndAmount member = getItem(position);
+        Member member = getItem(position);
         holder.bindCommunity(member);
     }
 
@@ -57,7 +57,7 @@ public class ChooseListAdapter extends ListAdapter<MemberAndAmount, ChooseListAd
         /**
          * 绑定社区数据
          */
-        void bindCommunity(MemberAndAmount member) {
+        void bindCommunity(Member member) {
             if (null == member) {
                 return;
             }
@@ -65,9 +65,9 @@ public class ChooseListAdapter extends ListAdapter<MemberAndAmount, ChooseListAd
             binding.tvName.setText(communityName);
 
             String balance = FmtMicrometer.fmtBalance(member.balance);
-            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
+//            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
             String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_color_no_title,
-                    balance, time);
+                    balance);
             binding.tvBalance.setText(Html.fromHtml(balanceAndTime));
             binding.tvBalancePending.setVisibility(View.GONE);
 
@@ -92,9 +92,9 @@ public class ChooseListAdapter extends ListAdapter<MemberAndAmount, ChooseListAd
         }
     }
 
-    private static final DiffUtil.ItemCallback<MemberAndAmount> diffCallback = new DiffUtil.ItemCallback<MemberAndAmount>() {
+    private static final DiffUtil.ItemCallback<Member> diffCallback = new DiffUtil.ItemCallback<Member>() {
         @Override
-        public boolean areContentsTheSame(@NonNull MemberAndAmount oldItem, @NonNull MemberAndAmount newItem) {
+        public boolean areContentsTheSame(@NonNull Member oldItem, @NonNull Member newItem) {
             return oldItem.equals(newItem) &&
                     oldItem.balance == newItem.balance &&
                     oldItem.balUpdateTime == newItem.balUpdateTime &&
@@ -104,7 +104,7 @@ public class ChooseListAdapter extends ListAdapter<MemberAndAmount, ChooseListAd
         }
 
         @Override
-        public boolean areItemsTheSame(@NonNull MemberAndAmount oldItem, @NonNull MemberAndAmount newItem) {
+        public boolean areItemsTheSame(@NonNull Member oldItem, @NonNull Member newItem) {
             return oldItem.equals(newItem);
         }
     };

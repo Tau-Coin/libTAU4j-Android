@@ -127,10 +127,46 @@ public interface CommunityDao {
             " WHERE m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND c.isBanned = 0";
 
-    String QUERY_COMMUNITY_MEMBER = "SELECT m.* FROM Members m" +
-            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+    String QUERY_COMMUNITY_MEMBER = "SELECT m.*, a.mTotalIncome, b.mIncomePending, c.txIncome, " +
+            " d.txExpenditure, e.txIncomePending, f.txExpenditurePending" +
+            " FROM Members m" +
+            " LEFT JOIN Communities cc ON m.chainID = cc.chainID" +
+            " LEFT JOIN (SELECT chainID, SUM(rewards) AS mTotalIncome FROM Blocks" +
+            " WHERE chainID = :chainID AND miner =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND status = 1" +
+            ") AS a ON m.chainID = a.chainID" +
+
+            " LEFT JOIN (SELECT chainID, SUM(rewards) AS mIncomePending FROM Blocks" +
+            " WHERE chainID = :chainID AND miner =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND status = 1 AND datetime(timestamp, 'unixepoch', 'localtime') > datetime('now','-3 hour','localtime')" +
+            ") AS b ON m.chainID = b.chainID" +
+
+            " LEFT JOIN (SELECT t1.chainID, SUM(amount) AS txIncome FROM Txs t1" +
+            " LEFT JOIN (SELECT txID, timestamp FROM Blocks WHERE chainID = :chainID" +
+            " AND txID IS NOT NULL AND status = 1 GROUP BY txID) AS b1 ON t1.txID = b1.txID" +
+            " WHERE t1.chainID = :chainID AND txType = 2 AND receiverPk =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND txStatus = 1 AND datetime(b1.timestamp, 'unixepoch', 'localtime') > datetime('now','-3 hour','localtime')" +
+            ") AS c ON m.chainID = c.chainID" +
+
+            " LEFT JOIN (SELECT t2.chainID, SUM(amount + fee) AS txExpenditure FROM Txs t2" +
+            " LEFT JOIN (SELECT txID, timestamp FROM Blocks WHERE chainID = :chainID" +
+            " AND txID IS NOT NULL AND status = 1 GROUP BY txID) AS b2 ON t2.txID = b2.txID" +
+            " WHERE t2.chainID = :chainID AND txType IN (2, 3, 4, 5, 6) AND senderPk =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND txStatus = 1 AND datetime(b2.timestamp, 'unixepoch', 'localtime') > datetime('now','-3 hour','localtime')" +
+            ") AS d ON m.chainID = d.chainID" +
+
+            " LEFT JOIN (SELECT chainID, SUM(amount) AS txIncomePending FROM Txs" +
+            " WHERE chainID = :chainID AND txType = 2 AND receiverPk =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND txStatus = 0 AND datetime(timestamp / 1000, 'unixepoch', 'localtime') > datetime('now','-24 hour','localtime')" +
+            ") AS e ON m.chainID = e.chainID" +
+
+            " LEFT JOIN (SELECT chainID, SUM(amount + fee) AS txExpenditurePending FROM Txs" +
+            " WHERE chainID = :chainID AND txType IN (2, 3, 4, 5, 6) AND senderPk =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND txStatus = 0 AND datetime(timestamp / 1000, 'unixepoch', 'localtime') > datetime('now','-24 hour','localtime')" +
+            ") AS f ON m.chainID = f.chainID" +
+
             " WHERE m.chainID =:chainID AND m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " AND c.isBanned = 0 limit 1";
+            " AND cc.isBanned = 0 limit 1";
 
     String QUERY_ALL_JOINED_COMMUNITY = "SELECT c.*" +
             " FROM Communities c" +
@@ -234,7 +270,7 @@ public interface CommunityDao {
      * 获取用户加入的社区列表
      */
     @Query(QUERY_JOINED_COMMUNITY)
-    Flowable<List<MemberAndAmount>> observeJoinedCommunityList();
+    Flowable<List<Member>> observeJoinedCommunityList();
 
     @Query(QUERY_COMMUNITY_MEMBER)
     Flowable<MemberAndAmount> observeMemberAndAmount(String chainID);

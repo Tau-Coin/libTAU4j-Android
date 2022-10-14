@@ -103,7 +103,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         if (null == status) {
             return;
         }
-        binding.itemMiningIncome.setRightText(FmtMicrometer.fmtBalance(status.totalRewards));
+//        binding.itemMiningIncome.setRightText(FmtMicrometer.fmtBalance(status.totalRewards));
         binding.itemLastBlock.setRightText(FmtMicrometer.fmtLong(status.headBlock));
         binding.itemDifficulty.setRightText(FmtMicrometer.fmtLong(status.difficulty));
     }
@@ -113,20 +113,31 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
      */
     private void loadMemberData(MemberAndAmount member) {
         long balance = 0;
+        long pendingBalance = 0;
         long power = 0;
-        long balUpdateTime = 0;
+        long miningIncome = 0;
+        long mIncomePending = 0;
         if (member != null) {
-            balance = member.balance;
-            balUpdateTime = member.balUpdateTime;
             power = member.power;
-        }
+            long onChainBalance = member.mIncomePending + member.txIncome - member.txExpenditure;
+            pendingBalance = onChainBalance + member.txIncomePending - member.txExpenditurePending;
+            // 余额根据libTAU balance减去计算上链为100%的金额
+            balance = member.balance - onChainBalance;
+            balance = Math.max(0, balance);
 
-        String balanceStr = FmtMicrometer.fmtBalance(balance);
-        String time = DateUtil.formatTime(balUpdateTime, DateUtil.pattern14);
-        String balanceShow;
-        balanceShow = getResources().getString(R.string.drawer_balance_time_no_title,
-                balanceStr, time);
-        binding.itemBalance.setRightText(Html.fromHtml(balanceShow));
+            logger.debug("loadMemberData balance::{}, showBalance::{}, onChainBalance::{}, pendingBalance::{}," +
+                            " mTotalIncome::{}, mIncomePending::{}",
+                    member.balance, balance, onChainBalance, pendingBalance,
+                    member.mTotalIncome, member.mIncomePending);
+
+            mIncomePending = member.mIncomePending;
+            miningIncome = member.mTotalIncome - mIncomePending;
+            miningIncome = Math.max(0, miningIncome);
+        }
+        binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance));
+        binding.itemPendingBalance.setRightText(FmtMicrometer.fmtLong(pendingBalance));
+        binding.itemMiningIncome.setRightText(FmtMicrometer.fmtLong(miningIncome));
+        binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(mIncomePending));
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
     }
 

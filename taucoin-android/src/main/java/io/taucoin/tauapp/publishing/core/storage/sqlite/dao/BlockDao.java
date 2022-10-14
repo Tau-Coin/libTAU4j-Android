@@ -32,9 +32,9 @@ public interface BlockDao {
             " ORDER BY balance DESC, nonce DESC, publicKey COLLATE UNICODE DESC";
 
     String QUERY_CHAIN_STATUS = "SELECT a.syncingHeadBlock, a.headBlock, a.consensusBlock, a.difficulty, a.forkPoint," +
-            " c.peerBlocks, c.totalRewards, d.totalPeers, d.totalCoin, e.balance, e.power, e.balUpdateTime" +
+            " c.peerBlocks, d.totalPeers, d.totalCoin, e.balance, e.power, e.balUpdateTime" +
             " FROM Communities a" +
-            " LEFT JOIN (SELECT bb.chainID, count(*) AS peerBlocks, SUM(rewards) AS totalRewards" +
+            " LEFT JOIN (SELECT bb.chainID, count(*) AS peerBlocks" +
             " FROM Blocks bb" +
             " LEFT JOIN Communities cc ON bb.chainID = cc.chainID" +
             " WHERE bb.chainID = :chainID AND bb.blockNumber >= 0" +
