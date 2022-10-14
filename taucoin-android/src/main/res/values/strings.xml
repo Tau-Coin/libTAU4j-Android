@@ -139,10 +139,11 @@
     removed from \"setting>privacy>blacklist\".]]></Data></string>
 
     <string name="community_input_hint">Message</string>
-    <string name="community_users_stats_c">&#160;-&#160;linked&#160;%1$d</string>
+    <string name="community_users_stats_c">&#160;-&#160;Linked&#160;%1$d</string>
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">Discovering</string>
-    <string name="community_users_mining">Mining Competing</string>
+    <string name="community_users_mining_missed">Mining Missed</string>
+    <string name="community_users_mining_block">Mining Block</string>
     <string name="community_users_doze">Doze</string>
     <string name="common_loading">loading&#8230;</string>
 

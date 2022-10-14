@@ -252,10 +252,14 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                         miningTime = maxMiningTime;
                     }
                     double rate = (maxMiningTime - miningTime) * 100f / maxMiningTime;
-                    subtitle.append(getString(R.string.community_users_mining));
-                    subtitle.append(" ").append(FmtMicrometer.fmtFixedDecimal(rate)).append("%");
-                    if (rate == 100) {
-                        subtitle.append(getString(R.string.chain_mining_syncing));
+                    if (rate < 10) {
+                        subtitle.append(getString(R.string.community_users_mining_missed));
+                    } else {
+                        subtitle.append(getString(R.string.community_users_mining_block));
+                        subtitle.append(" ").append(FmtMicrometer.fmtFixedDecimal(rate)).append("%");
+                        if (rate == 100) {
+                            subtitle.append(getString(R.string.chain_mining_syncing));
+                        }
                     }
                 } else if (miningTime == -100) {
                     subtitle.append(getString(R.string.community_users_doze));
