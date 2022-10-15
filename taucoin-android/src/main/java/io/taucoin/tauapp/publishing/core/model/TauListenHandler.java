@@ -539,7 +539,7 @@ public class TauListenHandler {
         }
 
         logger.info("UpdateMember chainID::{}, publicKey::{}, balance::{}, nonce::{}, power::{}",
-                chainID, publicKey, balance, nonce, power);
+                chainIDStr, publicKey, balance, nonce, power);
 
         if (null == member) {
             member = new Member(chainIDStr, publicKey);
