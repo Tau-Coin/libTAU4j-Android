@@ -1176,9 +1176,11 @@ public class CommunityViewModel extends AndroidViewModel {
         dialogBinding.tvPeer.setTextColor(context.getResources().getColor(R.color.color_black));
         dialogBinding.tvJoin.setText(R.string.common_proceed);
         String currentUser = MainApplication.getInstance().getPublicKey();
-        boolean isNeedCreate = StringUtil.isNotEquals(link.getPeer(), currentUser) &&
+        boolean isNeedCreate = link.isAirdropLink() && StringUtil.isNotEquals(link.getPeer(), currentUser) &&
                 StringUtil.isNotEquals(link.getReferralPeer(), currentUser);
-        dialogBinding.tvReferral.setVisibility(isNeedCreate && link.isAirdropLink() ? View.VISIBLE : View.GONE);
+        dialogBinding.llReferralLink.setVisibility(isNeedCreate ? View.VISIBLE : View.GONE);
+        String linkStr = LinkUtil.encodeAirdropReferral(link, currentUser);
+        dialogBinding.tvReferralLink.setText(linkStr);
         CommonDialog longTimeCreateDialog = new CommonDialog.Builder(activity)
                 .setContentView(dialogBinding.getRoot())
                 .setCanceledOnTouchOutside(false)
@@ -1192,14 +1194,14 @@ public class CommunityViewModel extends AndroidViewModel {
             }
         });
         dialogBinding.tvJoin.setOnClickListener(view -> {
-                longTimeCreateDialog.closeDialog();
+            longTimeCreateDialog.closeDialog();
             if (listener != null) {
                 listener.proceed();
             }
         });
-        dialogBinding.tvReferral.setOnClickListener(view -> {
-            String linkStr = LinkUtil.encodeAirdropReferral(link, currentUser);
-            CopyManager.copyText(activity.getString(R.string.main_referral_link_text, linkStr));
+        dialogBinding.tvReferralCopy.setOnClickListener(view -> {
+            longTimeCreateDialog.closeDialog();
+            CopyManager.copyText(linkStr);
             ToastUtils.showShortToast(R.string.main_referral_link_copy);
         });
         return longTimeCreateDialog;

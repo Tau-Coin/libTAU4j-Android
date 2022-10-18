@@ -63,10 +63,10 @@
     <string name="main_airdrop_link_peer" formatted="false"><Data><![CDATA[<font color="#000000">%1$s</font> sends you an airdrop link to receive free coins.]]></Data></string>
     <string name="main_chain_join_success" formatted="false"><Data><![CDATA[Welcome to join us. I\'m <font color="#000000">%1$s</font>, the creator of this community.]]></Data></string>
     <string name="main_airdrop_link_share">Share link to airdrop to friends.</string>
-    <string name="main_referral_link_create">Create Referral Link</string>
-    <string name="main_referral_link_copy">Referral Link is already in the clipboard.</string>
+    <string name="main_referral_link_create">Copy Referral Link</string>
+    <string name="main_referral_link_copy">Referral link copied</string>
     <string name="main_referral_link_text">This is your referral airdrop link. Send to your friends.
-        When they click, you will receive Y coins up to 10*Y coins.\n%s </string>
+        When they click, you will receive Y coins up to 10*Y coins. </string>
 
     <string name="main_publish_video">Publish Video</string>
     <string name="main_community_settings">Community Settings</string>
