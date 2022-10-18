@@ -26,9 +26,9 @@ import io.taucoin.tauapp.publishing.core.model.data.BlockStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.ChainStatus;
 import io.taucoin.tauapp.publishing.core.model.data.ForkPoint;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
-import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.HashUtil;
+import io.taucoin.tauapp.publishing.core.utils.Logarithm;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.databinding.ActivityChainStatusBinding;
 import io.taucoin.tauapp.publishing.databinding.ReloadChainDialogBinding;
@@ -144,7 +144,8 @@ public class ChainStatusActivity extends BaseActivity {
         }
 
         if (null == mStatus || mStatus.power != status.power) {
-            binding.itemPower.setRightText(FmtMicrometer.fmtLong(status.power));
+            long power = Logarithm.log2(status.power);
+            binding.itemPower.setRightText(FmtMicrometer.fmtLong(power));
         }
         if (null == mStatus || StringUtil.isNotEquals(mStatus.forkPoint, status.forkPoint)) {
             if (StringUtil.isNotEmpty(status.forkPoint)) {

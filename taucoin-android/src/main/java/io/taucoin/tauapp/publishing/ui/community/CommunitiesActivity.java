@@ -20,6 +20,7 @@ import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
+import io.taucoin.tauapp.publishing.core.utils.Logarithm;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityCommunitiesBinding;
@@ -118,7 +119,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         long miningIncome = 0;
         long mIncomePending = 0;
         if (member != null) {
-            power = member.power;
+            power = Logarithm.log2(member.power);
             long onChainBalance = member.mIncomePending + member.txIncome - member.txExpenditure;
             pendingBalance = onChainBalance + member.txIncomePending - member.txExpenditurePending;
             // 余额根据libTAU balance减去计算上链为100%的金额
