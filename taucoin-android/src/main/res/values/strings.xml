@@ -569,9 +569,10 @@
     <string name="bot_airdrop_tau_link">Airdrop Link</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share Airdrop link</string>
-    <string name="bot_share_airdrop_link_content">Please receive %1$s \"%2$s\" coins.\n1.
+    <string name="bot_share_airdrop_link_content">Hi, I am sending you free \"%1$s\" community crypto coins.\n1.
         We use taucoin.io wallet, which is a safe and secure server-less app.\n2.
-        Paste this FULL message below to the app \"Paste Link\" function to receive coins.\n\n%3$s</string>
+        Paste this FULL message to TAU app \"Paste Link\" function so you receive %2$s \"%3$s\" coins.\n3.
+        You will receive referral link to gain bonus by introduce to friends.\n\n%4$s</string>
     <string name="bot_hello_world">HelloWorld</string>
 
     <!-- Strings used for QRCode -->
