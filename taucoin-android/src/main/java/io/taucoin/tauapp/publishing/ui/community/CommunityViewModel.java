@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -88,6 +89,7 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.tauapp.publishing.core.utils.BitmapUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
+import io.taucoin.tauapp.publishing.core.utils.CopyManager;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
@@ -211,19 +213,9 @@ public class CommunityViewModel extends AndroidViewModel {
     /**
      * 添加新的社区到数据库
      * @param chainID
-     * @param chainUrl
-     */
-    public void addCommunity(String chainID, LinkUtil.Link chainUrl) {
-        addCommunity(null, chainID, chainUrl);
-    }
-
-    /**
-     * 添加新的社区到数据库
-     * @param airdropPeer
-     * @param chainID
      * @param link
      */
-    public void addCommunity(String airdropPeer, String chainID, LinkUtil.Link link) {
+    public void addCommunity(String chainID, LinkUtil.Link link) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             Result result = new Result();
             String communityName = ChainIDUtil.getName(chainID);
@@ -1169,13 +1161,6 @@ public class CommunityViewModel extends AndroidViewModel {
             return null;
         }
         long createTime = DateUtil.getTime() / 60 - link.getTimestamp();
-        // 大于5分钟提示；
-        if (createTime <= 1) {
-            if (listener != null) {
-                listener.proceed();
-            }
-            return null;
-        }
         Context context = activity.getApplicationContext();
         ExternalAirdropLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
                 R.layout.external_airdrop_link_dialog, null, false);
@@ -1190,6 +1175,10 @@ public class CommunityViewModel extends AndroidViewModel {
         dialogBinding.tvPeer.setText(activity.getString(contentRid, createTime));
         dialogBinding.tvPeer.setTextColor(context.getResources().getColor(R.color.color_black));
         dialogBinding.tvJoin.setText(R.string.common_proceed);
+        String currentUser = MainApplication.getInstance().getPublicKey();
+        boolean isNeedCreate = StringUtil.isNotEquals(link.getPeer(), currentUser) &&
+                StringUtil.isNotEquals(link.getReferralPeer(), currentUser);
+        dialogBinding.tvReferral.setVisibility(isNeedCreate && link.isAirdropLink() ? View.VISIBLE : View.GONE);
         CommonDialog longTimeCreateDialog = new CommonDialog.Builder(activity)
                 .setContentView(dialogBinding.getRoot())
                 .setCanceledOnTouchOutside(false)
@@ -1207,6 +1196,11 @@ public class CommunityViewModel extends AndroidViewModel {
             if (listener != null) {
                 listener.proceed();
             }
+        });
+        dialogBinding.tvReferral.setOnClickListener(view -> {
+            String linkStr = LinkUtil.encodeAirdropReferral(link, currentUser);
+            CopyManager.copyText(activity.getString(R.string.main_referral_link_text, linkStr));
+            ToastUtils.showShortToast(R.string.main_referral_link_copy);
         });
         return longTimeCreateDialog;
     }

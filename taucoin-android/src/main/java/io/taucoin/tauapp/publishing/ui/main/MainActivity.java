@@ -566,16 +566,13 @@ public class MainActivity extends ScanTriggerActivity {
      * @param link chain link
      */
     private void openExternalChainLink(LinkUtil.Link link) {
-        String airdropPeer = null;
         if (link.isChainLink()) {
             // 加朋友
             isFriendLink = false;
             userViewModel.addFriend(link.getPeer(), null);
-        } else if (link.isAirdropLink()){
-            airdropPeer = link.getPeer();
         }
         String chainID = link.getData();
-        communityViewModel.addCommunity(airdropPeer, chainID, link);
+        communityViewModel.addCommunity(chainID, link);
     }
 
     /**

@@ -249,10 +249,10 @@ public class TxUtils {
     }
 
     public static SpannableStringBuilder createSpanTxQueue(TxQueueAndStatus tx, boolean isShowNonce) {
-        return createSpanTxQueue(tx, tx.nonce, isShowNonce, null);
+        return createSpanTxQueue(tx, tx.nonce, isShowNonce, null, null);
     }
 
-    public static SpannableStringBuilder createSpanTxQueue(TxQueue tx, QueueOperation operation) {
+    public static SpannableStringBuilder createSpanTxQueue(TxQueue tx, String referralLink, QueueOperation operation) {
 //        if (operation == QueueOperation.INSERT) {
 //            SpanUtils msg = new SpanUtils();
 //            String coinName = ChainIDUtil.getCoinName(tx.chainID);
@@ -269,11 +269,11 @@ public class TxUtils {
 //            msg.append(" as miner fee.");
 //            return msg.create();
 //        }
-        return createSpanTxQueue(tx, 0, false, operation);
+        return createSpanTxQueue(tx, 0, false, referralLink, operation);
     }
 
     private static SpannableStringBuilder createSpanTxQueue(TxQueue tx, long nonce, boolean isShowNonce,
-                                                            QueueOperation operation) {
+                                                            String referralLink, QueueOperation operation) {
         String coinName = ChainIDUtil.getCoinName(tx.chainID);
         SpanUtils msg = new SpanUtils();
         if (tx.content != null) {
@@ -321,7 +321,11 @@ public class TxUtils {
                     msg.append("\n").append("Description: ").append(tx.memo);
                 }
                 if (operation == QueueOperation.INSERT) {
-                    msg.append("\n").append("Community Link ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
+                    if (StringUtil.isNotEmpty(referralLink)) {
+                        msg.append("\n").append("Airdrop Referral Link ").append(referralLink);
+                    } else {
+                        msg.append("\n").append("Community Link ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
+                    }
                 }
             } else if (txType == TxType.AIRDROP_TX.getType()) {
                 AirdropTxContent content = new AirdropTxContent(tx.content);

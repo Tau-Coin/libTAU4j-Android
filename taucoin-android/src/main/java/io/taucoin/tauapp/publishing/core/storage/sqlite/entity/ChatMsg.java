@@ -23,6 +23,7 @@ public class ChatMsg implements Parcelable {
     @NonNull
     public String receiverPk;              // 接收者的公钥
     public String airdropChain;            // 接收者发币的链
+    public String referralPeer;           // airdrop推荐节点
     @NonNull
     public long timestamp;                 // 时间戳
     @NonNull
@@ -54,8 +55,8 @@ public class ChatMsg implements Parcelable {
     }
 
     @Ignore
-    public ChatMsg(@NonNull String hash, String senderPk, String receiverPk, byte[] content,
-                   int contentType, long timestamp, String logicMsgHash, String airdropChain){
+    public ChatMsg(@NonNull String hash, String senderPk, String receiverPk, byte[] content, int contentType,
+                   long timestamp, String logicMsgHash, String airdropChain, String referralPeer){
         this.hash = hash;
         this.senderPk = senderPk;
         this.receiverPk = receiverPk;
@@ -64,6 +65,7 @@ public class ChatMsg implements Parcelable {
         this.timestamp = timestamp;
         this.logicMsgHash = logicMsgHash;
         this.airdropChain = airdropChain;
+        this.referralPeer = referralPeer;
     }
 
     @Ignore

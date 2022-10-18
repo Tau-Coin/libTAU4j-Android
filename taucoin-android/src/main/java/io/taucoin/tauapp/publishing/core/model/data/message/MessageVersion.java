@@ -5,7 +5,7 @@ package io.taucoin.tauapp.publishing.core.model.data.message;
  */
 public enum MessageVersion {
     VERSION1(1),
-    VERSION2(2); // 添加转账
+    VERSION2(2); // 添加referral节点
 
     private int version;
     MessageVersion(int version) {

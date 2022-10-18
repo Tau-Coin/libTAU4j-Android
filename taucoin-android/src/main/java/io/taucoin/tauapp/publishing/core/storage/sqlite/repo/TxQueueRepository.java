@@ -36,6 +36,8 @@ public interface TxQueueRepository {
 
     int getAirdropCount(String chainID, String currentPk, long currentTime);
 
+    int getReferralCount(String chainID, String currentPk, String friendPk, long currentTime);
+
     TxQueue getAirdropTxQueue(String chainID, String currentPk, String friendPk);
 
     Flowable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);

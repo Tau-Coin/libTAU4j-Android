@@ -874,8 +874,10 @@ public class UserViewModel extends AndroidViewModel {
     private void sendDefaultMessage(String friendPk, LinkUtil.Link airdropUrl) {
         String msg;
         String chainID = null;
+        String referralPeer = null;
         int type;
         if (airdropUrl != null) {
+            referralPeer = airdropUrl.getReferralPeer();
             chainID = airdropUrl.getData();
             String communityName = ChainIDUtil.getName(chainID);
             String link = airdropUrl.getLink();
@@ -886,7 +888,7 @@ public class UserViewModel extends AndroidViewModel {
             type = MessageType.TEXT.getType();
         }
         String senderPk = MainApplication.getInstance().getPublicKey();
-        chatViewModel.syncSendMessageTask(senderPk, friendPk, msg, type, chainID);
+        chatViewModel.syncSendMessageTask(senderPk, friendPk, msg, type, chainID, referralPeer);
         logger.info("AddFriendsLocally, syncSendMessageTask::{}", msg);
     }
 

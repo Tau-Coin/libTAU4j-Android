@@ -193,6 +193,8 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             tvMsg.setText(contentStr);
 
             Linkify.addLinks(tvMsg, Linkify.WEB_URLS);
+            Pattern referral = Pattern.compile(LinkUtil.REFERRAL_PATTERN, 0);
+            Linkify.addLinks(tvMsg, referral, null);
             Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
             Linkify.addLinks(tvMsg, airdrop, null);
             Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);

@@ -85,6 +85,8 @@ public class FavoriteListAdapter extends PagedListAdapter<UserAndTx,
             favoriteBinding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NOTES));
             // 添加link解析
             Linkify.addLinks(favoriteBinding.tvMsg, Linkify.WEB_URLS);
+            Pattern referral = Pattern.compile(LinkUtil.REFERRAL_PATTERN, 0);
+            Linkify.addLinks(favoriteBinding.tvMsg, referral, null);
             Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
             Linkify.addLinks(favoriteBinding.tvMsg, airdrop, null);
             Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);

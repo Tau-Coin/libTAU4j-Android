@@ -32,8 +32,8 @@
             android:layout_height="@dimen/widget_size_44"
             android:layout_marginTop="@dimen/widget_size_30"
             android:layout_centerHorizontal="true"
-            android:layout_marginStart="@dimen/widget_size_50"
-            android:layout_marginEnd="@dimen/widget_size_50"
+            android:layout_marginStart="@dimen/widget_size_30"
+            android:layout_marginEnd="@dimen/widget_size_30"
             android:gravity="center_horizontal|center"
             android:background="@drawable/primary_rect_round_bg"
             android:text="@string/common_join"
@@ -43,6 +43,22 @@
 
         <TextView
             android:layout_below="@+id/tv_join"
+            android:id="@+id/tv_referral"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_44"
+            android:layout_marginTop="@dimen/widget_size_20"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="@dimen/widget_size_30"
+            android:layout_marginEnd="@dimen/widget_size_30"
+            android:gravity="center_horizontal|center"
+            android:background="@drawable/primary_rect_round_bg"
+            android:text="@string/main_referral_link_create"
+            android:textAllCaps="false"
+            android:textColor="@color/color_white"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+        <TextView
+            android:layout_below="@+id/tv_referral"
             android:id="@+id/tv_skip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

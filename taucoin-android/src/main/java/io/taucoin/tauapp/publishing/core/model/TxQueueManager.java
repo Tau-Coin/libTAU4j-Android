@@ -277,7 +277,7 @@ class TxQueueManager {
 
     private boolean sendTxQueue(Account account, TxQueueAndStatus txQueue) {
         boolean isSendMessage = false;
-        if (txQueue.queueType == 1) {
+        if (txQueue.queueType == 1 || txQueue.queueType == 2) {
             long medianFee = Constants.WIRING_MIN_FEE.longValue();
             if (txQueue.fee != medianFee) {
                 txQueue.fee = medianFee;

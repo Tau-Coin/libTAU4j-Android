@@ -297,7 +297,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
      */
     private void openExternalChainLink(LinkUtil.Link link) {
         String chainID = link.getData();
-        communityViewModel.addCommunity(link.getPeer(), chainID, link);
+        communityViewModel.addCommunity(chainID, link);
     }
 
     /**

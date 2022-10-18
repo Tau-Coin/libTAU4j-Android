@@ -44,6 +44,7 @@ class DatabaseMigration {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             // 添加mining power
             database.execSQL("ALTER TABLE Members ADD COLUMN newsUnread INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE ChatMessages ADD COLUMN referralPeer TEXT");
         }
     };
 }

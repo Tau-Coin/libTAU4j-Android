@@ -75,6 +75,11 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     }
 
     @Override
+    public int getReferralCount(String chainID, String currentPk, String friendPk, long currentTime) {
+        return db.txQueueDao().getReferralCount(chainID, currentPk, friendPk, currentTime);
+    }
+
+    @Override
     public TxQueue getAirdropTxQueue(String chainID, String currentPk, String friendPk) {
         return db.txQueueDao().getAirdropTxQueue(chainID, currentPk, friendPk);
     }

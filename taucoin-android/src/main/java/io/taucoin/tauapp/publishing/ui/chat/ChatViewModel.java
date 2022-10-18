@@ -234,7 +234,7 @@ public class ChatViewModel extends AndroidViewModel {
      * @param type 消息类型
      */
     public Result syncSendMessageTask(String senderPk, String friendPk, String text, int type) {
-        return syncSendMessageTask(getApplication(), senderPk, friendPk, text, type, null);
+        return syncSendMessageTask(getApplication(), senderPk, friendPk, text, type, null, null);
     }
 
     /**
@@ -244,9 +244,11 @@ public class ChatViewModel extends AndroidViewModel {
      * @param text 消息
      * @param type 消息类型
      * @param airdropChain 发币的链
+     * @param referralPeer 推荐节点
      */
-    public Result syncSendMessageTask(String senderPk, String friendPk, String text, int type, String airdropChain) {
-        return syncSendMessageTask(getApplication(), senderPk, friendPk, text, type, airdropChain);
+    public Result syncSendMessageTask(String senderPk, String friendPk, String text, int type,
+                                      String airdropChain, String referralPeer) {
+        return syncSendMessageTask(getApplication(), senderPk, friendPk, text, type, airdropChain, referralPeer);
     }
 
     /**
@@ -259,7 +261,7 @@ public class ChatViewModel extends AndroidViewModel {
      */
     public static Result syncSendMessageTask(Context context, String senderPk, String friendPk,
                                              String text, int type) {
-        return syncSendMessageTask(context, senderPk, friendPk, text, type, null);
+        return syncSendMessageTask(context, senderPk, friendPk, text, type, null, null);
     }
 
     /**
@@ -267,14 +269,18 @@ public class ChatViewModel extends AndroidViewModel {
      * @param context Context
      */
     public static Result syncSendMessageTask(Context context, TxQueue tx, QueueOperation operation) {
+        return syncSendMessageTask(context, tx, null, operation);
+    }
+
+    public static Result syncSendMessageTask(Context context, TxQueue tx, String referralLink, QueueOperation operation) {
         // 自己发给自己的wiring交易，并且交易金额为0；不发送点对点消息
         if (null == tx || (operation == QueueOperation.INSERT && tx.txType == TxType.WIRING_TX.getType() &&
                 StringUtil.isEquals(tx.senderPk, tx.receiverPk) && tx.amount <= 0 )) {
             return null;
         }
-        String text = TxUtils.createSpanTxQueue(tx, operation).toString();
+        String text = TxUtils.createSpanTxQueue(tx, referralLink, operation).toString();
         return syncSendMessageTask(context, tx.senderPk, tx.receiverPk, text,
-                MessageType.WIRING.getType(), tx.chainID);
+                MessageType.WIRING.getType(), tx.chainID, null);
     }
 
     /**
@@ -284,7 +290,7 @@ public class ChatViewModel extends AndroidViewModel {
     public static Result syncSendMessageTask(Context context, Tx tx, long timestamp, QueueOperation operation) {
         String text = TxUtils.createSpanTxQueue(tx, timestamp, operation).toString();
         return syncSendMessageTask(context, tx.senderPk, tx.receiverPk, text,
-                MessageType.WIRING.getType(), tx.chainID);
+                MessageType.WIRING.getType(), tx.chainID, null);
     }
 
     /**
@@ -297,9 +303,8 @@ public class ChatViewModel extends AndroidViewModel {
      * @param chainID 发币的链
      */
     public static Result syncSendMessageTask(Context context, String senderPk, String friendPk,
-                     String text, int type, String chainID) {
+                     String text, int type, String chainID, String referralPeer) {
         Result result = new Result();
-        UserRepository userRepo = RepositoryHelper.getUserRepository(context);
         ChatRepository chatRepo = RepositoryHelper.getChatRepository(context);
         TauDaemon daemon = TauDaemon.getInstance(context);
         AppDatabase.getInstance(context).runInTransaction(() -> {
@@ -322,7 +327,7 @@ public class ChatViewModel extends AndroidViewModel {
                     currentTime = Math.max(currentTime, myLastSendTime + 1);
                     // 3、更新自己发送的最后一条的时间
                     myLastSendTime = currentTime;
-                    MsgContent msgContent = MsgContent.createContent(logicMsgHash, type, content, chainID);
+                    MsgContent msgContent = MsgContent.createContent(logicMsgHash, type, content, chainID, referralPeer);
                     byte[] encoded = msgContent.getEncoded();
                     Message message = new Message(currentTime, ByteUtil.toByte(senderPk),
                             ByteUtil.toByte(friendPk), encoded);
@@ -335,7 +340,7 @@ public class ChatViewModel extends AndroidViewModel {
                     boolean isSuccess = daemon.addNewMessage(message);
                     // 组织Message的结构，并发送到DHT和数据入库
                     ChatMsg chatMsg = new ChatMsg(hash, senderPk, friendPk, content, type,
-                            currentTime, logicMsgHash, chainID);
+                            currentTime, logicMsgHash, chainID, referralPeer);
                     messages[nonce] = chatMsg;
 
                     // 更新消息日志信息
@@ -376,7 +381,8 @@ public class ChatViewModel extends AndroidViewModel {
             String sender = chatMsg.senderPk;
             String receiver = chatMsg.receiverPk;
             String logicMsgHash = chatMsg.logicMsgHash;
-            MsgContent msgContent = MsgContent.createTextContent(logicMsgHash, chatMsg.content, chatMsg.airdropChain);
+            MsgContent msgContent = MsgContent.createContent(logicMsgHash, chatMsg.contentType,
+                    chatMsg.content, chatMsg.airdropChain, chatMsg.referralPeer);
             byte[] encoded = msgContent.getEncoded();
             Message message = new Message(timestamp, ByteUtil.toByte(sender),
                     ByteUtil.toByte(receiver), encoded);

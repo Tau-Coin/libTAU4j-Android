@@ -24,7 +24,7 @@ public class TxQueue implements Parcelable {
     public String senderPk;                 // 交易发送者的公钥
     @NonNull
     public String receiverPk;               // 交易接收者的公钥
-    public int queueType;                   // 队列类型，0：手动触发，1：airdrop自动触发
+    public int queueType;                   // 队列类型，0：手动触发，1：airdrop自动触发 2: referral自动触发
     public long queueTime;                  // 添加队列的时间
     public long amount;                     // 交易金额
     public long fee;                        // 交易费

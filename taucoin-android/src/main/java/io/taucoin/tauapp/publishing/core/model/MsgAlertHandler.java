@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 
 import org.libTAU4j.Account;
+import org.libTAU4j.Ed25519;
 import org.libTAU4j.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
+import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.Utils;
 import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
@@ -112,7 +114,7 @@ class MsgAlertHandler {
                 String logicMsgHash = msgContent.getLogicHash();
                 byte[] content = msgContent.getContent();
                 chatMsg = new ChatMsg(hash, senderPk, receiverPk, content, msgContent.getType(),
-                        sentTime, logicMsgHash, msgContent.getAirdropChain());
+                        sentTime, logicMsgHash, msgContent.getAirdropChain(), msgContent.getReferralPeer());
                 chatRepo.addChatMsg(chatMsg);
 
                 // 标记消息未读, 更新上次交流的时间
@@ -158,7 +160,7 @@ class MsgAlertHandler {
                 // 如果是Airdrop, 则给此消息的发送者airdrop coins
                 if (msgContent.getType() == MessageType.AIRDROP.getType()) {
                     String chainID = msgContent.getAirdropChain();
-                    handleAirdropCoins(chainID, userPk, senderPk);
+                    handleAirdropCoins(chainID, userPk, senderPk, msgContent.getReferralPeer());
                 }
 
                 // 创建通知栏消息
@@ -177,9 +179,9 @@ class MsgAlertHandler {
      * @param currentPk 当前用户
      * @param friendPk 接受airdrop的朋友
      */
-    private void handleAirdropCoins(String chainID, String currentPk, String friendPk) {
-        logger.info("handleAirdropCoins: yourself::{}, currentPk::{}, friendPk::{}, chainID::{}",
-                StringUtil.isEquals(currentPk, friendPk), currentPk, friendPk, chainID);
+    private void handleAirdropCoins(String chainID, String currentPk, String friendPk, String referralPeer) {
+        logger.info("handleAirdropCoins: yourself::{}, currentPk::{}, friendPk::{}, chainID::{}, referralPeer::{}",
+                StringUtil.isEquals(currentPk, friendPk), currentPk, friendPk, chainID, referralPeer);
         if (StringUtil.isEquals(currentPk, friendPk)) {
            return;
         }
@@ -204,8 +206,12 @@ class MsgAlertHandler {
         logger.info("handleAirdropCoins: airdrop progress::{}/{}", airdropCount, member.airdropMembers);
         // airdrop朋友数是否完成
         if (airdropCount >= member.airdropMembers) {
+            ChatViewModel.syncSendMessageTask(appContext, currentPk, friendPk,
+                    appContext.getString(R.string.tx_memo_airdrop_finished),  MessageType.TEXT.getType());
             return;
         }
+
+        // airdrop coins
         String memo = appContext.getString(R.string.tx_memo_airdrop);
         long amount = member.airdropCoins;
         long fee = Constants.WIRING_MIN_FEE.longValue();
@@ -214,12 +220,42 @@ class MsgAlertHandler {
                 TxType.WIRING_TX.getType(), txContent.getEncoded());
         txQueueRepo.addQueue(tx);
 
-        // 余额不足不发送点对点消息
         Account account = daemon.getAccountInfo(ChainIDUtil.encode(chainID), tx.senderPk);
+
+        // 给推荐者发送金额
+        boolean isSendReferralBonus = StringUtil.isNotEmpty(referralPeer) && referralPeer.length()
+                == Ed25519.PUBLIC_KEY_SIZE && StringUtil.isNotEquals(friendPk, referralPeer);
+        if (isSendReferralBonus) {
+            // 最多发送10次
+            int referralCount = txQueueRepo.getReferralCount(chainID, currentPk, referralPeer, currentTime);
+            if (referralCount > 10) {
+                logger.info("handleAirdropCoins: referral count::{}, chainID::{}, currentPk::{}, referralPeer::{}",
+                        referralCount, chainID, currentPk, referralPeer);
+            } else {
+                String referralMemo = appContext.getString(R.string.tx_memo_referral);
+                long referralBonus = member.airdropCoins / 2;
+                referralBonus = Math.max(1, referralBonus);
+                TxContent referralContent = new TxContent(TxType.WIRING_TX.getType(), referralMemo);
+                TxQueue referralTx = new TxQueue(chainID, currentPk, referralPeer, referralBonus, fee, 2,
+                        TxType.WIRING_TX.getType(), referralContent.getEncoded());
+                txQueueRepo.addQueue(referralTx);
+
+                logger.info("handleAirdropCoins: referral count::{}, bonus::{}, chainID::{}, currentPk::{}, referralPeer::{}",
+                        referralCount, referralBonus, chainID, currentPk, referralPeer);
+
+                // 余额不足不发送点对点消息
+                if (tx.amount + referralBonus + fee + fee <= account.getBalance()) {
+                    ChatViewModel.syncSendMessageTask(appContext, referralTx, QueueOperation.INSERT);
+                }
+            }
+        }
+        // 余额不足不发送点对点消息
         if (account != null) {
-            long medianFee = Constants.WIRING_MIN_FEE.longValue();
-            if (tx.amount + medianFee <= account.getBalance()) {
-                ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.INSERT);
+            if (tx.amount + fee <= account.getBalance()) {
+                long airdropTime = member.airdropTime / 60 / 1000;
+                String referralLink = LinkUtil.encodeAirdropReferral(member.publicKey, member.chainID, airdropTime, friendPk);
+                logger.debug("handleAirdropCoins referralLink::{}", referralLink);
+                ChatViewModel.syncSendMessageTask(appContext, tx, referralLink, QueueOperation.INSERT);
             }
         }
         daemon.updateTxQueue(tx.chainID);

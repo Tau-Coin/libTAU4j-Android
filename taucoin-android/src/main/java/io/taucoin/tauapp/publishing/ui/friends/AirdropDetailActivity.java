@@ -72,6 +72,13 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
     private void updateAirdropDetail(Member member) {
         this.member = member;
         if (member != null) {
+            String airdropPeer = MainApplication.getInstance().getPublicKey();
+            long airdropTime = member.airdropTime / 60 / 1000;
+            String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, airdropTime);
+            if (StringUtil.isNotEquals(this.airdropLink, airdropLink)) {
+                this.airdropLink = airdropLink;
+                binding.tauLink.setText(airdropLink);
+            }
             if (airdropDisposable != null && !airdropDisposable.isDisposed()) {
                 airdropDisposable.dispose();
             }

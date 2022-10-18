@@ -99,6 +99,11 @@ public interface TxQueueDao {
     String QUERY_AIRDROP_COUNT = "SELECT count(*) FROM TxQueues" +
             " WHERE chainID = :chainID AND senderPk = :currentPk" +
             " AND queueTime >= :currentTime AND queueType = 1";
+
+    String QUERY_REFERRAL_COUNT = "SELECT count(*) FROM TxQueues" +
+            " WHERE chainID = :chainID AND senderPk = :currentPk" +
+            " AND receiverPk = :friendPk " +
+            " AND queueTime >= :currentTime AND queueType = 2";
     /**
      * 入队列
      */
@@ -137,6 +142,10 @@ public interface TxQueueDao {
 
     @Query(QUERY_AIRDROP_COUNT)
     int getAirdropCount(String chainID, String currentPk, long currentTime);
+
+    @Query(QUERY_REFERRAL_COUNT)
+    int getReferralCount(String chainID, String currentPk, String friendPk, long currentTime);
+
 
     @Query(QUERY_AIRDROP_COUNT_ON_CHAIN)
     Flowable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);

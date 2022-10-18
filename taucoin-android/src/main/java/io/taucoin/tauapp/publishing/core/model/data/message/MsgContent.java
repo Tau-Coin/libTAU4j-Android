@@ -12,14 +12,10 @@ public class MsgContent {
     private int type;                       // 可以标识消息类型
     private byte[] content;                 // 原始消息体
     private String airdropChain;            // 发币的链
+    private String referralPeer;            // airdrop推荐节点
 
-    public static MsgContent createTextContent(String logicMsgHash, byte[] content, String airdropChain) {
-        return new MsgContent(MessageVersion.VERSION1.getV(), logicMsgHash, MessageType.TEXT.getType(),
-                content, airdropChain);
-    }
-
-    public static MsgContent createContent(String logicMsgHash, int type, byte[] content, String airdropChain) {
-        return new MsgContent(MessageVersion.VERSION1.getV(), logicMsgHash, type, content, airdropChain);
+    public static MsgContent createContent(String logicMsgHash, int type, byte[] content, String airdropChain, String referralPeer) {
+        return new MsgContent(MessageVersion.VERSION2.getV(), logicMsgHash, type, content, airdropChain);
     }
 
     private MsgContent(int version, String logicMsgHash, int type, byte[] content, String airdropChain) {
@@ -45,6 +41,9 @@ public class MsgContent {
         this.type = RLP.decodeInteger(messageList, 2, MessageType.TEXT.getType());
         this.content = RLP.decodeElement(messageList, 3);
         this.airdropChain = RLP.decodeString(messageList, 4, null);
+        if (this.version == MessageVersion.VERSION2.getV() && messageList.size() > 5)  {
+            this.referralPeer = RLP.decodeString(messageList, 5, null);
+        }
     }
 
     public byte[] getEncoded() {
@@ -53,8 +52,9 @@ public class MsgContent {
         byte[] type = RLP.encodeInteger(this.type);
         byte[] content = RLP.encodeElement(this.content);
         byte[] airdropChain = RLP.encodeString(this.airdropChain);
+        byte[] referralPeer = RLP.encodeString(this.referralPeer);
 
-       return RLP.encodeList(version, logicHash, type, content, airdropChain);
+       return RLP.encodeList(version, logicHash, type, content, airdropChain, referralPeer);
     }
 
     public int getVersion() {
@@ -75,5 +75,9 @@ public class MsgContent {
 
     public String getAirdropChain() {
         return airdropChain;
+    }
+
+    public String getReferralPeer() {
+        return referralPeer;
     }
 }

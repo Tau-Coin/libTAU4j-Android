@@ -111,7 +111,7 @@ public class PasteLinkActivity extends BaseActivity {
                         String airdropPeer = decode.getPeer();
                         userViewModel.addAirdropFriend(airdropPeer, decode);
                         String chainID = decode.getData();
-                        communityViewModel.addCommunity(decode.getPeer(), chainID, decode);
+                        communityViewModel.addCommunity(chainID, decode);
                     }
 
                     @Override
