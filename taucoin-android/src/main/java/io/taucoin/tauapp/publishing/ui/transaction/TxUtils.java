@@ -322,9 +322,9 @@ public class TxUtils {
                 }
                 if (operation == QueueOperation.INSERT) {
                     if (StringUtil.isNotEmpty(referralLink)) {
-                        msg.append("\n").append("Airdrop Referral Link ").append(referralLink);
+                        msg.append("\n").append("\n").append("Referral Link: ").append(referralLink);
                     } else {
-                        msg.append("\n").append("Community Link ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
+                        msg.append("\n").append("Community Link: ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
                     }
                 }
             } else if (txType == TxType.AIRDROP_TX.getType()) {

@@ -567,6 +567,7 @@
     <string name="bot_airdrop_participants_progress">Participants Progress</string>
     <string name="bot_airdrop_coins_usage">Coins Usage</string>
     <string name="bot_airdrop_tau_link">Airdrop Link</string>
+    <string name="bot_airdrop_referral_link_tips">\nPlease send referral link to friends to receive %d coins.</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share Airdrop link</string>
     <string name="bot_share_airdrop_link_content">Hi, I am sending you free \"%1$s\" community crypto coins.\n1.

@@ -15,15 +15,16 @@ public class MsgContent {
     private String referralPeer;            // airdrop推荐节点
 
     public static MsgContent createContent(String logicMsgHash, int type, byte[] content, String airdropChain, String referralPeer) {
-        return new MsgContent(MessageVersion.VERSION2.getV(), logicMsgHash, type, content, airdropChain);
+        return new MsgContent(MessageVersion.VERSION2.getV(), logicMsgHash, type, content, airdropChain, referralPeer);
     }
 
-    private MsgContent(int version, String logicMsgHash, int type, byte[] content, String airdropChain) {
+    private MsgContent(int version, String logicMsgHash, int type, byte[] content, String airdropChain, String referralPeer) {
         this.version = version;
         this.logicHash = logicMsgHash;
         this.type = type;
         this.content = content;
         this.airdropChain = airdropChain;
+        this.referralPeer = referralPeer;
     }
 
     public MsgContent(byte[] encode) {

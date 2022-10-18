@@ -223,8 +223,7 @@ class MsgAlertHandler {
         Account account = daemon.getAccountInfo(ChainIDUtil.encode(chainID), tx.senderPk);
 
         // 给推荐者发送金额
-        boolean isSendReferralBonus = StringUtil.isNotEmpty(referralPeer) && referralPeer.length()
-                == Ed25519.PUBLIC_KEY_SIZE && StringUtil.isNotEquals(friendPk, referralPeer);
+        boolean isSendReferralBonus = StringUtil.isNotEmpty(referralPeer) && StringUtil.isNotEquals(friendPk, referralPeer);
         if (isSendReferralBonus) {
             // 最多发送10次
             int referralCount = txQueueRepo.getReferralCount(chainID, currentPk, referralPeer, currentTime);
@@ -255,6 +254,9 @@ class MsgAlertHandler {
                 long airdropTime = member.airdropTime / 60 / 1000;
                 String referralLink = LinkUtil.encodeAirdropReferral(member.publicKey, member.chainID, airdropTime, friendPk);
                 logger.debug("handleAirdropCoins referralLink::{}", referralLink);
+                long referralBonus = member.airdropCoins / 2;
+                referralBonus = Math.max(1, referralBonus);
+                referralLink += appContext.getString(R.string.bot_airdrop_referral_link_tips, referralBonus);
                 ChatViewModel.syncSendMessageTask(appContext, tx, referralLink, QueueOperation.INSERT);
             }
         }
