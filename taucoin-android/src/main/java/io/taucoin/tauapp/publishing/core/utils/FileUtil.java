@@ -37,31 +37,6 @@ public class FileUtil {
 
     public static final String authority = BuildConfig.APPLICATION_ID + ".fileprovider";
 
-    static Bitmap getExternalBitmap(String fileName){
-        boolean isSdCardExist = Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED);
-        if (isSdCardExist) {
-            String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-            String filepath = sdPath + File.separator + BuildConfig.APPLICATION_ID + File.separator + "temp" + File.separator + fileName;
-            File file = new File(filepath);
-            if (file.exists()) {
-                return BitmapFactory.decodeFile(filepath);
-            }
-        }
-        return null;
-    }
-
-    public static void deleteExternalBitmap(){
-        boolean isSdCardExist = Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED);
-        if (isSdCardExist) {
-            String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-            String filepath = sdPath + File.separator + BuildConfig.APPLICATION_ID + File.separator + "temp";
-            File file = new File(filepath);
-            deleteFile(file);
-        }
-    }
-
     /**
      * Delete File
      * @param file target file

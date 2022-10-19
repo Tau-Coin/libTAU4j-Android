@@ -26,6 +26,7 @@ import org.libTAU4j.alerts.CommMsgArrivedAlert;
 import org.libTAU4j.alerts.CommNewMsgAlert;
 import org.libTAU4j.alerts.CommPeerAttentionAlert;
 import org.libTAU4j.alerts.CommUserInfoAlert;
+import org.libTAU4j.alerts.ListenFailedAlert;
 import org.libTAU4j.alerts.ListenSucceededAlert;
 import org.libTAU4j.alerts.PortmapAlert;
 import org.libTAU4j.alerts.PortmapErrorAlert;
@@ -323,9 +324,9 @@ public class TauDaemonAlertHandler {
      * @param alert libTAU上报
      */
     private void onListenFailed(Alert alert) {
-//        ListenFailedAlert a = (ListenFailedAlert) alert;
-//        String interfaces = a.address().toString() + ":" + a.port();
-//        logger.info("onListenFailed IP::{}", interfaces);
+        ListenFailedAlert a = (ListenFailedAlert) alert;
+        String interfaces = a.address().toString() + ":" + a.port();
+        logger.info("onListenFailed IP::{}", interfaces);
 //        settingsRepo.setStringValue(appContext.getString(R.string.pref_key_network_interfaces),
 //                interfaces);
     }

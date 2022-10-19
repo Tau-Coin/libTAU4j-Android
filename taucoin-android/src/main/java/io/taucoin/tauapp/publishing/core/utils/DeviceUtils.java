@@ -7,6 +7,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
 
+import java.io.File;
+
 import androidx.annotation.NonNull;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.core.utils.encrypt.DigestUtils;
@@ -70,6 +72,11 @@ public class DeviceUtils {
      * 获取系统存储空间大小:
      */
     public static long getFreeSpace() {
+        Context context = MainApplication.getInstance();
+        File file = context.getExternalFilesDir(null);
+        if (file != null && file.exists()) {
+            return file.getFreeSpace();
+        }
         return Environment.getExternalStorageDirectory().getFreeSpace();
     }
 
@@ -79,7 +86,7 @@ public class DeviceUtils {
      */
     public static boolean isSpaceInsufficient() {
         try {
-            long freeSpace = Environment.getExternalStorageDirectory().getFreeSpace();
+            long freeSpace = getFreeSpace();
             long totalMemorySize = getRAMTotalMemorySize();
             long insufficient = Math.min(totalMemorySize * 5 / 100, 500 * 1024 * 1024);
             return freeSpace <= insufficient;
