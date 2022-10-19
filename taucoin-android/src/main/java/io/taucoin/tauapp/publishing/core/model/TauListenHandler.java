@@ -669,6 +669,12 @@ public class TauListenHandler {
             String userPK = MainApplication.getInstance().getPublicKey();
             saveUserInfo(userPK);
             addMemberInfo(ChainIDUtil.encode(chainID), userPK);
+            // 默认置顶
+            Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPK);
+            if (member != null) {
+                member.stickyTop = 1;
+                memberRepo.updateMember(member);
+            }
 
             saveUserInfo(peer);
             addMemberInfo(ChainIDUtil.encode(chainID), peer);

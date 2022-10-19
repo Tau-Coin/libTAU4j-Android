@@ -135,8 +135,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             miningIncome = member.mTotalIncome - mIncomePending;
             miningIncome = Math.max(0, miningIncome);
         }
-        binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance));
-        binding.itemPendingBalance.setRightText(FmtMicrometer.fmtLong(pendingBalance));
+        binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));
         binding.itemMiningIncome.setRightText(FmtMicrometer.fmtLong(miningIncome));
         binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(mIncomePending));
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));

@@ -55,6 +55,7 @@ import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.PublicKeyQRContent;
 import io.taucoin.tauapp.publishing.ui.constant.SeedQRContent;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
+import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.friends.FriendsActivity;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.user.SeedActivity;
@@ -101,7 +102,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
     // 扫描线颜色
     private int laserColor;
 
-    private CommonDialog longTimeCreateDialog;
+    private ConfirmDialog longTimeCreateDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -432,7 +433,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
             longTimeCreateDialog.closeDialog();
         }
         longTimeCreateDialog = communityViewModel.showLongTimeCreateDialog(this, link, true,
-                new CommonDialog.ClickListener() {
+                new ConfirmDialog.ClickListener() {
                     @Override
                     public void proceed() {
                         // 加朋友
@@ -456,7 +457,7 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
             longTimeCreateDialog.closeDialog();
         }
         longTimeCreateDialog = communityViewModel.showLongTimeCreateDialog(this, link, true,
-                new CommonDialog.ClickListener() {
+                new ConfirmDialog.ClickListener() {
                     @Override
                     public void proceed() {
                         // 加朋友

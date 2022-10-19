@@ -16,6 +16,7 @@ import io.taucoin.tauapp.publishing.databinding.ActivityCommunityJoinBinding;
 import io.taucoin.tauapp.publishing.databinding.ExternalErrorLinkDialogBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
+import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
 /**
@@ -90,7 +91,7 @@ public class CommunityJoinActivity extends BaseActivity {
     private void handleCommunityLink(String url) {
         LinkUtil.Link decode = LinkUtil.decode(url);
         if (decode.isChainLink()) {
-            communityViewModel.showLongTimeCreateDialog(this, decode, new CommonDialog.ClickListener() {
+            communityViewModel.showLongTimeCreateDialog(this, decode, new ConfirmDialog.ClickListener() {
                 @Override
                 public void proceed() {
                     // 加朋友

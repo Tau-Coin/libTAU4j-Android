@@ -8,18 +8,27 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/widget_size_0"
-        android:paddingEnd="0dp"
-        android:paddingBottom="0dp"
+        android:paddingStart="@dimen/widget_size_10"
+        android:paddingEnd="@dimen/widget_size_0"
+        android:paddingBottom="@dimen/widget_size_30"
         android:background="@color/color_white">
 
+        <ImageView
+            android:id="@+id/iv_skip"
+            android:layout_width="@dimen/widget_size_40"
+            android:layout_height="@dimen/widget_size_40"
+            android:padding="@dimen/widget_size_10"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@null"
+            android:src="@mipmap/icon_close"/>
+
         <TextView
+            android:layout_below="@+id/iv_skip"
             android:id="@+id/tv_peer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_0"
             android:layout_marginStart="@dimen/widget_size_15"
-            android:layout_marginEnd="@dimen/widget_size_15"
+            android:layout_marginEnd="@dimen/widget_size_20"
             android:textColor="@color/gray_dark"
             android:lineSpacingExtra="@dimen/widget_size_5"
             android:text="@string/main_airdrop_link_peer"
@@ -52,7 +61,7 @@
                 android:id="@+id/tv_referral_link"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/widget_size_15"
+                android:layout_marginTop="@dimen/widget_size_0"
                 android:layout_marginStart="@dimen/widget_size_15"
                 android:layout_marginEnd="@dimen/widget_size_15"
                 android:lineSpacingExtra="@dimen/widget_size_5"
@@ -62,9 +71,10 @@
                 android:textAppearance="@style/TextAppearanceBody1"/>
 
             <TextView
+                android:id="@+id/tv_referral_bonus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/widget_size_0"
+                android:layout_marginTop="@dimen/widget_size_15"
                 android:layout_marginStart="@dimen/widget_size_15"
                 android:layout_marginEnd="@dimen/widget_size_15"
                 android:lineSpacingExtra="@dimen/widget_size_2"
@@ -75,7 +85,7 @@
                 android:id="@+id/tv_referral_copy"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/widget_size_44"
-                android:layout_marginTop="@dimen/widget_size_20"
+                android:layout_marginTop="@dimen/widget_size_30"
                 android:layout_marginStart="@dimen/widget_size_30"
                 android:layout_marginEnd="@dimen/widget_size_30"
                 android:gravity="center_horizontal|center"
@@ -86,18 +96,5 @@
                 android:textAppearance="@style/TextAppearanceBody1"/>
 
         </LinearLayout>
-
-        <TextView
-            android:layout_below="@+id/ll_referral_link"
-            android:id="@+id/tv_skip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_20"
-            android:layout_centerHorizontal="true"
-            android:gravity="center_horizontal|center"
-            android:text="@string/common_skip"
-            android:textAllCaps="false"
-            android:textColor="@color/gray_dark"
-            android:textAppearance="@style/TextAppearanceBody2"/>
     </RelativeLayout>
 </layout>

@@ -1,5 +1,6 @@
 package io.taucoin.tauapp.publishing.ui.friends;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -31,6 +32,7 @@ import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
+import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
@@ -44,7 +46,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private CommunityViewModel communityViewModel;
     private UserViewModel userViewModel;
     private AirdropListAdapter adapter;
-    private CommonDialog linkDialog;
+    private Dialog linkDialog;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private boolean linksSelector = false;
 
@@ -133,7 +135,8 @@ public class AirdropCommunityActivity extends BaseActivity implements
                 if (status == AirdropStatus.ON) {
                     String chainID = member.chainID;
                     String airdropPeer = MainApplication.getInstance().getPublicKey();
-                    String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID);
+                    long airdropTime = member.airdropTime / 60 / 1000;
+                    String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, member.airdropCoins, airdropTime);
                     Intent intent = new Intent();
                     intent.putExtra(IntentExtra.AIRDROP_LINK, airdropLink);
                     setResult(RESULT_OK, intent);
@@ -176,15 +179,15 @@ public class AirdropCommunityActivity extends BaseActivity implements
         super.onDestroy();
         disposables.clear();
         if(linkDialog != null){
-            linkDialog.closeDialog();
+            linkDialog.dismiss();
         }
     }
 
     @Override
-    public void onShare(String chainID, long airdropCoins) {
+    public void onShare(String chainID, long airdropCoins, long airdropTime) {
         if (StringUtil.isNotEmpty(chainID)) {
             String airdropPeer = MainApplication.getInstance().getPublicKey();
-            String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID);
+            String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, airdropCoins, airdropTime);
             shareAirdropLink(chainID, airdropLink, airdropCoins);
         }
     }
@@ -219,7 +222,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
                 return false;
             }
             communityViewModel.showLongTimeCreateDialog(this, link,
-                    new CommonDialog.ClickListener() {
+                    new ConfirmDialog.ClickListener() {
                 @Override
                 public void proceed() {
                     showJoinDialog(link);
@@ -242,18 +245,18 @@ public class AirdropCommunityActivity extends BaseActivity implements
         String airdropPeerName = UsersUtil.getShowName(null, link.getPeer());
         String airdropPeerTip = getString(R.string.main_airdrop_link_peer, airdropPeerName);
         dialogBinding.tvPeer.setText(Html.fromHtml(airdropPeerTip));
-        dialogBinding.tvSkip.setOnClickListener(v -> {
+        dialogBinding.ivSkip.setOnClickListener(v -> {
             if (linkDialog != null) {
-                linkDialog.closeDialog();
+                linkDialog.dismiss();
             }
         });
         dialogBinding.tvJoin.setOnClickListener(v -> {
             if (linkDialog != null) {
-                linkDialog.closeDialog();
+                linkDialog.dismiss();
             }
             openExternalAirdropLink(link);
         });
-        linkDialog = new CommonDialog.Builder(this)
+        linkDialog = new ConfirmDialog.Builder(this)
                 .setContentView(dialogBinding.getRoot())
                 .setCanceledOnTouchOutside(false)
                 .create();
@@ -268,7 +271,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
         }
         dialogBinding.tvClose.setOnClickListener(v -> {
             if(linkDialog != null){
-                linkDialog.closeDialog();
+                linkDialog.dismiss();
             }
         });
         linkDialog = new CommonDialog.Builder(this)

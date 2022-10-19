@@ -371,72 +371,70 @@ public class TxUtils {
         SpanUtils msg = new SpanUtils();
         int txType = tx.txType;
         if (operation != null) {
-            msg.append("Funds update: ");
+            msg.append("TX update - ");
             String prefix;
             if (txType == TxType.WIRING_TX.getType()) {
                 prefix = FmtMicrometer.fmtBalance(tx.amount) + " " + coinName;
             } else {
                 prefix = "News";
             }
+            msg.append(prefix);
             if (operation == QueueOperation.ON_CHAIN) {
-                msg.append(prefix);
-                msg.append(" is settled to your account onchain.");
+                msg.append(" is settled.");
             } else if (operation == QueueOperation.ROLL_BACK) {
-                msg.append(prefix);
-                msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName)
-                        .append(" was rolled back due to temporary mining fork.");
+                msg.append(" is rolled back due to temporary mining fork.");
             }
-            msg.append("\n").append("Community: ")
-                    .append(ChainIDUtil.getName(tx.chainID))
-                    .append("\n").append("Transmission ID: ")
-                    .append(HashUtil.hashMiddleHide(String.valueOf(timestamp)));
+//            msg.append("\n").append("Community: ")
+//                    .append(ChainIDUtil.getName(tx.chainID))
+//                    .append("\n").append("Transmission ID: ")
+//                    .append(HashUtil.hashMiddleHide(String.valueOf(timestamp)));
         }
-        if (txType == TxType.WIRING_TX.getType()) {
-            msg.append("\n").append("Amount: ").append(FmtMicrometer.fmtBalance(tx.amount))
-                    .append(" ").append(coinName);
-        }
-        if (tx.fee > 0) {
-            msg.append("\n").append("Fee: ").append(FmtMicrometer.fmtFeeValue(tx.fee))
-                    .append(" ").append(coinName);
-        }
-        if (txType == TxType.WIRING_TX.getType()) {
-            if (null == operation) {
-                msg.append("\n").append("To: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
-            }
-            if (StringUtil.isNotEmpty(tx.memo)) {
-                msg.append("\n").append("Description: ").append(tx.memo);
-            }
-        } else if (txType == TxType.AIRDROP_TX.getType()) {
-            msg.append("\n").append("Link: ").append(tx.link);
-            if (StringUtil.isNotEmpty(tx.memo)) {
-                msg.append("\n").append("Description: ").append(tx.memo);
-            }
-        } else if (txType == TxType.ANNOUNCEMENT.getType()) {
-            msg.append("\n").append("Title: ").append(tx.coinName);
-            if (StringUtil.isNotEmpty(tx.memo)) {
-                msg.append("\n").append("Description: ").append(tx.memo);
-            }
-        } else if (txType == TxType.SELL_TX.getType()) {
-            msg.append("\n").append("Selling: ")
-                    .append(tx.coinName)
-                    .append("\n").append("Quantity: ");
-            if (tx.quantity > 0) {
-                msg.append(String.valueOf(tx.quantity));
-            } else {
-                msg.append("TBD");
-            }
-            if (StringUtil.isNotEmpty(tx.link)) {
-                msg.append("\n").append("Link: ").append(tx.link);
-            }
-            if (StringUtil.isNotEmpty(tx.location)) {
-                msg.append("\n").append("Location: ").append(tx.location);
-            }
-            if (StringUtil.isNotEmpty(tx.memo)) {
-                msg.append("\n").append("Description: ").append(tx.memo);
-            }
-        } else if (txType == TxType.TRUST_TX.getType()) {
-            msg.append("\n").append("Trust: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
-        }
+//        if (txType == TxType.WIRING_TX.getType()) {
+//            msg.append("\n").append("Amount: ").append(FmtMicrometer.fmtBalance(tx.amount))
+//                    .append(" ").append(coinName);
+//        }
+//        if (tx.fee > 0) {
+//            msg.append("\n").append("Fee: ").append(FmtMicrometer.fmtFeeValue(tx.fee))
+//                    .append(" ").append(coinName);
+//        }
+//        if (txType == TxType.WIRING_TX.getType()) {
+//            if (null == operation) {
+//                msg.append("\n").append("To: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
+//            }
+//            if (StringUtil.isNotEmpty(tx.memo)) {
+//                msg.append("\n").append("Description: ").append(tx.memo);
+//            }
+//        } else if (txType == TxType.AIRDROP_TX.getType()) {
+//            msg.append("\n").append("Link: ").append(tx.link);
+//            if (StringUtil.isNotEmpty(tx.memo)) {
+//                msg.append("\n").append("Description: ").append(tx.memo);
+//            }
+//        } else if (txType == TxType.ANNOUNCEMENT.getType()) {
+//            msg.append("\n").append("Title: ").append(tx.coinName);
+//            if (StringUtil.isNotEmpty(tx.memo)) {
+//                msg.append("\n").append("Description: ").append(tx.memo);
+//            }
+//        } else if (txType == TxType.SELL_TX.getType()) {
+//            msg.append("\n").append("Selling: ")
+//                    .append(tx.coinName)
+//                    .append("\n").append("Quantity: ");
+//            if (tx.quantity > 0) {
+//                msg.append(String.valueOf(tx.quantity));
+//            } else {
+//                msg.append("TBD");
+//            }
+//            if (StringUtil.isNotEmpty(tx.link)) {
+//                msg.append("\n").append("Link: ").append(tx.link);
+//            }
+//            if (StringUtil.isNotEmpty(tx.location)) {
+//                msg.append("\n").append("Location: ").append(tx.location);
+//            }
+//            if (StringUtil.isNotEmpty(tx.memo)) {
+//                msg.append("\n").append("Description: ").append(tx.memo);
+//            }
+//        } else if (txType == TxType.TRUST_TX.getType()) {
+//            msg.append("\n").append("Trust: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
+//        }
 
         return msg.create();
     }

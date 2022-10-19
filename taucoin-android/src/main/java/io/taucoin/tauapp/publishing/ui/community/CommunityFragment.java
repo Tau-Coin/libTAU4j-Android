@@ -36,6 +36,7 @@ import io.taucoin.tauapp.publishing.databinding.ExternalAirdropLinkDialogBinding
 import io.taucoin.tauapp.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
+import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.customviews.FragmentStatePagerAdapter;
 import io.taucoin.tauapp.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
@@ -66,7 +67,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private long nodes = 0;
     private long miningTime = -1;
     private boolean isConnectChain = true;
-    private CommonDialog chainStoppedDialog;
+    private boolean isEnterSentTransactions = false;
+    private ConfirmDialog chainStoppedDialog;
 
     @Nullable
     @Override
@@ -96,6 +98,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private void initParameter() {
         if (getArguments() != null) {
             chainID = getArguments().getString(IntentExtra.ID);
+            isEnterSentTransactions = getArguments().getBoolean(IntentExtra.IS_ENTER_SENT_TRANSACTIONS, false);
         }
     }
 
@@ -168,6 +171,10 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 //                        showCommunitySubtitle();
                     }
                 });
+
+        if (isEnterSentTransactions) {
+            binding.viewPager.setCurrentItem(2);
+        }
     }
 
     private void updateTabBadgeDrawable(int index, boolean init, boolean visible) {
@@ -249,16 +256,18 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 if (miningTime >= 0) {
                     int maxMiningTime = 600;
                     if (miningTime > maxMiningTime) {
-                        miningTime = maxMiningTime;
-                    }
-                    double rate = (maxMiningTime - miningTime) * 100f / maxMiningTime;
-                    if (rate < 10) {
-                        subtitle.append(getString(R.string.community_users_mining_missed));
+                        subtitle.append(getString(R.string.community_users_mining_overflow));
                     } else {
-                        subtitle.append(getString(R.string.community_users_mining_block));
-                        subtitle.append(" ").append(FmtMicrometer.fmtFixedDecimal(rate)).append("%");
-                        if (rate == 100) {
-                            subtitle.append(getString(R.string.chain_mining_syncing));
+                        double rate = (maxMiningTime - miningTime) * 1f / maxMiningTime;
+                        rate = Math.sqrt(rate) * 100;
+                        if (rate < 10) {
+                            subtitle.append(getString(R.string.community_users_mining_missed));
+                        } else {
+                            subtitle.append(getString(R.string.community_users_mining_block));
+                            subtitle.append(" ").append(FmtMicrometer.fmtFixedDecimal(rate)).append("%");
+                            if (rate == 100) {
+                                subtitle.append(getString(R.string.chain_mining_syncing));
+                            }
                         }
                     }
                 } else if (miningTime == -100) {
@@ -404,7 +413,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         }
 
         dialogBinding.tvPeer.setTextColor(context.getResources().getColor(R.color.color_black));
-        dialogBinding.tvSkip.setOnClickListener(view -> {
+        dialogBinding.ivSkip.setOnClickListener(view -> {
             if (chainStoppedDialog != null) {
                 chainStoppedDialog.closeDialog();
             }
@@ -415,7 +424,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             }
             TauDaemon.getInstance(activity.getApplicationContext()).restartFailedChain(chainID);
         });
-        chainStoppedDialog = new CommonDialog.Builder(activity)
+        chainStoppedDialog = new ConfirmDialog.Builder(activity)
                 .setContentView(dialogBinding.getRoot())
                 .setCanceledOnTouchOutside(false)
                 .create();
@@ -447,6 +456,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         Bundle bundle = new Bundle();
         bundle.putString(IntentExtra.CHAIN_ID, chainID);
         bundle.putBoolean(IntentExtra.IS_JOINED, isJoined);
+        bundle.putBoolean(IntentExtra.IS_ENTER_SENT_TRANSACTIONS, isEnterSentTransactions);
         tab.setArguments(bundle);
         return tab;
     }

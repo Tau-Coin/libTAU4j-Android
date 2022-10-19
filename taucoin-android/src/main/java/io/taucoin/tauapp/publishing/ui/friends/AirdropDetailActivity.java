@@ -63,10 +63,6 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
         communityViewModel.getAirdropResult().observe(this, result -> {
             this.finish();
         });
-
-        String airdropPeer = MainApplication.getInstance().getPublicKey();
-        airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID);
-        binding.tauLink.setText(airdropLink);
     }
 
     private void updateAirdropDetail(Member member) {
@@ -74,7 +70,7 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
         if (member != null) {
             String airdropPeer = MainApplication.getInstance().getPublicKey();
             long airdropTime = member.airdropTime / 60 / 1000;
-            String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, airdropTime);
+            String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, member.airdropCoins, airdropTime);
             if (StringUtil.isNotEquals(this.airdropLink, airdropLink)) {
                 this.airdropLink = airdropLink;
                 binding.tauLink.setText(airdropLink);

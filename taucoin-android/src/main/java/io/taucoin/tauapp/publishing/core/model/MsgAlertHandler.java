@@ -42,6 +42,7 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
+import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.Utils;
@@ -252,11 +253,14 @@ class MsgAlertHandler {
         if (account != null) {
             if (tx.amount + fee <= account.getBalance()) {
                 long airdropTime = member.airdropTime / 60 / 1000;
-                String referralLink = LinkUtil.encodeAirdropReferral(member.publicKey, member.chainID, airdropTime, friendPk);
+                long airdropCoins = member.airdropCoins;
+                String referralLink = LinkUtil.encodeAirdropReferral(member.publicKey, member.chainID,
+                        airdropCoins, airdropTime, friendPk);
                 logger.debug("handleAirdropCoins referralLink::{}", referralLink);
                 long referralBonus = member.airdropCoins / 2;
                 referralBonus = Math.max(1, referralBonus);
-                referralLink += appContext.getString(R.string.bot_airdrop_referral_link_tips, referralBonus);
+                referralLink += appContext.getString(R.string.bot_airdrop_referral_link_tips,
+                        FmtMicrometer.fmtLong(referralBonus), FmtMicrometer.fmtLong(referralBonus * 10));
                 ChatViewModel.syncSendMessageTask(appContext, tx, referralLink, QueueOperation.INSERT);
             }
         }

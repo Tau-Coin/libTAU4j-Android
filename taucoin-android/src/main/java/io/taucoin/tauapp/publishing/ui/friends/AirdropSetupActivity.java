@@ -10,8 +10,6 @@ import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
@@ -32,7 +30,6 @@ public class AirdropSetupActivity extends BaseActivity {
 
     private ActivityAirdropSetupBinding binding;
     private CommunityViewModel communityViewModel;
-    private ReferralBonusAdapter adapter;
     private String chainID;
 
     @Override
@@ -54,22 +51,15 @@ public class AirdropSetupActivity extends BaseActivity {
 
 //        binding.etCoins.setFilters(new InputFilter[]{new MoneyValueFilter()});
         binding.etCoins.setInputType(InputType.TYPE_CLASS_NUMBER);
-        int[] referralBonuses = getResources().getIntArray(R.array.referral_bonus);
-        adapter = new ReferralBonusAdapter(referralBonuses);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(RecyclerView.HORIZONTAL);
-        binding.rvReferralBonus.setLayoutManager(layoutManager);
-        binding.rvReferralBonus.setAdapter(adapter);
 
         binding.etMembers.addTextChangedListener(textWatcher);
         binding.etCoins.addTextChangedListener(textWatcher);
 
-        updateAirdropCoinsTotal(0F);
+        updateAirdropCoinsTotal();
 
         binding.tvSubmit.setOnClickListener(v -> {
             int members = ViewUtils.getIntText(binding.etMembers);
             float coins = ViewUtils.getFloatText(binding.etCoins);
-//            int referralBonus  = adapter.getSelected();
             if (members <= 0) {
                 ToastUtils.showShortToast(R.string.bot_airdrop_members_error);
                 return;
@@ -78,7 +68,7 @@ public class AirdropSetupActivity extends BaseActivity {
                 ToastUtils.showShortToast(R.string.bot_airdrop_coins_error);
                 return;
             }
-            float airdropTotalCoins = members * coins;
+            float airdropTotalCoins = ViewUtils.getFloatTag(binding.tvTotal);
             long maxTotalCoins = Constants.TOTAL_COIN.divide(Constants.COIN).longValue();
             if (airdropTotalCoins > maxTotalCoins) {
                 ToastUtils.showShortToast(getString(R.string.bot_airdrop_total_coins_error,
@@ -96,7 +86,7 @@ public class AirdropSetupActivity extends BaseActivity {
         });
     }
 
-    private TextWatcher textWatcher = new TextWatcher() {
+    private final TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -104,9 +94,7 @@ public class AirdropSetupActivity extends BaseActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            int members = ViewUtils.getIntText(binding.etMembers);
-            float coins = ViewUtils.getFloatText(binding.etCoins);
-            updateAirdropCoinsTotal(members * coins);
+            updateAirdropCoinsTotal();
         }
 
         @Override
@@ -115,9 +103,19 @@ public class AirdropSetupActivity extends BaseActivity {
         }
     };
 
-    private void updateAirdropCoinsTotal(float total) {
+    private void updateAirdropCoinsTotal() {
+        int members = ViewUtils.getIntText(binding.etMembers);
+        float coins = ViewUtils.getFloatText(binding.etCoins);
+        int referralBonus = (int) (coins / 2);
+        if (coins > 0) {
+            referralBonus = Math.max(referralBonus, 1);
+        }
+        binding.tvReferralBnous.setText(getString(R.string.bot_airdrop_referral_bonus_total,
+                referralBonus));
+        float total = members * (coins + 10 * referralBonus);
         String totalCoins = FmtMicrometer.fmtDecimal(total);
         binding.tvTotal.setText(getString(R.string.bot_airdrop_coins_total_value, totalCoins));
+        binding.tvTotal.setTag(total);
 
         long maxTotalCoins = Constants.TOTAL_COIN.divide(Constants.COIN).longValue();
         boolean isShowError = total > maxTotalCoins;

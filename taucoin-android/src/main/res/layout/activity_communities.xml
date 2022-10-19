@@ -42,17 +42,6 @@
                     app:lineVisibility="false"/>
 
                 <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_pending_balance"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    app:lineLeftTextColor="@color/gray_dark"
-                    app:lineLeftText="@string/drawer_pending_balance"
-                    app:lineRightTextColor="@color/color_yellow"
-                    app:lineVisibility="false"/>
-
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_mining_income"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

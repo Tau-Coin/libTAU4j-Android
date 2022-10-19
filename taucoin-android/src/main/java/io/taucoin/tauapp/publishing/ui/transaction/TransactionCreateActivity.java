@@ -26,6 +26,7 @@ import io.taucoin.tauapp.publishing.core.model.data.UserAndFriend;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
+import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
@@ -37,6 +38,7 @@ import io.taucoin.tauapp.publishing.databinding.ActivityTransactionCreateBinding
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
+import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
 /**
@@ -178,7 +180,16 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
                 ToastUtils.showShortToast(result);
             } else {
                 setResult(RESULT_OK);
-                onBackPressed();
+                if (txQueue != null) {
+                    onBackPressed();
+                } else {
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra(IntentExtra.TYPE, 0);
+                    intent.putExtra(IntentExtra.IS_ENTER_SENT_TRANSACTIONS, true);
+                    ActivityUtil.startActivity(intent, this, MainActivity.class);
+                }
             }
         });
         if (null == txQueue) {

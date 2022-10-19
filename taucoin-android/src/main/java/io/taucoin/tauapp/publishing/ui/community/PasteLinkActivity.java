@@ -24,6 +24,7 @@ import io.taucoin.tauapp.publishing.databinding.ExternalErrorLinkDialogBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
+import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
@@ -105,7 +106,7 @@ public class PasteLinkActivity extends BaseActivity {
                 return;
             }
             communityViewModel.showLongTimeCreateDialog(this, decode,
-                new CommonDialog.ClickListener() {
+                new ConfirmDialog.ClickListener() {
                     @Override
                     public void proceed() {
                         String airdropPeer = decode.getPeer();
@@ -120,7 +121,7 @@ public class PasteLinkActivity extends BaseActivity {
                     }
                 });
         } else if (decode.isChainLink()) {
-            communityViewModel.showLongTimeCreateDialog(this, decode, new CommonDialog.ClickListener() {
+            communityViewModel.showLongTimeCreateDialog(this, decode, new ConfirmDialog.ClickListener() {
                 @Override
                 public void proceed() {
                     // 加朋友

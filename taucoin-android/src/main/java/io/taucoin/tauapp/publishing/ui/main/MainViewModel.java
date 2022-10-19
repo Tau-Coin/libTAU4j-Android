@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -17,11 +18,13 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.tauapp.publishing.BuildConfig;
 import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
+import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 
 /**
  * 主页的ViewModel
@@ -83,14 +86,27 @@ public class MainViewModel extends AndroidViewModel {
             ArrayList<CommunityAndFriend> list = new ArrayList<>();
             if (dataList != null && dataList.size() > 0) {
                 list.addAll(dataList);
-                for(CommunityAndFriend data : dataList) {
+                int stickyOnTop = 0;
+                for (int i = 0; i < dataList.size(); i++) {
+                    CommunityAndFriend data = dataList.get(i);
                     if (data.type == 0) {
+                        if (StringUtil.isEquals(data.ID, BuildConfig.TEST_CHAIN_ID)) {
+                            stickyOnTop = i;
+                        }
                         if (data.joined == 1) {
-                            communities.add(data);
+                            if (stickyOnTop > 0 && stickyOnTop == i) {
+                                communities.add(0, data);
+                            } else {
+                                communities.add(data);
+                            }
                         }
                     } else if (data.type == 1) {
                         friends.add(data);
                     }
+                }
+                if (stickyOnTop > 0) {
+                    CommunityAndFriend data = list.remove(stickyOnTop);
+                    list.add(0, data);
                 }
             }
             homeCommunityData.postValue(communities);

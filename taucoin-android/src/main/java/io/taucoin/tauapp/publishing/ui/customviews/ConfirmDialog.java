@@ -100,4 +100,9 @@ public class ConfirmDialog extends Dialog {
     public void closeDialog(){
         dismiss();
     }
+
+    public interface ClickListener {
+        void proceed();
+        void close();
+    }
 }

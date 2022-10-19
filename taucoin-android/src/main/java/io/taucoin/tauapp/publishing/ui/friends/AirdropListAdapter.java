@@ -105,14 +105,15 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
 
             binding.tvShare.setOnClickListener(v -> {
                 if (adapter.listener != null) {
-                    adapter.listener.onShare(member.chainID, member.airdropCoins);
+                    long airdropTime = member.airdropTime / 60 / 1000;
+                    adapter.listener.onShare(member.chainID, member.airdropCoins, airdropTime);
                 }
             });
         }
     }
 
     interface OnClickListener {
-        void onShare(String chainID, long airdropCoins);
+        void onShare(String chainID, long airdropCoins, long airdropTime);
     }
 
     private static final DiffUtil.ItemCallback<Member> diffCallback = new DiffUtil.ItemCallback<Member>() {

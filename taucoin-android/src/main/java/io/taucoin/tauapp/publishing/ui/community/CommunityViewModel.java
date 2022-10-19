@@ -106,6 +106,7 @@ import io.taucoin.tauapp.publishing.databinding.ExternalAirdropLinkDialogBinding
 import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
+import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.transaction.TxViewModel;
 
 /**
@@ -1147,26 +1148,29 @@ public class CommunityViewModel extends AndroidViewModel {
                 .subscribe();
     }
 
-    public CommonDialog showLongTimeCreateDialog(FragmentActivity activity, LinkUtil.Link link,
-                                                 CommonDialog.ClickListener listener) {
+    public ConfirmDialog showLongTimeCreateDialog(FragmentActivity activity, LinkUtil.Link link,
+                                                  ConfirmDialog.ClickListener listener) {
         return showLongTimeCreateDialog(activity, link, false, listener);
     }
 
-    public CommonDialog showLongTimeCreateDialog(FragmentActivity activity, LinkUtil.Link link,
-                                  boolean isQrCode, CommonDialog.ClickListener listener) {
+    public ConfirmDialog showLongTimeCreateDialog(FragmentActivity activity, LinkUtil.Link link,
+                                  boolean isQrCode, ConfirmDialog.ClickListener listener) {
         if (link.getTimestamp() <= 0) {
             if (listener != null) {
                 listener.proceed();
             }
             return null;
         }
+        String currentUser = MainApplication.getInstance().getPublicKey();
+        boolean isNeedCreateReferral = link.isAirdropLink() && StringUtil.isNotEquals(link.getPeer(), currentUser) &&
+                StringUtil.isNotEquals(link.getReferralPeer(), currentUser);
         long createTime = DateUtil.getTime() / 60 - link.getTimestamp();
         Context context = activity.getApplicationContext();
         ExternalAirdropLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
                 R.layout.external_airdrop_link_dialog, null, false);
         int contentRid;
         if (link.isAirdropLink()) {
-            contentRid = R.string.airdrop_link_long_time;
+            contentRid = isNeedCreateReferral ? R.string.referral_link_long_time : R.string.airdrop_link_long_time;
         } else if (link.isChainLink()) {
             contentRid = isQrCode ? R.string.chain_qr_long_time : R.string.chain_link_long_time;
         } else {
@@ -1175,22 +1179,30 @@ public class CommunityViewModel extends AndroidViewModel {
         dialogBinding.tvPeer.setText(activity.getString(contentRid, createTime));
         dialogBinding.tvPeer.setTextColor(context.getResources().getColor(R.color.color_black));
         dialogBinding.tvJoin.setText(R.string.common_proceed);
-        String currentUser = MainApplication.getInstance().getPublicKey();
-        boolean isNeedCreate = link.isAirdropLink() && StringUtil.isNotEquals(link.getPeer(), currentUser) &&
-                StringUtil.isNotEquals(link.getReferralPeer(), currentUser);
-        dialogBinding.llReferralLink.setVisibility(isNeedCreate ? View.VISIBLE : View.GONE);
+        if (isNeedCreateReferral) {
+            dialogBinding.tvJoin.setVisibility(View.GONE);
+            long referralBonus = link.getCoins() / 2;
+            referralBonus = Math.max(1, referralBonus);
+            dialogBinding.tvReferralBonus.setText(activity.getString(R.string.main_referral_link_text,
+                    FmtMicrometer.fmtLong(referralBonus), FmtMicrometer.fmtLong( 10 * referralBonus)));
+        }
+        dialogBinding.llReferralLink.setVisibility(isNeedCreateReferral ? View.VISIBLE : View.GONE);
         String linkStr = LinkUtil.encodeAirdropReferral(link, currentUser);
         dialogBinding.tvReferralLink.setText(linkStr);
-        CommonDialog longTimeCreateDialog = new CommonDialog.Builder(activity)
+        ConfirmDialog longTimeCreateDialog = new ConfirmDialog.Builder(activity)
                 .setContentView(dialogBinding.getRoot())
                 .setCanceledOnTouchOutside(false)
                 .create();
         longTimeCreateDialog.show();
 
-        dialogBinding.tvSkip.setOnClickListener(view -> {
+        dialogBinding.ivSkip.setOnClickListener(view -> {
             longTimeCreateDialog.closeDialog();
             if (listener != null) {
-                listener.close();
+                if (isNeedCreateReferral) {
+                    listener.proceed();
+                } else {
+                    listener.close();
+                }
             }
         });
         dialogBinding.tvJoin.setOnClickListener(view -> {
@@ -1203,6 +1215,9 @@ public class CommunityViewModel extends AndroidViewModel {
             longTimeCreateDialog.closeDialog();
             CopyManager.copyText(linkStr);
             ToastUtils.showShortToast(R.string.main_referral_link_copy);
+            if (listener != null) {
+                listener.proceed();
+            }
         });
         return longTimeCreateDialog;
     }

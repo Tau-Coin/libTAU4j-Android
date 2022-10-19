@@ -63,10 +63,9 @@
     <string name="main_airdrop_link_peer" formatted="false"><Data><![CDATA[<font color="#000000">%1$s</font> sends you an airdrop link to receive free coins.]]></Data></string>
     <string name="main_chain_join_success" formatted="false"><Data><![CDATA[Welcome to join us. I\'m <font color="#000000">%1$s</font>, the creator of this community.]]></Data></string>
     <string name="main_airdrop_link_share">Share link to airdrop to friends.</string>
-    <string name="main_referral_link_create">Copy Referral Link</string>
+    <string name="main_referral_link_create">Copy Link</string>
     <string name="main_referral_link_copy">Referral link copied</string>
-    <string name="main_referral_link_text">This is your referral airdrop link. Send to your friends.
-        When they click, you will receive Y coins up to 10*Y coins. </string>
+    <string name="main_referral_link_text">Please send to your friends. When they click, you will receive %1$s coins as bonus, up to %2$s coins.</string>
 
     <string name="main_publish_video">Publish Video</string>
     <string name="main_community_settings">Community Settings</string>
@@ -94,7 +93,6 @@
     <string name="drawer_crypto_cities">Crypto Cities</string>
     <string name="drawer_send_and_airdrop_coins">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
-    <string name="drawer_pending_balance">Pending Balance</string>
     <string name="drawer_power">Power</string>
     <string name="drawer_balance_time">Pending Balance %1$s</string>
     <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Pending Balance <font color="#f19322"><b>%1$s</b></font> Power %2$s]]></Data></string>
@@ -108,7 +106,7 @@
     <string name="drawer_setting">Settings</string>
     <string name="drawer_official_telegram">Official Telegram</string>
     <string name="drawer_data_cost">Data Cost</string>
-    <string name="drawer_working_condition">Dash Board</string>
+    <string name="drawer_working_condition">Dashboard</string>
     <string name="drawer_share">Share TAU App</string>
 
     <!-- Strings used for menu -->
@@ -146,7 +144,8 @@
     <string name="community_users_stats_c">&#160;-&#160;Linked&#160;%1$d</string>
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">Discovering</string>
-    <string name="community_users_mining_missed">Mining Missed</string>
+    <string name="community_users_mining_overflow">Overflow</string>
+    <string name="community_users_mining_missed">Previous Mining Missed…resuming…</string>
     <string name="community_users_mining_block">Mining Block</string>
     <string name="community_users_doze">Doze</string>
     <string name="common_loading">loading&#8230;</string>
@@ -214,6 +213,7 @@
     <string name="chain_mining_time_doze">Doze</string>
 <!--    The airdrop was created 3 minutes ago. Do you want to continue?-->
     <string name="airdrop_link_long_time">The airdrop link was created %1$d minutes ago. Do you want to continue?</string>
+    <string name="referral_link_long_time">The link was created %1$d minutes ago. Here is your new referral link.</string>
     <string name="chain_link_long_time">The community\'s link was created %1$d minutes ago. Do you want to continue?</string>
     <string name="chain_qr_long_time">The community\'s QR code was created %1$d minutes ago. Do you want to continue?</string>
     <string name="friend_link_long_time">The friend\'s link was created %1$d minutes ago. Do you want to continue?</string>
@@ -288,7 +288,7 @@
     <string name="community_block_forking">Forking</string>
     <string name="community_transfer_to">Transfer to %s</string>
     <string name="community_transfer_from">Transfer from %s</string>
-    <string name="community_post_news">Post %s</string>
+    <string name="community_post_news">News TX Fee</string>
     <string name="community_mining_rewards">Rewards for Block %s</string>
     <string name="community_tx_pending">Pending&#8230;</string>
     <string name="community_tx_confidence" formatted="false"><Data><![CDATA[Confidence <font color="#f19322">%1$d</font>]]></Data></string>
@@ -563,11 +563,13 @@
     <string name="bot_airdrop_total_coins_error">Airdrop total coins cannot exceed %1$s coins</string>
     <string name="bot_airdrop_coins_hit">Number of coins for each member</string>
     <string name="bot_airdrop_referral_bonus">Referral Bonus</string>
+    <string name="bot_airdrop_referral_bonus_total">Referral Bonus %d coins</string>
     <string name="bot_airdrop_coins_total_value">Total&#160;%1$s&#160;coins</string>
     <string name="bot_airdrop_participants_progress">Participants Progress</string>
     <string name="bot_airdrop_coins_usage">Coins Usage</string>
     <string name="bot_airdrop_tau_link">Airdrop Link</string>
-    <string name="bot_airdrop_referral_link_tips">\nPlease send referral link to friends to receive %d coins.</string>
+    <string name="bot_airdrop_referral_link_tips1">\nPlease send referral link to friends to receive %d coins.</string>
+    <string name="bot_airdrop_referral_link_tips">\nThis is your new referral link. Please send to your friends. When they click, you will receive %1$s coins as bonus, up to %2$s coins.</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share Airdrop link</string>
     <string name="bot_share_airdrop_link_content">Hi, I am sending you free \"%1$s\" community crypto coins.\n1.

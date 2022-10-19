@@ -25,4 +25,5 @@ public class IntentExtra {
     public static final String TIMESTAMP = "timestamp";
     public static final String OPEN_COMMUNITY = "openCommunity";
     public static final String CUSTOM_TAG = "customTag";
+    public static final String IS_ENTER_SENT_TRANSACTIONS = "isEnterSentTransactions";
 }

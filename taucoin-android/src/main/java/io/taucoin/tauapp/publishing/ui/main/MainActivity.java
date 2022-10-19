@@ -70,6 +70,7 @@ import io.taucoin.tauapp.publishing.ui.community.CommunityCreateActivity;
 import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
+import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.download.DownloadViewModel;
 import io.taucoin.tauapp.publishing.ui.friends.AirdropCommunityActivity;
 import io.taucoin.tauapp.publishing.ui.friends.FriendsActivity;
@@ -97,7 +98,7 @@ public class MainActivity extends ScanTriggerActivity {
     private User user;
     private BaseFragment currentFragment;
     private SettingsRepository settingsRepo;
-    private CommonDialog longTimeCreateDialog;
+    private ConfirmDialog longTimeCreateDialog;
     private boolean isFriendLink = false;
 //    private BadgeActionProvider badgeProvider;
 
@@ -158,6 +159,8 @@ public class MainActivity extends ScanTriggerActivity {
             Bundle bundle = new Bundle();
             bundle.putString(IntentExtra.ID, intent.getStringExtra(IntentExtra.CHAIN_ID));
             bundle.putInt(IntentExtra.TYPE, intent.getIntExtra(IntentExtra.TYPE, -1));
+            bundle.putBoolean(IntentExtra.IS_ENTER_SENT_TRANSACTIONS,
+                    intent.getBooleanExtra(IntentExtra.IS_ENTER_SENT_TRANSACTIONS, false));
             updateMainRightFragment(bundle);
         }
     }
@@ -604,7 +607,7 @@ public class MainActivity extends ScanTriggerActivity {
             longTimeCreateDialog.closeDialog();
         }
         longTimeCreateDialog = communityViewModel.showLongTimeCreateDialog(this, link,
-                new CommonDialog.ClickListener() {
+                new ConfirmDialog.ClickListener() {
                     @Override
                     public void proceed() {
                         onLinkClick(link);

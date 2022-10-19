@@ -79,9 +79,7 @@ public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, Tr
             StringBuilder stringBuilder = new StringBuilder();
             if (isMyself && entry.txType != -1) {
                 if (entry.txType != 2) {
-                    int typeName = TxType.valueOf(entry.txType).getName();
-                    binding.tvName.setText(resources.getString(R.string.community_post_news,
-                            resources.getString(typeName)));
+                    binding.tvName.setText(resources.getString(R.string.community_post_news));
                     binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.sender));
                 } else {
                     String name = UsersUtil.getShowName(entry.receiver);
@@ -109,10 +107,12 @@ public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, Tr
             if (entry.onlineStatus == 1) {
                 binding.tvConfirmRate.setVisibility(View.VISIBLE);
                 long currentTime = DateUtil.getTime();
-                int rate = (int) ((currentTime - entry.onlineTime) * 100f / 60 / 180);
-                rate = Math.min(100, rate);
+                double rate = (currentTime - entry.onlineTime) * 1.0f / 60 / 180;
+                rate = Math.min(1, rate);
                 rate = Math.max(0, rate);
-                String confirmRateStr = String.format(confirmRate, rate) + "%";
+                rate = Math.sqrt(rate) * 100;
+                rate = Math.max(1, rate);  // 保证从最终从1%开始
+                String confirmRateStr = String.format(confirmRate, (int)rate) + "%";
                 binding.tvConfirmRate.setText(Html.fromHtml(confirmRateStr));
                 binding.tvConfirmRate.setTextColor(resources.getColor(R.color.gray_dark));
             } else {

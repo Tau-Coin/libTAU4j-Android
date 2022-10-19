@@ -58,19 +58,13 @@
                     android:textAppearance="@style/TextAppearanceBody2"/>
 
                 <TextView
-                    android:visibility="gone"
+                    android:id="@+id/tv_referral_bnous"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/bot_airdrop_referral_bonus"
+                    android:text="@string/bot_airdrop_referral_bonus_total"
                     android:layout_marginTop="@dimen/widget_size_15"
-                    android:textColor="@color/gray_dark"
+                    android:layout_gravity="center_horizontal"
                     android:textAppearance="@style/TextAppearanceBody2"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:visibility="gone"
-                    android:id="@+id/rv_referral_bonus"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/tv_total"

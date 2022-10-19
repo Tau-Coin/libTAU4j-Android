@@ -53,13 +53,6 @@
         <item>Other</item>
     </string-array>
 
-    <integer-array name="referral_bonus">
-        <item>0</item>
-        <item>30</item>
-        <item>70</item>
-        <item>100</item>
-    </integer-array>
-
 <!--    发达地区：北美洲所有国家，整体欧盟，英国，北欧，阿联酋，新加坡，日韩台香港澳门，澳洲 -->
 <!--    https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes -->
     <string-array name="developedCountryCodes" >
