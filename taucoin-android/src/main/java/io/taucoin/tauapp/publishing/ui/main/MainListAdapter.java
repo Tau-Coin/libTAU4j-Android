@@ -115,7 +115,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 if (!onChain) {
                     binding.tvBalancePower.setText(context.getString(R.string.main_community_in_mining));
                 } else {
-                    String power = FmtMicrometer.fmtLong(Logarithm.log2(bean.power));
+                    String power = FmtMicrometer.fmtLong(Logarithm.log2(bean.power + 2));
                     String balance = FmtMicrometer.fmtBalance(bean.balance);
 //                    String time = DateUtil.formatTime(bean.balUpdateTime, DateUtil.pattern14);
                     String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_color,

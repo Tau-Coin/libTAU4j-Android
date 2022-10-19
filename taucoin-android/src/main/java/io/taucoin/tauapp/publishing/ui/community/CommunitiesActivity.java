@@ -119,7 +119,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         long miningIncome = 0;
         long mIncomePending = 0;
         if (member != null) {
-            power = Logarithm.log2(member.power);
+            power = Logarithm.log2(member.power + 2);
             long onChainBalance = member.mIncomePending + member.txIncome - member.txExpenditure;
             pendingBalance = onChainBalance + member.txIncomePending - member.txExpenditurePending;
             // 余额根据libTAU balance减去计算上链为100%的金额
