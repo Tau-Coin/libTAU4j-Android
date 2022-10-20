@@ -32,6 +32,7 @@ import io.taucoin.tauapp.publishing.ui.friends.AirdropDetailActivity;
 import io.taucoin.tauapp.publishing.ui.friends.AirdropSetupActivity;
 import io.taucoin.tauapp.publishing.ui.friends.FriendsActivity;
 import io.taucoin.tauapp.publishing.ui.qrcode.CommunityQRCodeActivity;
+import io.taucoin.tauapp.publishing.ui.transaction.TransactionCreateActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 
 /**
@@ -113,6 +114,11 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
                 Intent intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, ChainStatusActivity.class);
+                break;
+            case R.id.item_pay_people:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
                 break;
             case R.id.item_add_member:
                 intent = new Intent();
