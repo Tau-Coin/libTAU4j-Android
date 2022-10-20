@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
 
     defaultConfig {
         applicationId "io.taucoin.tauapp.publishing"
         minSdkVersion 22
-        targetSdkVersion 30
+        targetSdkVersion 29
         versionCode 19
         versionName "1.6.12"
         flavorDimensions("default", "id")
@@ -111,7 +111,7 @@ android {
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "7"
             // TauLogLevel.DEBUG
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://6e6170b970bae896803ecb1051653" +
-                    "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:9886\""
+                    "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:9881\""
             buildConfigField "String", "TEST_CHAIN_ID", "\"a837d1cf30303030PMCChain\""
             buildConfigField "String", "TEST_CHAIN_PEER", "\"602bc2c65f2c6e77c7e359339de7eb3d6d243a5eac4842d97b92e583d472690a\""
             signingConfig signingConfigs.debugConfig
