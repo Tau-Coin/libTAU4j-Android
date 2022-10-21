@@ -64,7 +64,7 @@
     <string name="main_chain_join_success" formatted="false"><Data><![CDATA[Welcome to join us. I\'m <font color="#000000">%1$s</font>, the creator of this community.]]></Data></string>
     <string name="main_airdrop_link_share">Share link to airdrop to friends.</string>
     <string name="main_referral_link_create">Copy Link</string>
-    <string name="main_referral_link_copy">Referral link copied</string>
+    <string name="main_referral_link_copy">Referral and Bonus Link copied</string>
     <string name="main_referral_link_text">Please send to your friends. When they click, you will receive %1$s coins as bonus, up to %2$s coins.</string>
 
     <string name="main_publish_video">Publish Video</string>
@@ -94,11 +94,11 @@
     <string name="drawer_send_and_airdrop_coins">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
     <string name="drawer_power">Power</string>
-    <string name="drawer_balance_time">Pending Balance %1$s</string>
-    <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Pending Balance <font color="#f19322"><b>%1$s</b></font> Power %2$s]]></Data></string>
+    <string name="drawer_balance_time">Interim Balance %1$s</string>
+    <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Interim Balance <font color="#f19322"><b>%1$s</b></font> Power %2$s]]></Data></string>
     <string name="drawer_balance_name_color" formatted="false"><Data><![CDATA[%1$s <font color="#f19322">%2$s</font>]]></Data></string>
     <string name="drawer_balance_time_no_title">%1$s on %2$s</string>
-    <string name="drawer_balance_time_color_no_title" formatted="false"><Data><![CDATA[Pending Balance <font color="#f19322"><b>%1$s</b></font>]]></Data></string>
+    <string name="drawer_balance_time_color_no_title" formatted="false"><Data><![CDATA[Interim Balance <font color="#f19322"><b>%1$s</b></font>]]></Data></string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Contacts</string>
     <string name="drawer_wallet">Wallet and Pay</string>
@@ -145,7 +145,7 @@
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">Discovering</string>
     <string name="community_users_mining_overflow">Overflow</string>
-    <string name="community_users_mining_missed">Previous Mining Missed…resuming…</string>
+    <string name="community_users_mining_missed">Missed, resuming&#8230;</string>
     <string name="community_users_mining_block">Mining Block</string>
     <string name="community_users_doze">Doze</string>
     <string name="common_loading">loading&#8230;</string>
@@ -175,6 +175,7 @@
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>
     <string name="community_mining_income">Mining Income</string>
+    <string name="community_balance_pending">Balance/Pending</string>
     <string name="community_mining_income_pending">Mining Income Pending</string>
     <string name="community_filter_all">All</string>
     <string name="community_chain_note">Chat</string>
@@ -213,7 +214,7 @@
     <string name="chain_mining_time_doze">Doze</string>
 <!--    The airdrop was created 3 minutes ago. Do you want to continue?-->
     <string name="airdrop_link_long_time">The airdrop link was created %1$d minutes ago. Do you want to continue?</string>
-    <string name="referral_link_long_time">The link was created %1$d minutes ago. Here is your new referral link.</string>
+    <string name="referral_link_long_time">The airdrop link was created %1$d minutes ago. The coins request is sent, please wait a bit to receive. Here is your new referral and bonus link.</string>
     <string name="chain_link_long_time">The community\'s link was created %1$d minutes ago. Do you want to continue?</string>
     <string name="chain_qr_long_time">The community\'s QR code was created %1$d minutes ago. Do you want to continue?</string>
     <string name="friend_link_long_time">The friend\'s link was created %1$d minutes ago. Do you want to continue?</string>
@@ -223,7 +224,7 @@
     <string name="chain_on_chain_blocks">On-chain blocks</string>
     <string name="chain_total_peers">Total Peers</string>
     <string name="chain_peers_blocks">Blocks Self-mined</string>
-    <string name="chain_pending_balance">Pending Balance</string>
+    <string name="chain_pending_balance">Interim Balance</string>
     <string name="chain_total_coins">Total Coins</string>
     <string name="chain_access_list">Connected List</string>
     <string name="chain_current_fork">Recent Fork Out</string>
@@ -568,14 +569,14 @@
     <string name="bot_airdrop_participants_progress">Participants Progress</string>
     <string name="bot_airdrop_coins_usage">Coins Usage</string>
     <string name="bot_airdrop_tau_link">Airdrop Link</string>
-    <string name="bot_airdrop_referral_link_tips1">\nPlease send referral link to friends to receive %d coins.</string>
-    <string name="bot_airdrop_referral_link_tips">\nThis is your new referral link. Please send to your friends. When they click, you will receive %1$s coins as bonus, up to %2$s coins.</string>
+    <string name="bot_airdrop_referral_link_tips1">\nPlease send referral and bonus link to friends to receive %d coins.</string>
+    <string name="bot_airdrop_referral_link_tips">\nThis is your new referral and bonus link. Please send to your friends. When they click, you will receive %1$s coins as bonus, up to %2$s coins.</string>
     <string name="bot_share_airdrop_link">Share to friend</string>
     <string name="bot_share_airdrop_link_title">Share Airdrop link</string>
     <string name="bot_share_airdrop_link_content">Hi, I am sending you free \"%1$s\" community crypto coins.\n1.
         We use taucoin.io wallet, which is a safe and secure server-less app.\n2.
         Paste this FULL message to TAU app \"Paste Link\" function so you receive %2$s \"%3$s\" coins.\n3.
-        You will receive referral link to gain bonus by introduce to friends.\n\n%4$s</string>
+        You will receive referral and bonus link to gain bonus by introduce to friends.\n\n%4$s</string>
     <string name="bot_hello_world">HelloWorld</string>
 
     <!-- Strings used for QRCode -->

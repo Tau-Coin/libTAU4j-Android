@@ -322,7 +322,7 @@ public class TxUtils {
                 }
                 if (operation == QueueOperation.INSERT) {
                     if (StringUtil.isNotEmpty(referralLink)) {
-                        msg.append("\n").append("\n").append("Referral Link: ").append(referralLink);
+                        msg.append("\n").append("\n").append("Referral and Bonus Link: ").append(referralLink);
                     } else {
                         msg.append("\n").append("Community Link: ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
                     }
