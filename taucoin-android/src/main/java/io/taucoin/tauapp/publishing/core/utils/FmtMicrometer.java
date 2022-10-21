@@ -44,6 +44,19 @@ public class FmtMicrometer {
         return fmtString(String.valueOf(power));
     }
 
+    public static String fmtBigInteger(BigInteger bigInteger) {
+        try {
+            DecimalFormat df = getDecimalFormatInstance();
+            df.applyPattern("###,##0");
+            df.setRoundingMode(RoundingMode.FLOOR);
+            BigDecimal bigDecimal = new BigDecimal(bigInteger.toString());
+            return df.format(bigDecimal);
+        }catch (Exception ignore) {
+
+        }
+        return new BigInteger("0").toString();
+    }
+
     public static String fmtString(String power) {
         try {
             DecimalFormat df = getDecimalFormatInstance();

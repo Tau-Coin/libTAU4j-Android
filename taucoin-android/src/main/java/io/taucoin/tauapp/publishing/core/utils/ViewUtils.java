@@ -19,6 +19,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.math.BigInteger;
+
 public class ViewUtils {
 
     public static String getText(TextView view) {
@@ -76,6 +78,15 @@ public class ViewUtils {
         }catch (Exception ignore){
         }
         return 0f;
+    }
+
+    public static BigInteger getBigIntegerTag(TextView view) {
+        String text = getStringTag(view);
+        try {
+            return new BigInteger(text);
+        }catch (Exception ignore){
+        }
+        return BigInteger.ZERO;
     }
 
     public static boolean getBooleanTag(View view) {

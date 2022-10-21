@@ -8,11 +8,14 @@ import android.text.TextWatcher;
 import android.view.View;
 
 
+import java.math.BigInteger;
+
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
+import io.taucoin.tauapp.publishing.core.utils.BitmapUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
@@ -68,11 +71,11 @@ public class AirdropSetupActivity extends BaseActivity {
                 ToastUtils.showShortToast(R.string.bot_airdrop_coins_error);
                 return;
             }
-            float airdropTotalCoins = ViewUtils.getFloatTag(binding.tvTotal);
-            long maxTotalCoins = Constants.TOTAL_COIN.divide(Constants.COIN).longValue();
-            if (airdropTotalCoins > maxTotalCoins) {
+            BigInteger airdropTotalCoins = ViewUtils.getBigIntegerTag(binding.tvTotal);
+            BigInteger maxTotalCoins = Constants.TOTAL_COIN.divide(Constants.COIN);
+            if (airdropTotalCoins.compareTo(maxTotalCoins) > 0) {
                 ToastUtils.showShortToast(getString(R.string.bot_airdrop_total_coins_error,
-                        FmtMicrometer.fmtLong(maxTotalCoins)));
+                        FmtMicrometer.fmtBigInteger(maxTotalCoins)));
                 return;
             }
             communityViewModel.setupAirdropBot(chainID, members, coins);
@@ -105,24 +108,25 @@ public class AirdropSetupActivity extends BaseActivity {
 
     private void updateAirdropCoinsTotal() {
         int members = ViewUtils.getIntText(binding.etMembers);
-        float coins = ViewUtils.getFloatText(binding.etCoins);
+        int coins = (int) ViewUtils.getFloatText(binding.etCoins);
         int referralBonus = (int) (coins / 2);
         if (coins > 0) {
             referralBonus = Math.max(referralBonus, 1);
         }
-        binding.tvReferralBnous.setText(getString(R.string.bot_airdrop_referral_bonus_total,
-                referralBonus));
-        float total = members * (coins + 10 * referralBonus);
-        String totalCoins = FmtMicrometer.fmtDecimal(total);
+        BigInteger totalReferralBonus = BigInteger.valueOf(referralBonus).multiply(BigInteger.TEN).multiply(BigInteger.valueOf(members));
+        binding.tvReferralBonus.setText(getString(R.string.bot_airdrop_referral_bonus_total,
+                FmtMicrometer.fmtLong(referralBonus), FmtMicrometer.fmtBigInteger(totalReferralBonus)));
+        BigInteger total = BigInteger.valueOf(members).multiply(BigInteger.valueOf(coins)).add(totalReferralBonus) ;
+        String totalCoins = FmtMicrometer.fmtBigInteger(total);
         binding.tvTotal.setText(getString(R.string.bot_airdrop_coins_total_value, totalCoins));
         binding.tvTotal.setTag(total);
 
-        long maxTotalCoins = Constants.TOTAL_COIN.divide(Constants.COIN).longValue();
-        boolean isShowError = total > maxTotalCoins;
+        BigInteger maxTotalCoins = Constants.TOTAL_COIN.divide(Constants.COIN);
+        boolean isShowError = total.compareTo(maxTotalCoins) > 0;
         binding.tvTotalError.setVisibility(isShowError ? View.VISIBLE : View.INVISIBLE);
         if (isShowError) {
             binding.tvTotalError.setText(getString(R.string.bot_airdrop_total_coins_error,
-                    FmtMicrometer.fmtLong(maxTotalCoins)));
+                    FmtMicrometer.fmtBigInteger(maxTotalCoins)));
         }
     }
 

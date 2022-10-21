@@ -564,7 +564,7 @@
     <string name="bot_airdrop_total_coins_error">Airdrop total coins cannot exceed %1$s coins</string>
     <string name="bot_airdrop_coins_hit">Number of coins for each member</string>
     <string name="bot_airdrop_referral_bonus">Referral Bonus</string>
-    <string name="bot_airdrop_referral_bonus_total">Referral Bonus %d coins</string>
+    <string name="bot_airdrop_referral_bonus_total">Referral Bonus %1$s coins X 100 X 10 = %2$s</string>
     <string name="bot_airdrop_coins_total_value">Total&#160;%1$s&#160;coins</string>
     <string name="bot_airdrop_participants_progress">Participants Progress</string>
     <string name="bot_airdrop_coins_usage">Coins Usage</string>
