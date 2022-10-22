@@ -28,12 +28,13 @@ public class LinkUtil {
     // Base58编码：包括9个数字，24个大写字母，25个小写字母
     private static final String PATTERN_KEY = "([123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+)";
     private static final String PATTERN_PREFIX = URL_SCHEME + "//" + PATTERN_KEY + "/";
-    private static final String PATTERN_SUFFIX = "/([a-f0-9]{16}[A-Za-z0-9\\s-%]+)&([0-9]+)&[0-9]{8}";
+    private static final String PATTERN_SUFFIX = "/([a-f0-9]{16}[A-Za-z0-9\\s-%]+)&[0-9]{8}";
+    private static final String AIRDROP_PATTERN_SUFFIX = "/([a-f0-9]{16}[A-Za-z0-9\\s-%]+)&([0-9]+)&[0-9]{8}";
     private static final String FRIEND_PATTERN_SUFFIX = "/([^&]+)&[0-9]{8}";
     public static final String FRIEND_PATTERN = PATTERN_PREFIX + LINK_FRIEND + FRIEND_PATTERN_SUFFIX;
     public static final String CHAIN_PATTERN = PATTERN_PREFIX + LINK_CHAIN + PATTERN_SUFFIX;
-    public static final String AIRDROP_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + PATTERN_SUFFIX;
-    public static final String REFERRAL_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + PATTERN_SUFFIX + "&" + PATTERN_KEY;
+    public static final String AIRDROP_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + AIRDROP_PATTERN_SUFFIX;
+    public static final String REFERRAL_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + AIRDROP_PATTERN_SUFFIX + "&" + PATTERN_KEY;
 
     public static boolean isTauUrl(String url) {
         return StringUtil.isNotEmpty(url) && url.startsWith("tau");
