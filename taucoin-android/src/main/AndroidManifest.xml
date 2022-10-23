@@ -46,6 +46,7 @@
         android:supportsRtl="false"
         android:theme="@style/AppTheme"
         android:networkSecurityConfig="@xml/network_config"
+        android:extractNativeLibs="true"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android:allowBackup, android:supportsRtl">
         <activity
