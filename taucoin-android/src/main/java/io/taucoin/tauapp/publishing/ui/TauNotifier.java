@@ -106,8 +106,14 @@ public class TauNotifier {
         startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         startupIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        PendingIntent startupPendingIntent = PendingIntent.getActivity(context, 0, startupIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent startupPendingIntent;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            startupPendingIntent = PendingIntent.getActivity(context, 0, startupIntent,
+                    PendingIntent.FLAG_MUTABLE);
+        } else {
+            startupPendingIntent = PendingIntent.getActivity(context, 0, startupIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+        }
 
         NotificationCompat.Builder foregroundNotify = new NotificationCompat.Builder(context,
                 FOREGROUND_NOTIFY_CHANNEL_ID)
@@ -170,8 +176,14 @@ public class TauNotifier {
     }
 
     private void makeNotify(int id, CharSequence title, CharSequence text, Bitmap largeIcon, Intent intent) {
-        PendingIntent pendingIntent = PendingIntent.getActivity(appContext, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT); // 允许更新
+        PendingIntent pendingIntent;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            pendingIntent = PendingIntent.getActivity(appContext, 0, intent,
+                    PendingIntent.FLAG_MUTABLE); // 允许更新
+        } else {
+            pendingIntent = PendingIntent.getActivity(appContext, 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT); // 允许更新
+        }
         NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(appContext, MSG_NOTIFY_CHANNEL_ID)
                 .setAutoCancel(true)
                 .setContentTitle(title)

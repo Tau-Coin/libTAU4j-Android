@@ -11,10 +11,10 @@ import com.yalantis.ucrop.UCropActivity;
 
 import java.util.concurrent.Executors;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 import androidx.work.Configuration;
-import androidx.work.WorkManager;
 import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.log.LogConfigurator;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
@@ -24,7 +24,7 @@ import io.taucoin.tauapp.publishing.core.utils.CrashHandler;
 import io.taucoin.tauapp.publishing.core.utils.FixMemLeak;
 import io.taucoin.tauapp.publishing.ui.TauNotifier;
 
-public class MainApplication extends MultiDexApplication {
+public class MainApplication extends MultiDexApplication implements Configuration.Provider {
     static {
         /* Vector Drawable support in ImageView for API < 21 */
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -52,14 +52,15 @@ public class MainApplication extends MultiDexApplication {
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
         settingsRepo = RepositoryHelper.getSettingsRepository(this);
 
-        // 首先在AndroidManifest.xml中禁用默认提供程序
-        // 自定义一个线程池, 根据项目中需要同时作业的Worker数而定
-        Configuration configuration = new Configuration.Builder()
+        FixMemLeak.fixSamSungEmergencyModeLeak(getApplicationContext());
+    }
+
+    @NonNull
+    @Override
+    public Configuration getWorkManagerConfiguration() {
+        return new Configuration.Builder()
                 .setExecutor(Executors.newFixedThreadPool(4))
                 .build();
-        WorkManager.initialize(this, configuration);
-
-        FixMemLeak.fixSamSungEmergencyModeLeak(getApplicationContext());
     }
 
     public static MainApplication getInstance(){

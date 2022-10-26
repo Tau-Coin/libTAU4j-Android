@@ -225,6 +225,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                     isSame = oldItem.timestamp == newItem.timestamp &&
                             oldItem.msgUnread == newItem.msgUnread &&
                             oldItem.stickyTop == newItem.stickyTop &&
+                            oldItem.balance == newItem.balance &&
                             oldItem.balUpdateTime == newItem.balUpdateTime &&
                             oldItem.nonce == newItem.nonce &&
                             oldItem.joined == newItem.joined &&

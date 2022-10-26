@@ -52,7 +52,8 @@
         <activity
             android:name=".ui.splash.SplashActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:theme="@style/AppTheme.Launcher">
+            android:theme="@style/AppTheme.Launcher"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -203,7 +204,8 @@
         </receiver>
 
         <receiver
-            android:name=".receiver.BootReceiver">
+            android:name=".receiver.BootReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
@@ -219,7 +221,8 @@
         </receiver>
 
         <receiver
-            android:name=".receiver.DownloadCompleteReceiver">
+            android:name=".receiver.DownloadCompleteReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
@@ -268,7 +271,8 @@
         <activity android:name=".ui.SendTextToClipboard"
             android:label="@string/send_text_to_clipboard"
             android:icon="@drawable/icon_share_copy"
-            android:theme="@android:style/Theme.NoDisplay">
+            android:theme="@android:style/Theme.NoDisplay"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -281,8 +285,8 @@
         <activity android:name=".ui.ExternalLinkActivity"
             android:label="@string/app_name"
             android:icon="@drawable/icon_share_tau"
-            android:theme="@android:style/Theme.NoDisplay">
-
+            android:theme="@android:style/Theme.NoDisplay"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -296,12 +300,20 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/transparent"/>
 
-        <!-- 禁用默认提供程序 -->
+        <!-- 防止自定义java.lang.IllegalStateException: WorkManager is already initialized.  -->
+        <!-- 1、禁用默认提供程序 -->
+        <!-- 2、MainApplication实现Configuration.Provider接口 -->
         <provider
-            android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="${applicationId}.workmanager-init"
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
-            android:enabled="false"/>
+            tools:node="merge">
+            <!-- If you are using androidx.startup to initialize other components -->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
 
         <activity
             android:name=".ui.setting.TrafficTipsActivity"

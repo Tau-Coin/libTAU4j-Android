@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "io.taucoin.tauapp.publishing"
         minSdkVersion 24
-        targetSdkVersion 30
-        versionCode 20
-        versionName "1.6.13"
+        targetSdkVersion 31
+        versionCode 21
+        versionName "1.6.14"
         flavorDimensions("default", "id")
 
         vectorDrawables.useSupportLibrary = true
@@ -73,12 +73,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding = true
     }
 
     lintOptions {
@@ -150,7 +150,7 @@ android {
             applicationId "io.taucoin.tauapp.publishing"
             resValue "string", "app_name", "TAU"
         }
-		/*
+        /*
         id01 {
             dimension 'id'
             applicationId "io.taucoin.tauapp.publishing01"
@@ -210,7 +210,7 @@ android {
             applicationId "io.taucoin.tauapp.publishing10"
             resValue "string", "app_name", "TAU10"
         }
-		*/
+        */
 //        id11 {
 //            dimension 'id'
 //            applicationId "io.taucoin.tauapp.publishing11"
@@ -454,7 +454,7 @@ android {
     }
 
     dexOptions {
-        incremental true
+//        incremental true
         javaMaxHeapSize "4g"
     }
 }
@@ -495,7 +495,7 @@ dependencies {
     implementation "androidx.room:room-rxjava2:$ROOM_VERSION"
     annotationProcessor "androidx.room:room-compiler:$ROOM_VERSION"
     /* For schemas import */
-    implementation 'androidx.work:work-runtime:2.5.0'
+    implementation 'androidx.work:work-runtime:2.7.1'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.paging:paging-runtime:2.1.2'
     /* ReactiveX */

@@ -119,24 +119,45 @@ public class ActivityUtil {
     }
 
     public static void openUri(Context context, String uriStr) {
-        boolean isExistBrowser = true;
-        try{
-            Uri uri = Uri.parse(uriStr);
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        boolean isExistBrowser = true;
+//        try{
+//            Uri uri = Uri.parse(uriStr);
+//            Intent intent = new Intent(Intent.ACTION_VIEW);
+//            intent.setData(uri);
+//            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+//            intent.addCategory(Intent.CATEGORY_DEFAULT);
+////            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            PackageManager pm = context.getPackageManager();
+////            List<ResolveInfo> list = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+//            List<ResolveInfo> list = pm.queryIntentActivities(intent, 0);
+//            if(list != null && list.size() > 0){
+//                logger.debug("browser installed size::{}", list.size());
+//                for (int i = 0; i < list.size(); i++) {
+//                    logger.debug("browser installed::{}", list.get(i));
+//                }
+//                context.startActivity(intent);
+//            } else {
+//                isExistBrowser = false;
+//            }
+//        } catch (Exception e){
+//            logger.error("No browser installed", e);
+//            isExistBrowser = false;
+//        }
+//        if(!isExistBrowser){
+//            ToastUtils.showShortToast(R.string.common_install_browser);
+//        }
+
+        try {
+            Intent intent= new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            PackageManager pm = context.getPackageManager();
-            List<ResolveInfo> list = pm.queryIntentActivities(intent, 0);
-            if(list != null && list.size() > 0){
-                context.startActivity(intent);
-            }else{
-                isExistBrowser = false;
-            }
-        }catch (Exception e){
-            logger.error("No browser installed", e);
-            isExistBrowser = false;
-        }
-        if(!isExistBrowser){
+            Uri uri = Uri.parse(uriStr);
+            intent.setData(uri);
+            context.startActivity(intent);
+        } catch (Exception e) {
             ToastUtils.showShortToast(R.string.common_install_browser);
         }
     }
