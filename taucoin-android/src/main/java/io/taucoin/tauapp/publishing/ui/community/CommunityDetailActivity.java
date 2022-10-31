@@ -148,6 +148,7 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
 
     private void enterAirdropPage(Member member) {
         Intent intent = new Intent();
+        intent.putExtra(IntentExtra.BALANCE, member.balance);
         intent.putExtra(IntentExtra.CHAIN_ID, member.chainID);
         if (member.airdropStatus == AirdropStatus.ON.getStatus()) {
             ActivityUtil.startActivity(intent, this, AirdropDetailActivity.class);

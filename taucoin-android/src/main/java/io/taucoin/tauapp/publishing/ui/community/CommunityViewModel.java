@@ -125,7 +125,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> addCommunityState = new MutableLiveData<>();
     private MutableLiveData<Boolean> setBlacklistState = new MutableLiveData<>();
-    private MutableLiveData<Boolean> airdropResult = new MutableLiveData<>();
+    private MutableLiveData<Result> airdropResult = new MutableLiveData<>();
     private MutableLiveData<Result> joinedResult = new MutableLiveData<>();
     private MutableLiveData<List<Community>> blackList = new MutableLiveData<>();
     private MutableLiveData<List<Member>> joinedUnexpiredList = new MutableLiveData<>();
@@ -157,7 +157,7 @@ public class CommunityViewModel extends AndroidViewModel {
         return chainBlocks;
     }
 
-    public MutableLiveData<Boolean> getAirdropResult() {
+    public MutableLiveData<Result> getAirdropResult() {
         return airdropResult;
     }
 
@@ -847,26 +847,32 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param members airdrop个数
      * @param coins 每次发币的coins
      */
-    public void setupAirdropBot(String chainID, int members, float coins) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
+    public void setupAirdropBot(String chainID, int members, float coins, BigInteger airdropTotalCoins) {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
+            Result result = new Result();
+            result.setSuccess(true);
             User user = userRepo.getCurrentUser();
             if (user != null) {
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, user.publicKey);
                 if (member != null) {
-                    member.airdropStatus = AirdropStatus.ON.getStatus();
-                    member.airdropMembers = members;
-                    member.airdropCoins = FmtMicrometer.fmtTxLongValue(String.valueOf(coins));
-                    member.airdropTime = DateUtil.getMillisTime();
-                    memberRepo.updateMember(member);
+                    if (airdropTotalCoins.compareTo(BigInteger.valueOf(member.balance)) > 0) {
+                        result.setFailMsg(getApplication().getString(R.string.tx_error_insufficient_balance));
+                    } else {
+                        member.airdropStatus = AirdropStatus.ON.getStatus();
+                        member.airdropMembers = members;
+                        member.airdropCoins = FmtMicrometer.fmtTxLongValue(String.valueOf(coins));
+                        member.airdropTime = DateUtil.getMillisTime();
+                        memberRepo.updateMember(member);
+                    }
                 }
             }
-            emitter.onNext(true);
+            emitter.onNext(result);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(userAndFriend -> {
-                    airdropResult.postValue(userAndFriend);
+                .subscribe(result -> {
+                    airdropResult.postValue(result);
                 });
         disposables.add(disposable);
     }
@@ -876,7 +882,9 @@ public class CommunityViewModel extends AndroidViewModel {
      * @param chainID 链ID
      */
     public void deleteAirdropBot(String chainID) {
-        Disposable disposable = Flowable.create((FlowableOnSubscribe<Boolean>) emitter -> {
+        Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
+            Result result = new Result();
+            result.setSuccess(true);
             User user = userRepo.getCurrentUser();
             if (user != null) {
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, user.publicKey);
@@ -894,13 +902,13 @@ public class CommunityViewModel extends AndroidViewModel {
                     memberRepo.updateMember(member);
                 }
             }
-            emitter.onNext(true);
+            emitter.onNext(result);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(userAndFriend -> {
-                    airdropResult.postValue(userAndFriend);
+                .subscribe(result -> {
+                    airdropResult.postValue(result);
                 });
         disposables.add(disposable);
     }

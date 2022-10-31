@@ -12,6 +12,7 @@ public class IntentExtra {
     public static final String PUBLIC_KEY = "publicKey";
     public static final String ON_CHAIN = "onChain";
     public static final String NO_BALANCE = "noBalance";
+    public static final String BALANCE = "balance";
     public static final String IS_JOINED = "isJoined";
     public static final String IMMEDIATE_EXECUTION = "immediateExecution";
     public static final String NICK_NAME = "nickname";

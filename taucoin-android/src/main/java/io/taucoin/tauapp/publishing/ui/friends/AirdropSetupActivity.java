@@ -13,9 +13,7 @@ import java.math.BigInteger;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.taucoin.tauapp.publishing.R;
-import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
-import io.taucoin.tauapp.publishing.core.utils.BitmapUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
@@ -34,6 +32,7 @@ public class AirdropSetupActivity extends BaseActivity {
     private ActivityAirdropSetupBinding binding;
     private CommunityViewModel communityViewModel;
     private String chainID;
+    private long balance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +45,7 @@ public class AirdropSetupActivity extends BaseActivity {
 
     private void initLayout() {
         chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
+        balance = getIntent().getLongExtra(IntentExtra.BALANCE, 0);
 
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         binding.toolbarInclude.toolbar.setTitle(ChainIDUtil.getName(chainID));
@@ -72,20 +72,24 @@ public class AirdropSetupActivity extends BaseActivity {
                 return;
             }
             BigInteger airdropTotalCoins = ViewUtils.getBigIntegerTag(binding.tvTotal);
-            BigInteger maxTotalCoins = Constants.TOTAL_COIN.divide(Constants.COIN);
-            if (airdropTotalCoins.compareTo(maxTotalCoins) > 0) {
+            BigInteger balanceStr = BigInteger.valueOf(balance);
+            if (airdropTotalCoins.compareTo(balanceStr) > 0) {
                 ToastUtils.showShortToast(getString(R.string.bot_airdrop_total_coins_error,
-                        FmtMicrometer.fmtBigInteger(maxTotalCoins)));
+                        FmtMicrometer.fmtBigInteger(balanceStr)));
                 return;
             }
-            communityViewModel.setupAirdropBot(chainID, members, coins);
+            communityViewModel.setupAirdropBot(chainID, members, coins, airdropTotalCoins);
         });
 
         communityViewModel.getAirdropResult().observe(this, result -> {
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            ActivityUtil.startActivity(intent, this, AirdropDetailActivity.class);
-            onBackPressed();
+            if (result.isSuccess()) {
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, AirdropDetailActivity.class);
+                onBackPressed();
+            } else {
+                ToastUtils.showShortToast(result.getMsg());
+            }
         });
     }
 
@@ -121,12 +125,12 @@ public class AirdropSetupActivity extends BaseActivity {
         binding.tvTotal.setText(getString(R.string.bot_airdrop_coins_total_value, totalCoins));
         binding.tvTotal.setTag(total);
 
-        BigInteger maxTotalCoins = Constants.TOTAL_COIN.divide(Constants.COIN);
-        boolean isShowError = total.compareTo(maxTotalCoins) > 0;
+        BigInteger balanceStr = BigInteger.valueOf(balance);
+        boolean isShowError = total.compareTo(balanceStr) > 0;
         binding.tvTotalError.setVisibility(isShowError ? View.VISIBLE : View.INVISIBLE);
         if (isShowError) {
             binding.tvTotalError.setText(getString(R.string.bot_airdrop_total_coins_error,
-                    FmtMicrometer.fmtBigInteger(maxTotalCoins)));
+                    FmtMicrometer.fmtBigInteger(balanceStr)));
         }
     }
 

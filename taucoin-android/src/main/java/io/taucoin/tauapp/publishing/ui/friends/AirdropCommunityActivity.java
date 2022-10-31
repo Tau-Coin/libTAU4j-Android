@@ -87,6 +87,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
             // 选择社区退出返回数据
             Member member = adapter.getCurrentList().get(adapterPosition);
             Intent intent = new Intent();
+            intent.putExtra(IntentExtra.BALANCE, member.balance);
             intent.putExtra(IntentExtra.CHAIN_ID, member.chainID);
             if (member.airdropStatus == AirdropStatus.ON.getStatus()) {
                 ActivityUtil.startActivity(intent, this, AirdropDetailActivity.class);
