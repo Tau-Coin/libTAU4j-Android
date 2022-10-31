@@ -91,6 +91,7 @@ public abstract class TauDaemon {
     private Disposable updateLocationTimer;          // 更新位置信息定时任务
     private Disposable noRemainingDataTimer;         // 触发无剩余流量的提示定时任务
     private Disposable onlineTimer;                  // 触发在线信号定时任务
+    private Disposable autoRelayTimer;               // 触发延迟设置relay定时任务
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
     private final TxQueueManager txQueueManager;     // 交易队列管理
     private final DataDozeManager tauDozeManager;     // tau休息模式管理
@@ -250,7 +251,7 @@ public abstract class TauDaemon {
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir) // 数据库目录
                 .setDumpfileDir(FileUtil.getDumpfileDir())  // Dump File目录
                 .setDhtNonReferable(true)
-                .setDhtAutoRelay(NetworkSetting.isUnlimitedNetwork())
+                .setDhtAutoRelay(NetworkSetting.isUnlimitedNetwork() && settingsRepo.chargingState())
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)
                 .setLogLevel(LogUtil.getTauLogLevel())
@@ -285,6 +286,9 @@ public abstract class TauDaemon {
         }
         if (updateBootstrapIntervalTimer != null && !updateBootstrapIntervalTimer.isDisposed()) {
             updateBootstrapIntervalTimer.dispose();
+        }
+        if (autoRelayTimer != null && !autoRelayTimer.isDisposed()) {
+            autoRelayTimer.dispose();
         }
         TauNotifier.getInstance().cancelAllNotify();
         locationManager.stopLocation();
@@ -364,6 +368,7 @@ public abstract class TauDaemon {
             reopenNetworkSockets();
         } else if (key.equals(appContext.getString(R.string.pref_key_charging_state))) {
             logger.info("SettingsChanged, charging state::{}", settingsRepo.chargingState());
+            setAutoRelayDelay();
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
             logger.info("isMeteredNetwork::{}", NetworkSetting.isMeteredNetwork());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_wifi_network))) {
@@ -434,9 +439,7 @@ public abstract class TauDaemon {
         } else {
             SystemServiceManager.getInstance().getNetworkAddress();
             sessionManager.reopenNetworkSockets();
-            setAutoRelay(NetworkSetting.isUnlimitedNetwork());
-            // 设置为true, 底层会智能判断，修改此值
-            setNonReferable(true);
+            setAutoRelay(NetworkSetting.isUnlimitedNetwork() && settingsRepo.chargingState());
             logger.info("Network change reopen network sockets...");
         }
     }
@@ -754,6 +757,21 @@ public abstract class TauDaemon {
         }
     }
 
+    public void setAutoRelayDelay() {
+        if (autoRelayTimer != null && !autoRelayTimer.isDisposed()) {
+            autoRelayTimer.dispose();
+        }
+        int timeMin = 5;
+        logger.info("setAutoRelay Delay::{}min...", timeMin);
+        autoRelayTimer = ObservableUtil.intervalSeconds(timeMin * 60)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(l -> {
+                boolean autoRelay = NetworkSetting.isUnlimitedNetwork() && settingsRepo.chargingState();
+                setAutoRelay(autoRelay);
+            });
+    }
+
     /**
      *  设置libTAU auto relay
      */
@@ -762,6 +780,9 @@ public abstract class TauDaemon {
             if (this.sessionManager != null) {
                 sessionManager.setAutoRelay(autoRelay);
                 logger.info("setAutoRelay::{}", autoRelay);
+                // 设置为true, 底层会智能判断，修改此值
+                setNonReferable(true);
+                setNonReferable(true);
             }
         }
     }
