@@ -312,17 +312,17 @@ public class TauListenHandler {
                 } else {
                     status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
                 }
-                //  交易状态改变
-                if (status != tx.txStatus && tx.queueID >= 0) {
-                    TxQueue txQueue = txQueueRepo.getTxQueueByID(tx.queueID);
-                    if (txQueue != null) {
-                        if (status == 1) {
-                            ChatViewModel.syncSendMessageTask(appContext, tx, txQueue.queueTime, QueueOperation.ON_CHAIN);
-                        } else {
-                            ChatViewModel.syncSendMessageTask(appContext, tx, txQueue.queueTime, QueueOperation.ROLL_BACK);
-                        }
-                    }
-                }
+                //  交易状态改变, 删除上链和回滚消息通知
+//                if (status != tx.txStatus && tx.queueID >= 0) {
+//                    TxQueue txQueue = txQueueRepo.getTxQueueByID(tx.queueID);
+//                    if (txQueue != null) {
+//                        if (status == 1) {
+//                            ChatViewModel.syncSendMessageTask(appContext, tx, txQueue.queueTime, QueueOperation.ON_CHAIN);
+//                        } else {
+//                            ChatViewModel.syncSendMessageTask(appContext, tx, txQueue.queueTime, QueueOperation.ROLL_BACK);
+//                        }
+//                    }
+//                }
                 tx.txStatus = status;
                 tx.blockNumber = block.getBlockNumber();
                 tx.blockHash = block.Hash();

@@ -178,6 +178,17 @@ public class FmtMicrometer {
         }
     }
 
+    public static String formatThreeDecimal(double num) {
+        try {
+            BigDecimal number = new BigDecimal(num);
+            DecimalFormat df = getDecimalFormatInstance();
+            df.applyPattern("0.000");
+            return df.format(number);
+        } catch (Exception e) {
+            return new BigInteger("0").toString();
+        }
+    }
+
     public static String fmtTestData(long balance) {
         DecimalFormat df = getDecimalFormatInstance();
         df.applyPattern("00000");

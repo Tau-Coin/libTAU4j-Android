@@ -3,7 +3,6 @@ package io.taucoin.tauapp.publishing.ui.community;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
@@ -13,14 +12,11 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.ChainStatus;
-import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
 import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
-import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
-import io.taucoin.tauapp.publishing.core.utils.Logarithm;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityCommunitiesBinding;
@@ -119,7 +115,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
 //        long miningIncome = 0;
         long mIncomePending = 0;
         if (member != null) {
-            power = Logarithm.log2(member.power + 2);
+            power = member.power;
             long onChainBalance = member.mIncomePending + member.txIncome - member.txExpenditure;
             pendingBalance = onChainBalance + member.txIncomePending - member.txExpenditurePending;
             // 余额根据libTAU balance减去计算上链为100%的金额
@@ -139,7 +135,11 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
 //        binding.itemMiningIncome.setRightText(FmtMicrometer.fmtLong(miningIncome));
         binding.itemMiningIncome.setVisibility(View.GONE);
         binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(mIncomePending));
-        binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
+        double showPower = Math.sqrt(1 + power);
+        String powerStr = "sqrt(1+%s)=%s";
+        powerStr = String.format(powerStr, FmtMicrometer.fmtLong(power), FmtMicrometer.formatThreeDecimal(showPower));
+        binding.itemMiningPower.setRightText(powerStr);
+        //sqrt(1+ power)//
     }
 
 //    /**

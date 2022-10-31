@@ -254,7 +254,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             // 已加入社区
             if (nodes > 0) {
                 if (miningTime >= 0) {
-                    int maxMiningTime = 600;
+                    int maxMiningTime = 1800;
                     if (miningTime > maxMiningTime) {
                         subtitle.append(getString(R.string.community_users_mining_overflow));
                     } else {
