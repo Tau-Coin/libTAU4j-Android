@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.tauapp.publishing.R;
-import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.data.BlockAndTx;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
@@ -89,14 +88,6 @@ public class BlockListAdapter extends ListAdapter<BlockAndTx, BlockListAdapter.V
                     R.string.community_block_forking);
             binding.tvBlockDetail.setOnLongClickListener(longListener);
             binding.tvMsg.setOnLongClickListener(longListener);
-//            boolean isShowState = block.status == 1 && block.blockNumber % Constants.CHAIN_EPOCH_BLOCK_SIZE == 0;
-//            binding.tvConsensusState.setVisibility(isShowState ? View.VISIBLE : View.GONE);
-            binding.tvConsensusState.setVisibility(View.GONE);
-            binding.tvConsensusState.setOnClickListener(view -> {
-                if (listener != null) {
-                    listener.onConsensusStateClick();
-                }
-            });
         }
 
         private View.OnClickListener clickListener = new View.OnClickListener() {
@@ -133,7 +124,6 @@ public class BlockListAdapter extends ListAdapter<BlockAndTx, BlockListAdapter.V
     public interface ClickListener {
         void onLongClick(BlockAndTx block);
         void onLongClick(Tx tx, TextView view);
-        void onConsensusStateClick();
     }
 
     private static final DiffUtil.ItemCallback<BlockAndTx> diffCallback = new DiffUtil.ItemCallback<BlockAndTx>() {

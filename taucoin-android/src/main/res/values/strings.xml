@@ -283,7 +283,6 @@
     <string name="community_tip_block_reward">Block Reward:&#160;</string>
     <string name="community_tip_block_difficulty">Difficulty:&#160;</string>
     <string name="community_tip_block_size">Size: </string>
-    <string name="community_consensus_state">Consensus State</string>
     <string name="community_all_peers">All Onchain Peers</string>
     <string name="community_block_on_chain">Onchain</string>
     <string name="community_block_forking">Forking</string>

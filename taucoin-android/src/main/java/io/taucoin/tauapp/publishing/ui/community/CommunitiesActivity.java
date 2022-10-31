@@ -116,7 +116,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         long balance = 0;
         long pendingBalance = 0;
         long power = 0;
-        long miningIncome = 0;
+//        long miningIncome = 0;
         long mIncomePending = 0;
         if (member != null) {
             power = Logarithm.log2(member.power + 2);
@@ -132,11 +132,12 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                     member.mTotalIncome, member.mIncomePending);
 
             mIncomePending = member.mIncomePending;
-            miningIncome = member.mTotalIncome - mIncomePending;
-            miningIncome = Math.max(0, miningIncome);
+//            miningIncome = member.mTotalIncome - mIncomePending;
+//            miningIncome = Math.max(0, miningIncome);
         }
         binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));
-        binding.itemMiningIncome.setRightText(FmtMicrometer.fmtLong(miningIncome));
+//        binding.itemMiningIncome.setRightText(FmtMicrometer.fmtLong(miningIncome));
+        binding.itemMiningIncome.setVisibility(View.GONE);
         binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(mIncomePending));
         binding.itemMiningPower.setRightText(FmtMicrometer.fmtLong(power));
     }

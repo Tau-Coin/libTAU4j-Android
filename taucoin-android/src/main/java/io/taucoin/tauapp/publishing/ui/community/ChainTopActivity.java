@@ -41,7 +41,7 @@ public class ChainTopActivity extends BaseActivity {
      * 初始化布局
      */
     private void initLayout() {
-        binding.toolbarInclude.toolbar.setTitle(R.string.community_consensus_state);
+        binding.toolbarInclude.toolbar.setTitle(R.string.community_all_peers);
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());

@@ -61,8 +61,9 @@ public class ChooseListAdapter extends ListAdapter<Member, ChooseListAdapter.Vie
             if (null == member) {
                 return;
             }
-            String communityName = ChainIDUtil.getName(member.chainID) + " chain";
-            binding.tvName.setText(communityName);
+            String communityName = ChainIDUtil.getName(member.chainID);
+            String communityCode = ChainIDUtil.getCode(member.chainID);
+            binding.tvName.setText(context.getString(R.string.main_community_name, communityName, communityCode));
 
             String balance = FmtMicrometer.fmtBalance(member.balance);
 //            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);

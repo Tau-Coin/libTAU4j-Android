@@ -1,6 +1,5 @@
 package io.taucoin.tauapp.publishing.ui.transaction;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.style.URLSpan;
 import android.view.LayoutInflater;
@@ -24,14 +23,11 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.BlockAndTx;
 import io.taucoin.tauapp.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
-import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.CopyManager;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.databinding.FragmentTxsTabBinding;
 import io.taucoin.tauapp.publishing.ui.community.BlockListAdapter;
-import io.taucoin.tauapp.publishing.ui.community.ChainTopActivity;
-import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
 
 /**
@@ -199,12 +195,5 @@ public class BlocksTabFragment extends CommunityTabFragment implements ChainList
             }
         });
         operationsMenu.show(activity.getPoint());
-    }
-
-    @Override
-    public void onConsensusStateClick() {
-        Intent intent = new Intent();
-        intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-        ActivityUtil.startActivity(intent, this, ChainTopActivity.class);
     }
 }
