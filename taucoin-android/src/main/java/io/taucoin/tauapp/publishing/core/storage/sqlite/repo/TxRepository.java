@@ -131,4 +131,12 @@ public interface TxRepository {
     List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize);
 
     Flowable<Object> observeWalletChanged();
+
+    /**
+     * 处理由于回滚未置为offChain状态的区块
+     * @param chainID
+     * @param userPk
+     * @param nonce
+     */
+    int updateAllOffChainTxs(String chainID, String userPk, long nonce);
 }

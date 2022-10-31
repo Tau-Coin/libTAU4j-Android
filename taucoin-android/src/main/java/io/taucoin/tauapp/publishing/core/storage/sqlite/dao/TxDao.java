@@ -177,6 +177,10 @@ public interface TxDao {
 
     String QUERY_TX_LOGS = "SELECT * FROM TxLogs WHERE hash = :hash ORDER BY status DESC";
 
+    String UPDATE_ALL_OFF_CHAIN_TXS = "UPDATE Txs SET txStatus = 0" +
+            " WHERE chainID = :chainID AND senderPk = :userPk" +
+            " AND txType IN (2, 3, 4, 5, 6) AND nonce > :nonce";
+
     /**
      * 添加新的交易
      */
@@ -327,4 +331,13 @@ public interface TxDao {
 
     @Query(QUERY_TX_LOGS)
     Observable<List<TxLog>> observerTxLogs(String hash);
+
+    /**
+     * 处理由于回滚未置为offChain状态的区块
+     * @param chainID
+     * @param userPk
+     * @param nonce
+     */
+    @Query(UPDATE_ALL_OFF_CHAIN_TXS)
+    int updateAllOffChainTxs(String chainID, String userPk, long nonce);
 }

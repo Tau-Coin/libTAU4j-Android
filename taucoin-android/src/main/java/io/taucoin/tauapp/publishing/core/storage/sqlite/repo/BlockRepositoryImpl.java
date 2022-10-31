@@ -122,4 +122,14 @@ public class BlockRepositoryImpl implements BlockRepository{
     public List<BlockAndTx> queryCommunityBlocks(String chainID, int pos, int pageSize) {
         return db.blockDao().queryCommunityBlocks(chainID, pos, pageSize);
     }
+
+    /**
+     * 处理由于回滚未置为offChain状态的区块
+     * @param chainID
+     * @param headBlock
+     */
+    @Override
+    public int updateAllOffChainBlocks(String chainID, long headBlock) {
+        return db.blockDao().updateAllOffChainBlocks(chainID, headBlock);
+    }
 }

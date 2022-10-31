@@ -127,7 +127,7 @@ public class TauListenHandler {
      * libTAU上报新head block
      * @param block head Block
      */
-    void onNewHeadBlock(Block block) {
+    void onNewHeadBlock(Block block, String userPk) {
         logger.info("onNewHeadBlock");
         String chainID = ChainIDUtil.decode(block.getChainID());
         Community community = communityRepo.getCommunityByChainID(chainID);
@@ -142,6 +142,21 @@ public class TauListenHandler {
             logger.info("onNewHeadBlock, chainID::{}, difficulty::{}, headBlock::{}, consensusBlock::{}",
                     chainID, community.difficulty, community.headBlock, community.consensusBlock);
             communityRepo.updateCommunity(community);
+        }
+
+        Account account = daemon.getAccountInfo(block.getChainID(), userPk);
+        if (account != null) {
+            // 处理区块回滚，
+            // 1、交易nonce大于libTAU的nonce，都置为未上链；
+            long nonce = account.getNonce();
+            int count = txRepo.updateAllOffChainTxs(chainID, userPk, nonce);
+            logger.info("onNewHeadBlock updateAllOffChainTxs count::{}, chainID::{}, userPk::{}, nonce::{}",
+                    count, chainID, userPk, nonce);
+            // 2、区块blockNumber大于最新head block的区块状态置为未上链；
+            long headBlock = block.getBlockNumber();
+            count = blockRepo.updateAllOffChainBlocks(chainID, headBlock);
+            logger.info("onNewHeadBlock updateAllOffChainBlocks count::{}, chainID::{}, headBlock::{}",
+                    count, chainID, headBlock);
         }
 
         handleBlockData(block, BlockStatus.NEW_BLOCK);

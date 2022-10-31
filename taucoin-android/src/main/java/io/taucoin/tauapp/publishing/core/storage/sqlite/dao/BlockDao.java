@@ -80,6 +80,9 @@ public interface BlockDao {
             " WHERE chainID = :chainID AND status == 1" +
             " ORDER BY blockNumber DESC LIMIT :num";
 
+    String UPDATE_ALL_OFF_CHAIN_BLOCKS = "UPDATE Blocks SET status = 0" +
+            " WHERE chainID = :chainID AND blockNumber > :headBlock";
+
     /**
      * 添加用户设备信息
      */
@@ -123,4 +126,12 @@ public interface BlockDao {
 
     @Query(QUERY_BLOCKS_LIMIT)
     Flowable<List<BlockInfo>> observerCommunityTopBlocks(String chainID, int num);
+
+    /**
+     * 处理由于回滚未置为offChain状态的区块
+     * @param chainID
+     * @param headBlock
+     */
+    @Query(UPDATE_ALL_OFF_CHAIN_BLOCKS)
+    int updateAllOffChainBlocks(String chainID, long headBlock);
 }

@@ -140,7 +140,7 @@ public class TauDaemonAlertHandler {
                 onConfirmRoot(alert, alertAndUser.getUserPk());
                 break;
             case BLOCK_CHAIN_HEAD_BLOCK:
-                onNewHeadBlock(alert);
+                onNewHeadBlock(alert, alertAndUser.getUserPk());
                 break;
             case BLOCK_CHAIN_SYNCING_BLOCK:
                 onSyncingBlock(alert);
@@ -382,11 +382,11 @@ public class TauDaemonAlertHandler {
      * libTAU上报新head block
      * @param alert libTAU上报
      */
-    private void onNewHeadBlock(Alert alert) {
+    private void onNewHeadBlock(Alert alert, String userPk) {
         BlockChainNewHeadBlockAlert a = (BlockChainNewHeadBlockAlert) alert;
         logger.info(a.get_message());
         Block block = a.get_new_block();
-        tauListenHandler.onNewHeadBlock(block);
+        tauListenHandler.onNewHeadBlock(block, userPk);
     }
 
     /**

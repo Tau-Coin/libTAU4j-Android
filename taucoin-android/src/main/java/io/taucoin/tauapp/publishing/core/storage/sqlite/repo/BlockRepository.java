@@ -61,4 +61,11 @@ public interface BlockRepository {
     Flowable<List<BlockAndTx>> observeCommunitySyncStatus(String chainID);
 
     List<BlockAndTx> queryCommunityBlocks(String chainID, int pos, int pageSize);
+
+    /**
+     * 处理由于回滚未置为offChain状态的区块
+     * @param chainID
+     * @param headBlock
+     */
+    int updateAllOffChainBlocks(String chainID, long headBlock);
 }

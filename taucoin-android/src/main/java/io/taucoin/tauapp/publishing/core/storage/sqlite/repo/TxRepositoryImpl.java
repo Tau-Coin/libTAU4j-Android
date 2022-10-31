@@ -284,4 +284,15 @@ public class TxRepositoryImpl implements TxRepository{
         String[] tables = new String[]{"Users", "Txs","Blocks"};
         return RxRoom.createFlowable(db, tables);
     }
+
+    /**
+     * 处理由于回滚未置为offChain状态的区块
+     * @param chainID
+     * @param userPk
+     * @param nonce
+     */
+    @Override
+    public int updateAllOffChainTxs(String chainID, String userPk, long nonce) {
+        return db.txDao().updateAllOffChainTxs(chainID, userPk, nonce);
+    }
 }
