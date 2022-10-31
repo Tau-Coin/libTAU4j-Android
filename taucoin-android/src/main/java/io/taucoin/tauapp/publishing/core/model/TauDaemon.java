@@ -435,6 +435,8 @@ public abstract class TauDaemon {
             SystemServiceManager.getInstance().getNetworkAddress();
             sessionManager.reopenNetworkSockets();
             setAutoRelay(NetworkSetting.isUnlimitedNetwork());
+            // 设置为true, 底层会智能判断，修改此值
+            setNonReferable(true);
             logger.info("Network change reopen network sockets...");
         }
     }
