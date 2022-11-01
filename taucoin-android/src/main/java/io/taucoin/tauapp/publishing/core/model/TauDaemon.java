@@ -91,7 +91,7 @@ public abstract class TauDaemon {
     private Disposable updateLocationTimer;          // 更新位置信息定时任务
     private Disposable noRemainingDataTimer;         // 触发无剩余流量的提示定时任务
     private Disposable onlineTimer;                  // 触发在线信号定时任务
-    private Disposable autoRelayTimer;               // 触发延迟设置relay定时任务
+    private Disposable chargingTimer;                // 触发充电5分钟计时任务
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
     private final TxQueueManager txQueueManager;     // 交易队列管理
     private final DataDozeManager tauDozeManager;     // tau休息模式管理
@@ -100,6 +100,8 @@ public abstract class TauDaemon {
     private volatile boolean trafficTips = true;     // 剩余流量用完提示
     volatile String seed;
     String deviceID;
+
+    private boolean chargingTimingCompleted = false;  // 充电5分钟计时完成
 
     // libTAU上报的Alert缓存队列
     LinkedBlockingQueue<AlertAndUser> alertQueue = new LinkedBlockingQueue<>();
@@ -251,7 +253,7 @@ public abstract class TauDaemon {
                 .setDatabaseDir(appContext.getApplicationInfo().dataDir) // 数据库目录
                 .setDumpfileDir(FileUtil.getDumpfileDir())  // Dump File目录
                 .setDhtNonReferable(true)
-                .setDhtAutoRelay(NetworkSetting.isUnlimitedNetwork() && settingsRepo.chargingState())
+                .setDhtAutoRelay(false)
                 .setDhtPingInterval(3600)
                 .setDhtBootstrapInterval(10)
                 .setLogLevel(LogUtil.getTauLogLevel())
@@ -287,8 +289,8 @@ public abstract class TauDaemon {
         if (updateBootstrapIntervalTimer != null && !updateBootstrapIntervalTimer.isDisposed()) {
             updateBootstrapIntervalTimer.dispose();
         }
-        if (autoRelayTimer != null && !autoRelayTimer.isDisposed()) {
-            autoRelayTimer.dispose();
+        if (chargingTimer != null && !chargingTimer.isDisposed()) {
+            chargingTimer.dispose();
         }
         TauNotifier.getInstance().cancelAllNotify();
         locationManager.stopLocation();
@@ -331,7 +333,11 @@ public abstract class TauDaemon {
      * 电源充电状态切换广播接受器
      */
     private void switchPowerReceiver() {
-        settingsRepo.chargingState(systemServiceManager.isPlugged());
+        boolean chargingState = systemServiceManager.isPlugged();
+        settingsRepo.chargingState(chargingState);
+        if (chargingState) {
+            startChargingTiming();
+        }
         try {
             appContext.unregisterReceiver(powerReceiver);
         } catch (IllegalArgumentException ignore) {
@@ -368,7 +374,7 @@ public abstract class TauDaemon {
             reopenNetworkSockets();
         } else if (key.equals(appContext.getString(R.string.pref_key_charging_state))) {
             logger.info("SettingsChanged, charging state::{}", settingsRepo.chargingState());
-            setAutoRelayDelay();
+            startChargingTiming();
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
             logger.info("isMeteredNetwork::{}", NetworkSetting.isMeteredNetwork());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_wifi_network))) {
@@ -439,7 +445,8 @@ public abstract class TauDaemon {
         } else {
             SystemServiceManager.getInstance().getNetworkAddress();
             sessionManager.reopenNetworkSockets();
-            setAutoRelay(NetworkSetting.isUnlimitedNetwork() && settingsRepo.chargingState());
+
+            resetAutoRelayDelay();
             logger.info("Network change reopen network sockets...");
         }
     }
@@ -757,19 +764,45 @@ public abstract class TauDaemon {
         }
     }
 
-    public void setAutoRelayDelay() {
-        if (autoRelayTimer != null && !autoRelayTimer.isDisposed()) {
-            autoRelayTimer.dispose();
+    /**
+     * 启动充电5分钟计时
+     */
+    private void startChargingTiming() {
+        if (chargingTimer != null && !chargingTimer.isDisposed()) {
+            chargingTimer.dispose();
         }
-        int timeMin = 5;
-        logger.info("setAutoRelay Delay::{}min...", timeMin);
-        autoRelayTimer = ObservableUtil.intervalSeconds(timeMin * 60)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(l -> {
-                boolean autoRelay = NetworkSetting.isUnlimitedNetwork() && settingsRepo.chargingState();
-                setAutoRelay(autoRelay);
-            });
+        boolean chargingState = settingsRepo.chargingState();
+        if (chargingState) {
+            int timeMin = 5;
+            logger.info("startChargingTiming::{}min...", timeMin);
+            chargingTimer = ObservableUtil.intervalSeconds(timeMin * 60)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(l -> {
+                    chargingTimingCompleted = true;
+                    resetAutoRelayDelay();
+                    if (chargingTimer != null && !chargingTimer.isDisposed()) {
+                        chargingTimer.dispose();
+                    }
+                });
+        } else {
+            chargingTimingCompleted = false;
+            resetAutoRelayDelay();
+        }
+    }
+
+    /**
+     * 延迟重置libTAU是否为自动中继
+     */
+    public void resetAutoRelayDelay() {
+        boolean autoRelay = NetworkSetting.isUnlimitedNetwork() && settingsRepo.chargingState()
+                && chargingTimingCompleted;
+        if (autoRelay) {
+            setAutoRelay(true);
+        } else {
+            setAutoRelay(false);
+            setNonReferable(true);
+        }
     }
 
     /**
