@@ -324,7 +324,7 @@ public class TxUtils {
                     if (StringUtil.isNotEmpty(referralLink)) {
                         msg.append("\n").append("\n").append("Referral and Bonus Link: ").append(referralLink);
                     } else {
-                        msg.append("\n").append("Community Link: ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID));
+                        msg.append("\n").append("Community Link: ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID, tx.senderPk));
                     }
                 }
             } else if (txType == TxType.AIRDROP_TX.getType()) {

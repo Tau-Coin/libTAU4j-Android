@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
@@ -32,7 +34,7 @@ import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 public class CommunityQRCodeActivity extends ScanTriggerActivity implements View.OnClickListener {
 
     private static final Logger logger = LoggerFactory.getLogger("QRCode");
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private ActivityCommunityQrCodeBinding binding;
     private CommunityViewModel communityViewModel;
     private UserViewModel userViewModel;
@@ -75,16 +77,19 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
         binding.qrCode.tvQrCode.setVisibility(View.GONE);
         binding.qrCode.ivCopy.setVisibility(View.GONE);
 
-        // 获取10个社区成员的公钥
-        String userPk = MainApplication.getInstance().getPublicKey();
-        chainUrl = LinkUtil.encodeChain(userPk, chainID);
-        binding.qrCode.tvName.setText(chainUrl);
-        logger.info("chainUrl::{}", chainUrl);
-        communityViewModel.generateQRCode(this, chainUrl, this.chainID, showName);
-
         communityViewModel.getQRBitmap().observe(this, bitmap -> {
             binding.qrCode.ivQrCode.setImageBitmap(bitmap);
         });
+        disposables.add(communityViewModel.observeLatestMiner(chainID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(miner -> {
+                    String userPk = MainApplication.getInstance().getPublicKey();
+                    chainUrl = LinkUtil.encodeChain(userPk, chainID, miner);
+                    binding.qrCode.tvName.setText(chainUrl);
+                    logger.info("chainUrl::{}", chainUrl);
+                    communityViewModel.generateQRCode(this, chainUrl, this.chainID, showName);
+                }));
     }
 
     /**

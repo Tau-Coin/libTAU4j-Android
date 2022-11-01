@@ -597,7 +597,7 @@ public abstract class TauDaemon {
                 Community community = communityRepo.getCommunityByChainID(testChainID);
                 if (null == community) {
                     String peer = BuildConfig.TEST_CHAIN_PEER;
-                    String tauTesting = LinkUtil.encodeChain(peer, testChainID);
+                    String tauTesting = LinkUtil.encodeChain(peer, testChainID, peer);
                     tauDaemonAlertHandler.addCommunity(tauTesting);
                 }
                 // 1、处理本地跟随的chains, libTAU未跟随的情况

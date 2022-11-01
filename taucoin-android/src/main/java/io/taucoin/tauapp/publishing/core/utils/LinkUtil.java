@@ -16,8 +16,9 @@ public class LinkUtil {
 
     private static final String URL_SCHEME = "tau:";
     private static final String LINK_FORMAT = URL_SCHEME + "//%s/%s/%s&%d";
-    private static final String AIRDROP_LINK_FORMAT = URL_SCHEME + "//%s/%s/%s&%d&%d";
-    private static final String REFERRAL_LINK_FORMAT = URL_SCHEME + "//%s/%s/%s&%d&%d&%s";
+    private static final String CHAIN_FORMAT = URL_SCHEME + "//%s/%s/%s&%d&%s";
+    private static final String AIRDROP_LINK_FORMAT = URL_SCHEME + "//%s/%s/%s&%d&%d&%s";
+    private static final String REFERRAL_LINK_FORMAT = URL_SCHEME + "//%s/%s/%s&%d&%d&%s&%s";
     private static final String LINK_FRIEND = "friend";
     private static final String LINK_CHAIN = "chain";
     private static final String LINK_AIRDROP = "airdrop";
@@ -26,15 +27,15 @@ public class LinkUtil {
     private static final String SPACES = " ";
 
     // Base58编码：包括9个数字，24个大写字母，25个小写字母
-    private static final String PATTERN_KEY = "([123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+)";
+    private static final String PATTERN_KEY = "([123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{44})";
     private static final String PATTERN_PREFIX = URL_SCHEME + "//" + PATTERN_KEY + "/";
     private static final String PATTERN_SUFFIX = "/([a-f0-9]{16}[A-Za-z0-9\\s-%]+)&[0-9]{8}";
     private static final String AIRDROP_PATTERN_SUFFIX = "/([a-f0-9]{16}[A-Za-z0-9\\s-%]+)&([0-9]+)&[0-9]{8}";
     private static final String FRIEND_PATTERN_SUFFIX = "/([^&]+)&[0-9]{8}";
     public static final String FRIEND_PATTERN = PATTERN_PREFIX + LINK_FRIEND + FRIEND_PATTERN_SUFFIX;
-    public static final String CHAIN_PATTERN = PATTERN_PREFIX + LINK_CHAIN + PATTERN_SUFFIX;
-    public static final String AIRDROP_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + AIRDROP_PATTERN_SUFFIX;
-    public static final String REFERRAL_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + AIRDROP_PATTERN_SUFFIX + "&" + PATTERN_KEY;
+    public static final String CHAIN_PATTERN = PATTERN_PREFIX + LINK_CHAIN + PATTERN_SUFFIX+ "&" + PATTERN_KEY;
+    public static final String AIRDROP_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + AIRDROP_PATTERN_SUFFIX + "&" + PATTERN_KEY;
+    public static final String REFERRAL_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + AIRDROP_PATTERN_SUFFIX + "&" + PATTERN_KEY + "&" + PATTERN_KEY;
 
     public static boolean isTauUrl(String url) {
         return StringUtil.isNotEmpty(url) && url.startsWith("tau");
@@ -109,15 +110,24 @@ public class LinkUtil {
                         if (data.length == 2) {
                             link.setData(data[0]);
                             link.setTimestamp(Long.parseLong(data[1]));
-                        } else if (data.length == 3) {
-                            link.setData(data[0]);
-                            link.setCoins(Long.parseLong(data[1]));
-                            link.setTimestamp(Long.parseLong(data[2]));
                         } else if (data.length == 4) {
                             link.setData(data[0]);
                             link.setCoins(Long.parseLong(data[1]));
                             link.setTimestamp(Long.parseLong(data[2]));
-                            byte[] referralPeer = Base58.decode(data[3]);
+
+                            byte[] miner = Base58.decode(data[3]);
+                            String minerStr = ByteUtil.toHexString(miner);
+                            link.setMiner(minerStr);
+                        } else if (data.length == 5) {
+                            link.setData(data[0]);
+                            link.setCoins(Long.parseLong(data[1]));
+                            link.setTimestamp(Long.parseLong(data[2]));
+
+                            byte[] miner = Base58.decode(data[3]);
+                            String minerStr = ByteUtil.toHexString(miner);
+                            link.setMiner(minerStr);
+
+                            byte[] referralPeer = Base58.decode(data[4]);
                             String referralPeerStr = ByteUtil.toHexString(referralPeer);
                             link.setReferralPeer(referralPeerStr);
                         }
@@ -164,11 +174,12 @@ public class LinkUtil {
      * @param chainID 链ID
      * @return 链URL
      */
-    public static String encodeChain(@NonNull String peer, @NonNull String chainID) {
+    public static String encodeChain(@NonNull String peer, @NonNull String chainID, String miner) {
         String peerBase58 = Base58.encode(ByteUtil.toByte(peer));
         logger.debug("peerBase58::{}, size::{}", peerBase58, peerBase58.length());
         long timestamp = DateUtil.getTime() / 60;
-        String link = String.format(Locale.ENGLISH, LINK_FORMAT, peerBase58, LINK_CHAIN, chainID, timestamp);
+        String minerBase58 = Base58.encode(ByteUtil.toByte(miner));
+        String link = String.format(Locale.ENGLISH, CHAIN_FORMAT, peerBase58, LINK_CHAIN, chainID, timestamp, minerBase58);
         if (link.contains(SPACES)) {
             link = link.replaceAll(SPACES, SPACES_REPLACE);
         }
@@ -181,12 +192,16 @@ public class LinkUtil {
      * Airdrop 编码
      * @param peer 当前节点
      * @param chainID 链ID
+     * @param miner 矿工
      * @return 链URL
      */
-    public static String encodeAirdrop(@NonNull String peer, @NonNull String chainID, long coins, long timestamp) {
+    public static String encodeAirdrop(@NonNull String peer, @NonNull String chainID, long coins,
+                                       long timestamp, String miner) {
         String peerBase58 = Base58.encode(ByteUtil.toByte(peer));
+        String minerBase58 = Base58.encode(ByteUtil.toByte(miner));
         logger.debug("peerBase58::{}, size::{}", peerBase58, peerBase58.length());
-        String link = String.format(Locale.ENGLISH, AIRDROP_LINK_FORMAT, peerBase58, LINK_AIRDROP, chainID, coins, timestamp);
+        String link = String.format(Locale.ENGLISH, AIRDROP_LINK_FORMAT, peerBase58, LINK_AIRDROP,
+                chainID, coins, timestamp, minerBase58);
         if (link.contains(SPACES)) {
             link = link.replaceAll(SPACES, SPACES_REPLACE);
         }
@@ -202,17 +217,19 @@ public class LinkUtil {
      * @return 链URL
      */
     public static String encodeAirdropReferral(LinkUtil.Link link, String referralPeer) {
-        return encodeAirdropReferral(link.getPeer(), link.getData(), link.getCoins(), link.getTimestamp(), referralPeer);
+        return encodeAirdropReferral(link.getPeer(), link.getData(), link.getCoins(), link.getTimestamp(),
+                link.getMiner(), referralPeer);
     }
 
     public static String encodeAirdropReferral(@NonNull String peer, @NonNull String chainID, long coins,
-                                               long timestamp, String referralPeer) {
+                                               long timestamp, String miner, String referralPeer) {
         String peerBase58 = Base58.encode(ByteUtil.toByte(peer));
         logger.debug("peerBase58::{}, size::{}", peerBase58, peerBase58.length());
 
+        String minerBase58 = Base58.encode(ByteUtil.toByte(miner));
         String referralPeerBase58 = Base58.encode(ByteUtil.toByte(referralPeer));
         String link = String.format(Locale.ENGLISH, REFERRAL_LINK_FORMAT, peerBase58, LINK_AIRDROP,
-                chainID, coins, timestamp, referralPeerBase58);
+                chainID, coins, timestamp, minerBase58, referralPeerBase58);
         if (link.contains(SPACES)) {
             link = link.replaceAll(SPACES, SPACES_REPLACE);
         }
@@ -224,6 +241,7 @@ public class LinkUtil {
     public static class Link {
         private String link;
         private String peer;
+        private String miner;
         private String referralPeer;
         private String type;
         private String data;
@@ -297,12 +315,13 @@ public class LinkUtil {
         public void setCoins(long coins) {
             this.coins = coins;
         }
-    }
 
-    public static void main(String[] args) {
-        String chainID = "55a10b4a30303030yang";
-        String peer = "2d74d85bc8ef4db0485d38ccb035425190e1d1478cb77c5b6ee81e79cf64506d";
-        encodeFriend(peer, "yang");
-        System.out.println("encodeFriend::" + encodeFriend(peer, "yang"));
+        public String getMiner() {
+            return miner;
+        }
+
+        public void setMiner(String miner) {
+            this.miner = miner;
+        }
     }
 }

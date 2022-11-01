@@ -225,6 +225,7 @@ public class CommunityViewModel extends AndroidViewModel {
 
                 Set<String> peers = new HashSet<>();
                 peers.add(link.getPeer());
+                peers.add(link.getMiner());
                 boolean success = false;
                 Community community = communityRepo.getCommunityByChainID(chainID);
                 // 向对方peer请求publish区块链数据
@@ -1271,5 +1272,21 @@ public class CommunityViewModel extends AndroidViewModel {
 
     public Observable<BlockInfo> observeBlockByHash(String chainID, String hash) {
         return blockRepo.observeBlock(chainID, hash);
+    }
+
+    public Observable<String> observeLatestMiner(String chainID) {
+        return Observable.create((ObservableOnSubscribe<String>) emitter -> {
+            String miner = MainApplication.getInstance().getPublicKey();
+            try {
+                BlockInfo block = blockRepo.queryLatestBlock(chainID);
+                if (block != null && StringUtil.isNotEmpty(block.miner)) {
+                    miner = block.miner;
+                }
+            } catch (Exception e) {
+                logger.error("observeLatestMiner error ", e);
+            }
+            emitter.onNext(miner);
+            emitter.onComplete();
+        });
     }
 }

@@ -179,7 +179,6 @@ public class FriendsListAdapter extends ListAdapter<UserAndFriend, FriendsListAd
 
     public interface ClickListener {
         void onItemClicked(User item);
-        void onShareClicked(UserAndFriend item);
     }
 
     static abstract class ItemCallback extends DiffUtil.ItemCallback<UserAndFriend> {

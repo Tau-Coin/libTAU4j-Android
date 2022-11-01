@@ -68,4 +68,6 @@ public interface BlockRepository {
      * @param headBlock
      */
     int updateAllOffChainBlocks(String chainID, long headBlock);
+
+    BlockInfo queryLatestBlock(String chainID);
 }

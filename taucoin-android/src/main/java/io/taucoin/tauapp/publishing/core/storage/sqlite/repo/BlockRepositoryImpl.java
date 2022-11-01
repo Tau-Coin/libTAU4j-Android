@@ -132,4 +132,9 @@ public class BlockRepositoryImpl implements BlockRepository{
     public int updateAllOffChainBlocks(String chainID, long headBlock) {
         return db.blockDao().updateAllOffChainBlocks(chainID, headBlock);
     }
+
+    @Override
+    public BlockInfo queryLatestBlock(String chainID) {
+        return db.blockDao().queryLatestBlock(chainID);
+    }
 }

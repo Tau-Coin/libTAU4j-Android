@@ -12,7 +12,10 @@ import android.view.View;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropStatus;
@@ -49,6 +52,7 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private Dialog linkDialog;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private boolean linksSelector = false;
+    private Disposable airdropDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,11 +141,12 @@ public class AirdropCommunityActivity extends BaseActivity implements
                     String chainID = member.chainID;
                     String airdropPeer = MainApplication.getInstance().getPublicKey();
                     long airdropTime = member.airdropTime / 60 / 1000;
-                    String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, member.airdropCoins, airdropTime);
-                    Intent intent = new Intent();
-                    intent.putExtra(IntentExtra.AIRDROP_LINK, airdropLink);
-                    setResult(RESULT_OK, intent);
-                    this.finish();
+                    createAirdropLink(airdropPeer, chainID, member.airdropCoins, airdropTime, true);
+//                    String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, member.airdropCoins, airdropTime, "");
+//                    Intent intent = new Intent();
+//                    intent.putExtra(IntentExtra.AIRDROP_LINK, airdropLink);
+//                    setResult(RESULT_OK, intent);
+//                    this.finish();
                 } else {
                     ToastUtils.showShortToast(R.string.tx_airdrop_setup);
                 }
@@ -150,6 +155,26 @@ public class AirdropCommunityActivity extends BaseActivity implements
             }
         }
         return true;
+    }
+
+    private void createAirdropLink(String airdropPeer, String chainID, long airdropCoins, long airdropTime, boolean isExit) {
+        if (airdropDisposable != null && !airdropDisposable.isDisposed()) {
+            airdropDisposable.dispose();
+            airdropDisposable = null;
+        }
+        airdropDisposable = communityViewModel.observeLatestMiner(chainID).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(miner -> {
+                    String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, airdropCoins, airdropTime, miner);
+                    if (isExit) {
+                        Intent intent = new Intent();
+                        intent.putExtra(IntentExtra.AIRDROP_LINK, airdropLink);
+                        setResult(RESULT_OK, intent);
+                        this.finish();
+                    } else {
+                        shareAirdropLink(chainID, airdropLink, airdropCoins);
+                    }
+                });
     }
 
     /**
@@ -188,8 +213,9 @@ public class AirdropCommunityActivity extends BaseActivity implements
     public void onShare(String chainID, long airdropCoins, long airdropTime) {
         if (StringUtil.isNotEmpty(chainID)) {
             String airdropPeer = MainApplication.getInstance().getPublicKey();
-            String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, airdropCoins, airdropTime);
-            shareAirdropLink(chainID, airdropLink, airdropCoins);
+//            String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, airdropCoins, airdropTime, "");
+            createAirdropLink(airdropPeer, chainID, airdropCoins, airdropTime, false);
+//            shareAirdropLink(chainID, airdropLink, airdropCoins);
         }
     }
 

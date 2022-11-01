@@ -261,7 +261,7 @@ class MsgAlertHandler {
                 long airdropTime = member.airdropTime / 60 / 1000;
                 long airdropCoins = member.airdropCoins;
                 String referralLink = LinkUtil.encodeAirdropReferral(member.publicKey, member.chainID,
-                        airdropCoins, airdropTime, friendPk);
+                        airdropCoins, airdropTime, member.publicKey, friendPk);
                 logger.debug("handleAirdropCoins referralLink::{}", referralLink);
                 long referralBonus = member.airdropCoins / 2;
                 referralBonus = Math.max(1, referralBonus);

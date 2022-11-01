@@ -83,6 +83,10 @@ public interface BlockDao {
     String UPDATE_ALL_OFF_CHAIN_BLOCKS = "UPDATE Blocks SET status = 0" +
             " WHERE chainID = :chainID AND blockNumber >= :headBlock";
 
+    String QUERY_LATEST_BLOCK = "SELECT * FROM Blocks" +
+            " WHERE chainID = :chainID AND status == 1" +
+            " ORDER BY blockNumber DESC LIMIT 1";
+
     /**
      * 添加用户设备信息
      */
@@ -134,4 +138,7 @@ public interface BlockDao {
      */
     @Query(UPDATE_ALL_OFF_CHAIN_BLOCKS)
     int updateAllOffChainBlocks(String chainID, long headBlock);
+
+    @Query(QUERY_LATEST_BLOCK)
+    BlockInfo queryLatestBlock(String chainID);
 }

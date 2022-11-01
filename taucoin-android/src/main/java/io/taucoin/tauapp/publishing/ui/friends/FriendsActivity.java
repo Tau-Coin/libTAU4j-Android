@@ -23,7 +23,6 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndFriend;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
-import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.ObservableUtil;
 import io.taucoin.tauapp.publishing.core.utils.bus.Members;
 import io.taucoin.tauapp.publishing.core.utils.bus.RxBus2;
@@ -271,20 +270,6 @@ public class FriendsActivity extends BaseActivity implements FriendsListAdapter.
             intent.putExtra(IntentExtra.TYPE, UserDetailActivity.TYPE_FRIEND_LIST);
             ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
 //        }
-    }
-
-    @Override
-    public void onShareClicked(UserAndFriend user) {
-        showShareDialog();
-    }
-
-    /**
-     * 显示联系平台的对话框
-     */
-    private void showShareDialog() {
-        String userPk = MainApplication.getInstance().getPublicKey();
-        String chainUrl = LinkUtil.encodeChain(userPk, chainID);
-        ActivityUtil.shareText(this, getString(R.string.contacts_share_link_via), chainUrl);
     }
 
     @Override
