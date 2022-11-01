@@ -102,11 +102,6 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
      * 初始化布局
      */
     private void initLayout() {
-        long txFree = 0L;
-        if (StringUtil.isNotEmpty(chainID)) {
-            txFree = viewModel.getTxFee(chainID, TxType.WIRING_TX);
-        }
-        medianFee = FmtMicrometer.fmtFeeValue(txFree);
         adapter = new MembersAddAdapter(airdropCoin);
         adapter.setListener(new MembersAddAdapter.ClickListener() {
             @Override
@@ -289,6 +284,13 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
                 calculateTotalCoins();
             }));
         }
+
+        disposables.add(viewModel.observeAverageTxFee(chainID, TxType.WIRING_TX)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(fee -> {
+                    this.medianFee = FmtMicrometer.fmtFeeValue(fee);
+                }));
     }
 
     @Override

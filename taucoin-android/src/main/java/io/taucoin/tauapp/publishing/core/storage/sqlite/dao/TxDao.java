@@ -12,6 +12,7 @@ import androidx.room.Update;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
+import io.taucoin.tauapp.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
@@ -181,6 +182,15 @@ public interface TxDao {
             " WHERE chainID = :chainID AND senderPk = :userPk" +
             " AND txType IN (2, 3, 4, 5, 6) AND nonce > :nonce";
 
+    String QUERY_AVERAGE_TXS_FEE = "SELECT count(*) AS total, ifnull(sum(ifnull(fee, 0)), 0) AS totalFee," +
+            " ifnull(sum(CASE WHEN ifnull(txType, 0) = 2 THEN 1 ELSE 0 END), 0) AS wiringCount, " +
+            " ifnull(sum(CASE WHEN ifnull(txType, 0) in (2, 3, 4, 5, 6) THEN 1 ELSE 0 END), 0) AS txsCount" +
+            " FROM (SELECT t.fee, t.txType" +
+            " FROM Blocks b" +
+            " LEFT JOIN Txs t ON b.txID = t.txID" +
+            " WHERE b.chainID = :chainID AND b.status = 1" +
+            " ORDER BY b.blockNumber DESC LIMIT 50)";
+
     /**
      * 添加新的交易
      */
@@ -340,4 +350,12 @@ public interface TxDao {
      */
     @Query(UPDATE_ALL_OFF_CHAIN_TXS)
     int updateAllOffChainTxs(String chainID, String userPk, long nonce);
+
+    /**
+     * 交易费统计
+     * @param chainID
+     * @return
+     */
+    @Query(QUERY_AVERAGE_TXS_FEE)
+    TxFreeStatistics queryAverageTxsFee(String chainID);
 }

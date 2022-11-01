@@ -81,7 +81,7 @@ public interface BlockDao {
             " ORDER BY blockNumber DESC LIMIT :num";
 
     String UPDATE_ALL_OFF_CHAIN_BLOCKS = "UPDATE Blocks SET status = 0" +
-            " WHERE chainID = :chainID AND blockNumber > :headBlock";
+            " WHERE chainID = :chainID AND blockNumber >= :headBlock";
 
     /**
      * 添加用户设备信息

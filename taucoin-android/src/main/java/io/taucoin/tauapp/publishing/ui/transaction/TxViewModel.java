@@ -43,6 +43,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.core.model.data.DataChanged;
 import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.tauapp.publishing.core.model.data.Result;
+import io.taucoin.tauapp.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
@@ -474,10 +475,6 @@ public class TxViewModel extends AndroidViewModel {
         return true;
     }
 
-    public long getLastTxFee(String chainID){
-        return settingsRepo.lastTxFee(chainID);
-    }
-
     /**
      * 显示编辑交易费的对话框
      */
@@ -511,19 +508,45 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     /**
-     * 0、默认为最小交易费
-     * 1、从交易池中获取前10名交易费的中位数
-     * 2、如果交易池返回小于等于0，用上次交易用的交易费
+     * 1、转账交易费默认还是1；只有达到50%才平均交易费+1；
+     * 2、news最小交易费为5，平均交易费超过5，就+1；
+     * 3、这里只是设置默认值，只能动态修改airdrop和referral的交易费；
      * @param chainID 交易所属的社区chainID
      */
-    public long getTxFee(String chainID, TxType type) {
-        long free;
-        if (type == WIRING_TX) {
-            free = Constants.WIRING_MIN_FEE.longValue();
-        } else {
-            free = Constants.NEWS_MIN_FEE.longValue();
-        }
-        return free;
+    public Observable<Long> observeAverageTxFee(String chainID, TxType type) {
+        return Observable.create((ObservableOnSubscribe<Long>) emitter -> {
+            long txFee;
+            try {
+                TxFreeStatistics statistics = txRepo.queryAverageTxsFee(chainID);
+                if (statistics != null) {
+                    logger.debug("observeAverageTxFee Total::{}, TotalFee::{}, TxsCount::{}, WiringCount::{}",
+                            statistics.getTotal(), statistics.getTotalFee(), statistics.getTxsCount(), statistics.getWiringCount());
+                }
+                if (type == WIRING_TX) {
+                    txFee = Constants.WIRING_MIN_FEE.longValue();
+                    if (statistics != null) {
+                        float wiringRate = statistics.getWiringCount() * 100f / statistics.getTotal();
+                        if (wiringRate >= 50) {
+                            long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
+                            txFee = averageTxsFee + Constants.COIN.longValue();
+                        }
+                    }
+                } else {
+                    txFee = Constants.NEWS_MIN_FEE.longValue();
+                    if (statistics != null) {
+                        long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
+                        if (averageTxsFee > Constants.NEWS_MIN_FEE.longValue()) {
+                            txFee = averageTxsFee + Constants.COIN.longValue();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                txFee = Constants.MIN_FEE.longValue();
+            }
+            logger.debug("observeAverageTxFee txFee::{}", txFee);
+            emitter.onNext(txFee);
+            emitter.onComplete();
+        });
     }
 
     /**

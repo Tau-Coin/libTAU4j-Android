@@ -7,6 +7,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.tauapp.publishing.core.model.data.DataChanged;
 import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
+import io.taucoin.tauapp.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
@@ -139,4 +140,11 @@ public interface TxRepository {
      * @param nonce
      */
     int updateAllOffChainTxs(String chainID, String userPk, long nonce);
+
+    /**
+     * 交易费统计
+     * @param chainID
+     * @return
+     */
+    TxFreeStatistics queryAverageTxsFee(String chainID);
 }

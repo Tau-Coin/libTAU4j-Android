@@ -13,7 +13,9 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
@@ -42,7 +44,7 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
     private TxViewModel txViewModel;
     private String chainID;
     private TxQueue txQueue;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private boolean isClickPaste = false;
 
     @Override
@@ -81,22 +83,11 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         if (StringUtil.isNotEmpty(chainID)) {
-            long txFee = 0;
             if (txQueue != null) {
-                txFee = txQueue.fee;
                 AirdropTxContent txContent = new AirdropTxContent(txQueue.content);
                 binding.etLink.setText(txContent.getLink());
                 binding.etDescription.setText(txContent.getMemo());
             }
-
-            long mediaTxFee = txViewModel.getTxFee(chainID, TxType.AIRDROP_TX);
-            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : mediaTxFee);
-            binding.tvFee.setTag(R.id.median_fee, mediaTxFee);
-
-            String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
-                    ChainIDUtil.getCoinName(chainID));
-            binding.tvFee.setText(Html.fromHtml(txFreeHtml));
-            binding.tvFee.setTag(txFeeStr);
         }
 
         binding.etLink.setOnPasteCallback(new FilterEditText.OnPasteCallback() {
@@ -131,6 +122,20 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
         });
     }
 
+    private void loadFeeView(long averageTxFee) {
+        long txFee = 0L;
+        if (txQueue != null) {
+            txFee = txQueue.fee;
+        }
+        String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : averageTxFee);
+        binding.tvFee.setTag(R.id.median_fee, averageTxFee);
+
+        String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
+                ChainIDUtil.getCoinName(chainID));
+        binding.tvFee.setText(Html.fromHtml(txFreeHtml));
+        binding.tvFee.setTag(txFeeStr);
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -142,6 +147,11 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
                 onBackPressed();
             }
         });
+
+        disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.AIRDROP_TX)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::loadFeeView));
     }
 
     @Override

@@ -20,6 +20,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.core.Constants;
+import io.taucoin.tauapp.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
@@ -278,7 +279,7 @@ class TxQueueManager {
     private boolean sendTxQueue(Account account, TxQueueAndStatus txQueue) {
         boolean isSendMessage = false;
         if (txQueue.queueType == 1 || txQueue.queueType == 2) {
-            long medianFee = Constants.WIRING_MIN_FEE.longValue();
+            long medianFee = getAverageTxFee(txQueue.chainID, TxType.WIRING_TX);
             if (txQueue.fee != medianFee) {
                 txQueue.fee = medianFee;
                 // 更新airdrop的交易费
@@ -296,6 +297,34 @@ class TxQueueManager {
         }
         sendTxQueue(account, txQueue, true, 0);
         return false;
+    }
+
+    private long getAverageTxFee(String chainID, TxType type) {
+        long txFee;
+        try {
+            TxFreeStatistics statistics = txRepo.queryAverageTxsFee(chainID);
+            if (type == WIRING_TX) {
+                txFee = Constants.WIRING_MIN_FEE.longValue();
+                if (statistics != null) {
+                    float wiringRate = statistics.getWiringCount() * 100f / statistics.getTotal();
+                    if (wiringRate >= 50) {
+                        long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
+                        txFee = averageTxsFee + Constants.COIN.longValue();
+                    }
+                }
+            } else {
+                txFee = Constants.NEWS_MIN_FEE.longValue();
+                if (statistics != null) {
+                    long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
+                    if (averageTxsFee > Constants.NEWS_MIN_FEE.longValue()) {
+                        txFee = averageTxsFee + Constants.COIN.longValue();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            txFee = Constants.MIN_FEE.longValue();
+        }
+        return txFee;
     }
 
     /**

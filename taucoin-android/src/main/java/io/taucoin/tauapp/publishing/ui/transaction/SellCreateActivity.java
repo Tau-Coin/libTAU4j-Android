@@ -10,7 +10,9 @@ import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
@@ -33,7 +35,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
     private ActivitySellBinding binding;
     private TxViewModel txViewModel;
     private String chainID;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private TxQueue txQueue;
 
     @Override
@@ -75,9 +77,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
         binding.etQuantity.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         if (StringUtil.isNotEmpty(chainID)) {
-            long txFee = 0;
             if (txQueue != null) {
-                txFee = txQueue.fee;
                 SellTxContent txContent = new SellTxContent(txQueue.content);
                 binding.etItemName.setText(txContent.getCoinName());
                 binding.etLink.setText(txContent.getLink());
@@ -85,18 +85,24 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
                 binding.etLocation.setText(txContent.getLocation());
                 binding.etDescription.setText(txContent.getMemo());
             }
-            long mediaTxFee = txViewModel.getTxFee(chainID, TxType.SELL_TX);
-            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : mediaTxFee);
-            binding.tvFee.setTag(R.id.median_fee, mediaTxFee);
-
-            String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
-                    ChainIDUtil.getCoinName(chainID));
-            binding.tvFee.setText(Html.fromHtml(txFreeHtml));
-            binding.tvFee.setTag(txFeeStr);
         }
         String coinName = ChainIDUtil.getCoinName(chainID);
         String[] items = getResources().getStringArray(R.array.coin_name);
         items[1] = coinName;
+    }
+
+    private void loadFeeView(long averageTxFee) {
+        long txFee = 0L;
+        if (txQueue != null) {
+            txFee = txQueue.fee;
+        }
+        String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : averageTxFee);
+        binding.tvFee.setTag(R.id.median_fee, averageTxFee);
+
+        String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
+                ChainIDUtil.getCoinName(chainID));
+        binding.tvFee.setText(Html.fromHtml(txFreeHtml));
+        binding.tvFee.setTag(txFeeStr);
     }
 
     @Override
@@ -110,6 +116,11 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
                 onBackPressed();
             }
         });
+
+        disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.SELL_TX)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::loadFeeView));
     }
 
     @Override

@@ -77,6 +77,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     private CommonDialog trustDialog;
     private TxLogsDialog txLogsDialog;
     private Disposable logsDisposable;
+    private long medianFee;
 
     boolean isJoined = false;
     protected String chainID;
@@ -347,7 +348,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         if (txQueue != null) {
             txFee = txQueue.fee;
         }
-        long medianFee = txViewModel.getTxFee(chainID, TxType.TRUST_TX);
         String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : medianFee);
         binding.tvTrustFee.setTag(R.id.median_fee, medianFee);
 
@@ -399,6 +399,14 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     @Override
     public void onStart() {
         super.onStart();
+        if (currentTab == TAB_MARKET) {
+            disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.TRUST_TX)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(fee -> {
+                        this.medianFee = fee;
+                    }));
+        }
     }
 
     @Override

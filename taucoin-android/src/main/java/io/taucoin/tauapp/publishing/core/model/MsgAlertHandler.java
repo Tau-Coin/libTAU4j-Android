@@ -15,6 +15,7 @@ import java.util.List;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.data.ChatMsgStatus;
+import io.taucoin.tauapp.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.UserHeadPic;
 import io.taucoin.tauapp.publishing.core.model.data.UserInfo;
 import io.taucoin.tauapp.publishing.core.model.data.FriendStatus;
@@ -39,6 +40,7 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.DeviceRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.TxQueueRepository;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
@@ -50,6 +52,8 @@ import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.tauapp.publishing.ui.TauNotifier;
 import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
 
+import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.WIRING_TX;
+
 /**
  * MsgListener处理程序
  */
@@ -60,6 +64,7 @@ class MsgAlertHandler {
     private final DeviceRepository deviceRepo;
     private final UserRepository userRepo;
     private final TxQueueRepository txQueueRepo;
+    private final TxRepository txRepo;
     private final MemberRepository memberRepo;
     private final CommunityRepository communityRepo;
     private final TauDaemon daemon;
@@ -73,6 +78,7 @@ class MsgAlertHandler {
         deviceRepo = RepositoryHelper.getDeviceRepository(appContext);
         userRepo = RepositoryHelper.getUserRepository(appContext);
         txQueueRepo = RepositoryHelper.getTxQueueRepository(appContext);
+        txRepo = RepositoryHelper.getTxRepository(appContext);
         memberRepo = RepositoryHelper.getMemberRepository(appContext);
         communityRepo = RepositoryHelper.getCommunityRepository(appContext);
     }
@@ -215,7 +221,7 @@ class MsgAlertHandler {
         // airdrop coins
         String memo = appContext.getString(R.string.tx_memo_airdrop);
         long amount = member.airdropCoins;
-        long fee = Constants.WIRING_MIN_FEE.longValue();
+        long fee = getAverageTxFee(chainID, TxType.WIRING_TX);;
         TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
         TxQueue tx = new TxQueue(chainID, currentPk, friendPk, amount, fee, 1,
                 TxType.WIRING_TX.getType(), txContent.getEncoded());
@@ -265,6 +271,34 @@ class MsgAlertHandler {
             }
         }
         daemon.updateTxQueue(tx.chainID);
+    }
+
+    private long getAverageTxFee(String chainID, TxType type) {
+        long txFee;
+        try {
+            TxFreeStatistics statistics = txRepo.queryAverageTxsFee(chainID);
+            if (type == WIRING_TX) {
+                txFee = Constants.WIRING_MIN_FEE.longValue();
+                if (statistics != null) {
+                    float wiringRate = statistics.getWiringCount() * 100f / statistics.getTotal();
+                    if (wiringRate >= 50) {
+                        long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
+                        txFee = averageTxsFee + Constants.COIN.longValue();
+                    }
+                }
+            } else {
+                txFee = Constants.NEWS_MIN_FEE.longValue();
+                if (statistics != null) {
+                    long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
+                    if (averageTxsFee > Constants.NEWS_MIN_FEE.longValue()) {
+                        txFee = averageTxsFee + Constants.COIN.longValue();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            txFee = Constants.MIN_FEE.longValue();
+        }
+        return txFee;
     }
 
     /**

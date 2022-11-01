@@ -14,6 +14,7 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.tauapp.publishing.core.model.data.DataChanged;
 import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
+import io.taucoin.tauapp.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
@@ -294,5 +295,10 @@ public class TxRepositoryImpl implements TxRepository{
     @Override
     public int updateAllOffChainTxs(String chainID, String userPk, long nonce) {
         return db.txDao().updateAllOffChainTxs(chainID, userPk, nonce);
+    }
+
+    @Override
+    public TxFreeStatistics queryAverageTxsFee(String chainID) {
+        return db.txDao().queryAverageTxsFee(chainID);
     }
 }

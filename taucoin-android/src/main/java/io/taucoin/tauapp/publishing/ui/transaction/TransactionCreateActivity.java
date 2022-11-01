@@ -100,9 +100,8 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         binding.etAmount.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         if (StringUtil.isNotEmpty(chainID)) {
-            long txFee = 0;
             if (txQueue != null) {
-                txFee = txQueue.fee;
+                long txFee = txQueue.fee;
                 if (txQueue.content != null) {
                     TxContent txContent = new TxContent(txQueue.content);
                     binding.etMemo.setText(txContent.getMemo());
@@ -118,14 +117,6 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
                 binding.ivSelectPk.setVisibility(View.GONE);
                 binding.etAmount.setText(FmtMicrometer.fmtBalance(txQueue.amount));
             }
-            long mediaTxFee = txViewModel.getTxFee(chainID, TxType.WIRING_TX);
-            String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : mediaTxFee);
-            binding.tvFee.setTag(R.id.median_fee, mediaTxFee);
-
-            String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
-                    ChainIDUtil.getCoinName(chainID));
-            binding.tvFee.setText(Html.fromHtml(txFreeHtml));
-            binding.tvFee.setTag(txFeeStr);
         }
 
         if (null == txQueue) {
@@ -153,6 +144,20 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
         } else {
             binding.llMembersSelect.setVisibility(View.GONE);
         }
+    }
+
+    private void loadFeeView(long averageTxFee) {
+        long txFee = 0L;
+        if (txQueue != null) {
+            txFee = txQueue.fee;
+        }
+        String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : averageTxFee);
+        binding.tvFee.setTag(R.id.median_fee, averageTxFee);
+
+        String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
+                ChainIDUtil.getCoinName(chainID));
+        binding.tvFee.setText(Html.fromHtml(txFreeHtml));
+        binding.tvFee.setTag(txFeeStr);
     }
 
     private void initRefreshLayout() {
@@ -207,7 +212,12 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
                             dataChanged = false;
                         }
                     }));
+
         }
+        disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.WIRING_TX)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::loadFeeView));
     }
 
     @Override
