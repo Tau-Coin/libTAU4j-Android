@@ -277,8 +277,15 @@ public class ScanQRCodeActivity extends BaseActivity implements View.OnClickList
                     openChainLink(chainID, decode);
                     return;
                 } else if (decode.isFriendLink() && ByteUtil.toByte(decode.getPeer()).length == Ed25519.PUBLIC_KEY_SIZE) {
-                    String nickname = decode.getData();
-                    openFriendLink(nickname, decode);
+                    if (scanKeyOnly) {
+                        Intent intent = new Intent();
+                        intent.putExtra(IntentExtra.DATA, scanResult);
+                        setResult(RESULT_OK, intent);
+                        onBackPressed();
+                    } else {
+                        String nickname = decode.getData();
+                        openFriendLink(nickname, decode);
+                    }
                     return;
                 }
                 SeedQRContent content = new Gson().fromJson(scanResult, SeedQRContent.class);

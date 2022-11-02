@@ -13,7 +13,11 @@ public class LinkUtilTest {
     public void encodeFriendLink() {
         String peer = "2d74d85bc8ef4db0485d38ccb035425190e1d1478cb77c5b6ee81e79cf64506d";
         String link = LinkUtil.encodeFriend(peer, "yang");
-        System.out.println("Friend link::" + link);
+        System.out.println("Friend link1::" + link);
+
+        String newLink = "tau://BzzQegGNcRCQvP3b2J5GXwxaWdHonxM2oHVsa8kWiKUr/friend/yang2&27789214";
+        System.out.println("Friend link2::" + newLink);
+        LinkUtil.Link decode = LinkUtil.decode(newLink);
     }
 
     @Test

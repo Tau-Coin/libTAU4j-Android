@@ -24,7 +24,7 @@ import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
  */
 public abstract class ScanTriggerActivity extends BaseActivity {
 
-    private static final int SCAN_CODE = 0X100;
+    protected static final int SCAN_CODE = 0X100;
     private User userTemp;
     private boolean isExit = false;
     private UserViewModel viewModel;
@@ -45,6 +45,11 @@ public abstract class ScanTriggerActivity extends BaseActivity {
     }
 
     protected void openScanQRActivity() {
+        requestCameraPermissions();
+    }
+
+    public void openScanQRActivityForResult() {
+        this.scanKeyOnly = true;
         requestCameraPermissions();
     }
 

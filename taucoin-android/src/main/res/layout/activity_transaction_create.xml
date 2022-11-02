@@ -30,21 +30,22 @@
                 android:layout_marginStart="@dimen/widget_size_20"
                 android:layout_marginEnd="@dimen/widget_size_20"
                 android:layout_marginTop="@dimen/widget_size_10"
+                android:paddingEnd="20dp"
                 android:hint="@string/tx_address_hint"
                 android:inputType="textMultiLine"
                 android:textAppearance="@style/TextAppearanceBody1"
                 android:autofillHints="@string/tx_public_key_hint" />
 
             <ImageView
-                android:visibility="gone"
-                android:id="@+id/iv_select_pk"
+                android:visibility="visible"
+                android:id="@+id/iv_scan"
                 android:layout_width="@dimen/widget_size_22"
                 android:layout_height="@dimen/widget_size_22"
                 android:layout_marginTop="@dimen/widget_size_25"
                 android:layout_marginEnd="@dimen/widget_size_20"
                 android:onClick="@{listener::onClick}"
                 android:contentDescription="@null"
-                android:src="@mipmap/icon_choose_contact"/>
+                android:src="@mipmap/icon_scan_orange"/>
 
         </LinearLayout>
 

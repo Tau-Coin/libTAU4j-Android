@@ -51,6 +51,7 @@
             android:textAppearance="@style/TextAppearanceBody1"/>
 
         <LinearLayout
+            android:visibility="gone"
             android:orientation="vertical"
             android:id="@+id/ll_referral_link"
             android:layout_below="@+id/tv_join"

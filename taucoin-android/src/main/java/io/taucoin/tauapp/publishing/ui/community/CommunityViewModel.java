@@ -100,6 +100,7 @@ import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.core.utils.Utils;
+import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.tauapp.publishing.databinding.BlacklistDialogBinding;
 import io.taucoin.tauapp.publishing.databinding.ExternalAirdropLinkDialogBinding;
@@ -1188,16 +1189,16 @@ public class CommunityViewModel extends AndroidViewModel {
         dialogBinding.tvPeer.setText(activity.getString(contentRid, createTime));
         dialogBinding.tvPeer.setTextColor(context.getResources().getColor(R.color.color_black));
         dialogBinding.tvJoin.setText(R.string.common_proceed);
+        dialogBinding.llReferralLink.setVisibility(isNeedCreateReferral ? View.VISIBLE : View.GONE);
         if (isNeedCreateReferral) {
             dialogBinding.tvJoin.setVisibility(View.GONE);
             long referralBonus = link.getCoins() / 2;
             referralBonus = Math.max(1, referralBonus);
             dialogBinding.tvReferralBonus.setText(activity.getString(R.string.main_referral_link_text,
                     FmtMicrometer.fmtLong(referralBonus), FmtMicrometer.fmtLong( 10 * referralBonus)));
+            String linkStr = LinkUtil.encodeAirdropReferral(link, currentUser);
+            dialogBinding.tvReferralLink.setText(linkStr);
         }
-        dialogBinding.llReferralLink.setVisibility(isNeedCreateReferral ? View.VISIBLE : View.GONE);
-        String linkStr = LinkUtil.encodeAirdropReferral(link, currentUser);
-        dialogBinding.tvReferralLink.setText(linkStr);
         ConfirmDialog longTimeCreateDialog = new ConfirmDialog.Builder(activity)
                 .setContentView(dialogBinding.getRoot())
                 .setCanceledOnTouchOutside(false)
@@ -1222,7 +1223,7 @@ public class CommunityViewModel extends AndroidViewModel {
         });
         dialogBinding.tvReferralCopy.setOnClickListener(view -> {
             longTimeCreateDialog.closeDialog();
-            CopyManager.copyText(linkStr);
+            CopyManager.copyText(ViewUtils.getText(dialogBinding.tvReferralLink));
             ToastUtils.showShortToast(R.string.main_referral_link_copy);
             if (listener != null) {
                 listener.proceed();

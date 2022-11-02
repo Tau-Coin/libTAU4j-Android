@@ -30,12 +30,13 @@ import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
+import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.ObservableUtil;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityTransactionCreateBinding;
-import io.taucoin.tauapp.publishing.ui.BaseActivity;
+import io.taucoin.tauapp.publishing.ui.ScanTriggerActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
@@ -44,10 +45,9 @@ import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 /**
  * 交易创建页面页面
  */
-public class TransactionCreateActivity extends BaseActivity implements View.OnClickListener,
+public class TransactionCreateActivity extends ScanTriggerActivity implements View.OnClickListener,
         MembersAdapter.ClickListener, BGARefreshLayout.BGARefreshLayoutDelegate{
 
-    private static final int REQUEST_CODE = 0x01;
     private ActivityTransactionCreateBinding binding;
 
     private UserViewModel userViewModel;
@@ -101,7 +101,6 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
 
         if (StringUtil.isNotEmpty(chainID)) {
             if (txQueue != null) {
-                long txFee = txQueue.fee;
                 if (txQueue.content != null) {
                     TxContent txContent = new TxContent(txQueue.content);
                     binding.etMemo.setText(txContent.getMemo());
@@ -114,7 +113,7 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
                         binding.etPublicKey.getLayoutParams();
                 layoutParams.rightMargin = getResources().getDimensionPixelSize(R.dimen.widget_size_20);
                 binding.etPublicKey.setLayoutParams(layoutParams);
-                binding.ivSelectPk.setVisibility(View.GONE);
+                binding.ivScan.setVisibility(View.GONE);
                 binding.etAmount.setText(FmtMicrometer.fmtBalance(txQueue.amount));
             }
         }
@@ -276,17 +275,21 @@ public class TransactionCreateActivity extends BaseActivity implements View.OnCl
             case R.id.tv_fee:
                 txViewModel.showEditFeeDialog(this, binding.tvFee, chainID);
                 break;
+            case R.id.iv_scan:
+                openScanQRActivityForResult();
+                break;
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+        if(requestCode == ScanTriggerActivity.SCAN_CODE && resultCode == RESULT_OK){
             if(data != null){
-                String publicKey = data.getStringExtra(IntentExtra.PUBLIC_KEY);
-                if(StringUtil.isNotEmpty(publicKey)){
-                    binding.etPublicKey.setText(publicKey);
+                String link = data.getStringExtra(IntentExtra.DATA);
+                LinkUtil.Link decode = LinkUtil.decode(link);
+                if(decode != null && decode.isFriendLink()){
+                    binding.etPublicKey.setText(decode.getPeer());
                 }
             }
         }
