@@ -300,7 +300,8 @@ public class TxViewModel extends AndroidViewModel {
                     // 保存到本地
                     tx.previousHash = previousHash;
                 }
-                transaction = new Transaction(chainID, version, timestamp, senderPk, ByteUtil.toByte(previousHash), txEncoded);
+                byte[] previousHashBytes = StringUtil.isNotEmpty(previousHash) ? ByteUtil.toByte(previousHash) : null;
+                transaction = new Transaction(chainID, version, timestamp, senderPk, previousHashBytes, txEncoded);
             } else {
                 transaction = new Transaction(chainID, version, timestamp, senderPk, receiverPk,
                         tx.nonce, tx.amount, tx.fee, txEncoded);
