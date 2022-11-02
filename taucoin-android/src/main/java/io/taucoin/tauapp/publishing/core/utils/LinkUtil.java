@@ -110,6 +110,12 @@ public class LinkUtil {
                         if (data.length == 2) {
                             link.setData(data[0]);
                             link.setTimestamp(Long.parseLong(data[1]));
+                        } else if (data.length == 3) {
+                            link.setData(data[0]);
+                            link.setTimestamp(Long.parseLong(data[1]));
+                            byte[] miner = Base58.decode(data[2]);
+                            String minerStr = ByteUtil.toHexString(miner);
+                            link.setMiner(minerStr);
                         } else if (data.length == 4) {
                             link.setData(data[0]);
                             link.setCoins(Long.parseLong(data[1]));

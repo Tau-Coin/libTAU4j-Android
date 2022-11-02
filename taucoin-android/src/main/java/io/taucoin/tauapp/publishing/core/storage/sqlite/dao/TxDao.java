@@ -192,7 +192,8 @@ public interface TxDao {
             " ORDER BY b.blockNumber DESC LIMIT 50)";
 
     String QUERY_LATEST_NOTE_TX_HASH = "SELECT txID FROM Txs" +
-            " WHERE chainID = :chainID ORDER BY timestamp DESC limit 1";
+            " WHERE chainID = :chainID AND txType = 1" +
+            " ORDER BY timestamp DESC limit 1";
 
     /**
      * 添加新的交易

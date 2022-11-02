@@ -49,6 +49,7 @@ import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.TransactionVersion;
 import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
@@ -283,22 +284,30 @@ public class TxViewModel extends AndroidViewModel {
             if (null == txEncoded) {
                 return result;
             }
-            String previousHash = "";
+            int version;
+            if (isResend) {
+                version = tx.version;
+            } else {
+                version = TransactionVersion.VERSION1.getV();
+            }
             Transaction transaction;
             if (tx.txType == NOTE_TX.getType()) {
-                if (StringUtil.isNotEmpty(tx.previousHash)) {
+                String previousHash;
+                if (isResend) {
                     previousHash = tx.previousHash;
                 } else {
                     previousHash = txRepo.getLatestNoteTxHash(tx.chainID);
+                    // 保存到本地
+                    tx.previousHash = previousHash;
                 }
-                transaction = new Transaction(chainID, 0, timestamp, senderPk, ByteUtil.toByte(previousHash), txEncoded);
+                transaction = new Transaction(chainID, version, timestamp, senderPk, ByteUtil.toByte(previousHash), txEncoded);
             } else {
-                transaction = new Transaction(chainID, 0, timestamp, senderPk, receiverPk,
+                transaction = new Transaction(chainID, version, timestamp, senderPk, receiverPk,
                         tx.nonce, tx.amount, tx.fee, txEncoded);
             }
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
-            logger.info("createTransaction txID::{}, previousHash::{}, limit::{}, transaction::{}",
-                    transaction.getTxID().to_hex(), previousHash, Constants.TX_MAX_BYTE_SIZE, transaction.Size());
+            logger.info("createTransaction txID::{}, version::{}, txType::{}, previousHash::{}, limit::{}, transaction::{}",
+                    transaction.getTxID().to_hex(), version, tx.txType, tx.previousHash, Constants.TX_MAX_BYTE_SIZE, transaction.Size());
             // 判断交易大小是否超出限制
             if (transaction.Size() > Constants.TX_MAX_BYTE_SIZE) {
                 return context.getString(R.string.tx_error_memo_too_large);
@@ -314,6 +323,7 @@ public class TxViewModel extends AndroidViewModel {
                 tx.txID = transaction.getTxID().to_hex();
                 tx.timestamp = timestamp;
                 tx.senderPk = currentUser.publicKey;
+                tx.version = version;
                 txRepo.addTransaction(tx);
                 logger.info("createTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
                         tx.txID, tx.senderPk, tx.receiverPk, tx.memo);
@@ -391,7 +401,7 @@ public class TxViewModel extends AndroidViewModel {
         byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
         long timestamp = daemon.getSessionTime();
         long nonce = account.getNonce() + 1;
-        Transaction transaction = new Transaction(chainIDBytes, 0, timestamp, senderPk, receiverPk,
+        Transaction transaction = new Transaction(chainIDBytes, TransactionVersion.VERSION1.getV(), timestamp, senderPk, receiverPk,
                 nonce, tx.amount, tx.fee, tx.content);
         transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
         logger.info("createTransaction txID::{}, limit::{}, transaction::{}",

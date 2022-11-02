@@ -27,6 +27,7 @@ import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.TransactionVersion;
 import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
@@ -370,7 +371,7 @@ class TxQueueManager {
         }
         long nonce = account.getNonce() + 1;
         byte[] chainIDBytes = ChainIDUtil.encode(txQueue.chainID);
-        Transaction transaction = new Transaction(chainIDBytes, 0, timestamp, senderPk, receiverPk,
+        Transaction transaction = new Transaction(chainIDBytes, TransactionVersion.VERSION1.getV(), timestamp, senderPk, receiverPk,
                 nonce, txQueue.amount, txQueue.fee, txEncoded);
         transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
         return transaction;
@@ -436,6 +437,7 @@ class TxQueueManager {
             tx.nonce = nonce;
             tx.queueID = txQueue.queueID;
             tx.sendStatus = isDirectSend ? 0 : 1;
+            tx.version = TransactionVersion.VERSION1.getV();
             if (pinnedTime > 0) {
                 tx.pinnedTime = pinnedTime;
             }

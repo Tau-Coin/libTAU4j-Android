@@ -54,6 +54,7 @@ class DatabaseMigration {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             // 添加note交易previousHash供底层链式结构使用
             database.execSQL("ALTER TABLE Txs ADD COLUMN previousHash TEXT");
+            database.execSQL("ALTER TABLE Txs ADD COLUMN version INTEGER NOT NULL DEFAULT 0");
         }
     };
 

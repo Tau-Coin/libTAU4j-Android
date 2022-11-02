@@ -371,6 +371,8 @@ public class TauListenHandler {
         tx.memo = txContent.getMemo();
         tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
         tx.txStatus = onChain ? 1 : 0;
+        tx.version = txMsg.getVersion();
+        tx.previousHash = txMsg.getPreviousHash().to_hex();
         tx.blockNumber = blockNumber;
         tx.blockHash = blockHash;
         tx.timestamp = txMsg.getTimestamp();
@@ -674,6 +676,7 @@ public class TauListenHandler {
         LinkUtil.Link url = LinkUtil.decode(chainURL);
         String chainID = url.getData();
         String peer = url.getPeer();
+        logger.debug("addCommunity::{}, peer::{}, chainURL::{}", chainID, peer, chainURL);
         Set<String> peers = new HashSet<>();
         peers.add(peer);
         peers.add(url.getMiner());
