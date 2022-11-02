@@ -31,6 +31,7 @@ public class Tx implements Parcelable {
     public long blockNumber;                // 交易所属的区块号
     public String blockHash;                // 交易所属的区块哈希
 
+    public String previousHash;             // notes交易上一个消息hash;
     public String receiverPk;               // 交易接收者的公钥 只针对TxType.WRING_TX类型
     public long amount;                     // 交易金额 只针对TxType.WRING_TX类型
 

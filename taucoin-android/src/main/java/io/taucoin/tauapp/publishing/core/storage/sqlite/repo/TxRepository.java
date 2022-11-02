@@ -147,4 +147,7 @@ public interface TxRepository {
      * @return
      */
     TxFreeStatistics queryAverageTxsFee(String chainID);
+
+
+    String getLatestNoteTxHash(String chainID);
 }

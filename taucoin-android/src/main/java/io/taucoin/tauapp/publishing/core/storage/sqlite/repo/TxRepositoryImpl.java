@@ -301,4 +301,9 @@ public class TxRepositoryImpl implements TxRepository{
     public TxFreeStatistics queryAverageTxsFee(String chainID) {
         return db.txDao().queryAverageTxsFee(chainID);
     }
+
+    @Override
+    public String getLatestNoteTxHash(String chainID) {
+        return db.txDao().getLatestNoteTxHash(chainID);
+    }
 }

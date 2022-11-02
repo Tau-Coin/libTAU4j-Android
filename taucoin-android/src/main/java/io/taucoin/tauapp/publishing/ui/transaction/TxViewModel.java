@@ -283,16 +283,22 @@ public class TxViewModel extends AndroidViewModel {
             if (null == txEncoded) {
                 return result;
             }
+            String previousHash = "";
             Transaction transaction;
             if (tx.txType == NOTE_TX.getType()) {
-                transaction = new Transaction(chainID, 0, timestamp, senderPk, txEncoded);
+                if (StringUtil.isNotEmpty(tx.previousHash)) {
+                    previousHash = tx.previousHash;
+                } else {
+                    previousHash = txRepo.getLatestNoteTxHash(tx.chainID);
+                }
+                transaction = new Transaction(chainID, 0, timestamp, senderPk, ByteUtil.toByte(previousHash), txEncoded);
             } else {
                 transaction = new Transaction(chainID, 0, timestamp, senderPk, receiverPk,
                         tx.nonce, tx.amount, tx.fee, txEncoded);
             }
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
-            logger.info("createTransaction txID::{}, limit::{}, transaction::{}",
-                    transaction.getTxID().to_hex(), Constants.TX_MAX_BYTE_SIZE, transaction.Size());
+            logger.info("createTransaction txID::{}, previousHash::{}, limit::{}, transaction::{}",
+                    transaction.getTxID().to_hex(), previousHash, Constants.TX_MAX_BYTE_SIZE, transaction.Size());
             // 判断交易大小是否超出限制
             if (transaction.Size() > Constants.TX_MAX_BYTE_SIZE) {
                 return context.getString(R.string.tx_error_memo_too_large);
