@@ -286,7 +286,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onResendClick(String txID) {
+    public void onTxLogClick(String txID, int version) {
         KeyboardUtils.hideSoftInput(activity);
         if (logsDisposable != null) {
             disposables.remove(logsDisposable);
@@ -295,7 +295,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(logs -> {
-                    showTxLogsDialog(txID, logs);
+                    showTxLogsDialog(txID, logs, version);
                 });
         disposables.add(logsDisposable);
     }
@@ -303,12 +303,13 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     /**
      * 显示交易确认的对话框
      */
-    private void showTxLogsDialog(String txID, List<TxLog> logs) {
+    private void showTxLogsDialog(String txID, List<TxLog> logs, int version) {
         if (txLogsDialog != null && txLogsDialog.isShowing()) {
             txLogsDialog.submitList(logs);
             return;
         }
         txLogsDialog = new TxLogsDialog.Builder(activity)
+                .setResend(version > 0)
                 .setMsgLogsListener(new TxLogsDialog.MsgLogsListener() {
                     @Override
                     public void onRetry() {

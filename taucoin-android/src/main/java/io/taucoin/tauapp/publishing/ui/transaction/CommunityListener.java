@@ -15,6 +15,6 @@ public interface CommunityListener  {
     void onItemClicked(TextView view, UserAndTx tx);
     void onItemClicked(UserAndTx tx);
     void onLinkClick(String link);
-    void onResendClick(String txID);
+    void onTxLogClick(String txID, int version);
 
 }

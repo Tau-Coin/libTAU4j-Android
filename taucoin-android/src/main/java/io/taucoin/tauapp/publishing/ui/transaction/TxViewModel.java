@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -284,12 +285,9 @@ public class TxViewModel extends AndroidViewModel {
             if (null == txEncoded) {
                 return result;
             }
-            int version;
-            if (isResend) {
-                version = tx.version;
-            } else {
-                version = TransactionVersion.VERSION1.getV();
-            }
+            // UI上禁止version为0的交易重发（由于version修改，previous hash的加入，造成交易hash改变），
+            // 这里直接用最新的交易结构构建新的交易
+            int version = TransactionVersion.VERSION1.getV();
             Transaction transaction;
             if (tx.txType == NOTE_TX.getType()) {
                 String previousHash;
@@ -300,7 +298,8 @@ public class TxViewModel extends AndroidViewModel {
                     // 保存到本地
                     tx.previousHash = previousHash;
                 }
-                byte[] previousHashBytes = StringUtil.isNotEmpty(previousHash) ? ByteUtil.toByte(previousHash) : null;
+                byte[] emptyHash = new byte[20];
+                byte[] previousHashBytes = StringUtil.isNotEmpty(previousHash) ? ByteUtil.toByte(previousHash) : emptyHash;
                 transaction = new Transaction(chainID, version, timestamp, senderPk, previousHashBytes, txEncoded);
             } else {
                 transaction = new Transaction(chainID, version, timestamp, senderPk, receiverPk,

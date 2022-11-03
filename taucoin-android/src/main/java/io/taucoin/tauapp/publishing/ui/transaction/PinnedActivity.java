@@ -180,7 +180,7 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
     }
 
     @Override
-    public void onResendClick(String txID) {
+    public void onTxLogClick(String txID, int version) {
 
     }
 

@@ -65,10 +65,16 @@ public class TxLogsDialog extends Dialog {
     public static class Builder {
         private Context context;
         private boolean isCanCancel = true;
+        private boolean isResend = false;
         private MsgLogsListener msgLogsListener;
 
         public Builder(Context context) {
             this.context = context;
+        }
+
+        public Builder setResend(boolean resend) {
+            this.isResend = resend;
+            return this;
         }
 
         public Builder setCanceledOnTouchOutside(boolean cancel) {
@@ -85,7 +91,7 @@ public class TxLogsDialog extends Dialog {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             MsgLogsBinding binding = DataBindingUtil.inflate(inflater, R.layout.msg_logs,
                     null, false);
-            LogsAdapter adapter = new LogsAdapter(msgLogsListener);
+            LogsAdapter adapter = new LogsAdapter(msgLogsListener, isResend);
             final TxLogsDialog msgLogsDialog = new TxLogsDialog(context, R.style.CommonDialog, adapter);
             binding.ivClose.setOnClickListener(v -> {
                 if (msgLogsDialog.isShowing()) {
@@ -124,9 +130,11 @@ public class TxLogsDialog extends Dialog {
     private static class LogsAdapter extends ListAdapter<TxLogStatus, LogsAdapter.ViewHolder> {
         private MsgLogsListener listener;
         private List<TxLog> logs = new ArrayList<>();
-        LogsAdapter(MsgLogsListener listener) {
+        private boolean isResend = false;
+        LogsAdapter(MsgLogsListener listener, boolean isResend) {
             super(diffCallback);
             this.listener = listener;
+            this.isResend = isResend;
         }
 
         private void setLogsData(List<TxLog> logs) {
@@ -145,7 +153,7 @@ public class TxLogsDialog extends Dialog {
                     R.layout.item_msg_log,
                     parent,
                     false);
-            return new ViewHolder(binding, listener, logs);
+            return new ViewHolder(binding, listener, logs, isResend);
         }
 
         @Override
@@ -161,11 +169,13 @@ public class TxLogsDialog extends Dialog {
             private Context context;
             private int blackColor;
             private int grayColor;
-            ViewHolder(ItemMsgLogBinding binding, MsgLogsListener listener, List<TxLog> logs) {
+            private boolean isResend = false;
+            ViewHolder(ItemMsgLogBinding binding, MsgLogsListener listener, List<TxLog> logs, boolean isResend) {
                 super(binding.getRoot());
                 this.binding = binding;
                 this.listener = listener;
                 this.logs = logs;
+                this.isResend = isResend;
                 this.context = binding.getRoot().getContext();
                 blackColor = context.getResources().getColor(R.color.color_black);
                 grayColor = context.getResources().getColor(R.color.gray_dark);
@@ -182,7 +192,7 @@ public class TxLogsDialog extends Dialog {
                 if (logs.size() > 0) {
                     latestStatus = logs.get(0).status;
                 }
-                boolean isShowResend = latestStatus == status.getStatus();
+                boolean isShowResend = isResend && latestStatus == status.getStatus();
                 int timePointRes;
                 if (status == TxLogStatus.ARRIVED_SWARM) {
                     isShowResend = false;

@@ -28,6 +28,7 @@ public interface TxQueueDao {
             " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID, MAX(sendStatus) AS sendStatus" +
             " From Txs" +
             " WHERE chainID = :chainID AND senderPk = :senderPk AND queueID IS NOT NULL" +
+            " AND (txStatus = 1 OR (txStatus = 0 AND version > 0))" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
             " WHERE tq.chainID = :chainID AND tq.senderPk = :senderPk)" +
@@ -57,6 +58,7 @@ public interface TxQueueDao {
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID From Txs" +
             " WHERE senderPk = :senderPk AND queueID IS NOT NULL" +
+            " AND (txStatus = 1 OR (txStatus = 0 AND version > 0))" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
             " WHERE tq.senderPk = :senderPk)" +

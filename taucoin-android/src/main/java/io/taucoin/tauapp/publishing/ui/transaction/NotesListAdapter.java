@@ -122,7 +122,7 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
                     rightBinding.ivStatus.setImageResource(parseStatusReid(tx));
                     rightBinding.ivStatus.setOnClickListener(v -> {
                         if (listener != null) {
-                            listener.onResendClick(tx.txID);
+                            listener.onTxLogClick(tx.txID, tx.version);
                         }
                     });
                 }
@@ -232,7 +232,7 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
         void onBanClicked(UserAndTx tx);
         void onItemLongClicked(TextView view, UserAndTx tx);
         void onLinkClick(String link);
-        void onResendClick(String txID);
+        void onTxLogClick(String txID, int version);
     }
 
     private static boolean isSameConfirms(List<TxLog> oldList, List<TxLog> newList) {
