@@ -679,7 +679,9 @@ public class TauListenHandler {
         logger.debug("addCommunity::{}, peer::{}, chainURL::{}", chainID, peer, chainURL);
         Set<String> peers = new HashSet<>();
         peers.add(peer);
-        peers.add(url.getMiner());
+        if (url.getMiner() != null) {
+            peers.add(url.getMiner());
+        }
         boolean isSuccess = daemon.followChain(chainID, peers);
         if (isSuccess) {
             Community community = new Community(chainID, ChainIDUtil.getName(chainID));

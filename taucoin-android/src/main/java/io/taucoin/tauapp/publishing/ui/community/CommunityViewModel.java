@@ -226,7 +226,9 @@ public class CommunityViewModel extends AndroidViewModel {
 
                 Set<String> peers = new HashSet<>();
                 peers.add(link.getPeer());
-                peers.add(link.getMiner());
+                if (link.getMiner() != null) {
+                    peers.add(link.getMiner());
+                }
                 boolean success = false;
                 Community community = communityRepo.getCommunityByChainID(chainID);
                 // 向对方peer请求publish区块链数据

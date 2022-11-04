@@ -223,6 +223,9 @@ public class LinkUtil {
      * @return 链URL
      */
     public static String encodeAirdropReferral(LinkUtil.Link link, String referralPeer) {
+        if (StringUtil.isEmpty(link.getMiner())) {
+            link.setMiner(link.getPeer());
+        }
         return encodeAirdropReferral(link.getPeer(), link.getData(), link.getCoins(), link.getTimestamp(),
                 link.getMiner(), referralPeer);
     }
