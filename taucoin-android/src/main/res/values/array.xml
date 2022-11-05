@@ -21,12 +21,6 @@
         <item>600</item>
     </integer-array>
 
-    <integer-array name="wifi_limit">
-        <item>300</item>
-        <item>600</item>
-        <item>1024</item>
-    </integer-array>
-
     <string-array name="font_scale_size">
         <item>0.9</item>
         <item>1.0</item>

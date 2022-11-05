@@ -11,11 +11,8 @@
     <string name="pref_key_need_prompt_user" translatable="false">pref_key_need_prompt_user</string>
     <string name="pref_key_metered_limit" translatable="false">pref_key_metered_limit</string>
     <string name="pref_key_metered_prompt_limit" translatable="false">pref_key_metered_prompt_limit</string>
-    <string name="pref_key_wifi_limit" translatable="false">pref_key_wifi_limit</string>
-    <string name="pref_key_wifi_prompt_limit" translatable="false">pref_key_wifi_prompt_limit</string>
     <string name="pref_key_current_speed" translatable="false">pref_key_current_speed</string>
     <string name="pref_key_metered_available_data" translatable="false">pref_key_metered_available_data</string>
-    <string name="pref_key_wifi_available_data" translatable="false">pref_key_wifi_available_data</string>
     <string name="pref_key_is_metered_network" translatable="false">pref_key_is_metered_network</string>
     <string name="pref_key_is_wifi_network" translatable="false">pref_key_is_wifi_network</string>
     <string name="pref_key_network_switch" translatable="false">pref_key_network_switch</string>

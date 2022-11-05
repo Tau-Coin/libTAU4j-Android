@@ -16,16 +16,12 @@ import io.taucoin.tauapp.publishing.databinding.ItemDailyQuotaBinding;
  * 每日数据流量定额Adapter
  */
 public class DailyQuotaAdapter extends ListAdapter<Integer, DailyQuotaAdapter.ViewHolder> {
-    static final int TYPE_METERED = 0x01;
-    static final int TYPE_WIFI = 0x02;
     private int selectPos;
-    private int type;
     private OnCheckedChangeListener listener;
-    DailyQuotaAdapter(OnCheckedChangeListener listener, int type, int pos) {
+    DailyQuotaAdapter(OnCheckedChangeListener listener, int pos) {
         super(diffCallback);
         this.selectPos = pos;
         this.listener = listener;
-        this.type = type;
     }
 
     public void updateSelectLimitPos(int pos) {
@@ -79,7 +75,7 @@ public class DailyQuotaAdapter extends ListAdapter<Integer, DailyQuotaAdapter.Vi
             holder.binding.getRoot().setOnClickListener(v -> {
                 if (!isSelected) {
                     if (adapter.listener != null) {
-                        adapter.listener.onCheckedChanged(adapter.type, pos);
+                        adapter.listener.onCheckedChanged(pos);
                     }
                     adapter.selectPos = pos;
                     adapter.notifyDataSetChanged();
@@ -89,7 +85,7 @@ public class DailyQuotaAdapter extends ListAdapter<Integer, DailyQuotaAdapter.Vi
     }
 
     public interface OnCheckedChangeListener {
-        void onCheckedChanged(int type, int pos);
+        void onCheckedChanged(int pos);
     }
 
     private static final DiffUtil.ItemCallback<Integer> diffCallback = new DiffUtil.ItemCallback<Integer>() {

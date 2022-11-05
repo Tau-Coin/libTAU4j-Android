@@ -21,14 +21,13 @@ public class TrafficUtil {
     private static final String TRAFFIC_DOWN = "download";
     private static final String TRAFFIC_UP = "upload";
     private static final String TRAFFIC_METERED = "metered";
-    private static final String TRAFFIC_WIFI = "wifi";
 
     private static final String TRAFFIC_VALUE_OLD = "pref_key_traffic_old_";
     private static final String TRAFFIC_VALUE = "pref_key_traffic_";
     private static final String TRAFFIC_TIME = "pref_key_traffic_time";
     public static  int TRAFFIC_RESET_TIME = 20; // 流量统计重置时间为20点
 
-    private static SettingsRepository settingsRepo;
+    private static final SettingsRepository settingsRepo;
     static {
         Context context = MainApplication.getInstance();
         settingsRepo = RepositoryHelper.getSettingsRepository(context);
@@ -46,15 +45,6 @@ public class TrafficUtil {
             total += incrementalDown + incrementalUp;
             settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, total);
             logger.debug("Save metered traffic::{}", total);
-        } else {
-            long total = getWifiTrafficTotal();
-            total += incrementalDown + incrementalUp;
-            boolean isUnlimitedNetwork = NetworkSetting.isUnlimitedNetwork();
-            if (!isUnlimitedNetwork) {
-                settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI, total);
-            }
-            logger.debug("Save wifi traffic::::{}, isDevelopCountry::{}, isUnlimitedNetwork::{}",
-                    total, NetworkSetting.isDevelopCountry(), isUnlimitedNetwork);
         }
     }
 
@@ -101,7 +91,6 @@ public class TrafficUtil {
         settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_DOWN, -1);
         settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_UP, -1);
         settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_METERED, -1);
-        settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_WIFI, -1);
     }
 
     /**
@@ -141,7 +130,6 @@ public class TrafficUtil {
         settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN, 0);
         settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_UP, 0);
         settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, 0);
-        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI, 0);
         resetTrafficTotalOld();
         // 同时重置前台运行时间
         NetworkSetting.updateForegroundRunningTime(0);
@@ -152,15 +140,13 @@ public class TrafficUtil {
         settingsRepo.setDataDozeTime(0, true);
         settingsRepo.setDataDozeTime(0, false);
         NetworkSetting.updateDataAvailableRate(100);
-        NetworkSetting.clearWifiPromptLimit();
         NetworkSetting.clearMeteredPromptLimit();
 
         logger.debug("resetTrafficInfo TRAFFIC_DOWN::{}, TRAFFIC_UP::{}, TRAFFIC_METERED::{}, " +
-                        "TRAFFIC_WIFI::{}, TRAFFIC_DOWN_OLD::{}, TRAFFIC_UP_OLD::{}",
+                        "TRAFFIC_DOWN_OLD::{}, TRAFFIC_UP_OLD::{}",
                 settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN),
                 settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_UP),
                 settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_METERED),
-                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI),
                 settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_DOWN),
                 settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_UP));
     }
@@ -171,14 +157,6 @@ public class TrafficUtil {
     static long getMeteredTrafficTotal() {
         resetTrafficInfo();
         return settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_METERED);
-    }
-
-    /**
-     * 获取当天非计费网络流量值
-     */
-    static long getWifiTrafficTotal() {
-        resetTrafficInfo();
-        return settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_WIFI);
     }
 
     public static String getUpKey() {

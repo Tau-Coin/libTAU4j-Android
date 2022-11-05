@@ -235,64 +235,6 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/ll_wifi_daily_quota"
-                        android:orientation="vertical"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/widget_size_20"
-                        android:layout_marginTop="@dimen/widget_size_0"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_daily_quota"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rv_wifi_daily_quota"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
-
-                    </LinearLayout>
-
-                    <include
-                        android:id="@+id/ll_wifi_line"
-                        layout="@layout/view_line"/>
-
-                    <LinearLayout
-                        android:id="@+id/ll_wifi_available_data"
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_7"
-                        android:paddingBottom="@dimen/widget_size_7"
-                        android:minHeight="@dimen/widget_size_44"
-                        android:layout_marginEnd="@dimen/widget_size_20"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:includeFontPadding="false"
-                            android:text="@string/setting_network_available_data"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                        <TextView
-                            android:id="@+id/tv_wifi_available_data"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/gray_dark"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:textAppearance="@style/TextAppearanceBody1"/>
-
-                    </LinearLayout>
-
-                    <include layout="@layout/view_line"/>
-
-                    <LinearLayout
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

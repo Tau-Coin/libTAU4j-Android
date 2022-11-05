@@ -26,7 +26,6 @@ public class NetworkSetting {
     private static final Logger logger = LoggerFactory.getLogger("NetworkSetting");
     private static final int[] METERED_LIMITED;                                   // 单位MB
     private static final int[] DEVELOPED_METERED_LIMITED;                         // 单位MB
-    private static final int[] WIFI_LIMITED;                                      // 单位MB
 
     private static final SettingsRepository settingsRepo;
     private static long lastElapsedRealTime = 0;
@@ -38,7 +37,6 @@ public class NetworkSetting {
         settingsRepo = RepositoryHelper.getSettingsRepository(context);
         METERED_LIMITED = context.getResources().getIntArray(R.array.metered_limit);
         DEVELOPED_METERED_LIMITED = context.getResources().getIntArray(R.array.developed_metered_limit);
-        WIFI_LIMITED = context.getResources().getIntArray(R.array.wifi_limit);
         updateDevelopCountry();
     }
 
@@ -128,53 +126,6 @@ public class NetworkSetting {
         settingsRepo.setIntValue(context.getString(R.string.pref_key_metered_prompt_limit), -1);
     }
 
-    /**
-     * 清除Wifi提升的流量包
-     */
-    static void clearWifiPromptLimit() {
-        Context context = MainApplication.getInstance();
-        settingsRepo.setIntValue(context.getString(R.string.pref_key_wifi_prompt_limit), -1);
-    }
-
-    /**
-     * 获取WiFi网络流量限制值
-     * 先优先使用无流量时，提升的流量包，重置流量时恢复到用户收到设置的流量包
-     * @return long
-     */
-    public static int getWiFiLimitPos() {
-        Context context = MainApplication.getInstance();
-        int pos = settingsRepo.getIntValue(context.getString(R.string.pref_key_wifi_prompt_limit), -1);
-        if (pos < 0) {
-            pos = settingsRepo.getIntValue(context.getString(R.string.pref_key_wifi_limit), 1);
-        }
-        return pos;
-    }
-
-    public static int getWiFiLimitValue() {
-        int pos = getWiFiLimitPos();
-        if (pos >= WIFI_LIMITED.length) {
-            pos = WIFI_LIMITED.length - 1;
-        }
-        return WIFI_LIMITED[pos];
-    }
-
-    public static int[] getWifiLimits() {
-        return WIFI_LIMITED;
-    }
-
-    /**
-     * 设置WiFi网络流量限制值
-     * @param pos
-     */
-    public static void setWiFiLimitPos(int pos, boolean isClearPrompt) {
-        Context context = MainApplication.getInstance();
-        if (isClearPrompt) {
-            clearWifiPromptLimit();
-            settingsRepo.setIntValue(context.getString(R.string.pref_key_wifi_limit), pos);
-        } else {
-            settingsRepo.setIntValue(context.getString(R.string.pref_key_wifi_prompt_limit), pos);
-        }
-    }
 
     /**
      * 设置当前是否为WiFi网络(存在计费和非计费的情况)
@@ -227,7 +178,6 @@ public class NetworkSetting {
         // 更新Mode运行时间
         updateRunningTime();
         updateMeteredSpeedLimit();
-        updateWiFiSpeedLimit();
 //        logger.debug("updateSpeed, CurrentSpeed::{}/s",
 //                Formatter.formatFileSize(context, currentSpeed).toUpperCase());
     }
@@ -365,6 +315,8 @@ public class NetworkSetting {
                 rate = availableData.multiply(Constants.PERCENTAGE).divide(bigLimit).intValue();
             }
             updateDataAvailableRate(rate);
+        } else {
+            updateDataAvailableRate(100);
         }
         settingsRepo.setLongValue(context.getString(R.string.pref_key_metered_available_data), availableData.longValue());
         logger.debug("updateSpeedLimit meteredLimit::{}, meteredUsage::{}, availableData::{}, rate::{}",
@@ -380,48 +332,11 @@ public class NetworkSetting {
     }
 
     /**
-     * 更新WiFi网络网速限制值
-     */
-    public static void updateWiFiSpeedLimit() {
-        Context context = MainApplication.getInstance();
-        long usage = TrafficUtil.getWifiTrafficTotal();
-        long limit = getWiFiLimitValue();
-        BigInteger availableData = BigInteger.ZERO;
-
-        BigInteger bigUnit = new BigInteger("1024");
-        BigInteger bigLimit = BigInteger.valueOf(limit).multiply(bigUnit).multiply(bigUnit);
-        BigInteger bigUsage = BigInteger.valueOf(usage);
-
-        if (bigLimit.compareTo(bigUsage) > 0) {
-            availableData = bigLimit.subtract(bigUsage);
-        }
-        int rate = 100;
-        if (isWiFiNetwork()) {
-            if (bigLimit.compareTo(BigInteger.ZERO) > 0) {
-                rate = availableData.multiply(Constants.PERCENTAGE).divide(bigLimit).intValue();
-            }
-            updateDataAvailableRate(rate);
-        }
-        settingsRepo.setLongValue(context.getString(R.string.pref_key_wifi_available_data), availableData.longValue());
-
-        logger.debug("updateSpeedLimit wifiLimit::{}, wifiUsage::{}, availableData::{}, rate::{}",
-                bigLimit.longValue(), bigUsage, availableData.longValue(), rate);
-    }
-
-    /**
      * 获取计费网络可用数据
      */
     public static long getMeteredAvailableData() {
         Context context = MainApplication.getInstance();
         return settingsRepo.getLongValue(context.getString(R.string.pref_key_metered_available_data));
-    }
-
-    /**
-     * 获取WiFi网络可用数据
-     */
-    public static long getWiFiAvailableData() {
-        Context context = MainApplication.getInstance();
-        return settingsRepo.getLongValue(context.getString(R.string.pref_key_wifi_available_data));
     }
 
     /**
@@ -432,8 +347,8 @@ public class NetworkSetting {
         if (!NetworkSetting.isWiFiNetwork()) {
             isHaveAvailableData = getMeteredAvailableData() > 0;
         } else {
-            // 发达国家WiFi网络流量不限制
-            isHaveAvailableData = isUnlimitedNetwork() || getWiFiAvailableData() > 0;
+            // WiFi网络流量不限制
+            isHaveAvailableData = true;
         }
         return isHaveAvailableData;
     }

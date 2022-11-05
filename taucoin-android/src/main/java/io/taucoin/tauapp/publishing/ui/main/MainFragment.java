@@ -200,8 +200,6 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
             handleWarningView();
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_metered_prompt_limit))) {
             handleWarningView();
-        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_wifi_prompt_limit))) {
-            handleWarningView();
         }
     }
 

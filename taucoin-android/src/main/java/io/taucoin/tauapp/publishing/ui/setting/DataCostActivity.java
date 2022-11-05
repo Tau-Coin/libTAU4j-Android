@@ -58,24 +58,13 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         LinearLayoutManager layoutManagerMetered = new LinearLayoutManager(this);
         layoutManagerMetered.setOrientation(RecyclerView.HORIZONTAL);
         binding.rvMeteredDailyQuota.setLayoutManager(layoutManagerMetered);
-        adapterMetered = new DailyQuotaAdapter(this,
-                DailyQuotaAdapter.TYPE_METERED, NetworkSetting.getMeteredLimitPos());
+        adapterMetered = new DailyQuotaAdapter(this, NetworkSetting.getMeteredLimitPos());
         binding.rvMeteredDailyQuota.setAdapter(adapterMetered);
         int[] meteredLimits = NetworkSetting.getMeteredLimits();
         List<Integer> meteredList = Ints.asList(meteredLimits);
         adapterMetered.submitList(meteredList);
 
         updateUnlimitedNetwork();
-
-        LinearLayoutManager layoutManagerWiFi = new LinearLayoutManager(this);
-        layoutManagerWiFi.setOrientation(RecyclerView.HORIZONTAL);
-        binding.rvWifiDailyQuota.setLayoutManager(layoutManagerWiFi);
-        adapterWiFi = new DailyQuotaAdapter(this,
-                DailyQuotaAdapter.TYPE_WIFI, NetworkSetting.getWiFiLimitPos());
-        binding.rvWifiDailyQuota.setAdapter(adapterWiFi);
-        int[] wifiLimits =  NetworkSetting.getWifiLimits();
-        List<Integer> wifiList = Ints.asList(wifiLimits);
-        adapterWiFi.submitList(wifiList);
 
         refreshAllData();
 
@@ -90,12 +79,8 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
     private void updateUnlimitedNetwork() {
         boolean isUnlimitedNetwork = NetworkSetting.isUnlimitedNetwork();
         if (null == this.isUnlimitedNetwork || Boolean.parseBoolean(this.isUnlimitedNetwork.toString()) != isUnlimitedNetwork) {
-            binding.llWifiDailyQuota.setVisibility(isUnlimitedNetwork ? View.GONE : View.VISIBLE);
-            binding.llWifiAvailableData.setVisibility(isUnlimitedNetwork ? View.GONE : View.VISIBLE);
-            binding.llWifiLine.setVisibility(isUnlimitedNetwork ? View.GONE : View.VISIBLE);
             if (this.isUnlimitedNetwork != null) {
-                adapterMetered = new DailyQuotaAdapter(this,
-                        DailyQuotaAdapter.TYPE_METERED, NetworkSetting.getMeteredLimitPos());
+                adapterMetered = new DailyQuotaAdapter(this, NetworkSetting.getMeteredLimitPos());
                 binding.rvMeteredDailyQuota.setAdapter(adapterMetered);
                 int[] newMeteredLimits = NetworkSetting.getMeteredLimits();
                 List<Integer> newMeteredList = Ints.asList(newMeteredLimits);
@@ -113,20 +98,13 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
         // 先更新，再显示
         NetworkSetting.updateMeteredSpeedLimit();
         handleSettingsChanged(getString(R.string.pref_key_metered_available_data));
-        NetworkSetting.updateWiFiSpeedLimit();
-        handleSettingsChanged(getString(R.string.pref_key_wifi_available_data));
         handleSettingsChanged(getString(R.string.pref_key_charging_state));
     }
 
     @Override
-    public void onCheckedChanged(int type, int pos) {
-        if (type == DailyQuotaAdapter.TYPE_METERED) {
-            NetworkSetting.setMeteredLimitPos(pos, true);
-            NetworkSetting.updateMeteredSpeedLimit();
-        } else if (type == DailyQuotaAdapter.TYPE_WIFI) {
-            NetworkSetting.setWiFiLimitPos(pos, true);
-            NetworkSetting.updateWiFiSpeedLimit();
-        }
+    public void onCheckedChanged(int pos) {
+        NetworkSetting.setMeteredLimitPos(pos, true);
+        NetworkSetting.updateMeteredSpeedLimit();
     }
 
     @Override
@@ -179,18 +157,10 @@ public class DataCostActivity extends BaseActivity implements DailyQuotaAdapter.
             String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();
             binding.tvMeteredAvailableData.setText(availableDataStr);
             updateUnlimitedNetwork();
-        } else if (key.equals(getString(R.string.pref_key_wifi_available_data))) {
-            long availableData = NetworkSetting.getWiFiAvailableData();
-            String availableDataStr = Formatter.formatFileSize(this, availableData).toUpperCase();
-            binding.tvWifiAvailableData.setText(availableDataStr);
         } else if (key.equals(getString(R.string.pref_key_metered_limit)) ||
                 key.equals(getString(R.string.pref_key_metered_prompt_limit))) {
             adapterMetered.updateSelectLimitPos(NetworkSetting.getMeteredLimitPos());
             NetworkSetting.updateMeteredSpeedLimit();
-        } else if (key.equals(getString(R.string.pref_key_wifi_limit)) ||
-                key.equals(getString(R.string.pref_key_wifi_prompt_limit))) {
-            adapterWiFi.updateSelectLimitPos(NetworkSetting.getWiFiLimitPos());
-            NetworkSetting.updateWiFiSpeedLimit();
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_foreground_running_time))) {
             int foregroundTime = NetworkSetting.getForegroundRunningTime();
             long dozeTime = settingsRepo.getDataDozeTime(true);
