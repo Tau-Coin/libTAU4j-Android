@@ -109,6 +109,8 @@
     <string name="drawer_working_condition">Dashboard</string>
     <string name="drawer_share">Share TAU App</string>
 
+    <string name="wallet_data_warning">The more communities, the more data costs.</string>
+
     <!-- Strings used for menu -->
     <string name="menu_share">Share</string>
     <string name="menu_scan">Scan</string>

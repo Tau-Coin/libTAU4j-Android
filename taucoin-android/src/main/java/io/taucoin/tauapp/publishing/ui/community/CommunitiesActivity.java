@@ -22,6 +22,7 @@ import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityCommunitiesBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
+import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.transaction.TransactionCreateActivity;
 
@@ -33,6 +34,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
     private CommunityViewModel viewModel;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
+    private CommonDialog blacklistDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,6 +180,9 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
                 break;
+            case R.id.rl_ban_community:
+                blacklistDialog = viewModel.showBanCommunityTipsDialog(this, chainID);
+                break;
         }
     }
 
@@ -190,6 +195,16 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleMemberTips));
+
+        viewModel.getSetBlacklistState().observe(this, isSuccess -> {
+            if (isSuccess) {
+                ToastUtils.showShortToast(R.string.blacklist_successfully);
+                this.setResult(RESULT_OK);
+                this.finish();
+            } else {
+                ToastUtils.showShortToast(R.string.blacklist_failed);
+            }
+        });
     }
 
     private void handleMemberTips(MemberTips tips) {
@@ -201,5 +216,13 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
     protected void onStop() {
         super.onStop();
         disposables.clear();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (blacklistDialog != null) {
+            blacklistDialog.closeDialog();
+        }
     }
 }
