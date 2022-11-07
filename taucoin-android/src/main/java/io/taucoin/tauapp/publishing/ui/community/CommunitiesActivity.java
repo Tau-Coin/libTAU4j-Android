@@ -130,7 +130,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             mIncomePending = member.mIncomePending;
         }
         binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));
-        binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(mIncomePending));
+        binding.tvMiningIncomePending.setText(FmtMicrometer.fmtLong(mIncomePending));
         double showPower = Math.sqrt(1 + power);
         String powerStr = "sqrt(1+%s)=%s";
         powerStr = String.format(powerStr, FmtMicrometer.fmtLong(power), FmtMicrometer.formatThreeDecimal(showPower));
@@ -169,7 +169,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, TransactionsActivity.class);
                 break;
-            case R.id.item_mining_income_pending:
+            case R.id.rl_mining_income_pending:
                 intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, MiningIncomeActivity.class);
