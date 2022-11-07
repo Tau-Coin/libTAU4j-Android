@@ -52,7 +52,6 @@ public class AirdropCommunityActivity extends BaseActivity implements
     private Dialog linkDialog;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private boolean linksSelector = false;
-    private Disposable airdropDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,23 +157,15 @@ public class AirdropCommunityActivity extends BaseActivity implements
     }
 
     private void createAirdropLink(String airdropPeer, String chainID, long airdropCoins, long airdropTime, boolean isExit) {
-        if (airdropDisposable != null && !airdropDisposable.isDisposed()) {
-            airdropDisposable.dispose();
-            airdropDisposable = null;
+        String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, airdropCoins, airdropTime);
+        if (isExit) {
+            Intent intent = new Intent();
+            intent.putExtra(IntentExtra.AIRDROP_LINK, airdropLink);
+            setResult(RESULT_OK, intent);
+            this.finish();
+        } else {
+            shareAirdropLink(chainID, airdropLink, airdropCoins);
         }
-        airdropDisposable = communityViewModel.observeLatestMiner(chainID).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(miner -> {
-                    String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, airdropCoins, airdropTime, miner);
-                    if (isExit) {
-                        Intent intent = new Intent();
-                        intent.putExtra(IntentExtra.AIRDROP_LINK, airdropLink);
-                        setResult(RESULT_OK, intent);
-                        this.finish();
-                    } else {
-                        shareAirdropLink(chainID, airdropLink, airdropCoins);
-                    }
-                });
     }
 
     /**

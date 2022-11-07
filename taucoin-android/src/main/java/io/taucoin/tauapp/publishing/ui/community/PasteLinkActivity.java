@@ -98,7 +98,7 @@ public class PasteLinkActivity extends BaseActivity {
     }
 
     private void handlePasteLink(String link) {
-        LinkUtil.Link decode = LinkUtil.decodeLink(link);
+        LinkUtil.Link decode = LinkUtil.decode(link);
         if (decode.isAirdropLink()) {
             if (StringUtil.isEquals(MainApplication.getInstance().getPublicKey(),
                     decode.getPeer())) {

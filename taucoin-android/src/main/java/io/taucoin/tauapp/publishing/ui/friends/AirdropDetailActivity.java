@@ -39,7 +39,6 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
     private final CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
     private Member member;
-    private String miner;
     private Disposable airdropDisposable;
     private String airdropLink;
 
@@ -70,10 +69,7 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
         if (member != null) {
             String airdropPeer = MainApplication.getInstance().getPublicKey();
             long airdropTime = member.airdropTime / 60 / 1000;
-            if (StringUtil.isEmpty(miner)) {
-                miner = airdropPeer;
-            }
-            String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, member.airdropCoins, airdropTime, miner);
+            String airdropLink = LinkUtil.encodeAirdrop(airdropPeer, chainID, member.airdropCoins, airdropTime);
             if (StringUtil.isNotEquals(this.airdropLink, airdropLink)) {
                 this.airdropLink = airdropLink;
                 binding.tauLink.setText(airdropLink);
@@ -147,14 +143,6 @@ public class AirdropDetailActivity extends BaseActivity implements View.OnClickL
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
                     this.member = member;
-                    updateAirdropDetail();
-                }));
-
-        disposables.add(communityViewModel.observeLatestMiner(chainID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(miner -> {
-                    this.miner = miner;
                     updateAirdropDetail();
                 }));
 

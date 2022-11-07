@@ -541,15 +541,19 @@ public class TxViewModel extends AndroidViewModel {
                 if (type == WIRING_TX) {
                     txFee = Constants.WIRING_MIN_FEE.longValue();
                     if (statistics != null) {
-                        float wiringRate = statistics.getWiringCount() * 100f / statistics.getTotal();
-                        if (wiringRate >= 50) {
-                            long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
-                            txFee = averageTxsFee + Constants.COIN.longValue();
+                        if (statistics.getTotal() > 0) {
+                            float wiringRate = statistics.getWiringCount() * 100f / statistics.getTotal();
+                            if (wiringRate >= 50) {
+                                if (statistics.getTxsCount() > 0) {
+                                    long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
+                                    txFee = averageTxsFee + Constants.COIN.longValue();
+                                }
+                            }
                         }
                     }
                 } else {
                     txFee = Constants.NEWS_MIN_FEE.longValue();
-                    if (statistics != null) {
+                    if (statistics != null && statistics.getTxsCount() > 0) {
                         long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
                         if (averageTxsFee > Constants.NEWS_MIN_FEE.longValue()) {
                             txFee = averageTxsFee + Constants.COIN.longValue();
