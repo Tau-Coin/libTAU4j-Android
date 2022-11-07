@@ -1,6 +1,7 @@
 package io.taucoin.tauapp.publishing.core.storage.sqlite.dao;
 
 import java.util.List;
+import java.util.concurrent.Flow;
 
 import androidx.paging.DataSource;
 import androidx.room.Dao;
@@ -116,17 +117,27 @@ public interface TxDao {
             " AND t.txType IN (2, 3, 4, 5, 6)";
 
     // 查询钱包挖矿记录
-    String QUERY_GET_BLOCK_MINED = "SELECT " +
-            " blockHash AS hash, miner AS senderOrMiner, '' AS receiverPk, blockNumber, -1 AS txType, rewards AS amount," +
-            " 0 AS fee, timestamp AS createTime, timestamp AS onlineTime, status AS onlineStatus" +
-            " FROM Blocks" +
-            " WHERE chainID = :chainID AND status = 1 AND miner = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
+//    String QUERY_GET_BLOCK_MINED = "SELECT " +
+//            " blockHash AS hash, miner AS senderOrMiner, '' AS receiverPk, blockNumber, -1 AS txType, rewards AS amount," +
+//            " 0 AS fee, timestamp AS createTime, timestamp AS onlineTime, status AS onlineStatus" +
+//            " FROM Blocks" +
+//            " WHERE chainID = :chainID AND status = 1 AND miner = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
 
     // 查询钱包的收入和支出
     String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = "SELECT * FROM" +
-            " (" + QUERY_GET_WALLET_TRANSACTIONS + " UNION ALL " + QUERY_GET_BLOCK_MINED +")" +
+            " (" + QUERY_GET_WALLET_TRANSACTIONS +")" +
+//            + " UNION ALL " + QUERY_GET_BLOCK_MINED +")" +
             " ORDER BY createTime DESC" +
             " LIMIT :loadSize OFFSET :startPosition";
+
+    // SQL:查询挖矿收入
+    String QUERY_MINING_INCOME = "SELECT " +
+            " blockHash AS hash, miner AS senderOrMiner, '' AS receiverPk, blockNumber, -1 AS txType, rewards AS amount," +
+            " 0 AS fee, timestamp AS createTime, timestamp AS onlineTime, status AS onlineStatus" +
+            " FROM Blocks" +
+            " WHERE chainID = :chainID AND miner = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND status = 1 AND datetime(timestamp, 'unixepoch', 'localtime') > datetime('now','-3 hour','localtime')" +
+            " ORDER BY createTime DESC";
 
     // SQL:查询未上链并且已过期的条件语句
     String QUERY_PENDING_TXS_NOT_EXPIRED_WHERE = " WHERE senderPk = :senderPk AND chainID = :chainID" +
@@ -269,6 +280,10 @@ public interface TxDao {
     @Transaction
     @Query(QUERY_GET_WALLET_INCOME_AND_EXPENDITURE)
     List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize);
+
+    @Transaction
+    @Query(QUERY_MINING_INCOME)
+    Flowable<List<IncomeAndExpenditure>> observeMiningIncome(String chainID);
 
     /**
      * 获取社区里用户未上链并且未过期的交易数

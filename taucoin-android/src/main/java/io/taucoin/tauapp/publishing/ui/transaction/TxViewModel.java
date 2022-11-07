@@ -941,6 +941,10 @@ public class TxViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
+    public Flowable<List<IncomeAndExpenditure>> observeMiningIncome(String chainID) {
+        return txRepo.observeMiningIncome(chainID);
+    }
+
     public Flowable<Object> observeWalletChanged() {
         return txRepo.observeWalletChanged();
     }

@@ -127,14 +127,10 @@ public interface CommunityDao {
             " WHERE m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND c.isBanned = 0";
 
-    String QUERY_COMMUNITY_MEMBER = "SELECT m.*, a.mTotalIncome, b.mIncomePending, c.txIncome, " +
+    String QUERY_COMMUNITY_MEMBER = "SELECT m.*, b.mIncomePending, c.txIncome, " +
             " d.txExpenditure, e.txIncomePending, f.txExpenditurePending" +
             " FROM Members m" +
             " LEFT JOIN Communities cc ON m.chainID = cc.chainID" +
-            " LEFT JOIN (SELECT chainID, SUM(rewards) AS mTotalIncome FROM Blocks" +
-            " WHERE chainID = :chainID AND miner =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " AND status = 1" +
-            ") AS a ON m.chainID = a.chainID" +
 
             " LEFT JOIN (SELECT chainID, SUM(rewards) AS mIncomePending FROM Blocks" +
             " WHERE chainID = :chainID AND miner =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +

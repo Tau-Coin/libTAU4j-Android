@@ -176,9 +176,8 @@
     <string name="community_choose_coin">Choose Coin</string>
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>
-    <string name="community_mining_income">Mining Income</string>
     <string name="community_balance_pending">Balance/Pending</string>
-    <string name="community_mining_income_pending">Mining Income Pending</string>
+    <string name="community_mining_income_pending">Potential Mining Rewards</string>
     <string name="community_filter_all">All</string>
     <string name="community_chain_note">Chat</string>
     <string name="community_chain_market">News</string>

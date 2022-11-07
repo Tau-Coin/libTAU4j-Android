@@ -92,6 +92,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.community.MiningIncomeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.community.CommunityDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 

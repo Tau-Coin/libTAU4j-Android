@@ -114,7 +114,6 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         long balance = 0;
         long pendingBalance = 0;
         long power = 0;
-//        long miningIncome = 0;
         long mIncomePending = 0;
         if (member != null) {
             power = member.power;
@@ -124,18 +123,13 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             balance = member.balance - onChainBalance;
             balance = Math.max(0, balance);
 
-            logger.debug("loadMemberData balance::{}, showBalance::{}, onChainBalance::{}, pendingBalance::{}," +
-                            " mTotalIncome::{}, mIncomePending::{}",
-                    member.balance, balance, onChainBalance, pendingBalance,
-                    member.mTotalIncome, member.mIncomePending);
+            logger.debug("loadMemberData balance::{}, showBalance::{}, onChainBalance::{}," +
+                            " pendingBalance::{}, mIncomePending::{}",
+                    member.balance, balance, onChainBalance, pendingBalance, member.mIncomePending);
 
             mIncomePending = member.mIncomePending;
-//            miningIncome = member.mTotalIncome - mIncomePending;
-//            miningIncome = Math.max(0, miningIncome);
         }
         binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));
-//        binding.itemMiningIncome.setRightText(FmtMicrometer.fmtLong(miningIncome));
-        binding.itemMiningIncome.setVisibility(View.GONE);
         binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(mIncomePending));
         double showPower = Math.sqrt(1 + power);
         String powerStr = "sqrt(1+%s)=%s";
@@ -174,6 +168,11 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                 Intent intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, TransactionsActivity.class);
+                break;
+            case R.id.item_mining_income_pending:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, MiningIncomeActivity.class);
                 break;
             case R.id.rl_pay_people:
                 intent = new Intent();
