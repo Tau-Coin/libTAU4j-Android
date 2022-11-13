@@ -383,6 +383,11 @@ public abstract class TauDaemon {
             boolean isForeground = settingsRepo.getBooleanValue(key);
             logger.info("foreground running::{}", isForeground);
             tauDozeManager.setForeground(isForeground);
+            if (isForeground) {
+                setForegroundMode();
+            } else {
+                setBackgroundMode();
+            }
         } else if (key.equals(appContext.getString(R.string.pref_key_nat_pmp_mapped))) {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
@@ -912,6 +917,26 @@ public abstract class TauDaemon {
             sessionManager.setLogLevel(level);
         }
         logger.info("setLogLevel level::{}, isRunning::{}", level, isRunning);
+    }
+
+    /**
+     * 设置前台模式
+     */
+    public void setForegroundMode() {
+        if (isRunning) {
+            sessionManager.setForegroundMode();
+        }
+        logger.warn("setForegroundMode isRunning::{}", isRunning);
+    }
+
+    /**
+     * 设置后台模式
+     */
+    public void setBackgroundMode() {
+        if (isRunning) {
+            sessionManager.setBackgroundMode();
+        }
+        logger.warn("setBackgroundMode isRunning::{}", isRunning);
     }
 
     /**
