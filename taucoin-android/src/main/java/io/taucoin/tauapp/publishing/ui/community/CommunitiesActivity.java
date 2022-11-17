@@ -132,7 +132,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         }
 		//Modified tc
         //binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));
-        binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance);
+        binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance));
         binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(power*10));
         double showPower = Math.log(2+power)/Math.log(2);
         String powerStr = "log2(2+%s)=%s";
@@ -167,13 +167,14 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             case R.id.tv_join:
                 viewModel.joinCommunity(chainID);
                 break;
-            case R.id.rl_transactions:
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                ActivityUtil.startActivity(intent, this, TransactionsActivity.class);
-                break;
+		    //Modified tc
+            //case R.id.rl_transactions:
+            //    Intent intent = new Intent();
+            //    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+            //    ActivityUtil.startActivity(intent, this, TransactionsActivity.class);
+            //    break;
             case R.id.item_mining_income_pending:
-                intent = new Intent();
+                Intent intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, MiningIncomeActivity.class);
                 break;
@@ -211,7 +212,8 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
 
     private void handleMemberTips(MemberTips tips) {
         boolean isShowTips = tips.pendingTime > 0;
-        binding.viewTips.setVisibility(isShowTips ? View.VISIBLE : View.GONE);
+		//Modified tc
+        //binding.viewTips.setVisibility(isShowTips ? View.VISIBLE : View.GONE);
     }
 
     @Override
