@@ -50,9 +50,10 @@ public class TransactionsTabFragment extends CommunityTabFragment {
         int verticalOffset = -getResources().getDimensionPixelSize(R.dimen.widget_size_5);
         binding.viewSpinner.setDropDownVerticalOffset(verticalOffset);
 
-        int[] spinnerItems = new int[] {R.string.community_view_blocks,
-                R.string.community_view_own_txs,
-                R.string.community_view_tx_history};
+		//Modified, tc
+        int[] spinnerItems = new int[] {R.string.community_view_own_txs,
+                R.string.community_view_tx_history,
+                R.string.R.string.community_view_blocks};
 
         SpinnerAdapter adapter = new SpinnerAdapter(activity, spinnerItems);
         binding.viewSpinner.setSelection(0);

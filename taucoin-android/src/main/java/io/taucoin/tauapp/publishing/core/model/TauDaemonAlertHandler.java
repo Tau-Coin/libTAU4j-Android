@@ -149,7 +149,8 @@ public class TauDaemonAlertHandler {
                 onSyncingHeadBlock(alert);
                 break;
             case BLOCK_CHAIN_ROLLBACK_BLOCK:
-                onRollbackBlock(alert);
+				//Modified tc
+                //onRollbackBlock(alert);
                 break;
             case BLOCK_CHAIN_NEW_TX:
                 onNewTransaction(alert);

@@ -88,19 +88,19 @@
                     android:layout_height="1dp"
                     android:background="@color/color_bg" />
 
-                <RelativeLayout
+                <!-RelativeLayout
                     android:id="@+id/rl_transactions"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:background="@color/color_white"
                     android:layout_height="@dimen/widget_size_40"
-                    android:onClick="@{listener::onClick}">
+                    android:onClick="@{listener::onClick}"->
 
-                    <RelativeLayout
+                    <!-RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"->
 
-                        <TextView
+                        <!-TextView
                             android:id="@+id/menu_transactions"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -110,9 +110,9 @@
                             android:gravity="center_vertical"
                             android:singleLine="true"
                             android:text="@string/menu_transactions"
-                            android:textAppearance="@style/TextAppearanceBody1" />
+                            android:textAppearance="@style/TextAppearanceBody1" /->
 
-                        <View
+                        <!-View
                             android:layout_toEndOf="@+id/menu_transactions"
                             android:visibility="visible"
                             android:id="@+id/view_tips"
@@ -121,27 +121,27 @@
                             android:layout_marginStart="@dimen/widget_size_2"
                             android:layout_marginEnd="@dimen/widget_size_2"
                             android:layout_marginTop="@dimen/widget_size_14"
-                            android:background="@drawable/red_rect_round_bg"/>
+                            android:background="@drawable/red_rect_round_bg"/->
 
-                    </RelativeLayout>
+                    <!-/RelativeLayout->
 
-                    <ImageView
+                    <!-ImageView
                         android:layout_width="@dimen/widget_size_14"
                         android:layout_height="@dimen/widget_size_14"
                         android:layout_marginEnd="@dimen/widget_size_10"
                         android:layout_centerVertical="true"
                         android:layout_alignParentEnd="true"
                         android:contentDescription="@null"
-                        android:src="@mipmap/icon_arrow"/>
+                        android:src="@mipmap/icon_arrow"/->
 
-                    <View
+                    <!-View
                         android:id="@+id/view_line"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_alignParentBottom="true"
-                        android:background="@color/color_bg" />
+                        android:background="@color/color_bg" /->
 
-                </RelativeLayout>
+                <!-/RelativeLayout->
 
                 <RelativeLayout
                     android:id="@+id/rl_pay_people"

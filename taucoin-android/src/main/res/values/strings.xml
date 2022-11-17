@@ -176,7 +176,7 @@
     <string name="community_choose_coin">Choose Coin</string>
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>
-    <string name="community_balance_pending">Balance/Pending</string>
+    <string name="community_balance_pending">Balance</string>
     <string name="community_mining_income_pending">Potential Mining Rewards</string>
     <string name="community_filter_all">All</string>
     <string name="community_chain_note">Message</string>
@@ -203,9 +203,9 @@
     <string name="community_view_note">Note</string>
     <string name="community_view_unknown">Unknown</string>
     <string name="community_view_announcement">Announcement</string>
-    <string name="community_view_blocks">Blocks Explorer</string>
     <string name="community_view_own_txs">Sent Transactions</string>
     <string name="community_view_tx_history">Transaction History</string>
+    <string name="community_view_blocks">Blocks Explorer</string>
 
     <string name="chain_mining_time">Mining Time</string>
     <string name="chain_mining_time_tips">Your remaining time to win the current mining slot.</string>
