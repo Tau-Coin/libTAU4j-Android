@@ -130,12 +130,12 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             mIncomePending = member.mIncomePending;
         }
         binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));
-        binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(mIncomePending));
-        double showPower = Math.sqrt(1 + power);
-        String powerStr = "sqrt(1+%s)=%s";
+        binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(power*10));
+        double showPower = Math.log(2+power)/Math.log(2);
+        String powerStr = "log2(2+%s)=%s";
         powerStr = String.format(powerStr, FmtMicrometer.fmtLong(power), FmtMicrometer.formatThreeDecimal(showPower));
         binding.itemMiningPower.setRightText(powerStr);
-        //sqrt(1+ power)//
+        //log2(2+ power)//
     }
 
 //    /**
