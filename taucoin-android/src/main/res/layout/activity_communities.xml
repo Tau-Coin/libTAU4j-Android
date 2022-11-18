@@ -41,67 +41,17 @@
                     app:lineRightTextColor="@color/color_yellow"
                     app:lineVisibility="false"/>
 
-                <RelativeLayout
-                    android:id="@+id/rl_mining_income_pending"
-                    android:orientation="horizontal"
+                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                    android:id="@+id/item_mining_income_pending"
                     android:layout_width="match_parent"
-                    android:background="@color/color_white"
                     android:layout_height="wrap_content"
-                    android:onClick="@{listener::onClick}">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="@dimen/widget_size_5"
-                        android:paddingBottom="@dimen/widget_size_5"
-                        android:gravity="center_vertical"
-                        android:minHeight="@dimen/widget_size_40">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="@dimen/widget_size_20"
-                            android:ellipsize="end"
-                            android:gravity="center_vertical"
-                            android:textColor="@color/gray_dark"
-                            android:text="@string/community_mining_income_pending"
-                            android:textAppearance="@style/TextAppearanceBody1" />
-
-                        <TextView
-                            android:id="@+id/tv_mining_income_pending"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/widget_size_5"
-                            android:layout_marginEnd="@dimen/widget_size_5"
-                            android:ellipsize="end"
-                            android:gravity="center_vertical"
-                            android:singleLine="true"
-                            android:textColor="@color/color_yellow"
-                            android:textAppearance="@style/TextAppearanceBody1" />
-
-                        <ImageView
-                            android:layout_width="@dimen/widget_size_14"
-                            android:layout_height="@dimen/widget_size_14"
-                            android:layout_marginEnd="@dimen/widget_size_10"
-                            android:contentDescription="@null"
-                            android:src="@mipmap/icon_arrow"/>
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_alignParentBottom="true"
-                        android:background="@color/color_bg" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_alignParentTop="true"
-                        android:background="@color/color_bg" />
-
-                </RelativeLayout>
+                    android:minHeight="@dimen/widget_size_44"
+                    android:onClick="@{listener::onClick}"
+                    android:gravity="center_vertical"
+                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineRightTextColor="@color/color_yellow"
+                    app:lineLeftText="@string/community_mining_income_pending"
+                    app:lineVisibility="false"/>
 
                 <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_mining_power"
