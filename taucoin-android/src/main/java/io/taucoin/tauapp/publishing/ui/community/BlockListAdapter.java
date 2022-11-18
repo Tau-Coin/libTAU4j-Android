@@ -83,9 +83,9 @@ public class BlockListAdapter extends ListAdapter<BlockAndTx, BlockListAdapter.V
                 binding.txTitle.setText(isMessage ? R.string.community_tip_block_msg_title :
                         R.string.community_tip_block_txs_title);
             }
-
-            binding.tvOnChain.setText(block.status == 1 ? R.string.community_block_on_chain :
-                    R.string.community_block_forking);
+			//Modified tc
+            //binding.tvOnChain.setText(block.status == 1 ? R.string.community_block_on_chain :
+            //        R.string.community_block_forking);
             binding.tvBlockDetail.setOnLongClickListener(longListener);
             binding.tvMsg.setOnLongClickListener(longListener);
         }

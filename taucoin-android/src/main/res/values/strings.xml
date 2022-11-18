@@ -47,7 +47,7 @@
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
 
-    <string name="main_title">TAU Phone Mining Coins</string>
+    <string name="main_title">Phone Mined Crypto Cities</string>
     <string name="main_empty_title">Welcome to TAU</string>
     <string name="main_empty_add_friends">Add Friend</string>
     <string name="main_empty_create_communities">Create Coin Group</string>
@@ -78,7 +78,7 @@
     <string name="main_insufficient_device_space">Insufficient device space</string>
 
     <string name="main_tab_all">All</string>
-    <string name="main_tab_community">My Coins</string>
+    <string name="main_tab_community">Communities</string>
     <string name="main_tab_personal">Personal</string>
     <string name="main_operation_mark_read">Mark as Read</string>
     <string name="main_operation_mark_unread">Mark as UnRead</string>
@@ -176,10 +176,10 @@
     <string name="community_choose_coin">Choose Coin</string>
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>
-    <string name="community_balance_pending">Balance/Pending</string>
+    <string name="community_balance_pending">Balance</string>
     <string name="community_mining_income_pending">Potential Mining Rewards</string>
     <string name="community_filter_all">All</string>
-    <string name="community_chain_note">Chat</string>
+    <string name="community_chain_note">Message</string>
     <string name="community_chain_market">News</string>
     <string name="community_on_chain">Transactions</string>
     <string name="community_pinned_message">Pinned Message</string>
@@ -203,9 +203,9 @@
     <string name="community_view_note">Note</string>
     <string name="community_view_unknown">Unknown</string>
     <string name="community_view_announcement">Announcement</string>
-    <string name="community_view_blocks">Blocks Explorer</string>
     <string name="community_view_own_txs">Sent Transactions</string>
     <string name="community_view_tx_history">Transaction History</string>
+    <string name="community_view_blocks">Blocks Explorer</string>
 
     <string name="chain_mining_time">Mining Time</string>
     <string name="chain_mining_time_tips">Your remaining time to win the current mining slot.</string>

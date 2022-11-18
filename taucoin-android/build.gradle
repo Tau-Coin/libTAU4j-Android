@@ -7,8 +7,8 @@ android {
         applicationId "io.taucoin.tauapp.publishing"
         minSdkVersion 24
         targetSdkVersion 31
-        versionCode 24
-        versionName "1.6.17"
+        versionCode 26
+        versionName "1.6.19"
         flavorDimensions("default", "id")
 
         vectorDrawables.useSupportLibrary = true
@@ -111,8 +111,8 @@ android {
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "7"
             // TauLogLevel.DEBUG
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://6e6170b970bae896803ecb1051653" +
-                    "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:9881\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"83b8539430303030PMCChain\""
+                    "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:19881\""
+            buildConfigField "String", "TEST_CHAIN_ID", "\"628507d230303030PMCChain\""
             buildConfigField "String", "TEST_CHAIN_PEER", "\"602bc2c65f2c6e77c7e359339de7eb3d6d243a5eac4842d97b92e583d472690a\""
             signingConfig signingConfigs.debugConfig
         }
