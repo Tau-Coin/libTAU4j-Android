@@ -176,7 +176,6 @@ class TxQueueManager {
      * 发送转账交易
      * @param chainID 发送社区链ID
      * @return 是否需要重发
-     */
     private boolean sendTxQueue(String chainID, int offset) {
         User currentUser = userRepos.getCurrentUser();
         if (null == currentUser) {
@@ -222,13 +221,60 @@ class TxQueueManager {
         }
         return false;
     }
+     */
+
+    /**
+     * 发送转账交易
+     * @param chainID 发送社区链ID
+     * @return 是否需要重发
+	 */
+    private boolean sendTxQueue(String chainID, int offset) {
+		//获取当前用户
+        User currentUser = userRepos.getCurrentUser();
+        if (null == currentUser) {
+            logger.info("sendTxQueue current user null");
+            return true;
+        }
+        // 获取当前用户在社区中链上nonce值
+        byte[] chainIDBytes = ChainIDUtil.encode(chainID);
+        Account account = daemon.getAccountInfo(chainIDBytes, currentUser.publicKey);
+        if (null == account) {
+            return true;
+        }
+        logger.info("sendTxQueue account nonce::{}, balance::{}", account.getNonce(), account.getBalance());
+
+        try {
+			//1. 先按照nonce搜索一遍, 没有则搜一个没有nonce的txQueue交易
+            TxQueueAndStatus txQueue = txQueueRepos.getNonceFirstTx(chainID, currentUser.publicKey, account.getNonce()+1);
+            if (null == txQueue) {
+                logger.info("sendTxQueue queue null");
+				//退一步，搜索没有nonce的txQueue交易
+				txQueue = txQueueRepos.getQueueFirstTx(chainID, currentUser.publicKey);
+				if (null == txQueue) {
+					return false;
+				}
+				return sendTxQueue(account, txQueue, 1); //1 -> 需要构造tx，然后发送
+            }
+            logger.info("sendTxQueue status::{}, sendCount::{}, timestamp::{}", txQueue.status, txQueue.sendCount, txQueue.timestamp);
+
+            if (txQueue.amount + txQueue.fee > account.getBalance()) {
+                logger.info("sendWiringTx amount({}) + fee({}) > balance({})", txQueue.amount,
+                        txQueue.fee, account.getBalance());
+                //return sendTxQueue(chainID, offset + 1);
+                return false; //当前nonce的交易金额>余额，则不进行
+            }
+            return sendTxQueue(account, txQueue, 2);
+        } catch (Exception e) {
+            logger.warn("Error adding transaction::{}", e.getMessage());
+        }
+        return false;
+    }
 
     /**
      * 队列数据已改变
      * @param account
      * @param txQueue
      * @return
-     */
     private boolean queueChanged(Account account, TxQueueAndStatus txQueue) {
         boolean changed = false;
         Tx tx = txRepo.getTxByQueueID(txQueue.queueID, txQueue.timestamp);
@@ -242,9 +288,7 @@ class TxQueueManager {
         return changed;
     }
 
-    /**
      * 重新发送等待上链的交易（防止由于libTAU丢弃交易而上不了链）
-     */
     private void resendTxQueue(Account account, TxQueueAndStatus txQueue) {
         String chainID = txQueue.chainID;
         if (chainResendTx.containsKey(chainID)) {
@@ -276,8 +320,9 @@ class TxQueueManager {
             txRepo.updateTransaction(tx);
         }
     }
+     */
 
-    private boolean sendTxQueue(Account account, TxQueueAndStatus txQueue) {
+    private boolean sendTxQueue(Account account, TxQueueAndStatus txQueue, int mode) {
         boolean isSendMessage = false;
         if (txQueue.queueType == 1 || txQueue.queueType == 2) {
             long medianFee = getAverageTxFee(txQueue.chainID, TxType.WIRING_TX);
@@ -296,7 +341,7 @@ class TxQueueManager {
         if (isSendMessage) {
             ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.UPDATE);
         }
-        sendTxQueue(account, txQueue, true, 0);
+        sendTxQueue(account, txQueue, true, 0, mode);
         return false;
     }
 
@@ -346,7 +391,7 @@ class TxQueueManager {
             // 如果只创建了一条, 并且不是未发送状态直接返回
             return false;
         }
-        return sendTxQueue(account, txQueue, false, pinnedTime);
+        return sendTxQueue(account, txQueue, false, pinnedTime, 2);
     }
 
     /**
@@ -369,7 +414,7 @@ class TxQueueManager {
         } else {
             txEncoded = txQueue.content;
         }
-        long nonce = account.getNonce() + 1;
+        long nonce = account.getNonce() + 1; //需要修改
         byte[] chainIDBytes = ChainIDUtil.encode(txQueue.chainID);
         Transaction transaction = new Transaction(chainIDBytes, TransactionVersion.VERSION1.getV(), timestamp, senderPk, receiverPk,
                 nonce, txQueue.amount, txQueue.fee, txEncoded);
@@ -381,9 +426,30 @@ class TxQueueManager {
      * 发送交易队列
      * @param account 账户信息
      * @param txQueue 队列信息
+     * @param mode 1: 需要构建交易, 2: 直接重新发送
      * @return 是否需要重发
      */
-    private boolean sendTxQueue(Account account, TxQueue txQueue, boolean isDirectSend, long pinnedTime) {
+    private boolean sendTxQueue(Account account, TxQueue txQueue, boolean isDirectSend, long pinnedTime, int mode) {
+		//处理已有的数据, tc
+		if(mode == 2) {
+			byte[] chainIDBytes = ChainIDUtil.encode(txQueue.chainID);
+			byte[] txEncoded;
+			if (txQueue.txType == TxType.WIRING_TX.getType() && null == txQueue.content) {
+				TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), txQueue.memo);
+				txEncoded = txContent.getEncoded();
+			} else {
+				txEncoded = txQueue.content;
+			}
+			Tx tx = txRepo.getTxByQueueID(txQueue.queueID);
+			byte[] senderPkBytes = ChainIDUtil.encode(tx.senderPk);
+			byte[] receiverPkBytes = ChainIDUtil.encode(tx.receiverPk);
+			Transaction transaction = new Transaction(chainIDBytes, TransactionVersion.VERSION1.getV(), tx.timestamp,
+					                                  senderPkBytes, receiverPkBytes, tx.nonce, tx.amount, tx.fee, txEncoded);
+            daemon.submitTransaction(transaction);
+			return true;
+		}
+
+		//mode==1，构建有nonce的交易，继续
         long timestamp = daemon.getSessionTime();
         Transaction transaction = createTransaction(account, txQueue, timestamp);
         long nonce = transaction.getNonce();
@@ -401,9 +467,11 @@ class TxQueueManager {
                 pinnedTime = tx.pinnedTime;
             }
         }
+		/* modified by tc
         // 删除未发送的交易
         txRepo.deleteUnsentTx(txQueue.queueID);
         logger.info("sendTxQueue delete unsent tx");
+		*/
 
         // 创建新的交易
         TxContent txContent = new TxContent(txEncoded);

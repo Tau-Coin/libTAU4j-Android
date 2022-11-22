@@ -159,7 +159,8 @@ public interface TxDao {
             " WHERE txID = :txID";
 
     String QUERY_GET_TX_BY_TX_QUEUE = "SELECT * FROM Txs" +
-            " WHERE queueID = :queueID AND timestamp = :timestamp";
+            " WHERE queueID = :queueID";
+    //        " WHERE queueID = :queueID AND timestamp = :timestamp";
 
     String QUERY_GET_NOT_ON_CHAIN_TX = "SELECT * FROM Txs" +
             " WHERE chainID = :chainID AND txType = :txType AND nonce = :nonce" +
@@ -317,7 +318,7 @@ public interface TxDao {
     Observable<Tx> observeTxByTxID(String txID);
 
     @Query(QUERY_GET_TX_BY_TX_QUEUE)
-    Tx getTxByQueueID(long queueID, long timestamp);
+    Tx getTxByQueueID(long queueID);
 
     @Transaction
     @Query(QUERY_GET_SELL_DETAIL)

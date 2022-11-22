@@ -173,8 +173,8 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public Tx getTxByQueueID(long queueID, long timestamp) {
-        return db.txDao().getTxByQueueID(queueID, timestamp);
+    public Tx getTxByQueueID(long queueID) {
+        return db.txDao().getTxByQueueID(queueID);
     }
 
     @Override

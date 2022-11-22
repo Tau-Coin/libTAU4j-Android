@@ -67,7 +67,7 @@ public interface TxRepository {
 
     Observable<Tx> observeTxByTxID(String txID);
 
-    Tx getTxByQueueID(long queueID, long timestamp);
+    Tx getTxByQueueID(long queueID);
 
     /**
      * 观察社区的交易的变化

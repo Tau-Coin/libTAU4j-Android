@@ -214,7 +214,7 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     /**
-     * 添加新的交易
+     * 添加新的note交易
      * @param tx 根据用户输入构建的用户数据
      */
     void addTransaction(Tx tx) {

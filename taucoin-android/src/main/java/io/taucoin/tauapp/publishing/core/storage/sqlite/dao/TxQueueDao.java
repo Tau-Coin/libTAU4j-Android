@@ -37,7 +37,22 @@ public interface TxQueueDao {
     String QUERY_COMMUNITY_TX_QUEUE = QUERY_COMMUNITY_TX_QUEUE_SELECT +
             " ORDER BY fee DESC, queueID ASC";
 
-    String QUERY_QUEUE_FIRST_TX = QUERY_COMMUNITY_TX_QUEUE + " LIMIT 1 offset :offset";
+    String QUERY_QUEUE_FIRST_TX = QUERY_COMMUNITY_TX_QUEUE + " LIMIT 1";
+
+    String QUERY_NONCE_FIRST_TX = "SELECT * FROM" +
+            " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status, " +
+            " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
+            " FROM TxQueues tq" +
+            " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
+            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID, MAX(sendStatus) AS sendStatus" +
+            " From Txs" +
+            " WHERE chainID = :chainID AND senderPk = :senderPk AND queueID IS NOT NULL AND nonce = :nonce" +
+            " AND (txStatus = 1 OR (txStatus = 0 AND version > 0))" +
+            " GROUP BY queueID) AS t" +
+            " ON tq.queueID = t.queueID" +
+            " WHERE tq.chainID = :chainID AND tq.senderPk = :senderPk)" +
+            " WHERE status <= 0";
 
     String QUERY_TX_QUEUE_BY_ID = "SELECT * FROM" +
             " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
@@ -130,8 +145,11 @@ public interface TxQueueDao {
     @Query(QUERY_COMMUNITY_TX_QUEUE)
     List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String senderPk);
 
+    @Query(QUERY_NONCE_FIRST_TX)
+    TxQueueAndStatus getNonceFirstTx(String chainID, String senderPk, long nonce);
+
     @Query(QUERY_QUEUE_FIRST_TX)
-    TxQueueAndStatus getQueueFirstTx(String chainID, String senderPk, int offset);
+    TxQueueAndStatus getQueueFirstTx(String chainID, String senderPk);
 
     @Query(QUERY_TX_QUEUE_BY_ID)
     TxQueueAndStatus getTxQueueByID(long queueID);
