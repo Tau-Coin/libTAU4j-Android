@@ -7,10 +7,15 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.style.URLSpan;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.noober.menu.FloatMenu;
 
 import org.slf4j.Logger;
@@ -32,13 +37,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
-import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.tauapp.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
@@ -51,46 +54,55 @@ import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.databinding.DialogTrustBinding;
+import io.taucoin.tauapp.publishing.databinding.FragmentNewsTabBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
+import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
 import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
+import io.taucoin.tauapp.publishing.ui.constant.Page;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
-import io.taucoin.tauapp.publishing.ui.customviews.TxLogsDialog;
+import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
-public abstract class CommunityTabFragment extends BaseFragment implements View.OnClickListener,
-        CommunityListener {
+/**
+ * 主页所有上链news或notes, 以及自己发的未上链news Tab页
+ */
+public class NewsTabFragment extends BaseFragment implements NewsListAdapter.ClickListener {
 
-    protected static final Logger logger = LoggerFactory.getLogger("CommunityTabFragment");
+    protected static final Logger logger = LoggerFactory.getLogger("NewsTabFragment");
+    private NewsListAdapter adapter;
+    private FragmentNewsTabBinding binding;
+    protected CompositeDisposable disposables = new CompositeDisposable();
+    private boolean isVisibleToUser;
     public static final int TX_REQUEST_CODE = 0x1002;
-    public static final int TAB_NOTES = 0;
-    public static final int TAB_MARKET = 1;
-    public static final int TAB_CHAIN = 2;
-    public static final int TAB_NEWS = 3;
+    public static final int CHOOSE_REQUEST_CODE = 0x1003;
     protected BaseActivity activity;
     protected TxViewModel txViewModel;
     protected UserViewModel userViewModel;
     protected CommunityViewModel communityViewModel;
-    protected CompositeDisposable disposables = new CompositeDisposable();
     private FloatMenu operationsMenu;
     private CommonDialog trustDialog;
-    private TxLogsDialog txLogsDialog;
-    private Disposable logsDisposable;
-    private long medianFee;
+    private Disposable txFeeDisposable;
 
-    boolean isJoined = false;
-    protected String chainID;
-    int currentTab;
-    int currentPos = 0;
-    boolean isScrollToBottom = true;
+    private int currentPos = 0;
+    private boolean isScrollToBottom = true;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof BaseActivity)
             activity = (BaseActivity)context;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_news_tab, container, false);
+//        binding.setListener(this);
+        return binding.getRoot();
     }
 
     @Override
@@ -102,26 +114,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         txViewModel = provider.get(TxViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
-        initParameter();
         initView();
-    }
-
-    /**
-     * 初始化参数
-     */
-    private void initParameter() {
-        if(getArguments() != null){
-            chainID = getArguments().getString(IntentExtra.CHAIN_ID);
-            isJoined = getArguments().getBoolean(IntentExtra.IS_JOINED, false);
-        }
-    }
-
-    public RecyclerView getRecyclerView() {
-        return null;
-    };
-
-    public SwipeRefreshLayout getRefreshLayout() {
-        return null;
     }
 
     /**
@@ -137,6 +130,10 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
             getRecyclerView().setLayoutManager(layoutManager);
             getRecyclerView().setItemAnimator(null);
         }
+        adapter = new NewsListAdapter(this);
+        binding.txList.setAdapter(adapter);
+
+        initFabSpeedDial();
     }
 
     final Runnable handleUpdateAdapter = () -> {
@@ -168,7 +165,134 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         }
     };
 
+    public RecyclerView getRecyclerView() {
+        return binding.txList;
+    }
 
+    public SwipeRefreshLayout getRefreshLayout() {
+        return binding.refreshLayout;
+    }
+
+    /**
+     * 初始化右下角悬浮按钮组件
+     */
+    private void initFabSpeedDial() {
+        FloatingActionButton mainFab = binding.fabButton.getMainFab();
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mainFab.getLayoutParams();
+        layoutParams.gravity = Gravity.END | Gravity.BOTTOM;
+        mainFab.setLayoutParams(layoutParams);
+        mainFab.setCustomSize(getResources().getDimensionPixelSize(R.dimen.widget_size_44));
+
+        SpeedDialActionItem invitationItem = new SpeedDialActionItem.Builder(R.id.community_create_invitation,
+                R.drawable.ic_add_36dp)
+                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_20))
+                .setLabel(getString(R.string.community_leader_invitation))
+                .setLabelColor(getResources().getColor(R.color.color_yellow))
+                .create();
+        binding.fabButton.addActionItem(invitationItem);
+
+        SpeedDialActionItem airdropItem = new SpeedDialActionItem.Builder(R.id.community_create_airdrop,
+                R.drawable.ic_add_36dp)
+                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_14))
+                .setLabel(getString(R.string.community_airdrop))
+                .setLabelColor(getResources().getColor(R.color.color_yellow))
+                .create();
+        binding.fabButton.addActionItem(airdropItem);
+
+        SpeedDialActionItem sellItem = new SpeedDialActionItem.Builder(R.id.community_create_sell,
+                R.drawable.ic_add_36dp)
+                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_30))
+                .setLabel(getString(R.string.community_sell_coins))
+                .setLabelColor(getResources().getColor(R.color.color_yellow))
+                .create();
+        binding.fabButton.addActionItem(sellItem);
+
+        binding.fabButton.getMainFab().setOnClickListener(v -> {
+            if (binding.fabButton.isOpen()) {
+                binding.fabButton.close();
+            } else {
+                binding.fabButton.open();
+            }
+        });
+
+        Intent intent = new Intent();
+        binding.fabButton.setOnActionSelectedListener(actionItem -> {
+            switch (actionItem.getId()) {
+                case R.id.community_create_sell:
+                    ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
+                            TX_REQUEST_CODE);
+                    break;
+                case R.id.community_create_airdrop:
+                    ActivityUtil.startActivityForResult(intent, activity, AirdropCreateActivity.class,
+                            TX_REQUEST_CODE);
+                    break;
+                case R.id.community_create_invitation:
+                    ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
+                            TX_REQUEST_CODE);
+                    break;
+            }
+            return false;
+        });
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        this.isVisibleToUser = isVisibleToUser;
+        logger.debug("setUserVisibleHint1::{}", isVisibleToUser);
+//        if (communityViewModel != null && isVisibleToUser) {
+//            communityViewModel.clearNewsUnread(chainID);
+//        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        txViewModel.observerChainTxs().observe(this, txs -> {
+            List<UserAndTx> currentList = new ArrayList<>(txs);
+            if (currentPos == 0) {
+                initScrollToBottom();
+                adapter.submitList(currentList, handleUpdateAdapter);
+            } else {
+                currentList.addAll(adapter.getCurrentList());
+                adapter.submitList(currentList, handlePullAdapter);
+            }
+            binding.refreshLayout.setRefreshing(false);
+            binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
+//            if (isVisibleToUser) {
+//                communityViewModel.clearNewsUnread(chainID);
+//            }
+//            logger.debug("txs.size::{}", txs.size());
+//            closeProgressDialog();
+//            TauNotifier.getInstance().cancelNotify(chainID);
+        });
+        loadData(0);
+
+        disposables.add(txViewModel.observeDataSetChanged()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                    // 跟当前用户有关系的才触发刷新
+                    if (result != null && StringUtil.isNotEmpty(result.getMsg())) {
+                        binding.refreshLayout.setRefreshing(false);
+                        binding.refreshLayout.setEnabled(false);
+                        // 立即执行刷新
+                        loadData(0);
+                    }
+                }));
+    }
+
+    private int getItemCount() {
+        if (adapter != null) {
+            return adapter.getItemCount();
+        }
+        return 0;
+    }
+
+    private void loadData(int pos) {
+        currentPos = pos;
+        txViewModel.loadNewsData(pos, getItemCount());
+    }
 
     /**
      * 显示每个item长按操作选项对话框
@@ -187,7 +311,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
                 MainApplication.getInstance().getPublicKey())){
             menuList.add(new OperationMenuItem(R.string.tx_operation_blacklist));
         }
-        menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
         if (tx.favoriteTime <= 0) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_favorite));
         }
@@ -215,10 +338,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
                     userViewModel.setUserBlacklist(publicKey, true);
                     ToastUtils.showShortToast(R.string.blacklist_successfully);
                     break;
-                case R.string.tx_operation_pin:
-                case R.string.tx_operation_unpin:
-                    txViewModel.setMessagePinned(tx, false);
-                    break;
                 case R.string.tx_operation_favorite:
                     txViewModel.setMessageFavorite(tx, false);
                     break;
@@ -231,11 +350,6 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
             }
         });
         operationsMenu.show(activity.getPoint());
-    }
-
-    @Override
-    public void onItemClicked(TextView view, UserAndTx tx) {
-        KeyboardUtils.hideSoftInput(activity);
     }
 
     @Override
@@ -265,9 +379,33 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onTrustClicked(User user) {
+    public void onRetweetClicked(UserAndTx tx) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+        ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
+                CHOOSE_REQUEST_CODE);
+    }
+
+    @Override
+    public void onReplyClicked(UserAndTx tx) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
+        ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
+                TX_REQUEST_CODE);
+    }
+
+    @Override
+    public void onTrustClicked(UserAndTx user) {
         KeyboardUtils.hideSoftInput(activity);
-        showTrustDialog(user, null);
+        if (txFeeDisposable != null && !txFeeDisposable.isDisposed()) {
+            txFeeDisposable.dispose();
+        }
+        txFeeDisposable = txViewModel.observeAverageTxFee(user.chainID, TxType.TRUST_TX)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(fee -> {
+                    showTrustDialog(user, null, fee);
+                });
     }
 
     @Override
@@ -286,57 +424,16 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         ActivityUtil.openUri(activity, link);
     }
 
-    @Override
-    public void onTxLogClick(String txID, int version) {
-        KeyboardUtils.hideSoftInput(activity);
-        if (logsDisposable != null) {
-            disposables.remove(logsDisposable);
-        }
-        logsDisposable = communityViewModel.observerTxLogs(txID)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(logs -> {
-                    showTxLogsDialog(txID, logs, version);
-                });
-        disposables.add(logsDisposable);
-    }
-
-    /**
-     * 显示交易确认的对话框
-     */
-    private void showTxLogsDialog(String txID, List<TxLog> logs, int version) {
-        if (txLogsDialog != null && txLogsDialog.isShowing()) {
-            txLogsDialog.submitList(logs);
-            return;
-        }
-        txLogsDialog = new TxLogsDialog.Builder(activity)
-                .setResend(version > 0)
-                .setMsgLogsListener(new TxLogsDialog.MsgLogsListener() {
-                    @Override
-                    public void onRetry() {
-                        txViewModel.resendTransaction(txID);
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        if (logsDisposable != null) {
-                            disposables.remove(logsDisposable);
-                        }
-                    }
-                }).create();
-        txLogsDialog.submitList(logs);
-        txLogsDialog.show();
-    }
-
     /**
      * 显示信任的对话框
      */
-    void showTrustDialog(User user, TxQueueAndStatus txQueue) {
+    void showTrustDialog(UserAndTx userAndTx, TxQueueAndStatus txQueue, long medianFee) {
         DialogTrustBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.dialog_trust, null, false);
 
         String showName;
         TrustContent content;
+        User user = userAndTx.sender;
         if (user != null) {
             showName = UsersUtil.getShowName(user);
             content = new TrustContent(null, user.publicKey);
@@ -353,8 +450,8 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : medianFee);
         binding.tvTrustFee.setTag(R.id.median_fee, medianFee);
 
-        String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
-                ChainIDUtil.getCoinName(chainID));
+        String chainID = userAndTx.chainID;
+        String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr, ChainIDUtil.getCoinName(chainID));
         binding.tvTrustFee.setText(Html.fromHtml(txFreeHtml));
         binding.tvTrustFee.setTag(txFeeStr);
         binding.tvTrustFee.setOnClickListener(v -> {
@@ -385,36 +482,12 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onClick(View v) {
-        closeAllDialog();
-        switch (v.getId()) {
-            case R.id.ll_pinned_message:
-                Intent intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                intent.putExtra(IntentExtra.TYPE, currentTab);
-                ActivityUtil.startActivityForResult(intent, activity, PinnedActivity.class,
-                        NotesTabFragment.TX_REQUEST_CODE);
-                break;
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (currentTab == TAB_MARKET) {
-            disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.TRUST_TX)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(fee -> {
-                        this.medianFee = fee;
-                    }));
-        }
-    }
-
-    @Override
     public void onStop() {
         super.onStop();
         disposables.clear();
+        if (txFeeDisposable != null && !txFeeDisposable.isDisposed()) {
+            txFeeDisposable.dispose();
+        }
     }
 
 
@@ -432,26 +505,11 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         if (trustDialog != null) {
             trustDialog.closeDialog();
         }
-        if (txLogsDialog != null) {
-            txLogsDialog.closeDialog();
-        }
-    }
-
-    public void handleMember(CommunityAndMember member) {
-        isJoined = member.isJoined();
     }
 
     @Override
     public void onRefresh() {
         loadData(getItemCount());
-    }
-
-    int getItemCount() {
-        return 0;
-    }
-
-    protected void loadData(int pos) {
-        currentPos = pos;
     }
 
     void initScrollToBottom() {
@@ -478,9 +536,17 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
         if (requestCode == TX_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             loadData(0);
         }
-    }
-
-    public void switchView(int spinnerItem) {
-        this.isScrollToBottom = true;
+        if (resultCode == Activity.RESULT_OK && requestCode == CHOOSE_REQUEST_CODE) {
+            if (data != null) {
+                String chainID = data.getStringExtra(IntentExtra.CHAIN_ID);
+                if (StringUtil.isNotEmpty(chainID)) {
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra(IntentExtra.TYPE, 0);
+                    ActivityUtil.startActivity(intent, this, MainActivity.class);
+                }
+            }
+        }
     }
 }

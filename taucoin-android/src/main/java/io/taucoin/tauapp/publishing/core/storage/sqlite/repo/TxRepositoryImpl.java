@@ -108,6 +108,11 @@ public class TxRepositoryImpl implements TxRepository{
         return db.txDao().loadChainTxsData(chainID, startPos, loadSize);
     }
 
+    @Override
+    public List<UserAndTx> loadNewsData(int startPos, int loadSize) {
+        return db.txDao().loadNewsData(startPos, loadSize);
+    }
+
     /**
      * 加载交易固定数据
      * @param chainID 社区链ID

@@ -115,6 +115,9 @@ public interface TxRepository {
 
     List<UserAndTx> loadChainTxsData(String chainID, int pos, int pageSize);
 
+    List<UserAndTx> loadNewsData(int pos, int pageSize);
+
+
     DataSource.Factory<Integer, UserAndTx> queryFavorites();
 
     List<Tx> getOnChainTxsByBlockHash(String blockHash);

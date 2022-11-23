@@ -130,6 +130,17 @@ public interface TxDao {
             " ORDER BY createTime DESC" +
             " LIMIT :loadSize OFFSET :startPosition";
 
+    String QUERY_GET_ALL_NEWS = "SELECT tx.*, t.trusts" +
+            " FROM Txs AS tx" +
+            " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk, chainID FROM Txs" +
+            " WHERE txStatus = 1 AND txType = 4 " +
+            " GROUP BY receiverPk, chainID" +
+            ") t" +
+            " ON tx.senderPk = t.receiverPk AND t.chainID = tx.chainID" +
+            " WHERE ((tx.txType IN (1, 3, 4, 5, 6) AND tx.txStatus = 1)" +
+            " OR (tx.txType IN (3, 4, 5, 6) AND tx.senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")))" +
+            QUERY_GET_TXS_ORDER;
+
     // SQL:查询挖矿收入
     String QUERY_MINING_INCOME = "SELECT " +
             " blockHash AS hash, miner AS senderOrMiner, '' AS receiverPk, blockNumber, -1 AS txType, rewards AS amount," +
@@ -226,6 +237,9 @@ public interface TxDao {
     @Update
     int updateTransaction(Tx tx);
 
+    @Transaction
+    @Query(QUERY_GET_ALL_NEWS)
+    List<UserAndTx> loadNewsData(int startPosition, int loadSize);
     /**
      * 根据chainID获取社区中的交易的被观察者
      * @param chainID 社区链id

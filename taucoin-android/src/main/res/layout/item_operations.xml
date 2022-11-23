@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/widget_size_50"
             android:onClick="@{listener::onClick}"
-            app:leftImage="@mipmap/icon_favourite"
+            app:leftImage="@mipmap/icon_favourite_news"
             app:rightText="@string/tx_operation_favorite"/>
 
         <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView

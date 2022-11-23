@@ -30,6 +30,7 @@ import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityAirdropCoinsBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
+import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.customviews.FilterEditText;
 import io.taucoin.tauapp.publishing.ui.friends.AirdropCommunityActivity;
@@ -40,6 +41,7 @@ import io.taucoin.tauapp.publishing.ui.friends.AirdropCommunityActivity;
 public class AirdropCreateActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int CHOOSE_REQUEST_CODE = 0x01;
+    private static final int CHOOSE_COMMUNITY_CODE = 0x02;
     private ActivityAirdropCoinsBinding binding;
     private TxViewModel txViewModel;
     private String chainID;
@@ -120,6 +122,7 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
                 }
             }
         });
+        binding.rlCommunity.setVisibility(StringUtil.isEmpty(chainID) ? View.VISIBLE : View.GONE);
     }
 
     private void loadFeeView(long averageTxFee) {
@@ -199,6 +202,9 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
             tx.queueID = txQueue.queueID;
             tx.queueTime = txQueue.queueTime;
         }
+        if (StringUtil.isEmpty(chainID)) {
+            tx.chainID = ViewUtils.getStringTag(binding.etCommunity);
+        }
         return tx;
     }
 
@@ -214,18 +220,36 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
             case R.id.tv_fee:
                 txViewModel.showEditFeeDialog(this, binding.tvFee, chainID);
                 break;
+            case R.id.iv_community:
+                ActivityUtil.startActivityForResult(this, CommunityChooseActivity.class,
+                        CHOOSE_COMMUNITY_CODE);
+                break;
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == CHOOSE_REQUEST_CODE) {
-            if (data != null) {
-                String airdropLink = data.getStringExtra(IntentExtra.AIRDROP_LINK);
-                if (StringUtil.isNotEmpty(airdropLink)) {
-                    binding.etLink.setText(airdropLink);
-                    binding.etLink.setSelection(airdropLink.length());
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CHOOSE_REQUEST_CODE) {
+                if (data != null) {
+                    String airdropLink = data.getStringExtra(IntentExtra.AIRDROP_LINK);
+                    if (StringUtil.isNotEmpty(airdropLink)) {
+                        binding.etLink.setText(airdropLink);
+                        binding.etLink.setSelection(airdropLink.length());
+                    }
+                }
+            } else if (requestCode == CHOOSE_COMMUNITY_CODE) {
+                if (data != null) {
+                    String chainID = data.getStringExtra(IntentExtra.CHAIN_ID);
+                    if (StringUtil.isNotEmpty(chainID)) {
+                        String communityName = ChainIDUtil.getName(chainID);
+                        String communityCode = ChainIDUtil.getCode(chainID);
+                        binding.etCommunity.setText(getString(R.string.main_community_name, communityName, communityCode));
+                        binding.etCommunity.setTag(chainID);
+                    } else {
+                        binding.etCommunity.getText().clear();
+                    }
                 }
             }
         }

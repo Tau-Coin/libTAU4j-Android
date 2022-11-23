@@ -151,6 +151,7 @@
     <string name="community_users_mining_block">Mining Block</string>
     <string name="community_users_doze">Doze</string>
     <string name="common_loading">loading&#8230;</string>
+    <string name="common_choice">Community Choice</string>
 
     <string name="community_create_tips" formatted="false"><Data><![CDATA[Creator is recommended to
     keep device <font color="#ff0000">ON CHARGING</font> to supply data for community.]]></Data></string>
@@ -187,6 +188,7 @@
     <string name="community_sell_coins">Sale</string>
     <string name="community_airdrop">Airdrop</string>
     <string name="community_leader_invitation">Announcement</string>
+    <string name="community_retweet">Retweet</string>
     <string name="community_sell_detail">Sell Detail</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
     <string name="community_create_success" formatted="false"><Data><![CDATA[Keep on <strong>WIFI</strong> and <strong>charging battery</strong> to best exchange data.]]></Data></string>
@@ -438,10 +440,12 @@
     <string name="tx_link">Link - optional</string>
     <string name="tx_airdrop_link">Airdrop Link</string>
     <string name="tx_airdrop_select">Please select an airdrop community first!</string>
+    <string name="tx_community_select">Please select an community first!</string>
     <string name="tx_airdrop_setup">Please set up airdrop first!</string>
     <string name="tx_quantity">Quantity - optional</string>
     <string name="tx_location">Location - optional</string>
     <string name="tx_description">Description - optional</string>
+    <string name="tx_select_community">Community</string>
     <string name="tx_invitation_title">Title</string>
     <string name="tx_operation_reply">Reply</string>
     <string name="tx_operation_copy">Copy</string>
@@ -479,6 +483,7 @@
     <string name="tx_error_memo_too_large">The transaction content is too large!</string>
     <string name="tx_error_invalid_item_name">Invalid item name</string>
     <string name="tx_error_invalid_title">Invalid title</string>
+    <string name="tx_error_no_select_community">Please select a community first!</string>
 
     <string name="tx_result_status_waiting">Waiting&#8230;</string>
     <string name="tx_result_status_processing">Competing &#038; waiting next mining block</string>

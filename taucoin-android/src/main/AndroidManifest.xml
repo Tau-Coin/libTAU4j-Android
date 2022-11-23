@@ -128,6 +128,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.community.CommunityChooseActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.friends.FriendsActivity"
             android:launchMode="singleTop"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
@@ -194,6 +198,10 @@
 
         <activity
             android:name=".ui.transaction.PinnedActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.transaction.NoteCreateActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <service
