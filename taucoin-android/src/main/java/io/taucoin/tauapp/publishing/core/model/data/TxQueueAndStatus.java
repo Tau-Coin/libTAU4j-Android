@@ -22,8 +22,10 @@ public class TxQueueAndStatus extends TxQueue {
 //                            long amount, long fee, TxType txType, byte[] content) {
 //        super(chainID, senderPk, receiverPk, amount, fee, txType, content);
 //    }
-
+	/* delete by tc
     public boolean isProcessing() {
-        return status == 0 && sendStatus == 0;
+        //return status == 0 && sendStatus == 0;
+        return nonce > 0;
     }
+	*/
 }

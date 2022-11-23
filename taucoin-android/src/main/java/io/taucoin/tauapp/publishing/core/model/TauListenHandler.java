@@ -144,20 +144,25 @@ public class TauListenHandler {
             communityRepo.updateCommunity(community);
         }
 
-        Account account = daemon.getAccountInfo(block.getChainID(), userPk);
-        if (account != null) {
-            // 处理区块回滚，
-            // 1、交易nonce大于libTAU的nonce，都置为未上链；
-            long nonce = account.getNonce();
-            int count = txRepo.updateAllOffChainTxs(chainID, userPk, nonce);
-            logger.info("onNewHeadBlock updateAllOffChainTxs count::{}, chainID::{}, userPk::{}, nonce::{}",
+		//add for update txs user received, and sended, modified tc
+		List<String> senderPks = txRepo.queryTxSendersReceived(chainID, userPk); //receiver is user
+		senderPks.add(userPk); //sender is user
+		for(String senderPk : senderPks) {
+			Account account = daemon.getAccountInfo(block.getChainID(), senderPk);
+			if (account != null) {
+				// 处理区块回滚，
+				// 1、交易nonce大于libTAU的nonce，都置为未上链；
+				long nonce = account.getNonce();
+				int count = txRepo.updateAllOffChainTxs(chainID, userPk, nonce);
+				logger.info("onNewHeadBlock updateAllOffChainTxs count::{}, chainID::{}, userPk::{}, nonce::{}",
                     count, chainID, userPk, nonce);
-            // 2、区块blockNumber大于最新head block的区块状态置为未上链；
-            long headBlock = block.getBlockNumber();
-            count = blockRepo.updateAllOffChainBlocks(chainID, headBlock);
-            logger.info("onNewHeadBlock updateAllOffChainBlocks count::{}, chainID::{}, headBlock::{}",
-                    count, chainID, headBlock);
-        }
+				// 2、区块blockNumber大于最新head block的区块状态置为未上链；
+				long headBlock = block.getBlockNumber();
+				count = blockRepo.updateAllOffChainBlocks(chainID, headBlock);
+				logger.info("onNewHeadBlock updateAllOffChainBlocks count::{}, chainID::{}, headBlock::{}",
+						count, chainID, headBlock);
+			}
+		}
 
         handleBlockData(block, BlockStatus.NEW_BLOCK);
 

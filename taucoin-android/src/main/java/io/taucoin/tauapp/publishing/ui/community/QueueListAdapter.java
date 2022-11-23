@@ -107,14 +107,13 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
                 }
             }
             boolean isHaveError = StringUtil.isNotEmpty(errorMsg);
-            boolean isProcessing = tx.isProcessing() && !isHaveError &&
-                    (pos == 0 || (!isTopProcessing && previousHaveError));
+            boolean isProcessing = !isHaveError;
             if (pos == 0) {
-                isTopProcessing = isProcessing;
+                isTopProcessing = true;
             }
-            int progressText = isProcessing ? R.string.tx_result_status_processing :
+            int progressText = isTopProcessing ? R.string.tx_result_status_processing :
                     R.string.tx_result_status_waiting;
-            int progressColor = isProcessing ? R.color.color_yellow : R.color.color_black;
+            int progressColor = isTopProcessing ? R.color.color_yellow : R.color.color_black;
 
             binding.tvProgress.setText(resources.getString(progressText));
             binding.tvProgress.setTextColor(resources.getColor(progressColor));

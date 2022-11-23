@@ -119,13 +119,15 @@ public interface TxRepository {
 
     List<Tx> getOnChainTxsByBlockHash(String blockHash);
 
+    List<String> queryTxSendersReceived(String ChainID, String pk);
+
     void addTxLog(TxLog txLog);
 
     TxLog getTxLog(String txID, int status);
 
     Observable<List<TxLog>> observerTxLogs(String txID);
 
-    void deleteUnsentTx(long queueID);
+    void deleteTxByQueueID(long queueID);
 
     Tx queryUnsentTx(long queueID);
 
@@ -142,6 +144,9 @@ public interface TxRepository {
      * @param nonce
      */
     int updateAllOffChainTxs(String chainID, String userPk, long nonce);
+
+	//获取当前链上的最大nonce
+    long getChainMaxNonce(String chainID, String userPk);
 
     /**
      * 交易费统计

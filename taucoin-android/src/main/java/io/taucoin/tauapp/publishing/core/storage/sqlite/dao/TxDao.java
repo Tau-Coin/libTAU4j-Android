@@ -74,7 +74,7 @@ public interface TxDao {
     // SQL:查询社区里的交易(上链)
     String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, 0 AS trusts" +
             " FROM Txs AS tx" +
-            " WHERE tx.chainID = :chainID AND sendStatus = 0";
+            " WHERE tx.chainID = :chainID AND txStatus = 1";
 
     // SQL:查询社区里的交易(上链)
     String QUERY_GET_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT +
@@ -166,6 +166,9 @@ public interface TxDao {
             " WHERE chainID = :chainID AND txType = :txType AND nonce = :nonce" +
             " ORDER BY timestamp DESC LIMIT 1";
 
+    String QUERY_CHAIN_MAX_NONCE = "SELECT max(nonce) FROM Txs" +
+            " WHERE chainID = :chainID AND senderPk = :senderPk" ;
+
     String QUERY_SET_MESSAGE_PINNED = "UPDATE Txs SET pinnedTime = :pinnedTime" +
             " WHERE txID = :txID";
 
@@ -181,10 +184,13 @@ public interface TxDao {
     String QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH = "SELECT * FROM Txs" +
             " WHERE txStatus = 1 AND blockHash = :blockHash";
 
+    String QUERY_TX_SENDERS_IN_RECEIVER = "SELECT senderPk FROM Txs" +
+            " WHERE txStatus = 1 AND chainID = :chainID AND receiverPk = :receiverPk " +
+			" GROUP BY senderPk";
 
     String QUERY_UNSENT_TX = "SELECT * FROM Txs WHERE queueID = :queueID AND sendStatus = 1 LIMIT 1";
 
-    String DELETE_UNSENT_TX = "DELETE FROM Txs WHERE queueID = :queueID AND sendStatus = 1";
+    String DELETE_TX_BY_QUEUEID = "DELETE FROM Txs WHERE queueID = :queueID";
 
     String QUERY_TX_LOG = "SELECT * FROM TxLogs WHERE hash = :hash AND status = :status";
 
@@ -204,7 +210,8 @@ public interface TxDao {
             " ORDER BY b.blockNumber DESC LIMIT 50)";
 
     String QUERY_LATEST_NOTE_TX_HASH = "SELECT txID FROM Txs" +
-            " WHERE chainID = :chainID AND txType = 1" +
+            " WHERE chainID = :chainID AND txType = 1" + 
+			" AND senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " ORDER BY timestamp DESC limit 1";
 
     /**
@@ -347,11 +354,14 @@ public interface TxDao {
     @Query(QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH)
     List<Tx> getOnChainTxsByBlockHash(String blockHash);
 
+    @Query(QUERY_TX_SENDERS_IN_RECEIVER)
+    List<String> queryTxSendersReceived(String chainID, String receiverPk);
+
     @Query(QUERY_UNSENT_TX)
     Tx queryUnsentTx(long queueID);
 
-    @Query(DELETE_UNSENT_TX)
-    void deleteUnsentTx(long queueID);
+    @Query(DELETE_TX_BY_QUEUEID)
+    void deleteTxByQueueID(long queueID);
 
     @Insert()
     void addTxLog(TxLog log);
@@ -370,6 +380,10 @@ public interface TxDao {
      */
     @Query(UPDATE_ALL_OFF_CHAIN_TXS)
     int updateAllOffChainTxs(String chainID, String userPk, long nonce);
+
+	//获取最大的nonce
+    @Query(QUERY_CHAIN_MAX_NONCE)
+	long getChainMaxNonce(String chainID, String senderPk);
 
     /**
      * 交易费统计

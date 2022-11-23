@@ -24,18 +24,18 @@ public interface TxQueueDao {
             " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status, " +
             " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
             " FROM TxQueues tq" +
-            " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
-            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID, MAX(sendStatus) AS sendStatus" +
+            " LEFT JOIN (SELECT txStatus AS status, COUNT(txID) AS sendCount," +
+            " timestamp, nonce, queueID, sendStatus" +
             " From Txs" +
             " WHERE chainID = :chainID AND senderPk = :senderPk AND queueID IS NOT NULL" +
-            " AND (txStatus = 1 OR (txStatus = 0 AND version > 0))" +
+            " AND txStatus <= 0 AND version > 0" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
-            " WHERE tq.chainID = :chainID AND tq.senderPk = :senderPk)" +
-            " WHERE status <= 0";
+            " WHERE tq.chainID = :chainID AND tq.senderPk = :senderPk)";
 
     String QUERY_COMMUNITY_TX_QUEUE = QUERY_COMMUNITY_TX_QUEUE_SELECT +
-            " ORDER BY fee DESC, queueID ASC";
+            " ORDER BY nonce";
+            //" ORDER BY fee DESC, queueID ASC";
 
     String QUERY_QUEUE_FIRST_TX = QUERY_COMMUNITY_TX_QUEUE + " LIMIT 1";
 
@@ -44,15 +44,12 @@ public interface TxQueueDao {
             " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status, " +
             " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
             " FROM TxQueues tq" +
-            " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
-            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID, MAX(sendStatus) AS sendStatus" +
+            " LEFT JOIN (SELECT txStatus AS status, COUNT(txID) AS sendCount," +
+            " timestamp, nonce, queueID, sendStatus" +
             " From Txs" +
-            " WHERE chainID = :chainID AND senderPk = :senderPk AND queueID IS NOT NULL AND nonce = :nonce" +
-            " AND (txStatus = 1 OR (txStatus = 0 AND version > 0))" +
-            " GROUP BY queueID) AS t" +
+            " WHERE chainID = :chainID AND senderPk = :senderPk AND nonce = :nonce) AS t" +
             " ON tq.queueID = t.queueID" +
-            " WHERE tq.chainID = :chainID AND tq.senderPk = :senderPk)" +
-            " WHERE status <= 0";
+            " WHERE tq.chainID = :chainID AND tq.senderPk = :senderPk)";
 
     String QUERY_TX_QUEUE_BY_ID = "SELECT * FROM" +
             " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
@@ -62,7 +59,7 @@ public interface TxQueueDao {
             " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
             " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID, MAX(sendStatus) AS sendStatus" +
             " From Txs" +
-            " WHERE queueID = :queueID  AND queueID IS NOT NULL" +
+            " WHERE queueID = :queueID" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
             " WHERE tq.queueID = :queueID)";
@@ -73,7 +70,7 @@ public interface TxQueueDao {
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID From Txs" +
             " WHERE senderPk = :senderPk AND queueID IS NOT NULL" +
-            " AND (txStatus = 1 OR (txStatus = 0 AND version > 0))" +
+            " AND txStatus <= 0 AND version > 0" +
             " GROUP BY queueID) AS t" +
             " ON tq.queueID = t.queueID" +
             " WHERE tq.senderPk = :senderPk)" +
@@ -121,6 +118,7 @@ public interface TxQueueDao {
             " WHERE chainID = :chainID AND senderPk = :currentPk" +
             " AND receiverPk = :friendPk " +
             " AND queueTime >= :currentTime AND queueType = 2";
+
     /**
      * 入队列
      */
@@ -165,7 +163,6 @@ public interface TxQueueDao {
 
     @Query(QUERY_REFERRAL_COUNT)
     int getReferralCount(String chainID, String currentPk, String friendPk, long currentTime);
-
 
     @Query(QUERY_AIRDROP_COUNT_ON_CHAIN)
     Flowable<Integer> observeAirdropCountOnChain(String chainID, String senderPk, long currentTime);

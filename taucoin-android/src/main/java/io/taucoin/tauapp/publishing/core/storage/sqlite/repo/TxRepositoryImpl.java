@@ -250,6 +250,11 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
+    public List<String> queryTxSendersReceived(String ChainID, String pk) {
+        return db.txDao().queryTxSendersReceived(ChainID, pk);
+    }
+
+    @Override
     public void addTxLog(TxLog txLog) {
         db.txDao().addTxLog(txLog);
         submitDataSetChanged();
@@ -266,8 +271,8 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public void deleteUnsentTx(long queueID) {
-        db.txDao().deleteUnsentTx(queueID);
+    public void deleteTxByQueueID(long queueID) {
+        db.txDao().deleteTxByQueueID(queueID);
     }
 
     @Override
@@ -300,6 +305,11 @@ public class TxRepositoryImpl implements TxRepository{
     @Override
     public int updateAllOffChainTxs(String chainID, String userPk, long nonce) {
         return db.txDao().updateAllOffChainTxs(chainID, userPk, nonce);
+    }
+
+    @Override
+    public long getChainMaxNonce(String chainID, String userPk) {
+        return db.txDao().getChainMaxNonce(chainID, userPk);
     }
 
     @Override

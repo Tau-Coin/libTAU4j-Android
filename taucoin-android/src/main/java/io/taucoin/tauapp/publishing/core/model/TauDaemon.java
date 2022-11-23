@@ -999,8 +999,8 @@ public abstract class TauDaemon {
         txQueueManager.updateChainTxStoppedTime(chainID);
     }
 
-    public void sendTxQueue(TxQueue txQueue, long pinnedTime) {
-        txQueueManager.sendTxQueue(txQueue, pinnedTime);
+    public void sendTxQueue(TxQueue txQueue, long pinnedTime, int mode) {
+        txQueueManager.sendTxQueue(txQueue, pinnedTime, mode);
     }
 
     /**

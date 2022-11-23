@@ -198,14 +198,14 @@ public class TxViewModel extends AndroidViewModel {
             long queueID = txQueueRepo.addQueue(tx);
             tx.queueID = queueID;
             logger.info("addTransactionTask insert queueID::{}", queueID);
-            daemon.sendTxQueue(tx, pinnedTime);
+            daemon.sendTxQueue(tx, pinnedTime, 1);
             ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.INSERT);
             daemon.updateTxQueue(tx.chainID);
         } else {
             // 重发交易队列
             txQueueRepo.updateQueue(tx);
             logger.info("addTransactionTask update queueID::{}", tx.queueID);
-            daemon.sendTxQueue(tx, 0);
+            daemon.sendTxQueue(tx, 0, 3); //编辑重发
             // 只有转账金额或者备注被修改，才会通知对方
             ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.UPDATE);
             daemon.updateTxQueue(tx.chainID);
@@ -842,7 +842,7 @@ public class TxViewModel extends AndroidViewModel {
         Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             try {
                 txQueueRepo.deleteQueue(tx);
-                txRepo.deleteUnsentTx(tx.queueID);
+                txRepo.deleteTxByQueueID(tx.queueID);
                 ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.DELETE);
             } catch (Exception e) {
                 logger.error("deleteTxQueue error::", e);
