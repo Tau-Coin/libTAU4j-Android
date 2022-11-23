@@ -50,7 +50,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/widget_size_15"
                 android:contentDescription="@null"
-                android:src="@mipmap/icon_reply"/>
+                android:src="@mipmap/icon_reply_news"/>
 
             <LinearLayout
                 android:layout_toEndOf="@+id/iv_replay"

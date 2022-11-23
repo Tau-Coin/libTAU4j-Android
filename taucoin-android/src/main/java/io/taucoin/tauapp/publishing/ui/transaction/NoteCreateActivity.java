@@ -3,7 +3,6 @@ package io.taucoin.tauapp.publishing.ui.transaction;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,36 +10,30 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
-import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
-import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
-import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
-import io.taucoin.tauapp.publishing.databinding.ActivityLeaderInvitationBinding;
+import io.taucoin.tauapp.publishing.databinding.ActivityNoteBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
+import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 
 /**
- * 发布Sell页面
+ * 发布Note页面
  */
-public class AnnouncementCreateActivity extends BaseActivity implements View.OnClickListener {
+public class NoteCreateActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int CHOOSE_REQUEST_CODE = 0x01;
-    private ActivityLeaderInvitationBinding binding;
+    private ActivityNoteBinding binding;
     private TxViewModel txViewModel;
-    private String chainID;
     private final CompositeDisposable disposables = new CompositeDisposable();
-    private TxQueue txQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,23 +41,9 @@ public class AnnouncementCreateActivity extends BaseActivity implements View.OnC
         ViewModelProvider provider = new ViewModelProvider(this);
         txViewModel = provider.get(TxViewModel.class);
         txViewModel.observeNeedStartDaemon();
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_leader_invitation);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_note);
         binding.setListener(this);
-        initParameter();
         initLayout();
-    }
-
-    /**
-     * 初始化参数
-     */
-    private void initParameter() {
-        if (getIntent() != null) {
-            chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            txQueue = getIntent().getParcelableExtra(IntentExtra.BEAN);
-            if (txQueue != null) {
-                chainID = txQueue.chainID;
-            }
-        }
     }
 
     /**
@@ -73,32 +52,14 @@ public class AnnouncementCreateActivity extends BaseActivity implements View.OnC
     @SuppressLint("ClickableViewAccessibility")
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.community_leader_invitation);
+        binding.toolbarInclude.toolbar.setTitle(R.string.community_retweet);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        if (StringUtil.isNotEmpty(chainID)) {
-            if (txQueue != null) {
-                AnnouncementContent txContent = new AnnouncementContent(txQueue.content);
-                binding.etCoinName.setText(txContent.getTitle());
-                binding.etDescription.setText(txContent.getMemo());
-            }
+        if (getIntent() != null) {
+            CharSequence msg = getIntent().getCharSequenceExtra(IntentExtra.DATA);
+            binding.etMessage.setText(msg.toString());
         }
-        binding.rlCommunity.setVisibility(StringUtil.isEmpty(chainID) ? View.VISIBLE : View.GONE);
-    }
-
-    private void loadFeeView(long averageTxFee) {
-        long txFee = 0L;
-        if (txQueue != null) {
-            txFee = txQueue.fee;
-        }
-        String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : averageTxFee);
-        binding.tvFee.setTag(R.id.median_fee, averageTxFee);
-
-        String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr,
-                ChainIDUtil.getCoinName(chainID));
-        binding.tvFee.setText(Html.fromHtml(txFreeHtml));
-        binding.tvFee.setTag(txFeeStr);
     }
 
     @Override
@@ -108,15 +69,14 @@ public class AnnouncementCreateActivity extends BaseActivity implements View.OnC
             if (StringUtil.isNotEmpty(result)) {
                 ToastUtils.showShortToast(result);
             } else {
-                setResult(RESULT_OK);
-                onBackPressed();
+                String chainID = ViewUtils.getStringTag(binding.etCommunity);
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra(IntentExtra.TYPE, 0);
+                ActivityUtil.startActivity(intent, this, MainActivity.class);
             }
         });
-
-        disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.ANNOUNCEMENT)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::loadFeeView));
     }
 
     @Override
@@ -140,9 +100,9 @@ public class AnnouncementCreateActivity extends BaseActivity implements View.OnC
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_done) {
-            TxQueue tx = buildTx();
-            if (txViewModel.validateTx(tx)) {
-                txViewModel.addTransaction(tx, txQueue);
+            Tx tx = buildTx();
+            if (txViewModel.validateNoteTx(tx)) {
+                txViewModel.addTransaction(tx);
             }
         }
         return true;
@@ -152,30 +112,16 @@ public class AnnouncementCreateActivity extends BaseActivity implements View.OnC
      * 构建交易数据
      * @return Tx
      */
-    private TxQueue buildTx() {
-        String senderPk = MainApplication.getInstance().getPublicKey();
-        String fee = ViewUtils.getStringTag(binding.tvFee);
-        String coinName = ViewUtils.getText(binding.etCoinName);
-        String description = ViewUtils.getText(binding.etDescription);
-        AnnouncementContent content = new AnnouncementContent(coinName, description);
-        TxQueue tx = new TxQueue(chainID, senderPk, senderPk, 0L,
-                FmtMicrometer.fmtTxLongValue(fee), TxType.ANNOUNCEMENT, content.getEncoded());
-        if (txQueue != null) {
-            tx.queueID = txQueue.queueID;
-            tx.queueTime = txQueue.queueTime;
-        }
-        if (StringUtil.isEmpty(chainID)) {
-            tx.chainID = ViewUtils.getStringTag(binding.etCommunity);
-        }
-        return tx;
+    private Tx buildTx() {
+        int txType = TxType.NOTE_TX.getType();
+        String memo = ViewUtils.getText(binding.etMessage);
+        String chainID = ViewUtils.getStringTag(binding.etCommunity);
+        return new Tx(chainID, 0L, txType, memo);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.tv_fee:
-                txViewModel.showEditFeeDialog(this, binding.tvFee, chainID);
-                break;
             case R.id.iv_community:
                 ActivityUtil.startActivityForResult(this, CommunityChooseActivity.class,
                         CHOOSE_REQUEST_CODE);

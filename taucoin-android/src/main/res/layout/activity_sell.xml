@@ -83,6 +83,38 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_description" />
 
+        <RelativeLayout
+            android:id="@+id/rl_community"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginTop="@dimen/widget_size_5">
+
+            <ImageView
+                android:id="@+id/iv_community"
+                android:layout_width="@dimen/widget_size_20"
+                android:layout_height="@dimen/widget_size_20"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="@null"
+                android:onClick="@{listener::onClick}"
+                android:src="@mipmap/icon_choose_contact"/>
+
+            <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
+                android:id="@+id/et_community"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/widget_size_15"
+                android:minHeight="@dimen/widget_size_50"
+                android:hint="@string/tx_select_community"
+                android:enabled="false"
+                android:inputType="textMultiLine"
+                android:textAppearance="@style/TextAppearanceBody1"
+                android:autofillHints="@string/tx_select_community" />
+
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/tv_fee"
             android:layout_width="wrap_content"

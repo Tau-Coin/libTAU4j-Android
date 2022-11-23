@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -30,9 +29,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
-import androidx.room.RxRoom;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -41,49 +38,49 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.tauapp.publishing.MainApplication;
+import io.taucoin.tauapp.publishing.R;
+import io.taucoin.tauapp.publishing.core.Constants;
+import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.model.data.DataChanged;
 import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.tauapp.publishing.core.model.data.Result;
 import io.taucoin.tauapp.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
+import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TransactionVersion;
 import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
+import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
+import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
+import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.TxQueueRepository;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.TxRepository;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
-import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
-import io.taucoin.tauapp.publishing.ui.constant.Page;
-import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
-import io.taucoin.tauapp.publishing.MainApplication;
-import io.taucoin.tauapp.publishing.R;
-import io.taucoin.tauapp.publishing.core.Constants;
-import io.taucoin.tauapp.publishing.core.model.TauDaemon;
-import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
-import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.MemberRepository;
-import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.TxRepository;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.UserRepository;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.Utils;
+import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.tauapp.publishing.databinding.EditFeeDialogBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
+import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
+import io.taucoin.tauapp.publishing.ui.constant.Page;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
-import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.AIRDROP_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.ANNOUNCEMENT;
@@ -94,7 +91,7 @@ import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.WIRING
 /**
  * 交易模块相关的ViewModel
  */
-public class TxViewModel extends AndroidViewModel {
+public class TxViewModel1 extends AndroidViewModel {
 
     private static final Logger logger = LoggerFactory.getLogger("TxViewModel");
     private Context application;
@@ -113,7 +110,7 @@ public class TxViewModel extends AndroidViewModel {
     private MutableLiveData<Result> airdropState = new MutableLiveData<>();
     private MutableLiveData<String> addState = new MutableLiveData<>();
     private CommonDialog editFeeDialog;
-    public TxViewModel(@NonNull Application application) {
+    public TxViewModel1(@NonNull Application application) {
         super(application);
         this.application = application;
         txRepo = RepositoryHelper.getTxRepository(application);
@@ -214,7 +211,7 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     /**
-     * 添加新的note交易
+     * 添加新的交易
      * @param tx 根据用户输入构建的用户数据
      */
     void addTransaction(Tx tx) {
@@ -698,26 +695,26 @@ public class TxViewModel extends AndroidViewModel {
             loadViewDisposable.dispose();
         }
         loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
-                    List<UserAndTx> txs = new ArrayList<>();
-                    try {
-                        int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
-                        if (pos == 0 && initSize > pageSize) {
-                            pageSize = initSize;
-                        }
-                        txs = txRepo.loadNewsData(pos, pageSize);
-                        logger.debug("loadNewsData pos::{}, pageSize::{}, messages.size::{}",
-                                pos, pageSize, txs.size());
-                        Collections.reverse(txs);
-                    } catch (Exception e) {
-                        logger.error("loadNewsData error::", e);
-                    }
-                    emitter.onNext(txs);
-                    emitter.onComplete();
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(messages -> {
-                    chainTxs.postValue(messages);
-                });
+            List<UserAndTx> txs = new ArrayList<>();
+            try {
+                int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
+                txs = txRepo.loadNewsData(pos, pageSize);
+                logger.debug("loadNewsData pos::{}, pageSize::{}, messages.size::{}",
+                        pos, pageSize, txs.size());
+                Collections.reverse(txs);
+            } catch (Exception e) {
+                logger.error("loadNewsData error::", e);
+            }
+            emitter.onNext(txs);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(messages -> {
+            chainTxs.postValue(messages);
+        });
     }
 
     /**

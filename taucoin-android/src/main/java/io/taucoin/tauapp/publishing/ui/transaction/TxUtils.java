@@ -223,11 +223,19 @@ public class TxUtils {
                     .append(context.getString(R.string.community_block_on_chain))
                     .append("\n");
         }
-        msg.append("Title: ").setForegroundColor(titleColor)
-            .append(tx.coinName).setForegroundColor(titleColor);
-        if (StringUtil.isNotEmpty(tx.memo)) {
-            msg.append("\n").append("Description: ").setForegroundColor(titleColor)
-                    .append(tx.memo);
+
+        if (tab == CommunityTabFragment.TAB_NEWS) {
+            msg.append(tx.coinName);
+            if (StringUtil.isNotEmpty(tx.memo)) {
+                msg.append("\n").append(tx.memo);
+            }
+        } else {
+            msg.append("Title: ").setForegroundColor(titleColor)
+                    .append(tx.coinName).setForegroundColor(titleColor);
+            if (StringUtil.isNotEmpty(tx.memo)) {
+                msg.append("\n").append("Description: ").setForegroundColor(titleColor)
+                        .append(tx.memo);
+            }
         }
 
         if (tab == CommunityTabFragment.TAB_CHAIN) {
