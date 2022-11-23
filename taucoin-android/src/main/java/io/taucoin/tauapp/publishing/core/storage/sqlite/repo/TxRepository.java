@@ -132,8 +132,6 @@ public interface TxRepository {
 
     void deleteTxByQueueID(long queueID);
 
-    Tx queryUnsentTx(long queueID);
-
     List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize);
 
     Flowable<List<IncomeAndExpenditure>> observeMiningIncome(String chainID);

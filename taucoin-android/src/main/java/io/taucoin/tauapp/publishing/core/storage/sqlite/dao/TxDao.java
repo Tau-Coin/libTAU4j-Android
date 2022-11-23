@@ -61,8 +61,7 @@ public interface TxDao {
     // SQL:查询社区里的交易(所有，排除WIRING Tx)
     String QUERY_GET_NOTES_SELECT = "SELECT tx.*, 0 AS trusts" +
             " FROM Txs AS tx" +
-            " WHERE tx.chainID = :chainID AND txType IN (1, 3, 4, 5, 6)" +
-            " AND sendStatus = 0";
+            " WHERE tx.chainID = :chainID AND txType IN (1, 3, 4, 5, 6)";
 
     String QUERY_GET_ALL_NOTES = QUERY_GET_NOTES_SELECT +
             QUERY_GET_TXS_ORDER;
@@ -198,8 +197,6 @@ public interface TxDao {
     String QUERY_TX_SENDERS_IN_RECEIVER = "SELECT senderPk FROM Txs" +
             " WHERE txStatus = 1 AND chainID = :chainID AND receiverPk = :receiverPk " +
 			" GROUP BY senderPk";
-
-    String QUERY_UNSENT_TX = "SELECT * FROM Txs WHERE queueID = :queueID AND sendStatus = 1 LIMIT 1";
 
     String DELETE_TX_BY_QUEUEID = "DELETE FROM Txs WHERE queueID = :queueID";
 
@@ -370,9 +367,6 @@ public interface TxDao {
 
     @Query(QUERY_TX_SENDERS_IN_RECEIVER)
     List<String> queryTxSendersReceived(String chainID, String receiverPk);
-
-    @Query(QUERY_UNSENT_TX)
-    Tx queryUnsentTx(long queueID);
 
     @Query(DELETE_TX_BY_QUEUEID)
     void deleteTxByQueueID(long queueID);

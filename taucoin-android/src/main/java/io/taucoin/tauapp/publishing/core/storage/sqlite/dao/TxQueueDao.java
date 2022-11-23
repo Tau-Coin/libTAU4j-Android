@@ -21,11 +21,10 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
 public interface TxQueueDao {
     String QUERY_COMMUNITY_TX_QUEUE_SELECT = "SELECT * FROM" +
             " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status, " +
-            " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT txStatus AS status, COUNT(txID) AS sendCount," +
-            " timestamp, nonce, queueID, sendStatus" +
+            " timestamp, nonce, queueID" +
             " From Txs" +
             " WHERE chainID = :chainID AND senderPk = :senderPk AND queueID IS NOT NULL" +
             " AND txStatus <= 0 AND version > 0" +
@@ -41,11 +40,10 @@ public interface TxQueueDao {
 
     String QUERY_NONCE_FIRST_TX = "SELECT * FROM" +
             " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status, " +
-            " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT txStatus AS status, COUNT(txID) AS sendCount," +
-            " timestamp, nonce, queueID, sendStatus" +
+            " timestamp, nonce, queueID" +
             " From Txs" +
             " WHERE chainID = :chainID AND senderPk = :senderPk AND nonce = :nonce) AS t" +
             " ON tq.queueID = t.queueID" +
@@ -53,11 +51,10 @@ public interface TxQueueDao {
 
     String QUERY_TX_QUEUE_BY_ID = "SELECT * FROM" +
             " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status," +
-            " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
             " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
-            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID, MAX(sendStatus) AS sendStatus" +
+            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID" +
             " From Txs" +
             " WHERE queueID = :queueID" +
             " GROUP BY queueID) AS t" +
@@ -79,10 +76,9 @@ public interface TxQueueDao {
 
     String QUERY_AIRDROP_COUNT_ON_CHAIN = "SELECT count(*) FROM" +
             " (SELECT tq.chainID, tq.queueID," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status," +
-            " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
-            " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID, MAX(sendStatus) AS sendStatus" +
+            " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID" +
             " From Txs" +
             " WHERE senderPk = :senderPk AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +
@@ -93,10 +89,9 @@ public interface TxQueueDao {
 
     String QUERY_AIRDROP_HISTORY_ON_CHAIN = "SELECT queueID, receiverPk FROM" +
             " (SELECT tq.chainID, tq.queueID, tq.receiverPk," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status," +
-            " (CASE WHEN t.sendStatus IS NULL THEN -1 ELSE t.sendStatus END) AS sendStatus" +
+            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
             " FROM TxQueues tq" +
-            " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID, MAX(sendStatus) AS sendStatus" +
+            " LEFT JOIN (SELECT SUM(txStatus) AS status, queueID" +
             " From Txs" +
             " WHERE senderPk = :senderPk AND queueID IS NOT NULL" +
             " GROUP BY queueID) AS t" +

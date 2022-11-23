@@ -11,7 +11,6 @@ public class TxQueueAndStatus extends TxQueue {
     public long nonce;                      // 最新一笔未上链交易的nonce
     public long timestamp;                  // 最新一笔未上链交易的时间
     public long sendCount;                  // 发送次数
-    public long sendStatus;                 // 发送状态
 
     public TxQueueAndStatus(@NonNull String chainID, @NonNull String senderPk, @NonNull String receiverPk,
                             long amount, long fee, int queueType, int txType, byte[] content) {
@@ -24,7 +23,7 @@ public class TxQueueAndStatus extends TxQueue {
 //    }
 	/* delete by tc
     public boolean isProcessing() {
-        //return status == 0 && sendStatus == 0;
+        //return status == 0;
         return nonce > 0;
     }
 	*/

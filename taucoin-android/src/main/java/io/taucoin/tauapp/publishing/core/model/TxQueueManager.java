@@ -283,39 +283,6 @@ class TxQueueManager {
         logger.info("sendTxQueue queueChanged::{}", changed);
         return changed;
     }
-
-     * 重新发送等待上链的交易（防止由于libTAU丢弃交易而上不了链）
-    private void resendTxQueue(Account account, TxQueueAndStatus txQueue) {
-        String chainID = txQueue.chainID;
-        if (chainResendTx.containsKey(chainID)) {
-            Boolean isResend = chainResendTx.get(chainID);
-            if (isResend != null && !isResend && txQueue.sendStatus != 1) {
-                logger.info("resendTransaction:: No need to resend");
-                return;
-            }
-        }
-        Tx tx = txRepo.getTxByQueueID(txQueue.queueID, txQueue.timestamp);
-        if ( null == tx) {
-            logger.info("resendTransaction:: tx not found");
-            return;
-        }
-
-        if (tx.amount + tx.fee > account.getBalance()) {
-            logger.info("resendTransaction amount({}) + fee({}) > balance({})", txQueue.amount,
-                    txQueue.fee, account.getBalance());
-            return;
-        }
-        String result = TxViewModel.createTransaction(appContext, tx, true);
-        logger.debug("resendTransaction chainID::{}, txID::{}, result::{}",
-                tx.chainID, tx.txID, result);
-
-        if (StringUtil.isEmpty(result)) {
-            chainResendTx.put(chainID, false);
-            // 已发送
-            tx.sendStatus = 0;
-            txRepo.updateTransaction(tx);
-        }
-    }
      */
 
     private boolean sendTxQueue(Account account, TxQueueAndStatus txQueue, int mode) {
@@ -462,14 +429,6 @@ class TxQueueManager {
 			}
 		}		
 
-        // 更新未发送的交易是否置顶
-        if (pinnedTime == 0) {
-            Tx tx = txRepo.queryUnsentTx(txQueue.queueID);
-            if (tx != null) {
-                pinnedTime = tx.pinnedTime;
-            }
-        }
-
         // 创建新的本地交易
 		byte[] txEncoded = transaction.getPayload();
         TxContent txContent = new TxContent(txEncoded);
@@ -502,8 +461,6 @@ class TxQueueManager {
             tx.senderPk = txQueue.senderPk;
             tx.nonce = nonce;
             tx.queueID = txQueue.queueID;
-            //tx.sendStatus = isDirectSend ? 0 : 1;
-            tx.sendStatus = 1;
             tx.version = TransactionVersion.VERSION1.getV();
             if (pinnedTime > 0) {
                 tx.pinnedTime = pinnedTime;
