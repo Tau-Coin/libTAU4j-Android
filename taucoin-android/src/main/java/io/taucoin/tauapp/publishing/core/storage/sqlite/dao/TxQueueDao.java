@@ -19,43 +19,25 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
  */
 @Dao
 public interface TxQueueDao {
-    String QUERY_COMMUNITY_TX_QUEUE_SELECT = "SELECT * FROM" +
-            " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
+    String QUERY_COMMUNITY_TX_QUEUE = "SELECT * FROM" +
+            " (SELECT tq.*, t.timestamp, t.nonce as nonce, t.txStatus as status" +
             " FROM TxQueues tq" +
-            " LEFT JOIN (SELECT txStatus AS status, COUNT(txID) AS sendCount," +
-            " timestamp, nonce, queueID" +
-            " From Txs" +
-            " WHERE chainID = :chainID AND senderPk = :senderPk AND queueID IS NOT NULL" +
-            " AND txStatus <= 0 AND version > 0" +
-            " GROUP BY queueID) AS t" +
+            " LEFT JOIN Txs t" +
             " ON tq.queueID = t.queueID" +
-            " WHERE tq.chainID = :chainID AND tq.senderPk = :senderPk)";
-
-    String QUERY_COMMUNITY_TX_QUEUE = QUERY_COMMUNITY_TX_QUEUE_SELECT +
-            " ORDER BY nonce";
-            //" ORDER BY fee DESC, queueID ASC";
+            " WHERE t.chainID = :chainID AND t.senderPk = :senderPk AND t.txStatus = 0 AND t.version > 0)" +
+			" ORDER BY nonce";
 
     String QUERY_NONCE_FIRST_TX = "SELECT * FROM" +
-            " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
+            " (SELECT tq.*, t.timestamp, t.nonce, t.txStatus as status" +
             " FROM TxQueues tq" +
-            " LEFT JOIN (SELECT txStatus AS status, COUNT(txID) AS sendCount," +
-            " timestamp, nonce, queueID" +
-            " From Txs" +
-            " WHERE chainID = :chainID AND senderPk = :senderPk AND nonce = :nonce) AS t" +
+            " LEFT JOIN Txs t" +
             " ON tq.queueID = t.queueID" +
-            " WHERE tq.chainID = :chainID AND tq.senderPk = :senderPk)";
+            " WHERE t.chainID = :chainID AND t.senderPk = :senderPk AND t.nonce = :nonce)";
 
     String QUERY_TX_QUEUE_BY_ID = "SELECT * FROM" +
-            " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
-            " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
+            " (SELECT tq.*, t.timestamp, t.nonce, t.txStatus as status" +
             " FROM TxQueues tq" +
-            " LEFT JOIN (SELECT SUM(txStatus) AS status, COUNT(txID) AS sendCount," +
-            " MAX(timestamp) AS timestamp, MAX(nonce) AS nonce, queueID" +
-            " From Txs" +
-            " WHERE queueID = :queueID" +
-            " GROUP BY queueID) AS t" +
+            " LEFT JOIN Txs t" +
             " ON tq.queueID = t.queueID" +
             " WHERE tq.queueID = :queueID)";
 

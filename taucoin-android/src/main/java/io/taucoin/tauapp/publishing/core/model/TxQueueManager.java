@@ -201,7 +201,7 @@ class TxQueueManager {
                 logger.info("sendTxQueue queue null");
 				return false;
             }
-            logger.info("sendTxQueue status::{}, nonce::{}, timestamp::{}", txQueue.status, txQueue.nonce, txQueue.timestamp);
+            logger.info("sendTxQueue id::{}, nonce::{}, timestamp::{}", txQueue.queueID, txQueue.nonce, txQueue.timestamp);
 
             return sendTxQueue(account, txQueue, 2);
         } catch (Exception e) {
@@ -289,8 +289,8 @@ class TxQueueManager {
         byte[] chainID = ChainIDUtil.encode(txQueue.chainID);
         Account account = daemon.getAccountInfo(chainID, txQueue.senderPk);
         TxQueueAndStatus tx = txQueueRepos.getTxQueueByID(txQueue.queueID);
-        logger.info("sendTxQueue chainID::{}, queueID::{}, status::{}, sendCount::{}, mode::{}",
-                txQueue.chainID, txQueue.queueID, tx.status, tx.sendCount, mode);
+        logger.info("sendTxQueue chainID::{}, queueID::{}, status::{}, mode::{}",
+                txQueue.chainID, txQueue.queueID, tx.status, mode);
         if (tx.status > 0) {
             // 如果上链成功直接返回
             return false;

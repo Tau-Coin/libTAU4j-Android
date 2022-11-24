@@ -73,7 +73,7 @@ public interface TxDao {
     // SQL:查询社区里的交易(上链)
     String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, 0 AS trusts" +
             " FROM Txs AS tx" +
-            " WHERE tx.chainID = :chainID AND txStatus = 1";
+            " WHERE chainID = :chainID AND  nonce >= 1";
 
     // SQL:查询社区里的交易(上链)
     String QUERY_GET_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT +
