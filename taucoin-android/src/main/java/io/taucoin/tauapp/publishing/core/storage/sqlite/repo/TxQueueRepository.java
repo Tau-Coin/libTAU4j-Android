@@ -28,8 +28,6 @@ public interface TxQueueRepository {
 
     List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String userPk);
 
-    //TxQueueAndStatus getQueueFirstTx(String chainID, String userPk, int offset);
-    TxQueueAndStatus getQueueFirstTx(String chainID, String userPk);
     TxQueueAndStatus getNonceFirstTx(String chainID, String userPk, long nonce);
 
     TxQueueAndStatus getTxQueueByID(long queueID);

@@ -178,57 +178,6 @@ class TxQueueManager {
      * 发送转账交易
      * @param chainID 发送社区链ID
      * @return 是否需要重发
-    private boolean sendTxQueue(String chainID, int offset) {
-        User currentUser = userRepos.getCurrentUser();
-        if (null == currentUser) {
-            logger.info("sendTxQueue current user null");
-            return true;
-        }
-        try {
-            TxQueueAndStatus txQueue = txQueueRepos.getQueueFirstTx(chainID, currentUser.publicKey, offset);
-            if (null == txQueue) {
-                logger.info("sendTxQueue queue null");
-                return false;
-            }
-            logger.info("sendTxQueue status::{}, sendCount::{}, timestamp::{}, offset::{}", txQueue.status,
-                    txQueue.sendCount, txQueue.timestamp, 0);
-            // 获取当前用户在社区中链上nonce值
-            byte[] chainIDBytes = ChainIDUtil.encode(chainID);
-            Account account = daemon.getAccountInfo(chainIDBytes, currentUser.publicKey);
-            if (null == account) {
-                return true;
-            }
-            logger.info("sendTxQueue account nonce::{}, balance::{}", account.getNonce(), account.getBalance());
-
-            if (txQueue.amount + txQueue.fee > account.getBalance()) {
-                logger.info("sendWiringTx amount({}) + fee({}) > balance({})", txQueue.amount,
-                        txQueue.fee, account.getBalance());
-                return sendTxQueue(chainID, offset + 1);
-            }
-            // 交易已创建
-            if (txQueue.status == 0) {
-                logger.info("sendTxQueue account nonce::{}, queue nonce::{}", account.getNonce(),
-                        txQueue.nonce);
-                // 判断是否nonce冲突, 如果冲突重建按最新nonce重新创建交易
-                if (account.getNonce() >= txQueue.nonce || queueChanged(account, txQueue)) {
-                    return sendTxQueue(account, txQueue);
-                } else {
-                    resendTxQueue(account, txQueue);
-                    return false;
-                }
-            }
-            return sendTxQueue(account, txQueue);
-        } catch (Exception e) {
-            logger.warn("Error adding transaction::{}", e.getMessage());
-        }
-        return false;
-    }
-     */
-
-    /**
-     * 发送转账交易
-     * @param chainID 发送社区链ID
-     * @return 是否需要重发
 	 */
     private boolean sendTxQueue(String chainID, int offset) {
 		//获取当前用户
@@ -250,12 +199,7 @@ class TxQueueManager {
             TxQueueAndStatus txQueue = txQueueRepos.getNonceFirstTx(chainID, currentUser.publicKey, nonce);
             if (null == txQueue) {
                 logger.info("sendTxQueue queue null");
-				//退一步，搜索没有nonce的txQueue交易
-				txQueue = txQueueRepos.getQueueFirstTx(chainID, currentUser.publicKey);
-				if (null == txQueue) {
-					return false;
-				}
-				return sendTxQueue(account, txQueue, 1); //1 -> 需要构造tx，然后发送
+				return false;
             }
             logger.info("sendTxQueue status::{}, nonce::{}, timestamp::{}", txQueue.status, txQueue.nonce, txQueue.timestamp);
 

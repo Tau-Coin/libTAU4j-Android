@@ -36,8 +36,6 @@ public interface TxQueueDao {
             " ORDER BY nonce";
             //" ORDER BY fee DESC, queueID ASC";
 
-    String QUERY_QUEUE_FIRST_TX = QUERY_COMMUNITY_TX_QUEUE + " LIMIT 1";
-
     String QUERY_NONCE_FIRST_TX = "SELECT * FROM" +
             " (SELECT tq.*, t.timestamp, t.sendCount, t.nonce," +
             " (CASE WHEN t.status IS NULL THEN -1 ELSE t.status END) AS status" +
@@ -140,9 +138,6 @@ public interface TxQueueDao {
 
     @Query(QUERY_NONCE_FIRST_TX)
     TxQueueAndStatus getNonceFirstTx(String chainID, String senderPk, long nonce);
-
-    @Query(QUERY_QUEUE_FIRST_TX)
-    TxQueueAndStatus getQueueFirstTx(String chainID, String senderPk);
 
     @Query(QUERY_TX_QUEUE_BY_ID)
     TxQueueAndStatus getTxQueueByID(long queueID);
