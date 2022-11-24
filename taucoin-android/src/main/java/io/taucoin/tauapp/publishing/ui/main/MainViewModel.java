@@ -23,6 +23,7 @@ import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 
@@ -33,6 +34,7 @@ public class MainViewModel extends AndroidViewModel {
 
     private final static Logger logger = LoggerFactory.getLogger("MainViewModel");
     private final CommunityRepository communityRepo;
+    private final TxRepository txRepository;
     private final TauDaemon daemon;
     private MutableLiveData<ArrayList<CommunityAndFriend>> homeAllData = new MutableLiveData<>();
     private MutableLiveData<ArrayList<CommunityAndFriend>> homeCommunityData = new MutableLiveData<>();
@@ -42,6 +44,7 @@ public class MainViewModel extends AndroidViewModel {
     public MainViewModel(@NonNull Application application) {
         super(application);
         communityRepo = RepositoryHelper.getCommunityRepository(getApplication());
+        txRepository = RepositoryHelper.getTxRepository(getApplication());
         daemon = TauDaemon.getInstance(application);
     }
 
@@ -136,6 +139,10 @@ public class MainViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.io())
                 .filter((needStart) -> needStart)
                 .subscribe((needStart) -> daemon.start()));
+    }
+
+    public Flowable<Integer> observeUnreadNews() {
+        return txRepository.observeUnreadNews();
     }
 
 }

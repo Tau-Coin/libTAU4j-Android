@@ -1070,6 +1070,21 @@ public class CommunityViewModel extends AndroidViewModel {
         return txRepo.observerTxLogs(txID);
     }
 
+    public void clearNewsUnread() {
+        if (clearDisposable != null && !clearDisposable.isDisposed()) {
+            return;
+        }
+        clearDisposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            try {
+                memberRepo.clearNewsUnread();
+            } catch (Exception e) {
+                logger.error("markReadOrUnread error ", e);
+            }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe();
+    }
     /**
      * 清除社区的消息未读状态
      */

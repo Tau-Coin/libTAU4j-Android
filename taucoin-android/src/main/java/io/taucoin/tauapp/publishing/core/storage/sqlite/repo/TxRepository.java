@@ -158,4 +158,10 @@ public interface TxRepository {
 
 
     String getLatestNoteTxHash(String chainID);
+
+    /**
+     * 观察各个社区未读消息
+     * @return
+     */
+    Flowable<Integer> observeUnreadNews();
 }

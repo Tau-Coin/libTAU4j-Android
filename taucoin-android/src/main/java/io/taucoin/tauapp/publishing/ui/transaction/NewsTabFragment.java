@@ -236,13 +236,18 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        this.isVisibleToUser = isVisibleToUser;
-        logger.debug("setUserVisibleHint1::{}", isVisibleToUser);
-//        if (communityViewModel != null && isVisibleToUser) {
-//            communityViewModel.clearNewsUnread(chainID);
-//        }
+    public void onResume() {
+        super.onResume();
+        this.isVisibleToUser = true;
+        if (communityViewModel != null && isVisibleToUser) {
+            communityViewModel.clearNewsUnread();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        this.isVisibleToUser = false;
     }
 
     @Override
@@ -259,9 +264,9 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
             }
             binding.refreshLayout.setRefreshing(false);
             binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
-//            if (isVisibleToUser) {
-//                communityViewModel.clearNewsUnread(chainID);
-//            }
+            if (isVisibleToUser) {
+                communityViewModel.clearNewsUnread();
+            }
 //            logger.debug("txs.size::{}", txs.size());
 //            closeProgressDialog();
 //            TauNotifier.getInstance().cancelNotify(chainID);

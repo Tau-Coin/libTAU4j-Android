@@ -131,14 +131,21 @@ public interface TxDao {
 
     String QUERY_GET_ALL_NEWS = "SELECT tx.*, t.trusts" +
             " FROM Txs AS tx" +
+            " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk, chainID FROM Txs" +
             " WHERE txStatus = 1 AND txType = 4 " +
             " GROUP BY receiverPk, chainID" +
             ") t" +
             " ON tx.senderPk = t.receiverPk AND t.chainID = tx.chainID" +
-            " WHERE ((tx.txType IN (1, 3, 4, 5, 6) AND tx.txStatus = 1)" +
-            " OR (tx.txType IN (3, 4, 5, 6) AND tx.senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")))" +
+//            " WHERE ((tx.txType IN (1, 3, 4, 5, 6) AND tx.txStatus = 1)" +
+//            " OR (tx.txType IN (3, 4, 5, 6) AND tx.senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")))" +
+            " WHERE tx.txType IN (3, 4, 5, 6) AND c.isBanned = 0" +
             QUERY_GET_TXS_ORDER;
+
+    String QUERY_UNREAD_NEWS = "SELECT SUM(newsUnread) FROM Members m" +
+            " LEFT JOIN Communities c ON m.chainID = c.chainID" +
+            " WHERE m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND c.isBanned = 0";
 
     // SQL:查询挖矿收入
     String QUERY_MINING_INCOME = "SELECT " +
@@ -218,7 +225,7 @@ public interface TxDao {
             " ORDER BY b.blockNumber DESC LIMIT 50)";
 
     String QUERY_LATEST_NOTE_TX_HASH = "SELECT txID FROM Txs" +
-            " WHERE chainID = :chainID AND txType = 1" + 
+            " WHERE chainID = :chainID AND txType = 1" +
 			" AND senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " ORDER BY timestamp DESC limit 1";
 
@@ -403,4 +410,7 @@ public interface TxDao {
 
     @Query(QUERY_LATEST_NOTE_TX_HASH)
     String getLatestNoteTxHash(String chainID);
+
+    @Query(QUERY_UNREAD_NEWS)
+    Flowable<Integer> observeUnreadNews();
 }

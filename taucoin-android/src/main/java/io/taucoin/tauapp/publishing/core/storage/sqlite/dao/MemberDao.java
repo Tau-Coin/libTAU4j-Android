@@ -79,6 +79,9 @@ public interface MemberDao {
             " WHERE chainID = :chainID AND" +
             " publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
 
+    String QUERY_CLEAR_NEWS_UNREAD = "UPDATE Members SET newsUnread = 0" +
+            " WHERE publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
+
     /**
      * 添加新社区成员
      */
@@ -150,4 +153,7 @@ public interface MemberDao {
 
     @Query(QUERY_GET_MEMBER_BY_CHAIN_ID_PK)
     Single<Member> getMemberSingle(String chainID, String publicKey);
+
+    @Query(QUERY_CLEAR_NEWS_UNREAD)
+    void clearNewsUnread();
 }

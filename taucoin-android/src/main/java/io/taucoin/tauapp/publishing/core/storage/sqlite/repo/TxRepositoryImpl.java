@@ -321,4 +321,9 @@ public class TxRepositoryImpl implements TxRepository{
     public String getLatestNoteTxHash(String chainID) {
         return db.txDao().getLatestNoteTxHash(chainID);
     }
+
+    @Override
+    public Flowable<Integer> observeUnreadNews() {
+        return db.txDao().observeUnreadNews();
+    }
 }

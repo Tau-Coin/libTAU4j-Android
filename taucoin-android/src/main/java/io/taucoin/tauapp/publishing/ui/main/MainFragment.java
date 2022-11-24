@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -122,6 +123,7 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 tab.view.setLayoutParams(layoutParams);
             }
         }
+        updateTabBadgeDrawable(0, true, false);
     }
 
     private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -170,6 +172,13 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleSettingsChanged));
+
+        disposables.add(viewModel.observeUnreadNews()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(msgUnread -> {
+                    updateTabBadgeDrawable(0, false, msgUnread > 0);
+                }));
     }
 
     private void handleWarningView() {
@@ -242,6 +251,22 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                     activity.startActivity(intent);
                 }
             }
+        }
+    }
+
+    private void updateTabBadgeDrawable(int index, boolean init, boolean visible) {
+        TabLayout.Tab tab = binding.tabLayout.getTabAt(index);
+        if (tab != null) {
+            BadgeDrawable badgeDrawable = tab.getOrCreateBadge();
+            if (init) {
+                int badgeOffset = getResources().getDimensionPixelSize(R.dimen.widget_size_5);
+                badgeDrawable.setHorizontalOffset(-badgeOffset);
+                badgeDrawable.setVerticalOffset(badgeOffset);
+                badgeDrawable.setBackgroundColor(getResources().getColor(R.color.color_red));
+            }
+            // 红点显示并且不在当前tab页
+            badgeDrawable.setVisible(true);
+            badgeDrawable.setVisible(visible && binding.tabLayout.getSelectedTabPosition() != index);
         }
     }
 

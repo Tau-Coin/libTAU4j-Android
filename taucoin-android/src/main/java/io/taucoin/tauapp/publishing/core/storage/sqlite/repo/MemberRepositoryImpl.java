@@ -157,4 +157,9 @@ public class MemberRepositoryImpl implements MemberRepository {
     public List<MemberAndTime> getJoinedCommunityList(String userPk) {
         return db.memberDao().getJoinedCommunityList(userPk);
     }
+
+    @Override
+    public void clearNewsUnread() {
+        db.memberDao().clearNewsUnread();
+    }
 }

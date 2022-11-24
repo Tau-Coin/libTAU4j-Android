@@ -83,4 +83,6 @@ public interface MemberRepository {
     String getCommunityLargestCoinHolder(String chainID);
 
     List<MemberAndTime> getJoinedCommunityList(String publicKey);
+
+    void clearNewsUnread();
 }
