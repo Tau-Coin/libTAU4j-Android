@@ -131,8 +131,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             mIncomePending = member.mIncomePending;
         }
 		//Modified tc
-        //binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));
-        binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance));
+        binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));
         binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(power*10));
         double showPower = Math.log(2+power)/Math.log(2);
         String powerStr = "log2(2+%s)=%s";
