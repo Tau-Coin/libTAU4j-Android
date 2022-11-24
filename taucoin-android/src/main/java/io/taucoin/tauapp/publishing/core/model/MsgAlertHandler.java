@@ -225,7 +225,10 @@ class MsgAlertHandler {
         TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
         TxQueue tx = new TxQueue(chainID, currentPk, friendPk, amount, fee, 1,
                 TxType.WIRING_TX.getType(), txContent.getEncoded());
-        txQueueRepo.addQueue(tx);
+		long queueID = txQueueRepo.addQueue(tx);
+		tx.queueID = queueID;
+        logger.info("automatic airdrop queueID::{}", queueID);
+        daemon.sendTxQueue(tx, 1, 1);// not pinned tx, 1
 
         Account account = daemon.getAccountInfo(ChainIDUtil.encode(chainID), tx.senderPk);
 
@@ -245,6 +248,11 @@ class MsgAlertHandler {
                 TxQueue referralTx = new TxQueue(chainID, currentPk, referralPeer, referralBonus, fee, 2,
                         TxType.WIRING_TX.getType(), referralContent.getEncoded());
                 txQueueRepo.addQueue(referralTx);
+				long queueRTxID = txQueueRepo.addQueue(referralTx);
+				referralTx.queueID = queueRTxID;
+				logger.info("automatic referal queueID::{}", queueRTxID);
+				daemon.sendTxQueue(referralTx, 1, 1);// not pinned tx, 1
+
 
                 logger.info("handleAirdropCoins: referral count::{}, bonus::{}, chainID::{}, currentPk::{}, referralPeer::{}",
                         referralCount, referralBonus, chainID, currentPk, referralPeer);

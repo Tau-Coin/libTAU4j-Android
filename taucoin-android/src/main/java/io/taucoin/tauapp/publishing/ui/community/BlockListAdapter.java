@@ -86,6 +86,7 @@ public class BlockListAdapter extends ListAdapter<BlockAndTx, BlockListAdapter.V
 			//Modified tc
             //binding.tvOnChain.setText(block.status == 1 ? R.string.community_block_on_chain :
             //        R.string.community_block_forking);
+		    binding.tvOnChain.setVisibility(View.GONE);
             binding.tvBlockDetail.setOnLongClickListener(longListener);
             binding.tvMsg.setOnLongClickListener(longListener);
         }

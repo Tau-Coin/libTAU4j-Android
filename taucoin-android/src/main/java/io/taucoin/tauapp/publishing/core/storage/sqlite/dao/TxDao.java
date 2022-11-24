@@ -125,7 +125,6 @@ public interface TxDao {
     // 查询钱包的收入和支出
     String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = "SELECT * FROM" +
             " (" + QUERY_GET_WALLET_TRANSACTIONS +")" +
-//            + " UNION ALL " + QUERY_GET_BLOCK_MINED +")" +
             " ORDER BY createTime DESC" +
             " LIMIT :loadSize OFFSET :startPosition";
 
