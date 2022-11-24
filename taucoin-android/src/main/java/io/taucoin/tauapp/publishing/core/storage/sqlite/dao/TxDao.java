@@ -137,9 +137,9 @@ public interface TxDao {
             " GROUP BY receiverPk, chainID" +
             ") t" +
             " ON tx.senderPk = t.receiverPk AND t.chainID = tx.chainID" +
-//            " WHERE ((tx.txType IN (1, 3, 4, 5, 6) AND tx.txStatus = 1)" +
-//            " OR (tx.txType IN (3, 4, 5, 6) AND tx.senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")))" +
-            " WHERE tx.txType IN (3, 4, 5, 6) AND c.isBanned = 0" +
+            " WHERE ((tx.txType = 1 AND tx.txStatus = 1)" +
+            " OR (tx.txType IN (3, 4, 5, 6)))" +
+            " AND c.isBanned = 0" +
             QUERY_GET_TXS_ORDER;
 
     String QUERY_UNREAD_NEWS = "SELECT SUM(newsUnread) FROM Members m" +
