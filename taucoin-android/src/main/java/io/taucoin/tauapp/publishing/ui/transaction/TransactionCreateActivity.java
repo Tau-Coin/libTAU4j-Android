@@ -108,13 +108,16 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
                     binding.etMemo.setText(txQueue.memo);
                 }
                 binding.etPublicKey.setText(txQueue.receiverPk);
-                binding.etPublicKey.setEnabled(false);
                 LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)
                         binding.etPublicKey.getLayoutParams();
                 layoutParams.rightMargin = getResources().getDimensionPixelSize(R.dimen.widget_size_20);
                 binding.etPublicKey.setLayoutParams(layoutParams);
                 binding.ivScan.setVisibility(View.GONE);
                 binding.etAmount.setText(FmtMicrometer.fmtBalance(txQueue.amount));
+				//不可修改有3项
+                binding.etPublicKey.setEnabled(false);
+                binding.etAmount.setEnabled(false);
+                binding.etMemo.setEnabled(false);
             }
         }
 
