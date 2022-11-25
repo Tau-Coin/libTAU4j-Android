@@ -288,6 +288,8 @@
     <string name="community_tip_block_size">Size: </string>
     <string name="community_all_peers">All Onchain Peers</string>
     <string name="community_block_on_chain">Onchain</string>
+    <string name="community_block_settled">Settled</string>
+    <string name="community_block_pending">Pending</string>
     <string name="community_block_forking">Forking</string>
     <string name="community_transfer_to">Transfer to %s</string>
     <string name="community_transfer_from">Transfer from %s</string>

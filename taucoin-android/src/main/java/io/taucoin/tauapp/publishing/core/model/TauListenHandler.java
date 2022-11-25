@@ -282,8 +282,8 @@ public class TauListenHandler {
             // 由于第一次同步共识区块
             // 如果是同步，并且已经是上链状态了, 则保持上链状态
             int status;
-            if (blockInfo.status == 1 && blockStatus == BlockStatus.SYNCING) {
-                status = 1;
+            if (blockInfo.status == Constants.STATUS_ON_CHAIN && blockStatus == BlockStatus.SYNCING) {
+                status = Constants.STATUS_ON_CHAIN;
             } else {
                 status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
             }
@@ -327,22 +327,11 @@ public class TauListenHandler {
                 // 由于第一次同步共识区块
                 // 如果是同步，并且已经是上链状态了, 则保持上链状态
                 int status;
-                if (tx.txStatus == 1 && blockStatus == BlockStatus.SYNCING) {
-                    status = 1;
+                if (tx.txStatus == Constants.STATUS_SETTLED && blockStatus == BlockStatus.SYNCING) {
+                    status = Constants.STATUS_SETTLED;
                 } else {
                     status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
                 }
-                //  交易状态改变, 删除上链和回滚消息通知
-//                if (status != tx.txStatus && tx.queueID >= 0) {
-//                    TxQueue txQueue = txQueueRepo.getTxQueueByID(tx.queueID);
-//                    if (txQueue != null) {
-//                        if (status == 1) {
-//                            ChatViewModel.syncSendMessageTask(appContext, tx, txQueue.queueTime, QueueOperation.ON_CHAIN);
-//                        } else {
-//                            ChatViewModel.syncSendMessageTask(appContext, tx, txQueue.queueTime, QueueOperation.ROLL_BACK);
-//                        }
-//                    }
-//                }
                 tx.txStatus = status;
                 tx.blockNumber = block.getBlockNumber();
                 tx.blockHash = block.Hash();
@@ -742,6 +731,11 @@ public class TauListenHandler {
                     member.power = account.getPower();
                     memberRepo.addMember(member);
                 }
+
+				//Update txs
+				txRepo.updateAllOffChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> 0
+
+				txRepo.updateAllOnChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> 2
             }
         }
     }

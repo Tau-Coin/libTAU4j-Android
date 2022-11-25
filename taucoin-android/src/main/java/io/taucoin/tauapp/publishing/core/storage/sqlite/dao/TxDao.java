@@ -115,13 +115,6 @@ public interface TxDao {
             " OR t.receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
             " AND t.txType IN (2, 3, 4, 5, 6)";
 
-    // 查询钱包挖矿记录
-//    String QUERY_GET_BLOCK_MINED = "SELECT " +
-//            " blockHash AS hash, miner AS senderOrMiner, '' AS receiverPk, blockNumber, -1 AS txType, rewards AS amount," +
-//            " 0 AS fee, timestamp AS createTime, timestamp AS onlineTime, status AS onlineStatus" +
-//            " FROM Blocks" +
-//            " WHERE chainID = :chainID AND status = 1 AND miner = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
-
     // 查询钱包的收入和支出
     String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = "SELECT * FROM" +
             " (" + QUERY_GET_WALLET_TRANSACTIONS +")" +
@@ -213,6 +206,10 @@ public interface TxDao {
     String UPDATE_ALL_OFF_CHAIN_TXS = "UPDATE Txs SET txStatus = 0" +
             " WHERE chainID = :chainID AND senderPk = :userPk" +
             " AND txType IN (2, 3, 4, 5, 6) AND nonce > :nonce";
+
+    String UPDATE_ALL_ON_CHAIN_TXS = "UPDATE Txs SET txStatus = 2" +
+            " WHERE chainID = :chainID AND senderPk = :userPk" +
+            " AND txType IN (2, 3, 4, 5, 6) AND nonce <= :nonce";
 
     String QUERY_AVERAGE_TXS_FEE = "SELECT count(*) AS total, ifnull(sum(ifnull(fee, 0)), 0) AS totalFee," +
             " ifnull(sum(CASE WHEN ifnull(txType, 0) = 2 THEN 1 ELSE 0 END), 0) AS wiringCount, " +
@@ -394,6 +391,10 @@ public interface TxDao {
      */
     @Query(UPDATE_ALL_OFF_CHAIN_TXS)
     int updateAllOffChainTxs(String chainID, String userPk, long nonce);
+
+	//update status into ON_CHAIN
+    @Query(UPDATE_ALL_ON_CHAIN_TXS)
+    int updateAllOnChainTxs(String chainID, String userPk, long nonce);
 
 	//获取最大的nonce
     @Query(QUERY_CHAIN_MAX_NONCE)

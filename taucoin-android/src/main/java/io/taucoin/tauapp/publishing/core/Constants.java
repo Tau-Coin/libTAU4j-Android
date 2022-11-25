@@ -68,4 +68,13 @@ public class Constants {
     // 默认字体缩放大小
     public static final float DEFAULT_FONT_SCALE_SIZE = 1.1f;
 
+    // 上链
+    public static final int STATUS_ON_CHAIN = 2;
+
+	// Settled
+    public static final int STATUS_SETTLED = 1;
+
+	// Pending
+    public static final int STATUS_PENDING = 0;
+
 }

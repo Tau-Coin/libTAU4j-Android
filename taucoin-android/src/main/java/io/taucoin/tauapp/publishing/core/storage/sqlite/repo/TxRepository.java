@@ -146,6 +146,9 @@ public interface TxRepository {
      */
     int updateAllOffChainTxs(String chainID, String userPk, long nonce);
 
+	//state前的交易上链
+    int updateAllOnChainTxs(String chainID, String userPk, long nonce);
+
 	//获取当前链上的最大nonce
     long getChainMaxNonce(String chainID, String userPk);
 

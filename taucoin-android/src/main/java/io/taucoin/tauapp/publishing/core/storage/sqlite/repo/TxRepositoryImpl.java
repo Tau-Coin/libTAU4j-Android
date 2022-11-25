@@ -308,6 +308,11 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
+    public int updateAllOnChainTxs(String chainID, String userPk, long nonce) {
+        return db.txDao().updateAllOnChainTxs(chainID, userPk, nonce);
+    }
+
+    @Override
     public long getChainMaxNonce(String chainID, String userPk) {
         return db.txDao().getChainMaxNonce(chainID, userPk);
     }
