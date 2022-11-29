@@ -37,6 +37,12 @@ public interface ChatDao {
     // 查询消息单独状态日志数据
     String QUERY_CHAT_MSG_LOG = "SELECT * FROM ChatMsgLogs WHERE hash = :hash AND status = :status";
 
+    // 查询消息未被confirm的消息
+    String QUERY_MESSAGES_RESEND = "SELECT g.* FROM ChatMsgLogs AS g" +
+								   " LEFT JOIN ChatMessages AS m" +
+								   " ON g.hash = m.hash" +
+								   " WHERE m.senderPk = :senderPk AND m.receiverPk = :receiverPk AND g.status <= 1 ";
+
     // 获取发送的最后一条消息的时间
     String QUERY_LAST_SEND_TIME = "SELECT timestamp FROM ChatMessages" +
             " WHERE senderPk = :senderPk AND receiverPk = :receiverPk" +
@@ -77,6 +83,9 @@ public interface ChatDao {
     @Query(QUERY_MESSAGES_BY_FRIEND_PK)
     @Transaction
     List<ChatMsgAndLog> getMessages(String senderPk, String receiverPk, int startPosition, int loadSize);
+
+    @Query(QUERY_MESSAGES_RESEND)
+    List<ChatMsgLog> getResendMessages(String senderPk, String receiverPk);
 
     /**
      * 添加消息日志

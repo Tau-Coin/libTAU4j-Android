@@ -99,6 +99,12 @@ public class ChatRepositoryImpl implements ChatRepository{
         return db.chatDao().getMessages(senderPk, friendPk, startPosition, loadSize);
     }
 
+    @Override
+    public List<ChatMsgLog> getResendMessages(String friendPk) {
+        String senderPk = MainApplication.getInstance().getPublicKey();
+        return db.chatDao().getResendMessages(senderPk, friendPk);
+    }
+
     /**
      * 添加消息日志
      * @param msgLogs
