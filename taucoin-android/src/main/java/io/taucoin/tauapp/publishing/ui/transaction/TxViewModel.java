@@ -707,7 +707,7 @@ public class TxViewModel extends AndroidViewModel {
                         txs = txRepo.loadNewsData(pos, pageSize);
                         logger.debug("loadNewsData pos::{}, pageSize::{}, messages.size::{}",
                                 pos, pageSize, txs.size());
-                        Collections.reverse(txs);
+//                        Collections.reverse(txs);
                     } catch (Exception e) {
                         logger.error("loadNewsData error::", e);
                     }

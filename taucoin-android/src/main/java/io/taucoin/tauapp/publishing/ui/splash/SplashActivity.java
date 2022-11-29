@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class SplashActivity extends BaseActivity {
             logger.info("SplashActivity show");
             // Open for the first time
             ActivitySplashBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
-            binding.appTitle.setText(BuildConfig.SPLASH_APP_NAME);
+            binding.appTitle.setText(Html.fromHtml(BuildConfig.SPLASH_APP_NAME, Html.FROM_HTML_MODE_LEGACY));
 
             ViewModelProvider provider = new ViewModelProvider(this);
             crashViewModel = provider.get(CrashViewModel.class);

@@ -33,6 +33,7 @@ import io.taucoin.tauapp.publishing.databinding.FragmentMainTabBinding;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
 import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
+import io.taucoin.tauapp.publishing.ui.qrcode.CommunityQRCodeActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
@@ -151,8 +152,9 @@ public class MainTabFragment extends BaseFragment implements MainListAdapter.Cli
         List<OperationMenuItem> menuList = new ArrayList<>();
         if (bean.msgUnread == 1) {
             menuList.add(new OperationMenuItem(R.string.main_operation_mark_read));
-        } else {
-            menuList.add(new OperationMenuItem(R.string.main_operation_mark_unread));
+        }
+        if (bean.type == 0) {
+            menuList.add(new OperationMenuItem(R.string.main_operation_share_community));
         }
         if (bean.stickyTop == 1) {
             menuList.add(new OperationMenuItem(R.string.main_operation_remove_top));
@@ -181,6 +183,11 @@ public class MainTabFragment extends BaseFragment implements MainListAdapter.Cli
                     } else {
                         userViewModel.markReadOrUnread(bean.ID, status);
                     }
+                    break;
+                case R.string.main_operation_share_community:
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, bean.ID);
+                    ActivityUtil.startActivity(intent, this, CommunityQRCodeActivity.class);
                     break;
                 case R.string.main_operation_sticky_top:
                 case R.string.main_operation_remove_top:

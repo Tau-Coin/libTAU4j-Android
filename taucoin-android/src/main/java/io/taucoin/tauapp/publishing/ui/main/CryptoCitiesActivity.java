@@ -26,6 +26,8 @@ public class CryptoCitiesActivity extends BaseActivity {
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         SpannableStringBuilder spannableStringBuilder = new SpanUtils()
+                .append("Crypto Cities are public place for chats and news.  These groups have city logos. The coins arrangement is as following:")
+                .append("\n\n")
                 .append("- Initial Volume: ").append("\n")
                 .append("1,000,000")
                 .setForegroundColor(getResources().getColor(R.color.color_yellow))
@@ -46,14 +48,16 @@ public class CryptoCitiesActivity extends BaseActivity {
                 .setBold()
                 .setFontSize(20, true)
                 .append(" coins each 5 minutes, annually about 1 millions new coins added as always.").append("\n")
-                .append("\n").append("The Scarcity of London PMC")
-                .setForegroundColor(getResources().getColor(R.color.color_black))
-                .setFontSize(20, true).append("\n")
-                .append("- Only one London city in the world.").append("\n")
-                .append("- Limited initial coins volume.").append("\n")
-                .append("- Only 10 new coins added to the world each 5 minutes.").append("\n")
-                .append("- Only \"London PMC\" for London GPS region embedded natively in the PMC app.").append("\n")
-                .append("- Phones in London will auto join the London PMC network through TAU app.")
+                .append("\n")
+                .append("The current crypto cities are San Francisco and London.")
+//                .append("The Scarcity of London PMC")
+//                .setForegroundColor(getResources().getColor(R.color.color_black))
+//                .setFontSize(20, true).append("\n")
+//                .append("- Only one London city in the world.").append("\n")
+//                .append("- Limited initial coins volume.").append("\n")
+//                .append("- Only 10 new coins added to the world each 5 minutes.").append("\n")
+//                .append("- Only \"London PMC\" for London GPS region embedded natively in the PMC app.").append("\n")
+//                .append("- Phones in London will auto join the London PMC network through TAU app.")
                 .create();
         binding.tvLondonPmcDesc.setText(spannableStringBuilder);
     }

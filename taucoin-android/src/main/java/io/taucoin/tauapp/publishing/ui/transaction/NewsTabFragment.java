@@ -256,7 +256,7 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         txViewModel.observerChainTxs().observe(this, txs -> {
             List<UserAndTx> currentList = new ArrayList<>(txs);
             if (currentPos == 0) {
-                initScrollToBottom();
+//                initScrollToBottom();
                 adapter.submitList(currentList, handleUpdateAdapter);
             } else {
                 currentList.addAll(adapter.getCurrentList());
@@ -268,7 +268,7 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
                 communityViewModel.clearNewsUnread();
             }
 //            logger.debug("txs.size::{}", txs.size());
-//            closeProgressDialog();
+//            closeProgressDialog();\
 //            TauNotifier.getInstance().cancelNotify(chainID);
         });
         loadData(0);

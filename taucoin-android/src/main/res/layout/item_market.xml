@@ -41,9 +41,8 @@
                 android:includeFontPadding="false"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:text="1233333"
                 android:textColor="@color/gray_dark"
-                android:textAppearance="@style/TextAppearanceBody3"/>
+                android:textAppearance="@style/TextAppearanceBody2"/>
 
             <TextView
                 android:id="@+id/tv_trust"
@@ -83,7 +82,7 @@
                 android:includeFontPadding="false"
                 android:lineSpacingExtra="@dimen/widget_size_5"
                 android:textColorLink="@color/color_blue_link"
-                android:textAppearance="@style/TextAppearanceBody3" />
+                android:textAppearance="@style/TextAppearanceBody2" />
 
             <ImageView
                 android:id="@+id/iv_arrow"

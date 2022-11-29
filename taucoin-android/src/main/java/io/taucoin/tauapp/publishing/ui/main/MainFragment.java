@@ -51,7 +51,8 @@ import io.taucoin.tauapp.publishing.ui.transaction.NewsTabFragment;
 /**
  * 群组列表页面
  */
-public class MainFragment extends BaseFragment implements View.OnClickListener {
+public class
+MainFragment extends BaseFragment implements View.OnClickListener {
 
     private MainActivity activity;
 

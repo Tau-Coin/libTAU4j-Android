@@ -29,6 +29,7 @@ import io.taucoin.tauapp.publishing.core.utils.HashUtil;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
+import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 
 public class TxUtils {
@@ -279,7 +280,8 @@ public class TxUtils {
                    .append("\n");
 			}
         }
-        if (tab == CommunityTabFragment.TAB_NEWS) {
+        if (tab == CommunityTabFragment.TAB_NEWS || tab == CommunityTabFragment.TAB_NOTES ||
+                tab == CommunityTabFragment.TAB_MARKET) {
             msg.append(tx.coinName);
             if (StringUtil.isNotEmpty(tx.memo)) {
                 msg.append("\n").append(tx.memo);
@@ -473,8 +475,13 @@ public class TxUtils {
                    .append("\n");
 			}
         }
-        msg.append("Trust: ")
-                .setForegroundColor(titleColor)
+        msg.append("Trust ");
+        if (tx instanceof UserAndTx) {
+            msg.append(UsersUtil.getShowName(((UserAndTx) tx).receiver, tx.receiverPk));
+        } else {
+            msg.append(UsersUtil.getDefaultName(tx.receiverPk));
+        }
+        msg.append(" at ")
                 .append(HashUtil.hashMiddleHide(tx.receiverPk));
 
         if (tab == CommunityTabFragment.TAB_CHAIN) {
