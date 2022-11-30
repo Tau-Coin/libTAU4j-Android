@@ -111,60 +111,64 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
         mainFab.setLayoutParams(layoutParams);
         mainFab.setCustomSize(getResources().getDimensionPixelSize(R.dimen.widget_size_44));
 
-        SpeedDialActionItem invitationItem = new SpeedDialActionItem.Builder(R.id.community_create_invitation,
-                R.drawable.ic_add_36dp)
-                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_20))
-                .setLabel(getString(R.string.community_leader_invitation))
-                .setLabelColor(getResources().getColor(R.color.color_yellow))
-                .create();
-        binding.fabButton.addActionItem(invitationItem);
-
-        SpeedDialActionItem airdropItem = new SpeedDialActionItem.Builder(R.id.community_create_airdrop,
-                R.drawable.ic_add_36dp)
-                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_14))
-                .setLabel(getString(R.string.community_airdrop))
-                .setLabelColor(getResources().getColor(R.color.color_yellow))
-                .create();
-        binding.fabButton.addActionItem(airdropItem);
-
-        SpeedDialActionItem sellItem = new SpeedDialActionItem.Builder(R.id.community_create_sell,
-                R.drawable.ic_add_36dp)
-                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_30))
-                .setLabel(getString(R.string.community_sell_coins))
-                .setLabelColor(getResources().getColor(R.color.color_yellow))
-                .create();
-        binding.fabButton.addActionItem(sellItem);
+//        SpeedDialActionItem invitationItem = new SpeedDialActionItem.Builder(R.id.community_create_invitation,
+//                R.drawable.ic_add_36dp)
+//                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_20))
+//                .setLabel(getString(R.string.community_leader_invitation))
+//                .setLabelColor(getResources().getColor(R.color.color_yellow))
+//                .create();
+//        binding.fabButton.addActionItem(invitationItem);
+//
+//        SpeedDialActionItem airdropItem = new SpeedDialActionItem.Builder(R.id.community_create_airdrop,
+//                R.drawable.ic_add_36dp)
+//                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_14))
+//                .setLabel(getString(R.string.community_airdrop))
+//                .setLabelColor(getResources().getColor(R.color.color_yellow))
+//                .create();
+//        binding.fabButton.addActionItem(airdropItem);
+//
+//        SpeedDialActionItem sellItem = new SpeedDialActionItem.Builder(R.id.community_create_sell,
+//                R.drawable.ic_add_36dp)
+//                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_30))
+//                .setLabel(getString(R.string.community_sell_coins))
+//                .setLabelColor(getResources().getColor(R.color.color_yellow))
+//                .create();
+//        binding.fabButton.addActionItem(sellItem);
 
         binding.fabButton.getMainFab().setOnClickListener(v -> {
-            if (binding.fabButton.isOpen()) {
-                binding.fabButton.close();
-            } else {
-                binding.fabButton.open();
-            }
+//            if (binding.fabButton.isOpen()) {
+//                binding.fabButton.close();
+//            } else {
+//                binding.fabButton.open();
+//            }
+            Intent intent = new Intent();
+            intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+            ActivityUtil.startActivityForResult(intent, activity, NewsCreateActivity.class,
+                            TX_REQUEST_CODE);
         });
 
-        Intent intent = new Intent();
-        intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-        binding.fabButton.setOnActionSelectedListener(actionItem -> {
-            if (!isJoined) {
-                return false;
-            }
-            switch (actionItem.getId()) {
-                case R.id.community_create_sell:
-                    ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
-                            TX_REQUEST_CODE);
-                    break;
-                case R.id.community_create_airdrop:
-                    ActivityUtil.startActivityForResult(intent, activity, AirdropCreateActivity.class,
-                            TX_REQUEST_CODE);
-                    break;
-                case R.id.community_create_invitation:
-                    ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
-                            TX_REQUEST_CODE);
-                    break;
-            }
-            return false;
-        });
+//        Intent intent = new Intent();
+//        intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+//        binding.fabButton.setOnActionSelectedListener(actionItem -> {
+//            if (!isJoined) {
+//                return false;
+//            }
+//            switch (actionItem.getId()) {
+//                case R.id.community_create_sell:
+//                    ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
+//                            TX_REQUEST_CODE);
+//                    break;
+//                case R.id.community_create_airdrop:
+//                    ActivityUtil.startActivityForResult(intent, activity, AirdropCreateActivity.class,
+//                            TX_REQUEST_CODE);
+//                    break;
+//                case R.id.community_create_invitation:
+//                    ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
+//                            TX_REQUEST_CODE);
+//                    break;
+//            }
+//            return false;
+//        });
     }
 
     @Override

@@ -631,6 +631,7 @@ public class UserViewModel extends AndroidViewModel {
             // 创建昵称的社区
             if (isCreateCommunity && StringUtil.isNotEmpty(name)) {
                 Community community = new Community("", name);
+
                 CommunityViewModel.createCommunity(getApplication(), community, null);
             }
             emitter.onNext(true);

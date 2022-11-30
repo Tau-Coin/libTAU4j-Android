@@ -30,7 +30,8 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
+import cn.bingoogolapple.refreshlayout.BGAStickinessRefreshViewHolder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -69,7 +70,8 @@ import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 /**
  * 主页所有上链news或notes, 以及自己发的未上链news Tab页
  */
-public class NewsTabFragment extends BaseFragment implements NewsListAdapter.ClickListener {
+public class NewsTabFragment extends BaseFragment implements NewsListAdapter.ClickListener,
+        BGARefreshLayout.BGARefreshLayoutDelegate {
 
     protected static final Logger logger = LoggerFactory.getLogger("NewsTabFragment");
     private NewsListAdapter adapter;
@@ -87,7 +89,8 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
     private Disposable txFeeDisposable;
 
     private int currentPos = 0;
-    private boolean isScrollToBottom = true;
+    private boolean isScrollToTop = true;
+    private boolean isLoadMore = false;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -115,15 +118,25 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         userViewModel = provider.get(UserViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
         initView();
+        initRefreshLayout();
+    }
+
+    private void initRefreshLayout() {
+        binding.refreshLayout.setDelegate(this);
+        BGAStickinessRefreshViewHolder refreshViewHolder = new BGAStickinessRefreshViewHolder(activity.getApplicationContext(), true);
+        refreshViewHolder.setRotateImage(R.mipmap.ic_launcher_foreground);
+        refreshViewHolder.setStickinessColor(R.color.color_yellow);
+
+        refreshViewHolder.setLoadingMoreText(getString(R.string.common_loading));
+        binding.refreshLayout.setPullDownRefreshEnable(false);
+
+        binding.refreshLayout.setRefreshViewHolder(refreshViewHolder);
     }
 
     /**
      * 初始化视图
      */
     public void initView() {
-        if (getRefreshLayout() != null) {
-            getRefreshLayout().setOnRefreshListener(this);
-        }
         if (getRecyclerView() != null) {
             LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
 //        layoutManager.setStackFromEnd(true);
@@ -142,13 +155,11 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         }
         LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
         if (layoutManager != null) {
-            logger.debug("handleUpdateAdapter isScrollToBottom::{}", isScrollToBottom);
-            if (isScrollToBottom) {
-                isScrollToBottom = false;
-                // 滚动到底部
-                int bottomPosition = getItemCount() - 1;
-                logger.debug("handleUpdateAdapter scrollToPosition::{}", bottomPosition);
-                layoutManager.scrollToPositionWithOffset(bottomPosition, Integer.MIN_VALUE);
+            logger.debug("handleUpdateAdapter isScrollToTop::{}", isScrollToTop);
+            if (isScrollToTop) {
+                isScrollToTop = false;
+                logger.debug("handleUpdateAdapter scrollToPosition::{}", 0);
+                layoutManager.scrollToPositionWithOffset(0, Integer.MIN_VALUE);
             }
         }
     };
@@ -169,7 +180,7 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         return binding.txList;
     }
 
-    public SwipeRefreshLayout getRefreshLayout() {
+    public BGARefreshLayout getRefreshLayout() {
         return binding.refreshLayout;
     }
 
@@ -183,56 +194,30 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         mainFab.setLayoutParams(layoutParams);
         mainFab.setCustomSize(getResources().getDimensionPixelSize(R.dimen.widget_size_44));
 
-        SpeedDialActionItem invitationItem = new SpeedDialActionItem.Builder(R.id.community_create_invitation,
-                R.drawable.ic_add_36dp)
-                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_20))
-                .setLabel(getString(R.string.community_leader_invitation))
-                .setLabelColor(getResources().getColor(R.color.color_yellow))
-                .create();
-        binding.fabButton.addActionItem(invitationItem);
-
-        SpeedDialActionItem airdropItem = new SpeedDialActionItem.Builder(R.id.community_create_airdrop,
-                R.drawable.ic_add_36dp)
-                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_14))
-                .setLabel(getString(R.string.community_airdrop))
-                .setLabelColor(getResources().getColor(R.color.color_yellow))
-                .create();
-        binding.fabButton.addActionItem(airdropItem);
-
-        SpeedDialActionItem sellItem = new SpeedDialActionItem.Builder(R.id.community_create_sell,
-                R.drawable.ic_add_36dp)
-                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_30))
-                .setLabel(getString(R.string.community_sell_coins))
-                .setLabelColor(getResources().getColor(R.color.color_yellow))
-                .create();
-        binding.fabButton.addActionItem(sellItem);
-
         binding.fabButton.getMainFab().setOnClickListener(v -> {
-            if (binding.fabButton.isOpen()) {
-                binding.fabButton.close();
-            } else {
-                binding.fabButton.open();
-            }
+            Intent intent = new Intent();
+            intent.putExtra(IntentExtra.TYPE, CommunityChooseActivity.TYPE_CREATE_NEWS);
+            ActivityUtil.startActivity(intent, activity, CommunityChooseActivity.class);
         });
 
-        Intent intent = new Intent();
-        binding.fabButton.setOnActionSelectedListener(actionItem -> {
-            switch (actionItem.getId()) {
-                case R.id.community_create_sell:
-                    ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
-                            TX_REQUEST_CODE);
-                    break;
-                case R.id.community_create_airdrop:
-                    ActivityUtil.startActivityForResult(intent, activity, AirdropCreateActivity.class,
-                            TX_REQUEST_CODE);
-                    break;
-                case R.id.community_create_invitation:
-                    ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
-                            TX_REQUEST_CODE);
-                    break;
-            }
-            return false;
-        });
+//        Intent intent = new Intent();
+//        binding.fabButton.setOnActionSelectedListener(actionItem -> {
+//            switch (actionItem.getId()) {
+//                case R.id.community_create_sell:
+//                    ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
+//                            TX_REQUEST_CODE);
+//                    break;
+//                case R.id.community_create_airdrop:
+//                    ActivityUtil.startActivityForResult(intent, activity, AirdropCreateActivity.class,
+//                            TX_REQUEST_CODE);
+//                    break;
+//                case R.id.community_create_invitation:
+//                    ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
+//                            TX_REQUEST_CODE);
+//                    break;
+//            }
+//            return false;
+//        });
     }
 
     @Override
@@ -255,15 +240,18 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         super.onStart();
         txViewModel.observerChainTxs().observe(this, txs -> {
             List<UserAndTx> currentList = new ArrayList<>(txs);
+            int size;
             if (currentPos == 0) {
-//                initScrollToBottom();
+                initScrollToTop();
                 adapter.submitList(currentList, handleUpdateAdapter);
+                size = currentList.size();
+                isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
             } else {
-                currentList.addAll(adapter.getCurrentList());
+                currentList.addAll(0, adapter.getCurrentList());
                 adapter.submitList(currentList, handlePullAdapter);
+                isLoadMore = txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0;
             }
-            binding.refreshLayout.setRefreshing(false);
-            binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
+            binding.refreshLayout.endLoadingMore();
             if (isVisibleToUser) {
                 communityViewModel.clearNewsUnread();
             }
@@ -279,8 +267,6 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
                 .subscribe(result -> {
                     // 跟当前用户有关系的才触发刷新
                     if (result != null && StringUtil.isNotEmpty(result.getMsg())) {
-                        binding.refreshLayout.setRefreshing(false);
-                        binding.refreshLayout.setEnabled(false);
                         // 立即执行刷新
                         loadData(0);
                     }
@@ -377,17 +363,11 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
     }
 
     @Override
-    public void onBanClicked(UserAndTx tx){
-        KeyboardUtils.hideSoftInput(activity);
-        String showName = UsersUtil.getShowName(tx.sender, tx.senderPk);
-        userViewModel.showBanDialog(activity, tx.senderPk, showName);
-    }
-
-    @Override
     public void onRetweetClicked(UserAndTx tx) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-        ActivityUtil.startActivityForResult(intent, activity, NoteCreateActivity.class,
+        intent.putExtra(IntentExtra.TYPE, CommunityChooseActivity.TYPE_CREATE_NOTE);
+        ActivityUtil.startActivityForResult(intent, activity, CommunityChooseActivity.class,
                 CHOOSE_REQUEST_CODE);
     }
 
@@ -513,24 +493,39 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
     }
 
     @Override
-    public void onRefresh() {
-        loadData(getItemCount());
+    public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout refreshLayout) {
+        refreshLayout.endRefreshing();
+        refreshLayout.setPullDownRefreshEnable(false);
     }
 
-    void initScrollToBottom() {
-        if (!isScrollToBottom) {
-            this.isScrollToBottom = true;
+    @Override
+    public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout refreshLayout) {
+        logger.debug("LoadingMore isLoadMore::{}", isLoadMore);
+        if (isLoadMore) {
+            loadData(getItemCount());
+            return true;
+        } else {
+            refreshLayout.endLoadingMore();
+            return false;
+        }
+    }
+
+//    @Override
+//    public void onRefresh() {
+//        loadData(getItemCount());
+//    }
+
+    void initScrollToTop() {
+        if (!isScrollToTop) {
             if (null == getRecyclerView()) {
                 return;
             }
             LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
             if (layoutManager != null) {
-                int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-                int bottomPosition = getItemCount() - 1;
-                this.isScrollToBottom = lastVisibleItemPosition <= bottomPosition &&
-                        lastVisibleItemPosition >= bottomPosition - 2;
-                logger.debug("handleUpdateAdapter lastVisibleItemPosition::{}, bottomPosition::{}",
-                        lastVisibleItemPosition, bottomPosition);
+                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                this.isScrollToTop = firstVisibleItemPosition < 2;
+                logger.debug("handleUpdateAdapter firstVisibleItemPosition::{}, isScrollToTop::{}",
+                        firstVisibleItemPosition, isScrollToTop);
             }
         }
     }

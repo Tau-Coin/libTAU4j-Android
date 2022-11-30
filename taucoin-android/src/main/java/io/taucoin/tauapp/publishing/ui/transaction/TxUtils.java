@@ -66,6 +66,8 @@ public class TxUtils {
                 return createSpanTrustTx(tx, tab);
             case ANNOUNCEMENT:
                 return createSpanLeaderTx(tx, tab);
+            case NEWS_TX:
+                return createSpanNewsTx(tx, tab);
         }
         return new SpanUtils().create();
     }
@@ -316,6 +318,47 @@ public class TxUtils {
         return msg.create();
     }
 
+    private static SpannableStringBuilder createSpanNewsTx(Tx tx, int tab) {
+        Context context = MainApplication.getInstance();
+        int titleColor = context.getResources().getColor(R.color.gray_dark);
+        SpanUtils msg = new SpanUtils();
+        if (tab == CommunityTabFragment.TAB_CHAIN || tab == CommunityTabFragment.TAB_MARKET) {
+            if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+                msg.append("Status: ").setForegroundColor(titleColor)
+                        .append(context.getString(R.string.community_block_on_chain))
+                        .append("\n");
+            } else if (tx.txStatus == Constants.STATUS_SETTLED) {
+                msg.append("Status: ").setForegroundColor(titleColor)
+                        .append(context.getString(R.string.community_block_settled))
+                        .append("\n");
+            } else if (tx.txStatus == Constants.STATUS_PENDING) {
+                msg.append("Status: ").setForegroundColor(titleColor)
+                        .append(context.getString(R.string.community_block_pending))
+                        .append("\n");
+            }
+        }
+        msg.append(tx.memo);
+        if (tab == CommunityTabFragment.TAB_CHAIN) {
+            msg.append("\n").append("Nonce: ").setForegroundColor(titleColor)
+                    .append(FmtMicrometer.fmtLong(tx.nonce));
+
+            String coinName = ChainIDUtil.getCoinName(tx.chainID);
+            msg.append("\n").append("Fee: ").setForegroundColor(titleColor)
+                    .append(FmtMicrometer.fmtFeeValue(tx.fee))
+                    .append(" ").append(coinName)
+                    .append("\n").append("From: ").setForegroundColor(titleColor)
+                    .append(HashUtil.hashMiddleHide(tx.senderPk));
+            if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
+                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
+            } else if (tx.txStatus == Constants.STATUS_SETTLED) {
+                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
+                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
+            }
+        }
+        return msg.create();
+    }
+
     public static SpannableStringBuilder createSpanTxQueue(TxQueueAndStatus tx, boolean isShowNonce) {
         return createSpanTxQueue(tx, tx.nonce, isShowNonce, null, null);
     }
@@ -429,6 +472,9 @@ public class TxUtils {
             } else if (txType == TxType.TRUST_TX.getType()) {
                 TrustContent trustContent = new TrustContent(tx.content);
                 msg.append("\n").append("Trust: ").append(HashUtil.hashMiddleHide(trustContent.getTrustedPkStr()));
+            } else if (txType == TxType.NEWS_TX.getType()) {
+                TxContent trustContent = new TxContent(tx.content);
+                msg.append("\n").append(trustContent.getMemo());
             }
         }
         return msg.create();

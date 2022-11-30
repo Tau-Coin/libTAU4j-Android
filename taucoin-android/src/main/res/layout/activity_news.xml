@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/widget_size_10"
+            android:paddingEnd="@dimen/widget_size_10"
+            android:minHeight="@dimen/widget_size_50">
+
+            <TextView
+                android:id="@+id/tv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/widget_size_10"
+                android:text="@string/cancel"
+                android:layout_centerVertical="true"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+            <TextView
+                android:id="@+id/tv_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="@string/common_post"
+                android:paddingStart="@dimen/widget_size_20"
+                android:paddingEnd="@dimen/widget_size_20"
+                android:paddingTop="@dimen/widget_size_2"
+                android:paddingBottom="@dimen/widget_size_2"
+                android:textColor="@color/color_white"
+                android:enabled="false"
+                android:onClick="@{listener::onClick}"
+                android:background="@drawable/blue_btn_rect_round_bg"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:text="@string/community_chain_market"
+            android:textColor="@color/color_blue_light"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+        <View
+            android:background="@color/color_bg"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_1"
+            android:layout_marginTop="@dimen/widget_size_5" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_marginStart="@dimen/widget_size_20">
+
+            <io.taucoin.tauapp.publishing.ui.customviews.RoundImageView
+                android:id="@+id/iv_user_pic"
+                android:layout_width="@dimen/widget_size_30"
+                android:layout_height="@dimen/widget_size_30"
+                android:layout_marginEnd="@dimen/widget_size_7"
+                android:src="@color/color_yellow"
+                android:scaleType="centerCrop"/>
+
+            <TextView
+                android:id="@+id/tv_community"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/widget_size_15"
+                android:paddingEnd="@dimen/widget_size_15"
+                android:paddingTop="@dimen/widget_size_2"
+                android:paddingBottom="@dimen/widget_size_2"
+                android:textColor="@color/color_black"
+                android:enabled="false"
+                android:background="@drawable/grey_rect_round_bg"
+                android:textAppearance="@style/TextAppearanceBody2"/>
+
+        </LinearLayout>
+
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
+            android:id="@+id/et_news"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_200"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:autofillHints="@string/tx_what_happening"
+            android:hint="@string/tx_what_happening"
+            android:inputType="textMultiLine"
+            android:background="@null"
+            android:gravity="start"
+            android:textAppearance="@style/TextAppearanceBody1" />
+
+        <TextView
+            android:id="@+id/tv_bytes_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_gravity="end"
+            android:onClick="@{listener::onClick}"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:textAppearance="@style/TextAppearanceBody2"/>
+
+        <View
+            android:background="@color/color_bg"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_1"
+            android:layout_marginTop="@dimen/widget_size_5" />
+
+        <TextView
+            android:id="@+id/tv_fee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_marginBottom="@dimen/widget_size_5"
+            android:text="@string/tx_median_fee"
+            android:layout_gravity="end"
+            android:onClick="@{listener::onClick}"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:textAppearance="@style/TextAppearanceBody2"/>
+
+    </LinearLayout>
+</layout>

@@ -147,7 +147,7 @@ public interface CommunityDao {
             " LEFT JOIN (SELECT t2.chainID, SUM(amount + fee) AS txExpenditure FROM Txs t2" +
             " LEFT JOIN (SELECT txID, timestamp FROM Blocks WHERE chainID = :chainID" +
             " AND txID IS NOT NULL AND status = 1 GROUP BY txID) AS b2 ON t2.txID = b2.txID" +
-            " WHERE t2.chainID = :chainID AND txType IN (2, 3, 4, 5, 6) AND senderPk =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " WHERE t2.chainID = :chainID AND txType IN (2, 3, 4, 5, 6, 7) AND senderPk =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND txStatus = 1 AND datetime(b2.timestamp, 'unixepoch', 'localtime') > datetime('now','-3 hour','localtime')" +
             ") AS d ON m.chainID = d.chainID" +
 
@@ -157,7 +157,7 @@ public interface CommunityDao {
             ") AS e ON m.chainID = e.chainID" +
 
             " LEFT JOIN (SELECT chainID, SUM(amount + fee) AS txExpenditurePending FROM Txs" +
-            " WHERE chainID = :chainID AND txType IN (2, 3, 4, 5, 6) AND senderPk =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " WHERE chainID = :chainID AND txType IN (2, 3, 4, 5, 6, 7) AND senderPk =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND txStatus = 0 AND datetime(timestamp / 1000, 'unixepoch', 'localtime') > datetime('now','-24 hour','localtime')" +
             ") AS f ON m.chainID = f.chainID" +
 

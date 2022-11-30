@@ -11,6 +11,7 @@ import android.widget.EditText;
 import io.taucoin.tauapp.publishing.BuildConfig;
 import io.taucoin.tauapp.publishing.core.model.DozeEvent;
 import io.taucoin.tauapp.publishing.core.model.TauDaemon;
+import io.taucoin.tauapp.publishing.core.utils.BytesLimitFilter;
 import io.taucoin.tauapp.publishing.core.utils.ChineseFilter;
 
 /**
@@ -42,6 +43,14 @@ public class FilterEditText extends EditText {
     public FilterEditText(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initFilters();
+    }
+
+    public void setMaxBytesLimit(int maxBytes) {
+        if (BuildConfig.DEBUG) {
+            setFilters(new InputFilter[]{new BytesLimitFilter(maxBytes)});
+            return;
+        }
+        setFilters(new InputFilter[]{new ChineseFilter(), new BytesLimitFilter(maxBytes)});
     }
 
     @Override

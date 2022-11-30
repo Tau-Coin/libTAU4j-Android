@@ -9,8 +9,6 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/widget_size_5"
-        android:layout_marginStart="@dimen/widget_size_5"
         android:layout_marginTop="@dimen/widget_size_3"
         android:background="@drawable/white_rect_round_bg_middle_radius"
         android:gravity="end">
@@ -19,6 +17,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/widget_size_5"
+            android:layout_marginStart="@dimen/widget_size_5"
             android:paddingStart="@dimen/widget_size_5"
             android:paddingEnd="@dimen/widget_size_5"
             android:paddingTop="@dimen/widget_size_5"
@@ -26,8 +26,8 @@
 
             <io.taucoin.tauapp.publishing.ui.customviews.RoundImageView
                 android:id="@+id/iv_head_pic"
-                android:layout_width="@dimen/widget_size_24"
-                android:layout_height="@dimen/widget_size_24"
+                android:layout_width="@dimen/widget_size_26"
+                android:layout_height="@dimen/widget_size_26"
                 android:scaleType="centerCrop"
                 android:src="@drawable/primary_rect_round_bg"/>
 
@@ -46,57 +46,54 @@
                 android:textAppearance="@style/TextAppearanceBody2"/>
 
             <ImageView
-                android:id="@+id/iv_ban"
-                android:layout_width="@dimen/widget_size_20"
+                android:id="@+id/iv_long_press"
+                android:layout_width="@dimen/widget_size_30"
                 android:layout_height="@dimen/widget_size_20"
-                android:layout_marginStart="@dimen/widget_size_15"
+                android:paddingStart="@dimen/widget_size_5"
+                android:paddingEnd="@dimen/widget_size_5"
+                android:rotation="90"
+                android:layout_gravity="end"
                 android:contentDescription="@null"
-                android:src="@mipmap/icon_ban"/>
-
-            <ImageView
-                android:id="@+id/iv_reply"
-                android:layout_width="@dimen/widget_size_20"
-                android:layout_height="@dimen/widget_size_20"
-                android:layout_marginStart="@dimen/widget_size_15"
-                android:contentDescription="@null"
-                android:src="@mipmap/icon_reply_news"/>
-
-            <ImageView
-                android:id="@+id/iv_retweet"
-                android:layout_width="@dimen/widget_size_24"
-                android:layout_height="@dimen/widget_size_24"
-                android:layout_marginStart="@dimen/widget_size_15"
-                android:contentDescription="@null"
-                android:src="@mipmap/icon_retweet"/>
-
-            <TextView
-                android:visibility="gone"
-                android:id="@+id/tv_trust"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/widget_size_1"
-                android:includeFontPadding="false"
-                android:gravity="end"
-                android:text="@string/common_numerical_value"
-                android:textColor="@color/color_yellow"
-                android:textAppearance="@style/TextAppearanceBody2"/>
-
-            <ImageView
-                android:id="@+id/iv_trust"
-                android:layout_width="@dimen/widget_size_20"
-                android:layout_height="@dimen/widget_size_20"
-                android:layout_marginStart="@dimen/widget_size_15"
-                android:contentDescription="@null"
-                android:src="@mipmap/icon_favourite_news"/>
+                android:src="@mipmap/icon_long_press"/>
 
         </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/middle_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/widget_size_5"
+            android:layout_marginStart="@dimen/widget_size_5">
+
+            <LinearLayout
+                android:id="@+id/ll_trust"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginStart="@dimen/widget_size_34">
+
+                <ImageView
+                    android:id="@+id/iv_trust"
+                    android:layout_width="@dimen/widget_size_20"
+                    android:layout_height="@dimen/widget_size_20"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_favourite_news"/>
+
+                <TextView
+                    android:id="@+id/tv_trust"
+                    android:layout_width="@dimen/widget_size_20"
+                    android:layout_height="@dimen/widget_size_20"
+                    android:layout_marginStart="@dimen/widget_size_5"
+                    android:includeFontPadding="false"
+                    android:text="12333"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody1"/>
+
+            </LinearLayout>
 
             <io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView
+                android:layout_below="@+id/ll_trust"
                 android:id="@+id/tv_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -105,9 +102,8 @@
                 android:paddingTop="@dimen/widget_size_10"
                 android:paddingBottom="@dimen/widget_size_10"
                 android:includeFontPadding="false"
-                android:lineSpacingExtra="@dimen/widget_size_5"
                 android:textColorLink="@color/color_blue_link"
-                android:textAppearance="@style/TextAppearanceBody2" />
+                android:textAppearance="@style/TextAppearanceBody1" />
 
             <ImageView
                 android:id="@+id/iv_arrow"
@@ -121,6 +117,35 @@
                 android:src="@mipmap/icon_arrow"/>
 
         </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_size_35"
+            android:layout_marginEnd="@dimen/widget_size_35">
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/iv_reply"
+                android:layout_width="@dimen/widget_size_20"
+                android:layout_height="@dimen/widget_size_20"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_reply_news"/>
+
+            <ImageView
+                android:id="@+id/iv_retweet"
+                android:layout_width="@dimen/widget_size_24"
+                android:layout_height="@dimen/widget_size_24"
+                android:layout_centerHorizontal="true"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_retweet"/>
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_1"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:background="@color/color_bg"/>
 
     </LinearLayout>
 </layout>

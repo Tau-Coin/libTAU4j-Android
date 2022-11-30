@@ -127,6 +127,8 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
             ActivityUtil.startActivity(intent, this, AnnouncementCreateActivity.class);
         } else if (type == TxType.TRUST_TX.getType()) {
             showTrustDialog(null, tx);
+        } else if (type == TxType.NEWS_TX.getType()) {
+            ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
         }
     }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -11,21 +12,22 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+import io.taucoin.tauapp.publishing.BuildConfig;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
+import io.taucoin.tauapp.publishing.core.utils.Utils;
 import io.taucoin.tauapp.publishing.databinding.ItemAirdropBinding;
 import io.taucoin.tauapp.publishing.databinding.ItemCommunityBinding;
+import io.taucoin.tauapp.publishing.databinding.ItemCommunitySelectBinding;
 
 /**
  * 社区选择列表的Adapter
  */
 public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapter.ViewHolder> {
-
-    private Member member;
 
     CommunityListAdapter() {
         super(diffCallback);
@@ -35,16 +37,12 @@ public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapt
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ItemCommunityBinding binding = DataBindingUtil.inflate(inflater,
-                R.layout.item_community,
+        ItemCommunitySelectBinding binding = DataBindingUtil.inflate(inflater,
+                R.layout.item_community_select,
                 parent,
                 false);
 
         return new ViewHolder(this, binding);
-    }
-
-    public Member getMember() {
-        return member;
     }
 
     @Override
@@ -54,11 +52,11 @@ public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapt
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private final ItemCommunityBinding binding;
+        private final ItemCommunitySelectBinding binding;
         private final CommunityListAdapter adapter;
         private final Context context;
 
-        ViewHolder(CommunityListAdapter adapter, ItemCommunityBinding binding) {
+        ViewHolder(CommunityListAdapter adapter, ItemCommunitySelectBinding binding) {
             super(binding.getRoot());
             this.adapter = adapter;
             this.binding = binding;
@@ -72,32 +70,25 @@ public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapt
             if (null == member) {
                 return;
             }
-            binding.cbSelect.setOnCheckedChangeListener(null);
-            boolean checked = adapter.member != null && StringUtil.isEquals(adapter.member.chainID,
-                    member.chainID);
-            binding.cbSelect.setChecked(checked);
-            if (checked) {
-                adapter.member = member;
-            }
-            binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    adapter.member = member;
-                    adapter.notifyDataSetChanged();
-                } else {
-                    adapter.member = null;
-                }
-            });
             String communityName = ChainIDUtil.getName(member.chainID);
+            String firstLetters = StringUtil.getFirstLettersOfName(communityName);
+            binding.rbCommunity.setText(firstLetters);
+            int bgColor = Utils.getGroupColor(member.chainID);
+            binding.rbCommunity.setBgColor(bgColor);
+
+            boolean isLondonPMC = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID);
+            binding.rbCommunity.setVisibility(isLondonPMC ? View.GONE : View.VISIBLE);
+            binding.ivCommunity.setVisibility(!isLondonPMC ? View.GONE : View.VISIBLE);
+
             String communityCode = ChainIDUtil.getCode(member.chainID);
-            binding.tvLeft.setText(context.getString(R.string.main_community_name, communityName, communityCode));
+            binding.tvName.setText(context.getString(R.string.main_community_name, communityName, communityCode));
         }
     }
 
-    private static final DiffUtil.ItemCallback<Member> diffCallback = new DiffUtil.ItemCallback<Member>() {
+    private static final DiffUtil.ItemCallback<Member> diffCallback = new DiffUtil.ItemCallback<>() {
         @Override
         public boolean areContentsTheSame(@NonNull Member oldItem, @NonNull Member newItem) {
-            return oldItem.equals(newItem) &&
-                    oldItem.airdropStatus == newItem.airdropStatus;
+            return oldItem.equals(newItem);
         }
 
         @Override

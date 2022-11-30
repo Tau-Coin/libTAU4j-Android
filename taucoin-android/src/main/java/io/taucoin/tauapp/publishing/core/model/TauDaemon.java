@@ -940,6 +940,17 @@ public abstract class TauDaemon {
     }
 
     /**
+     * touch Chain
+     */
+    public void touchChain(String chainID) {
+        if (!isRunning) {
+            return;
+        }
+        sessionManager.touchChain(ChainIDUtil.encode(chainID));
+        logger.info("touchChain::{} isRunning::{}", chainID, isRunning);
+    }
+
+    /**
      * crash测试
      */
     public void crashTest() {

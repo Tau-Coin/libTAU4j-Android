@@ -43,6 +43,7 @@
     <string name="common_close">Close</string>
     <string name="common_resend">Resend</string>
     <string name="common_done">Done</string>
+    <string name="common_post">Post</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
@@ -152,7 +153,7 @@
     <string name="community_users_mining_block">Mining Block</string>
     <string name="community_users_doze">Doze</string>
     <string name="common_loading">loading&#8230;</string>
-    <string name="common_choice">Community Choice</string>
+    <string name="community_select">Select Community</string>
 
     <string name="community_create_tips" formatted="false"><Data><![CDATA[Creator is recommended to
     keep device <font color="#ff0000">ON CHARGING</font> to supply data for community.]]></Data></string>
@@ -206,6 +207,7 @@
     <string name="community_view_note">Note</string>
     <string name="community_view_unknown">Unknown</string>
     <string name="community_view_announcement">Announcement</string>
+    <string name="community_view_news">News</string>
     <string name="community_view_own_txs">Sent Transactions</string>
     <string name="community_view_tx_history">Transaction History</string>
     <string name="community_view_blocks">Blocks Explorer</string>
@@ -443,13 +445,13 @@
     <string name="tx_link">Link - optional</string>
     <string name="tx_airdrop_link">Airdrop Link</string>
     <string name="tx_airdrop_select">Please select an airdrop community first!</string>
-    <string name="tx_community_select">Please select an community first!</string>
     <string name="tx_airdrop_setup">Please set up airdrop first!</string>
     <string name="tx_quantity">Quantity - optional</string>
     <string name="tx_location">Location - optional</string>
     <string name="tx_description">Description - optional</string>
     <string name="tx_select_community">Community</string>
     <string name="tx_invitation_title">Title</string>
+    <string name="tx_what_happening">What\'s happening?</string>
     <string name="tx_operation_reply">Reply</string>
     <string name="tx_operation_copy">Copy</string>
     <string name="tx_operation_copy_hash">Copy Hash</string>

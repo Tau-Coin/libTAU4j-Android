@@ -1,11 +1,14 @@
 package io.taucoin.tauapp.publishing.ui.transaction;
 
+import android.text.SpannableStringBuilder;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.zxing.common.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -20,10 +23,14 @@ import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.tauapp.publishing.core.utils.BitmapUtil;
+import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
+import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
+import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
+import io.taucoin.tauapp.publishing.core.utils.Utils;
 import io.taucoin.tauapp.publishing.databinding.ItemMarketBinding;
 import io.taucoin.tauapp.publishing.databinding.ItemNewsBinding;
 import io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView;
@@ -58,11 +65,13 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
     static class ViewHolder extends RecyclerView.ViewHolder {
         private final ItemNewsBinding binding;
         private final ClickListener listener;
+        private final int nameColor;
 
         ViewHolder(ItemNewsBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
+            this.nameColor = binding.getRoot().getResources().getColor(R.color.color_black);
         }
 
         void bind(ViewHolder holder, UserAndTx tx) {
@@ -75,13 +84,26 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
             setLeftViewClickListener(binding.ivHeadPic, tx);
 
-            binding.tvName.setText(UsersUtil.getShowName(tx.sender));
-            setEditNameClickListener(binding.tvName, tx);
+            String userName = UsersUtil.getShowName(tx.sender);
+            userName = null == userName ? "" : userName;
+            String communityName = ChainIDUtil.getName(tx.chainID);
+            String communityCode = ChainIDUtil.getCode(tx.chainID);
+            SpannableStringBuilder name = new SpanUtils()
+                    .append(userName)
+                    .setForegroundColor(nameColor)
+                    .append(" @")
+                    .append(UsersUtil.getLastPublicKey(tx.senderPk, 4))
+                    .append(" · ")
+                    .append(communityName)
+                    .append("(").append(communityCode).append(")")
+                    .append(" · ")
+                    .append(DateUtil.getNewsTime(tx.timestamp))
+                    .create();
+            binding.tvName.setText(name);
+//            setEditNameClickListener(binding.tvName, tx);
 
 //            binding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
             setImageClickListener(binding, tx);
-            boolean isMyself = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
-            binding.ivBan.setVisibility(isMyself ? View.GONE : View.VISIBLE);
 
             binding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
             // 添加link解析
@@ -96,6 +118,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             Linkify.addLinks(binding.tvMsg, friend, null);
 
             setClickListener(binding.tvMsg, tx);
+            binding.tvMsg.requestLayout();
         }
 
         private void setImageClickListener(ItemNewsBinding binding, UserAndTx tx) {
@@ -114,9 +137,9 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                     listener.onReplyClicked(tx);
                 }
             });
-            binding.ivBan.setOnClickListener(view -> {
+            binding.ivLongPress.setOnClickListener(view -> {
                 if (listener != null) {
-                    listener.onBanClicked(tx);
+                    listener.onItemLongClicked(binding.tvMsg, tx);
                 }
             });
         }
@@ -177,12 +200,11 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
         void onItemLongClicked(TextView view, UserAndTx tx);
         void onItemClicked(UserAndTx tx);
         void onLinkClick(String link);
-        void onBanClicked(UserAndTx tx);
         void onRetweetClicked(UserAndTx tx);
         void onReplyClicked(UserAndTx tx);
     }
 
-    private static final DiffUtil.ItemCallback<UserAndTx> diffCallback = new DiffUtil.ItemCallback<UserAndTx>() {
+    private static final DiffUtil.ItemCallback<UserAndTx> diffCallback = new DiffUtil.ItemCallback<>() {
         @Override
         public boolean areContentsTheSame(@NonNull UserAndTx oldItem, @NonNull UserAndTx newItem) {
             boolean isSame = false;

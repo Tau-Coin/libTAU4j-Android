@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_white">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_marginBottom="@dimen/widget_size_5"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <io.taucoin.tauapp.publishing.ui.customviews.CornerImageView
+                    android:id="@+id/iv_community"
+                    android:layout_width="@dimen/widget_size_40"
+                    android:layout_height="@dimen/widget_size_40"
+                    android:layout_marginEnd="@dimen/widget_size_7"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:src="@mipmap/icon_london_pmc"/>
+
+                <io.taucoin.tauapp.publishing.ui.customviews.RoundButton
+                    android:visibility="gone"
+                    android:id="@+id/rb_community"
+                    android:layout_width="@dimen/widget_size_40"
+                    android:layout_height="@dimen/widget_size_40"
+                    android:layout_marginEnd="@dimen/widget_size_7"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:gravity="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/color_white"
+                    android:textAppearance="@style/TextAppearanceHeadline6"
+                    app:btnStrokeColor="@color/primary_light"
+                    app:btnStrokeWidth="0dp"
+                    app:btnCornerRadius="@dimen/widget_size_7"
+                    app:btnSolidColor="@color/primary_light"
+                    app:btnPressedRatio="1.5" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:textAppearance="@style/TextAppearanceHeadline6" />
+
+        </LinearLayout>
+
+        <View
+            android:background="@color/color_bg"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_1" />
+    </LinearLayout>
+</layout>

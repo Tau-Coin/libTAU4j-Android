@@ -160,9 +160,13 @@ public class UsersUtil {
      * @return
      */
     public static String getLastPublicKey(String publicKey) {
-        if (StringUtil.isNotEmpty(publicKey) && publicKey.length() > 6) {
+        return getLastPublicKey(publicKey, 6);
+    }
+
+    public static String getLastPublicKey(String publicKey, int size) {
+        if (StringUtil.isNotEmpty(publicKey) && publicKey.length() > size) {
             int length = publicKey.length();
-            return publicKey.substring(length - 6, length);
+            return publicKey.substring(length - size, length);
         }
         return publicKey;
     }

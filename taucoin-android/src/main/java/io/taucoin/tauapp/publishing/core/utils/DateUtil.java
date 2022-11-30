@@ -479,4 +479,20 @@ public class DateUtil {
         }
         return true;
     }
+
+    public static CharSequence getNewsTime(long timestamp) {
+        long currentTime = getMillisTime();
+        int seconds = getSeconds(timestamp, currentTime);
+        int hours = seconds / 60 / 60;
+        int days = hours / 24;
+        if (days > 7) {
+            return DateUtil.format(timestamp, DateUtil.pattern4);
+        } else if (days > 0) {
+            return days + "day";
+        } else if (hours <= 0) {
+            return "1h";
+        } else {
+            return hours + "h";
+        }
+    }
 }

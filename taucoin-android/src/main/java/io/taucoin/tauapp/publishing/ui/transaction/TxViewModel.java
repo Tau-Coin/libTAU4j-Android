@@ -87,6 +87,7 @@ import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.AIRDROP_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.ANNOUNCEMENT;
+import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.NEWS_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.NOTE_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.SELL_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.WIRING_TX;
@@ -131,7 +132,7 @@ public class TxViewModel extends AndroidViewModel {
                 .subscribe((needStart) -> daemon.start()));
     }
 
-    MutableLiveData<String> getAddState() {
+    public MutableLiveData<String> getAddState() {
         return addState;
     }
 
@@ -217,7 +218,7 @@ public class TxViewModel extends AndroidViewModel {
      * 添加新的note交易
      * @param tx 根据用户输入构建的用户数据
      */
-    void addTransaction(Tx tx) {
+    public void addTransaction(Tx tx) {
         if (addTxDisposable != null && !addTxDisposable.isDisposed()) {
             return;
         }
@@ -484,7 +485,7 @@ public class TxViewModel extends AndroidViewModel {
      * 验证交易
      * @param tx 交易数据
      */
-    boolean validateNoteTx(Tx tx) {
+    public boolean validateNoteTx(Tx tx) {
         if (null == tx) {
             return false;
         }

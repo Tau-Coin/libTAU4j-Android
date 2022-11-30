@@ -185,6 +185,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
+            android:name=".ui.transaction.NewsCreateActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
             android:name=".ui.transaction.CoinsChooseActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 

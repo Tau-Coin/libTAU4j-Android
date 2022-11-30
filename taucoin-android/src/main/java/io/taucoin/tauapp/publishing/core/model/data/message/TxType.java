@@ -28,7 +28,8 @@ public enum TxType {
     SELL_TX(3, R.string.community_view_sell),
     TRUST_TX(4, R.string.community_view_trust),
     AIRDROP_TX(5, R.string.community_view_airdrop),
-    ANNOUNCEMENT(6, R.string.community_view_announcement);
+    ANNOUNCEMENT(6, R.string.community_view_announcement),
+    NEWS_TX(7, R.string.community_view_news);
 
     private final int type;
     private final int name;
