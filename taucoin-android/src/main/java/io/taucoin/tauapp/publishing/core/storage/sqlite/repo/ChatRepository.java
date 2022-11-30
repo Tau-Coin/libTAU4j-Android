@@ -55,6 +55,11 @@ public interface ChatRepository {
 
     List<ChatMsgAndLog> getMessages(String friendPk, int pos, int loadSize);
 
+	/*
+	 获取需要发送的消息: 24小时，30分钟一次；48小时，1个小时1次
+	 */
+    List<ChatMsgLog> getResendMessages(String friendPk);
+
     /**
      * 添加消息日志
      * @param msgLogs

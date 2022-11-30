@@ -30,6 +30,7 @@ import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.tauapp.publishing.core.model.data.ChatMsgStatus;
 import io.taucoin.tauapp.publishing.core.model.data.DataChanged;
+import io.taucoin.tauapp.publishing.core.model.data.FriendAndUser;
 import io.taucoin.tauapp.publishing.core.model.data.Result;
 import io.taucoin.tauapp.publishing.core.model.data.message.MsgContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
@@ -38,9 +39,11 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.ChatMsgLog;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.ChatRepository;
+import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.FriendRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
@@ -414,6 +417,47 @@ public class ChatViewModel extends AndroidViewModel {
                 .subscribe(result -> resentResult.postValue(result));
         disposables.add(disposable);
     }
+
+    /**
+     * 周期性重发消息，24小时，30分钟一次；48小时，1个小时1次
+     */
+    void resendMessage(ChatMsgLog msgLog) {
+    }
+
+	public static void resendRegularMessages(Context context) {
+        FriendRepository friendRepo = RepositoryHelper.getFriendsRepository(context);
+        ChatRepository chatRepo = RepositoryHelper.getChatRepository(context);
+        TauDaemon daemon = TauDaemon.getInstance(context);
+		//获取朋友列表
+		List<FriendAndUser> friends =  friendRepo.queryFriendsByUserPk(MainApplication.getInstance().getPublicKey());
+		if (friends != null && friends.size() > 0) { 
+			for (Friend friend : friends) {
+				long timestamp_now = daemon.getSessionTime();
+				List<ChatMsgLog> msgLogs = chatRepo.getResendMessages(friend.friendPK);
+				if (msgLogs != null && msgLogs.size() > 0) { 
+					for(ChatMsgLog msgLog: msgLogs) {
+						ChatMsg chatMsg = chatRepo.queryChatMsg(msgLog.hash);
+						long timestamp = chatMsg.timestamp;
+						//24小时，30分钟一次；48小时，1个小时1次
+						if(timestamp_now - timestamp >= 48*3600*1000 && timestamp_now/10000000%2!=0)
+							continue;
+						String sender = chatMsg.senderPk;
+						String receiver = chatMsg.receiverPk;
+						String logicMsgHash = chatMsg.logicMsgHash;
+						MsgContent msgContent = MsgContent.createContent(logicMsgHash, chatMsg.contentType,
+							chatMsg.content, chatMsg.airdropChain, chatMsg.referralPeer);
+						byte[] encoded = msgContent.getEncoded();
+						Message message = new Message(timestamp, ByteUtil.toByte(sender),
+								ByteUtil.toByte(receiver), encoded);
+						boolean isSuccess = daemon.addNewMessage(message);
+						if(!isSuccess){
+							logger.debug("Regular send unreceived msgs failed");
+						}
+					}
+                }
+			}
+		}
+	}
 
     /**
      * 观察消息日志信息
