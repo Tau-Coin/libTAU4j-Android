@@ -330,7 +330,7 @@ public class CommunityViewModel extends AndroidViewModel {
     void addCommunity(@NonNull Community community, Map<String, String> selectedMap) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             // TauController:创建Community社区
-            Result result = createCommunity(getApplication(), community, selectedMap);
+            Result result = createCommunity(getApplication(), community, selectedMap, false);
             emitter.onNext(result);
             emitter.onComplete();
         }, BackpressureStrategy.LATEST)
@@ -340,7 +340,7 @@ public class CommunityViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    public static  Result createCommunity(Context appContext, Community community, Map<String, String> selectedMap) {
+    public static  Result createCommunity(Context appContext, Community community, Map<String, String> selectedMap, boolean stickyTop) {
         Result result = new Result();
         try {
             TauDaemon daemon = TauDaemon.getInstance(appContext);
@@ -384,9 +384,11 @@ public class CommunityViewModel extends AndroidViewModel {
             if (account != null) {
                 member = new Member(community.chainID, currentUser.publicKey,
                         account.getBalance(), account.getNonce());
+                member.stickyTop = stickyTop ? 1 : 0;
             } else {
                 // 防止与libTAU交互失败的情况！！！
                 member = new Member(community.chainID, currentUser.publicKey, 0, 0);
+                member.stickyTop = stickyTop ? 1 : 0;
             }
             memberRepo.addMember(member);
 
@@ -1055,7 +1057,7 @@ public class CommunityViewModel extends AndroidViewModel {
                     String communityName = name + (i + 1);
                     String chainID = createNewChainID(communityName);
                     Community community = new Community(chainID, communityName);
-                    createCommunity(getApplication(), community, null);
+                    createCommunity(getApplication(), community, null, false);
                     emitter.onNext(i + 1);
                 }
             }

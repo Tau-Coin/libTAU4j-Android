@@ -51,7 +51,6 @@
                 android:layout_height="@dimen/widget_size_20"
                 android:paddingStart="@dimen/widget_size_5"
                 android:paddingEnd="@dimen/widget_size_5"
-                android:rotation="90"
                 android:layout_gravity="end"
                 android:contentDescription="@null"
                 android:src="@mipmap/icon_long_press"/>

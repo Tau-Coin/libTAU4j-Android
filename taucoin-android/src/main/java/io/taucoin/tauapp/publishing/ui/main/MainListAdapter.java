@@ -133,9 +133,15 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 binding.msgUnread.setVisibility(bean.msgUnread > 0 ? View.VISIBLE : View.GONE);
                 ivLongPress = binding.ivLongPress;
 
-                boolean isLondonPMC = StringUtil.isEquals(bean.ID, BuildConfig.TEST_CHAIN_ID);
-                binding.leftView.setVisibility(isLondonPMC ? View.GONE : View.VISIBLE);
-                binding.ivGroup.setVisibility(!isLondonPMC ? View.GONE : View.VISIBLE);
+                boolean isLondonPMC = StringUtil.isEquals(bean.ID, BuildConfig.TEST_CHAIN_ID_1);
+                boolean isSanFrancisco = StringUtil.isEquals(bean.ID, BuildConfig.TEST_CHAIN_ID_2);
+                binding.leftView.setVisibility(isLondonPMC || isSanFrancisco ? View.GONE : View.VISIBLE);
+                binding.ivGroup.setVisibility(isLondonPMC || isSanFrancisco ? View.VISIBLE : View.GONE);
+                if (isLondonPMC) {
+                    binding.ivGroup.setImageResource(R.mipmap.icon_london_pmc);
+                } else if (isSanFrancisco) {
+                    binding.ivGroup.setImageResource(R.mipmap.icon_san_francisco);
+                }
             } else if (holder.binding instanceof ItemChatListBinding) {
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;
                 String friendNickName = UsersUtil.getShowNameWithYourself(bean.friend, bean.ID);

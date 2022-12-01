@@ -632,7 +632,7 @@ public class UserViewModel extends AndroidViewModel {
             if (isCreateCommunity && StringUtil.isNotEmpty(name)) {
                 Community community = new Community("", name);
 
-                CommunityViewModel.createCommunity(getApplication(), community, null);
+                CommunityViewModel.createCommunity(getApplication(), community, null, true);
             }
             emitter.onNext(true);
             emitter.onComplete();

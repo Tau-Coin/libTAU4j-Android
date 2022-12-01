@@ -58,10 +58,10 @@ public class Constants {
     public static final int STATISTICS_DISPLAY_PERIOD = 60;
 
     // 交易最大字节大小
-    public static final int TX_MAX_BYTE_SIZE = 500;
+    public static final int TX_MAX_BYTE_SIZE = 700;
 
     // news交易内容最大字节大小309，取整数300
-    public static final int NEWS_TX_MAX_BYTE_SIZE = 300;
+    public static final int NEWS_TX_MAX_BYTE_SIZE = 500;
 
     // 消息最大字节大小
     public static final int MSG_MAX_BYTE_SIZE = 821;

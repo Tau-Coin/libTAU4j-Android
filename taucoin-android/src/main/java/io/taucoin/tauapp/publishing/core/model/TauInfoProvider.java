@@ -186,6 +186,9 @@ public class TauInfoProvider {
                 String nodesKey = MainApplication.getInstance().getString(R.string.pref_key_dht_nodes);
 
                 while (!emitter.isCancelled()) {
+                    // 防止android doze造成延迟
+                    daemon.checkCommunicationMsgResend();
+
                     long currentTime = DateUtil.getMillisTime();
                     // 内存采样：AndroidQ开始限制采样频率5分钟
                     if (samplerStatistics.totalMemory == 0 ||

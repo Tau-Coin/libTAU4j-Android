@@ -26,10 +26,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
+                <View
+                    android:layout_width="@dimen/widget_size_42"
+                    android:layout_height="@dimen/widget_size_42"
+                    android:layout_marginEnd="@dimen/widget_size_7"
+                    android:layout_marginTop="@dimen/widget_size_4"
+                    android:background="@drawable/bg_rect_round_bg"/>
+
                 <io.taucoin.tauapp.publishing.ui.customviews.CornerImageView
                     android:id="@+id/iv_community"
                     android:layout_width="@dimen/widget_size_40"
                     android:layout_height="@dimen/widget_size_40"
+                    android:layout_marginStart="@dimen/widget_size_1"
                     android:layout_marginEnd="@dimen/widget_size_7"
                     android:layout_marginTop="@dimen/widget_size_5"
                     android:src="@mipmap/icon_london_pmc"/>
@@ -39,6 +47,7 @@
                     android:id="@+id/rb_community"
                     android:layout_width="@dimen/widget_size_40"
                     android:layout_height="@dimen/widget_size_40"
+                    android:layout_marginStart="@dimen/widget_size_1"
                     android:layout_marginEnd="@dimen/widget_size_7"
                     android:layout_marginTop="@dimen/widget_size_5"
                     android:gravity="center"

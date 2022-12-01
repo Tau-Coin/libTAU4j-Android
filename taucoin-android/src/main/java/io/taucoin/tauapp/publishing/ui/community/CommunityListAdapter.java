@@ -76,9 +76,15 @@ public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapt
             int bgColor = Utils.getGroupColor(member.chainID);
             binding.rbCommunity.setBgColor(bgColor);
 
-            boolean isLondonPMC = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID);
-            binding.rbCommunity.setVisibility(isLondonPMC ? View.GONE : View.VISIBLE);
-            binding.ivCommunity.setVisibility(!isLondonPMC ? View.GONE : View.VISIBLE);
+            boolean isLondonPMC = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID_1);
+            boolean isSanFrancisco = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID_2);
+            binding.rbCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.GONE : View.VISIBLE);
+            binding.ivCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.VISIBLE : View.GONE);
+            if (isLondonPMC) {
+                binding.ivCommunity.setImageResource(R.mipmap.icon_london_pmc);
+            } else if (isSanFrancisco) {
+                binding.ivCommunity.setImageResource(R.mipmap.icon_san_francisco);
+            }
 
             String communityCode = ChainIDUtil.getCode(member.chainID);
             binding.tvName.setText(context.getString(R.string.main_community_name, communityName, communityCode));

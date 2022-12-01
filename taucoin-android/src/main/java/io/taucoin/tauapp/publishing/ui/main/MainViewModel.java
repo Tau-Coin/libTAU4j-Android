@@ -89,15 +89,11 @@ public class MainViewModel extends AndroidViewModel {
             ArrayList<CommunityAndFriend> list = new ArrayList<>();
             if (dataList != null && dataList.size() > 0) {
                 list.addAll(dataList);
-                int stickyOnTop = 0;
                 for (int i = 0; i < dataList.size(); i++) {
                     CommunityAndFriend data = dataList.get(i);
                     if (data.type == 0) {
-                        if (StringUtil.isEquals(data.ID, BuildConfig.TEST_CHAIN_ID)) {
-                            stickyOnTop = i;
-                        }
                         if (data.joined == 1) {
-                            if (stickyOnTop > 0 && stickyOnTop == i) {
+                            if (data.stickyTop > 0) {
                                 communities.add(0, data);
                             } else {
                                 communities.add(data);
@@ -106,10 +102,6 @@ public class MainViewModel extends AndroidViewModel {
                     } else if (data.type == 1) {
                         friends.add(data);
                     }
-                }
-                if (stickyOnTop > 0) {
-                    CommunityAndFriend data = list.remove(stickyOnTop);
-                    list.add(0, data);
                 }
             }
             homeCommunityData.postValue(communities);

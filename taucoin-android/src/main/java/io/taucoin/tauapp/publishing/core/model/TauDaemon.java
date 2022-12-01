@@ -65,6 +65,7 @@ import io.taucoin.tauapp.publishing.receiver.PowerReceiver;
 import io.taucoin.tauapp.publishing.service.SystemServiceManager;
 import io.taucoin.tauapp.publishing.service.TauService;
 import io.taucoin.tauapp.publishing.ui.TauNotifier;
+import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
 import io.taucoin.tauapp.publishing.ui.setting.TrafficTipsActivity;
 
 /**
@@ -165,6 +166,8 @@ public abstract class TauDaemon {
                     setLogLevel(LogUtil.getTauLogLevel());
                     // 查看当前网络开关是否关闭
                     checkNetworkSwitch();
+                    // 重发点对点消息
+                    startCommunicationMsgResend();
                 }
             }
         });
@@ -291,6 +294,9 @@ public abstract class TauDaemon {
         }
         if (chargingTimer != null && !chargingTimer.isDisposed()) {
             chargingTimer.dispose();
+        }
+        if (msgResendDisposable != null && !msgResendDisposable.isDisposed()) {
+            msgResendDisposable.dispose();
         }
         TauNotifier.getInstance().cancelAllNotify();
         locationManager.stopLocation();
@@ -605,11 +611,20 @@ public abstract class TauDaemon {
                 logger.info("checkAllChains localChain::{}, tauChains::{}",
                         localChains.size(), tauChains.size());
                 // 0、添加默认Cambridge Coin
-                String testChainID = BuildConfig.TEST_CHAIN_ID;
-                Community community = communityRepo.getCommunityByChainID(testChainID);
-                if (null == community) {
+                String testChainID1 = BuildConfig.TEST_CHAIN_ID_1;
+                Community community1 = communityRepo.getCommunityByChainID(testChainID1);
+                if (null == community1) {
                     String peer = BuildConfig.TEST_CHAIN_PEER;
-                    String tauTesting = LinkUtil.encodeChain(peer, testChainID, peer);
+                    String tauTesting = LinkUtil.encodeChain(peer, testChainID1, peer);
+                    tauDaemonAlertHandler.addCommunity(tauTesting);
+                }
+
+                // 1、添加默认San Francisco
+                String testChainID2 = BuildConfig.TEST_CHAIN_ID_2;
+                Community community2 = communityRepo.getCommunityByChainID(testChainID2);
+                if (null == community2) {
+                    String peer = BuildConfig.TEST_CHAIN_PEER;
+                    String tauTesting = LinkUtil.encodeChain(peer, testChainID2, peer);
                     tauDaemonAlertHandler.addCommunity(tauTesting);
                 }
                 // 1、处理本地跟随的chains, libTAU未跟随的情况
@@ -794,6 +809,33 @@ public abstract class TauDaemon {
             chargingTimingCompleted = false;
             resetAutoRelayDelay();
         }
+    }
+
+    /**
+     * 启动点对点消息重发
+     */
+    private long resendTime = 0;
+    private Disposable msgResendDisposable;
+    public void checkCommunicationMsgResend() {
+        int intervalSeconds = 30 * 60;
+        long currentTime = DateUtil.getMillisTime();
+        if (null == msgResendDisposable || resendTime == 0 || (currentTime - resendTime) / 1000 <= intervalSeconds) {
+            return;
+        }
+        startCommunicationMsgResend();
+    }
+    public void startCommunicationMsgResend() {
+        int intervalSeconds = 30 * 60;
+        if (msgResendDisposable != null && !msgResendDisposable.isDisposed()) {
+            msgResendDisposable.dispose();
+        }
+        msgResendDisposable = ObservableUtil.intervalSeconds(intervalSeconds, true)
+                .subscribeOn(Schedulers.io())
+                .subscribe(l -> {
+                    resendTime = DateUtil.getMillisTime();
+                    logger.debug("resendRegularMessages...");
+                    ChatViewModel.resendRegularMessages(appContext);
+                });
     }
 
     /**

@@ -687,7 +687,7 @@ public class TauListenHandler {
             // 默认置顶
             Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPK);
             if (member != null) {
-                member.stickyTop = 1;
+                member.stickyTop = 0;
                 memberRepo.updateMember(member);
             }
 

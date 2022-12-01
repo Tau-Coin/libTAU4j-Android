@@ -112,7 +112,8 @@ android {
             // TauLogLevel.DEBUG
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://6e6170b970bae896803ecb1051653" +
                     "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:19881\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"628507d230303030PMCChain\""
+            buildConfigField "String", "TEST_CHAIN_ID_1", "\"628507d230303030PMCChain\""
+            buildConfigField "String", "TEST_CHAIN_ID_2", "\"fdb4128330303030San Francisco\""
             buildConfigField "String", "TEST_CHAIN_PEER", "\"602bc2c65f2c6e77c7e359339de7eb3d6d243a5eac4842d97b92e583d472690a\""
             signingConfig signingConfigs.debugConfig
         }
@@ -126,7 +127,8 @@ android {
             // TauLogLevel.INFO
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://58f39fc2243907dd122b9f32d551d" +
                     "bd2c5f24ed153b71be589ce9fb23b7c08d1@13.229.53.249:3882\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"5244bc8730303030London PMC\""
+            buildConfigField "String", "TEST_CHAIN_ID_1", "\"5244bc8730303030London PMC\""
+            buildConfigField "String", "TEST_CHAIN_ID_2", "\"fdb4128330303030San Francisco\""
             buildConfigField "String", "TEST_CHAIN_PEER", "\"283cb209f470b7916fc311a259b65dc2a3ca4a234bfd58ba6479509f0fceb66e\""
             signingConfig signingConfigs.releaseConfig
         }
@@ -140,7 +142,8 @@ android {
             // TauLogLevel.WARN
             buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://58f39fc2243907dd122b9f32d551d" +
                     "bd2c5f24ed153b71be589ce9fb23b7c08d1@13.229.53.249:3882\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"5244bc8730303030London PMC\""
+            buildConfigField "String", "TEST_CHAIN_ID_1", "\"5244bc8730303030London PMC\""
+            buildConfigField "String", "TEST_CHAIN_ID_2", "\"fdb4128330303030San Francisco\""
             buildConfigField "String", "TEST_CHAIN_PEER", "\"283cb209f470b7916fc311a259b65dc2a3ca4a234bfd58ba6479509f0fceb66e\""
             signingConfig signingConfigs.releaseConfig
         }
