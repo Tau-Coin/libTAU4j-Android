@@ -117,9 +117,9 @@ MainFragment extends BaseFragment implements View.OnClickListener {
                 if (i == 0) {
                     layoutParams.weight = 1.2f;
                 } else if (i == 1) {
-                    layoutParams.weight = 1.8f;
+                    layoutParams.weight = 2.0f;
                 } else {
-                    layoutParams.weight = 1.8f;
+                    layoutParams.weight = 1.5f;
                 }
                 tab.view.setLayoutParams(layoutParams);
             }

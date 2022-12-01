@@ -412,8 +412,9 @@ public class Utils {
     }
 
     public static boolean isTablet(FragmentActivity activity) {
-        return (activity.getResources().getConfiguration().screenLayout &
-                Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+//        return (activity.getResources().getConfiguration().screenLayout &
+//                Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+        return true;
     }
 
     /**
