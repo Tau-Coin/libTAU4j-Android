@@ -97,7 +97,7 @@
         <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_news"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_200"
+            android:layout_height="@dimen/widget_size_205"
             android:layout_marginStart="@dimen/widget_size_20"
             android:layout_marginTop="@dimen/widget_size_10"
             android:layout_marginEnd="@dimen/widget_size_20"

@@ -41,6 +41,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     private String chainID;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private TxQueue txQueue;
+    private CharSequence msg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
             txQueue = getIntent().getParcelableExtra(IntentExtra.BEAN);
+            msg = getIntent().getCharSequenceExtra(IntentExtra.DATA);
             if (txQueue != null) {
                 chainID = txQueue.chainID;
             }
@@ -71,12 +73,23 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
      */
     @SuppressLint("ClickableViewAccessibility")
     private void initLayout() {
+        binding.tvBytesCount.setText("0/" + Constants.NEWS_TX_MAX_BYTE_SIZE);
+        binding.tvBytesCount.setTextColor(getResources().getColor(R.color.color_gray_dark));
+        binding.etNews.addTextChangedListener(textWatcher);
+        binding.etNews.setMaxBytesLimit(Constants.NEWS_TX_MAX_BYTE_SIZE);
+
         binding.tvCancel.setOnClickListener(v -> onBackPressed());
         if (StringUtil.isNotEmpty(chainID)) {
             if (txQueue != null) {
                 TxContent txContent = new TxContent(txQueue.content);
                 binding.etNews.setText(txContent.getMemo());
+                binding.etNews.setSelection(binding.etNews.getText().length());
                 binding.etNews.setEnabled(false);
+            } else if (StringUtil.isNotEmpty(msg)) {
+                binding.etNews.setText(msg);
+                binding.etNews.setSelection(binding.etNews.getText().length());
+                binding.etNews.setEnabled(false);
+                binding.tvPost.setText(R.string.common_retweet);
             }
             String communityName = ChainIDUtil.getName(chainID);
             String communityCode = ChainIDUtil.getCode(chainID);
@@ -86,10 +99,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         if (user != null) {
             binding.ivUserPic.setImageBitmap(UsersUtil.getHeadPic(user));
         }
-        binding.etNews.addTextChangedListener(textWatcher);
-        binding.etNews.setMaxBytesLimit(Constants.NEWS_TX_MAX_BYTE_SIZE);
-        binding.tvBytesCount.setText("0/" + Constants.NEWS_TX_MAX_BYTE_SIZE);
-        binding.tvBytesCount.setTextColor(getResources().getColor(R.color.color_gray_dark));
     }
 
     private final TextWatcher textWatcher = new TextWatcher() {

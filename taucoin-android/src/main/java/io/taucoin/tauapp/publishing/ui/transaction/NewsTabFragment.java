@@ -366,7 +366,7 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
     public void onRetweetClicked(UserAndTx tx) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-        intent.putExtra(IntentExtra.TYPE, CommunityChooseActivity.TYPE_CREATE_NOTE);
+        intent.putExtra(IntentExtra.TYPE, CommunityChooseActivity.TYPE_RETWEET_NEWS);
         ActivityUtil.startActivityForResult(intent, activity, CommunityChooseActivity.class,
                 CHOOSE_REQUEST_CODE);
     }

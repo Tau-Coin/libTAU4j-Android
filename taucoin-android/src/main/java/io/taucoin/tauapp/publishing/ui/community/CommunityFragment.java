@@ -149,7 +149,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 binding.tabLayout.getTabCount());
         // ViewPager设置Adapter
         binding.viewPager.setAdapter(stateAdapter);
-        binding.viewPager.setOffscreenPageLimit(3);
+        binding.viewPager.setOffscreenPageLimit(2);
         binding.tabLayout.setupWithViewPager(binding.viewPager);
 
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
@@ -174,7 +174,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                 });
 
         if (isEnterSentTransactions) {
-            binding.viewPager.setCurrentItem(2);
+            binding.viewPager.setCurrentItem(1);
         }
     }
 
@@ -368,7 +368,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     LoggerFactory.getLogger("updateTabBadgeDrawable")
                             .debug("msgUnread::{}, newsUnread::{}", member.msgUnread, member.newsUnread);
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
-                    updateTabBadgeDrawable(1, false, member.msgUnread == 1);
+//                    updateTabBadgeDrawable(1, false, member.msgUnread == 1);
                     updateTabBadgeDrawable(0, false, member.newsUnread == 1);
                 }, it -> {}));
     }
@@ -447,8 +447,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         CommunityTabFragment tab;
         if (pos == 0) {
             tab = new MarketTabFragment();
-        } else if (pos == 1) {
-            tab = new NotesTabFragment();
         } else {
             tab = new TransactionsTabFragment();
         }
@@ -478,8 +476,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         @Override
         public CharSequence getPageTitle(int position) {
             if (position == 1) {
-                return getString(R.string.community_chain_note);
-            } else if (position == 2) {
                 return getString(R.string.community_on_chain);
             } else {
                 return getString(R.string.community_chain_market);

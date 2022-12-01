@@ -55,7 +55,8 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.balUpdateTime, b.power, b.nonce," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk," +
-            " (CASE WHEN b.msgUnread = 1 THEN b.msgUnread ELSE b.newsUnread END) AS msgUnread," +
+//            " (CASE WHEN b.msgUnread = 1 THEN b.msgUnread ELSE b.newsUnread END) AS msgUnread," +
+            " b.newsUnread," +
             " b.stickyTop AS stickyTop, 0 AS focused, null AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
@@ -69,7 +70,8 @@ public interface CommunityDao {
     String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.balUpdateTime, b.power, b.nonce," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk," +
-            " (CASE WHEN b.msgUnread = 1 THEN b.msgUnread ELSE b.newsUnread END) AS msgUnread," +
+//            " (CASE WHEN b.msgUnread = 1 THEN b.msgUnread ELSE b.newsUnread END) AS msgUnread," +
+            " b.newsUnread," +
             " b.stickyTop AS stickyTop, 0 AS focused, null AS msg, c.memo, c.timestamp" +
             " FROM Communities AS a" +
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +

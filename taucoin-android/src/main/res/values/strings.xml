@@ -44,6 +44,7 @@
     <string name="common_resend">Resend</string>
     <string name="common_done">Done</string>
     <string name="common_post">Post</string>
+    <string name="common_retweet">Retweet</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>

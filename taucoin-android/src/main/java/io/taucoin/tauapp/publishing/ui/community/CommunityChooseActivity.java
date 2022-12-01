@@ -31,7 +31,7 @@ public class CommunityChooseActivity extends BaseActivity {
 
     public static final int TYPE_SELECT_COMMUNITY_EXIT = 0x01;
     public static final int TYPE_CREATE_NEWS = 0x02;
-    public static final int TYPE_CREATE_NOTE = 0x03;
+    public static final int TYPE_RETWEET_NEWS = 0x03;
     private ActivityCommunityChoiceBinding binding;
     private CommunityViewModel communityViewModel;
     private TxViewModel txViewModel;
@@ -76,14 +76,10 @@ public class CommunityChooseActivity extends BaseActivity {
             if (type == TYPE_CREATE_NEWS) {
                 ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
                 this.finish();
-            } else if (type == TYPE_CREATE_NOTE) {
-                int txType = TxType.NOTE_TX.getType();
-                String memo = msg.toString();
-                String chainID = member.chainID;
-                Tx tx = new Tx(chainID, 0L, txType, memo);
-                if (txViewModel.validateNoteTx(tx)) {
-                    txViewModel.addTransaction(tx);
-                }
+            } else if (type == TYPE_RETWEET_NEWS) {
+                intent.putExtra(IntentExtra.DATA, msg);
+                ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
+                this.finish();
             } else {
                 setResult(RESULT_OK, intent);
                 this.finish();
