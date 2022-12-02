@@ -437,6 +437,7 @@
     <string name="tx_memo_hint">Memo(optional)</string>
     <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction fee:<font color="#f19322"><u>&nbsp;&nbsp;%1$s&nbsp;&nbsp;</u></font>%2$s]]></Data></string>
     <string name="tx_new_name">Nick Name(required)</string>
+    <string name="tx_news_overdraw">You can overdraw 100 coins here.</string>
     <string name="tx_personal_profile">Personal profile(Optional)</string>
     <string name="tx_message">Message(required)</string>
     <string name="tx_contact_id">%1$s(Optional)</string>
