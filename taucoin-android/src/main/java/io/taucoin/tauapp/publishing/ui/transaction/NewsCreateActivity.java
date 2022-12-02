@@ -78,7 +78,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         binding.etNews.addTextChangedListener(textWatcher);
         binding.etNews.setMaxBytesLimit(Constants.NEWS_TX_MAX_BYTE_SIZE);
 
-        binding.tvCancel.setOnClickListener(v -> onBackPressed());
+        binding.ivCancel.setOnClickListener(v -> onBackPressed());
         if (StringUtil.isNotEmpty(chainID)) {
             if (txQueue != null) {
                 TxContent txContent = new TxContent(txQueue.content);

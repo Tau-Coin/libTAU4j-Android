@@ -20,14 +20,14 @@
             android:paddingEnd="@dimen/widget_size_10"
             android:minHeight="@dimen/widget_size_50">
 
-            <TextView
-                android:id="@+id/tv_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/iv_cancel"
+                android:layout_width="@dimen/widget_size_40"
+                android:layout_height="@dimen/widget_size_40"
                 android:padding="@dimen/widget_size_10"
-                android:text="@string/cancel"
                 android:layout_centerVertical="true"
-                android:textAppearance="@style/TextAppearanceBody1"/>
+                android:src="@mipmap/icon_close"
+                android:contentDescription="@null"/>
 
             <TextView
                 android:id="@+id/tv_post"
@@ -36,14 +36,15 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:text="@string/common_post"
-                android:paddingStart="@dimen/widget_size_20"
-                android:paddingEnd="@dimen/widget_size_20"
-                android:paddingTop="@dimen/widget_size_2"
-                android:paddingBottom="@dimen/widget_size_2"
+                android:includeFontPadding="false"
+                android:paddingStart="@dimen/widget_size_18"
+                android:paddingEnd="@dimen/widget_size_18"
+                android:paddingTop="@dimen/widget_size_3"
+                android:paddingBottom="@dimen/widget_size_3"
                 android:textColor="@color/color_white"
                 android:enabled="false"
                 android:onClick="@{listener::onClick}"
-                android:background="@drawable/blue_btn_rect_round_bg"
+                android:background="@drawable/primary_btn_rect_round_bg"
                 android:textAppearance="@style/TextAppearanceBody1"/>
 
         </RelativeLayout>
@@ -54,7 +55,7 @@
             android:layout_marginStart="@dimen/widget_size_20"
             android:layout_marginTop="@dimen/widget_size_10"
             android:text="@string/community_chain_market"
-            android:textColor="@color/color_blue_light"
+            android:textColor="@color/color_yellow"
             android:textAppearance="@style/TextAppearanceBody1"/>
 
         <View

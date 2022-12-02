@@ -53,6 +53,7 @@
     <color name="color_yellow">#f19322</color>
     <color name="color_yellow_dark">#E1B447</color>
     <color name="color_yellow_light">#FB9500</color>
+    <color name="color_yellow_white">#eebe80</color>
 
     <color name="color_white">#FFFFFF</color>
     <color name="color_bg">#F5F5F5</color>
