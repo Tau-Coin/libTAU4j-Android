@@ -126,7 +126,7 @@ class TxQueueManager {
                 try {
                     String chainID = chainIDQueue.take();
                     logger.info("QueueConsumer size::{}, chainID::{}", chainIDQueue.size(), chainID);
-                    boolean isResend = sendTxQueue(chainID, 0);
+                    boolean isResend = sendTxQueue(chainID);
                     if (isResend) {
                         updateTxQueue(chainID);
                         Thread.sleep(Interval.INTERVAL_RETRY.getInterval());
@@ -180,7 +180,7 @@ class TxQueueManager {
      * @param chainID 发送社区链ID
      * @return 是否需要重发
 	 */
-    private boolean sendTxQueue(String chainID, int offset) {
+    private boolean sendTxQueue(String chainID) {
 		//获取当前用户
         User currentUser = userRepos.getCurrentUser();
         if (null == currentUser) {
@@ -211,27 +211,9 @@ class TxQueueManager {
         return false;
     }
 
-    /**
-     * 队列数据已改变
-     * @param account
-     * @param txQueue
-     * @return
-    private boolean queueChanged(Account account, TxQueueAndStatus txQueue) {
-        boolean changed = false;
-        Tx tx = txRepo.getTxByQueueID(txQueue.queueID, txQueue.timestamp);
-        if (tx != null) {
-            Transaction transaction = createTransaction(account, txQueue, txQueue.timestamp);
-            String newTxID = transaction.getTxID().to_hex();
-            logger.debug("sendTxQueue txID::{}, newTxID::{}", tx.txID, newTxID);
-            changed = StringUtil.isNotEquals(tx.txID, newTxID);
-        }
-        logger.info("sendTxQueue queueChanged::{}", changed);
-        return changed;
-    }
-     */
-
     private boolean sendTxQueue(Account account, TxQueueAndStatus txQueue, int mode) {
         boolean isSendMessage = false;
+		//1. 自动airdrop tx; 2. 自动referal tx
         if (txQueue.queueType == 1 || txQueue.queueType == 2) {
             long medianFee = getAverageTxFee(txQueue.chainID, TxType.WIRING_TX);
             if (txQueue.fee != medianFee) {
