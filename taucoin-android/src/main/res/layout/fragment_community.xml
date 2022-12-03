@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
         <variable
@@ -49,50 +48,8 @@
                 android:textAppearance="@style/TextAppearanceBody2"/>
         </LinearLayout>
 
-        <com.google.android.material.tabs.TabLayout
-            android:layout_below="@+id/ll_warning"
-            android:id="@+id/tab_layout"
-            android:layout_height="@dimen/widget_size_40"
-            android:layout_width="match_parent"
-            android:background="@color/color_white"
-            app:tabIndicatorFullWidth="false"
-            app:tabMode="fixed"
-            app:tabMaxWidth="0dp"
-            app:tabGravity="fill"
-            app:tabTextAppearance="@style/TabLayout"
-            app:tabIndicatorHeight="@dimen/widget_size_4"
-            app:tabIndicatorColor="@color/primary_dark"
-            app:tabSelectedTextColor="@color/primary_dark"
-            app:tabTextColor="@color/gray_dark"
-            app:tabBackground="@color/color_transparent"
-            app:tabRippleColor="@color/color_transparent">
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/community_chain_market"/>
-
-<!--            <com.google.android.material.tabs.TabItem-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/community_chain_note"/>-->
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/community_on_chain"/>
-
-        </com.google.android.material.tabs.TabLayout>
-
-        <View
-            android:layout_below="@+id/tab_layout"
-            android:id="@+id/view_line"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_2"
-            android:background="@color/color_bg"/>
-
         <androidx.viewpager.widget.ViewPager
-            android:layout_below="@+id/view_line"
+            android:layout_below="@+id/ll_warning"
             android:layout_above="@+id/fl_join"
             android:background="@color/color_chat_bg"
             android:id="@+id/view_pager"

@@ -115,6 +115,12 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, ChainStatusActivity.class);
                 break;
+            case R.id.item_chain_explorer:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                intent.putExtra(IntentExtra.IS_JOINED, isJoined);
+                ActivityUtil.startActivity(intent, this, ChainExplorerActivity.class);
+                break;
             case R.id.item_pay_people:
                 intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);

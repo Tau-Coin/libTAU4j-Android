@@ -7,9 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.material.badge.BadgeDrawable;
-import com.google.android.material.tabs.TabLayout;
-
 import org.slf4j.LoggerFactory;
 
 import androidx.annotation.NonNull;
@@ -35,15 +32,12 @@ import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.databinding.ExternalAirdropLinkDialogBinding;
 import io.taucoin.tauapp.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
-import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
 import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.customviews.FragmentStatePagerAdapter;
 import io.taucoin.tauapp.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.transaction.MarketTabFragment;
-import io.taucoin.tauapp.publishing.ui.transaction.NotesTabFragment;
-import io.taucoin.tauapp.publishing.ui.transaction.TransactionsTabFragment;
 
 /**
  * 单个群组页面
@@ -56,7 +50,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private CommunityViewModel communityViewModel;
     private SettingsRepository settingsRepo;
     private final CompositeDisposable disposables = new CompositeDisposable();
-    private final CommunityTabFragment[] fragments = new CommunityTabFragment[3];
+    private final CommunityTabFragment[] fragments = new CommunityTabFragment[1];
     private String chainID;
     private boolean nearExpired = false;
     private boolean chainStopped = false;
@@ -130,29 +124,11 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             ActivityUtil.startActivityForResult(intent, activity, CommunityDetailActivity.class, MEMBERS_REQUEST_CODE);
         });
 
-//        int[] tabs = new int[]{R.string.community_chain_note, R.string.community_chain_market, R.string.community_on_chain};
-//        for (int i = 0; i < tabs.length; i++) {
-//            TabViewBinding tabBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
-//                    R.layout.tab_view, null, false);
-//            tabBinding.tvTabTitle.setText(tabs[0]);
-//            tabBinding.ivTabRed.setVisibility(View.VISIBLE);
-//            TabLayout.Tab tab = binding.tabLayout.newTab();
-//            tab.setCustomView(tabBinding.getRoot());
-//            binding.tabLayout.addTab(tab);
-//        }
-
-        for (int i = 0; i < binding.tabLayout.getTabCount(); i++) {
-            updateTabBadgeDrawable(i, true, false);
-        }
         // 自定义的Adapter继承自FragmentPagerAdapter
-        StateAdapter stateAdapter = new StateAdapter(this.getChildFragmentManager(),
-                binding.tabLayout.getTabCount());
+        StateAdapter stateAdapter = new StateAdapter(this.getChildFragmentManager(), 1);
         // ViewPager设置Adapter
         binding.viewPager.setAdapter(stateAdapter);
-        binding.viewPager.setOffscreenPageLimit(2);
-        binding.tabLayout.setupWithViewPager(binding.viewPager);
-
-        binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
+        binding.viewPager.setOffscreenPageLimit(1);
 
         // 检测区块链是否因为获取数据失败而停止
         tauDaemonHandler.getChainStoppedData()
@@ -177,45 +153,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             binding.viewPager.setCurrentItem(1);
         }
     }
-
-    private void updateTabBadgeDrawable(int index, boolean init, boolean visible) {
-        TabLayout.Tab tab = binding.tabLayout.getTabAt(index);
-        if (tab != null) {
-            BadgeDrawable badgeDrawable = tab.getOrCreateBadge();
-            if (init) {
-                int badgeOffset = getResources().getDimensionPixelSize(R.dimen.widget_size_5);
-                badgeDrawable.setHorizontalOffset(-badgeOffset);
-                badgeDrawable.setVerticalOffset(badgeOffset);
-                badgeDrawable.setBackgroundColor(getResources().getColor(R.color.color_red));
-            }
-            // 红点显示并且不在当前tab页
-            badgeDrawable.setVisible(visible && binding.tabLayout.getSelectedTabPosition() != index);
-        }
-    }
-
-    private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
-
-        @Override
-        public void onTabSelected(TabLayout.Tab tab) {
-            int currentTab = tab.getPosition();
-            int currentItem = binding.viewPager.getCurrentItem();
-            if (currentTab != currentItem) {
-                binding.viewPager.setCurrentItem(currentTab);
-            }
-            KeyboardUtils.hideSoftInput(activity);
-        }
-
-        @Override
-        public void onTabUnselected(TabLayout.Tab tab) {
-
-        }
-
-        @Override
-        public void onTabReselected(TabLayout.Tab tab) {
-
-        }
-    };
-
     private void handleSettingsChanged(String key) {
         if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
             nodes = settingsRepo.getLongValue(key, 0);
@@ -300,7 +237,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        binding.tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
         if (chainStoppedDialog != null && chainStoppedDialog.isShowing()) {
             chainStoppedDialog.closeDialog();
         }
@@ -368,8 +304,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     LoggerFactory.getLogger("updateTabBadgeDrawable")
                             .debug("msgUnread::{}, newsUnread::{}", member.msgUnread, member.newsUnread);
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
-//                    updateTabBadgeDrawable(1, false, member.msgUnread == 1);
-                    updateTabBadgeDrawable(0, false, member.newsUnread == 1);
                 }, it -> {}));
     }
 
@@ -443,14 +377,8 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     }
 
     private CommunityTabFragment createFragmentView(int position) {
-        int pos = position < binding.tabLayout.getTabCount() ? position : 0;
-        CommunityTabFragment tab;
-        if (pos == 0) {
-            tab = new MarketTabFragment();
-        } else {
-            tab = new TransactionsTabFragment();
-        }
-        fragments[pos] = tab;
+        CommunityTabFragment tab = new MarketTabFragment();
+        fragments[0] = tab;
 
         Bundle bundle = new Bundle();
         bundle.putString(IntentExtra.CHAIN_ID, chainID);
@@ -470,16 +398,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         @Override
         public Fragment getItem(int position) {
             return createFragmentView(position);
-        }
-
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            if (position == 1) {
-                return getString(R.string.community_on_chain);
-            } else {
-                return getString(R.string.community_chain_market);
-            }
         }
     }
 }
