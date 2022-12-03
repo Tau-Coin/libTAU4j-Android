@@ -3,6 +3,7 @@ package io.taucoin.tauapp.publishing.ui.customviews;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -50,6 +51,11 @@ public class CornerImageView extends ImageView {
             mBitmapShader = new BitmapShader(bm, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         }
         super.setImageBitmap(bm);
+    }
+
+    public void setImageRes(int resId) {
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), resId);
+        setImageBitmap(bm);
     }
 
     @Override

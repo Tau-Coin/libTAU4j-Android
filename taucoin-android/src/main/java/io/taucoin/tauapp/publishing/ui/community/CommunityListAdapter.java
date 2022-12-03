@@ -81,9 +81,9 @@ public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapt
             binding.rbCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.GONE : View.VISIBLE);
             binding.ivCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.VISIBLE : View.GONE);
             if (isLondonPMC) {
-                binding.ivCommunity.setImageResource(R.mipmap.icon_london_pmc);
+                binding.ivCommunity.setImageRes(R.mipmap.icon_london_pmc);
             } else if (isSanFrancisco) {
-                binding.ivCommunity.setImageResource(R.mipmap.icon_san_francisco);
+                binding.ivCommunity.setImageRes(R.mipmap.icon_san_francisco);
             }
 
             String communityCode = ChainIDUtil.getCode(member.chainID);

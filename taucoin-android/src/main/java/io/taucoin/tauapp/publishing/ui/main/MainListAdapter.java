@@ -138,9 +138,9 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 binding.leftView.setVisibility(isLondonPMC || isSanFrancisco ? View.GONE : View.VISIBLE);
                 binding.ivGroup.setVisibility(isLondonPMC || isSanFrancisco ? View.VISIBLE : View.GONE);
                 if (isLondonPMC) {
-                    binding.ivGroup.setImageResource(R.mipmap.icon_london_pmc);
+                    binding.ivGroup.setImageRes(R.mipmap.icon_london_pmc);
                 } else if (isSanFrancisco) {
-                    binding.ivGroup.setImageResource(R.mipmap.icon_san_francisco);
+                    binding.ivGroup.setImageRes(R.mipmap.icon_san_francisco);
                 }
             } else if (holder.binding instanceof ItemChatListBinding) {
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;
