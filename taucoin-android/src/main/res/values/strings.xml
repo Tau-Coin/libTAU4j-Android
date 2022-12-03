@@ -44,7 +44,7 @@
     <string name="common_resend">Resend</string>
     <string name="common_done">Done</string>
     <string name="common_post">Post</string>
-    <string name="common_retweet">Retweet</string>
+    <string name="common_retweet">Retwitt</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
@@ -181,7 +181,7 @@
     <string name="community_mining_status">Mining Status</string>
     <string name="community_mining_online">Mining online</string>
 	<string name="community_balance_pending">Balance/Pending</string>
-    <string name="community_mining_income_pending">Potential Mining Rewards</string>
+    <string name="community_mining_income_pending">Mining Rewards</string>
     <string name="community_filter_all">All</string>
     <string name="community_chain_note">Messages</string>
     <string name="community_chain_market">News</string>
@@ -191,7 +191,6 @@
     <string name="community_sell_coins">Sale</string>
     <string name="community_airdrop">Airdrop</string>
     <string name="community_leader_invitation">Announcement</string>
-    <string name="community_retweet">Retweet</string>
     <string name="community_sell_detail">Sell Detail</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
     <string name="community_create_success" formatted="false"><Data><![CDATA[Keep on <strong>WIFI</strong> and <strong>charging battery</strong> to best exchange data.]]></Data></string>
@@ -437,7 +436,6 @@
     <string name="tx_memo_hint">Memo(optional)</string>
     <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction fee:<font color="#f19322"><u>&nbsp;&nbsp;%1$s&nbsp;&nbsp;</u></font>%2$s]]></Data></string>
     <string name="tx_new_name">Nick Name(required)</string>
-    <string name="tx_news_overdraw">You can overdraw 100 coins here.</string>
     <string name="tx_personal_profile">Personal profile(Optional)</string>
     <string name="tx_message">Message(required)</string>
     <string name="tx_contact_id">%1$s(Optional)</string>
@@ -517,7 +515,7 @@
     <string name="tx_sell_direct_talk">Connect</string>
     <string name="tx_sell_add_friend">Add\nFriend</string>
     <string name="tx_unknown">Unknown Transaction</string>
-    <string name="tx_community_creator_selling">This is community creator selling coins anchor. Contact me for %s matter. </string>
+    <string name="tx_community_creator_selling">This is community creator. Contact me for %s matter. </string>
 
     <string name="escrow_now">Escrow Now</string>
     <string name="escrow_tip">Need an escrow service for p2p trading?\nConnect to the largest holder.</string>

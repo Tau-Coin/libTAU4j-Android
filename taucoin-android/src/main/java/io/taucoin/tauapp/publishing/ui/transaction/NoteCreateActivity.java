@@ -52,7 +52,7 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
     @SuppressLint("ClickableViewAccessibility")
     private void initLayout() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.community_retweet);
+        binding.toolbarInclude.toolbar.setTitle(R.string.common_retweet);
         setSupportActionBar(binding.toolbarInclude.toolbar);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 

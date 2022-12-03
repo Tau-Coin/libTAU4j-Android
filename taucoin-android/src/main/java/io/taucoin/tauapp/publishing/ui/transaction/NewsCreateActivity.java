@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.view.MenuItem;
 import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
@@ -86,9 +85,9 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                 binding.etNews.setSelection(binding.etNews.getText().length());
                 binding.etNews.setEnabled(false);
             } else if (StringUtil.isNotEmpty(msg)) {
-                binding.etNews.setText(msg);
+                binding.etNews.setText(msg.toString());
                 binding.etNews.setSelection(binding.etNews.getText().length());
-                binding.etNews.setEnabled(false);
+//                binding.etNews.setEnabled(false);
                 binding.tvPost.setText(R.string.common_retweet);
             }
             String communityName = ChainIDUtil.getName(chainID);
