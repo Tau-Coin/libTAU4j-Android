@@ -517,21 +517,21 @@ public class UserViewModel extends AndroidViewModel {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
             Result result = new Result();
             userRepo.setCommunityUserBlacklist(publicKey, blacklist);
-            if (blacklist) {
-                // 拉黑社区用户，给同在的社区发notes消息
-                String memberPk = HashUtil.hashMiddleHide(publicKey);
-                String userPk = MainApplication.getInstance().getPublicKey();
-                List<Community> communities = communityRepo.getSameCommunity(userPk, publicKey);
-                if (communities != null && communities.size() > 0) {
-                    int txType = TxType.NOTE_TX.getType();
-                    Context context = getApplication();
-                    String banMsg = context.getString(R.string.ban_member_msg, memberPk);
-                    for (Community community : communities) {
-                        Tx tx = new Tx(community.chainID, 0L, txType, banMsg);
-                        TxViewModel.createTransaction(context, tx, false);
-                    }
-                }
-            }
+//            if (blacklist) {
+//                // 拉黑社区用户，给同在的社区发notes消息
+//                String memberPk = HashUtil.hashMiddleHide(publicKey);
+//                String userPk = MainApplication.getInstance().getPublicKey();
+//                List<Community> communities = communityRepo.getSameCommunity(userPk, publicKey);
+//                if (communities != null && communities.size() > 0) {
+//                    int txType = TxType.NOTE_TX.getType();
+//                    Context context = getApplication();
+//                    String banMsg = context.getString(R.string.ban_member_msg, memberPk);
+//                    for (Community community : communities) {
+//                        Tx tx = new Tx(community.chainID, 0L, txType, banMsg);
+//                        TxViewModel.createTransaction(context, tx, false);
+//                    }
+//                }
+//            }
             result.setMsg(DateUtil.getDateTime());
             result.setSuccess(true);
             emitter.onNext(result);
