@@ -199,7 +199,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                         double rate = (maxMiningTime - miningTime) * 1f / maxMiningTime;
                         rate = Math.sqrt(rate) * 100;
                         if (rate < 10) {
-                            subtitle.append(getString(R.string.community_users_mining_missed));
+                            subtitle.append(getString(R.string.community_users_mining_preparation));
                         } else {
                             subtitle.append(getString(R.string.community_users_mining_block));
                             subtitle.append(" ").append(FmtMicrometer.fmtFixedDecimal(rate)).append("%");

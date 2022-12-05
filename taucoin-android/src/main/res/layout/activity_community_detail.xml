@@ -71,6 +71,7 @@
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
                 <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                    android:visibility="gone"
                     android:id="@+id/item_airdrop_coins"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

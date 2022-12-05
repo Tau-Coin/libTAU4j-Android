@@ -151,7 +151,7 @@
     <string name="community_users_stats_s">%1$s</string>
     <string name="community_users_discovering">Discovering</string>
     <string name="community_users_mining_overflow">Overflow</string>
-    <string name="community_users_mining_missed">Missed, resuming&#8230;</string>
+    <string name="community_users_mining_preparation">Mining preparation&#8230;</string>
     <string name="community_users_mining_block">Mining Block</string>
     <string name="community_users_doze">Doze</string>
     <string name="common_loading">loading&#8230;</string>

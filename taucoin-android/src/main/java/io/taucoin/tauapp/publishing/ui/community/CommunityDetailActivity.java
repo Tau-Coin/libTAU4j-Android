@@ -88,7 +88,7 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
 
         if (!isJoined || noBalance) {
             binding.itemAddMember.setVisibility(View.GONE);
-            binding.itemAirdropCoins.setVisibility(View.GONE);
+//            binding.itemAirdropCoins.setVisibility(View.GONE);
         }
 
         adapter = new MemberListAdapter(this);
