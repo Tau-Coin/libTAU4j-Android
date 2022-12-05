@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 
 /**
@@ -94,5 +95,9 @@ public class Member implements Parcelable {
         return o instanceof Member && (o == this || (
                 publicKey.equals(((Member)o).publicKey) &&
                         chainID.equals(((Member)o).chainID)));
+    }
+
+    public long getDisplayBalance() {
+        return balance + Constants.TX_MAX_OVERDRAFT;
     }
 }

@@ -111,17 +111,17 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 binding.leftView.setText(firstLetters);
                 boolean isNotExpired = daemon.getMyAccountManager().isNotExpired(bean.ID);
                 boolean onChain = bean.onChain() && isNotExpired;
-                if (!onChain) {
-                    binding.tvBalancePower.setText(context.getString(R.string.main_community_in_mining));
-                } else {
+//                if (!onChain) {
+//                    binding.tvBalancePower.setText(context.getString(R.string.main_community_in_mining));
+//                } else {
                     double showPower = Math.sqrt(1 + bean.power);
                     String power = FmtMicrometer.formatThreeDecimal(showPower);
-                    String balance = FmtMicrometer.fmtBalance(bean.balance);
+                    String balance = FmtMicrometer.fmtBalance(bean.getDisplayBalance());
 //                    String time = DateUtil.formatTime(bean.balUpdateTime, DateUtil.pattern14);
                     String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_color,
                             balance, power);
                     binding.tvBalancePower.setText(Html.fromHtml(balanceAndTime));
-                }
+//                }
 
                 binding.tvUserMessage.setVisibility(StringUtil.isNotEmpty(bean.memo) ?
                         View.VISIBLE : View.GONE);

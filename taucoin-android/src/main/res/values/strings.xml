@@ -478,6 +478,7 @@
     <string name="tx_error_invalid_airdrop_link">Invalid airdrop link</string>
     <string name="tx_error_invalid_free">Invalid Transaction free</string>
     <string name="tx_error_min_free">Transaction fee cannot be less than %1$s</string>
+    <string name="tx_error_wiring_balance_no_enough">Insufficient Balance :\nBalance &#60;= 100</string>
     <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Balance</string>
     <string name="tx_error_no_enough_coins_for_fee">Insufficient Balance :\nTransaction Fee > Balance</string>
     <string name="tx_error_insufficient_balance">Insufficient Balance</string>

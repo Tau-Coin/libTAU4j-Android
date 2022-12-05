@@ -65,7 +65,7 @@ public class ChooseListAdapter extends ListAdapter<Member, ChooseListAdapter.Vie
             String communityCode = ChainIDUtil.getCode(member.chainID);
             binding.tvName.setText(context.getString(R.string.main_community_name, communityName, communityCode));
 
-            String balance = FmtMicrometer.fmtBalance(member.balance);
+            String balance = FmtMicrometer.fmtBalance(member.getDisplayBalance());
 //            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
             String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_color_no_title,
                     balance);

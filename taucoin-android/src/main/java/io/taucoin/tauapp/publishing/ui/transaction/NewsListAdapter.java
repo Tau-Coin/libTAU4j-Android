@@ -1,5 +1,6 @@
 package io.taucoin.tauapp.publishing.ui.transaction;
 
+import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -66,12 +67,14 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
         private final ItemNewsBinding binding;
         private final ClickListener listener;
         private final int nameColor;
+        private final String balancePower;
 
         ViewHolder(ItemNewsBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
             this.nameColor = binding.getRoot().getResources().getColor(R.color.color_black);
+            this.balancePower = binding.getRoot().getResources().getString(R.string.drawer_balance_time_color);
         }
 
         void bind(ViewHolder holder, UserAndTx tx) {
@@ -104,6 +107,13 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
 
 //            binding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
             setImageClickListener(binding, tx);
+
+            double showPower = Math.sqrt(1 + tx.power);
+            String power = FmtMicrometer.formatThreeDecimal(showPower);
+            String balance = FmtMicrometer.fmtBalance(tx.getDisplayBalance());
+//                    String time = DateUtil.formatTime(bean.balUpdateTime, DateUtil.pattern14);
+            String balanceAndTime = String.format(balancePower, balance, power);
+            binding.tvBalancePower.setText(Html.fromHtml(balanceAndTime));
 
             binding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
             // 添加link解析

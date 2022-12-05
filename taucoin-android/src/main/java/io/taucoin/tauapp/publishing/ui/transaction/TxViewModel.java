@@ -424,6 +424,7 @@ public class TxViewModel extends AndroidViewModel {
         Account account = daemon.getAccountInfo(chainID, senderPk);
         long balance = account != null ? account.getBalance() : 0;
         int type = tx.txType;
+        long displayBalance = balance + Constants.TX_MAX_OVERDRAFT;
         if (type == WIRING_TX.getType()) {
             if (StringUtil.isEmpty(tx.receiverPk) ||
                     ByteUtil.toByte(tx.receiverPk).length != Ed25519.PUBLIC_KEY_SIZE) {
@@ -439,6 +440,9 @@ public class TxViewModel extends AndroidViewModel {
                 String minFee = getApplication().getString(R.string.tx_error_min_free,
                         FmtMicrometer.fmtFeeValue(Constants.WIRING_MIN_FEE.longValue()));
                 ToastUtils.showShortToast(minFee);
+                return false;
+            } else if (displayBalance > 0 && displayBalance <= Constants.TX_MAX_OVERDRAFT) {
+                ToastUtils.showShortToast(R.string.tx_error_wiring_balance_no_enough);
                 return false;
             } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
                 ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
@@ -473,7 +477,7 @@ public class TxViewModel extends AndroidViewModel {
                         FmtMicrometer.fmtFeeValue(Constants.NEWS_MIN_FEE.longValue()));
                 ToastUtils.showShortToast(minFee);
                 return false;
-            } else if (tx.fee > balance + Constants.TX_MAX_OVERDRAFT) {
+            } else if (tx.fee > displayBalance) {
                 ToastUtils.showShortToast(R.string.tx_error_no_enough_coins_for_fee);
                 return false;
             }

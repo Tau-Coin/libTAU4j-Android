@@ -94,7 +94,7 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
                 }
             });
             String name = ChainIDUtil.getName(member.chainID);
-            String balance = FmtMicrometer.fmtBalance(member.balance);
+            String balance = FmtMicrometer.fmtBalance(member.getDisplayBalance());
             String nameAndBalance = context.getResources().getString(R.string.drawer_balance_name_color,
                     name, balance);
             binding.tvLeft.setText(Html.fromHtml(nameAndBalance));

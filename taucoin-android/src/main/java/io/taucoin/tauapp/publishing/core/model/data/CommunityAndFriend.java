@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import androidx.room.Ignore;
 import androidx.room.Relation;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
 
 /**
@@ -104,5 +105,9 @@ public class CommunityAndFriend implements Parcelable {
 
     public boolean onChain() {
         return balance > 0 || nonce > 0;
+    }
+
+    public long getDisplayBalance() {
+        return balance + Constants.TX_MAX_OVERDRAFT;
     }
 }

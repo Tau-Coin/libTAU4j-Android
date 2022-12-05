@@ -51,7 +51,7 @@ public class BalanceAdapter extends ListAdapter<CommunityAndAccount, BalanceAdap
 
         void bindCommunity(CommunityAndAccount community) {
             String communityName = ChainIDUtil.getName(community.chainID);
-            String balance = FmtMicrometer.fmtBalance(community.balance);
+            String balance = FmtMicrometer.fmtBalance(community.getDisplayBalance());
             binding.tvName.setText(communityName);
             binding.tvBalance.setText(balance);
         }

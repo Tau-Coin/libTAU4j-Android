@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -65,6 +66,7 @@
             android:layout_marginStart="@dimen/widget_size_5">
 
             <LinearLayout
+                android:visibility="gone"
                 android:id="@+id/ll_trust"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -91,14 +93,28 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/tv_balance_power"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_34"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMaxTextSize="@dimen/font_size_14"
+                app:autoSizeMinTextSize="@dimen/font_size_2"
+                app:autoSizeStepGranularity="@dimen/font_size_0_5"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody2" />
+
             <io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView
-                android:layout_below="@+id/ll_trust"
+                android:layout_below="@+id/tv_balance_power"
                 android:id="@+id/tv_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/widget_size_34"
                 android:paddingEnd="@dimen/widget_size_35"
-                android:paddingTop="@dimen/widget_size_10"
+                android:paddingTop="@dimen/widget_size_5"
                 android:paddingBottom="@dimen/widget_size_10"
                 android:includeFontPadding="false"
                 android:textColorLink="@color/color_blue_link"

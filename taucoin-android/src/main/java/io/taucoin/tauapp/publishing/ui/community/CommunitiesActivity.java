@@ -121,7 +121,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             pendingBalance = onChainBalance + member.txIncomePending - member.txExpenditurePending;
             // 余额根据libTAU balance减去计算上链为100%的金额
             //balance = member.balance - onChainBalance;
-            balance = member.balance;
+            balance = member.getDisplayBalance();
             balance = Math.max(0, balance);
 
             logger.debug("loadMemberData balance::{}, showBalance::{}, onChainBalance::{}," +

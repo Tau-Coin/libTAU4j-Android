@@ -1,6 +1,7 @@
 package io.taucoin.tauapp.publishing.core.model.data;
 
 import androidx.annotation.NonNull;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Community;
 
 /**
@@ -15,5 +16,9 @@ public class CommunityAndAccount extends Community {
 
     public CommunityAndAccount(@NonNull String chainID, @NonNull String communityName) {
         super(chainID, communityName);
+    }
+
+    public long getDisplayBalance() {
+        return balance + Constants.TX_MAX_OVERDRAFT;
     }
 }

@@ -24,8 +24,9 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
 @Dao
 public interface TxDao {
 
-    String QUERY_GET_SELL_DETAIL = "SELECT tx.*, t.trusts" +
+    String QUERY_GET_SELL_DETAIL = "SELECT tx.*, t.trusts, m.balance, m.power" +
             " FROM Txs AS tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
             " WHERE chainID = :chainID AND txType = 4 AND txStatus = 1 GROUP BY receiverPk) t" +
             " ON tx.senderPk = t.receiverPk" +
@@ -37,8 +38,9 @@ public interface TxDao {
             " limit :loadSize offset :startPosition";
 
     // SQL:查询社区里的交易(MARKET交易，排除Trust Tx, 并且上链)
-    String QUERY_GET_MARKET_SELECT = "SELECT tx.*, t.trusts" +
+    String QUERY_GET_MARKET_SELECT = "SELECT tx.*, t.trusts, m.balance, m.power" +
             " FROM Txs AS tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk FROM Txs" +
             " WHERE chainID = :chainID AND txStatus = 1 AND txType = 4 " +
             " GROUP BY receiverPk" +
@@ -59,8 +61,9 @@ public interface TxDao {
             " AND tx.txType = 6" + QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区里的交易(所有，排除WIRING Tx)
-    String QUERY_GET_NOTES_SELECT = "SELECT tx.*, 0 AS trusts" +
+    String QUERY_GET_NOTES_SELECT = "SELECT tx.*, 0 AS trusts, m.balance, m.power" +
             " FROM Txs AS tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " WHERE tx.chainID = :chainID AND txType IN (1, 3, 4, 5, 6, 7)";
 
     String QUERY_GET_ALL_NOTES = QUERY_GET_NOTES_SELECT +
@@ -71,9 +74,10 @@ public interface TxDao {
             QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区里的交易(上链)
-    String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, 0 AS trusts" +
+    String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, 0 AS trusts, m.balance, m.power" +
             " FROM Txs AS tx" +
-            " WHERE chainID = :chainID AND  nonce >= 1";
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
+            " WHERE tx.chainID = :chainID AND tx.nonce >= 1";
 
     // SQL:查询社区里的交易(上链)
     String QUERY_GET_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT +
@@ -121,8 +125,9 @@ public interface TxDao {
             " ORDER BY createTime DESC" +
             " LIMIT :loadSize OFFSET :startPosition";
 
-    String QUERY_GET_ALL_NEWS = "SELECT tx.*, t.trusts" +
+    String QUERY_GET_ALL_NEWS = "SELECT tx.*, t.trusts, m.balance, m.power" +
             " FROM Txs AS tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
             " LEFT JOIN (SELECT count(receiverPk) AS trusts, receiverPk, chainID FROM Txs" +
             " WHERE txStatus = 1 AND txType = 4 " +
@@ -184,8 +189,9 @@ public interface TxDao {
     String QUERY_SET_MESSAGE_FAVORITE = "UPDATE Txs SET favoriteTime = :favoriteTime" +
             " WHERE txID = :txID";
 
-    String QUERY_GET_FAVORITE_TXS = "SELECT tx.*, 0 AS trusts" +
+    String QUERY_GET_FAVORITE_TXS = "SELECT tx.*, 0 AS trusts, m.balance, m.power" +
             " FROM Txs AS tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " WHERE favoriteTime > 0 " +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " ORDER BY tx.favoriteTime DESC";

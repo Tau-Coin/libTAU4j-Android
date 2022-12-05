@@ -5,6 +5,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.room.Ignore;
 import androidx.room.Relation;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
@@ -22,6 +23,8 @@ public class UserAndTx extends Tx {
     public User receiver;                   // 交易接受者对应的用户信息
 
     public int trusts;
+    public long balance;
+    public long power;
 
     @Relation(parentColumn = "txID",
             entityColumn = "hash")
@@ -39,5 +42,9 @@ public class UserAndTx extends Tx {
     @Override
     public boolean equals(Object o) {
         return super.equals(o);
+    }
+
+    public long getDisplayBalance() {
+        return balance + Constants.TX_MAX_OVERDRAFT;
     }
 }
