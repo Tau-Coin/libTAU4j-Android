@@ -918,16 +918,15 @@ public class UserViewModel extends AndroidViewModel {
      * 显示编辑名字的对话框
      */
     public void showEditNameDialog(AppCompatActivity activity, String publicKey) {
-        showEditNameDialog(activity, publicKey, false);
-    }
-
-    public void showEditNameDialog(AppCompatActivity activity, String publicKey, boolean isCreateCommunity) {
         ContactsDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.contacts_dialog, null, false);
         binding.etPublicKey.setHint(R.string.user_new_name_hint);
         // 社区名字禁止输入#特殊符号
         binding.etPublicKey.setFilters(new InputFilter[]{
                 new EditTextInhibitInput(EditTextInhibitInput.COMMUNITY_NAME_REGEX)});
+        String setNicknameKey = activity.getString(R.string.pref_key_set_nickname);
+        boolean setNickName = settingsRepo.getBooleanValue(setNicknameKey, false);
+        boolean isCreateCommunity = !setNickName;
         if (isCreateCommunity) {
             binding.ivClose.setVisibility(View.INVISIBLE);
         }
@@ -945,6 +944,7 @@ public class UserViewModel extends AndroidViewModel {
                 if (nicknameLength > Constants.NICKNAME_LENGTH) {
                     ToastUtils.showShortToast(R.string.user_new_name_too_long);
                 } else {
+                    settingsRepo.setBooleanValue(setNicknameKey, true);
                     saveUserName(publicKey, newName, isCreateCommunity);
                     if (editNameDialog != null) {
                         editNameDialog.closeDialog();
@@ -1110,22 +1110,18 @@ public class UserViewModel extends AndroidViewModel {
      * @param user
      */
     public void promptUserFirstStartApp(AppCompatActivity activity, User user) {
-        String firstStartKey = activity.getString(R.string.pref_key_first_start);
-        boolean isFirstStart = settingsRepo.getBooleanValue(firstStartKey, true);
+        String setNicknameKey = activity.getString(R.string.pref_key_set_nickname);
+        boolean setNickName = settingsRepo.getBooleanValue(setNicknameKey, false);
         String permissionsActivity = "GrantPermissionsActivity";
         String mainActivity = MainActivity.class.getName();
         boolean isForeground = AppUtil.isForeground(activity, permissionsActivity, mainActivity);
-        logger.info("promptUserFirstStart isFirstStart::{}, isForeground::{}", isFirstStart, isForeground);
+        logger.info("promptUserFirstStart setNickName::{}, isForeground::{}", setNickName, isForeground);
         // 如果APP是第一次启动, 并且MainActivity也在前台
-        if (isFirstStart && isForeground) {
-            // 如果用户没有nickname
-            settingsRepo.setBooleanValue(firstStartKey, false);
-            String showName = UsersUtil.getCurrentUserName(user);
-            String defaultName = UsersUtil.getDefaultName(user.publicKey);
-            logger.info("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
-            if (StringUtil.isEquals(showName, defaultName)) {
-                showEditNameDialog(activity, user.publicKey, true);
+        if (!setNickName && isForeground) {
+            if (editNameDialog != null && editNameDialog.isShowing()) {
+                return;
             }
+            showEditNameDialog(activity, user.publicKey);
         }
     }
 

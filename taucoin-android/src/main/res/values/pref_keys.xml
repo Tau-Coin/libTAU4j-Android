@@ -24,8 +24,6 @@
     <string name="pref_key_tau_fore_doze_time" translatable="false">pref_key_tau_fore_doze_time</string>
     <string name="pref_key_tau_back_doze_time" translatable="false">pref_key_tau_back_doze_time</string>
 
-    <string name="pref_key_first_start" translatable="false">pref_key_first_start</string>
-
     <string name="pref_key_upnp_mapped" translatable="false">pref_key_upnp_mapped</string>
     <string name="pref_key_nat_pmp_mapped" translatable="false">pref_key_nat_pmp_mapped</string>
 
@@ -42,5 +40,7 @@
     <string name="pref_key_font_scale_size" translatable="false">pref_key_font_scale_size</string>
     <string name="pref_key_dump_file_timestamp" translatable="false">pref_key_dump_file_timestamp</string>
     <string name="pref_key_dump_times" translatable="false">pref_key_dump_times</string>
+
+    <string name="pref_key_set_nickname" translatable="false">pref_key_set_nickname</string>
 
 </resources>
