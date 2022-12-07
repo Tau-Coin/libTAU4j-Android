@@ -776,7 +776,7 @@ public class UserViewModel extends AndroidViewModel {
 
     private void addFriend(String publicKey, String nickname, String remark, LinkUtil.Link airdropUrl) {
         Disposable disposable = Flowable.create((FlowableOnSubscribe<Result>) emitter -> {
-            Result result = addFriendTask(publicKey, nickname, remark, airdropUrl);
+            Result result = addFriendTask(getApplication(), publicKey, nickname, remark, airdropUrl);
 
             result.setSuccess(result.isExist());
             emitter.onNext(result);
@@ -788,7 +788,10 @@ public class UserViewModel extends AndroidViewModel {
         disposables.add(disposable);
     }
 
-    private Result addFriendTask(String publicKey, String nickname, String remark, LinkUtil.Link airdropUrl) {
+    public static Result addFriendTask(Context appContext, String publicKey, String nickname, String remark, LinkUtil.Link airdropUrl) {
+        UserRepository userRepo = RepositoryHelper.getUserRepository(appContext);
+        FriendRepository friendRepo = RepositoryHelper.getFriendsRepository(appContext);
+        TauDaemon daemon = TauDaemon.getInstance(appContext);
         logger.info("AddFriendsLocally, publicKey::{}, nickname::{}", publicKey, nickname);
         Result result = new Result();
         result.setKey(publicKey);
@@ -835,11 +838,11 @@ public class UserViewModel extends AndroidViewModel {
             if (isSuccess) {
                 result.setMsg(publicKey);
                 // 发送默认消息
-                sendDefaultMessage(publicKey, airdropUrl);
+                sendDefaultMessage(appContext, publicKey, airdropUrl);
                 // 更新朋友信息
                 daemon.requestFriendInfo(publicKey);
             } else {
-                result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));
+                result.setMsg(appContext.getString(R.string.contacts_friend_add_failed));
                 logger.info("AddFriendsLocally, {}", result.getMsg());
             }
         } else {
@@ -851,20 +854,20 @@ public class UserViewModel extends AndroidViewModel {
                     friend.status = FriendStatus.ADDED.getStatus();
                     friendRepo.updateFriend(friend);
                     // 发送默认消息
-                    sendDefaultMessage(publicKey, airdropUrl);
+                    sendDefaultMessage(appContext, publicKey, airdropUrl);
                     // 更新朋友信息
                     daemon.requestFriendInfo(publicKey);
                 } else {
-                    result.setMsg(getApplication().getString(R.string.contacts_friend_add_failed));
+                    result.setMsg(appContext.getString(R.string.contacts_friend_add_failed));
                     logger.info("AddFriendsLocally, {}", result.getMsg());
                 }
             } else {
                 isExist = true;
-                result.setMsg(getApplication().getString(R.string.contacts_friend_already_exists));
+                result.setMsg(appContext.getString(R.string.contacts_friend_already_exists));
                 logger.info("AddFriendsLocally, {}", result.getMsg());
                 if (airdropUrl != null) {
                     // 发送接受airdrop消息
-                    sendDefaultMessage(publicKey, airdropUrl);
+                    sendDefaultMessage(appContext, publicKey, airdropUrl);
                 }
             }
         }
@@ -872,7 +875,7 @@ public class UserViewModel extends AndroidViewModel {
         return result;
     }
 
-    private void sendDefaultMessage(String friendPk, LinkUtil.Link airdropUrl) {
+    private static void sendDefaultMessage(Context appContext, String friendPk, LinkUtil.Link airdropUrl) {
         String msg;
         String chainID = null;
         String referralPeer = null;
@@ -882,14 +885,14 @@ public class UserViewModel extends AndroidViewModel {
             chainID = airdropUrl.getData();
             String communityName = ChainIDUtil.getName(chainID);
             String link = airdropUrl.getLink();
-            msg = getApplication().getString(R.string.contacts_accepting_airdrop, communityName, link);
+            msg = appContext.getString(R.string.contacts_accepting_airdrop, communityName, link);
             type = MessageType.AIRDROP.getType();
         } else {
-            msg = getApplication().getString(R.string.contacts_have_added);
+            msg = appContext.getString(R.string.contacts_have_added);
             type = MessageType.TEXT.getType();
         }
         String senderPk = MainApplication.getInstance().getPublicKey();
-        chatViewModel.syncSendMessageTask(senderPk, friendPk, msg, type, chainID, referralPeer);
+        ChatViewModel.syncSendMessageTask(appContext, senderPk, friendPk, msg, type, chainID, referralPeer);
         logger.info("AddFriendsLocally, syncSendMessageTask::{}", msg);
     }
 
@@ -1231,7 +1234,7 @@ public class UserViewModel extends AndroidViewModel {
                     }
                 } else {
                     if (isAutoAdd) {
-                        addFriendTask(friendPK, null, null, null);
+                        addFriendTask(getApplication(), friendPK, null, null, null);
                         friend = friendRepo.queryFriend(userPk, friendPK);
                         if (friend != null) {
                             friend.msgUnread = status;
@@ -1262,7 +1265,7 @@ public class UserViewModel extends AndroidViewModel {
                         friendRepo.updateFriend(friend);
                     }
                 } else {
-                    addFriendTask(friendPK, null, null, null);
+                    addFriendTask(getApplication(), friendPK, null, null, null);
                     friend = friendRepo.queryFriend(userPk, friendPK);
                     if (friend != null) {
                         friend.stickyTop = top;

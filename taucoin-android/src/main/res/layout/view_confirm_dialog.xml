@@ -71,6 +71,18 @@
                 android:text="@string/community_airdrop_fee"
                 style="@style/TextAppearanceBody2" />
 
+            <TextView
+                android:layout_below="@+id/tv_airdrop_free"
+                android:id="@+id/tv_available_balance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginBottom="@dimen/widget_size_5"
+                android:text="@string/tx_available_balance"
+                android:layout_gravity="end"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody2"/>
+
         </RelativeLayout>
 
         <TextView

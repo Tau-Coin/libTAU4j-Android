@@ -84,10 +84,10 @@ import io.taucoin.tauapp.publishing.databinding.EditFeeDialogBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
 import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
+import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.AIRDROP_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.ANNOUNCEMENT;
-import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.NEWS_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.NOTE_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.SELL_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.WIRING_TX;
@@ -195,6 +195,12 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     public String addTransactionTask(TxQueue tx, TxQueue oldTx, long pinnedTime) {
+        // 转账交易: 如果对方不是好友，先加对方为好友
+        if (tx.txType == WIRING_TX.getType() && StringUtil.isNotEquals(tx.senderPk, tx.receiverPk)) {
+            Result result = UserViewModel.addFriendTask(getApplication(), tx.receiverPk, null, null, null);
+            logger.info("addTransactionTask: add friend success::{}, isExist::{}, msg::{}",
+                    result.isSuccess(), result.isExist(), result.getMsg());
+        }
         if (null == oldTx) {
             long queueID = txQueueRepo.addQueue(tx);
             tx.queueID = queueID;

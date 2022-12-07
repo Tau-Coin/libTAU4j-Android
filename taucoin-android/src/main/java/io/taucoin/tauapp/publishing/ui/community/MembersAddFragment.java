@@ -27,6 +27,7 @@ import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
+import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.ObservableUtil;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
@@ -54,6 +55,7 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
     private FragmentMembersAddBinding binding;
     private TxViewModel viewModel;
     private UserViewModel userViewModel;
+    private CommunityViewModel communityViewModel;
     private ConfirmDialog confirmDialog;
     private MembersAddAdapter adapter;
     private String chainID;
@@ -65,6 +67,7 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
     private boolean dataChanged = false;
     private int currentPos = 0;
     private boolean isLoadMore = false;
+    private long availableBalance = 0;
 
     @Nullable
     @Override
@@ -81,6 +84,7 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
         ViewModelProvider provider = new ViewModelProvider(this);
         viewModel = provider.get(TxViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
+        communityViewModel = provider.get(CommunityViewModel.class);
         initParameter();
         initLayout();
         observeAirdropState();
@@ -210,6 +214,9 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
         }
         ViewConfirmDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.view_confirm_dialog, null, false);
+        binding.tvAvailableBalance.setText(getString(R.string.tx_available_balance,
+                FmtMicrometer.fmtFeeValue(availableBalance),
+                ChainIDUtil.getCoinName(chainID)));
         MembersConfirmAdapter adapter = new MembersConfirmAdapter(getSelectedMap());
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
         binding.recyclerList.setLayoutManager(layoutManager);
@@ -291,6 +298,15 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
                 .subscribe(fee -> {
                     this.medianFee = FmtMicrometer.fmtFeeValue(fee);
                 }));
+
+        disposables.add(communityViewModel.observerCurrentMember(chainID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(member -> {
+                    if (member != null) {
+                        availableBalance =   member.balance >= 0 ? member.balance : 0;
+                    }
+                }, it -> {}));
     }
 
     @Override
