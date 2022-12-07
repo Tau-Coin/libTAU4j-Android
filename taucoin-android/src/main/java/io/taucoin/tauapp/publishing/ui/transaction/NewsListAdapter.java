@@ -28,6 +28,7 @@ import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
+import io.taucoin.tauapp.publishing.core.utils.Logarithm;
 import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
@@ -108,7 +109,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
 //            binding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
             setImageClickListener(binding, tx);
 
-            double showPower = Math.sqrt(1 + tx.power);
+            double showPower = Logarithm.log2(2 + tx.power);
             String power = FmtMicrometer.formatThreeDecimal(showPower);
             String balance = FmtMicrometer.fmtBalance(tx.getDisplayBalance());
 //                    String time = DateUtil.formatTime(bean.balUpdateTime, DateUtil.pattern14);

@@ -23,6 +23,7 @@ import io.taucoin.tauapp.publishing.core.utils.BitmapUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
+import io.taucoin.tauapp.publishing.core.utils.Logarithm;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.core.utils.Utils;
@@ -114,7 +115,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
 //                if (!onChain) {
 //                    binding.tvBalancePower.setText(context.getString(R.string.main_community_in_mining));
 //                } else {
-                    double showPower = Math.sqrt(1 + bean.power);
+                    double showPower = Logarithm.log2(2 + bean.power);
                     String power = FmtMicrometer.formatThreeDecimal(showPower);
                     String balance = FmtMicrometer.fmtBalance(bean.getDisplayBalance());
 //                    String time = DateUtil.formatTime(bean.balUpdateTime, DateUtil.pattern14);

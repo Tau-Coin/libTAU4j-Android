@@ -21,7 +21,7 @@ public class Logarithm {
         return log(value, 2);
     }
 
-    public static long log2(long value) {
-        return (long) log(value, 2);
-    }
+//    public static long log2(long value) {
+//        return (long) log(value, 2);
+//    }
 }

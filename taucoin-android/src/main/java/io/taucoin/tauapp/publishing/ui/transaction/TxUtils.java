@@ -159,7 +159,7 @@ public class TxUtils {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
-        if (tab == CommunityTabFragment.TAB_CHAIN || tab == CommunityTabFragment.TAB_MARKET) {
+        if (tab == CommunityTabFragment.TAB_CHAIN) {
 			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_on_chain))
@@ -220,7 +220,7 @@ public class TxUtils {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
-        if (tab == CommunityTabFragment.TAB_CHAIN || tab == CommunityTabFragment.TAB_MARKET) {
+        if (tab == CommunityTabFragment.TAB_CHAIN) {
 			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_on_chain))
@@ -267,7 +267,7 @@ public class TxUtils {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
-        if (tab == CommunityTabFragment.TAB_CHAIN || tab == CommunityTabFragment.TAB_MARKET) {
+        if (tab == CommunityTabFragment.TAB_CHAIN) {
 			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_on_chain))
@@ -322,7 +322,7 @@ public class TxUtils {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
-        if (tab == CommunityTabFragment.TAB_CHAIN || tab == CommunityTabFragment.TAB_MARKET) {
+        if (tab == CommunityTabFragment.TAB_CHAIN) {
             if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
                 msg.append("Status: ").setForegroundColor(titleColor)
                         .append(context.getString(R.string.community_block_on_chain))

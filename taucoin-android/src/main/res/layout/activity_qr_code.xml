@@ -31,22 +31,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <include
+                    android:id="@+id/qr_code"
+                    layout="@layout/qr_code"/>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/widget_size_30"
                     android:layout_marginEnd="@dimen/widget_size_30"
-                    android:layout_marginTop="@dimen/widget_size_10"
-                    android:layout_marginBottom="@dimen/widget_size_15"
+                    android:layout_marginTop="@dimen/widget_size_15"
+                    android:layout_marginBottom="@dimen/widget_size_10"
                     android:includeFontPadding="false"
                     android:lineSpacingExtra="@dimen/widget_size_3"
                     android:text="@string/setting_key_explain"
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody2"/>
-
-                <include
-                    android:id="@+id/qr_code"
-                    layout="@layout/qr_code"/>
 
                 <LinearLayout
                     android:visibility="gone"

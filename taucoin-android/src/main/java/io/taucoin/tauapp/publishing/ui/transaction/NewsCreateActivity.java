@@ -7,6 +7,8 @@ import android.text.Html;
 import android.text.TextWatcher;
 import android.view.View;
 
+import org.slf4j.LoggerFactory;
+
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -28,6 +30,7 @@ import io.taucoin.tauapp.publishing.core.utils.Utils;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityNewsBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
+import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 
 /**
@@ -37,6 +40,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
 
     private ActivityNewsBinding binding;
     private TxViewModel txViewModel;
+    private CommunityViewModel communityViewModel;
     private String chainID;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private TxQueue txQueue;
@@ -47,6 +51,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
         txViewModel = provider.get(TxViewModel.class);
+        communityViewModel = provider.get(CommunityViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_news);
         binding.setListener(this);
         initParameter();
@@ -90,13 +95,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
 //                binding.etNews.setEnabled(false);
                 binding.tvPost.setText(R.string.common_retweet);
             }
-            String communityName = ChainIDUtil.getName(chainID);
-            String communityCode = ChainIDUtil.getCode(chainID);
-            binding.tvCommunity.setText(getString(R.string.main_community_name, communityName, communityCode));
-        }
-        User user = MainApplication.getInstance().getCurrentUser();
-        if (user != null) {
-            binding.ivUserPic.setImageBitmap(UsersUtil.getHeadPic(user));
         }
     }
 
@@ -153,6 +151,25 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::loadFeeView));
+
+        disposables.add(communityViewModel.observerCurrentMember(chainID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(member -> {
+                    long balance = ViewUtils.getLongTag(binding.tvInterimBalance);
+                    if (member != null && member.getDisplayBalance() != balance) {
+                        loadInterimBalanceView(member.getDisplayBalance());
+                    }
+                }, it -> {
+                    loadInterimBalanceView(0);
+                }));
+    }
+
+    private void loadInterimBalanceView(long showBalance) {
+        binding.tvInterimBalance.setText(getString(R.string.tx_interim_balance,
+                FmtMicrometer.fmtFeeValue(showBalance),
+                ChainIDUtil.getCoinName(chainID)));
+        binding.tvInterimBalance.setTag(showBalance);
     }
 
     @Override

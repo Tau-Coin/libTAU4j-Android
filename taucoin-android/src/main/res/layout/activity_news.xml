@@ -64,37 +64,6 @@
             android:layout_height="@dimen/widget_size_1"
             android:layout_marginTop="@dimen/widget_size_5" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_marginTop="@dimen/widget_size_5"
-            android:layout_marginStart="@dimen/widget_size_20">
-
-            <io.taucoin.tauapp.publishing.ui.customviews.RoundImageView
-                android:id="@+id/iv_user_pic"
-                android:layout_width="@dimen/widget_size_30"
-                android:layout_height="@dimen/widget_size_30"
-                android:layout_marginEnd="@dimen/widget_size_7"
-                android:src="@color/color_yellow"
-                android:scaleType="centerCrop"/>
-
-            <TextView
-                android:id="@+id/tv_community"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/widget_size_15"
-                android:paddingEnd="@dimen/widget_size_15"
-                android:paddingTop="@dimen/widget_size_2"
-                android:paddingBottom="@dimen/widget_size_2"
-                android:textColor="@color/color_black"
-                android:enabled="false"
-                android:background="@drawable/grey_rect_round_bg"
-                android:textAppearance="@style/TextAppearanceBody2"/>
-
-        </LinearLayout>
-
         <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_news"
             android:layout_width="match_parent"
@@ -133,6 +102,18 @@
             android:layout_marginTop="@dimen/widget_size_5"
             android:layout_marginBottom="@dimen/widget_size_5"
             android:text="@string/tx_median_fee"
+            android:layout_gravity="end"
+            android:onClick="@{listener::onClick}"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:textAppearance="@style/TextAppearanceBody2"/>
+
+        <TextView
+            android:id="@+id/tv_interim_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/widget_size_5"
+            android:text="@string/tx_interim_balance"
             android:layout_gravity="end"
             android:onClick="@{listener::onClick}"
             android:layout_marginStart="@dimen/widget_size_20"

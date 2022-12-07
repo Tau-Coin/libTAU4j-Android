@@ -80,8 +80,8 @@ public class MarketListAdapter extends ListAdapter<UserAndTx, MarketListAdapter.
             binding.tvName.setText(UsersUtil.getShowName(tx.sender));
             setEditNameClickListener(binding.tvName, tx);
 
-            binding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
-            setTrustClickListener(binding.ivTrust, tx);
+//            binding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
+//            setTrustClickListener(binding.ivTrust, tx);
 
             binding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_MARKET));
             // 添加link解析

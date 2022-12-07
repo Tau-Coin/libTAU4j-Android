@@ -144,7 +144,7 @@ public class ChainStatusActivity extends BaseActivity {
         }
 
         if (null == mStatus || mStatus.power != status.power) {
-            double showPower = Math.sqrt(1 + status.power);
+            double showPower = Logarithm.log2(2 + status.power);
             binding.itemPower.setRightText(FmtMicrometer.formatThreeDecimal(showPower));
         }
         if (null == mStatus || StringUtil.isNotEquals(mStatus.forkPoint, status.forkPoint)) {

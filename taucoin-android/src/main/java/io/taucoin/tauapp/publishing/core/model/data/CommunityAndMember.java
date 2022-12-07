@@ -1,6 +1,7 @@
 package io.taucoin.tauapp.publishing.core.model.data;
 
 import androidx.annotation.NonNull;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Community;
 
 /**
@@ -33,5 +34,9 @@ public class CommunityAndMember extends Community {
 
     public boolean nearExpired() {
         return onChain() && nearExpired == 1;
+    }
+
+    public long getDisplayBalance() {
+        return balance + Constants.TX_MAX_OVERDRAFT;
     }
 }

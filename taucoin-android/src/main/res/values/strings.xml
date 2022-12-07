@@ -303,7 +303,7 @@
     <string name="community_tx_confidence" formatted="false"><Data><![CDATA[Confidence <font color="#f19322">%1$d</font>]]></Data></string>
 
     <string name="setting_title">Settings</string>
-    <string name="setting_key_explain">Key is private secret for your own; address is public and derived from key.</string>
+    <string name="setting_key_explain">Address is the public key derived from your device random seed.</string>
     <string name="setting_account">Address</string>
     <string name="setting_nickname">Nickname</string>
     <string name="setting_username_app">Nickname in app</string>
@@ -435,6 +435,8 @@
     <string name="tx_address_hint">Address</string>
     <string name="tx_amount_hint">Amount</string>
     <string name="tx_memo_hint">Memo(optional)</string>
+    <string name="tx_interim_balance">Interim Balance %1$s %2$s</string>
+    <string name="tx_available_balance">Available Balance %1$s %2$s</string>
     <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction fee:<font color="#f19322"><u>&nbsp;&nbsp;%1$s&nbsp;&nbsp;</u></font>%2$s]]></Data></string>
     <string name="tx_new_name">Nick Name(required)</string>
     <string name="tx_personal_profile">Personal profile(Optional)</string>

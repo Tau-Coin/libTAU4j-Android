@@ -17,6 +17,7 @@ import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
+import io.taucoin.tauapp.publishing.core.utils.Logarithm;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityCommunitiesBinding;
@@ -133,7 +134,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
 		//Modified tc
         binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));
         binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(power*10));
-        double showPower = Math.log(2+power)/Math.log(2);
+        double showPower = Logarithm.log2(2 + power);
         String powerStr = "log2(2+%s)=%s";
         powerStr = String.format(powerStr, FmtMicrometer.fmtLong(power), FmtMicrometer.formatThreeDecimal(showPower));
         binding.itemMiningPower.setRightText(powerStr);
