@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
@@ -89,7 +90,7 @@ public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, Tr
                 stringBuilder.append("-");
                 stringBuilder.append(FmtMicrometer.fmtMiningIncome(entry.amount + entry.fee));
                 binding.tvAmount.setTextColor(resources.getColor(R.color.color_red));
-            } else {
+            } else { //txType == -1是mining rewards
                 binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.sender));
                 if (entry.txType == -1) {
                     binding.tvName.setText(resources.getString(R.string.community_mining_rewards,
@@ -104,9 +105,10 @@ public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, Tr
             }
             binding.tvAmount.setText(stringBuilder.toString());
 
-            if (entry.onlineStatus == 1) {
+            if (entry.onlineStatus >= Constants.TX_STATUS_ON_CHAIN) {
                 binding.tvConfirmRate.setVisibility(View.VISIBLE);
                 long currentTime = DateUtil.getTime();
+				//注意：state block之前的情况
                 double rate = (currentTime - entry.onlineTime) * 1.0f / 60 / 180;
                 rate = Math.min(1, rate);
                 rate = Math.max(0, rate);
