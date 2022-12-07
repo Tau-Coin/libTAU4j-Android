@@ -1115,12 +1115,24 @@ public class UserViewModel extends AndroidViewModel {
     public void promptUserFirstStartApp(AppCompatActivity activity, User user) {
         String setNicknameKey = activity.getString(R.string.pref_key_set_nickname);
         boolean setNickName = settingsRepo.getBooleanValue(setNicknameKey, false);
+        logger.info("promptUserFirstStart setNickName::{}", setNickName);
+        if (setNickName) {
+            return;
+        }
+        // 兼容老版本：防止以前创建过昵称社区，再次创建
+        String showName = UsersUtil.getCurrentUserName(user);
+        String defaultName = UsersUtil.getDefaultName(user.publicKey);
+        logger.info("promptUserFirstStart showName::{}, defaultName::{}", showName, defaultName);
+        if (StringUtil.isNotEquals(showName, defaultName)) {
+            settingsRepo.setBooleanValue(setNicknameKey, true);
+            return;
+        }
         String permissionsActivity = "GrantPermissionsActivity";
         String mainActivity = MainActivity.class.getName();
         boolean isForeground = AppUtil.isForeground(activity, permissionsActivity, mainActivity);
-        logger.info("promptUserFirstStart setNickName::{}, isForeground::{}", setNickName, isForeground);
+        logger.info("promptUserFirstStart isForeground::{}", isForeground);
         // 如果APP是第一次启动, 并且MainActivity也在前台
-        if (!setNickName && isForeground) {
+        if (isForeground) {
             if (editNameDialog != null && editNameDialog.isShowing()) {
                 return;
             }
