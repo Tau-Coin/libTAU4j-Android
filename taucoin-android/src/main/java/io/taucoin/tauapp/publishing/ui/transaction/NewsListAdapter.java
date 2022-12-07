@@ -100,10 +100,9 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                     .append(" · ")
                     .append(communityName)
                     .append("(").append(communityCode).append(")")
-                    .append(" · ")
-                    .append(DateUtil.getNewsTime(tx.timestamp))
                     .create();
             binding.tvName.setText(name);
+            binding.tvTime.setText(DateUtil.getNewsTime(tx.timestamp));
 //            setEditNameClickListener(binding.tvName, tx);
 
 //            binding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
