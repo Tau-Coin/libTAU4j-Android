@@ -144,25 +144,25 @@ public class TauListenHandler {
             communityRepo.updateCommunity(community);
         }
 
-		//add for update txs user received, and sended, modified tc
-		List<String> senderPks = txRepo.queryTxSendersReceived(chainID, userPk); //receiver is user
-		senderPks.add(userPk); //sender is user
-		for(String senderPk : senderPks) {
-			Account account = daemon.getAccountInfo(block.getChainID(), senderPk);
-			if (account != null) {
-				// 处理区块回滚，
-				// 1、交易nonce大于libTAU的nonce，都置为未上链；
-				long nonce = account.getNonce();
-				int count = txRepo.updateAllOffChainTxs(chainID, userPk, nonce);
-				logger.info("onNewHeadBlock updateAllOffChainTxs count::{}, chainID::{}, userPk::{}, nonce::{}",
+        //add for update txs user received, and sended, modified tc
+        List<String> senderPks = txRepo.queryTxSendersReceived(chainID, userPk); //receiver is user
+        senderPks.add(userPk); //sender is user
+        for(String senderPk : senderPks) {
+            Account account = daemon.getAccountInfo(block.getChainID(), senderPk);
+            if (account != null) {
+                // 处理区块回滚，
+                // 1、交易nonce大于libTAU的nonce，都置为未上链；
+                long nonce = account.getNonce();
+                int count = txRepo.updateAllOffChainTxs(chainID, userPk, nonce);
+                logger.info("onNewHeadBlock updateAllOffChainTxs count::{}, chainID::{}, userPk::{}, nonce::{}",
                     count, chainID, userPk, nonce);
-				// 2、区块blockNumber大于最新head block的区块状态置为未上链；
-				long headBlock = block.getBlockNumber();
-				count = blockRepo.updateAllOffChainBlocks(chainID, headBlock);
-				logger.info("onNewHeadBlock updateAllOffChainBlocks count::{}, chainID::{}, headBlock::{}",
-						count, chainID, headBlock);
-			}
-		}
+                // 2、区块blockNumber大于最新head block的区块状态置为未上链；
+                long headBlock = block.getBlockNumber();
+                count = blockRepo.updateAllOffChainBlocks(chainID, headBlock);
+                logger.info("onNewHeadBlock updateAllOffChainBlocks count::{}, chainID::{}, headBlock::{}",
+                        count, chainID, headBlock);
+            }
+        }
 
         handleBlockData(block, BlockStatus.NEW_BLOCK);
 
@@ -282,8 +282,8 @@ public class TauListenHandler {
             // 由于第一次同步共识区块
             // 如果是同步，并且已经是上链状态了, 则保持上链状态
             int status;
-            if (blockInfo.status == Constants.STATUS_ON_CHAIN && blockStatus == BlockStatus.SYNCING) {
-                status = Constants.STATUS_ON_CHAIN;
+            if (blockInfo.status == 1 && blockStatus == BlockStatus.SYNCING) {
+                status = 1;
             } else {
                 status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
             }
@@ -327,8 +327,8 @@ public class TauListenHandler {
                 // 由于第一次同步共识区块
                 // 如果是同步，并且已经是上链状态了, 则保持上链状态
                 int status;
-                if (tx.txStatus == Constants.STATUS_SETTLED && blockStatus == BlockStatus.SYNCING) {
-                    status = Constants.STATUS_SETTLED;
+                if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN && blockStatus == BlockStatus.SYNCING) {
+                    status = Constants.TX_STATUS_ON_CHAIN;
                 } else {
                     status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
                 }
@@ -364,7 +364,7 @@ public class TauListenHandler {
         tx.txType = txContent.getType();
         tx.memo = txContent.getMemo();
         tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
-        tx.txStatus = onChain ? 1 : 0;
+        tx.txStatus = onChain ? Constants.TX_STATUS_ON_CHAIN : Constants.TX_STATUS_PENDING;
         tx.version = txMsg.getVersion();
         tx.previousHash = txMsg.getPreviousHash().to_hex();
         tx.blockNumber = blockNumber;
@@ -732,10 +732,10 @@ public class TauListenHandler {
                     memberRepo.addMember(member);
                 }
 
-				//Update txs
-				txRepo.updateAllOffChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> 0
+                //Update txs
+                txRepo.updateAllOffChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Pending
 
-				txRepo.updateAllOnChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> 2
+                txRepo.updateAllOnChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Settled
             }
         }
     }

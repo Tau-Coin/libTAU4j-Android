@@ -78,15 +78,15 @@ public class TxUtils {
             Context context = MainApplication.getInstance();
             int titleColor = context.getResources().getColor(R.color.gray_dark);
             String coinName = ChainIDUtil.getCoinName(tx.chainID);
-            if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+            if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
                 msg.append("Status: ").setForegroundColor(titleColor)
                     .append(context.getString(R.string.community_block_on_chain))
                     .append("\n");
-            } else if (tx.txStatus == Constants.STATUS_SETTLED) {
+            } else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
                 msg.append("Status: ").setForegroundColor(titleColor)
                     .append(context.getString(R.string.community_block_settled))
                     .append("\n");
-            } else if (tx.txStatus == Constants.STATUS_PENDING) {
+            } else if (tx.txStatus == Constants.TX_STATUS_PENDING) {
                 msg.append("Status: ").setForegroundColor(titleColor)
                     .append(context.getString(R.string.community_block_pending))
                     .append("\n");
@@ -98,10 +98,10 @@ public class TxUtils {
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
                     .append(HashUtil.hashMiddleHide(tx.senderPk));
-            if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+            if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
                 msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                         .append(FmtMicrometer.fmtLong(tx.blockNumber));
-            } else if (tx.txStatus == Constants.STATUS_SETTLED) {
+            } else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
                 msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                         .append(FmtMicrometer.fmtLong(tx.blockNumber));
             }
@@ -116,15 +116,15 @@ public class TxUtils {
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         String coinName = ChainIDUtil.getCoinName(tx.chainID);
         SpanUtils msg = new SpanUtils();
-        if (tx.txStatus == Constants.STATUS_ON_CHAIN && showStatus) {
+        if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN && showStatus) {
             msg.append("Status: ").setForegroundColor(titleColor)
                 .append(context.getString(R.string.community_block_on_chain))
                 .append("\n");
-        } else if (tx.txStatus == Constants.STATUS_SETTLED && showStatus) {
+        } else if (tx.txStatus == Constants.TX_STATUS_SETTLED && showStatus) {
             msg.append("Status: ").setForegroundColor(titleColor)
                 .append(context.getString(R.string.community_block_settled))
                 .append("\n");
-        } else if (tx.txStatus == Constants.STATUS_PENDING && showStatus) {
+        } else if (tx.txStatus == Constants.TX_STATUS_PENDING && showStatus) {
             msg.append("Status: ").setForegroundColor(titleColor)
                 .append(context.getString(R.string.community_block_pending))
                 .append("\n");
@@ -141,10 +141,10 @@ public class TxUtils {
                 .append(HashUtil.hashMiddleHide(tx.receiverPk))
                 .append("\n").append("Hash: ").setForegroundColor(titleColor)
                 .append(HashUtil.hashMiddleHide(tx.txID));
-        if (tx.txStatus == Constants.STATUS_ON_CHAIN && showStatus) {
+        if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN && showStatus) {
             msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtLong(tx.blockNumber));
-        } else if (tx.txStatus == Constants.STATUS_SETTLED && showStatus) {
+        } else if (tx.txStatus == Constants.TX_STATUS_SETTLED && showStatus) {
             msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtLong(tx.blockNumber));
 		}
@@ -160,15 +160,15 @@ public class TxUtils {
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
         if (tab == CommunityTabFragment.TAB_CHAIN) {
-			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+			if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_on_chain))
                    .append("\n");
-			} else if (tx.txStatus == Constants.STATUS_SETTLED) {
+			} else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_settled))
                    .append("\n");
-			} else if (tx.txStatus == Constants.STATUS_PENDING) {
+			} else if (tx.txStatus == Constants.TX_STATUS_PENDING) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_pending))
                    .append("\n");
@@ -205,10 +205,10 @@ public class TxUtils {
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
                     .append(HashUtil.hashMiddleHide(tx.senderPk));
-			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+			if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
 				msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                    .append(FmtMicrometer.fmtLong(tx.blockNumber));
-			} else if (tx.txStatus == Constants.STATUS_SETTLED) {
+			} else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
 				msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtLong(tx.blockNumber));
 			}
@@ -221,15 +221,15 @@ public class TxUtils {
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
         if (tab == CommunityTabFragment.TAB_CHAIN) {
-			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+			if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_on_chain))
                    .append("\n");
-			} else if (tx.txStatus == Constants.STATUS_SETTLED) {
+			} else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_settled))
                    .append("\n");
-			} else if (tx.txStatus == Constants.STATUS_PENDING) {
+			} else if (tx.txStatus == Constants.TX_STATUS_PENDING) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_pending))
                    .append("\n");
@@ -252,10 +252,10 @@ public class TxUtils {
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
                     .append(HashUtil.hashMiddleHide(tx.senderPk));
-			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+			if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
 				msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                    .append(FmtMicrometer.fmtLong(tx.blockNumber));
-			} else if (tx.txStatus == Constants.STATUS_SETTLED) {
+			} else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
 				msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtLong(tx.blockNumber));
 			}
@@ -268,15 +268,15 @@ public class TxUtils {
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
         if (tab == CommunityTabFragment.TAB_CHAIN) {
-			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+			if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_on_chain))
                    .append("\n");
-			} else if (tx.txStatus == Constants.STATUS_SETTLED) {
+			} else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_settled))
                    .append("\n");
-			} else if (tx.txStatus == Constants.STATUS_PENDING) {
+			} else if (tx.txStatus == Constants.TX_STATUS_PENDING) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_pending))
                    .append("\n");
@@ -307,10 +307,10 @@ public class TxUtils {
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
                     .append(HashUtil.hashMiddleHide(tx.senderPk));
-			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+			if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
 				msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                    .append(FmtMicrometer.fmtLong(tx.blockNumber));
-			} else if (tx.txStatus == Constants.STATUS_SETTLED) {
+			} else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
 				msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtLong(tx.blockNumber));
 			}
@@ -323,15 +323,15 @@ public class TxUtils {
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
         if (tab == CommunityTabFragment.TAB_CHAIN) {
-            if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+            if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
                 msg.append("Status: ").setForegroundColor(titleColor)
                         .append(context.getString(R.string.community_block_on_chain))
                         .append("\n");
-            } else if (tx.txStatus == Constants.STATUS_SETTLED) {
+            } else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
                 msg.append("Status: ").setForegroundColor(titleColor)
                         .append(context.getString(R.string.community_block_settled))
                         .append("\n");
-            } else if (tx.txStatus == Constants.STATUS_PENDING) {
+            } else if (tx.txStatus == Constants.TX_STATUS_PENDING) {
                 msg.append("Status: ").setForegroundColor(titleColor)
                         .append(context.getString(R.string.community_block_pending))
                         .append("\n");
@@ -348,10 +348,10 @@ public class TxUtils {
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
                     .append(HashUtil.hashMiddleHide(tx.senderPk));
-            if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+            if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
                 msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                         .append(FmtMicrometer.fmtLong(tx.blockNumber));
-            } else if (tx.txStatus == Constants.STATUS_SETTLED) {
+            } else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
                 msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                         .append(FmtMicrometer.fmtLong(tx.blockNumber));
             }
@@ -507,15 +507,15 @@ public class TxUtils {
         int titleColor = context.getResources().getColor(R.color.gray_dark);
         SpanUtils msg = new SpanUtils();
         if (tab == CommunityTabFragment.TAB_CHAIN) {
-			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+			if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_on_chain))
                    .append("\n");
-			} else if (tx.txStatus == Constants.STATUS_SETTLED) {
+			} else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_settled))
                    .append("\n");
-			} else if (tx.txStatus == Constants.STATUS_PENDING) {
+			} else if (tx.txStatus == Constants.TX_STATUS_PENDING) {
 				msg.append("Status: ").setForegroundColor(titleColor)
                    .append(context.getString(R.string.community_block_pending))
                    .append("\n");
@@ -540,10 +540,10 @@ public class TxUtils {
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
                     .append(HashUtil.hashMiddleHide(tx.senderPk));
-			if (tx.txStatus == Constants.STATUS_ON_CHAIN) {
+			if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
 				msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                    .append(FmtMicrometer.fmtLong(tx.blockNumber));
-			} else if (tx.txStatus == Constants.STATUS_SETTLED) {
+			} else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
 				msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtLong(tx.blockNumber));
 			}
