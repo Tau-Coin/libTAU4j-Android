@@ -37,6 +37,7 @@ import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityTransactionCreateBinding;
 import io.taucoin.tauapp.publishing.ui.ScanTriggerActivity;
+import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
@@ -52,6 +53,7 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
 
     private UserViewModel userViewModel;
     private TxViewModel txViewModel;
+    private CommunityViewModel communityViewModel;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private String chainID;
     private TxQueue txQueue;
@@ -66,6 +68,7 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
         ViewModelProvider provider = new ViewModelProvider(this);
         userViewModel = provider.get(UserViewModel.class);
         txViewModel = provider.get(TxViewModel.class);
+        communityViewModel = provider.get(CommunityViewModel.class);
         txViewModel.observeNeedStartDaemon();
         binding = DataBindingUtil.setContentView(this, R.layout.activity_transaction_create);
         binding.setListener(this);
@@ -220,6 +223,26 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::loadFeeView));
+
+        disposables.add(communityViewModel.observerCurrentMember(chainID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(member -> {
+                    long balance = ViewUtils.getLongTag(binding.tvAvailableBalance);
+                    if (member != null && member.balance != balance) {
+                        loadAvailableBalanceView(member.balance);
+                    }
+                }, it -> {
+                    loadAvailableBalanceView(0);
+                }));
+    }
+
+    private void loadAvailableBalanceView(long balance) {
+        long showBalance = balance >= 0 ? balance : 0;
+        binding.tvAvailableBalance.setText(getString(R.string.tx_available_balance,
+                FmtMicrometer.fmtFeeValue(showBalance),
+                ChainIDUtil.getCoinName(chainID)));
+        binding.tvAvailableBalance.setTag(balance);
     }
 
     @Override

@@ -109,6 +109,9 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
 //            binding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
             setImageClickListener(binding, tx);
 
+            boolean isMyself = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
+            binding.ivBan.setVisibility(isMyself ? View.INVISIBLE : View.VISIBLE);
+
             double showPower = Logarithm.log2(2 + tx.power);
             String power = FmtMicrometer.formatThreeDecimal(showPower);
             String balance = FmtMicrometer.fmtBalance(tx.getDisplayBalance());
@@ -133,11 +136,6 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
         }
 
         private void setImageClickListener(ItemNewsBinding binding, UserAndTx tx) {
-            binding.ivTrust.setOnClickListener(view -> {
-                if (listener != null) {
-                    listener.onTrustClicked(tx);
-                }
-            });
             binding.ivRetweet.setOnClickListener(view -> {
                 if (listener != null) {
                     listener.onRetweetClicked(tx);
@@ -151,6 +149,11 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             binding.ivLongPress.setOnClickListener(view -> {
                 if (listener != null) {
                     listener.onItemLongClicked(binding.tvMsg, tx);
+                }
+            });
+            binding.ivBan.setOnClickListener(view -> {
+                if (listener != null) {
+                    listener.onBanClicked(tx);
                 }
             });
         }
@@ -213,6 +216,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
         void onLinkClick(String link);
         void onRetweetClicked(UserAndTx tx);
         void onReplyClicked(UserAndTx tx);
+        void onBanClicked(UserAndTx tx);
     }
 
     private static final DiffUtil.ItemCallback<UserAndTx> diffCallback = new DiffUtil.ItemCallback<>() {

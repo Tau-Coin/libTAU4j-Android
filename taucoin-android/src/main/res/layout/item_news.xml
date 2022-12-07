@@ -27,24 +27,45 @@
 
             <io.taucoin.tauapp.publishing.ui.customviews.RoundImageView
                 android:id="@+id/iv_head_pic"
-                android:layout_width="@dimen/widget_size_26"
-                android:layout_height="@dimen/widget_size_26"
+                android:layout_width="@dimen/widget_size_40"
+                android:layout_height="@dimen/widget_size_40"
                 android:scaleType="centerCrop"
                 android:src="@drawable/primary_rect_round_bg"/>
 
-            <TextView
-                android:id="@+id/tv_name"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/widget_size_5"
-                android:layout_marginEnd="@dimen/widget_size_1"
-                android:includeFontPadding="false"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:text=""
-                android:textColor="@color/gray_dark"
-                android:textAppearance="@style/TextAppearanceBody2"/>
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_5"
+                    android:layout_marginEnd="@dimen/widget_size_1"
+                    android:includeFontPadding="false"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
+
+                <TextView
+                    android:id="@+id/tv_balance_power"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_5"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMaxTextSize="@dimen/font_size_14"
+                    app:autoSizeMinTextSize="@dimen/font_size_2"
+                    app:autoSizeStepGranularity="@dimen/font_size_0_5"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody2" />
+
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/iv_long_press"
@@ -65,55 +86,22 @@
             android:layout_marginEnd="@dimen/widget_size_5"
             android:layout_marginStart="@dimen/widget_size_5">
 
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/ll_trust"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginStart="@dimen/widget_size_34">
-
-                <ImageView
-                    android:id="@+id/iv_trust"
-                    android:layout_width="@dimen/widget_size_20"
-                    android:layout_height="@dimen/widget_size_20"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/icon_favourite_news"/>
-
-                <TextView
-                    android:id="@+id/tv_trust"
-                    android:layout_width="@dimen/widget_size_20"
-                    android:layout_height="@dimen/widget_size_20"
-                    android:layout_marginStart="@dimen/widget_size_5"
-                    android:includeFontPadding="false"
-                    android:text="12333"
-                    android:textColor="@color/gray_dark"
-                    android:textAppearance="@style/TextAppearanceBody1"/>
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tv_balance_power"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/widget_size_34"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                app:autoSizeTextType="uniform"
-                app:autoSizeMaxTextSize="@dimen/font_size_14"
-                app:autoSizeMinTextSize="@dimen/font_size_2"
-                app:autoSizeStepGranularity="@dimen/font_size_0_5"
-                android:textColor="@color/gray_dark"
-                android:textAppearance="@style/TextAppearanceBody2" />
+            <ImageView
+                android:id="@+id/iv_ban"
+                android:layout_width="@dimen/widget_size_30"
+                android:layout_height="@dimen/widget_size_30"
+                android:padding="@dimen/widget_size_5"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_ban"/>
 
             <io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView
-                android:layout_below="@+id/tv_balance_power"
+                android:layout_toEndOf="@+id/iv_ban"
+                android:layout_toStartOf="@+id/iv_arrow"
                 android:id="@+id/tv_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="@dimen/widget_size_34"
-                android:paddingEnd="@dimen/widget_size_35"
+                android:layout_marginStart="@dimen/widget_size_5"
                 android:paddingTop="@dimen/widget_size_5"
                 android:paddingBottom="@dimen/widget_size_10"
                 android:includeFontPadding="false"
