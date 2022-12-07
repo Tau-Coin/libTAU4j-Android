@@ -325,9 +325,9 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
                     }
                     break;
                 case R.string.tx_operation_blacklist:
-                    String publicKey = tx.senderPk;
-                    userViewModel.setUserBlacklist(publicKey, true);
-                    ToastUtils.showShortToast(R.string.blacklist_successfully);
+                    KeyboardUtils.hideSoftInput(activity);
+                    String showName = UsersUtil.getShowName(tx.sender, tx.senderPk);
+                    userViewModel.showBanDialog(activity, tx.senderPk, showName);
                     break;
                 case R.string.tx_operation_favorite:
                     txViewModel.setMessageFavorite(tx, false);
@@ -377,6 +377,13 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
         ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
                 TX_REQUEST_CODE);
+    }
+
+    @Override
+    public void onBanClicked(UserAndTx tx) {
+        KeyboardUtils.hideSoftInput(activity);
+        String showName = UsersUtil.getShowName(tx.sender, tx.senderPk);
+        userViewModel.showBanDialog(activity, tx.senderPk, showName);
     }
 
     @Override

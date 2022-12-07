@@ -85,6 +85,20 @@
             android:onClick="@{listener::onClick}"
             android:layout_marginStart="@dimen/widget_size_20"
             android:layout_marginEnd="@dimen/widget_size_20"
+            android:layout_marginBottom="@dimen/widget_size_5"
+            android:textAppearance="@style/TextAppearanceBody2"/>
+
+        <TextView
+            android:id="@+id/tv_available_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/widget_size_5"
+            android:text="@string/tx_available_balance"
+            android:layout_gravity="end"
+            android:onClick="@{listener::onClick}"
+            android:layout_marginStart="@dimen/widget_size_20"
+            android:layout_marginEnd="@dimen/widget_size_20"
+            android:textColor="@color/gray_dark"
             android:textAppearance="@style/TextAppearanceBody2"/>
 
         <LinearLayout

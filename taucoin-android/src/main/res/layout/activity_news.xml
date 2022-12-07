@@ -118,6 +118,7 @@
             android:onClick="@{listener::onClick}"
             android:layout_marginStart="@dimen/widget_size_20"
             android:layout_marginEnd="@dimen/widget_size_20"
+            android:textColor="@color/gray_dark"
             android:textAppearance="@style/TextAppearanceBody2"/>
 
     </LinearLayout>
