@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.tauapp.publishing.R;
+import io.taucoin.tauapp.publishing.core.Constants;
+import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.databinding.ItemTxQueueBinding;
@@ -97,14 +99,16 @@ public class QueueListAdapter extends ListAdapter<TxQueueAndStatus, QueueListAda
             }
             Resources resources = binding.getRoot().getResources();
             String errorMsg = "";
-            boolean previousHaveError = false;
             if (account != null) {
-                if (account.getBalance() < tx.amount + tx.fee) {
-                    errorMsg = resources.getString(R.string.tx_error_insufficient_balance);
-                }
-                if (previousTx != null && account.getBalance() < previousTx.amount + previousTx.fee) {
-                    previousHaveError = true;
-                }
+				if(tx.txType == TxType.WIRING_TX.getType()) {
+					if (account.getBalance() < tx.amount + tx.fee) {
+						errorMsg = resources.getString(R.string.tx_error_insufficient_balance);
+					}
+				} else if(tx.txType == TxType.NEWS_TX.getType()) {
+					if ((account.getBalance() + Constants.TX_MAX_OVERDRAFT) < (tx.amount + tx.fee)) {
+						errorMsg = resources.getString(R.string.tx_error_insufficient_balance);
+					}
+				}
             }
             boolean isHaveError = StringUtil.isNotEmpty(errorMsg);
             boolean isProcessing = !isHaveError;
