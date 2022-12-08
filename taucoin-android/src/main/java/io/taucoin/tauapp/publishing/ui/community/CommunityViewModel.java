@@ -739,16 +739,18 @@ public class CommunityViewModel extends AndroidViewModel {
                         hints, logoBitmap, context);
 
                 // 二维码背景样式
-                Bitmap bgBitmap = BitmapFactory.decodeResource(context.getResources(),
-                        R.mipmap.icon_community_qr_bg);
-                bgBitmap.getWidth();
-                DrawBean bean = new DrawBean();
-                bean.setSize(resources.getDimensionPixelSize(R.dimen.widget_size_210));
-                bean.setX(resources.getDimensionPixelSize(R.dimen.widget_size_60));
-                bean.setY(resources.getDimensionPixelSize(R.dimen.widget_size_60));
-                Bitmap lastBitmap = BitmapUtil.drawStyleQRcode(bgBitmap,
-                        null, bitmap, bean);
-                emitter.onNext(lastBitmap);
+//                Bitmap bgBitmap = BitmapFactory.decodeResource(context.getResources(),
+//                        R.mipmap.icon_community_qr_bg);
+//                bgBitmap.getWidth();
+//                DrawBean bean = new DrawBean();
+//                bean.setSize(resources.getDimensionPixelSize(R.dimen.widget_size_210));
+//                bean.setX(resources.getDimensionPixelSize(R.dimen.widget_size_60));
+//                bean.setY(resources.getDimensionPixelSize(R.dimen.widget_size_60));
+//                Bitmap lastBitmap = BitmapUtil.drawStyleQRcode(bgBitmap,
+//                        null, bitmap, bean);
+                if (bitmap != null) {
+                    emitter.onNext(bitmap);
+                }
                 // 生成二维码触发pub链数据
                 daemon.pubChainData(chainID);
             } catch (Exception e) {

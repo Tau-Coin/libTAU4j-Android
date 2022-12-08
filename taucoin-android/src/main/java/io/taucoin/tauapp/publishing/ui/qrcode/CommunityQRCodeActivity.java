@@ -1,14 +1,23 @@
 package io.taucoin.tauapp.publishing.ui.qrcode;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.text.Editable;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.XMLReader;
 
+import java.util.Locale;
+
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -16,10 +25,13 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
+import io.taucoin.tauapp.publishing.core.utils.DrawablesUtil;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.CopyManager;
+import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityCommunityQrCodeBinding;
@@ -40,7 +52,6 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     private UserViewModel userViewModel;
     private String chainID;
     private String chainUrl;
-    private int maxLines = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +82,7 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         String showName = ChainIDUtil.getName(chainID);
-        binding.qrCode.tvName.setText(showName);
-        binding.qrCode.tvName.setMaxLines(maxLines);
-        binding.qrCode.tvName.setEllipsize(TextUtils.TruncateAt.END);
+        binding.qrCode.tvName.setVisibility(View.GONE);
         binding.qrCode.tvQrCode.setVisibility(View.GONE);
         binding.qrCode.ivCopy.setVisibility(View.GONE);
 
@@ -86,7 +95,33 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
                 .subscribe(miner -> {
                     String userPk = MainApplication.getInstance().getPublicKey();
                     chainUrl = LinkUtil.encodeChain(userPk, chainID, miner);
-                    binding.qrCode.tvName.setText(chainUrl);
+                    String qrExplainShare = getString(R.string.setting_community_qr_share, Constants.TX_MAX_OVERDRAFT, chainUrl);
+                    String qrExplain = getString(R.string.setting_community_qr_explain, Constants.TX_MAX_OVERDRAFT, chainUrl, R.mipmap.icon_copy_text);
+                    int size = getResources().getDimensionPixelSize(R.dimen.widget_size_16);
+                    binding.tvQrExplain.setText(Html.fromHtml(qrExplain,
+                        new Html.ImageGetter() {
+                            @Override
+                            public Drawable getDrawable(String source) {
+                                return DrawablesUtil.getDrawable(CommunityQRCodeActivity.this,
+                                        R.mipmap.icon_copy_text, size, size);
+                            }
+                        }, new Html.TagHandler() {
+                            @Override
+                            public void handleTag(boolean opening, String tag, Editable output, XMLReader xmlReader) {
+                                if (tag.toLowerCase(Locale.getDefault()).equals("img")) {
+                                    // 获取长度
+                                    int len = output.length();
+                                    output.setSpan(new ClickableSpan() {
+                                        @Override
+                                        public void onClick(@NonNull View widget) {
+                                            CopyManager.copyText(qrExplainShare);
+                                            ToastUtils.showShortToast(R.string.copy_share_link);
+                                        }
+                                    }, len - 1, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                }
+                            }
+                        }));
+                    binding.tvQrExplain.setMovementMethod(LinkMovementMethod.getInstance());
                     logger.info("chainUrl::{}", chainUrl);
                     communityViewModel.generateQRCode(this, chainUrl, this.chainID, showName);
                 }));
@@ -109,7 +144,9 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_share) {
-            userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 480);
+            String qrExplainShare = getString(R.string.setting_community_qr_share, Constants.TX_MAX_OVERDRAFT, chainUrl);
+            ActivityUtil.shareText(this, getString(R.string.contacts_share_qr_code), qrExplainShare);
+//            userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 480);
         } else if (item.getItemId() == R.id.menu_scan) {
             openScanQRActivityAndExit();
         }
@@ -129,17 +166,6 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     public void onClick(View v) {
         if (v.getId() == R.id.ll_scan_qr_code) {
             openScanQRActivityAndExit();
-        } else if (v.getId() == R.id.iv_see) {
-            if (StringUtil.isNotEmpty(chainUrl)) {
-                int maxLines = binding.qrCode.tvName.getMaxLines();
-                if (this.maxLines == maxLines) {
-                    binding.qrCode.tvName.setMaxLines(1000);
-                    binding.ivSee.setImageResource(R.mipmap.icon_no_see);
-                } else {
-                    binding.qrCode.tvName.setMaxLines(this.maxLines);
-                    binding.ivSee.setImageResource(R.mipmap.icon_see);
-                }
-            }
         } else if (v.getId() == R.id.iv_copy) {
             if (StringUtil.isNotEmpty(chainUrl)) {
                 CopyManager.copyText(chainUrl);

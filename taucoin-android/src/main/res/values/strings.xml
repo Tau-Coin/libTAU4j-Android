@@ -49,7 +49,7 @@
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
 
-    <string name="main_title">TAU - Unrestricted Twitt</string>
+    <string name="main_title">Serverless &#038; Unrestricted</string>
     <string name="main_empty_title">Welcome to TAU</string>
     <string name="main_empty_add_friends">Add Friend</string>
     <string name="main_empty_create_communities">Create Coin Group</string>
@@ -303,6 +303,13 @@
     <string name="community_tx_confidence" formatted="false"><Data><![CDATA[Confidence <font color="#f19322">%1$d</font>]]></Data></string>
 
     <string name="setting_title">Settings</string>
+    Please join my community in TAU, the unrestricted twitt from taucoin.io
+    You can paste the “tau link” to app to start with 100 coins balance.
+
+    <string name="setting_community_qr_explain" formatted="false"><Data><![CDATA[Please join my community in TAU, the unrestricted twitt from taucoin.io.
+You can paste the "tau link" to app to start with %1$d coins balance.<br/>%2$s <img src="%3$d">]]></Data></string>
+    <string name="setting_community_qr_share">Please join my community in TAU, the unrestricted twitt from taucoin.io.
+You can paste the "tau link" to app to start with %1$d coins balance.\n%2$s</string>
     <string name="setting_key_explain">Address is the public key derived from your device random seed.</string>
     <string name="setting_account">Address</string>
     <string name="setting_nickname">Nickname</string>
