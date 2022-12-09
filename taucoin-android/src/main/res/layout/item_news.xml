@@ -46,7 +46,7 @@
                     android:layout_marginEnd="@dimen/widget_size_1"
                     android:includeFontPadding="false"
                     android:singleLine="true"
-                    android:ellipsize="end"
+                    android:ellipsize="middle"
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody2"/>
 
@@ -144,6 +144,7 @@
                 android:src="@mipmap/icon_retweet"/>
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/tv_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -99,9 +99,10 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                     .append(" · ")
                     .append(communityName)
                     .append("(").append(communityCode).append(")")
+                    .append(" · ")
+                    .append(DateUtil.getNewsTime(tx.timestamp))
                     .create();
             binding.tvName.setText(name);
-            binding.tvTime.setText(DateUtil.getNewsTime(tx.timestamp));
 //            setEditNameClickListener(binding.tvName, tx);
 
 //            binding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
@@ -118,16 +119,16 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             binding.tvBalancePower.setText(Html.fromHtml(balanceAndTime));
 
             binding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-            // 添加link解析
-            Linkify.addLinks(binding.tvMsg, Linkify.WEB_URLS);
-            Pattern referral = Pattern.compile(LinkUtil.REFERRAL_PATTERN, 0);
-            Linkify.addLinks(binding.tvMsg, referral, null);
-            Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
-            Linkify.addLinks(binding.tvMsg, airdrop, null);
-            Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
-            Linkify.addLinks(binding.tvMsg, chain, null);
-            Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
-            Linkify.addLinks(binding.tvMsg, friend, null);
+//            // 添加link解析
+//            Linkify.addLinks(binding.tvMsg, Linkify.WEB_URLS);
+//            Pattern referral = Pattern.compile(LinkUtil.REFERRAL_PATTERN, 0);
+//            Linkify.addLinks(binding.tvMsg, referral, null);
+//            Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
+//            Linkify.addLinks(binding.tvMsg, airdrop, null);
+//            Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
+//            Linkify.addLinks(binding.tvMsg, chain, null);
+//            Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
+//            Linkify.addLinks(binding.tvMsg, friend, null);
 
             setClickListener(binding.tvMsg, tx);
             binding.tvMsg.requestLayout();
