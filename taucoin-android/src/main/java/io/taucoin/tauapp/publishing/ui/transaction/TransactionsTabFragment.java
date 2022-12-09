@@ -82,13 +82,6 @@ public class TransactionsTabFragment extends CommunityTabFragment {
             ActivityUtil.startActivityForResult(intent, activity, TransactionCreateActivity.class,
                     TX_REQUEST_CODE);
         });
-
-        if (getArguments() != null) {
-            boolean isEnterSentTransactions = getArguments().getBoolean(IntentExtra.IS_ENTER_SENT_TRANSACTIONS, false);
-            if (isEnterSentTransactions) {
-                binding.viewSpinner.setSelection(1);
-            }
-        }
     }
 
     private void loadSpinnerView(int item) {

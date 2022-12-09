@@ -1,16 +1,21 @@
 package io.taucoin.tauapp.publishing.ui.transaction;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.style.URLSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.leinardi.android.speeddial.SpeedDialActionItem;
+import com.noober.menu.FloatMenu;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,29 +23,68 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
+import cn.bingoogolapple.refreshlayout.BGAStickinessRefreshViewHolder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.tauapp.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
+import io.taucoin.tauapp.publishing.core.utils.CopyManager;
+import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
+import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
+import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.databinding.FragmentTxsMarketTabBinding;
+import io.taucoin.tauapp.publishing.ui.BaseActivity;
+import io.taucoin.tauapp.publishing.ui.BaseFragment;
 import io.taucoin.tauapp.publishing.ui.TauNotifier;
+import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
+import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
+import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
+import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
+
+import static io.taucoin.tauapp.publishing.ui.transaction.CommunityTabFragment.TAB_MARKET;
 
 /**
  * Market Tab页
  */
-public class MarketTabFragment extends CommunityTabFragment implements MarketListAdapter.ClickListener {
+public class MarketTabFragment extends BaseFragment implements View.OnClickListener, NewsListAdapter.ClickListener,
+        BGARefreshLayout.BGARefreshLayoutDelegate {
 
-    private MarketListAdapter adapter;
-    private int filterItem;
+    private static final Logger logger = LoggerFactory.getLogger("MarketTabFragment");
+    private NewsListAdapter adapter;
     private FragmentTxsMarketTabBinding binding;
+    private TxViewModel txViewModel;
+    private UserViewModel userViewModel;
+    protected CompositeDisposable disposables = new CompositeDisposable();
+    private CommunityViewModel communityViewModel;
+    protected BaseActivity activity;
+    private FloatMenu operationsMenu;
+    private String chainID;
+    private boolean isJoined;
     private boolean isVisibleToUser;
+
+    private int currentPos = 0;
+    private int currentTab = TAB_MARKET;
+    private boolean isScrollToTop = true;
+    private boolean isLoadMore = false;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof BaseActivity)
+            activity = (BaseActivity)context;
+    }
 
     @Nullable
     @Override
@@ -51,54 +95,90 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
         return binding.getRoot();
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        activity = (BaseActivity) getActivity();
+        assert activity != null;
+        ViewModelProvider provider = new ViewModelProvider(this);
+        txViewModel = provider.get(TxViewModel.class);
+        userViewModel = provider.get(UserViewModel.class);
+        communityViewModel = provider.get(CommunityViewModel.class);
+        initParameter();
+        initView();
+    }
+
+    /**
+     * 初始化参数
+     */
+    private void initParameter() {
+        if(getArguments() != null){
+            chainID = getArguments().getString(IntentExtra.CHAIN_ID);
+            isJoined = getArguments().getBoolean(IntentExtra.IS_JOINED, false);
+        }
+    }
+
     /**
      * 初始化视图
      */
-    @Override
     public void initView() {
-        super.initView();
-        filterItem = R.string.community_view_all;
-        currentTab = TAB_MARKET;
-        adapter = new MarketListAdapter(this, chainID);
+        if (getRecyclerView() != null) {
+            LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+//        layoutManager.setStackFromEnd(true);
+            getRecyclerView().setLayoutManager(layoutManager);
+            getRecyclerView().setItemAnimator(null);
+        }
+        adapter = new NewsListAdapter(this);
         binding.txList.setAdapter(adapter);
-
-        initSpinner();
         initFabSpeedDial();
+        initRefreshLayout();
     }
 
-    @Override
+    final Runnable handleUpdateAdapter = () -> {
+        if (null == getRecyclerView()) {
+            return;
+        }
+        LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
+        if (layoutManager != null) {
+            logger.debug("handleUpdateAdapter isScrollToTop::{}", isScrollToTop);
+            if (isScrollToTop) {
+                isScrollToTop = false;
+                logger.debug("handleUpdateAdapter scrollToPosition::{}", 0);
+                layoutManager.scrollToPositionWithOffset(0, Integer.MIN_VALUE);
+            }
+        }
+    };
+
+    final Runnable handlePullAdapter = () -> {
+        if (null == getRecyclerView()) {
+            return;
+        }
+        LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
+        if (layoutManager != null) {
+            int bottomPosition = getItemCount() - 1;
+            int position = bottomPosition - currentPos;
+            layoutManager.scrollToPositionWithOffset(position, 0);
+        }
+    };
+
     public RecyclerView getRecyclerView() {
         return binding.txList;
     }
 
-    @Override
-    public SwipeRefreshLayout getRefreshLayout() {
+    public BGARefreshLayout getRefreshLayout() {
         return binding.refreshLayout;
     }
 
-    private void initSpinner() {
-        int verticalOffset = -getResources().getDimensionPixelSize(R.dimen.widget_size_5);
-        binding.viewSpinner.setDropDownVerticalOffset(verticalOffset);
+    private void initRefreshLayout() {
+        binding.refreshLayout.setDelegate(this);
+        BGAStickinessRefreshViewHolder refreshViewHolder = new BGAStickinessRefreshViewHolder(activity.getApplicationContext(), true);
+        refreshViewHolder.setRotateImage(R.mipmap.ic_launcher_foreground);
+        refreshViewHolder.setStickinessColor(R.color.color_yellow);
 
-        int[] spinnerItems = new int[] {R.string.community_view_all,
-                R.string.community_view_sell,
-                R.string.community_view_airdrop,
-                R.string.community_view_announcement};
-        SpinnerAdapter adapter = new SpinnerAdapter(activity, spinnerItems);
-        binding.viewSpinner.setSelection(0);
-        binding.viewSpinner.setAdapter(adapter);
+        refreshViewHolder.setLoadingMoreText(getString(R.string.common_loading));
+        binding.refreshLayout.setPullDownRefreshEnable(false);
 
-        binding.viewSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switchView(spinnerItems[position]);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
+        binding.refreshLayout.setRefreshViewHolder(refreshViewHolder);
     }
 
     /**
@@ -111,64 +191,11 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
         mainFab.setLayoutParams(layoutParams);
         mainFab.setCustomSize(getResources().getDimensionPixelSize(R.dimen.widget_size_44));
 
-//        SpeedDialActionItem invitationItem = new SpeedDialActionItem.Builder(R.id.community_create_invitation,
-//                R.drawable.ic_add_36dp)
-//                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_20))
-//                .setLabel(getString(R.string.community_leader_invitation))
-//                .setLabelColor(getResources().getColor(R.color.color_yellow))
-//                .create();
-//        binding.fabButton.addActionItem(invitationItem);
-//
-//        SpeedDialActionItem airdropItem = new SpeedDialActionItem.Builder(R.id.community_create_airdrop,
-//                R.drawable.ic_add_36dp)
-//                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_14))
-//                .setLabel(getString(R.string.community_airdrop))
-//                .setLabelColor(getResources().getColor(R.color.color_yellow))
-//                .create();
-//        binding.fabButton.addActionItem(airdropItem);
-//
-//        SpeedDialActionItem sellItem = new SpeedDialActionItem.Builder(R.id.community_create_sell,
-//                R.drawable.ic_add_36dp)
-//                .setFabSize(getResources().getDimensionPixelSize(R.dimen.widget_size_30))
-//                .setLabel(getString(R.string.community_sell_coins))
-//                .setLabelColor(getResources().getColor(R.color.color_yellow))
-//                .create();
-//        binding.fabButton.addActionItem(sellItem);
-
         binding.fabButton.getMainFab().setOnClickListener(v -> {
-//            if (binding.fabButton.isOpen()) {
-//                binding.fabButton.close();
-//            } else {
-//                binding.fabButton.open();
-//            }
             Intent intent = new Intent();
             intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-            ActivityUtil.startActivityForResult(intent, activity, NewsCreateActivity.class,
-                            TX_REQUEST_CODE);
+            ActivityUtil.startActivity(intent, activity, NewsCreateActivity.class);
         });
-
-//        Intent intent = new Intent();
-//        intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-//        binding.fabButton.setOnActionSelectedListener(actionItem -> {
-//            if (!isJoined) {
-//                return false;
-//            }
-//            switch (actionItem.getId()) {
-//                case R.id.community_create_sell:
-//                    ActivityUtil.startActivityForResult(intent, activity, SellCreateActivity.class,
-//                            TX_REQUEST_CODE);
-//                    break;
-//                case R.id.community_create_airdrop:
-//                    ActivityUtil.startActivityForResult(intent, activity, AirdropCreateActivity.class,
-//                            TX_REQUEST_CODE);
-//                    break;
-//                case R.id.community_create_invitation:
-//                    ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
-//                            TX_REQUEST_CODE);
-//                    break;
-//            }
-//            return false;
-//        });
     }
 
     @Override
@@ -186,15 +213,18 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
         super.onStart();
         txViewModel.observerChainTxs().observe(this, txs -> {
             List<UserAndTx> currentList = new ArrayList<>(txs);
+            int size;
             if (currentPos == 0) {
-                initScrollToBottom();
+                initScrollToTop();
                 adapter.submitList(currentList, handleUpdateAdapter);
+                size = currentList.size();
+                isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
             } else {
-                currentList.addAll(adapter.getCurrentList());
+                currentList.addAll(0, adapter.getCurrentList());
                 adapter.submitList(currentList, handlePullAdapter);
+                isLoadMore = txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0;
             }
-            binding.refreshLayout.setRefreshing(false);
-            binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
+            binding.refreshLayout.endLoadingMore();
             if (isVisibleToUser) {
                 communityViewModel.clearNewsUnread(chainID);
             }
@@ -210,14 +240,12 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
                 .subscribe(result -> {
                     // 跟当前用户有关系的才触发刷新
                     if (result != null && StringUtil.isNotEmpty(result.getMsg())) {
-                        binding.refreshLayout.setRefreshing(false);
-                        binding.refreshLayout.setEnabled(false);
                         // 立即执行刷新
                         loadData(0);
                     }
                 }));
 
-        disposables.add(txViewModel.observeLatestPinnedMsg(currentTab, chainID)
+        disposables.add(txViewModel.observeLatestPinnedMsg(chainID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(list -> {
@@ -229,31 +257,212 @@ public class MarketTabFragment extends CommunityTabFragment implements MarketLis
                 }));
     }
 
+    private void initScrollToTop() {
+        if (!isScrollToTop) {
+            if (null == getRecyclerView()) {
+                return;
+            }
+            LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
+            if (layoutManager != null) {
+                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                this.isScrollToTop = firstVisibleItemPosition < 2;
+                logger.debug("handleUpdateAdapter firstVisibleItemPosition::{}, isScrollToTop::{}",
+                        firstVisibleItemPosition, isScrollToTop);
+            }
+        }
+    }
+
+    private void closeAllDialog() {
+        if (operationsMenu != null) {
+            operationsMenu.setOnItemClickListener(null);
+            operationsMenu.dismiss();
+        }
+    }
+
     @Override
+    public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout refreshLayout) {
+        refreshLayout.endRefreshing();
+        refreshLayout.setPullDownRefreshEnable(false);
+    }
+
+    @Override
+    public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout refreshLayout) {
+        logger.debug("LoadingMore isLoadMore::{}", isLoadMore);
+        if (isLoadMore) {
+            loadData(getItemCount());
+            return true;
+        } else {
+            refreshLayout.endLoadingMore();
+            return false;
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposables.clear();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        closeAllDialog();
+    }
+
+    @Override
+    public void onClick(View v) {
+        closeAllDialog();
+        switch (v.getId()) {
+            case R.id.ll_pinned_message:
+                Intent intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                intent.putExtra(IntentExtra.TYPE, currentTab);
+                ActivityUtil.startActivityForResult(intent, activity, PinnedActivity.class,
+                        NotesTabFragment.TX_REQUEST_CODE);
+                break;
+        }
+    }
+
     int getItemCount() {
         if (adapter != null) {
             return adapter.getItemCount();
         }
-        return super.getItemCount();
+        return 0;
     }
 
-    @Override
-    public void switchView(int filterItem) {
-        super.switchView(filterItem);
-        this.filterItem = filterItem;
-        loadData(0);
-    }
-
-    @Override
     public void handleMember(CommunityAndMember member) {
-        super.handleMember(member);
+        isJoined = member.isJoined();
         int color = !isJoined ? R.color.gray_light : R.color.primary;
         binding.fabButton.setMainFabClosedBackgroundColor(getResources().getColor(color));
     }
 
-    @Override
     public void loadData(int pos) {
-        super.loadData(pos);
-        txViewModel.loadMarketData(filterItem, chainID, pos, getItemCount());
+        currentPos = pos;
+        txViewModel.loadMarketData(chainID, pos, getItemCount());
+    }
+
+    /**
+     * 显示每个item长按操作选项对话框
+     */
+    @Override
+    public void onItemLongClicked(TextView view, UserAndTx tx) {
+        KeyboardUtils.hideSoftInput(activity);
+        List<OperationMenuItem> menuList = new ArrayList<>();
+        menuList.add(new OperationMenuItem(R.string.tx_operation_copy));
+        final URLSpan[] urls = view.getUrls();
+        if (urls != null && urls.length > 0) {
+            menuList.add(new OperationMenuItem(R.string.tx_operation_copy_link));
+        }
+        // 用户不能拉黑自己
+        if(StringUtil.isNotEquals(tx.senderPk,
+                MainApplication.getInstance().getPublicKey())){
+            menuList.add(new OperationMenuItem(R.string.tx_operation_blacklist));
+        }
+        menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
+        if (tx.favoriteTime <= 0) {
+            menuList.add(new OperationMenuItem(R.string.tx_operation_favorite));
+        }
+        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
+
+        operationsMenu = new FloatMenu(activity);
+        operationsMenu.items(menuList);
+        operationsMenu.setOnItemClickListener((v, position) -> {
+            OperationMenuItem item = menuList.get(position);
+            int resId = item.getResId();
+            switch (resId) {
+                case R.string.tx_operation_copy:
+                    CopyManager.copyText(view.getText());
+                    ToastUtils.showShortToast(R.string.copy_successfully);
+                    break;
+                case R.string.tx_operation_copy_link:
+                    if (urls != null && urls.length > 0) {
+                        String link = urls[0].getURL();
+                        CopyManager.copyText(link);
+                        ToastUtils.showShortToast(R.string.copy_link_successfully);
+                    }
+                    break;
+                case R.string.tx_operation_blacklist:
+                    String publicKey = tx.senderPk;
+                    userViewModel.setUserBlacklist(publicKey, true);
+                    ToastUtils.showShortToast(R.string.blacklist_successfully);
+                    break;
+                case R.string.tx_operation_pin:
+                case R.string.tx_operation_unpin:
+                    txViewModel.setMessagePinned(tx, false);
+                    break;
+                case R.string.tx_operation_favorite:
+                    txViewModel.setMessageFavorite(tx, false);
+                    break;
+                case R.string.tx_operation_msg_hash:
+                    String msgHash = tx.txID;
+                    CopyManager.copyText(msgHash);
+                    ToastUtils.showShortToast(R.string.copy_message_hash);
+                    break;
+
+            }
+        });
+        operationsMenu.show(activity.getPoint());
+    }
+
+    @Override
+    public void onTrustClicked(UserAndTx user) {
+
+    }
+
+    @Override
+    public void onUserClicked(String senderPk) {
+        KeyboardUtils.hideSoftInput(activity);
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.PUBLIC_KEY, senderPk);
+        ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
+    }
+
+    @Override
+    public void onEditNameClicked(String senderPk){
+        KeyboardUtils.hideSoftInput(activity);
+        String userPk = MainApplication.getInstance().getPublicKey();
+        if (StringUtil.isEquals(userPk, senderPk)) {
+            userViewModel.showEditNameDialog(activity, senderPk);
+        } else {
+            userViewModel.showRemarkDialog(activity, senderPk);
+        }
+    }
+
+    @Override
+    public void onBanClicked(UserAndTx tx){
+        KeyboardUtils.hideSoftInput(activity);
+        String showName = UsersUtil.getShowName(tx.sender, tx.senderPk);
+        userViewModel.showBanDialog(activity, tx.senderPk, showName);
+    }
+
+    @Override
+    public void onItemClicked(UserAndTx tx) {
+        KeyboardUtils.hideSoftInput(activity);
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.ID, tx.txID);
+        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
+        intent.putExtra(IntentExtra.PUBLIC_KEY, tx.senderPk);
+        ActivityUtil.startActivity(intent, activity, SellDetailActivity.class);
+    }
+
+    @Override
+    public void onLinkClick(String link) {
+        KeyboardUtils.hideSoftInput(activity);
+        ActivityUtil.openUri(activity, link);
+    }
+
+    @Override
+    public void onRetweetClicked(UserAndTx tx) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+        intent.putExtra(IntentExtra.TYPE, CommunityChooseActivity.TYPE_RETWEET_NEWS);
+        ActivityUtil.startActivity(intent, activity, CommunityChooseActivity.class);
+    }
+
+    @Override
+    public void onReplyClicked(UserAndTx tx) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
+        ActivityUtil.startActivity(intent, activity, AnnouncementCreateActivity.class);
     }
 }

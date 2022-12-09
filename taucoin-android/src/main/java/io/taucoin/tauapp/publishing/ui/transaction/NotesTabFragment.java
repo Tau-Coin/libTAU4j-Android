@@ -194,16 +194,16 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
 
         loadData(0);
 
-        disposables.add(txViewModel.observeLatestPinnedMsg(currentTab, chainID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> {
-                    boolean isHavePinnedMsg = list != null && list.size() > 0;
-                    binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
-                    if (isHavePinnedMsg) {
-                        binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
-                    }
-                }));
+//        disposables.add(txViewModel.observeLatestPinnedMsg(chainID)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(list -> {
+//                    boolean isHavePinnedMsg = list != null && list.size() > 0;
+//                    binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
+//                    if (isHavePinnedMsg) {
+//                        binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
+//                    }
+//                }));
 
         disposables.add(txViewModel.observeDataSetChanged()
                 .subscribeOn(Schedulers.io())

@@ -63,14 +63,8 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID) {
-        if (currentTab == CommunityTabFragment.TAB_CHAIN) {
-            return db.txDao().observeOnChainLatestPinnedTx(chainID);
-        } else if (currentTab == CommunityTabFragment.TAB_MARKET) {
-            return db.txDao().queryCommunityMarketLatestPinnedTx(chainID);
-        } else {
-            return db.txDao().queryCommunityNoteLatestPinnedTx(chainID);
-        }
+    public Flowable<List<UserAndTx>> observeLatestPinnedMsg(String chainID) {
+        return db.txDao().queryCommunityMarketLatestPinnedTx(chainID);
     }
 
     @Override
@@ -81,21 +75,6 @@ public class TxRepositoryImpl implements TxRepository{
     @Override
     public List<UserAndTx> loadAllNotesData(String chainID, int startPos, int loadSize) {
         return db.txDao().loadAllNotesData(chainID, startPos, loadSize);
-    }
-
-    @Override
-    public List<UserAndTx> loadAirdropMarketData(String chainID, int startPos, int loadSize) {
-        return db.txDao().loadAirdropMarketData(chainID, startPos, loadSize);
-    }
-
-    @Override
-    public List<UserAndTx> loadSellMarketData(String chainID, int startPos, int loadSize) {
-        return db.txDao().loadSellMarketData(chainID, startPos, loadSize);
-    }
-
-    @Override
-    public List<UserAndTx> loadAnnouncementMarketData(String chainID, int startPos, int loadSize) {
-        return db.txDao().loadAnnouncementMarketData(chainID, startPos, loadSize);
     }
 
     @Override
@@ -118,14 +97,8 @@ public class TxRepositoryImpl implements TxRepository{
      * @param chainID 社区链ID
      */
     @Override
-    public List<UserAndTx> queryCommunityPinnedTxs(String chainID, int currentTab) {
-        if (currentTab == CommunityTabFragment.TAB_CHAIN) {
-            return db.txDao().queryCommunityOnChainPinnedTxs(chainID);
-        } else if (currentTab == CommunityTabFragment.TAB_MARKET) {
-            return db.txDao().queryCommunityMarketPinnedTxs(chainID);
-        } else {
-            return db.txDao().queryCommunityNotePinnedTxs(chainID);
-        }
+    public List<UserAndTx> queryCommunityPinnedTxs(String chainID) {
+        return db.txDao().queryCommunityMarketPinnedTxs(chainID);
     }
 
     /**

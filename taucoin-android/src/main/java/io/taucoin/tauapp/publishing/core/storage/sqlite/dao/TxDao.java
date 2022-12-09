@@ -1,7 +1,6 @@
 package io.taucoin.tauapp.publishing.core.storage.sqlite.dao;
 
 import java.util.List;
-import java.util.concurrent.Flow;
 
 import androidx.paging.DataSource;
 import androidx.room.Dao;
@@ -51,15 +50,6 @@ public interface TxDao {
     String QUERY_GET_ALL_MARKET = QUERY_GET_MARKET_SELECT +
             " AND tx.txType IN (3, 5, 6, 7)" + QUERY_GET_TXS_ORDER;
 
-    String QUERY_GET_AIRDROP_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND tx.txType = 5" + QUERY_GET_TXS_ORDER;
-
-    String QUERY_GET_SELL_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND tx.txType = 3" + QUERY_GET_TXS_ORDER;
-
-    String QUERY_GET_ANNOUNCEMENT_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND tx.txType = 6" + QUERY_GET_TXS_ORDER;
-
     // SQL:查询社区里的交易(所有，排除WIRING Tx)
     String QUERY_GET_NOTES_SELECT = "SELECT tx.*, 0 AS trusts, m.balance, m.power" +
             " FROM Txs AS tx" +
@@ -83,22 +73,10 @@ public interface TxDao {
     String QUERY_GET_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT +
             QUERY_GET_TXS_ORDER;
 
-    // SQL:查询社区里的置顶交易(所有，排除WIRING Tx)
-    String QUERY_GET_NOTE_PINNED_TXS = QUERY_GET_NOTES_SELECT +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " AND pinnedTime > 0" +
-            " ORDER BY tx.pinnedTime DESC";
-
     // SQL:查询社区里的置顶交易(MARKET交易，排除Trust Tx, 并且上链)
     String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " AND tx.txType IN (3, 5, 6, 7) AND pinnedTime > 0" +
-            " ORDER BY tx.pinnedTime DESC";
-
-    // SQL:查询社区里的置顶交易(上链)
-    String QUERY_GET_CHAIN_PINNED_TXS = QUERY_GET_CHAIN_TXS_SELECT +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     // SQL:查询社区里用户Trust交易(上链)
@@ -255,18 +233,6 @@ public interface TxDao {
     List<UserAndTx> loadChainTxsData(String chainID, int startPosition, int loadSize);
 
     @Transaction
-    @Query(QUERY_GET_AIRDROP_MARKET)
-    List<UserAndTx> loadAirdropMarketData(String chainID, int startPosition, int loadSize);
-
-    @Transaction
-    @Query(QUERY_GET_SELL_MARKET)
-    List<UserAndTx> loadSellMarketData(String chainID, int startPosition, int loadSize);
-
-    @Transaction
-    @Query(QUERY_GET_ANNOUNCEMENT_MARKET)
-    List<UserAndTx> loadAnnouncementMarketData(String chainID, int startPosition, int loadSize);
-
-    @Transaction
     @Query(QUERY_GET_ALL_MARKET)
     List<UserAndTx> loadAllMarketData(String chainID, int startPosition, int loadSize);
 
@@ -279,28 +245,12 @@ public interface TxDao {
     List<UserAndTx> loadAllNotesData(String chainID, int startPosition, int loadSize);
 
     @Transaction
-    @Query(QUERY_GET_CHAIN_PINNED_TXS)
-    List<UserAndTx> queryCommunityOnChainPinnedTxs(String chainID);
-
-    @Transaction
     @Query(QUERY_GET_MARKET_PINNED_TXS)
     List<UserAndTx> queryCommunityMarketPinnedTxs(String chainID);
 
     @Transaction
-    @Query(QUERY_GET_NOTE_PINNED_TXS)
-    List<UserAndTx> queryCommunityNotePinnedTxs(String chainID);
-
-    @Transaction
-    @Query(QUERY_GET_CHAIN_PINNED_TXS + " limit 1")
-    Flowable<List<UserAndTx>> observeOnChainLatestPinnedTx(String chainID);
-
-    @Transaction
     @Query(QUERY_GET_MARKET_PINNED_TXS + " limit 1")
     Flowable<List<UserAndTx>> queryCommunityMarketLatestPinnedTx(String chainID);
-
-    @Transaction
-    @Query(QUERY_GET_NOTE_PINNED_TXS + " limit 1")
-    Flowable<List<UserAndTx>> queryCommunityNoteLatestPinnedTx(String chainID);
 
     @Query(QUERY_GET_TRUST_TXS)
     List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPosition, int loadSize);

@@ -21,23 +21,27 @@ import io.taucoin.tauapp.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.CopyManager;
+import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
+import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.databinding.ActivityPinnedBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
+import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
+import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
 /**
  * Pinned Message
  */
-public class PinnedActivity extends BaseActivity implements NotesListAdapter.ClickListener {
+public class PinnedActivity extends BaseActivity implements NewsListAdapter.ClickListener {
     private ActivityPinnedBinding binding;
     private TxViewModel txViewModel;
-    private CompositeDisposable disposables = new CompositeDisposable();
-    private NotesListAdapter adapter;
+    private UserViewModel userViewModel;
+    private final CompositeDisposable disposables = new CompositeDisposable();
+    private NewsListAdapter adapter;
     private String chainID;
-    private int currentTab;
     private FloatMenu operationsMenu;
 
     @Override
@@ -45,6 +49,7 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
         txViewModel = provider.get(TxViewModel.class);
+        userViewModel = provider.get(UserViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pinned);
         initParam();
         initView();
@@ -56,7 +61,6 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
     private void initParam() {
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            currentTab = getIntent().getIntExtra(IntentExtra.TYPE, -1);
         }
     }
 
@@ -68,7 +72,7 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
         binding.toolbarInclude.toolbar.setTitle(R.string.community_pinned_message);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        adapter = new NotesListAdapter(this, chainID, false);
+        adapter = new NewsListAdapter(this);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 //        layoutManager.setStackFromEnd(true);
@@ -153,7 +157,7 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
     }
 
     @Override
-    public void onItemClicked(TextView view, UserAndTx tx) {
+    public void onTrustClicked(UserAndTx user) {
 
     }
 
@@ -170,18 +174,41 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
     }
 
     @Override
-    public void onBanClicked(UserAndTx tx) {
+    public void onBanClicked(UserAndTx tx){
+        KeyboardUtils.hideSoftInput(this);
+        String showName = UsersUtil.getShowName(tx.sender, tx.senderPk);
+        userViewModel.showBanDialog(this, tx.senderPk, showName);
+    }
 
+    @Override
+    public void onItemClicked(UserAndTx tx) {
+        KeyboardUtils.hideSoftInput(this);
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.ID, tx.txID);
+        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
+        intent.putExtra(IntentExtra.PUBLIC_KEY, tx.senderPk);
+        ActivityUtil.startActivity(intent, this, SellDetailActivity.class);
     }
 
     @Override
     public void onLinkClick(String link) {
+        KeyboardUtils.hideSoftInput(this);
         ActivityUtil.openUri(this, link);
     }
 
     @Override
-    public void onTxLogClick(String txID, int version) {
+    public void onRetweetClicked(UserAndTx tx) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+        intent.putExtra(IntentExtra.TYPE, CommunityChooseActivity.TYPE_RETWEET_NEWS);
+        ActivityUtil.startActivity(intent, this, CommunityChooseActivity.class);
+    }
 
+    @Override
+    public void onReplyClicked(UserAndTx tx) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
+        ActivityUtil.startActivity(intent, this, AnnouncementCreateActivity.class);
     }
 
     @Override
@@ -198,6 +225,6 @@ public class PinnedActivity extends BaseActivity implements NotesListAdapter.Cli
     }
 
     private void loadData() {
-        txViewModel.loadPinnedTxsData(currentTab, chainID);
+        txViewModel.loadPinnedTxsData(chainID);
     }
 }

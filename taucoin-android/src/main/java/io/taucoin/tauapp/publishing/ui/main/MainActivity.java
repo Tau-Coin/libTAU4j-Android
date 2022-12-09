@@ -159,8 +159,6 @@ public class MainActivity extends ScanTriggerActivity {
             Bundle bundle = new Bundle();
             bundle.putString(IntentExtra.ID, intent.getStringExtra(IntentExtra.CHAIN_ID));
             bundle.putInt(IntentExtra.TYPE, intent.getIntExtra(IntentExtra.TYPE, -1));
-            bundle.putBoolean(IntentExtra.IS_ENTER_SENT_TRANSACTIONS,
-                    intent.getBooleanExtra(IntentExtra.IS_ENTER_SENT_TRANSACTIONS, false));
             updateMainRightFragment(bundle);
         }
     }

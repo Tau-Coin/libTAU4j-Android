@@ -733,12 +733,11 @@ public class TxViewModel extends AndroidViewModel {
 
     /**
      * 加载交易Market分页数据
-     * @param filterItem 用户过滤条件
      * @param chainID 社区链ID
      * @param pos 分页位置
      * @param initSize 刷新时第一页数据大小
      */
-    void loadMarketData(int filterItem, String chainID, int pos, int initSize) {
+    void loadMarketData(String chainID, int pos, int initSize) {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
@@ -749,18 +748,9 @@ public class TxViewModel extends AndroidViewModel {
                 if (pos == 0 && initSize > pageSize) {
                     pageSize = initSize;
                 }
-                if (filterItem == R.string.community_view_airdrop) {
-                    txs = txRepo.loadAirdropMarketData(chainID, pos, pageSize);
-                } else if (filterItem == R.string.community_view_sell) {
-                    txs = txRepo.loadSellMarketData(chainID, pos, pageSize);
-                } else if (filterItem == R.string.community_view_announcement) {
-                    txs = txRepo.loadAnnouncementMarketData(chainID, pos, pageSize);
-                } else {
-                    txs = txRepo.loadAllMarketData(chainID, pos, pageSize);
-                }
-                logger.debug("loadMarketData filterItem::{}, pos::{}, pageSize::{}, messages.size::{}",
-                        application.getString(filterItem), pos, pageSize, txs.size());
-                Collections.reverse(txs);
+                txs = txRepo.loadAllMarketData(chainID, pos, pageSize);
+                logger.debug("loadMarketData chainID::{}, pos::{}, pageSize::{}, messages.size::{}",
+                        chainID, pos, pageSize, txs.size());
             } catch (Exception e) {
                 logger.error("loadMarketData error::", e);
             }
@@ -806,22 +796,20 @@ public class TxViewModel extends AndroidViewModel {
                 });
     }
 
-    public Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID) {
-        return txRepo.observeLatestPinnedMsg(currentTab, chainID);
+    public Flowable<List<UserAndTx>> observeLatestPinnedMsg(String chainID) {
+        return txRepo.observeLatestPinnedMsg(chainID);
     }
 
     /**
      * 加载交易固定数据
-     * @param currentTab 用户选择的tab页
      * @param chainID 社区链ID
      */
-    void loadPinnedTxsData(int currentTab, String chainID) {
+    void loadPinnedTxsData(String chainID) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
             List<UserAndTx> txs = new ArrayList<>();
             try {
-                txs = txRepo.queryCommunityPinnedTxs(chainID, currentTab);
-                logger.debug("loadPinnedTxsData, currentTab::{}, messages.size::{}",
-                        currentTab, txs.size());
+                txs = txRepo.queryCommunityPinnedTxs(chainID);
+                logger.debug("loadPinnedTxsData messages.size::{}", txs.size());
             } catch (Exception e) {
                 logger.error("loadPinnedTxsData error::", e);
             }

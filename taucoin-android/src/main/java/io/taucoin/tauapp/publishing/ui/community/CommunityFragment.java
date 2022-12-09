@@ -7,13 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.slf4j.LoggerFactory;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -33,11 +31,14 @@ import io.taucoin.tauapp.publishing.databinding.ExternalAirdropLinkDialogBinding
 import io.taucoin.tauapp.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
 import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
-import io.taucoin.tauapp.publishing.ui.customviews.FragmentStatePagerAdapter;
 import io.taucoin.tauapp.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.transaction.MarketTabFragment;
+import io.taucoin.tauapp.publishing.ui.transaction.NotesTabFragment;
+import io.taucoin.tauapp.publishing.ui.transaction.PinnedActivity;
+
+import static io.taucoin.tauapp.publishing.ui.transaction.CommunityTabFragment.TAB_MARKET;
 
 /**
  * 单个群组页面
@@ -50,7 +51,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private CommunityViewModel communityViewModel;
     private SettingsRepository settingsRepo;
     private final CompositeDisposable disposables = new CompositeDisposable();
-    private final CommunityTabFragment[] fragments = new CommunityTabFragment[1];
+    private MarketTabFragment currentFragment = null;
     private String chainID;
     private boolean nearExpired = false;
     private boolean chainStopped = false;
@@ -61,7 +62,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private long nodes = 0;
     private long miningTime = -1;
     private boolean isConnectChain = true;
-    private boolean isEnterSentTransactions = false;
     private ConfirmDialog chainStoppedDialog;
 
     @Nullable
@@ -84,6 +84,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         binding.toolbarInclude.setListener(this);
         initParameter();
         initLayout();
+        loadNewsFragment();
         communityViewModel.touchChain(chainID);
     }
 
@@ -93,7 +94,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private void initParameter() {
         if (getArguments() != null) {
             chainID = getArguments().getString(IntentExtra.ID);
-            isEnterSentTransactions = getArguments().getBoolean(IntentExtra.IS_ENTER_SENT_TRANSACTIONS, false);
         }
     }
 
@@ -124,12 +124,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             ActivityUtil.startActivityForResult(intent, activity, CommunityDetailActivity.class, MEMBERS_REQUEST_CODE);
         });
 
-        // 自定义的Adapter继承自FragmentPagerAdapter
-        StateAdapter stateAdapter = new StateAdapter(this.getChildFragmentManager(), 1);
-        // ViewPager设置Adapter
-        binding.viewPager.setAdapter(stateAdapter);
-        binding.viewPager.setOffscreenPageLimit(1);
-
         // 检测区块链是否因为获取数据失败而停止
         tauDaemonHandler.getChainStoppedData()
                 .observe(this.getViewLifecycleOwner(), set -> {
@@ -148,10 +142,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
 //                        showCommunitySubtitle();
                     }
                 });
-
-        if (isEnterSentTransactions) {
-            binding.viewPager.setCurrentItem(1);
-        }
     }
     private void handleSettingsChanged(String key) {
         if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
@@ -260,12 +250,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     showCommunitySubtitle();
                 }, it->{}));
 
-//        // 60s更新检查一次
-//        disposables.add(ObservableUtil.intervalSeconds(60)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(l -> showCommunitySubtitle()));
-
         nodes = settingsRepo.getLongValue(getString(R.string.pref_key_dht_nodes), 0);
         disposables.add(settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.io())
@@ -296,13 +280,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                         showWarningView();
                     }
                     isNoBalance = member.noBalance();
-                    for (CommunityTabFragment fragment: fragments) {
-                        if (fragment != null) {
-                            fragment.handleMember(member);
-                        }
+                    if (currentFragment != null) {
+                        currentFragment.handleMember(member);
                     }
-                    LoggerFactory.getLogger("updateTabBadgeDrawable")
-                            .debug("msgUnread::{}, newsUnread::{}", member.msgUnread, member.newsUnread);
                     binding.flJoin.setVisibility(member.isJoined() ? View.GONE : View.VISIBLE);
                 }, it -> {}));
     }
@@ -369,35 +349,28 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onFragmentResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onFragmentResult(requestCode, resultCode, data);
-        for (CommunityTabFragment fragment : fragments) {
-            if (fragment != null) {
-                fragment.onFragmentResult(requestCode, resultCode, data);
-            }
+        if (currentFragment != null) {
+            currentFragment.onFragmentResult(requestCode, resultCode, data);
         }
     }
 
-    private CommunityTabFragment createFragmentView(int position) {
-        CommunityTabFragment tab = new MarketTabFragment();
-        fragments[0] = tab;
-
+    private void loadNewsFragment() {
+        currentFragment = new MarketTabFragment();
         Bundle bundle = new Bundle();
         bundle.putString(IntentExtra.CHAIN_ID, chainID);
         bundle.putBoolean(IntentExtra.IS_JOINED, isJoined);
-        bundle.putBoolean(IntentExtra.IS_ENTER_SENT_TRANSACTIONS, isEnterSentTransactions);
-        tab.setArguments(bundle);
-        return tab;
-    }
+        currentFragment.setArguments(bundle);
 
-    public class StateAdapter extends FragmentStatePagerAdapter {
-
-        StateAdapter(@NonNull FragmentManager fm, int count) {
-            super(fm, count);
+        FragmentManager fm = this.getChildFragmentManager();
+        if (fm.isDestroyed()) {
+            return;
         }
-
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            return createFragmentView(position);
-        }
+        FragmentTransaction transaction = fm.beginTransaction();
+        // Replace whatever is in the fragment container view with this fragment,
+        // and add the transaction to the back stack
+        transaction.replace(R.id.news_fragment, currentFragment);
+        // 执行此方法后，fragment的onDestroy()方法和ViewModel的onCleared()方法都不执行
+        // transaction.addToBackStack(null);
+        transaction.commitAllowingStateLoss();
     }
 }

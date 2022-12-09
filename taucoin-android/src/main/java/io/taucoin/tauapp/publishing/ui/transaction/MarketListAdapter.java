@@ -33,12 +33,10 @@ import io.taucoin.tauapp.publishing.ui.customviews.RoundImageView;
 public class MarketListAdapter extends ListAdapter<UserAndTx, MarketListAdapter.ViewHolder> {
 
     private ClickListener listener;
-    private String chainID;
 
     MarketListAdapter(ClickListener listener, String chainID) {
         super(diffCallback);
         this.listener = listener;
-        this.chainID = chainID;
     }
 
     @NonNull
@@ -46,8 +44,8 @@ public class MarketListAdapter extends ListAdapter<UserAndTx, MarketListAdapter.
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ItemMarketBinding binding = DataBindingUtil.inflate(inflater,
-                R.layout.item_market, parent, false);
-        return new ViewHolder(binding, listener, chainID);
+                R.layout.item_news, parent, false);
+        return new ViewHolder(binding, listener);
     }
 
     @Override
@@ -58,17 +56,15 @@ public class MarketListAdapter extends ListAdapter<UserAndTx, MarketListAdapter.
     static class ViewHolder extends RecyclerView.ViewHolder {
         private ItemMarketBinding binding;
         private ClickListener listener;
-        private String chainID;
 
-        ViewHolder(ItemMarketBinding binding, ClickListener listener, String chainID) {
+        ViewHolder(ItemMarketBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
-            this.chainID = chainID;
         }
 
         void bind(ViewHolder holder, UserAndTx tx) {
-            if(null == binding || null == holder || null == tx || StringUtil.isEmpty(chainID)){
+            if(null == binding || null == holder || null == tx){
                 return;
             }
             boolean isSell = tx.txType == TxType.SELL_TX.getType();
@@ -76,12 +72,6 @@ public class MarketListAdapter extends ListAdapter<UserAndTx, MarketListAdapter.
 
             binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
             setLeftViewClickListener(binding.ivHeadPic, tx);
-
-            binding.tvName.setText(UsersUtil.getShowName(tx.sender));
-            setEditNameClickListener(binding.tvName, tx);
-
-//            binding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
-//            setTrustClickListener(binding.ivTrust, tx);
 
             binding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_MARKET));
             // 添加link解析
@@ -98,26 +88,10 @@ public class MarketListAdapter extends ListAdapter<UserAndTx, MarketListAdapter.
             setClickListener(binding.tvMsg, tx);
         }
 
-        private void setTrustClickListener(ImageView ivTrust, UserAndTx tx) {
-            ivTrust.setOnClickListener(view -> {
-                if (listener != null) {
-                    listener.onTrustClicked(tx.sender);
-                }
-            });
-        }
-
         private void setLeftViewClickListener(RoundImageView ivHeadPic, UserAndTx tx) {
             ivHeadPic.setOnClickListener(view ->{
                 if (listener != null) {
                     listener.onUserClicked(tx.senderPk);
-                }
-            });
-        }
-
-        private void setEditNameClickListener(TextView textView, UserAndTx tx) {
-            textView.setOnClickListener(view ->{
-                if(listener != null){
-                    listener.onEditNameClicked(tx.senderPk);
                 }
             });
         }
@@ -156,15 +130,14 @@ public class MarketListAdapter extends ListAdapter<UserAndTx, MarketListAdapter.
     }
 
     public interface ClickListener {
-        void onTrustClicked(User user);
         void onUserClicked(String publicKey);
-        void onEditNameClicked(String publicKey);
         void onItemLongClicked(TextView view, UserAndTx tx);
         void onItemClicked(UserAndTx tx);
         void onLinkClick(String link);
+        void onBanClicked(UserAndTx tx);
     }
 
-    private static final DiffUtil.ItemCallback<UserAndTx> diffCallback = new DiffUtil.ItemCallback<UserAndTx>() {
+    private static final DiffUtil.ItemCallback<UserAndTx> diffCallback = new DiffUtil.ItemCallback<>() {
         @Override
         public boolean areContentsTheSame(@NonNull UserAndTx oldItem, @NonNull UserAndTx newItem) {
             boolean isSame = false;

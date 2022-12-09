@@ -37,6 +37,7 @@ import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityTransactionCreateBinding;
 import io.taucoin.tauapp.publishing.ui.ScanTriggerActivity;
+import io.taucoin.tauapp.publishing.ui.community.ChainExplorerActivity;
 import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
@@ -195,10 +196,8 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
                 } else {
                     Intent intent = new Intent();
                     intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra(IntentExtra.TYPE, 0);
-                    intent.putExtra(IntentExtra.IS_ENTER_SENT_TRANSACTIONS, true);
-                    ActivityUtil.startActivity(intent, this, MainActivity.class);
+                    intent.putExtra(IntentExtra.IS_JOINED, true);
+                    ActivityUtil.startActivity(intent, this, ChainExplorerActivity.class);
                 }
             }
         });

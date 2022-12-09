@@ -48,11 +48,11 @@
                 android:textAppearance="@style/TextAppearanceBody2"/>
         </LinearLayout>
 
-        <androidx.viewpager.widget.ViewPager
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/news_fragment"
             android:layout_below="@+id/ll_warning"
             android:layout_above="@+id/fl_join"
             android:background="@color/color_chat_bg"
-            android:id="@+id/view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

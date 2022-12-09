@@ -31,7 +31,7 @@ public interface TxRepository {
      * 加载交易固定数据
      * @param chainID 社区链ID
      */
-    List<UserAndTx> queryCommunityPinnedTxs(String chainID, int currentTab);
+    List<UserAndTx> queryCommunityPinnedTxs(String chainID);
 
     /**
      * 查询社区用户被Trust列表
@@ -99,17 +99,11 @@ public interface TxRepository {
 
     void setMessageFavorite(String txID, long pinnedTime, boolean isRefresh);
 
-    Flowable<List<UserAndTx>> observeLatestPinnedMsg(int currentTab, String chainID);
+    Flowable<List<UserAndTx>> observeLatestPinnedMsg(String chainID);
 
     List<UserAndTx> loadOnChainNotesData(String chainID, int pos, int pageSize);
 
     List<UserAndTx> loadAllNotesData(String chainID, int pos, int pageSize);
-
-    List<UserAndTx> loadAirdropMarketData(String chainID, int pos, int pageSize);
-
-    List<UserAndTx> loadSellMarketData(String chainID, int pos, int pageSize);
-
-    List<UserAndTx> loadAnnouncementMarketData(String chainID, int pos, int pageSize);
 
     List<UserAndTx> loadAllMarketData(String chainID, int pos, int pageSize);
 
