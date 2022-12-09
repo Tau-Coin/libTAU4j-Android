@@ -383,6 +383,7 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_charging_state))) {
             logger.info("SettingsChanged, charging state::{}", settingsRepo.chargingState());
             startChargingTiming();
+            resetFrequencyMode();
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
             logger.info("isMeteredNetwork::{}", NetworkSetting.isMeteredNetwork());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_wifi_network))) {
@@ -391,11 +392,7 @@ public abstract class TauDaemon {
             boolean isForeground = settingsRepo.getBooleanValue(key);
             logger.info("foreground running::{}", isForeground);
             tauDozeManager.setForeground(isForeground);
-            if (isForeground) {
-                setForegroundMode();
-            } else {
-                setBackgroundMode();
-            }
+            resetFrequencyMode();
         } else if (key.equals(appContext.getString(R.string.pref_key_nat_pmp_mapped))) {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
@@ -964,23 +961,36 @@ public abstract class TauDaemon {
     }
 
     /**
-     * 设置前台模式
+     * 重置频率模式
      */
-    public void setForegroundMode() {
-        if (isRunning) {
-            sessionManager.setForegroundMode();
+    private void resetFrequencyMode() {
+        String foregroundRunningKey = appContext.getString(R.string.pref_key_foreground_running);
+        boolean isForeground = settingsRepo.getBooleanValue(foregroundRunningKey, true);
+        if (isForeground || settingsRepo.chargingState()) {
+            setHighFrequencyMode();
+        } else {
+            setLowFrequencyMode();
         }
-        logger.warn("setForegroundMode isRunning::{}", isRunning);
     }
 
     /**
-     * 设置后台模式
+     * 设置高频模式
      */
-    public void setBackgroundMode() {
+    public void setHighFrequencyMode() {
         if (isRunning) {
-            sessionManager.setBackgroundMode();
+            sessionManager.setHighFrequencyMode();
         }
-        logger.warn("setBackgroundMode isRunning::{}", isRunning);
+        logger.warn("setHighFrequencyMode isRunning::{}", isRunning);
+    }
+
+    /**
+     * 设置低频模式
+     */
+    public void setLowFrequencyMode() {
+        if (isRunning) {
+            sessionManager.setLowFrequencyMode();
+        }
+        logger.warn("setLowFrequencyMode isRunning::{}", isRunning);
     }
 
     /**
