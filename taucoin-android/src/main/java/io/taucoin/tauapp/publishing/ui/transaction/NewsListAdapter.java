@@ -82,8 +82,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             if(null == binding || null == holder || null == tx){
                 return;
             }
-            boolean isSell = tx.txType == TxType.SELL_TX.getType();
-            binding.ivArrow.setVisibility(isSell ? View.VISIBLE : View.INVISIBLE);
+            binding.ivArrow.setVisibility(View.INVISIBLE);
 
             binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
             setLeftViewClickListener(binding.ivHeadPic, tx);

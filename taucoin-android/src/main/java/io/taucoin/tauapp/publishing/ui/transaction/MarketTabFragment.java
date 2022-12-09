@@ -438,11 +438,11 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onItemClicked(UserAndTx tx) {
         KeyboardUtils.hideSoftInput(activity);
-        Intent intent = new Intent();
-        intent.putExtra(IntentExtra.ID, tx.txID);
-        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
-        intent.putExtra(IntentExtra.PUBLIC_KEY, tx.senderPk);
-        ActivityUtil.startActivity(intent, activity, SellDetailActivity.class);
+//        Intent intent = new Intent();
+//        intent.putExtra(IntentExtra.ID, tx.txID);
+//        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
+//        intent.putExtra(IntentExtra.PUBLIC_KEY, tx.senderPk);
+//        ActivityUtil.startActivity(intent, activity, SellDetailActivity.class);
     }
 
     @Override
