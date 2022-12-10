@@ -9,18 +9,6 @@
         <item>#7C7386</item>
     </array>
 
-    <integer-array name="developed_metered_limit">
-        <item>100</item>
-        <item>300</item>
-        <item>600</item>
-    </integer-array>
-
-    <integer-array name="metered_limit">
-        <item>100</item>
-        <item>300</item>
-        <item>600</item>
-    </integer-array>
-
     <string-array name="font_scale_size">
         <item>0.9</item>
         <item>1.0</item>

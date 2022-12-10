@@ -974,17 +974,14 @@ public class CommunityViewModel extends AndroidViewModel {
             TauDaemonAlertHandler tauDaemonHandler = TauDaemon.getInstance(getApplication()).getTauDaemonHandler();
             while (!emitter.isDisposed()) {
                 boolean isStopped = tauDaemonHandler.isChainStopped(chainID);
-                boolean isTauDozeMode = daemon.getTauDozeManager().isDozeMode();
                 long time;
-                if (isTauDozeMode) {
-                    time = -100;
-                } else if (isStopped) {
+                if (isStopped) {
                     time = -1;
                 } else {
                     time = daemon.getMiningTime(ChainIDUtil.encode(chainID));
                 }
-                logger.debug("Mining Time::{}, chainID::{}, isRunning::{}, isTauDozeMode::{}", time,
-                        chainID, daemon.isRunning(), isTauDozeMode);
+                logger.debug("Mining Time::{}, chainID::{}, isRunning::{}", time,
+                        chainID, daemon.isRunning());
                 emitter.onNext(time);
                 try {
                     Thread.sleep(1000);

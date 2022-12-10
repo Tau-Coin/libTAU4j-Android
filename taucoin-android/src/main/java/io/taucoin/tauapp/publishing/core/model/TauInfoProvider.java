@@ -282,11 +282,10 @@ public class TauInfoProvider {
     private void handlerTrafficStatistics(SessionStatistics statistics) {
         daemon.getSessionStatistics(statistics);
         // 保存流量统计
-        TrafficUtil.saveTrafficTotal(statistics);
+//        TrafficUtil.saveTrafficTotal(statistics);
+        TrafficUtil.resetTrafficInfo();
         // 更新网速采样数据
         NetworkSetting.updateNetworkSpeed(statistics);
-        // 根据当前的流量包的使用，判断是否给用户更换流量包的提示
-        daemon.handleNoRemainingDataTips();
 //        Context context = MainApplication.getInstance();
 //        logger.debug("Network statistical:: totalDownload::{}({}), totalUpload::{}({})" +
 //                        ", downloadRate::{}/s, uploadRate::{}/s",

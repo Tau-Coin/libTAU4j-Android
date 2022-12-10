@@ -9,7 +9,6 @@ import android.util.AttributeSet;
 import android.widget.EditText;
 
 import io.taucoin.tauapp.publishing.BuildConfig;
-import io.taucoin.tauapp.publishing.core.model.DozeEvent;
 import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.utils.BytesLimitFilter;
 import io.taucoin.tauapp.publishing.core.utils.ChineseFilter;
@@ -62,7 +61,7 @@ public class FilterEditText extends EditText {
     private final TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            TauDaemon.getInstance(getContext().getApplicationContext()).newActionEvent(DozeEvent.TEXT_INPUT);
+//            TauDaemon.getInstance(getContext().getApplicationContext()).newActionEvent(DozeEvent.TEXT_INPUT);
         }
 
         @Override

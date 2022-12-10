@@ -190,10 +190,12 @@ MainFragment extends BaseFragment implements View.OnClickListener {
             binding.tvWarning.setText(getString(R.string.main_network_unavailable));
         } else if (StringUtil.isEquals(settingsRepo.getStringValue(interfacesKey, ""), "0.0.0.0")) {
             binding.tvWarning.setText(getString(R.string.main_no_ipv4));
-        } else if (!NetworkSetting.isHaveAvailableData()) {
-            binding.tvWarning.setText(getString(R.string.main_data_used_up));
-            binding.llWarning.setTag(true);
-        } else if (DeviceUtils.isSpaceInsufficient()) {
+        }
+//        else if (!NetworkSetting.isHaveAvailableData()) {
+//            binding.tvWarning.setText(getString(R.string.main_data_used_up));
+//            binding.llWarning.setTag(true);
+//        }
+        else if (DeviceUtils.isSpaceInsufficient()) {
             binding.tvWarning.setText(getString(R.string.main_insufficient_device_space));
         } else {
             binding.llWarning.setVisibility(View.GONE);
@@ -209,9 +211,10 @@ MainFragment extends BaseFragment implements View.OnClickListener {
             handleWarningView();
         } else if (StringUtil.isEquals(key, getString(R.string.pref_key_internet_state))) {
             handleWarningView();
-        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_metered_prompt_limit))) {
-            handleWarningView();
         }
+//        else if (StringUtil.isEquals(key, getString(R.string.pref_key_metered_prompt_limit))) {
+//            handleWarningView();
+//        }
     }
 
     @Override

@@ -5,14 +5,10 @@
     <string name="pref_key_charging_state" translatable="false">pref_key_charging_state</string>
     <string name="pref_key_internet_state" translatable="false">pref_key_internet_state</string>
     <string name="pref_key_internet_type" translatable="false">pref_key_internet_type</string>
-    <string name="pref_key_bg_data_mode" translatable="false">pref_key_bg_data_mode</string>
     <string name="pref_key_last_tx_fee" translatable="false">pref_key_last_tx_fee_</string>
     <string name="pref_key_apk_download_id" translatable="false">pref_key_apk_download_id</string>
     <string name="pref_key_need_prompt_user" translatable="false">pref_key_need_prompt_user</string>
-    <string name="pref_key_metered_limit" translatable="false">pref_key_metered_limit</string>
-    <string name="pref_key_metered_prompt_limit" translatable="false">pref_key_metered_prompt_limit</string>
     <string name="pref_key_current_speed" translatable="false">pref_key_current_speed</string>
-    <string name="pref_key_metered_available_data" translatable="false">pref_key_metered_available_data</string>
     <string name="pref_key_is_metered_network" translatable="false">pref_key_is_metered_network</string>
     <string name="pref_key_is_wifi_network" translatable="false">pref_key_is_wifi_network</string>
     <string name="pref_key_network_switch" translatable="false">pref_key_network_switch</string>
@@ -21,8 +17,6 @@
     <string name="pref_key_foreground_running_time" translatable="false">pref_key_foreground_running_time</string>
     <string name="pref_key_background_running_time" translatable="false">pref_key_background_running_time</string>
     <string name="pref_key_doze_running_time" translatable="false">pref_key_doze_running_time</string>
-    <string name="pref_key_tau_fore_doze_time" translatable="false">pref_key_tau_fore_doze_time</string>
-    <string name="pref_key_tau_back_doze_time" translatable="false">pref_key_tau_back_doze_time</string>
 
     <string name="pref_key_upnp_mapped" translatable="false">pref_key_upnp_mapped</string>
     <string name="pref_key_nat_pmp_mapped" translatable="false">pref_key_nat_pmp_mapped</string>

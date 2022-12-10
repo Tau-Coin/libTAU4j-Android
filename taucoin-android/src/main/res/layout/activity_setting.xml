@@ -238,6 +238,7 @@
                         app:rightText="@string/drawer_working_condition"/>
 
                     <include
+                        android:visibility="gone"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/widget_size_1"
                         android:layout_marginStart="@dimen/widget_size_20"
@@ -245,6 +246,7 @@
                         layout="@layout/view_line"/>
 
                     <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
+                        android:visibility="gone"
                         android:id="@+id/item_data_cost"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

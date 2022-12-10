@@ -9,7 +9,6 @@ import java.util.Date;
 
 import androidx.annotation.NonNull;
 import io.taucoin.tauapp.publishing.MainApplication;
-import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 
@@ -25,7 +24,7 @@ public class TrafficUtil {
     private static final String TRAFFIC_VALUE_OLD = "pref_key_traffic_old_";
     private static final String TRAFFIC_VALUE = "pref_key_traffic_";
     private static final String TRAFFIC_TIME = "pref_key_traffic_time";
-    public static  int TRAFFIC_RESET_TIME = 20; // 流量统计重置时间为20点
+//    public static  int TRAFFIC_RESET_TIME = 20; // 流量统计重置时间为20点
 
     private static final SettingsRepository settingsRepo;
     static {
@@ -38,14 +37,15 @@ public class TrafficUtil {
      * @param statistics 当前网络数据总量
      */
     public static void saveTrafficTotal(@NonNull SessionStatistics statistics) {
-        long incrementalDown = saveTrafficTotal(TRAFFIC_DOWN, statistics.getTotalDownload());
-        long incrementalUp = saveTrafficTotal(TRAFFIC_UP, statistics.getTotalUpload());
-        if (!NetworkSetting.isWiFiNetwork()) {
-            long total = getMeteredTrafficTotal();
-            total += incrementalDown + incrementalUp;
-            settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, total);
-            logger.debug("Save metered traffic::{}", total);
-        }
+//        long incrementalDown = saveTrafficTotal(TRAFFIC_DOWN, statistics.getTotalDownload());
+//        long incrementalUp = saveTrafficTotal(TRAFFIC_UP, statistics.getTotalUpload());
+//        if (!NetworkSetting.isWiFiNetwork()) {
+//            long total = getMeteredTrafficTotal();
+//            total += incrementalDown + incrementalUp;
+//            settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, total);
+//            logger.debug("Save metered traffic::{}", total);
+//        }
+        resetTrafficInfo();
     }
 
     /**
@@ -88,15 +88,15 @@ public class TrafficUtil {
      * 重置上一次本地流量统计信息
      */
     public static void resetTrafficTotalOld() {
-        settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_DOWN, -1);
-        settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_UP, -1);
-        settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_METERED, -1);
+//        settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_DOWN, -1);
+//        settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_UP, -1);
+//        settingsRepo.setLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_METERED, -1);
     }
 
     /**
      * 重置本地流量统计信息
      */
-    private synchronized static void resetTrafficInfo() {
+    public synchronized static void resetTrafficInfo() {
         long currentTrafficTime = new Date().getTime();
         long oldTrafficTime = settingsRepo.getLongValue(TRAFFIC_TIME);
         if (oldTrafficTime == 0) {
@@ -105,17 +105,20 @@ public class TrafficUtil {
         } else {
             // 当前时间与前一次重置时间相隔天数
             int days = DateUtil.compareDay(oldTrafficTime, currentTrafficTime);
-            if (days >= 2) {
-                // 相隔天数大于等于2天数据重置
-                resetTrafficInfo(oldTrafficTime, currentTrafficTime);
-            } else if (days == 1 && DateUtil.getHourOfDay() >= TRAFFIC_RESET_TIME) {
-                // 相隔天数等于1天，并且当前时间点大于等于重置时间点
-                resetTrafficInfo(oldTrafficTime, currentTrafficTime);
-            } else if (days == 0 && DateUtil.getHourOfDay() >= TRAFFIC_RESET_TIME
-                    && DateUtil.getHourOfDay(oldTrafficTime) < TRAFFIC_RESET_TIME) {
-                // 相隔天数等于0天（同一天），当前时间点大于等于重置时间点，并且前一次重置时间点小于重置时间点
+            if (days > 0) {
                 resetTrafficInfo(oldTrafficTime, currentTrafficTime);
             }
+//            if (days >= 2) {
+//                // 相隔天数大于等于2天数据重置
+//                resetTrafficInfo(oldTrafficTime, currentTrafficTime);
+//            } else if (days == 1 && DateUtil.getHourOfDay() >= TRAFFIC_RESET_TIME) {
+//                // 相隔天数等于1天，并且当前时间点大于等于重置时间点
+//                resetTrafficInfo(oldTrafficTime, currentTrafficTime);
+//            } else if (days == 0 && DateUtil.getHourOfDay() >= TRAFFIC_RESET_TIME
+//                    && DateUtil.getHourOfDay(oldTrafficTime) < TRAFFIC_RESET_TIME) {
+//                // 相隔天数等于0天（同一天），当前时间点大于等于重置时间点，并且前一次重置时间点小于重置时间点
+//                resetTrafficInfo(oldTrafficTime, currentTrafficTime);
+//            }
         }
     }
 
@@ -126,29 +129,23 @@ public class TrafficUtil {
         logger.debug("resetTrafficInfo oldTrafficTime::{}, currentTrafficTime::{}",
                 DateUtil.format(oldTrafficTime, DateUtil.pattern6),
                 DateUtil.format(currentTrafficTime, DateUtil.pattern6));
-        settingsRepo.setLongValue(TRAFFIC_TIME, currentTrafficTime);
-        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN, 0);
-        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_UP, 0);
-        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, 0);
-        resetTrafficTotalOld();
+//        settingsRepo.setLongValue(TRAFFIC_TIME, currentTrafficTime);
+//        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN, 0);
+//        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_UP, 0);
+//        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, 0);
+//        resetTrafficTotalOld();
         // 同时重置前台运行时间
         NetworkSetting.updateForegroundRunningTime(0);
         NetworkSetting.updateBackgroundRunningTime(0);
         NetworkSetting.updateDozeTime(0);
-        Context context = MainApplication.getInstance();
-        TauDaemon.getInstance(context).resetDozeStartTime();
-        settingsRepo.setDataDozeTime(0, true);
-        settingsRepo.setDataDozeTime(0, false);
-        NetworkSetting.updateDataAvailableRate(100);
-        NetworkSetting.clearMeteredPromptLimit();
 
-        logger.debug("resetTrafficInfo TRAFFIC_DOWN::{}, TRAFFIC_UP::{}, TRAFFIC_METERED::{}, " +
-                        "TRAFFIC_DOWN_OLD::{}, TRAFFIC_UP_OLD::{}",
-                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN),
-                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_UP),
-                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_METERED),
-                settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_DOWN),
-                settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_UP));
+//        logger.debug("resetTrafficInfo TRAFFIC_DOWN::{}, TRAFFIC_UP::{}, TRAFFIC_METERED::{}, " +
+//                        "TRAFFIC_DOWN_OLD::{}, TRAFFIC_UP_OLD::{}",
+//                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN),
+//                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_UP),
+//                settingsRepo.getLongValue(TRAFFIC_VALUE + TRAFFIC_METERED),
+//                settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_DOWN),
+//                settingsRepo.getLongValue(TRAFFIC_VALUE_OLD + TRAFFIC_UP));
     }
 
     /**

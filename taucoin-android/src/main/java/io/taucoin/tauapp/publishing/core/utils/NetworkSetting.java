@@ -6,15 +6,10 @@ import android.os.SystemClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
-import io.taucoin.tauapp.publishing.core.Constants;
-import io.taucoin.tauapp.publishing.core.model.DozeEvent;
-import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 
@@ -24,8 +19,6 @@ import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
  */
 public class NetworkSetting {
     private static final Logger logger = LoggerFactory.getLogger("NetworkSetting");
-    private static final int[] METERED_LIMITED;                                   // 单位MB
-    private static final int[] DEVELOPED_METERED_LIMITED;                         // 单位MB
 
     private static final SettingsRepository settingsRepo;
     private static long lastElapsedRealTime = 0;
@@ -35,97 +28,7 @@ public class NetworkSetting {
     static {
         Context context = MainApplication.getInstance();
         settingsRepo = RepositoryHelper.getSettingsRepository(context);
-        METERED_LIMITED = context.getResources().getIntArray(R.array.metered_limit);
-        DEVELOPED_METERED_LIMITED = context.getResources().getIntArray(R.array.developed_metered_limit);
-        updateDevelopCountry();
     }
-
-
-
-    /**
-     * 获取计费网络流量限制值
-     * 先优先使用无流量时，提升的流量包，重置流量时恢复到用户收到设置的流量包
-     * @return long
-     */
-    public static int getMeteredLimitPos() {
-        Context context = MainApplication.getInstance();
-        int pos = settingsRepo.getIntValue(context.getString(R.string.pref_key_metered_prompt_limit), -1);
-        if (pos < 0) {
-            pos = settingsRepo.getIntValue(context.getString(R.string.pref_key_metered_limit), isUnlimitedNetwork() ? 1 : 0);
-        }
-        return pos;
-    }
-
-    public static int getMeteredLimitValue() {
-        int pos = getMeteredLimitPos();
-        if (isUnlimitedNetwork()) {
-            if (pos >= DEVELOPED_METERED_LIMITED.length) {
-                pos = DEVELOPED_METERED_LIMITED.length - 1;
-            }
-            return DEVELOPED_METERED_LIMITED[pos];
-        } else {
-            if (pos >= METERED_LIMITED.length) {
-                pos = METERED_LIMITED.length - 1;
-            }
-            return METERED_LIMITED[pos];
-        }
-    }
-
-    public static MutableLiveData<Boolean> getDevelopCountry() {
-        return developCountry;
-    }
-
-    public static boolean isDevelopCountry() {
-        return isDevelopCountry;
-    }
-
-    public static void updateDevelopCountry() {
-        boolean isNewDevelopCountry = Utils.isDevelopedCountry();
-        if (isDevelopCountry != isNewDevelopCountry) {
-            isDevelopCountry = isNewDevelopCountry;
-            developCountry.postValue(isDevelopCountry);
-        }
-    }
-
-    public static void updateDevelopCountryTest() {
-        if (isDevelopCountry) {
-            isDevelopCountry = false;
-        } else {
-            isDevelopCountry = true;
-        }
-        developCountry.postValue(isDevelopCountry);
-    }
-
-    public static int[] getMeteredLimits() {
-        if (isUnlimitedNetwork()) {
-            return DEVELOPED_METERED_LIMITED;
-        } else {
-            return METERED_LIMITED;
-        }
-    }
-
-    /**
-     * 设置计费网络流量限制值
-     * @param pos
-     */
-    public static void setMeteredLimitPos(int pos, boolean isClearPrompt) {
-        Context context = MainApplication.getInstance();
-        if (isClearPrompt) {
-            clearMeteredPromptLimit();
-            settingsRepo.setIntValue(context.getString(R.string.pref_key_metered_limit), pos);
-        } else {
-            settingsRepo.setIntValue(context.getString(R.string.pref_key_metered_prompt_limit), pos);
-        }
-    }
-
-    /**
-     * 清除计费提升的流量包
-     */
-    static void clearMeteredPromptLimit() {
-        Context context = MainApplication.getInstance();
-        settingsRepo.setIntValue(context.getString(R.string.pref_key_metered_prompt_limit), -1);
-    }
-
 
     /**
      * 设置当前是否为WiFi网络(存在计费和非计费的情况)
@@ -152,13 +55,6 @@ public class NetworkSetting {
     }
 
     /**
-     * 返回是否限制网络（在发达国家，WiFi网络，并且不是计费网络不限制网络）
-     */
-    public static boolean isUnlimitedNetwork() {
-        return isDevelopCountry() && isWiFiNetwork() && !isMeteredNetwork();
-    }
-
-    /**
      * 返回当前是否为计费网络
      */
     public static boolean isMeteredNetwork() {
@@ -177,9 +73,8 @@ public class NetworkSetting {
 
         // 更新Mode运行时间
         updateRunningTime();
-        updateMeteredSpeedLimit();
-//        logger.debug("updateSpeed, CurrentSpeed::{}/s",
-//                Formatter.formatFileSize(context, currentSpeed).toUpperCase());
+        logger.debug("updateSpeed, CurrentSpeed::{}/s",
+                Formatter.formatFileSize(context, currentSpeed).toUpperCase());
     }
 
     /**
@@ -217,10 +112,6 @@ public class NetworkSetting {
                 int dozeTime = getDozeTime() + dozeSeconds;
                 updateDozeTime(dozeTime);
                 logger.debug("updateRunningTime dozeTime::{}s", dozeSeconds);
-                TauDaemon tauDaemon = TauDaemon.getInstance(MainApplication.getInstance());
-                tauDaemon.newActionEvent(DozeEvent.SYS_DOZE_END);
-                // 防止因为Android doze引起libTAU不能出块
-                tauDaemon.resumeService();
             }
         }
         lastElapsedRealTime = currentElapsedRealTime;
@@ -290,66 +181,23 @@ public class NetworkSetting {
                 0);
     }
 
-    /**
-     * 更新计费网络网速限制值
-     */
-    public static void updateMeteredSpeedLimit() {
-        Context context = MainApplication.getInstance();
-        long usage = TrafficUtil.getMeteredTrafficTotal();
-        long limit =  getMeteredLimitValue();
-        BigInteger availableData = BigInteger.ZERO;
-
-        BigInteger bigUnit = new BigInteger("1024");
-        BigInteger bigLimit = BigInteger.valueOf(limit).multiply(bigUnit).multiply(bigUnit);
-        BigInteger bigUsage = BigInteger.valueOf(usage);
-
-        logger.debug("updateSpeedLimit meteredLimit::{}, meteredUsage::{}, compareTo::{}",
-                bigLimit.longValue(), bigUsage, bigLimit.compareTo(bigUsage));
-
-        if (bigLimit.compareTo(bigUsage) > 0) {
-            availableData = bigLimit.subtract(bigUsage);
-        }
-        int rate = 100;
-        if (!isWiFiNetwork()) {
-            if (bigLimit.compareTo(BigInteger.ZERO) > 0) {
-                rate = availableData.multiply(Constants.PERCENTAGE).divide(bigLimit).intValue();
-            }
-            updateDataAvailableRate(rate);
-        } else {
-            updateDataAvailableRate(100);
-        }
-        settingsRepo.setLongValue(context.getString(R.string.pref_key_metered_available_data), availableData.longValue());
-        logger.debug("updateSpeedLimit meteredLimit::{}, meteredUsage::{}, availableData::{}, rate::{}",
-                bigLimit.longValue(), bigUsage, availableData.longValue(), rate);
+    public static boolean isDevelopCountry() {
+        return isDevelopCountry;
     }
 
     /**
-     * 更新流量剩余可用率
+     * 返回是否限制网络（在发达国家，WiFi网络，并且不是计费网络不限制网络）
      */
-    public static void updateDataAvailableRate(int rate) {
-        Context context = MainApplication.getInstance();
-        TauDaemon.getInstance(context).setDataAvailableRate(rate);
+    public static boolean isUnlimitedNetwork() {
+//        return isDevelopCountry() && isWiFiNetwork() && !isMeteredNetwork();
+        return isWiFiNetwork() && !isMeteredNetwork();
     }
 
-    /**
-     * 获取计费网络可用数据
-     */
-    public static long getMeteredAvailableData() {
-        Context context = MainApplication.getInstance();
-        return settingsRepo.getLongValue(context.getString(R.string.pref_key_metered_available_data));
-    }
-
-    /**
-     * 当前网络是否还有剩余可用流量
-     */
-    public static boolean isHaveAvailableData() {
-        boolean isHaveAvailableData;
-        if (!NetworkSetting.isWiFiNetwork()) {
-            isHaveAvailableData = getMeteredAvailableData() > 0;
-        } else {
-            // WiFi网络流量不限制
-            isHaveAvailableData = true;
+    public static void updateDevelopCountry() {
+        boolean isNewDevelopCountry = Utils.isDevelopedCountry();
+        if (isDevelopCountry != isNewDevelopCountry) {
+            isDevelopCountry = isNewDevelopCountry;
+            developCountry.postValue(isDevelopCountry);
         }
-        return isHaveAvailableData;
     }
 }

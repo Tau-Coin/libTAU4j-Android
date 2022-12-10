@@ -184,10 +184,4 @@ public interface SettingsRepository {
      * 设置社区选择过滤
      */
     void setFiltersSelected(Set<String> filters);
-
-    void setDataDozeTime(long time, boolean isForeground);
-
-    void updateDataDozeTime(long time, boolean isForeground);
-
-    long getDataDozeTime(boolean isForeground);
 }

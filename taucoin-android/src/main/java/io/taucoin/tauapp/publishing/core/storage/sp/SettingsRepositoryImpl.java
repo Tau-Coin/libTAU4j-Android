@@ -310,32 +310,4 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         edit.putStringSet(appContext.getString(R.string.pref_key_community_filters_selected),
                 filters).apply();
     }
-
-    @Override
-    public void setDataDozeTime(long time, boolean isForeground) {
-        String key;
-        if (isForeground) {
-            key = appContext.getString(R.string.pref_key_tau_fore_doze_time);
-        } else {
-            key = appContext.getString(R.string.pref_key_tau_back_doze_time);
-        }
-        edit.putLong(key, time).apply();
-    }
-
-    @Override
-    public void updateDataDozeTime(long time, boolean isForeground) {
-        long dozeTime = getDataDozeTime(isForeground) + time;
-        setDataDozeTime(dozeTime, isForeground);
-    }
-
-    @Override
-    public long getDataDozeTime(boolean isForeground) {
-        String key;
-        if (isForeground) {
-            key = appContext.getString(R.string.pref_key_tau_fore_doze_time);
-        } else {
-            key = appContext.getString(R.string.pref_key_tau_back_doze_time);
-        }
-        return pref.getLong(key, 0);
-    }
 }

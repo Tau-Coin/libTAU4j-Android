@@ -18,7 +18,7 @@ import io.taucoin.tauapp.publishing.ui.BaseActivity;
 /**
  * 流量提示页面
  */
-
+@Deprecated
 public class TrafficTipsActivity extends BaseActivity {
 
     private static final Logger logger = LoggerFactory.getLogger("TrafficTipsActivity");
@@ -66,20 +66,20 @@ public class TrafficTipsActivity extends BaseActivity {
      * @param isProceed 是否继续
      */
     private void handleUserSelected(boolean isProceed) {
-        boolean updateDailyDataLimit = false;
-        if (isProceed) {
-            int pos = NetworkSetting.getMeteredLimitPos();
-            int[] meteredLimits = NetworkSetting.getMeteredLimits();
-            for (int i = 0; i < meteredLimits.length; i++) {
-                if (pos == i && i < meteredLimits.length - 1) {
-                    NetworkSetting.setMeteredLimitPos(i + 1, false);
-                    NetworkSetting.updateMeteredSpeedLimit();
-                    updateDailyDataLimit = true;
-                    break;
-                }
-            }
-        }
-        TauDaemon.getInstance(this).handleUserSelected(updateDailyDataLimit);
+//        boolean updateDailyDataLimit = false;
+//        if (isProceed) {
+//            int pos = NetworkSetting.getMeteredLimitPos();
+//            int[] meteredLimits = NetworkSetting.getMeteredLimits();
+//            for (int i = 0; i < meteredLimits.length; i++) {
+//                if (pos == i && i < meteredLimits.length - 1) {
+//                    NetworkSetting.setMeteredLimitPos(i + 1, false);
+//                    NetworkSetting.updateMeteredSpeedLimit();
+//                    updateDailyDataLimit = true;
+//                    break;
+//                }
+//            }
+//        }
+//        TauDaemon.getInstance(this).handleUserSelected(updateDailyDataLimit);
         this.finish();
     }
 

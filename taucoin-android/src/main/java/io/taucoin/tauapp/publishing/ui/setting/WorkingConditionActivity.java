@@ -14,6 +14,7 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
+import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.Formatter;
 import io.taucoin.tauapp.publishing.core.utils.NetworkSetting;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
@@ -69,6 +70,10 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
         handleSettingsChanged(getString(R.string.pref_key_cpu_usage));
         handleSettingsChanged(getString(R.string.pref_key_memory_usage));
         handleSettingsChanged(getString(R.string.pref_key_current_heap_size));
+        handleSettingsChanged(getString(R.string.pref_key_current_speed));
+        handleSettingsChanged(getString(R.string.pref_key_foreground_running_time));
+        handleSettingsChanged(getString(R.string.pref_key_background_running_time));
+        handleSettingsChanged(getString(R.string.pref_key_doze_running_time));
 
         disposables.add(settingsRepo.observeSettingsChanged()
                 .subscribeOn(Schedulers.newThread())
@@ -120,6 +125,37 @@ public class WorkingConditionActivity extends BaseActivity implements View.OnCli
             long heapSize = settingsRepo.getCurrentHeapSize();
             String heapSizeStr = Formatter.formatFileSize(this, heapSize);
             binding.tvHeapSize.setText(heapSizeStr);
+        } else if (StringUtil.isEquals(key, getString(R.string.pref_key_foreground_running_time))) {
+            int foreRun = NetworkSetting.getForegroundRunningTime();
+            String foregroundTimeStr = DateUtil.getFormatTime(foreRun);
+            binding.tvForeRunningTime.setText(foregroundTimeStr);
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_background_running_time))) {
+            int backgroundTime = NetworkSetting.getBackgroundRunningTime();
+            long androidDoze = NetworkSetting.getDozeTime();
+            long bgRun = backgroundTime - androidDoze;
+            bgRun = bgRun < 0 ? 0 : bgRun;
+            String backgroundTimeStr = DateUtil.getFormatTime(bgRun);
+            binding.tvBgRunningTime.setText(backgroundTimeStr);
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_doze_running_time))) {
+            int dozeTime = NetworkSetting.getDozeTime();
+            String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
+            binding.tvDozeRunningTime.setText(dozeTimeStr);
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_doze_running_time))) {
+            int dozeTime = NetworkSetting.getDozeTime();
+            String dozeTimeStr = DateUtil.getFormatTime(dozeTime);
+            binding.tvDozeRunningTime.setText(dozeTimeStr);
+        } else if(StringUtil.isEquals(key, getString(R.string.pref_key_current_speed))) {
+            boolean internetState = settingsRepo.internetState();
+            if (internetState) {
+                long currentSpeed = NetworkSetting.getCurrentSpeed();
+                String currentSpeedStr = getString(R.string.setting_metered_network_limit_speed,
+                        Formatter.formatFileSize(this, currentSpeed).toUpperCase());
+                binding.tvSpeed.setText(currentSpeedStr);
+            } else {
+                String noSpeedStr = getString(R.string.setting_metered_network_limit_speed,
+                        Formatter.formatFileSize(this, 0).toUpperCase());
+                binding.tvSpeed.setText(noSpeedStr);
+            }
         }
     }
 

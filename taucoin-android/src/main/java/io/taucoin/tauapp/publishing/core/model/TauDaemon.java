@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
@@ -46,7 +45,6 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.MemberRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.UserRepository;
-import io.taucoin.tauapp.publishing.core.utils.AppUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.DeviceUtils;
@@ -66,7 +64,6 @@ import io.taucoin.tauapp.publishing.service.SystemServiceManager;
 import io.taucoin.tauapp.publishing.service.TauService;
 import io.taucoin.tauapp.publishing.ui.TauNotifier;
 import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
-import io.taucoin.tauapp.publishing.ui.setting.TrafficTipsActivity;
 
 /**
  * 区块链业务Daemon
@@ -74,10 +71,8 @@ import io.taucoin.tauapp.publishing.ui.setting.TrafficTipsActivity;
 public abstract class TauDaemon {
     private static final String TAG = TauDaemon.class.getSimpleName();
     static final Logger logger = LoggerFactory.getLogger(TAG);
-    private static final int SHOW_DIALOG_THRESHOLD = 10;        // 单位s
     static final int ALERT_QUEUE_CAPACITY = 10000;              // Alert缓存队列
     private static volatile TauDaemon instance;
-    public static long daemonStartTime = DateUtil.getMillisTime(); // Daemon启动时间
 
     Context appContext;
     private final SettingsRepository settingsRepo;
@@ -90,15 +85,12 @@ public abstract class TauDaemon {
     private final LocationManagerUtil locationManager;
     private Disposable updateBootstrapIntervalTimer; // 更新BootstrapInterval定时任务
     private Disposable updateLocationTimer;          // 更新位置信息定时任务
-    private Disposable noRemainingDataTimer;         // 触发无剩余流量的提示定时任务
     private Disposable onlineTimer;                  // 触发在线信号定时任务
     private Disposable chargingTimer;                // 触发充电5分钟计时任务
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
     private final TxQueueManager txQueueManager;     // 交易队列管理
-    private final DataDozeManager tauDozeManager;     // tau休息模式管理
     private final MyAccountManager myAccountManager; // 社区我的账户管理
     volatile boolean isRunning = false;
-    private volatile boolean trafficTips = true;     // 剩余流量用完提示
     volatile String seed;
     String deviceID;
 
@@ -130,12 +122,10 @@ public abstract class TauDaemon {
         deviceID = DeviceUtils.getCustomDeviceID(appContext);
         sessionManager = new SessionManager(true);
         txQueueManager = new TxQueueManager(this);
-        tauDozeManager = new DataDozeManager(this, settingsRepo);
         myAccountManager = new MyAccountManager();
 
         observeTauDaemon();
         initLocalParam();
-        handleNoRemainingDataTips();
     }
 
     private void observeTauDaemon() {
@@ -282,9 +272,6 @@ public abstract class TauDaemon {
             return;
         isRunning = false;
         disposables.clear();
-        if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
-            noRemainingDataTimer.dispose();
-        }
         if (updateLocationTimer != null && !updateLocationTimer.isDisposed()) {
             updateLocationTimer.dispose();
         }
@@ -307,7 +294,6 @@ public abstract class TauDaemon {
         sessionManager.stop();
         tauDaemonAlertHandler.onCleared();
         txQueueManager.onCleared();
-        tauDozeManager.onCleared();
         myAccountManager.onCleared();
         sessionStopOver();
     }
@@ -391,7 +377,6 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_foreground_running))) {
             boolean isForeground = settingsRepo.getBooleanValue(key);
             logger.info("foreground running::{}", isForeground);
-            tauDozeManager.setForeground(isForeground);
             resetFrequencyMode();
         } else if (key.equals(appContext.getString(R.string.pref_key_nat_pmp_mapped))) {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
@@ -400,43 +385,7 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_dht_nodes))) {
             long nodes = settingsRepo.getLongValue(key, 0);
             logger.info("SettingsChanged, nodes::{}", nodes);
-            tauDozeManager.setNodesChanged(nodes);
         }
-    }
-
-    public void setDataAvailableRate(int rate) {
-        tauDozeManager.setDataAvailableRate(rate);
-    }
-
-    public void resetDozeStartTime() {
-        tauDozeManager.resetDozeStartTime();
-    }
-
-    /**
-     * 用户新的操作时间
-     */
-    public void newActionEvent(DozeEvent event) {
-        tauDozeManager.newActionEvent(event);
-    }
-
-    /**
-     * 暂停区块链服务
-     */
-    protected void pauseService() {
-        if (isRunning) {
-            sessionManager.pauseService();
-        }
-        logger.info("pauseService isRunning::{}", isRunning);
-    }
-
-    /**
-     * 恢复区块链服务
-     */
-    public void resumeService() {
-        if (isRunning) {
-            sessionManager.resumeService();
-        }
-        logger.info("resumeService isRunning::{}", isRunning);
     }
 
     /**
@@ -458,65 +407,6 @@ public abstract class TauDaemon {
 
             resetAutoRelayDelay();
             logger.info("Network change reopen network sockets...");
-        }
-    }
-
-    /**
-     * 根据当前的流量包的使用，判断是否给用户更换流量包的提示
-     * 发达国家使用wifi网络时不限量
-     */
-    void handleNoRemainingDataTips() {
-        if (!isRunning || !NetworkSetting.isForegroundRunning()) {
-            return;
-        }
-        // 判断有无网络连接
-        if (settingsRepo.internetState()) {
-            if (NetworkSetting.isHaveAvailableData()) {
-                // 重置无可用流量提示对话框的参数
-                trafficTips = true;
-                if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
-                    noRemainingDataTimer.dispose();
-                }
-            } else {
-                showNoRemainingDataTipsDialog();
-            }
-        }
-    }
-
-    /**
-     * 显示没有剩余流量提示对话框
-     * 必须同时满足需要提示、触发次数大于等于网速采样数、APP在前台、目前没有打开的流量提示Activity
-     */
-    private void showNoRemainingDataTipsDialog() {
-        if (!trafficTips) {
-            return;
-        }
-        if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
-            return;
-        }
-        noRemainingDataTimer = Observable.timer(SHOW_DIALOG_THRESHOLD, TimeUnit.SECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(aLong -> {
-                    if (AppUtil.isOnForeground(appContext) && !AppUtil.isForeground(appContext,
-                            TrafficTipsActivity.class)) {
-                        Intent intent = new Intent(appContext, TrafficTipsActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        appContext.startActivity(intent);
-                    }
-                });
-    }
-
-    /**
-     * 处理用户流量提示选择
-     * @param updateDailyDataLimit 是否更新每日流量限制
-     */
-    public void handleUserSelected(boolean updateDailyDataLimit) {
-        trafficTips = updateDailyDataLimit;
-        if (!trafficTips) {
-            if (noRemainingDataTimer != null && !noRemainingDataTimer.isDisposed()) {
-                noRemainingDataTimer.dispose();
-            }
         }
     }
 
@@ -738,10 +628,6 @@ public abstract class TauDaemon {
 
     public TauDaemonAlertHandler getTauDaemonHandler() {
         return tauDaemonAlertHandler;
-    }
-
-    public DataDozeManager getTauDozeManager() {
-        return tauDozeManager;
     }
 
     public MyAccountManager getMyAccountManager() {
