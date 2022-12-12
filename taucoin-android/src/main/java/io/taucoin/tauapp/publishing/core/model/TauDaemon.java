@@ -156,8 +156,6 @@ public abstract class TauDaemon {
                     updateChainsAndAccountInfo();
                     // 防止Crash后重启 初始化来不及设置新的日志等级
                     setLogLevel(LogUtil.getTauLogLevel());
-                    // 查看当前网络开关是否关闭
-                    checkNetworkSwitch();
                     // 重发点对点消息
                     startCommunicationMsgResend();
                 }
@@ -172,18 +170,6 @@ public abstract class TauDaemon {
         disposables.add(tauInfoProvider.observeCPUStatistics()
                 .subscribeOn(Schedulers.io())
                 .subscribe());
-    }
-
-    /**
-     * 检查网络开关
-     */
-    private void checkNetworkSwitch() {
-        String networkKey = appContext.getString(R.string.pref_key_network_switch);
-        boolean networkSwitch = settingsRepo.getBooleanValue(networkKey, true);
-        logger.info("Check network switch::{}", networkSwitch);
-        if (!networkSwitch) {
-            disconnectNetwork();
-        }
     }
 
     /**

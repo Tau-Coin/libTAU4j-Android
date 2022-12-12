@@ -352,7 +352,6 @@ You can paste the "tau link" to app to start with %1$d coins balance.\n%2$s</str
     <string name="setting_back_doze_time">Data Saving Background Pause</string>
     <string name="setting_survival_mode">Survival Mode</string>
     <string name="setting_doze_time">Doze time: %1$s</string>
-    <string name="setting_network_switch">Internet</string>
     <string name="setting_running_time_hours">%1$s h</string>
     <string name="setting_running_time_minutes">%1$s m</string>
     <string name="setting_running_time_seconds">%1$s s</string>
