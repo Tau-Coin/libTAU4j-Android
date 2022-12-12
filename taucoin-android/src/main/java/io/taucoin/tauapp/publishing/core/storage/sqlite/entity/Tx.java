@@ -32,8 +32,8 @@ public class Tx implements Parcelable {
     public String blockHash;                // 交易所属的区块哈希
 
     public int version;                     // notes交易上一个消息hash;
-    public String previousHash;             // notes交易上一个消息hash;
-    public String receiverPk;               // 交易接收者的公钥 只针对TxType.WRING_TX类型
+    public String previousHash;             // notes交易上一个消息hash; news交易回复的交易hash
+    public String receiverPk;               // 交易接收者的公钥 只针对TxType.WRING_TX类型, notes交易为回复的交易hash，news交易为针对回复的pubkey
     public long amount;                     // 交易金额 只针对TxType.WRING_TX类型
 
     public String coinName;                 // 币名 只针对TxType.SELL_TX类型
@@ -62,6 +62,16 @@ public class Tx implements Parcelable {
         this.fee = fee;
         this.txType = txType;
         this.memo = memo;
+    }
+
+    @Ignore
+    public Tx(@NonNull String chainID, long fee, int txType, String memo, String link, String repliedHash){
+        this.chainID = chainID;
+        this.fee = fee;
+        this.txType = txType;
+        this.memo = memo;
+        this.link = link;
+        this.receiverPk = repliedHash;
     }
 
     // sell

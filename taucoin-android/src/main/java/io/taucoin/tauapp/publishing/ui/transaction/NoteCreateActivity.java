@@ -116,7 +116,10 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
         int txType = TxType.NOTE_TX.getType();
         String memo = ViewUtils.getText(binding.etMessage);
         String chainID = ViewUtils.getStringTag(binding.etCommunity);
-        return new Tx(chainID, 0L, txType, memo);
+		//TODO: link, repliedHash
+		String link = null;
+		String repliedHash = null;
+        return new Tx(chainID, 0L, txType, memo, link, repliedHash);
     }
 
     @Override

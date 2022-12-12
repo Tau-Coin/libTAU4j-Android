@@ -17,7 +17,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.Constants;
-import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
@@ -85,7 +85,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         binding.ivCancel.setOnClickListener(v -> onBackPressed());
         if (StringUtil.isNotEmpty(chainID)) {
             if (txQueue != null) {
-                TxContent txContent = new TxContent(txQueue.content);
+                NewsContent txContent = new NewsContent(txQueue.content);
                 binding.etNews.setText(txContent.getMemo());
                 binding.etNews.setSelection(binding.etNews.getText().length());
                 binding.etNews.setEnabled(false);
@@ -192,7 +192,11 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         String senderPk = MainApplication.getInstance().getPublicKey();
         String fee = ViewUtils.getStringTag(binding.tvFee);
         String news = ViewUtils.getText(binding.etNews);
-        TxContent content = new TxContent(TxType.NEWS_TX.getType(), news);
+		//TODO: link, repliedHash, repliedKey
+		String link = null;
+		String repliedHash = null;
+		String repliedKey = null;
+        NewsContent content = new NewsContent(news, link, repliedHash, repliedKey);
         TxQueue tx = new TxQueue(chainID, senderPk, senderPk, 0L,
                 FmtMicrometer.fmtTxLongValue(fee), TxType.NEWS_TX, content.getEncoded());
         if (txQueue != null) {

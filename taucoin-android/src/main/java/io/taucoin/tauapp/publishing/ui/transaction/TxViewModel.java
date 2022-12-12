@@ -49,6 +49,8 @@ import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.NoteContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TransactionVersion;
 import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
@@ -91,6 +93,7 @@ import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.ANNOUN
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.NOTE_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.SELL_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.WIRING_TX;
+import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.NEWS_TX;
 
 /**
  * 交易模块相关的ViewModel
@@ -263,6 +266,9 @@ public class TxViewModel extends AndroidViewModel {
             byte[] txEncoded = null;
             switch (TxType.valueOf(tx.txType)) {
                 case NOTE_TX:
+					NoteContent noteContent = new NoteContent(tx.memo, tx.link, tx.receiverPk);
+                    txEncoded = noteContent.getEncoded();
+					break;
                 case WIRING_TX:
                     TxContent txContent = new TxContent(tx.txType, tx.memo);
                     txEncoded = txContent.getEncoded();
@@ -286,6 +292,10 @@ public class TxViewModel extends AndroidViewModel {
                     AnnouncementContent invitationContent = new AnnouncementContent(tx.coinName, tx.memo);
                     txEncoded = invitationContent.getEncoded();
                     break;
+                case NEWS_TX:
+					NewsContent newsContent = new NewsContent(tx.memo, tx.link, tx.previousHash, tx.receiverPk);
+                    txEncoded = newsContent.getEncoded();
+					break;
                 default:
                     break;
             }
