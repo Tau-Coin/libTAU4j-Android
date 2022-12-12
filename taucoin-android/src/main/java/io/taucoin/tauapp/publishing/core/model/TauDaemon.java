@@ -64,6 +64,7 @@ import io.taucoin.tauapp.publishing.service.SystemServiceManager;
 import io.taucoin.tauapp.publishing.service.TauService;
 import io.taucoin.tauapp.publishing.ui.TauNotifier;
 import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
+import io.taucoin.tauapp.publishing.ui.transaction.TxViewModel;
 
 /**
  * 区块链业务Daemon
@@ -720,6 +721,7 @@ public abstract class TauDaemon {
                     resendTime = DateUtil.getMillisTime();
                     logger.debug("resendRegularMessages...");
                     ChatViewModel.resendRegularMessages(appContext);
+                    TxViewModel.resendRegularTxs(appContext);
                 });
     }
 

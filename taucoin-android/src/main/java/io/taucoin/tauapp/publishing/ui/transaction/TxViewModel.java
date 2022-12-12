@@ -862,6 +862,35 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     /**
+     * 周期性重发交易，12小时，30分钟一次
+	 * note tx: 最近10笔
+	 * new tx: 没有上链的所有消息
+     */
+	public static void resendRegularTxs(Context context) {
+        TxQueueRepository txQueueRepo = RepositoryHelper.getTxQueueRepository(context);
+        TauDaemon daemon = TauDaemon.getInstance(context);
+		//重发note tx
+		List<TxQueueAndStatus> txQueues =  txQueueRepo.getResendNoteTxQueue(MainApplication.getInstance().getPublicKey());
+		if (txQueues.size() > 0) { 
+			for (TxQueueAndStatus txQueue : txQueues) {
+				txQueueRepo.updateQueue(txQueue);
+				logger.info("resend regular note tx queueID::{}", txQueue.queueID);
+				daemon.sendTxQueue(txQueue, 0, 2); //直接重发
+			}
+		}
+
+		//重发news tx
+		txQueues =  txQueueRepo.getResendNewsTxQueue(MainApplication.getInstance().getPublicKey());
+		if (txQueues.size() > 0) { 
+			for (TxQueueAndStatus txQueue : txQueues) {
+				txQueueRepo.updateQueue(txQueue);
+				logger.info("resend regular news tx queueID::{}", txQueue.queueID);
+				daemon.sendTxQueue(txQueue, 0, 2); //直接重发
+			}
+		}
+	}
+
+    /**
      * 观察社区的消息的变化
      */
     Observable<DataChanged> observeDataSetChanged() {

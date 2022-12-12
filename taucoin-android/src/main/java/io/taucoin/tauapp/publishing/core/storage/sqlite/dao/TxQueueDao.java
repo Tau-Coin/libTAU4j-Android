@@ -34,6 +34,21 @@ public interface TxQueueDao {
             " ON tq.queueID = t.queueID" +
             " WHERE t.chainID = :chainID AND t.senderPk = :senderPk AND t.nonce = :nonce)";
 
+    String QUERY_RESEND_NOTE_TX_QUEUE = "SELECT * FROM" +
+            " (SELECT tq.*, t.timestamp, t.nonce, t.txStatus as status" +
+            " FROM TxQueues tq" +
+            " LEFT JOIN Txs t" +
+            " ON tq.queueID = t.queueID" +
+            " WHERE t.senderPk = :senderPk AND t.txType = 1" +
+			" ORDER BY t.timestamp LIMIT 10)"; //1 note tx, 10笔
+
+    String QUERY_RESEND_NEWS_TX_QUEUE = "SELECT * FROM" +
+            " (SELECT tq.*, t.timestamp, t.nonce, t.txStatus as status" +
+            " FROM TxQueues tq" +
+            " LEFT JOIN Txs t" +
+            " ON tq.queueID = t.queueID" +
+            " WHERE t.senderPk = :senderPk AND t.txStatus = 0 AND t.txType = 7)"; //7 news tx, 未确认
+
     String QUERY_TX_QUEUE_BY_ID = "SELECT * FROM" +
             " (SELECT tq.*, t.timestamp, t.nonce, t.txStatus as status" +
             " FROM TxQueues tq" +
@@ -117,6 +132,12 @@ public interface TxQueueDao {
 
     @Query(QUERY_COMMUNITY_TX_QUEUE)
     List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String senderPk);
+
+    @Query(QUERY_RESEND_NOTE_TX_QUEUE)
+    List<TxQueueAndStatus> getResendNoteTxQueue(String senderPk);
+
+    @Query(QUERY_RESEND_NEWS_TX_QUEUE)
+    List<TxQueueAndStatus> getResendNewsTxQueue(String senderPk);
 
     @Query(QUERY_NONCE_FIRST_TX)
     TxQueueAndStatus getNonceFirstTx(String chainID, String senderPk, long nonce);

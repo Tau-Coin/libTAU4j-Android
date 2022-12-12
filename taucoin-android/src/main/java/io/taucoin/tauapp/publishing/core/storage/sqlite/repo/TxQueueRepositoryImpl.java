@@ -64,6 +64,16 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     }
 
     @Override
+    public List<TxQueueAndStatus> getResendNoteTxQueue(String senderPk) {
+        return db.txQueueDao().getResendNoteTxQueue(senderPk);
+    }
+
+    @Override
+    public List<TxQueueAndStatus> getResendNewsTxQueue(String senderPk) {
+        return db.txQueueDao().getResendNewsTxQueue(senderPk);
+    }
+
+    @Override
     public List<String> getNeedWiringTxCommunities(String userPk) {
         return db.txQueueDao().getNeedWiringTxCommunities(userPk);
     }
