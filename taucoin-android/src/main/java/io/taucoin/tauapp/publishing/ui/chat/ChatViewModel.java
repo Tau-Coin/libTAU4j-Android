@@ -421,9 +421,6 @@ public class ChatViewModel extends AndroidViewModel {
     /**
      * 周期性重发消息，24小时，30分钟一次；48小时，1个小时1次
      */
-    void resendMessage(ChatMsgLog msgLog) {
-    }
-
 	public static void resendRegularMessages(Context context) {
         FriendRepository friendRepo = RepositoryHelper.getFriendsRepository(context);
         ChatRepository chatRepo = RepositoryHelper.getChatRepository(context);

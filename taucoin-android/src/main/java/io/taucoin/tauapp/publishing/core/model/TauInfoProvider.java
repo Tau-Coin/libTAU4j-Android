@@ -187,7 +187,7 @@ public class TauInfoProvider {
 
                 while (!emitter.isCancelled()) {
                     // 防止android doze造成延迟
-                    daemon.checkCommunicationMsgResend();
+                    daemon.checkDataResend();
 
                     long currentTime = DateUtil.getMillisTime();
                     // 内存采样：AndroidQ开始限制采样频率5分钟
