@@ -64,6 +64,7 @@ import io.taucoin.tauapp.publishing.service.SystemServiceManager;
 import io.taucoin.tauapp.publishing.service.TauService;
 import io.taucoin.tauapp.publishing.ui.TauNotifier;
 import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
+import io.taucoin.tauapp.publishing.ui.transaction.TxViewModel;
 
 /**
  * 区块链业务Daemon
@@ -157,7 +158,7 @@ public abstract class TauDaemon {
                     // 防止Crash后重启 初始化来不及设置新的日志等级
                     setLogLevel(LogUtil.getTauLogLevel());
                     // 重发点对点消息
-                    startCommunicationMsgResend();
+                    startDataResend();
                 }
             }
         });
@@ -687,15 +688,15 @@ public abstract class TauDaemon {
      */
     private long resendTime = 0;
     private Disposable msgResendDisposable;
-    public void checkCommunicationMsgResend() {
+    public void checkDataResend() {
         int intervalSeconds = 30 * 60;
         long currentTime = DateUtil.getMillisTime();
         if (null == msgResendDisposable || resendTime == 0 || (currentTime - resendTime) / 1000 <= intervalSeconds) {
             return;
         }
-        startCommunicationMsgResend();
+        startDataResend();
     }
-    public void startCommunicationMsgResend() {
+    public void startDataResend() {
         int intervalSeconds = 30 * 60;
         if (msgResendDisposable != null && !msgResendDisposable.isDisposed()) {
             msgResendDisposable.dispose();
@@ -706,6 +707,7 @@ public abstract class TauDaemon {
                     resendTime = DateUtil.getMillisTime();
                     logger.debug("resendRegularMessages...");
                     ChatViewModel.resendRegularMessages(appContext);
+                    TxViewModel.resendRegularTxs(appContext);
                 });
     }
 

@@ -32,6 +32,10 @@ public interface TxQueueRepository {
 
     TxQueueAndStatus getTxQueueByID(long queueID);
 
+    List<TxQueueAndStatus> getResendNoteTxQueue(String senderPk);
+
+    List<TxQueueAndStatus> getResendNewsTxQueue(String senderPk);
+
     List<String> getNeedWiringTxCommunities(String userPk);
 
     int getAirdropCount(String chainID, String currentPk, long currentTime);
