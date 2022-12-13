@@ -117,8 +117,8 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
         String memo = ViewUtils.getText(binding.etMessage);
         String chainID = ViewUtils.getStringTag(binding.etCommunity);
 		//TODO: link, repliedHash
-		String link = null;
-		String repliedHash = null;
+		String link = "https://taucoin.io/test";
+		String repliedHash = "b0cff312c8fc5e74f31940ba3b83646437461a889bece82265039c9080ac6161";
         return new Tx(chainID, 0L, txType, memo, link, repliedHash);
     }
 

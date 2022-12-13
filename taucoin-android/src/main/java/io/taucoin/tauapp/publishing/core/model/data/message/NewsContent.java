@@ -15,7 +15,7 @@ public class NewsContent extends TxContent {
 
     public NewsContent(String memo, String link, String repliedHash, String repliedKey) {
         super(TxType.NEWS_TX.getType(), Utils.textStringToBytes(memo));
-        this.link = ByteUtil.toByte(link);
+        this.link =  Utils.textStringToBytes(link);
         this.repliedHash = ByteUtil.toByte(repliedHash);
         this.repliedKey = ByteUtil.toByte(repliedKey);
     }

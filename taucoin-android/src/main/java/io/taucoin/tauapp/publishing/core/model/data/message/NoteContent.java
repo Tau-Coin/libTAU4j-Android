@@ -14,7 +14,7 @@ public class NoteContent extends TxContent {
 
     public NoteContent(String memo, String link, String repliedHash) {
         super(TxType.NOTE_TX.getType(), Utils.textStringToBytes(memo));
-        this.link = ByteUtil.toByte(link);
+        this.link = Utils.textStringToBytes(link);
         this.repliedHash = ByteUtil.toByte(repliedHash);
     }
 

@@ -193,9 +193,9 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         String fee = ViewUtils.getStringTag(binding.tvFee);
         String news = ViewUtils.getText(binding.etNews);
 		//TODO: link, repliedHash, repliedKey
-		String link = null;
-		String repliedHash = null;
-		String repliedKey = null;
+		String link = "https://taucoin.io/test";
+		String repliedHash = "b0cff312c8fc5e74f31940ba3b83646437461a889bece82265039c9080ac6161";
+		String repliedKey = "b0cff312c8fc5e74f31940ba3b83646437461a889bece82265039c9080ac6161";
         NewsContent content = new NewsContent(news, link, repliedHash, repliedKey);
         TxQueue tx = new TxQueue(chainID, senderPk, senderPk, 0L,
                 FmtMicrometer.fmtTxLongValue(fee), TxType.NEWS_TX, content.getEncoded());
