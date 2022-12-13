@@ -9,8 +9,8 @@ import io.taucoin.tauapp.publishing.core.utils.rlp.RLPList;
  * 交易内容类
  */
 public class NoteContent extends TxContent {
-    private byte[]  link;
-    private byte[] repliedHash;
+    private byte[]  link; //ascii编码
+    private byte[] repliedHash; //hex 编码
 
     public NoteContent(String memo, String link, String repliedHash) {
         super(TxType.NOTE_TX.getType(), Utils.textStringToBytes(memo));
@@ -20,7 +20,6 @@ public class NoteContent extends TxContent {
 
     public NoteContent(byte[] encode) {
         super(encode);
-
         if (encode != null) {
             parseRLP(encode);
         }
@@ -63,7 +62,7 @@ public class NoteContent extends TxContent {
 
     public String getLinkStr() {
         if (link != null) {
-            return ByteUtil.toHexString(link);
+            return Utils.textBytesToString(link);
         }
         return null;
     }

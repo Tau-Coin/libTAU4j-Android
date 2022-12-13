@@ -25,6 +25,8 @@ import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndFriend;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.NoteContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.MessageType;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
@@ -374,7 +376,13 @@ public class TauListenHandler {
         tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
         tx.amount = txMsg.getAmount();
 
-        if (tx.txType == TxType.TRUST_TX.getType()) {
+        if (tx.txType == TxType.NOTE_TX.getType()) {
+            NoteContent noteContent = new NoteContent(txMsg.getPayload());
+            // 添加Note信息(link, repliedHash)
+            tx.link = noteContent.getLinkStr();
+            tx.repliedHash = noteContent.getRepliedHashStr();
+		}
+		else if (tx.txType == TxType.TRUST_TX.getType()) {
             TrustContent trustContent = new TrustContent(txMsg.getPayload());
             // 添加Trust信息
             tx.receiverPk = trustContent.getTrustedPkStr();
@@ -393,6 +401,12 @@ public class TauListenHandler {
             AnnouncementContent sellTxContent = new AnnouncementContent(txMsg.getPayload());
             // 添加社区领导者邀请信息
             tx.coinName = sellTxContent.getTitle();
+        } else if (tx.txType == TxType.NEWS_TX.getType()) {
+            NewsContent newsContent = new NewsContent(txMsg.getPayload());
+            // 添加News信息(link, repliedHash, repliedKey)
+            tx.link = newsContent.getLinkStr();
+            tx.repliedHash = newsContent.getRepliedHashStr();
+            tx.receiverPk = newsContent.getRepliedKeyStr();
         }
 
         txRepo.addTransaction(tx);

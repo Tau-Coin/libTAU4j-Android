@@ -25,6 +25,7 @@ import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TransactionVersion;
@@ -378,8 +379,9 @@ class TxQueueManager {
             tx = new Tx(txQueue.chainID, txQueue.receiverPk, txQueue.fee, ANNOUNCEMENT.getType(), content.getMemo());
             tx.coinName = content.getTitle();
         } else if (txType == NEWS_TX.getType()) {
-            tx = new Tx(txQueue.chainID, txQueue.receiverPk, txQueue.amount, txQueue.fee,
-                    NEWS_TX.getType(), txContent.getMemo());
+            NewsContent content = new NewsContent(txEncoded);
+            tx = new Tx(txQueue.chainID, txQueue.fee, NEWS_TX.getType(),
+					content.getMemo(), content.getLinkStr(), content.getRepliedHashStr(), content.getRepliedKeyStr());
         } else if (txType == TRUST_TX.getType()) {
             TrustContent content = new TrustContent(txEncoded);
             tx = new Tx(txQueue.chainID, content.getTrustedPkStr(), txQueue.fee, TRUST_TX.getType(), content.getMemo());

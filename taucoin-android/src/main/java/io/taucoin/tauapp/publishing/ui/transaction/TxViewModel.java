@@ -266,7 +266,7 @@ public class TxViewModel extends AndroidViewModel {
             byte[] txEncoded = null;
             switch (TxType.valueOf(tx.txType)) {
                 case NOTE_TX:
-					NoteContent noteContent = new NoteContent(tx.memo, tx.link, tx.receiverPk);
+					NoteContent noteContent = new NoteContent(tx.memo, tx.link, tx.repliedHash);
                     txEncoded = noteContent.getEncoded();
 					break;
                 case WIRING_TX:
@@ -293,7 +293,7 @@ public class TxViewModel extends AndroidViewModel {
                     txEncoded = invitationContent.getEncoded();
                     break;
                 case NEWS_TX:
-					NewsContent newsContent = new NewsContent(tx.memo, tx.link, tx.previousHash, tx.receiverPk);
+					NewsContent newsContent = new NewsContent(tx.memo, tx.link, tx.repliedHash, tx.receiverPk);
                     txEncoded = newsContent.getEncoded();
 					break;
                 default:

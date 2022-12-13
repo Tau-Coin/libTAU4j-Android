@@ -33,11 +33,12 @@ public class Tx implements Parcelable {
 
     public int version;                     // notes交易上一个消息hash;
     public String previousHash;             // notes交易上一个消息hash; news交易回复的交易hash
-    public String receiverPk;               // 交易接收者的公钥 只针对TxType.WRING_TX类型, notes交易为回复的交易hash，news交易为针对回复的pubkey
+    public String receiverPk;               // 交易接收者的公钥 只针对TxType.WRING_TX类型, news交易为针对回复的pubkey
     public long amount;                     // 交易金额 只针对TxType.WRING_TX类型
 
     public String coinName;                 // 币名 只针对TxType.SELL_TX类型
-    public String link;                     // 用户link 只针对TxType.SELL_TX类型
+    public String link;                     // 用户link 只针对TxType.SELL_TX类型,  notes交易, news交易
+    public String repliedHash;              // 针对与notes交易和news交易回复的hash
     public long quantity;                   // 币的数量 只针对TxType.SELL_TX类型
     public String location;                 // 位置信息 只针对TxType.SELL_TX类型
     public long queueID = -1;               // 交易对应的队列ID
@@ -63,7 +64,6 @@ public class Tx implements Parcelable {
         this.txType = txType;
         this.memo = memo;
     }
-
     @Ignore
     public Tx(@NonNull String chainID, long fee, int txType, String memo, String link, String repliedHash){
         this.chainID = chainID;
@@ -71,9 +71,21 @@ public class Tx implements Parcelable {
         this.txType = txType;
         this.memo = memo;
         this.link = link;
-        this.receiverPk = repliedHash;
+        this.repliedHash = repliedHash;
     }
 
+	// news
+    @Ignore
+    public Tx(@NonNull String chainID, long fee, int txType, String memo, String link, String repliedHash, String receiverPk){
+        this.chainID = chainID;
+        this.fee = fee;
+        this.txType = txType;
+        this.memo = memo;
+        this.link = link;
+        this.repliedHash = repliedHash;
+        this.receiverPk = receiverPk; //当作@的key使用
+    }
+	
     // sell
     @Ignore
     public Tx(@NonNull String chainID, String receiverPk, long fee, int txType, String coinName, long quantity,
