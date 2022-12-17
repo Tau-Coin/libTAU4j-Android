@@ -119,14 +119,6 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
         intent.putExtra(IntentExtra.BEAN, tx);
         if (type == TxType.WIRING_TX.getType()) {
             ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
-        } else if (type == TxType.SELL_TX.getType()) {
-            ActivityUtil.startActivity(intent, this, SellCreateActivity.class);
-        } else if (type == TxType.AIRDROP_TX.getType()) {
-            ActivityUtil.startActivity(intent, this, AirdropCreateActivity.class);
-        } else if (type == TxType.ANNOUNCEMENT.getType()) {
-            ActivityUtil.startActivity(intent, this, AnnouncementCreateActivity.class);
-        } else if (type == TxType.TRUST_TX.getType()) {
-            showTrustDialog(null, tx);
         } else if (type == TxType.NEWS_TX.getType()) {
             ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
         }

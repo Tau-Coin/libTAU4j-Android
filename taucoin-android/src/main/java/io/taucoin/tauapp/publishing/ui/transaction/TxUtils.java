@@ -12,10 +12,7 @@ import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.data.BlockAndTx;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
-import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
@@ -56,18 +53,10 @@ public class TxUtils {
         switch (TxType.valueOf(tx.txType)) {
             case NOTE_TX:
                 return createSpanNoteTx(tx, tab);
-            case WIRING_TX:
-                return createSpanWiringTx(tx, tab == CommunityTabFragment.TAB_CHAIN);
-            case SELL_TX:
-                return createSpanSellTx(tx, tab);
-            case AIRDROP_TX:
-                return createSpanAirdropTx(tx, tab);
-            case TRUST_TX:
-                return createSpanTrustTx(tx, tab);
-            case ANNOUNCEMENT:
-                return createSpanLeaderTx(tx, tab);
             case NEWS_TX:
                 return createSpanNewsTx(tx, tab);
+            case WIRING_TX:
+                return createSpanWiringTx(tx, tab == CommunityTabFragment.TAB_CHAIN);
         }
         return new SpanUtils().create();
     }
@@ -438,43 +427,9 @@ public class TxUtils {
                         msg.append("\n").append("Community Link: ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID, tx.senderPk));
                     }
                 }
-            } else if (txType == TxType.AIRDROP_TX.getType()) {
-                AirdropTxContent content = new AirdropTxContent(tx.content);
-                msg.append("\n").append("Link: ").append(content.getLink());
-                if (StringUtil.isNotEmpty(txContent.getMemo())) {
-                    msg.append("\n").append("Description: ").append(txContent.getMemo());
-                }
-            } else if (txType == TxType.ANNOUNCEMENT.getType()) {
-                AnnouncementContent content = new AnnouncementContent(tx.content);
-                msg.append("\n").append("Title: ").append(content.getTitle());
-                if (StringUtil.isNotEmpty(txContent.getMemo())) {
-                    msg.append("\n").append("Description: ").append(txContent.getMemo());
-                }
-            } else if (txType == TxType.SELL_TX.getType()) {
-                SellTxContent content = new SellTxContent(tx.content);
-                msg.append("\n").append("Selling: ")
-                        .append(content.getCoinName())
-                        .append("\n").append("Quantity: ");
-                if (content.getQuantity() > 0) {
-                    msg.append(String.valueOf(content.getQuantity()));
-                } else {
-                    msg.append("TBD");
-                }
-                if (StringUtil.isNotEmpty(content.getLink())) {
-                    msg.append("\n").append("Link: ").append(content.getLink());
-                }
-                if (StringUtil.isNotEmpty(content.getLocation())) {
-                    msg.append("\n").append("Location: ").append(content.getLocation());
-                }
-                if (StringUtil.isNotEmpty(content.getMemo())) {
-                    msg.append("\n").append("Description: ").append(content.getMemo());
-                }
-            } else if (txType == TxType.TRUST_TX.getType()) {
-                TrustContent trustContent = new TrustContent(tx.content);
-                msg.append("\n").append("Trust: ").append(HashUtil.hashMiddleHide(trustContent.getTrustedPkStr()));
             } else if (txType == TxType.NEWS_TX.getType()) {
-                TxContent trustContent = new TxContent(tx.content);
-                msg.append("\n").append(trustContent.getMemo());
+                NewsContent newsContent = new NewsContent(tx.content);
+                msg.append("\n").append(newsContent.getMemo());
             }
         }
         return msg.create();

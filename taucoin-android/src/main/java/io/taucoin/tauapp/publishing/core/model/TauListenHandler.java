@@ -23,14 +23,10 @@ import io.taucoin.tauapp.publishing.core.model.data.ForkPoint;
 import io.taucoin.tauapp.publishing.core.model.data.FriendStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndFriend;
-import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.NoteContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.MessageType;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
-import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
@@ -381,26 +377,6 @@ public class TauListenHandler {
             // 添加Note信息(link, repliedHash)
             tx.link = noteContent.getLinkStr();
             tx.repliedHash = noteContent.getRepliedHashStr();
-		}
-		else if (tx.txType == TxType.TRUST_TX.getType()) {
-            TrustContent trustContent = new TrustContent(txMsg.getPayload());
-            // 添加Trust信息
-            tx.receiverPk = trustContent.getTrustedPkStr();
-        } else if (tx.txType == TxType.SELL_TX.getType()) {
-            SellTxContent sellTxContent = new SellTxContent(txMsg.getPayload());
-            // 添加Sell信息
-            tx.coinName = sellTxContent.getCoinName();
-            tx.quantity = sellTxContent.getQuantity();
-            tx.link = sellTxContent.getLink();
-            tx.location = sellTxContent.getLocation();
-        } else if (tx.txType == TxType.AIRDROP_TX.getType()) {
-            AirdropTxContent sellTxContent = new AirdropTxContent(txMsg.getPayload());
-            // 添加Airdrop信息
-            tx.link = sellTxContent.getLink();
-        } else if (tx.txType == TxType.ANNOUNCEMENT.getType()) {
-            AnnouncementContent sellTxContent = new AnnouncementContent(txMsg.getPayload());
-            // 添加社区领导者邀请信息
-            tx.coinName = sellTxContent.getTitle();
         } else if (tx.txType == TxType.NEWS_TX.getType()) {
             NewsContent newsContent = new NewsContent(txMsg.getPayload());
             // 添加News信息(link, repliedHash, repliedKey)
@@ -455,10 +431,7 @@ public class TauListenHandler {
 
         if (txType == TxType.WIRING_TX.getType()) {
             saveUserInfo(txMsg.getReceiver());
-        } else if (txType == TxType.TRUST_TX.getType()) {
-            TrustContent trustContent = new TrustContent(txMsg.getPayload());
-            saveUserInfo(trustContent.getTrustedPk());
-        }
+        } 
     }
 
     /**
@@ -481,9 +454,6 @@ public class TauListenHandler {
                 pendingTime = status == BlockStatus.NEW_TX || status == BlockStatus.SYNCING ? DateUtil.getMillisTime() : 0;
             }
             addMemberInfo(txMsg.getChainID(), ByteUtil.toHexString(txMsg.getReceiver()), pendingTime);
-        } else if (txType == TxType.TRUST_TX.getType()) {
-            TrustContent trustContent = new TrustContent(txMsg.getPayload());
-            addMemberInfo(txMsg.getChainID(), ByteUtil.toHexString(trustContent.getTrustedPk()));
         }
     }
 

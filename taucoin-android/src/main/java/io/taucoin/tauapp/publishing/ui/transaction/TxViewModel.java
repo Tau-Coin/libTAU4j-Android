@@ -47,13 +47,9 @@ import io.taucoin.tauapp.publishing.core.model.data.Result;
 import io.taucoin.tauapp.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
-import io.taucoin.tauapp.publishing.core.model.data.message.AirdropTxContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.AnnouncementContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.NoteContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TransactionVersion;
-import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
@@ -88,12 +84,9 @@ import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
 import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
-import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.AIRDROP_TX;
-import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.ANNOUNCEMENT;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.NOTE_TX;
-import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.SELL_TX;
-import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.WIRING_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.NEWS_TX;
+import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.WIRING_TX;
 
 /**
  * 交易模块相关的ViewModel
@@ -269,33 +262,14 @@ public class TxViewModel extends AndroidViewModel {
 					NoteContent noteContent = new NoteContent(tx.memo, tx.link, tx.repliedHash);
                     txEncoded = noteContent.getEncoded();
 					break;
-                case WIRING_TX:
-                    TxContent txContent = new TxContent(tx.txType, tx.memo);
-                    txEncoded = txContent.getEncoded();
-                    break;
-                case TRUST_TX:
-                    // trust UserPk占用receiverPk
-                    TrustContent trustContent = new TrustContent(tx.memo, tx.receiverPk);
-                    txEncoded = trustContent.getEncoded();
-                    receiverPk = senderPk;
-                    break;
-                case SELL_TX:
-                    SellTxContent sellTxContent = new SellTxContent(tx.coinName, tx.quantity,
-                            tx.link, tx.location, tx.memo);
-                    txEncoded = sellTxContent.getEncoded();
-                    break;
-                case AIRDROP_TX:
-                    AirdropTxContent airdropContent = new AirdropTxContent(tx.link, tx.memo);
-                    txEncoded = airdropContent.getEncoded();
-                    break;
-                case ANNOUNCEMENT:
-                    AnnouncementContent invitationContent = new AnnouncementContent(tx.coinName, tx.memo);
-                    txEncoded = invitationContent.getEncoded();
-                    break;
                 case NEWS_TX:
 					NewsContent newsContent = new NewsContent(tx.memo, tx.link, tx.repliedHash, tx.receiverPk);
                     txEncoded = newsContent.getEncoded();
 					break;
+                case WIRING_TX:
+                    TxContent txContent = new TxContent(tx.txType, tx.memo);
+                    txEncoded = txContent.getEncoded();
+                    break;
                 default:
                     break;
             }
@@ -465,26 +439,7 @@ public class TxViewModel extends AndroidViewModel {
                 return false;
             }
         } else {
-            if (type == SELL_TX.getType()) {
-                SellTxContent txContent = new SellTxContent(tx.content);
-                if (StringUtil.isEmpty(txContent.getCoinName())) {
-                    ToastUtils.showShortToast(R.string.tx_error_invalid_item_name);
-                    return false;
-                }
-            } else if (type == AIRDROP_TX.getType()) {
-                AirdropTxContent txContent = new AirdropTxContent(tx.content);
-                LinkUtil.Link link = LinkUtil.decode(txContent.getLink());
-                if (!link.isAirdropLink()) {
-                    ToastUtils.showShortToast(R.string.tx_error_invalid_airdrop_link);
-                    return false;
-                }
-            } else if (type == ANNOUNCEMENT.getType()) {
-                AnnouncementContent txContent = new AnnouncementContent(tx.content);
-                if (StringUtil.isEmpty(txContent.getTitle())) {
-                    ToastUtils.showShortToast(R.string.tx_error_invalid_title);
-                    return false;
-                }
-            }
+            //TODO: news tx valid?
             if (tx.fee < 0) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_free);
                 return false;

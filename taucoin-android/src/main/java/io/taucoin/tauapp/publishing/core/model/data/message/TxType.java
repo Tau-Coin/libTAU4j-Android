@@ -24,12 +24,8 @@ import io.taucoin.tauapp.publishing.R;
 public enum TxType {
     UNKNOWN(0, R.string.community_view_unknown),
     NOTE_TX(1, R.string.community_view_note),
-    WIRING_TX(2, R.string.community_view_wiring),
-    SELL_TX(3, R.string.community_view_sell),
-    TRUST_TX(4, R.string.community_view_trust),
-    AIRDROP_TX(5, R.string.community_view_airdrop),
-    ANNOUNCEMENT(6, R.string.community_view_announcement),
-    NEWS_TX(7, R.string.community_view_news);
+    NEWS_TX(2, R.string.community_view_news),
+    WIRING_TX(3, R.string.community_view_wiring);
 
     private final int type;
     private final int name;

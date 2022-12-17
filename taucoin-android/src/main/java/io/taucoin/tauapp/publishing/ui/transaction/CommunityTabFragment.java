@@ -36,7 +36,6 @@ import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.tauapp.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
-import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
@@ -332,6 +331,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
      * 显示信任的对话框
      */
     void showTrustDialog(User user, TxQueueAndStatus txQueue) {
+        /*
         DialogTrustBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.dialog_trust, null, false);
 
@@ -382,6 +382,7 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
                 .enableWarpWidth(true)
                 .create();
         trustDialog.show();
+        */
     }
 
     @Override
@@ -402,12 +403,14 @@ public abstract class CommunityTabFragment extends BaseFragment implements View.
     public void onStart() {
         super.onStart();
         if (currentTab == TAB_MARKET) {
+            /*
             disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.TRUST_TX)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(fee -> {
                         this.medianFee = fee;
                     }));
+            */
         }
     }
 

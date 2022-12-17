@@ -67,7 +67,8 @@ public class MarketListAdapter extends ListAdapter<UserAndTx, MarketListAdapter.
             if(null == binding || null == holder || null == tx){
                 return;
             }
-            boolean isSell = tx.txType == TxType.SELL_TX.getType();
+            //boolean isSell = tx.txType == TxType.SELL_TX.getType();
+            boolean isSell = false;
             binding.ivArrow.setVisibility(isSell ? View.VISIBLE : View.INVISIBLE);
 
             binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
@@ -100,9 +101,11 @@ public class MarketListAdapter extends ListAdapter<UserAndTx, MarketListAdapter.
             tvMsg.setAutoLinkListener(new AutoLinkTextView.AutoLinkListener() {
                 @Override
                 public void onClick(AutoLinkTextView view) {
+                    /*
                     if (tx.txType == TxType.SELL_TX.getType() && listener != null) {
                         listener.onItemClicked(tx);
                     }
+                    */
                 }
 
                 @Override
