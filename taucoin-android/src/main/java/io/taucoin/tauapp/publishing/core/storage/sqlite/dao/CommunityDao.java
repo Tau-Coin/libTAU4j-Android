@@ -118,8 +118,7 @@ public interface CommunityDao {
     String QUERY_GET_COMMUNITY_BY_CHAIN_ID = "SELECT * FROM Communities WHERE chainID = :chainID";
     String QUERY_ADD_COMMUNITY_BLACKLIST = "Update Communities set isBanned =:isBanned WHERE chainID = :chainID";
 
-    String QUERY_MEMBER_TIPS = "SELECT MAX(m.rewardTime) rewardTime, MAX(m.incomeTime) incomeTime, " +
-            " MAX(m.pendingTime) pendingTime FROM Members m" +
+    String QUERY_MEMBER_TIPS = "SELECT MAX(m.pendingTime) pendingTime FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
             " WHERE m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND c.isBanned = 0";
