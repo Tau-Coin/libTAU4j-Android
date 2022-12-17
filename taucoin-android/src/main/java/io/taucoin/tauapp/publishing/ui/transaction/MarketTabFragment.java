@@ -36,6 +36,8 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.tauapp.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
+import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
+import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.CopyManager;
 import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
@@ -49,6 +51,7 @@ import io.taucoin.tauapp.publishing.ui.TauNotifier;
 import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
+import io.taucoin.tauapp.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
@@ -68,7 +71,9 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     protected CompositeDisposable disposables = new CompositeDisposable();
     private CommunityViewModel communityViewModel;
     protected BaseActivity activity;
+    private SettingsRepository settingsRepo;
     private FloatMenu operationsMenu;
+    private PopUpDialog retweetDialog;
     private String chainID;
     private boolean isJoined;
     private boolean isVisibleToUser;
@@ -103,6 +108,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         txViewModel = provider.get(TxViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
+        settingsRepo = RepositoryHelper.getSettingsRepository(activity.getApplicationContext());
         initParameter();
         initView();
     }
@@ -254,6 +260,19 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                         binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
                     }
                 }));
+
+        handleSettingsChanged(getString(R.string.pref_key_dht_nodes));
+        disposables.add(settingsRepo.observeSettingsChanged()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleSettingsChanged));
+    }
+
+    private void handleSettingsChanged(String key) {
+        if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
+            long nodes = settingsRepo.getLongValue(key, 0);
+            binding.llLowLinked.setVisibility(nodes < 3 ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void initScrollToTop() {
@@ -275,6 +294,9 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         if (operationsMenu != null) {
             operationsMenu.setOnItemClickListener(null);
             operationsMenu.dismiss();
+        }
+        if (retweetDialog != null && retweetDialog.isShowing()) {
+            retweetDialog.closeDialog();
         }
     }
 
@@ -441,10 +463,29 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onRetweetClicked(UserAndTx tx) {
-        Intent intent = new Intent();
-        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-        intent.putExtra(IntentExtra.LINK, tx.link);
-        ActivityUtil.startActivity(intent, activity, NewsCreateActivity.class);
+        if (retweetDialog != null && retweetDialog.isShowing()) {
+            retweetDialog.closeDialog();
+        }
+        retweetDialog = new PopUpDialog.Builder(activity)
+                .addItems(R.mipmap.icon_retweet, getString(R.string.common_retweet))
+                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share))
+                .setOnItemClickListener((dialog, name, code) -> {
+                    dialog.cancel();
+                    if (code == R.mipmap.icon_retweet) {
+                        Intent intent = new Intent();
+                        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+                        intent.putExtra(IntentExtra.LINK, tx.link);
+                        ActivityUtil.startActivity(intent, activity, NewsCreateActivity.class);
+                    } else if (code == R.mipmap.icon_share_gray) {
+                        String text = tx.memo;
+                        if (StringUtil.isNotEmpty(tx.link)) {
+                            text = tx.memo + "\n" + tx.link;
+                        }
+                        ActivityUtil.shareText(activity, getString(R.string.app_share_news), text);
+                    }
+                })
+                .create();
+        retweetDialog.show();
     }
 
     @Override

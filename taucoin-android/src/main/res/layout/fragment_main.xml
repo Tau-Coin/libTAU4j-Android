@@ -56,7 +56,7 @@
             app:tabTextAppearance="@style/TabLayoutMain"
             app:tabIndicatorHeight="@dimen/widget_size_4"
             app:tabIndicatorColor="@color/primary_dark"
-            app:tabSelectedTextColor="@color/primary_dark"
+            app:tabSelectedTextColor="@color/color_black"
             app:tabTextColor="@color/gray_dark"
             app:tabBackground="@color/color_transparent"
             app:tabRippleColor="@color/color_transparent">

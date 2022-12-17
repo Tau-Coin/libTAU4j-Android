@@ -3,6 +3,7 @@
     <string name="app_name_alpha_description">Freely Create Crypto Coins\nDecentral Serverless Network</string>
     <string name="app_name_alpha_desc">Open Source</string>
     <string name="app_share">Share app link via</string>
+    <string name="app_share_news">Share news</string>
     <string name="app_share_error">Can\'t find share component to share</string>
 
     <string name="action_settings">Settings</string>
@@ -189,6 +190,7 @@
     <string name="community_chain_market">News</string>
     <string name="community_on_chain">Transactions</string>
     <string name="community_pinned_message">Pinned News</string>
+    <string name="community_low_linked">Low Linked Peers, very slow messaging speed</string>
     <string name="community_chain_note_title">Note Transaction</string>
     <string name="community_sell_coins">Sale</string>
     <string name="community_airdrop">Airdrop</string>

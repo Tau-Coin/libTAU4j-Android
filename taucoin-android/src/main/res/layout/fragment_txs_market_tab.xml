@@ -94,6 +94,37 @@
 
         </RelativeLayout>
 
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ll_low_linked"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/widget_size_10"
+            android:paddingEnd="@dimen/widget_size_10"
+            android:paddingTop="@dimen/widget_size_5"
+            android:paddingBottom="@dimen/widget_size_5"
+            android:layout_marginBottom="@dimen/widget_size_1"
+            android:background="@color/color_white">
+
+            <ImageView
+                android:layout_width="@dimen/widget_size_16"
+                android:layout_height="@dimen/widget_size_16"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_notice_red"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_5"
+                android:includeFontPadding="false"
+                android:text="@string/community_low_linked"
+                android:textAppearance="@style/TextAppearanceBody3"
+                android:textColor="@color/color_red" />
+
+        </LinearLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

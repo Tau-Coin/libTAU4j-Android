@@ -73,8 +73,7 @@ import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndFriend;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.tauapp.publishing.core.model.data.AirdropHistory;
-import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
-import io.taucoin.tauapp.publishing.core.model.data.message.SellTxContent;
+import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.BlockInfo;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
@@ -398,12 +397,12 @@ public class CommunityViewModel extends AndroidViewModel {
             // 自动发送一笔Sell交易
             String coinName = ChainIDUtil.getCoinName(community.chainID);
             String description = appContext.getString(R.string.tx_community_creator_selling, coinName);
-            SellTxContent sellContent = new SellTxContent(coinName, 0, null, null, description);
-            TxQueue sellTxQueue = new TxQueue(community.chainID, currentUser.publicKey, currentUser.publicKey, 0L,
-                    Constants.NEWS_MIN_FEE.longValue(), TxType.SELL_TX, sellContent.getEncoded());
+            NewsContent newsContent = new NewsContent(description, null, null, null);
+            TxQueue newsTxQueue = new TxQueue(community.chainID, currentUser.publicKey, currentUser.publicKey, 0L,
+                    Constants.NEWS_MIN_FEE.longValue(), TxType.NEWS_TX, newsContent.getEncoded());
 
             TxViewModel txViewModel = new TxViewModel(MainApplication.getInstance());
-            txViewModel.addTransactionTask(sellTxQueue, null, DateUtil.getMillisTime());
+            txViewModel.addTransactionTask(newsTxQueue, null, DateUtil.getMillisTime());
 
             // 发送通知 取消通知
 //            if (accounts.size() > 0) {

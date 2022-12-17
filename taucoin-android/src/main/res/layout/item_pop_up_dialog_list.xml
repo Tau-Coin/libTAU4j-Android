@@ -6,26 +6,33 @@
     </data>
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/widget_size_50">
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/widget_size_30"
+        android:paddingEnd="@dimen/widget_size_30"
+        android:paddingTop="@dimen/widget_size_15"
+        android:paddingBottom="@dimen/widget_size_15"
+        android:gravity="center_vertical">
 
-        <include
-            android:id="@+id/top_line"
-            layout="@layout/view_line"/>
+        <ImageView
+            android:id="@+id/iv_item_icon"
+            android:layout_width="@dimen/widget_size_24"
+            android:layout_height="@dimen/widget_size_24"
+            android:layout_marginEnd="@dimen/widget_size_5"
+            android:contentDescription="@null"
+            android:src="@mipmap/icon_retweet"/>
 
         <TextView
             android:id="@+id/tv_item_title"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
+            android:includeFontPadding="false"
             android:singleLine="true"
             android:ellipsize="middle"
-            android:textSize="@dimen/font_size_18"
+            android:textColor="@color/gray_dark"
             android:textAppearance="@style/TextAppearanceBody1" />
 
-        <include layout="@layout/view_line"/>
     </LinearLayout>
 </layout>

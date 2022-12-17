@@ -33,8 +33,8 @@ public class PopUpDialog extends Dialog{
     }
 
     public static class Builder{
-        private Context context;
-        private List<ItemBean> items = new ArrayList<>();
+        private final Context context;
+        private final List<ItemBean> items = new ArrayList<>();
         private OnItemClickListener listener;
 
         public Builder(Context context) {
@@ -43,6 +43,11 @@ public class PopUpDialog extends Dialog{
 
         public Builder addItems(CharSequence name, int code) {
             this.items.add(new ItemBean(name, code));
+            return this;
+        }
+
+        public Builder addItems(int coin, CharSequence name) {
+            this.items.add(new ItemBean(coin, name));
             return this;
         }
 
@@ -68,6 +73,9 @@ public class PopUpDialog extends Dialog{
                 lp.width = WindowManager.LayoutParams.MATCH_PARENT;
                 dialogWindow.setAttributes(lp);
             }
+            binding.tvCancel.setOnClickListener(v -> {
+                popUpDialog.closeDialog();
+            });
             return popUpDialog;
         }
     }
@@ -95,9 +103,11 @@ public class PopUpDialog extends Dialog{
 
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             if(position >= 0 && position < items.size() && holder.binding != null){
-                holder.binding.topLine.setVisibility(View.INVISIBLE);
-                holder.binding.topLine.setVisibility(View.INVISIBLE);
                 ItemBean itemBean = items.get(position);
+                holder.binding.ivItemIcon.setVisibility(itemBean.icon > 0 ? View.VISIBLE : View.GONE);
+                if (itemBean.icon > 0) {
+                    holder.binding.ivItemIcon.setImageResource(itemBean.icon);
+                }
                 holder.binding.tvItemTitle.setText(itemBean.name);
                 holder.itemView.setOnClickListener(v -> {
                     if(listener != null){
@@ -154,11 +164,18 @@ public class PopUpDialog extends Dialog{
     }
 
     static class ItemBean{
+        int icon;
         CharSequence name;
         int code;
         ItemBean(CharSequence name, int code){
             this.name = name;
             this.code = code;
+        }
+
+        ItemBean(int coin, CharSequence name){
+            this.name = name;
+            this.icon = coin;
+            this.code = coin;
         }
     }
 

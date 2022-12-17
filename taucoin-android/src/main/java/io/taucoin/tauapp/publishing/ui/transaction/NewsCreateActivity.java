@@ -21,6 +21,8 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
+import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
+import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
@@ -46,6 +48,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     private CommunityListAdapter adapter;
     private CommunityViewModel communityViewModel;
     private final CompositeDisposable disposables = new CompositeDisposable();
+    private SettingsRepository settingsRepo;
     private String chainID;
     private String repliedHash;
     private String repliedKey;
@@ -61,6 +64,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         ViewModelProvider provider = new ViewModelProvider(this);
         txViewModel = provider.get(TxViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
+        settingsRepo = RepositoryHelper.getSettingsRepository(getApplicationContext());
         binding = DataBindingUtil.setContentView(this, R.layout.activity_news);
         binding.setListener(this);
         initParameter();
@@ -240,6 +244,19 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                     }, it -> {
                         loadInterimBalanceView(0);
                     }));
+        }
+
+        handleSettingsChanged(getString(R.string.pref_key_dht_nodes));
+        disposables.add(settingsRepo.observeSettingsChanged()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleSettingsChanged));
+    }
+
+    private void handleSettingsChanged(String key) {
+        if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
+            long nodes = settingsRepo.getLongValue(key, 0);
+            binding.llLowLinked.setVisibility(nodes < 3 ? View.VISIBLE : View.GONE);
         }
     }
 

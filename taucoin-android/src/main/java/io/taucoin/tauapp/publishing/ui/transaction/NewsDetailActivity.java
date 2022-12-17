@@ -44,6 +44,7 @@ import io.taucoin.tauapp.publishing.databinding.ItemNewsBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
+import io.taucoin.tauapp.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
@@ -57,6 +58,7 @@ public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.
     private UserViewModel userViewModel;
     private NewsListAdapter adapter;
     private FloatMenu operationsMenu;
+    private PopUpDialog retweetDialog;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private String txID;
     private UserAndTx tx;
@@ -211,10 +213,29 @@ public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.
     private void setClickListener(ItemNewsBinding binding, UserAndTx tx) {
 
         binding.ivRetweet.setOnClickListener(view -> {
-            Intent intent = new Intent();
-            intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-            intent.putExtra(IntentExtra.LINK, tx.link);
-            ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
+            if (retweetDialog != null && retweetDialog.isShowing()) {
+                retweetDialog.closeDialog();
+            }
+            retweetDialog = new PopUpDialog.Builder(this)
+                    .addItems(R.mipmap.icon_retweet, getString(R.string.common_retweet))
+                    .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share))
+                    .setOnItemClickListener((dialog, name, code) -> {
+                        dialog.cancel();
+                        if (code == R.mipmap.icon_retweet) {
+                            Intent intent = new Intent();
+                            intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+                            intent.putExtra(IntentExtra.LINK, tx.link);
+                            ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
+                        } else if (code == R.mipmap.icon_share_gray) {
+                            String text = tx.memo;
+                            if (StringUtil.isNotEmpty(tx.link)) {
+                                text = tx.memo + "\n" + tx.link;
+                            }
+                            ActivityUtil.shareText(this, getString(R.string.app_share_news), text);
+                        }
+                    })
+                    .create();
+            retweetDialog.show();
         });
         binding.ivReply.setOnClickListener(view -> {
             Intent intent = new Intent();
@@ -404,6 +425,9 @@ public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.
         if (operationsMenu != null) {
             operationsMenu.setOnItemClickListener(null);
             operationsMenu.dismiss();
+        }
+        if (retweetDialog != null && retweetDialog.isShowing()) {
+            retweetDialog.closeDialog();
         }
     }
 }

@@ -27,6 +27,7 @@ import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.databinding.ActivityPinnedBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
+import io.taucoin.tauapp.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
@@ -41,6 +42,7 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
     private NewsListAdapter adapter;
     private String chainID;
     private FloatMenu operationsMenu;
+    private PopUpDialog retweetDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,10 +182,29 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
 
     @Override
     public void onRetweetClicked(UserAndTx tx) {
-        Intent intent = new Intent();
-        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-        intent.putExtra(IntentExtra.LINK, tx.link);
-        ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
+        if (retweetDialog != null && retweetDialog.isShowing()) {
+            retweetDialog.closeDialog();
+        }
+        retweetDialog = new PopUpDialog.Builder(this)
+                .addItems(R.mipmap.icon_retweet, getString(R.string.common_retweet))
+                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share))
+                .setOnItemClickListener((dialog, name, code) -> {
+                    dialog.cancel();
+                    if (code == R.mipmap.icon_retweet) {
+                        Intent intent = new Intent();
+                        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+                        intent.putExtra(IntentExtra.LINK, tx.link);
+                        ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
+                    } else if (code == R.mipmap.icon_share_gray) {
+                        String text = tx.memo;
+                        if (StringUtil.isNotEmpty(tx.link)) {
+                            text = tx.memo + "\n" + tx.link;
+                        }
+                        ActivityUtil.shareText(this, getString(R.string.app_share_news), text);
+                    }
+                })
+                .create();
+        retweetDialog.show();
     }
 
     @Override
@@ -212,6 +233,9 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
         if (operationsMenu != null) {
             operationsMenu.setOnItemClickListener(null);
             operationsMenu.dismiss();
+        }
+        if (retweetDialog != null && retweetDialog.isShowing()) {
+            retweetDialog.closeDialog();
         }
     }
 

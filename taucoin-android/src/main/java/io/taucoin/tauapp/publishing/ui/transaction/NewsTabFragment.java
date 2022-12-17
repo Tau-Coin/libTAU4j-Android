@@ -1,6 +1,7 @@
 package io.taucoin.tauapp.publishing.ui.transaction;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,6 +49,7 @@ import io.taucoin.tauapp.publishing.ui.BaseFragment;
 import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
+import io.taucoin.tauapp.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
@@ -70,6 +72,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     protected UserViewModel userViewModel;
     protected CommunityViewModel communityViewModel;
     private FloatMenu operationsMenu;
+    private PopUpDialog retweetDialog;
 
     private int currentPos = 0;
     private boolean isScrollToTop = true;
@@ -368,11 +371,30 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
 
     @Override
     public void onRetweetClicked(UserAndTx tx) {
-        Intent intent = new Intent();
-        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-        intent.putExtra(IntentExtra.LINK, tx.link);
-        ActivityUtil.startActivityForResult(intent, activity, NewsCreateActivity.class,
-                CHOOSE_REQUEST_CODE);
+        if (retweetDialog != null && retweetDialog.isShowing()) {
+            retweetDialog.closeDialog();
+        }
+        retweetDialog = new PopUpDialog.Builder(activity)
+                .addItems(R.mipmap.icon_retweet, getString(R.string.common_retweet))
+                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share))
+                .setOnItemClickListener((dialog, name, code) -> {
+                    dialog.cancel();
+                    if (code == R.mipmap.icon_retweet) {
+                        Intent intent = new Intent();
+                        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+                        intent.putExtra(IntentExtra.LINK, tx.link);
+                        ActivityUtil.startActivityForResult(intent, activity, NewsCreateActivity.class,
+                                CHOOSE_REQUEST_CODE);
+                    } else if (code == R.mipmap.icon_share_gray) {
+                        String text = tx.memo;
+                        if (StringUtil.isNotEmpty(tx.link)) {
+                            text = tx.memo + "\n" + tx.link;
+                        }
+                        ActivityUtil.shareText(activity, getString(R.string.app_share_news), text);
+                    }
+                })
+                .create();
+        retweetDialog.show();
     }
 
     @Override
@@ -430,6 +452,9 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         if (operationsMenu != null) {
             operationsMenu.setOnItemClickListener(null);
             operationsMenu.dismiss();
+        }
+        if (retweetDialog != null && retweetDialog.isShowing()) {
+            retweetDialog.closeDialog();
         }
     }
 
