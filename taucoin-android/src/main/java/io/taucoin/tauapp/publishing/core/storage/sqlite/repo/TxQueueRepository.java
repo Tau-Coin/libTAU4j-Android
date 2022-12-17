@@ -18,15 +18,14 @@ public interface TxQueueRepository {
     void updateQueue(TxQueue tx);
 
     /**
-     * 添加新的交易进队列
+     * 添加交易进队列
      */
     long addQueue(TxQueue tx);
 
+    /**
+     * 删除交易进队列
+     */
     void deleteQueue(TxQueue tx);
-
-    Flowable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String userPk);
-
-    List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String userPk);
 
     TxQueueAndStatus getNonceFirstTx(String chainID, String userPk, long nonce);
 
@@ -35,6 +34,10 @@ public interface TxQueueRepository {
     List<TxQueueAndStatus> getResendNoteTxQueue(String senderPk);
 
     List<TxQueueAndStatus> getResendNewsTxQueue(String senderPk);
+
+    List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String userPk);
+
+    Flowable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String userPk);
 
     List<String> getNeedWiringTxCommunities(String userPk);
 

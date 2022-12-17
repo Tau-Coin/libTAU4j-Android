@@ -43,6 +43,10 @@ public interface TxRepository {
 
     Observable<Tx> observeTxByTxID(String txID);
 
+    /**
+     * 根据queueID查询交易
+     * @param queueID 交易queueID
+     */
     Tx getTxByQueueID(long queueID);
 
     /**
@@ -59,15 +63,6 @@ public interface TxRepository {
      * 提交数据变化
      */
     void submitDataSetChanged();
-
-    /**
-     * 获取在当前nonce上是否有未上链的转账交易
-     * @param chainID 链ID
-     * @param txType 类型
-     * @param nonce nonce
-     * @return Tx
-     */
-    Tx getNotOnChainTx(String chainID, int txType, long nonce);
 
     void setMessagePinned(String txID, long pinnedTime, boolean isRefresh);
 
@@ -127,7 +122,6 @@ public interface TxRepository {
      * @return
      */
     TxFreeStatistics queryAverageTxsFee(String chainID);
-
 
     String getLatestNoteTxHash(String chainID);
 

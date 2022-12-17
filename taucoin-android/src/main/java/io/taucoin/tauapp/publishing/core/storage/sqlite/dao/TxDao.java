@@ -53,17 +53,16 @@ public interface TxDao {
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
-    // SQL:查询社区里的交易(上链)
+    // SQL:查询社区里的交易
     String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, 0 AS repliesNum, m.balance, m.power" +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " WHERE tx.chainID = :chainID AND tx.nonce >= 1";
 
     // SQL:查询社区里的交易(上链)
-    String QUERY_GET_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT +
-            QUERY_GET_TXS_ORDER;
+    String QUERY_GET_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT + QUERY_GET_TXS_ORDER;
 
-    // SQL:查询社区里的置顶交易(MARKET交易，排除Trust Tx, 并且上链)
+    // SQL:查询社区里的置顶交易(目前只显示News交易)
     String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " AND tx.txType = 2 AND pinnedTime > 0" +
@@ -259,12 +258,12 @@ public interface TxDao {
     List<UserAndTx> queryCommunityMarketPinnedTxs(String chainID);
 
     @Transaction
-    @Query(QUERY_GET_MARKET_PINNED_TXS + " limit 1")
-    Flowable<List<UserAndTx>> queryCommunityMarketLatestPinnedTx(String chainID);
-
-    @Transaction
     @Query(QUERY_GET_ALL_MARKET_PINNED_TXS)
     List<UserAndTx> queryCommunityMarketPinnedTxs();
+
+    @Transaction
+    @Query(QUERY_GET_MARKET_PINNED_TXS + " limit 1")
+    Flowable<List<UserAndTx>> queryCommunityMarketLatestPinnedTx(String chainID);
 
     @Transaction
     @Query(QUERY_GET_ALL_MARKET_PINNED_TXS + " limit 1")
@@ -290,16 +289,6 @@ public interface TxDao {
 
     @Query(QUERY_GET_TX_BY_TX_QUEUE)
     Tx getTxByQueueID(long queueID);
-
-    /**
-     * 获取在当前nonce上是否有未上链的转账交易
-     * @param chainID 链ID
-     * @param txType 类型
-     * @param nonce nonce
-     * @return Tx
-     */
-    @Query(QUERY_GET_NOT_ON_CHAIN_TX)
-    Tx getNotOnChainTx(String chainID, int txType, long nonce);
 
     @Query(QUERY_SET_MESSAGE_PINNED)
     void setMessagePinned(String txID, long pinnedTime);
