@@ -120,32 +120,6 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     /**
-     * 获取社区里用户未上链并且未过期的交易数
-     * @param chainID chainID
-     * @param senderPk 公钥
-     * @param expireTime 过期时间时长
-     * @return int
-     */
-    @Override
-    public int getPendingTxsNotExpired(String chainID, String senderPk, long expireTime){
-        long expireTimePoint = DateUtil.getTime() - expireTime;
-        return db.txDao().getPendingTxsNotExpired(chainID, senderPk, expireTimePoint);
-    }
-
-    /**
-     * 获取社区里用户未上链并且过期的最早的交易
-     * @param chainID chainID
-     * @param senderPk 公钥
-     * @param expireTime 过期时间时长
-     * @return int
-     */
-    @Override
-    public Tx getEarliestExpireTx(String chainID, String senderPk, long expireTime){
-        long expireTimePoint = DateUtil.getTime() - expireTime;
-        return db.txDao().getEarliestExpireTx(chainID, senderPk, expireTimePoint);
-    }
-
-    /**
      * 根据txID查询交易
      * @param txID 交易ID
      */

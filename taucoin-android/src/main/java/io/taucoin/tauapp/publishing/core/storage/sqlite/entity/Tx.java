@@ -31,16 +31,14 @@ public class Tx implements Parcelable {
     public long blockNumber;                // 交易所属的区块号
     public String blockHash;                // 交易所属的区块哈希
 
-    public int version;                     // notes交易上一个消息hash;
-    public String previousHash;             // notes交易上一个消息hash; news交易回复的交易hash
+    public int version;                     // 交易version;
+    public String previousHash;             // notes交易上一个消息hash;
     public String receiverPk;               // 交易接收者的公钥 只针对TxType.WRING_TX类型, news交易为针对回复的pubkey
     public long amount;                     // 交易金额 只针对TxType.WRING_TX类型
 
-    public String coinName;                 // 币名 只针对TxType.SELL_TX类型
     public String link;                     // 用户link 只针对TxType.SELL_TX类型,  notes交易, news交易
     public String repliedHash;              // 针对与notes交易和news交易回复的hash
-    public long quantity;                   // 币的数量 只针对TxType.SELL_TX类型
-    public String location;                 // 位置信息 只针对TxType.SELL_TX类型
+    public String repliedKey;               // 针对news交易回复的key
     public long queueID = -1;               // 交易对应的队列ID
     public int sendStatus = 0;              // 交易发送状态 0: 已发送，1: 未发送（供本地显示）
     public long pinnedTime;                 // 置顶固定时间
@@ -76,41 +74,16 @@ public class Tx implements Parcelable {
 
 	// news
     @Ignore
-    public Tx(@NonNull String chainID, long fee, int txType, String memo, String link, String repliedHash, String receiverPk){
+    public Tx(@NonNull String chainID, long fee, int txType, String memo, String link, String repliedHash, String repliedKey){
         this.chainID = chainID;
         this.fee = fee;
         this.txType = txType;
         this.memo = memo;
         this.link = link;
         this.repliedHash = repliedHash;
-        this.receiverPk = receiverPk; //当作@的key使用
+        this.repliedKey = repliedKey; //当作@的key使用
     }
 	
-    // sell
-    @Ignore
-    public Tx(@NonNull String chainID, String receiverPk, long fee, int txType, String coinName, long quantity,
-              String link, String location, String memo){
-        this.chainID = chainID;
-        this.receiverPk = receiverPk;
-        this.fee = fee;
-        this.txType = txType;
-        this.coinName = coinName;
-        this.quantity = quantity;
-        this.link = link;
-        this.location = location;
-        this.memo = memo;
-    }
-
-    // airdrop、announcement
-    @Ignore
-    public Tx(@NonNull String chainID, String receiverPk, long fee, int txType, String memo){
-        this.chainID = chainID;
-        this.receiverPk = receiverPk;
-        this.fee = fee;
-        this.txType = txType;
-        this.memo = memo;
-    }
-
     @Ignore
     public Tx( @NonNull String txID, @NonNull String chainID, long fee){
         this.txID = txID;

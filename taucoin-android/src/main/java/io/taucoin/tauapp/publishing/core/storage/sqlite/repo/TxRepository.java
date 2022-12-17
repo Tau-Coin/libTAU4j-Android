@@ -42,26 +42,6 @@ public interface TxRepository {
     List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPos, int loadSize);
 
     /**
-     * 获取社区里用户未上链并且未过期的交易数
-     * @param chainID chainID
-     * @param publicKey 公钥
-     * @param expireTime 过期时间时长
-     * @return int
-     */
-    @Deprecated
-    int getPendingTxsNotExpired(String chainID, String publicKey, long expireTime);
-    /**
-     * 获取社区里用户未上链并且未过期的交易数
-     * @param chainID chainID
-     * @param senderPk 公钥
-     * @param expireTime 过期时间时长
-     * @return int
-     */
-    @Deprecated
-    Tx getEarliestExpireTx(String chainID, String senderPk, long expireTime);
-
-
-    /**
      * 根据txID查询交易
      * @param txID 交易ID
      */

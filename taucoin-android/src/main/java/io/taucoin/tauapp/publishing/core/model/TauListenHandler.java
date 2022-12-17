@@ -382,7 +382,7 @@ public class TauListenHandler {
             // 添加News信息(link, repliedHash, repliedKey)
             tx.link = newsContent.getLinkStr();
             tx.repliedHash = newsContent.getRepliedHashStr();
-            tx.receiverPk = newsContent.getRepliedKeyStr();
+            tx.repliedKey = newsContent.getRepliedKeyStr();
         }
 
         txRepo.addTransaction(tx);

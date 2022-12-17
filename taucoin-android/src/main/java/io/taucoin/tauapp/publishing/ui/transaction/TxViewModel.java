@@ -49,7 +49,6 @@ import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.NoteContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.TransactionVersion;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
@@ -263,7 +262,7 @@ public class TxViewModel extends AndroidViewModel {
                     txEncoded = noteContent.getEncoded();
 					break;
                 case NEWS_TX:
-					NewsContent newsContent = new NewsContent(tx.memo, tx.link, tx.repliedHash, tx.receiverPk);
+					NewsContent newsContent = new NewsContent(tx.memo, tx.link, tx.repliedHash, tx.repliedKey);
                     txEncoded = newsContent.getEncoded();
 					break;
                 case WIRING_TX:
@@ -276,9 +275,6 @@ public class TxViewModel extends AndroidViewModel {
             if (null == txEncoded) {
                 return result;
             }
-            // UI上禁止version为0的交易重发（由于version修改，previous hash的加入，造成交易hash改变），
-            // 这里直接用最新的交易结构构建新的交易
-            int version = TransactionVersion.VERSION1.getV();
             Transaction transaction;
             if (tx.txType == NOTE_TX.getType()) {
                 String previousHash;
@@ -291,14 +287,14 @@ public class TxViewModel extends AndroidViewModel {
                 }
                 byte[] emptyHash = new byte[20];
                 byte[] previousHashBytes = StringUtil.isNotEmpty(previousHash) ? ByteUtil.toByte(previousHash) : emptyHash;
-                transaction = new Transaction(chainID, version, timestamp, senderPk, previousHashBytes, txEncoded);
+                transaction = new Transaction(chainID, timestamp, senderPk, previousHashBytes, txEncoded);
             } else {
-                transaction = new Transaction(chainID, version, timestamp, senderPk, receiverPk,
+                transaction = new Transaction(chainID, timestamp, senderPk, receiverPk,
                         tx.nonce, tx.amount, tx.fee, txEncoded);
             }
             transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
-            logger.info("createTransaction txID::{}, version::{}, txType::{}, previousHash::{}, limit::{}, transaction::{}",
-                    transaction.getTxID().to_hex(), version, tx.txType, tx.previousHash, Constants.TX_MAX_BYTE_SIZE, transaction.Size());
+            logger.info("createTransaction txID::{}, txType::{}, previousHash::{}, limit::{}, transaction::{}",
+                    transaction.getTxID().to_hex(), tx.txType, tx.previousHash, Constants.TX_MAX_BYTE_SIZE, transaction.Size());
             // 判断交易大小是否超出限制
             if (transaction.Size() > Constants.TX_MAX_BYTE_SIZE) {
                 return context.getString(R.string.tx_error_memo_too_large);
@@ -314,7 +310,7 @@ public class TxViewModel extends AndroidViewModel {
                 tx.txID = transaction.getTxID().to_hex();
                 tx.timestamp = timestamp;
                 tx.senderPk = currentUser.publicKey;
-                tx.version = version;
+                tx.version = transaction.getVersion();
                 txRepo.addTransaction(tx);
                 logger.info("createTransaction txID::{}, senderPk::{}, receiverPk::{}, memo::{}",
                         tx.txID, tx.senderPk, tx.receiverPk, tx.memo);
@@ -392,7 +388,7 @@ public class TxViewModel extends AndroidViewModel {
         byte[] receiverPk = ByteUtil.toByte(tx.receiverPk);
         long timestamp = daemon.getSessionTime();
         long nonce = account.getNonce() + 1;
-        Transaction transaction = new Transaction(chainIDBytes, TransactionVersion.VERSION1.getV(), timestamp, senderPk, receiverPk,
+        Transaction transaction = new Transaction(chainIDBytes, timestamp, senderPk, receiverPk,
                 nonce, tx.amount, tx.fee, tx.content);
         transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
         logger.info("createTransaction txID::{}, limit::{}, transaction::{}",

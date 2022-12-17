@@ -25,7 +25,6 @@ import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.QueueOperation;
-import io.taucoin.tauapp.publishing.core.model.data.message.TransactionVersion;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
@@ -297,7 +296,7 @@ class TxQueueManager {
 		if(0 == nonce) //nonce为0代表新交易
 			nonce = txRepo.getChainMaxNonce(txQueue.chainID, txQueue.senderPk) + 1;
         byte[] chainIDBytes = ChainIDUtil.encode(txQueue.chainID);
-        Transaction transaction = new Transaction(chainIDBytes, TransactionVersion.VERSION1.getV(), timestamp, senderPk, receiverPk,
+        Transaction transaction = new Transaction(chainIDBytes, timestamp, senderPk, receiverPk,
                 nonce, txQueue.amount, txQueue.fee, txEncoded);
         transaction.sign(ByteUtil.toHexString(senderPk), ByteUtil.toHexString(secretKey));
         return transaction;
@@ -320,6 +319,11 @@ class TxQueueManager {
 			if (!isSubmitSuccess) {
 				return true;
 			}
+            //为了重发交易的时候兼容版本的更新
+            tx.txID = transaction.getTxID().to_hex();
+            tx.version = transaction.getVersion();
+			txRepo.deleteTxByQueueID(txQueue.queueID);
+            txRepo.addTransaction(tx);
 			return true; //已发送的交易，直接退出
 		}
 		//以下需要构建新的tx
@@ -369,7 +373,7 @@ class TxQueueManager {
             tx.senderPk = txQueue.senderPk;
             tx.nonce = nonce;
             tx.queueID = txQueue.queueID;
-            tx.version = TransactionVersion.VERSION1.getV();
+            tx.version = transaction.getVersion();
             if (pinnedTime > 0) {
                 tx.pinnedTime = pinnedTime;
             }

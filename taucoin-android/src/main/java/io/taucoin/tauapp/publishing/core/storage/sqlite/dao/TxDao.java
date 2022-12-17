@@ -166,17 +166,8 @@ public interface TxDao {
     String QUERY_PENDING_TXS_NOT_EXPIRED_WHERE = " WHERE senderPk = :senderPk AND chainID = :chainID" +
             " and txStatus = 0 and timestamp > :expireTimePoint ";
 
-    // SQL:查询未上链、未过期的交易
-    String QUERY_PENDING_TXS_NOT_EXPIRED = "SELECT count(*) FROM Txs" + QUERY_PENDING_TXS_NOT_EXPIRED_WHERE;
-
     // SQL:查询未上链并且未过期的txID
     String QUERY_PENDING_TX_IDS_NOT_EXPIRED = "SELECT txID FROM Txs" + QUERY_PENDING_TXS_NOT_EXPIRED_WHERE;
-
-    // SQL:查询未上链、已过期的并且nonce值未被再次使用的最早的交易
-    String QUERY_USERS_EARLIEST_EXPIRE_TX = "SELECT * FROM Txs" +
-            " WHERE senderPk = :senderPk AND chainID = :chainID AND txStatus = 0 AND timestamp <= :expireTimePoint" +
-            " AND nonce NOT IN (" + QUERY_PENDING_TX_IDS_NOT_EXPIRED + ")" +
-            " ORDER BY nonce LIMIT 1";
 
     String QUERY_GET_TX_BY_TX_ID = "SELECT * FROM Txs" +
             " WHERE txID = :txID";
@@ -305,27 +296,6 @@ public interface TxDao {
     @Transaction
     @Query(QUERY_MINING_INCOME)
     Flowable<List<IncomeAndExpenditure>> observeMiningIncome(String chainID);
-
-    /**
-     * 获取社区里用户未上链并且未过期的交易数
-     * @param chainID chainID
-     * @param senderPk 公钥
-     * @param expireTimePoint 过期的时间点
-     * @return int
-     */
-    @Query(QUERY_PENDING_TXS_NOT_EXPIRED)
-    int getPendingTxsNotExpired(String chainID, String senderPk, long expireTimePoint);
-
-    /**
-     * 获取社区里用户未上链并且过期的最早的交易
-     * @param chainID chainID
-     * @param senderPk 公钥
-     * @param expireTimePoint 过期的时间点
-     * @return Tx
-     */
-    @Transaction
-    @Query(QUERY_USERS_EARLIEST_EXPIRE_TX)
-    Tx getEarliestExpireTx(String chainID, String senderPk, long expireTimePoint);
 
     /**
      * 根据txID查询交易
