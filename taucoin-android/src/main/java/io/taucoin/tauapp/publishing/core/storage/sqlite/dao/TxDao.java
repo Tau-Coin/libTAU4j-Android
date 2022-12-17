@@ -23,16 +23,6 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
 @Dao
 public interface TxDao {
 
-    String QUERY_GET_SELL_DETAIL = "SELECT tx.*, t.repliesNum, m.balance, m.power" +
-            " FROM Txs AS tx" +
-            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            " LEFT JOIN (SELECT count(txID) AS repliesNum, repliedHash FROM Txs" +
-            " WHERE chainID = :chainID AND repliedHash IS NOT NULL" +
-            " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " GROUP BY repliedHash) t" +
-            " ON tx.txID = t.repliedHash" +
-            " WHERE tx.chainID = :chainID AND tx.txID = :txID";
-
     String QUERY_GET_TXS_ORDER =
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " AND tx.repliedHash IS NULL" +
@@ -51,7 +41,7 @@ public interface TxDao {
             " WHERE tx.chainID = :chainID";
 
     String QUERY_GET_ALL_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND tx.txType IN (2, 3)" + QUERY_GET_TXS_ORDER;
+            " AND tx.txType = 2" + QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区news对应的notes交易
     String QUERY_GET_ALL_NOTES = "SELECT tx.*, 0 AS repliesNum, m.balance, m.power" +
@@ -76,7 +66,7 @@ public interface TxDao {
     // SQL:查询社区里的置顶交易(MARKET交易，排除Trust Tx, 并且上链)
     String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " AND tx.txType IN (2, 3) AND pinnedTime > 0" +
+            " AND tx.txType = 2 AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     String QUERY_GET_ALL_MARKET_PINNED_TXS = "SELECT tx.*, t.repliesNum, m.balance, m.power" +
@@ -88,16 +78,10 @@ public interface TxDao {
         " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
         " GROUP BY repliedHash) t" +
         " ON tx.txID = t.repliedHash  " +
-        " WHERE tx.txType IN (2, 3) AND pinnedTime > 0" +
+        " WHERE tx.txType = 2 AND pinnedTime > 0" +
         " AND c.isBanned = 0" +
         " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
         " ORDER BY tx.pinnedTime DESC";
-
-    // SQL:查询社区里用户Trust交易(上链)
-    String QUERY_GET_TRUST_TXS = "SELECT * FROM Txs WHERE chainID = :chainID" +
-            " AND txType = 4 AND txStatus = 1 AND receiverPk = :trustPk" +
-            " ORDER BY timestamp DESC" +
-            " limit :loadSize offset :startPosition";
 
     // 查询钱包交易记录
     String QUERY_GET_WALLET_TRANSACTIONS = "SELECT " +
@@ -134,7 +118,7 @@ public interface TxDao {
             " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " GROUP BY repliedHash) t" +
             " ON tx.txID = t.repliedHash  " +
-            " WHERE tx.txType IN (2, 3)" +
+            " WHERE tx.txType = 2" +
             " AND c.isBanned = 0" +
             QUERY_GET_TXS_ORDER;
 
@@ -286,9 +270,6 @@ public interface TxDao {
     @Query(QUERY_GET_ALL_MARKET_PINNED_TXS + " limit 1")
     Flowable<List<UserAndTx>> queryCommunityMarketLatestPinnedTx();
 
-    @Query(QUERY_GET_TRUST_TXS)
-    List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPosition, int loadSize);
-
     @Transaction
     @Query(QUERY_GET_WALLET_INCOME_AND_EXPENDITURE)
     List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize);
@@ -309,10 +290,6 @@ public interface TxDao {
 
     @Query(QUERY_GET_TX_BY_TX_QUEUE)
     Tx getTxByQueueID(long queueID);
-
-    @Transaction
-    @Query(QUERY_GET_SELL_DETAIL)
-    Flowable<UserAndTx> observeSellTxDetail(String chainID, String txID);
 
     /**
      * 获取在当前nonce上是否有未上链的转账交易

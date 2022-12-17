@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -30,9 +29,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
-import androidx.room.RxRoom;
 import io.reactivex.BackpressureStrategy;
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -57,7 +54,6 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
-import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
@@ -84,7 +80,6 @@ import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.NOTE_TX;
-import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.NEWS_TX;
 import static io.taucoin.tauapp.publishing.core.model.data.message.TxType.WIRING_TX;
 
 /**
@@ -104,7 +99,6 @@ public class TxViewModel extends AndroidViewModel {
     private Disposable loadViewDisposable;
     private Disposable addTxDisposable;
     private MutableLiveData<List<UserAndTx>> chainTxs = new MutableLiveData<>();
-    private MutableLiveData<List<Tx>> trustTxs = new MutableLiveData<>();
     private MutableLiveData<List<IncomeAndExpenditure>> walletTxs = new MutableLiveData<>();
     private MutableLiveData<Result> airdropState = new MutableLiveData<>();
     private MutableLiveData<String> addState = new MutableLiveData<>();
@@ -137,10 +131,6 @@ public class TxViewModel extends AndroidViewModel {
      */
     public MutableLiveData<List<UserAndTx>> observerChainTxs() {
         return chainTxs;
-    }
-
-    public MutableLiveData<List<Tx>> observerTrustTxs() {
-        return trustTxs;
     }
 
     public MutableLiveData<List<IncomeAndExpenditure>> getWalletTxs() {
@@ -819,44 +809,6 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     /**
-     * 加载Trust交易分页数据
-     * @param chainID 社区链ID
-     * @param trustPk trust用户
-     * @param pos 分页位置
-     */
-    void loadTrustTxsData(String chainID, String trustPk, int pos) {
-        int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
-        loadTrustTxsData(chainID, trustPk, pos, pageSize);
-
-    }
-
-    void loadTrustTxsData(String chainID, String trustPk, int pos, int pageSize) {
-        Disposable disposable = Observable.create((ObservableOnSubscribe<List<Tx>>) emitter -> {
-            List<Tx> trustTxs = new ArrayList<>();
-            try {
-                long startTime = System.currentTimeMillis();
-                trustTxs = txRepo.queryCommunityTrustTxs(chainID, trustPk, pos, pageSize);
-                long getMessagesTime = System.currentTimeMillis();
-                logger.debug("loadTrustTxsData pos::{}, pageSize::{}, messages.size::{}",
-                        pos, pageSize, trustTxs.size());
-                logger.debug("loadTrustTxsData getMessagesTime::{}", getMessagesTime - startTime);
-                Collections.reverse(trustTxs);
-                long endTime = System.currentTimeMillis();
-                logger.debug("loadTrustTxsData reverseTime Time::{}", endTime - getMessagesTime);
-            } catch (Exception e) {
-                logger.error("loadTrustTxsData error::", e);
-            }
-            emitter.onNext(trustTxs);
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(txs -> {
-                    trustTxs.postValue(txs);
-                });
-        disposables.add(disposable);
-    }
-
-    /**
      * 周期性重发交易，12小时，30分钟一次
 	 * note tx: 最近10笔
 	 * new tx: 没有上链的所有消息
@@ -890,10 +842,6 @@ public class TxViewModel extends AndroidViewModel {
      */
     Observable<DataChanged> observeDataSetChanged() {
         return txRepo.observeDataSetChanged();
-    }
-
-    public Flowable<UserAndTx> observeSellTxDetail(String chainID, String txID) {
-        return txRepo.observeSellTxDetail(chainID, txID);
     }
 
     public Flowable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID) {

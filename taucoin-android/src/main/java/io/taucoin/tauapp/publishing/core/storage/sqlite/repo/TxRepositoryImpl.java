@@ -111,15 +111,6 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     /**
-     * 查询社区用户被Trust列表
-     * @param chainID 社区链ID
-     */
-    @Override
-    public List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPos, int loadSize) {
-        return db.txDao().queryCommunityTrustTxs(chainID, trustPk, startPos, loadSize);
-    }
-
-    /**
      * 根据txID查询交易
      * @param txID 交易ID
      */
@@ -136,11 +127,6 @@ public class TxRepositoryImpl implements TxRepository{
     @Override
     public Tx getTxByQueueID(long queueID) {
         return db.txDao().getTxByQueueID(queueID);
-    }
-
-    @Override
-    public Flowable<UserAndTx> observeSellTxDetail(String chainID, String txID) {
-        return db.txDao().observeSellTxDetail(chainID, txID);
     }
 
     @Override

@@ -33,6 +33,7 @@ import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 /**
  * Sell detail
  */
+@Deprecated
 public class SellDetailActivity extends BaseActivity implements View.OnClickListener {
     private ActivitySellDetailBinding binding;
     private TxViewModel txViewModel;
@@ -85,9 +86,9 @@ public class SellDetailActivity extends BaseActivity implements View.OnClickList
         // 获取用户详情数据
         userViewModel.getUserDetail(sellerPk);
 
-        txViewModel.observerTrustTxs().observe(this, txs -> {
-            adapter.submitList(txs);
-        });
+//        txViewModel.observerTrustTxs().observe(this, txs -> {
+//            adapter.submitList(txs);
+//        });
 
         userViewModel.getUserDetail().observe(this, this::showUserInfo);
 
@@ -207,11 +208,11 @@ public class SellDetailActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onStart() {
         super.onStart();
-        Disposable disposable = txViewModel.observeSellTxDetail(chainID, txID)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(this::showSellInfo);
-        disposables.add(disposable);
+//        Disposable disposable = txViewModel.observeSellTxDetail(chainID, txID)
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe(this::showSellInfo);
+//        disposables.add(disposable);
     }
 
     @Override

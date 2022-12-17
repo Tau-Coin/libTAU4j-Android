@@ -22,6 +22,7 @@ import io.taucoin.tauapp.publishing.ui.constant.Page;
 /**
  * Trust more
  */
+@Deprecated
 public class TrustMoreActivity extends BaseActivity {
     private ActivityTrustMoreBinding binding;
     private TxViewModel txViewModel;
@@ -92,17 +93,17 @@ public class TrustMoreActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        txViewModel.observerTrustTxs().observe(this, txs -> {
-            List<Tx> currentList = new ArrayList<>(txs);
-            if (currentPos == 0) {
-                adapter.submitList(currentList, handleUpdateAdapter);
-            } else {
-                currentList.addAll(adapter.getCurrentList());
-                adapter.submitList(currentList, handlePullAdapter);
-            }
-            binding.refreshLayout.setRefreshing(false);
-            binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
-        });
+//        txViewModel.observerTrustTxs().observe(this, txs -> {
+//            List<Tx> currentList = new ArrayList<>(txs);
+//            if (currentPos == 0) {
+//                adapter.submitList(currentList, handleUpdateAdapter);
+//            } else {
+//                currentList.addAll(adapter.getCurrentList());
+//                adapter.submitList(currentList, handlePullAdapter);
+//            }
+//            binding.refreshLayout.setRefreshing(false);
+//            binding.refreshLayout.setEnabled(txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0);
+//        });
 
         disposables.add(txViewModel.observeDataSetChanged()
                 .subscribeOn(Schedulers.io())
@@ -131,6 +132,6 @@ public class TrustMoreActivity extends BaseActivity {
 
     private void loadData(int pos) {
         currentPos = pos;
-        txViewModel.loadTrustTxsData(chainID, trustPk, pos);
+//        txViewModel.loadTrustTxsData(chainID, trustPk, pos);
     }
 }

@@ -36,12 +36,6 @@ public interface TxRepository {
     List<UserAndTx> queryCommunityPinnedTxs();
 
     /**
-     * 查询社区用户被Trust列表
-     * @param chainID 社区链ID
-     */
-    List<Tx> queryCommunityTrustTxs(String chainID, String trustPk, int startPos, int loadSize);
-
-    /**
      * 根据txID查询交易
      * @param txID 交易ID
      */
@@ -65,8 +59,6 @@ public interface TxRepository {
      * 提交数据变化
      */
     void submitDataSetChanged();
-
-    Flowable<UserAndTx> observeSellTxDetail(String chainID, String txID);
 
     /**
      * 获取在当前nonce上是否有未上链的转账交易
