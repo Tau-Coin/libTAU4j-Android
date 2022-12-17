@@ -378,14 +378,12 @@ class TxQueueManager {
                 tx.pinnedTime = pinnedTime;
             }
             txRepo.addTransaction(tx);
-            logger.info("sendWiringTx createTransaction chainID::{}, txID::{}, senderPk::{}, " +
+            logger.info("createTransaction in sendTxQueue chainID::{}, txID::{}, senderPk::{}, " +
                             "receiverPk::{}, nonce::{}, memo::{}", tx.chainID, tx.txID, tx.senderPk, tx.receiverPk, tx.nonce, tx.memo);
             addUserInfoToLocal(tx);
             addMemberInfoToLocal(tx);
-            //if (isDirectSend) {
             TxLog log = new TxLog(tx.txID, TxLogStatus.SENT.getStatus(), DateUtil.getMillisTime());
             txRepo.addTxLog(log);
-            //}
         }
         return false;
     }

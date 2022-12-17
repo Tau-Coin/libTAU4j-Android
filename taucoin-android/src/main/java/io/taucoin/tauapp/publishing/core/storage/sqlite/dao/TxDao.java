@@ -51,7 +51,7 @@ public interface TxDao {
             " WHERE tx.chainID = :chainID";
 
     String QUERY_GET_ALL_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND tx.txType IN (3, 5, 6, 7)" + QUERY_GET_TXS_ORDER;
+            " AND tx.txType IN (2, 3)" + QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区news对应的notes交易
     String QUERY_GET_ALL_NOTES = "SELECT tx.*, 0 AS repliesNum, m.balance, m.power" +
@@ -76,7 +76,7 @@ public interface TxDao {
     // SQL:查询社区里的置顶交易(MARKET交易，排除Trust Tx, 并且上链)
     String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " AND tx.txType IN (3, 5, 6, 7) AND pinnedTime > 0" +
+            " AND tx.txType IN (2, 3) AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
     String QUERY_GET_ALL_MARKET_PINNED_TXS = "SELECT tx.*, t.repliesNum, m.balance, m.power" +
@@ -88,7 +88,7 @@ public interface TxDao {
         " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
         " GROUP BY repliedHash) t" +
         " ON tx.txID = t.repliedHash  " +
-        " WHERE tx.txType IN (3, 4, 5, 6, 7) AND pinnedTime > 0" +
+        " WHERE tx.txType IN (2, 3) AND pinnedTime > 0" +
         " AND c.isBanned = 0" +
         " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
         " ORDER BY tx.pinnedTime DESC";
@@ -109,7 +109,7 @@ public interface TxDao {
             " WHERE t.chainID = :chainID" +
             " AND (t.senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " OR t.receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
-            " AND t.txType IN (2, 3, 4, 5, 6, 7)";
+            " AND t.txType IN (2, 3)";
 
     // 查询钱包的收入和支出
     String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = "SELECT * FROM" +
@@ -134,7 +134,7 @@ public interface TxDao {
             " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " GROUP BY repliedHash) t" +
             " ON tx.txID = t.repliedHash  " +
-            " WHERE tx.txType IN (3, 4, 5, 6, 7)" +
+            " WHERE tx.txType IN (2, 3)" +
             " AND c.isBanned = 0" +
             QUERY_GET_TXS_ORDER;
 
@@ -211,15 +211,15 @@ public interface TxDao {
 
     String UPDATE_ALL_OFF_CHAIN_TXS = "UPDATE Txs SET txStatus = 0" +
             " WHERE chainID = :chainID AND senderPk = :userPk" +
-            " AND txType IN (2, 3, 4, 5, 6, 7) AND nonce > :nonce";
+            " AND txType IN (2, 3) AND nonce > :nonce";
 
     String UPDATE_ALL_ON_CHAIN_TXS = "UPDATE Txs SET txStatus = 2" +
             " WHERE chainID = :chainID AND senderPk = :userPk" +
-            " AND txType IN (2, 3, 4, 5, 6, 7) AND nonce <= :nonce";
+            " AND txType IN (2, 3) AND nonce <= :nonce";
 
     String QUERY_AVERAGE_TXS_FEE = "SELECT count(*) AS total, ifnull(sum(ifnull(fee, 0)), 0) AS totalFee," +
             " ifnull(sum(CASE WHEN ifnull(txType, 0) = 2 THEN 1 ELSE 0 END), 0) AS wiringCount, " +
-            " ifnull(sum(CASE WHEN ifnull(txType, 0) in (2, 3, 4, 5, 6, 7) THEN 1 ELSE 0 END), 0) AS txsCount" +
+            " ifnull(sum(CASE WHEN ifnull(txType, 0) in (2, 3) THEN 1 ELSE 0 END), 0) AS txsCount" +
             " FROM (SELECT t.fee, t.txType" +
             " FROM Blocks b" +
             " LEFT JOIN Txs t ON b.txID = t.txID" +
