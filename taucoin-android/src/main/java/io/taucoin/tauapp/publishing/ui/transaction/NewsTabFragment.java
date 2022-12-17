@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.Spanned;
 import android.text.style.URLSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -15,7 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.noober.menu.FloatMenu;
 
 import org.slf4j.Logger;
@@ -34,35 +31,23 @@ import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
 import cn.bingoogolapple.refreshlayout.BGAStickinessRefreshViewHolder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.OperationMenuItem;
-import io.taucoin.tauapp.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
-import io.taucoin.tauapp.publishing.core.model.data.message.TrustContent;
-import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
-import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.CopyManager;
-import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
-import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
-import io.taucoin.tauapp.publishing.databinding.DialogTrustBinding;
 import io.taucoin.tauapp.publishing.databinding.FragmentNewsTabBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
-import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
 import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
-import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
@@ -70,7 +55,7 @@ import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 /**
  * 主页所有上链news或notes, 以及自己发的未上链news Tab页
  */
-public class NewsTabFragment extends BaseFragment implements NewsListAdapter.ClickListener,
+public class NewsTabFragment extends BaseFragment implements View.OnClickListener, NewsListAdapter.ClickListener,
         BGARefreshLayout.BGARefreshLayoutDelegate {
 
     protected static final Logger logger = LoggerFactory.getLogger("NewsTabFragment");
@@ -85,8 +70,6 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
     protected UserViewModel userViewModel;
     protected CommunityViewModel communityViewModel;
     private FloatMenu operationsMenu;
-    private CommonDialog trustDialog;
-    private Disposable txFeeDisposable;
 
     private int currentPos = 0;
     private boolean isScrollToTop = true;
@@ -104,7 +87,7 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_news_tab, container, false);
-//        binding.setListener(this);
+        binding.setListener(this);
         return binding.getRoot();
     }
 
@@ -196,8 +179,7 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
 
         binding.fabButton.getMainFab().setOnClickListener(v -> {
             Intent intent = new Intent();
-            intent.putExtra(IntentExtra.TYPE, CommunityChooseActivity.TYPE_CREATE_NEWS);
-            ActivityUtil.startActivity(intent, activity, CommunityChooseActivity.class);
+            ActivityUtil.startActivity(intent, activity, NewsCreateActivity.class);
         });
 
 //        Intent intent = new Intent();
@@ -271,6 +253,27 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
                         loadData(0);
                     }
                 }));
+
+        disposables.add(txViewModel.observeLatestPinnedMsg()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list -> {
+                    boolean isHavePinnedMsg = list != null && list.size() > 0;
+                    binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
+                    if (isHavePinnedMsg) {
+                        binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
+                    }
+                }));
+    }
+
+    @Override
+    public void onClick(View v) {
+        closeAllDialog();
+        switch (v.getId()) {
+            case R.id.ll_pinned_message:
+                ActivityUtil.startActivity(activity, PinnedActivity.class);
+                break;
+        }
     }
 
     private int getItemCount() {
@@ -293,8 +296,7 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         KeyboardUtils.hideSoftInput(activity);
         List<OperationMenuItem> menuList = new ArrayList<>();
         menuList.add(new OperationMenuItem(R.string.tx_operation_copy));
-        final URLSpan[] urls = view.getUrls();
-        if (urls != null && urls.length > 0) {
+        if (tx != null && StringUtil.isNotEmpty(tx.link)) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_copy_link));
         }
         // 用户不能拉黑自己
@@ -302,6 +304,7 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
                 MainApplication.getInstance().getPublicKey())){
             menuList.add(new OperationMenuItem(R.string.tx_operation_blacklist));
         }
+        menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
         if (tx.favoriteTime <= 0) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_favorite));
         }
@@ -318,16 +321,17 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
                     ToastUtils.showShortToast(R.string.copy_successfully);
                     break;
                 case R.string.tx_operation_copy_link:
-                    if (urls != null && urls.length > 0) {
-                        String link = urls[0].getURL();
-                        CopyManager.copyText(link);
-                        ToastUtils.showShortToast(R.string.copy_link_successfully);
-                    }
+                    CopyManager.copyText(tx.link);
+                    ToastUtils.showShortToast(R.string.copy_link_successfully);
                     break;
                 case R.string.tx_operation_blacklist:
                     KeyboardUtils.hideSoftInput(activity);
                     String showName = UsersUtil.getShowName(tx.sender, tx.senderPk);
                     userViewModel.showBanDialog(activity, tx.senderPk, showName);
+                    break;
+                case R.string.tx_operation_pin:
+                case R.string.tx_operation_unpin:
+                    txViewModel.setMessagePinned(tx, false);
                     break;
                 case R.string.tx_operation_favorite:
                     txViewModel.setMessageFavorite(tx, false);
@@ -351,23 +355,23 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
     }
 
-    @Override
-    public void onEditNameClicked(String senderPk){
-        KeyboardUtils.hideSoftInput(activity);
-        String userPk = MainApplication.getInstance().getPublicKey();
-        if (StringUtil.isEquals(userPk, senderPk)) {
-            userViewModel.showEditNameDialog(activity, senderPk);
-        } else {
-            userViewModel.showRemarkDialog(activity, senderPk);
-        }
-    }
+//    @Override
+//    public void onEditNameClicked(String senderPk){
+//        KeyboardUtils.hideSoftInput(activity);
+//        String userPk = MainApplication.getInstance().getPublicKey();
+//        if (StringUtil.isEquals(userPk, senderPk)) {
+//            userViewModel.showEditNameDialog(activity, senderPk);
+//        } else {
+//            userViewModel.showRemarkDialog(activity, senderPk);
+//        }
+//    }
 
     @Override
     public void onRetweetClicked(UserAndTx tx) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-        intent.putExtra(IntentExtra.TYPE, CommunityChooseActivity.TYPE_RETWEET_NEWS);
-        ActivityUtil.startActivityForResult(intent, activity, CommunityChooseActivity.class,
+        intent.putExtra(IntentExtra.LINK, tx.link);
+        ActivityUtil.startActivityForResult(intent, activity, NewsCreateActivity.class,
                 CHOOSE_REQUEST_CODE);
     }
 
@@ -375,8 +379,17 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
     public void onReplyClicked(UserAndTx tx) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
-        ActivityUtil.startActivityForResult(intent, activity, AnnouncementCreateActivity.class,
+        intent.putExtra(IntentExtra.HASH, tx.txID);
+        ActivityUtil.startActivityForResult(intent, activity, NewsCreateActivity.class,
                 TX_REQUEST_CODE);
+    }
+
+    @Override
+    public void onChatClicked(UserAndTx tx) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
+        intent.putExtra(IntentExtra.HASH, tx.txID);
+        ActivityUtil.startActivity(intent, activity, CommunityChatActivity.class);
     }
 
     @Override
@@ -387,27 +400,11 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
     }
 
     @Override
-    public void onTrustClicked(UserAndTx user) {
-        KeyboardUtils.hideSoftInput(activity);
-        if (txFeeDisposable != null && !txFeeDisposable.isDisposed()) {
-            txFeeDisposable.dispose();
-        }
-        txFeeDisposable = txViewModel.observeAverageTxFee(user.chainID, TxType.TRUST_TX)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(fee -> {
-                    showTrustDialog(user, null, fee);
-                });
-    }
-
-    @Override
     public void onItemClicked(UserAndTx tx) {
         KeyboardUtils.hideSoftInput(activity);
-//        Intent intent = new Intent();
-//        intent.putExtra(IntentExtra.ID, tx.txID);
-//        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
-//        intent.putExtra(IntentExtra.PUBLIC_KEY, tx.senderPk);
-//        ActivityUtil.startActivity(intent, activity, SellDetailActivity.class);
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.ID, tx.txID);
+        ActivityUtil.startActivity(intent, activity, NewsDetailActivity.class);
     }
 
     @Override
@@ -416,70 +413,10 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         ActivityUtil.openUri(activity, link);
     }
 
-    /**
-     * 显示信任的对话框
-     */
-    void showTrustDialog(UserAndTx userAndTx, TxQueueAndStatus txQueue, long medianFee) {
-        DialogTrustBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
-                R.layout.dialog_trust, null, false);
-
-        String showName;
-        TrustContent content;
-        User user = userAndTx.sender;
-        if (user != null) {
-            showName = UsersUtil.getShowName(user);
-            content = new TrustContent(null, user.publicKey);
-        } else {
-            showName = UsersUtil.getShowName(null, txQueue.receiverPk);
-            content = new TrustContent(txQueue.content);
-        }
-        Spanned trustTip = Html.fromHtml(getString(R.string.tx_give_trust_tip, showName));
-        binding.tvTrustTip.setText(trustTip);
-        long txFee = 0;
-        if (txQueue != null) {
-            txFee = txQueue.fee;
-        }
-        String txFeeStr = FmtMicrometer.fmtFeeValue(txFee > 0 ? txFee : medianFee);
-        binding.tvTrustFee.setTag(R.id.median_fee, medianFee);
-
-        String chainID = userAndTx.chainID;
-        String txFreeHtml = getString(R.string.tx_median_fee, txFeeStr, ChainIDUtil.getCoinName(chainID));
-        binding.tvTrustFee.setText(Html.fromHtml(txFreeHtml));
-        binding.tvTrustFee.setTag(txFeeStr);
-        binding.tvTrustFee.setOnClickListener(v -> {
-            txViewModel.showEditFeeDialog(activity, binding.tvTrustFee, chainID);
-        });
-
-        binding.ivClose.setOnClickListener(v -> trustDialog.closeDialog());
-        binding.tvSubmit.setOnClickListener(v -> {
-            String fee = ViewUtils.getStringTag(binding.tvTrustFee);
-            String senderPk = MainApplication.getInstance().getPublicKey();
-            TxQueue tx = new TxQueue(chainID, senderPk, senderPk, 0L,
-                    FmtMicrometer.fmtTxLongValue(fee), TxType.TRUST_TX, content.getEncoded());
-            if (txQueue != null) {
-                tx.queueID = txQueue.queueID;
-                tx.queueTime = txQueue.queueTime;
-            }
-            if (txViewModel.validateTx(tx)) {
-                txViewModel.addTransaction(tx, txQueue);
-                trustDialog.closeDialog();
-            }
-        });
-        trustDialog = new CommonDialog.Builder(activity)
-                .setContentView(binding.getRoot())
-                .setCanceledOnTouchOutside(false)
-                .enableWarpWidth(true)
-                .create();
-        trustDialog.show();
-    }
-
     @Override
     public void onStop() {
         super.onStop();
         disposables.clear();
-        if (txFeeDisposable != null && !txFeeDisposable.isDisposed()) {
-            txFeeDisposable.dispose();
-        }
     }
 
 
@@ -493,9 +430,6 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
         if (operationsMenu != null) {
             operationsMenu.setOnItemClickListener(null);
             operationsMenu.dismiss();
-        }
-        if (trustDialog != null) {
-            trustDialog.closeDialog();
         }
     }
 
@@ -516,11 +450,6 @@ public class NewsTabFragment extends BaseFragment implements NewsListAdapter.Cli
             return false;
         }
     }
-
-//    @Override
-//    public void onRefresh() {
-//        loadData(getItemCount());
-//    }
 
     void initScrollToTop() {
         if (!isScrollToTop) {

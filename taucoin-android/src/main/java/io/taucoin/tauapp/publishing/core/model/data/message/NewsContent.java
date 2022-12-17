@@ -1,5 +1,6 @@
 package io.taucoin.tauapp.publishing.core.model.data.message;
 
+import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.Utils;
 import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.tauapp.publishing.core.utils.rlp.RLP;
@@ -17,8 +18,12 @@ public class NewsContent extends TxContent {
     public NewsContent(String memo, String link, String repliedHash, String repliedKey) {
         super(TxType.NEWS_TX.getType(), Utils.textStringToBytes(memo));
         this.link =  Utils.textStringToBytes(link);
-        this.repliedHash = ByteUtil.toByte(repliedHash);
-        this.repliedKey = ByteUtil.toByte(repliedKey);
+        if (StringUtil.isNotEmpty(repliedHash)) {
+            this.repliedHash = ByteUtil.toByte(repliedHash);
+        }
+        if (StringUtil.isNotEmpty(repliedKey)) {
+            this.repliedKey = ByteUtil.toByte(repliedKey);
+        }
     }
 
     public NewsContent(byte[] encode) {

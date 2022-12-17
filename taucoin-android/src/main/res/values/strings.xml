@@ -55,6 +55,8 @@
     <string name="main_empty_create_communities">Create Coin Group</string>
     <string name="main_exit">Click again to exit the application!</string>
     <string name="main_community_name">%1$s - %2$s</string>
+    <string name="main_community_chat">Chat</string>
+    <string name="main_community_name_balance">%1$s(%2$s)-balance %3$s</string>
     <string name="main_community_name_discovered">%1$s - %2$s - Discovered</string>
     <string name="main_community_name_total">%1$s - %2$s(%3$d)</string>
     <string name="main_community_in_mining">In Mining &#8230;</string>
@@ -155,7 +157,6 @@
     <string name="community_users_mining_block">Mining Block</string>
     <string name="community_users_doze">Doze</string>
     <string name="common_loading">loading&#8230;</string>
-    <string name="community_select">Select Community</string>
 
     <string name="community_create_tips" formatted="false"><Data><![CDATA[Creator is recommended to
     keep device <font color="#ff0000">ON CHARGING</font> to supply data for community.]]></Data></string>
@@ -187,7 +188,7 @@
     <string name="community_chain_note">Messages</string>
     <string name="community_chain_market">News</string>
     <string name="community_on_chain">Transactions</string>
-    <string name="community_pinned_message">Pinned Message</string>
+    <string name="community_pinned_message">Pinned News</string>
     <string name="community_chain_note_title">Note Transaction</string>
     <string name="community_sell_coins">Sale</string>
     <string name="community_airdrop">Airdrop</string>
@@ -460,7 +461,11 @@ You can paste the "tau link" to app to start with %1$d coins balance.\n%2$s</str
     <string name="tx_description">Description - optional</string>
     <string name="tx_select_community">Community</string>
     <string name="tx_invitation_title">Title</string>
+    <string name="tx_communities_more">More&#8230;</string>
     <string name="tx_what_happening">What\'s happening?</string>
+    <string name="tx_link_http">Https://(optional)</string>
+    <string name="tx_your_reply">Your reply</string>
+    <string name="tx_recent">Recent</string>
     <string name="tx_operation_reply">Reply</string>
     <string name="tx_operation_copy">Copy</string>
     <string name="tx_operation_copy_hash">Copy Hash</string>

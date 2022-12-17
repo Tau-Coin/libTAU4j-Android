@@ -544,7 +544,7 @@ public class CommunityViewModel extends AndroidViewModel {
     /**
      * 获取用户加入的社区列表
      */
-    Flowable<List<Member>> observerJoinedCommunityList() {
+    public Flowable<List<Member>> observerJoinedCommunityList() {
         return communityRepo.observerJoinedCommunityList();
     }
 

@@ -1,5 +1,6 @@
 package io.taucoin.tauapp.publishing.ui.transaction;
 
+import android.text.SpannableStringBuilder;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,34 +21,33 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.TxLogStatus;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
+import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
+import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.databinding.ItemLeftNoteBinding;
 import io.taucoin.tauapp.publishing.databinding.ItemRightNoteBinding;
 import io.taucoin.tauapp.publishing.databinding.TxLeftViewBinding;
 import io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView;
+import io.taucoin.tauapp.publishing.ui.customviews.RoundImageView;
 
 /**
  * 消息/交易列表显示的Adapter
  */
-public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.ViewHolder> {
+public class CommunityChatAdapter extends ListAdapter<UserAndTx, CommunityChatAdapter.ViewHolder> {
 
     enum ViewType {
         ITEM_LEFT,
         ITEM_RIGHT
     }
 
-    private ClickListener listener;
-    private String chainID;
-    private boolean isShowBan;
+    private final ClickListener listener;
 
-    NotesListAdapter(ClickListener listener, String chainID, boolean isShowBan) {
+    CommunityChatAdapter(ClickListener listener) {
         super(diffCallback);
         this.listener = listener;
-        this.chainID = chainID;
-        this.isShowBan = isShowBan;
     }
 
     @NonNull
@@ -62,7 +62,7 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
             binding = DataBindingUtil.inflate(inflater,
                     R.layout.item_left_note, parent, false);
         }
-        return new ViewHolder(binding, listener, chainID, isShowBan);
+        return new ViewHolder(binding, listener);
     }
 
     @Override
@@ -91,49 +91,64 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private ViewDataBinding binding;
-        private ClickListener listener;
-        private String chainID;
-        private boolean isShowBan;
+        private final ViewDataBinding binding;
+        private final ClickListener listener;
+        private final int nameColor;
 
-        ViewHolder(ViewDataBinding binding, ClickListener listener, String chainID, boolean isShowBan) {
+        ViewHolder(ViewDataBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
-            this.chainID = chainID;
-            this.isShowBan = isShowBan;
+            this.nameColor = binding.getRoot().getResources().getColor(R.color.color_black);
         }
 
         void bind(ViewHolder holder, UserAndTx tx, boolean isShowTime) {
-            if(null == binding || null == holder || null == tx || StringUtil.isEmpty(chainID)){
+            if(null == binding || null == holder || null == tx){
                 return;
             }
             AutoLinkTextView tvMsg;
             TextView tvTime;
-            TxLeftViewBinding headView;
+            RoundImageView headView;
             if (binding instanceof ItemRightNoteBinding) {
                 ItemRightNoteBinding rightBinding = (ItemRightNoteBinding) holder.binding;
                 tvMsg = rightBinding.tvMsg;
                 tvTime = rightBinding.tvTime;
-                headView = rightBinding.leftView;
+                headView = rightBinding.leftView.ivHeadPic;
                 rightBinding.leftView.tvBlacklist.setVisibility(View.GONE);
-                rightBinding.ivStatus.setVisibility(isShowBan ? View.VISIBLE : View.GONE);
-                if (isShowBan) {
-                    rightBinding.ivStatus.setImageResource(parseStatusReid(tx));
-                    rightBinding.ivStatus.setOnClickListener(v -> {
-                        if (listener != null) {
-                            listener.onTxLogClick(tx.txID, tx.version);
-                        }
-                    });
-                }
+                rightBinding.ivStatus.setVisibility(View.VISIBLE);
+                rightBinding.ivStatus.setImageResource(parseStatusReid(tx));
+                rightBinding.ivStatus.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onTxLogClick(tx.txID, tx.version);
+                    }
+                });
             } else {
                 ItemLeftNoteBinding leftBinding = (ItemLeftNoteBinding) holder.binding;
                 tvMsg = leftBinding.tvMsg;
                 tvTime = leftBinding.tvTime;
-//                headView = leftBinding.leftView;
-//                leftBinding.leftView.tvBlacklist.setVisibility(isShowBan ? View.VISIBLE : View.GONE);
-                leftBinding.tvName.setText(UsersUtil.getShowName(tx.sender));
-                setEditNameClickListener(leftBinding.tvName, tx);
+                headView = leftBinding.ivHeadPic;
+                leftBinding.tvBlacklist.setVisibility(View.VISIBLE );
+                String userName = UsersUtil.getShowName(tx.sender);
+                userName = null == userName ? "" : userName;
+                String communityName = ChainIDUtil.getName(tx.chainID);
+                String communityCode = ChainIDUtil.getCode(tx.chainID);
+                SpannableStringBuilder name = new SpanUtils()
+                        .append(userName)
+                        .setForegroundColor(nameColor)
+                        .append(" @")
+                        .append(UsersUtil.getLastPublicKey(tx.senderPk, 4))
+                        .append(" · ")
+                        .append(communityName)
+                        .append("(").append(communityCode).append(")")
+                        .append(" · ")
+                        .append(DateUtil.getNewsTime(tx.timestamp))
+                        .create();
+                leftBinding.tvName.setText(name);
+                leftBinding.tvBlacklist.setOnClickListener(view -> {
+                    if(listener != null){
+                        listener.onBanClicked(tx);
+                    }
+                });
             }
 
             if (isShowTime) {
@@ -142,7 +157,7 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
             }
             tvTime.setVisibility(isShowTime ? View.VISIBLE : View.GONE);
 
-//            headView.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
+            headView.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
             tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NOTES));
             // 添加link解析
             Linkify.addLinks(tvMsg, Linkify.WEB_URLS);
@@ -156,13 +171,7 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
             Linkify.addLinks(tvMsg, friend, null);
 
             setClickListener(tvMsg, tx);
-//            setLeftViewClickListener(headView, tx);
-
-            binding.getRoot().setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onItemClicked(tvMsg, tx);
-                }
-            });
+            setLeftViewClickListener(headView, tx);
         }
 
         private static int parseStatusReid(UserAndTx msg) {
@@ -178,23 +187,10 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
             }
         }
 
-        private void setLeftViewClickListener(TxLeftViewBinding binding, UserAndTx tx) {
-            binding.ivHeadPic.setOnClickListener(view ->{
+        private void setLeftViewClickListener(RoundImageView headView, UserAndTx tx) {
+            headView.setOnClickListener(view ->{
                 if (listener != null) {
                     listener.onUserClicked(tx.senderPk);
-                }
-            });
-            binding.tvBlacklist.setOnClickListener(view -> {
-                if(listener != null){
-                    listener.onBanClicked(tx);
-                }
-            });
-        }
-
-        private void setEditNameClickListener(TextView textView, UserAndTx tx) {
-            textView.setOnClickListener(view ->{
-                if(listener != null){
-                    listener.onEditNameClicked(tx.senderPk);
                 }
             });
         }
@@ -203,9 +199,7 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
             tvMsg.setAutoLinkListener(new AutoLinkTextView.AutoLinkListener() {
                 @Override
                 public void onClick(AutoLinkTextView view) {
-                    if (listener != null) {
-                        listener.onItemClicked(tvMsg, tx);
-                    }
+
                 }
 
                 @Override
@@ -226,9 +220,7 @@ public class NotesListAdapter extends ListAdapter<UserAndTx, NotesListAdapter.Vi
     }
 
     public interface ClickListener {
-        void onItemClicked(TextView view, UserAndTx tx);
         void onUserClicked(String publicKey);
-        void onEditNameClicked(String publicKey);
         void onBanClicked(UserAndTx tx);
         void onItemLongClicked(TextView view, UserAndTx tx);
         void onLinkClick(String link);

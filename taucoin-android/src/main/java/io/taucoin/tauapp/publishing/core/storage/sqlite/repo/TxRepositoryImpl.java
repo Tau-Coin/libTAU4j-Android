@@ -20,7 +20,6 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
-import io.taucoin.tauapp.publishing.ui.transaction.CommunityTabFragment;
 
 /**
  * TxRepository接口实现
@@ -68,13 +67,13 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public List<UserAndTx> loadOnChainNotesData(String chainID, int startPos, int loadSize) {
-        return db.txDao().loadOnChainNotesData(chainID, startPos, loadSize);
+    public Flowable<List<UserAndTx>> observeLatestPinnedMsg() {
+        return db.txDao().queryCommunityMarketLatestPinnedTx();
     }
 
     @Override
-    public List<UserAndTx> loadAllNotesData(String chainID, int startPos, int loadSize) {
-        return db.txDao().loadAllNotesData(chainID, startPos, loadSize);
+    public List<UserAndTx> loadAllNotesData(String repliesHash, int startPos, int loadSize) {
+        return db.txDao().loadAllNotesData(repliesHash, startPos, loadSize);
     }
 
     @Override
@@ -92,6 +91,11 @@ public class TxRepositoryImpl implements TxRepository{
         return db.txDao().loadNewsData(startPos, loadSize);
     }
 
+    @Override
+    public List<UserAndTx> loadNewsRepliesData(String txID, int startPos, int loadSize) {
+        return db.txDao().loadNewsRepliesData(txID, startPos, loadSize);
+    }
+
     /**
      * 加载交易固定数据
      * @param chainID 社区链ID
@@ -99,6 +103,11 @@ public class TxRepositoryImpl implements TxRepository{
     @Override
     public List<UserAndTx> queryCommunityPinnedTxs(String chainID) {
         return db.txDao().queryCommunityMarketPinnedTxs(chainID);
+    }
+
+    @Override
+    public List<UserAndTx> queryCommunityPinnedTxs() {
+        return db.txDao().queryCommunityMarketPinnedTxs();
     }
 
     /**
@@ -303,5 +312,10 @@ public class TxRepositoryImpl implements TxRepository{
     @Override
     public Flowable<Integer> observeUnreadNews() {
         return db.txDao().observeUnreadNews();
+    }
+
+    @Override
+    public Observable<UserAndTx> observeNewsDetail(String txID) {
+        return db.txDao().observeNewsDetail(txID);
     }
 }

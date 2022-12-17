@@ -23,6 +23,7 @@ public interface UserDao {
     String QUERY_GET_CURRENT_USER_SEED = "SELECT seed FROM Users WHERE isCurrentUser = 1";
     String QUERY_GET_CURRENT_USER_PK = "SELECT publicKey FROM Users WHERE isCurrentUser = 1";
     String QUERY_GET_USER_LIST = "SELECT * FROM Users";
+    String QUERY_GET_USERS_PKS_IN_BAN_LIST = "SELECT publicKey FROM Users where isBanned = 1 and isCurrentUser != 1";
     String QUERY_GET_USERS_IN_BAN_LIST = "SELECT * FROM Users where isBanned = 1 and isCurrentUser != 1";
     String QUERY_GET_COMMUNITY_USERS_IN_BAN_LIST = "SELECT * FROM Users where isMemBanned = 1 and isCurrentUser != 1";
 
@@ -53,8 +54,8 @@ public interface UserDao {
             " LEFT JOIN Friends f ON u.publicKey = f.friendPK and f.userPK = (" + QUERY_GET_CURRENT_USER_PK + ")" +
             " where u.publicKey = :publicKey";
 
-    String QUERY_GET_USER_PKS_IN_BAN_LIST = " (SELECT publicKey FROM Users WHERE isBanned == 1 and isCurrentUser != 1) ";
-    String QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST = " (SELECT publicKey FROM Users WHERE isMemBanned == 1 and isCurrentUser != 1) ";
+    String QUERY_GET_USER_PKS_IN_BAN_LIST = " (SELECT publicKey FROM Users WHERE isBanned = 1 and isCurrentUser != 1) ";
+    String QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST = " (SELECT publicKey FROM Users WHERE isMemBanned = 1 and isCurrentUser != 1) ";
 
     String QUERY_FRIEND_BY_PUBLIC_KEY = "SELECT * FROM Friends" +
             " where friendPk =:friendPk and userPK = (" + QUERY_GET_CURRENT_USER_PK + ")";

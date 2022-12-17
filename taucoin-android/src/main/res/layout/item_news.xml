@@ -50,20 +50,45 @@
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody2"/>
 
-                <TextView
-                    android:id="@+id/tv_balance_power"
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:layout_marginStart="@dimen/widget_size_5"
-                    android:layout_marginTop="@dimen/widget_size_5"
-                    android:includeFontPadding="false"
-                    android:maxLines="1"
-                    app:autoSizeTextType="uniform"
-                    app:autoSizeMaxTextSize="@dimen/font_size_14"
-                    app:autoSizeMinTextSize="@dimen/font_size_2"
-                    app:autoSizeStepGranularity="@dimen/font_size_0_5"
-                    android:textColor="@color/gray_dark"
-                    android:textAppearance="@style/TextAppearanceBody2" />
+                    android:layout_marginTop="@dimen/widget_size_5">
+
+                    <ImageView
+                        android:layout_width="@dimen/widget_size_16"
+                        android:layout_height="@dimen/widget_size_16"
+                        android:contentDescription="@null"
+                        android:src="@mipmap/icon_community_balance"/>
+
+                    <TextView
+                        android:id="@+id/tv_balance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/widget_size_1"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody2" />
+
+                    <ImageView
+                        android:layout_width="@dimen/widget_size_17"
+                        android:layout_height="@dimen/widget_size_17"
+                        android:layout_marginStart="@dimen/widget_size_10"
+                        android:contentDescription="@null"
+                        android:src="@mipmap/icon_power"/>
+
+                    <TextView
+                        android:id="@+id/tv_power"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody2" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -95,17 +120,48 @@
                 android:contentDescription="@null"
                 android:src="@mipmap/icon_ban"/>
 
-            <io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView
+            <TextView
+                android:visibility="gone"
                 android:layout_toEndOf="@+id/iv_ban"
                 android:layout_toStartOf="@+id/iv_arrow"
-                android:id="@+id/tv_msg"
-                android:layout_width="match_parent"
+                android:id="@+id/tv_reply"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/widget_size_10"
                 android:paddingTop="@dimen/widget_size_5"
-                android:paddingBottom="@dimen/widget_size_10"
                 android:includeFontPadding="false"
-                android:textColorLink="@color/color_blue_link"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody1" />
+
+            <TextView
+                android:layout_below="@+id/tv_reply"
+                android:layout_toEndOf="@+id/iv_ban"
+                android:layout_toStartOf="@+id/iv_arrow"
+                android:id="@+id/tv_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:paddingTop="@dimen/widget_size_5"
+                android:includeFontPadding="false"
+                android:textAppearance="@style/TextAppearanceBody1" />
+
+            <TextView
+                android:layout_toEndOf="@+id/iv_ban"
+                android:layout_below="@+id/tv_msg"
+                android:id="@+id/tv_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/widget_size_80"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:paddingTop="@dimen/widget_size_5"
+                android:textColor="@color/color_blue_link"
+                android:drawablePadding="@dimen/widget_size_2"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:breakStrategy="simple"
+                android:hyphenationFrequency="normal"
+                android:includeFontPadding="false"
                 android:textAppearance="@style/TextAppearanceBody1" />
 
             <ImageView
@@ -122,41 +178,51 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/rl_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/widget_size_35"
-            android:layout_marginEnd="@dimen/widget_size_35">
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:layout_marginStart="@dimen/widget_size_55"
+            android:layout_marginEnd="@dimen/widget_size_55">
 
             <ImageView
-                android:visibility="gone"
                 android:id="@+id/iv_reply"
-                android:layout_width="@dimen/widget_size_20"
-                android:layout_height="@dimen/widget_size_20"
+                android:layout_width="@dimen/widget_size_22"
+                android:layout_height="@dimen/widget_size_22"
                 android:contentDescription="@null"
                 android:src="@mipmap/icon_reply_news"/>
 
+            <TextView
+                android:id="@+id/tv_replies_num"
+                android:layout_toEndOf="@+id/iv_reply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_2"
+                android:text="0"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody2"/>
+
             <ImageView
                 android:id="@+id/iv_retweet"
-                android:layout_width="@dimen/widget_size_24"
-                android:layout_height="@dimen/widget_size_24"
+                android:layout_width="@dimen/widget_size_26"
+                android:layout_height="@dimen/widget_size_26"
                 android:layout_centerHorizontal="true"
                 android:contentDescription="@null"
                 android:src="@mipmap/icon_retweet"/>
 
-            <TextView
-                android:visibility="gone"
-                android:id="@+id/tv_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/iv_chat"
+                android:layout_width="@dimen/widget_size_22"
+                android:layout_height="@dimen/widget_size_22"
+                android:contentDescription="@null"
                 android:layout_alignParentEnd="true"
-                android:textColor="@color/gray_dark"
-                android:textAppearance="@style/TextAppearanceBody2"/>
+                android:src="@mipmap/icon_chat"/>
         </RelativeLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_1"
-            android:layout_marginTop="@dimen/widget_size_5"
+            android:layout_marginTop="@dimen/widget_size_10"
             android:background="@color/color_bg"/>
 
     </LinearLayout>

@@ -29,13 +29,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <include
-                android:id="@+id/left_view"
+            <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/widget_size_0"
-                android:layout_marginEnd="@dimen/widget_size_5"
-                layout="@layout/tx_left_view"/>
+                android:layout_marginEnd="@dimen/widget_size_5">
+
+                <io.taucoin.tauapp.publishing.ui.customviews.RoundImageView
+                    android:id="@+id/iv_head_pic"
+                    android:layout_width="@dimen/widget_size_45"
+                    android:layout_height="@dimen/widget_size_45"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/primary_rect_round_bg"/>
+
+                <ImageView
+                    android:id="@+id/tv_blacklist"
+                    android:layout_width="@dimen/widget_size_30"
+                    android:layout_height="@dimen/widget_size_30"
+                    android:padding="@dimen/widget_size_5"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_ban"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="vertical"

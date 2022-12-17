@@ -30,7 +30,6 @@ import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityAirdropCoinsBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
-import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.customviews.FilterEditText;
 import io.taucoin.tauapp.publishing.ui.friends.AirdropCommunityActivity;
@@ -221,7 +220,7 @@ public class AirdropCreateActivity extends BaseActivity implements View.OnClickL
                 txViewModel.showEditFeeDialog(this, binding.tvFee, chainID);
                 break;
             case R.id.iv_community:
-                ActivityUtil.startActivityForResult(this, CommunityChooseActivity.class,
+                ActivityUtil.startActivityForResult(this, NewsCreateActivity.class,
                         CHOOSE_COMMUNITY_CODE);
                 break;
         }

@@ -17,6 +17,7 @@ package io.taucoin.tauapp.publishing.core.utils;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.view.Display;
 import android.view.Surface;
@@ -157,6 +159,26 @@ public class ActivityUtil {
             Uri uri = Uri.parse(uriStr);
             intent.setData(uri);
             context.startActivity(intent);
+        } catch (Exception e) {
+            jumpBrowser(context, uriStr);
+//            ToastUtils.showShortToast(R.string.common_install_browser);
+        }
+    }
+
+    /**
+     * 调用系统的浏览器搜索详情
+     */
+    public static void jumpBrowser(Context context, String value) {
+        try {
+            /* 取得网页搜寻的intent */
+            Intent search = new Intent(Intent.ACTION_WEB_SEARCH);
+            search.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            search.putExtra(SearchManager.QUERY, value);
+//            final Bundle appData = context.getIntent().getBundleExtra(SearchManager.APP_DATA);
+//            if (appData != null) {
+//                search.putExtra(SearchManager.APP_DATA, appData);
+//            }
+            context.startActivity(search);
         } catch (Exception e) {
             ToastUtils.showShortToast(R.string.common_install_browser);
         }

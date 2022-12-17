@@ -46,7 +46,6 @@ import io.taucoin.tauapp.publishing.databinding.FragmentTxsMarketTabBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
 import io.taucoin.tauapp.publishing.ui.TauNotifier;
-import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
 import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
@@ -349,8 +348,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         KeyboardUtils.hideSoftInput(activity);
         List<OperationMenuItem> menuList = new ArrayList<>();
         menuList.add(new OperationMenuItem(R.string.tx_operation_copy));
-        final URLSpan[] urls = view.getUrls();
-        if (urls != null && urls.length > 0) {
+        if (tx != null && StringUtil.isNotEmpty(tx.link)) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_copy_link));
         }
         // 用户不能拉黑自己
@@ -375,11 +373,8 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                     ToastUtils.showShortToast(R.string.copy_successfully);
                     break;
                 case R.string.tx_operation_copy_link:
-                    if (urls != null && urls.length > 0) {
-                        String link = urls[0].getURL();
-                        CopyManager.copyText(link);
-                        ToastUtils.showShortToast(R.string.copy_link_successfully);
-                    }
+                    CopyManager.copyText(tx.link);
+                    ToastUtils.showShortToast(R.string.copy_link_successfully);
                     break;
                 case R.string.tx_operation_blacklist:
                     String publicKey = tx.senderPk;
@@ -405,11 +400,6 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
-    public void onTrustClicked(UserAndTx user) {
-
-    }
-
-    @Override
     public void onUserClicked(String senderPk) {
         KeyboardUtils.hideSoftInput(activity);
         Intent intent = new Intent();
@@ -417,16 +407,16 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
     }
 
-    @Override
-    public void onEditNameClicked(String senderPk){
-        KeyboardUtils.hideSoftInput(activity);
-        String userPk = MainApplication.getInstance().getPublicKey();
-        if (StringUtil.isEquals(userPk, senderPk)) {
-            userViewModel.showEditNameDialog(activity, senderPk);
-        } else {
-            userViewModel.showRemarkDialog(activity, senderPk);
-        }
-    }
+//    @Override
+//    public void onEditNameClicked(String senderPk){
+//        KeyboardUtils.hideSoftInput(activity);
+//        String userPk = MainApplication.getInstance().getPublicKey();
+//        if (StringUtil.isEquals(userPk, senderPk)) {
+//            userViewModel.showEditNameDialog(activity, senderPk);
+//        } else {
+//            userViewModel.showRemarkDialog(activity, senderPk);
+//        }
+//    }
 
     @Override
     public void onBanClicked(UserAndTx tx){
@@ -438,11 +428,9 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onItemClicked(UserAndTx tx) {
         KeyboardUtils.hideSoftInput(activity);
-//        Intent intent = new Intent();
-//        intent.putExtra(IntentExtra.ID, tx.txID);
-//        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
-//        intent.putExtra(IntentExtra.PUBLIC_KEY, tx.senderPk);
-//        ActivityUtil.startActivity(intent, activity, SellDetailActivity.class);
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.ID, tx.txID);
+        ActivityUtil.startActivity(intent, activity, NewsDetailActivity.class);
     }
 
     @Override
@@ -455,14 +443,23 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     public void onRetweetClicked(UserAndTx tx) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-        intent.putExtra(IntentExtra.TYPE, CommunityChooseActivity.TYPE_RETWEET_NEWS);
-        ActivityUtil.startActivity(intent, activity, CommunityChooseActivity.class);
+        intent.putExtra(IntentExtra.LINK, tx.link);
+        ActivityUtil.startActivity(intent, activity, NewsCreateActivity.class);
     }
 
     @Override
     public void onReplyClicked(UserAndTx tx) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
-        ActivityUtil.startActivity(intent, activity, AnnouncementCreateActivity.class);
+        intent.putExtra(IntentExtra.HASH, tx.txID);
+        ActivityUtil.startActivity(intent, activity, NewsCreateActivity.class);
+    }
+
+    @Override
+    public void onChatClicked(UserAndTx tx) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
+        intent.putExtra(IntentExtra.HASH, tx.txID);
+        ActivityUtil.startActivity(intent, activity, CommunityChatActivity.class);
     }
 }

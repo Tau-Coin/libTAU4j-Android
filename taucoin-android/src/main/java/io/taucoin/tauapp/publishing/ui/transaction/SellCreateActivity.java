@@ -28,7 +28,6 @@ import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivitySellBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
-import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 
 /**
@@ -192,7 +191,7 @@ public class SellCreateActivity extends BaseActivity implements View.OnClickList
                 txViewModel.showEditFeeDialog(this, binding.tvFee, chainID);
                 break;
             case R.id.iv_community:
-                ActivityUtil.startActivityForResult(this, CommunityChooseActivity.class,
+                ActivityUtil.startActivityForResult(this, NewsCreateActivity.class,
                         CHOOSE_REQUEST_CODE);
                 break;
         }

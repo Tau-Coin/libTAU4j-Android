@@ -49,20 +49,48 @@
 
         </RelativeLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/widget_size_20"
-            android:layout_marginTop="@dimen/widget_size_10"
-            android:text="@string/community_chain_market"
-            android:textColor="@color/color_yellow"
-            android:textAppearance="@style/TextAppearanceBody1"/>
-
         <View
             android:background="@color/color_bg"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_1"
             android:layout_marginTop="@dimen/widget_size_5" />
+
+        <LinearLayout
+            android:id="@+id/ll_communities"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.yanzhenjie.recyclerview.SwipeRecyclerView
+                android:id="@+id/joined_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:clipToPadding="false"
+                android:scrollbars="vertical"
+                android:focusable="true"
+                android:scrollbarStyle="outsideOverlay" />
+
+            <TextView
+                android:id="@+id/tv_more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/widget_size_5"
+                android:paddingBottom="@dimen/widget_size_5"
+                android:paddingStart="@dimen/widget_size_20"
+                android:paddingEnd="@dimen/widget_size_20"
+                android:text="@string/tx_communities_more"
+                android:onClick="@{listener::onClick}"
+                android:includeFontPadding="false"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+            <View
+                android:background="@color/color_bg"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/widget_size_1"
+                android:layout_marginTop="@dimen/widget_size_5" />
+
+        </LinearLayout>
 
         <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_news"
@@ -78,35 +106,63 @@
             android:gravity="start"
             android:textAppearance="@style/TextAppearanceBody1" />
 
-        <TextView
-            android:id="@+id/tv_bytes_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_5"
-            android:layout_gravity="end"
-            android:onClick="@{listener::onClick}"
-            android:layout_marginStart="@dimen/widget_size_20"
-            android:layout_marginEnd="@dimen/widget_size_20"
-            android:textAppearance="@style/TextAppearanceBody2"/>
-
         <View
             android:background="@color/color_bg"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_1"
             android:layout_marginTop="@dimen/widget_size_5" />
 
-        <TextView
-            android:id="@+id/tv_fee"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_5"
-            android:layout_marginBottom="@dimen/widget_size_5"
-            android:text="@string/tx_median_fee"
-            android:layout_gravity="end"
-            android:onClick="@{listener::onClick}"
+        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
+            android:id="@+id/et_link"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_40"
             android:layout_marginStart="@dimen/widget_size_20"
             android:layout_marginEnd="@dimen/widget_size_20"
-            android:textAppearance="@style/TextAppearanceBody2"/>
+            android:paddingTop="@dimen/widget_size_10"
+            android:paddingBottom="@dimen/widget_size_10"
+            android:autofillHints="@string/tx_link_http"
+            android:hint="@string/tx_link_http"
+            android:inputType="text"
+            android:background="@null"
+            android:gravity="start|center_vertical"
+            android:textAppearance="@style/TextAppearanceBody1" />
+
+        <View
+            android:background="@color/color_bg"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/widget_size_1" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_size_5">
+
+            <TextView
+                android:id="@+id/tv_bytes_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:layout_gravity="end"
+                android:layout_marginStart="@dimen/widget_size_20"
+                android:layout_marginEnd="@dimen/widget_size_20"
+                android:textAppearance="@style/TextAppearanceBody2"/>
+
+            <TextView
+                android:id="@+id/tv_fee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:layout_marginBottom="@dimen/widget_size_5"
+                android:text="@string/tx_median_fee"
+                android:layout_gravity="end"
+                android:onClick="@{listener::onClick}"
+                android:layout_marginStart="@dimen/widget_size_20"
+                android:layout_marginEnd="@dimen/widget_size_20"
+                android:textAppearance="@style/TextAppearanceBody2"/>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_interim_balance"

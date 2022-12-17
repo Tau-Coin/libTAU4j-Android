@@ -1,17 +1,10 @@
 package io.taucoin.tauapp.publishing.ui.transaction;
 
-import android.text.Html;
 import android.text.SpannableStringBuilder;
-import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.zxing.common.StringUtils;
-
-import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -21,33 +14,35 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
-import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
-import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.tauapp.publishing.core.utils.BitmapUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
+import io.taucoin.tauapp.publishing.core.utils.DrawablesUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
-import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.Logarithm;
 import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
-import io.taucoin.tauapp.publishing.core.utils.Utils;
-import io.taucoin.tauapp.publishing.databinding.ItemMarketBinding;
 import io.taucoin.tauapp.publishing.databinding.ItemNewsBinding;
-import io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView;
-import io.taucoin.tauapp.publishing.ui.customviews.RoundImageView;
 
 /**
  * Market 列表显示的Adapter
  */
 public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.ViewHolder> {
 
-    private ClickListener listener;
+    private final BaseClickListener listener;
+    private final boolean isReply;
 
-    NewsListAdapter(ClickListener listener) {
+    NewsListAdapter(BaseClickListener listener) {
         super(diffCallback);
         this.listener = listener;
+        this.isReply = false;
+    }
+
+    NewsListAdapter(BaseClickListener listener, boolean isReply) {
+        super(diffCallback);
+        this.listener = listener;
+        this.isReply = isReply;
     }
 
     @NonNull
@@ -56,7 +51,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ItemNewsBinding binding = DataBindingUtil.inflate(inflater,
                 R.layout.item_news, parent, false);
-        return new ViewHolder(binding, listener);
+        return new ViewHolder(binding, listener, isReply);
     }
 
     @Override
@@ -66,26 +61,38 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         private final ItemNewsBinding binding;
-        private final ClickListener listener;
+        private final BaseClickListener listener;
         private final int nameColor;
-        private final String balancePower;
+        private final int replyColor;
+        private final int linkDrawableSize;
+        private final boolean isReply;
 
-        ViewHolder(ItemNewsBinding binding, ClickListener listener) {
+        ViewHolder(ItemNewsBinding binding, BaseClickListener listener, boolean isReply) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
             this.nameColor = binding.getRoot().getResources().getColor(R.color.color_black);
-            this.balancePower = binding.getRoot().getResources().getString(R.string.drawer_balance_time_color);
+            this.replyColor = binding.getRoot().getResources().getColor(R.color.color_blue_link);
+            this.linkDrawableSize = binding.getRoot().getResources().getDimensionPixelSize(R.dimen.widget_size_14);
+            this.isReply = isReply;
         }
 
         void bind(ViewHolder holder, UserAndTx tx) {
             if(null == binding || null == holder || null == tx){
                 return;
             }
-            binding.ivArrow.setVisibility(View.INVISIBLE);
-
+            binding.rlBottom.setVisibility(isReply ? View.GONE : View.VISIBLE);
+            binding.ivArrow.setVisibility(isReply ? View.GONE : View.VISIBLE);
             binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
-            setLeftViewClickListener(binding.ivHeadPic, tx);
+            binding.tvReply.setVisibility(isReply ? View.VISIBLE : View.GONE);
+            if (isReply) {
+                SpannableStringBuilder reply = new SpanUtils()
+                        .append("reply")
+                        .append("@" + UsersUtil.getLastPublicKey(tx.senderPk, 4))
+                        .setForegroundColor(replyColor)
+                        .create();
+                binding.tvReply.setText(reply);
+            }
 
             String userName = UsersUtil.getShowName(tx.sender);
             userName = null == userName ? "" : userName;
@@ -99,14 +106,9 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                     .append(" · ")
                     .append(communityName)
                     .append("(").append(communityCode).append(")")
-                    .append(" · ")
-                    .append(DateUtil.getNewsTime(tx.timestamp))
                     .create();
             binding.tvName.setText(name);
-//            setEditNameClickListener(binding.tvName, tx);
-
-//            binding.tvTrust.setText(FmtMicrometer.fmtLong(tx.trusts));
-            setImageClickListener(binding, tx);
+            setClickListener(binding, tx);
 
             boolean isMyself = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
             binding.ivBan.setVisibility(isMyself ? View.INVISIBLE : View.VISIBLE);
@@ -114,35 +116,42 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             double showPower = Logarithm.log2(2 + tx.power);
             String power = FmtMicrometer.formatThreeDecimal(showPower);
             String balance = FmtMicrometer.fmtBalance(tx.getDisplayBalance());
-//                    String time = DateUtil.formatTime(bean.balUpdateTime, DateUtil.pattern14);
-            String balanceAndTime = String.format(balancePower, balance, power);
-            binding.tvBalancePower.setText(Html.fromHtml(balanceAndTime));
+            binding.tvBalance.setText(balance);
+            binding.tvPower.setText(power);
 
             binding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-//            // 添加link解析
-//            Linkify.addLinks(binding.tvMsg, Linkify.WEB_URLS);
-//            Pattern referral = Pattern.compile(LinkUtil.REFERRAL_PATTERN, 0);
-//            Linkify.addLinks(binding.tvMsg, referral, null);
-//            Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
-//            Linkify.addLinks(binding.tvMsg, airdrop, null);
-//            Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
-//            Linkify.addLinks(binding.tvMsg, chain, null);
-//            Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
-//            Linkify.addLinks(binding.tvMsg, friend, null);
 
-            setClickListener(binding.tvMsg, tx);
+            boolean isShowLink = StringUtil.isNotEmpty(tx.link);
+            binding.tvLink.setText(tx.link);
+            binding.tvLink.setVisibility(isShowLink ? View.VISIBLE : View.GONE);
+            if (isShowLink) {
+                DrawablesUtil.setUnderLine(binding.tvLink);
+                DrawablesUtil.setEndDrawable(binding.tvLink, R.mipmap.icon_share_link, linkDrawableSize);
+            }
+            binding.tvRepliesNum.setText(FmtMicrometer.fmtLong(tx.repliesNum));
             binding.tvMsg.requestLayout();
         }
 
-        private void setImageClickListener(ItemNewsBinding binding, UserAndTx tx) {
-            binding.ivRetweet.setOnClickListener(view -> {
+        private void setClickListener(ItemNewsBinding binding, UserAndTx tx) {
+            binding.ivHeadPic.setOnClickListener(view ->{
                 if (listener != null) {
-                    listener.onRetweetClicked(tx);
+                    listener.onUserClicked(tx.senderPk);
+                }
+            });
+
+            binding.ivRetweet.setOnClickListener(view -> {
+                if (listener != null && listener instanceof ClickListener) {
+                    ((ClickListener) listener).onRetweetClicked(tx);
                 }
             });
             binding.ivReply.setOnClickListener(view -> {
-                if (listener != null) {
-                    listener.onReplyClicked(tx);
+                if (listener != null && listener instanceof ClickListener) {
+                    ((ClickListener) listener).onReplyClicked(tx);
+                }
+            });
+            binding.ivChat.setOnClickListener(view -> {
+                if (listener != null && listener instanceof ClickListener) {
+                    ((ClickListener) listener).onChatClicked(tx);
                 }
             });
             binding.ivLongPress.setOnClickListener(view -> {
@@ -155,46 +164,21 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                     listener.onBanClicked(tx);
                 }
             });
-        }
-
-        private void setLeftViewClickListener(RoundImageView ivHeadPic, UserAndTx tx) {
-            ivHeadPic.setOnClickListener(view ->{
+            binding.tvLink.setOnClickListener(view -> {
                 if (listener != null) {
-                    listener.onUserClicked(tx.senderPk);
+                    listener.onLinkClick(tx.link);
                 }
             });
-        }
-
-        private void setEditNameClickListener(TextView textView, UserAndTx tx) {
-            textView.setOnClickListener(view ->{
-                if(listener != null){
-                    listener.onEditNameClicked(tx.senderPk);
+            binding.getRoot().setOnClickListener(v -> {
+                if (listener != null && listener instanceof ClickListener) {
+                    ((ClickListener) listener).onItemClicked(tx);
                 }
             });
-        }
-
-        private void setClickListener(AutoLinkTextView tvMsg, UserAndTx tx) {
-            tvMsg.setAutoLinkListener(new AutoLinkTextView.AutoLinkListener() {
-                @Override
-                public void onClick(AutoLinkTextView view) {
-                    if (tx.txType == TxType.SELL_TX.getType() && listener != null) {
-                        listener.onItemClicked(tx);
-                    }
+            binding.getRoot().setOnLongClickListener(v -> {
+                if (listener != null) {
+                    listener.onItemLongClicked(binding.tvMsg, tx);
                 }
-
-                @Override
-                public void onLongClick(AutoLinkTextView view) {
-                    if (listener != null) {
-                        listener.onItemLongClicked(tvMsg, tx);
-                    }
-                }
-
-                @Override
-                public void onLinkClick(String link) {
-                    if (listener != null) {
-                        listener.onLinkClick(link);
-                    }
-                }
+                return false;
             });
         }
     }
@@ -206,15 +190,17 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
         super.onViewRecycled(holder);
     }
 
-    public interface ClickListener {
-        void onTrustClicked(UserAndTx user);
-        void onUserClicked(String publicKey);
-        void onEditNameClicked(String publicKey);
-        void onItemLongClicked(TextView view, UserAndTx tx);
-        void onItemClicked(UserAndTx tx);
-        void onLinkClick(String link);
+    public interface ClickListener extends BaseClickListener {
         void onRetweetClicked(UserAndTx tx);
         void onReplyClicked(UserAndTx tx);
+        void onChatClicked(UserAndTx tx);
+        void onItemClicked(UserAndTx tx);
+    }
+
+    public interface BaseClickListener {
+        void onUserClicked(String publicKey);
+        void onItemLongClicked(TextView view, UserAndTx tx);
+        void onLinkClick(String link);
         void onBanClicked(UserAndTx tx);
     }
 
@@ -230,10 +216,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                     isSame = StringUtil.isEquals(oldItem.sender.remark, newItem.sender.remark);
                 }
             }
-            if (isSame && oldItem.trusts != newItem.trusts) {
-                isSame = false;
-            }
-            if (isSame && oldItem.txStatus != newItem.txStatus) {
+            if (isSame && oldItem.repliesNum != newItem.repliesNum) {
                 isSame = false;
             }
             if (isSame && oldItem.pinnedTime != newItem.pinnedTime) {

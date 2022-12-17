@@ -251,6 +251,6 @@ public class NotesTabFragment extends CommunityTabFragment implements NotesListA
     @Override
     public void loadData(int pos) {
         super.loadData(pos);
-        txViewModel.loadNotesData(false, chainID, pos, getItemCount());
+//        txViewModel.loadNotesData(false, chainID, pos, getItemCount());
     }
 }

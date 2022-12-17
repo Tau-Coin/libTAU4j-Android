@@ -13,7 +13,90 @@
         android:layout_height="match_parent"
         android:background="@color/color_chat_bg">
 
+        <RelativeLayout
+            android:visibility="visible"
+            android:id="@+id/ll_pinned_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/widget_size_10"
+            android:paddingEnd="@dimen/widget_size_10"
+            android:paddingTop="@dimen/widget_size_5"
+            android:paddingBottom="@dimen/widget_size_5"
+            android:layout_marginTop="@dimen/widget_size_0"
+            android:layout_marginBottom="@dimen/widget_size_1"
+            android:onClick="@{listener::onClick}"
+            android:background="@color/color_white">
+
+            <TextView
+                android:layout_toStartOf="@+id/iv_close"
+                android:id="@+id/tv_pinned_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/community_pinned_message"
+                android:textColor="@color/color_yellow"
+                android:includeFontPadding="false"
+                android:textAppearance="@style/TextAppearanceBody3"/>
+
+            <ImageView
+                android:id="@+id/iv_close"
+                android:layout_width="@dimen/widget_size_12"
+                android:layout_height="@dimen/widget_size_12"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:layout_alignParentEnd="true"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_pinned"/>
+
+            <LinearLayout
+                android:layout_below="@+id/tv_pinned_message"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="@dimen/widget_size_2"
+                    android:layout_height="@dimen/widget_size_25"
+                    android:layout_marginTop="@dimen/widget_size_2">
+
+                    <View
+                        android:background="@color/color_yellow_dark"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <View
+                        android:background="@color/color_yellow"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1.5"
+                        android:layout_marginTop="@dimen/widget_size_2"
+                        android:layout_marginBottom="@dimen/widget_size_2"/>
+
+                    <View
+                        android:background="@color/color_yellow_dark"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_pinned_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:textAppearance="@style/TextAppearanceBody2"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
         <cn.bingoogolapple.refreshlayout.BGARefreshLayout
+            android:layout_below="@+id/ll_pinned_message"
             android:id="@+id/refresh_layout"
             android:layout_height="match_parent"
             android:layout_width="match_parent">

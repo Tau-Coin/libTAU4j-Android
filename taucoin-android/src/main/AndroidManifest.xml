@@ -128,10 +128,6 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name=".ui.community.CommunityChooseActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
-
-        <activity
             android:name=".ui.community.ChainExplorerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
@@ -190,6 +186,14 @@
 
         <activity
             android:name=".ui.transaction.NewsCreateActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.transaction.NewsDetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name=".ui.transaction.CommunityChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity

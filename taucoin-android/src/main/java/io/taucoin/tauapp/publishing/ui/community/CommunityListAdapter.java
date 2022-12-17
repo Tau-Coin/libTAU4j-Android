@@ -29,8 +29,17 @@ import io.taucoin.tauapp.publishing.databinding.ItemCommunitySelectBinding;
  */
 public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapter.ViewHolder> {
 
-    CommunityListAdapter() {
+    private String chainID;
+    public CommunityListAdapter() {
         super(diffCallback);
+    }
+
+    public void setChainID(String chainID) {
+        this.chainID = chainID;
+    }
+
+    public String getChainID() {
+        return chainID;
     }
 
     @NonNull
@@ -71,23 +80,31 @@ public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapt
                 return;
             }
             String communityName = ChainIDUtil.getName(member.chainID);
-            String firstLetters = StringUtil.getFirstLettersOfName(communityName);
-            binding.rbCommunity.setText(firstLetters);
-            int bgColor = Utils.getGroupColor(member.chainID);
-            binding.rbCommunity.setBgColor(bgColor);
-
-            boolean isLondonPMC = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID_1);
-            boolean isSanFrancisco = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID_2);
-            binding.rbCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.GONE : View.VISIBLE);
-            binding.ivCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.VISIBLE : View.GONE);
-            if (isLondonPMC) {
-                binding.ivCommunity.setImageRes(R.mipmap.icon_london_pmc);
-            } else if (isSanFrancisco) {
-                binding.ivCommunity.setImageRes(R.mipmap.icon_san_francisco);
-            }
-
+//            String firstLetters = StringUtil.getFirstLettersOfName(communityName);
+//            binding.rbCommunity.setText(firstLetters);
+//            int bgColor = Utils.getGroupColor(member.chainID);
+//            binding.rbCommunity.setBgColor(bgColor);
+//
+//            boolean isLondonPMC = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID_1);
+//            boolean isSanFrancisco = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID_2);
+//            binding.rbCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.GONE : View.VISIBLE);
+//            binding.ivCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.VISIBLE : View.GONE);
+//            if (isLondonPMC) {
+//                binding.ivCommunity.setImageRes(R.mipmap.icon_london_pmc);
+//            } else if (isSanFrancisco) {
+//                binding.ivCommunity.setImageRes(R.mipmap.icon_san_francisco);
+//            }
             String communityCode = ChainIDUtil.getCode(member.chainID);
-            binding.tvName.setText(context.getString(R.string.main_community_name, communityName, communityCode));
+            String balance = FmtMicrometer.fmtBalance(member.balance);
+            binding.tvName.setText(context.getString(R.string.main_community_name_balance,
+                    communityName, communityCode, balance));
+            binding.ivSelected.setVisibility(StringUtil.isEquals(adapter.getChainID(), member.chainID)
+                    ? View.VISIBLE : View.INVISIBLE);
+            binding.getRoot().setOnClickListener(v -> {
+                adapter.setChainID(member.chainID);
+                binding.ivSelected.setVisibility(View.VISIBLE);
+                adapter.notifyDataSetChanged();
+            });
         }
     }
 

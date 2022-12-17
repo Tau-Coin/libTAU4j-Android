@@ -33,6 +33,8 @@ public interface TxRepository {
      */
     List<UserAndTx> queryCommunityPinnedTxs(String chainID);
 
+    List<UserAndTx> queryCommunityPinnedTxs();
+
     /**
      * 查询社区用户被Trust列表
      * @param chainID 社区链ID
@@ -101,9 +103,9 @@ public interface TxRepository {
 
     Flowable<List<UserAndTx>> observeLatestPinnedMsg(String chainID);
 
-    List<UserAndTx> loadOnChainNotesData(String chainID, int pos, int pageSize);
+    Flowable<List<UserAndTx>> observeLatestPinnedMsg();
 
-    List<UserAndTx> loadAllNotesData(String chainID, int pos, int pageSize);
+    List<UserAndTx> loadAllNotesData(String repliesHash, int pos, int pageSize);
 
     List<UserAndTx> loadAllMarketData(String chainID, int pos, int pageSize);
 
@@ -111,6 +113,7 @@ public interface TxRepository {
 
     List<UserAndTx> loadNewsData(int pos, int pageSize);
 
+    List<UserAndTx> loadNewsRepliesData(String txID, int pos, int pageSize);
 
     DataSource.Factory<Integer, UserAndTx> queryFavorites();
 
@@ -161,4 +164,6 @@ public interface TxRepository {
      * @return
      */
     Flowable<Integer> observeUnreadNews();
+
+    Observable<UserAndTx> observeNewsDetail(String txID);
 }

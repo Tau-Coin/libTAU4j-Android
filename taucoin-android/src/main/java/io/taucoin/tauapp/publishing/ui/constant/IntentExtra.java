@@ -9,6 +9,7 @@ public class IntentExtra {
     public static final String CHAIN_ID = "chainID";
     public static final String ID = "ID";
     public static final String LINK = "link";
+    public static final String HASH = "hash";
     public static final String PUBLIC_KEY = "publicKey";
     public static final String ON_CHAIN = "onChain";
     public static final String NO_BALANCE = "noBalance";

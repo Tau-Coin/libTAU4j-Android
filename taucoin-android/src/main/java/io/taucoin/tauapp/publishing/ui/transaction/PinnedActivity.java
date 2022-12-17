@@ -2,7 +2,6 @@ package io.taucoin.tauapp.publishing.ui.transaction;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.style.URLSpan;
 import android.widget.TextView;
 
 import com.noober.menu.FloatMenu;
@@ -27,7 +26,6 @@ import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.databinding.ActivityPinnedBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
-import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
@@ -117,8 +115,7 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
     public void onItemLongClicked(TextView view, UserAndTx tx) {
         List<OperationMenuItem> menuList = new ArrayList<>();
         menuList.add(new OperationMenuItem(R.string.tx_operation_copy));
-        final URLSpan[] urls = view.getUrls();
-        if (urls != null && urls.length > 0) {
+        if (tx != null && StringUtil.isNotEmpty(tx.link)) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_copy_link));
         }
         menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
@@ -135,11 +132,8 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
                     ToastUtils.showShortToast(R.string.copy_successfully);
                     break;
                 case R.string.tx_operation_copy_link:
-                    if (urls != null && urls.length > 0) {
-                        String link = urls[0].getURL();
-                        CopyManager.copyText(link);
-                        ToastUtils.showShortToast(R.string.copy_link_successfully);
-                    }
+                    CopyManager.copyText(tx.link);
+                    ToastUtils.showShortToast(R.string.copy_link_successfully);
                     break;
                 case R.string.tx_operation_pin:
                 case R.string.tx_operation_unpin:
@@ -157,20 +151,10 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
     }
 
     @Override
-    public void onTrustClicked(UserAndTx user) {
-
-    }
-
-    @Override
     public void onUserClicked(String senderPk) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.PUBLIC_KEY, senderPk);
         ActivityUtil.startActivity(intent, this, UserDetailActivity.class);
-    }
-
-    @Override
-    public void onEditNameClicked(String publicKey) {
-
     }
 
     @Override
@@ -185,9 +169,7 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
         KeyboardUtils.hideSoftInput(this);
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.ID, tx.txID);
-        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
-        intent.putExtra(IntentExtra.PUBLIC_KEY, tx.senderPk);
-        ActivityUtil.startActivity(intent, this, SellDetailActivity.class);
+        ActivityUtil.startActivity(intent, this, NewsDetailActivity.class);
     }
 
     @Override
@@ -200,15 +182,24 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
     public void onRetweetClicked(UserAndTx tx) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
-        intent.putExtra(IntentExtra.TYPE, CommunityChooseActivity.TYPE_RETWEET_NEWS);
-        ActivityUtil.startActivity(intent, this, CommunityChooseActivity.class);
+        intent.putExtra(IntentExtra.LINK, tx.link);
+        ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
     }
 
     @Override
     public void onReplyClicked(UserAndTx tx) {
         Intent intent = new Intent();
         intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
-        ActivityUtil.startActivity(intent, this, AnnouncementCreateActivity.class);
+        intent.putExtra(IntentExtra.HASH, tx.txID);
+        ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
+    }
+
+    @Override
+    public void onChatClicked(UserAndTx tx) {
+        Intent intent = new Intent();
+        intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
+        intent.putExtra(IntentExtra.HASH, tx.txID);
+        ActivityUtil.startActivity(intent, this, CommunityChatActivity.class);
     }
 
     @Override

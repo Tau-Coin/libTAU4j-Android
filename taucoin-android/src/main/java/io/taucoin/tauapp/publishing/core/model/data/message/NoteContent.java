@@ -34,7 +34,7 @@ public class NoteContent extends TxContent {
         this.type = RLP.decodeInteger(messageList, 1, TxType.NEWS_TX.getType());
         this.memo = RLP.decodeElement(messageList, 2);
         this.repliedHash = RLP.decodeElement(messageList, 3);
-        this.link = RLP.decodeElement(messageList, 5);
+        this.link = RLP.decodeElement(messageList, 4);
 
     }
 

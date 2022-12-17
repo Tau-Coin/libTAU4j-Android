@@ -16,7 +16,8 @@ class DatabaseMigration {
                 MIGRATION_1_2,
                 MIGRATION_2_3,
                 MIGRATION_3_4,
-                MIGRATION_4_5
+                MIGRATION_4_5,
+                MIGRATION_5_6
         };
     }
 
@@ -57,6 +58,14 @@ class DatabaseMigration {
             database.execSQL("ALTER TABLE Txs ADD COLUMN version INTEGER NOT NULL DEFAULT 0");
         }
     };
+    private static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // 添加note交易previousHash供底层链式结构使用
+            database.execSQL("ALTER TABLE Txs ADD COLUMN repliedHash TEXT");
+        }
+    };
+
 
 
 }

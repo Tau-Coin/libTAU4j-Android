@@ -10,13 +10,14 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="@dimen/widget_size_5"
+        android:paddingBottom="@dimen/widget_size_5"
         android:background="@color/color_white"
         android:gravity="center_vertical"
         android:layout_marginStart="@dimen/widget_size_20"
         android:layout_marginEnd="@dimen/widget_size_20">
 
         <FrameLayout
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
@@ -69,11 +70,12 @@
             android:textAppearance="@style/TextAppearanceBody1" />
 
         <ImageView
+            android:visibility="gone"
             android:id="@+id/iv_selected"
-            android:layout_width="@dimen/widget_size_25"
-            android:layout_height="@dimen/widget_size_25"
+            android:layout_width="@dimen/widget_size_20"
+            android:layout_height="@dimen/widget_size_20"
             android:layout_marginStart="@dimen/widget_size_10"
-            android:src="@mipmap/icon_done_orange"
+            android:src="@mipmap/icon_scan_orange"
             android:contentDescription="@null"/>
 
     </LinearLayout>

@@ -21,7 +21,6 @@ import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.databinding.ActivityNoteBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
-import io.taucoin.tauapp.publishing.ui.community.CommunityChooseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 
@@ -125,9 +124,8 @@ public class NoteCreateActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.iv_community:
-                ActivityUtil.startActivityForResult(this, CommunityChooseActivity.class,
-                        CHOOSE_REQUEST_CODE);
+            case R.id.tv_more:
+
                 break;
         }
     }

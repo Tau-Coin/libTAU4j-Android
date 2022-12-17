@@ -664,12 +664,11 @@ public class TxViewModel extends AndroidViewModel {
 
     /**
      * 加载交易Notes分页数据
-     * @param onChain 上链查询条件
-     * @param chainID 社区链ID
+     * @param repliesHash 回复的news hash
      * @param pos 分页位置
      * @param initSize 刷新时第一页数据大小
      */
-    void loadNotesData(boolean onChain, String chainID, int pos, int initSize) {
+    void loadNotesData(String repliesHash, int pos, int initSize) {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
@@ -681,14 +680,10 @@ public class TxViewModel extends AndroidViewModel {
                 if (pos == 0 && initSize > pageSize) {
                     pageSize = initSize;
                 }
-                if (onChain) {
-                    txs = txRepo.loadOnChainNotesData(chainID, pos, pageSize);
-                } else {
-                    txs = txRepo.loadAllNotesData(chainID, pos, pageSize);
-                }
+                txs = txRepo.loadAllNotesData(repliesHash, pos, pageSize);
                 long getMessagesTime = System.currentTimeMillis();
-                logger.debug("loadNotesData onChain::{}, pos::{}, pageSize::{}, messages.size::{}",
-                        onChain, pos, pageSize, txs.size());
+                logger.debug("loadNotesData repliesHash::{}, pos::{}, pageSize::{}, messages.size::{}",
+                        repliesHash, pos, pageSize, txs.size());
                 logger.debug("loadNotesData getMessagesTime::{}", getMessagesTime - startTime);
                 Collections.reverse(txs);
 
@@ -731,6 +726,37 @@ public class TxViewModel extends AndroidViewModel {
 //                        Collections.reverse(txs);
                     } catch (Exception e) {
                         logger.error("loadNewsData error::", e);
+                    }
+                    emitter.onNext(txs);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(messages -> {
+                    chainTxs.postValue(messages);
+                });
+    }
+
+    /**
+     * 加载news的回复交易分页数据
+     * @param pos 分页位置
+     * @param initSize 刷新时第一页数据大小
+     */
+    void loadNewsRepliesData(String txID, int pos, int initSize) {
+        if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
+            loadViewDisposable.dispose();
+        }
+        loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
+                    List<UserAndTx> txs = new ArrayList<>();
+                    try {
+                        int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
+                        if (pos == 0 && initSize > pageSize) {
+                            pageSize = initSize;
+                        }
+                        txs = txRepo.loadNewsRepliesData(txID, pos, pageSize);
+                        logger.debug("loadNewsRepliesData txID::{}, pos::{}, pageSize::{}, messages.size::{}",
+                                txID, pos, pageSize, txs.size());
+                    } catch (Exception e) {
+                        logger.error("loadNewsRepliesData error::", e);
                     }
                     emitter.onNext(txs);
                     emitter.onComplete();
@@ -810,6 +836,10 @@ public class TxViewModel extends AndroidViewModel {
         return txRepo.observeLatestPinnedMsg(chainID);
     }
 
+    public Flowable<List<UserAndTx>> observeLatestPinnedMsg() {
+        return txRepo.observeLatestPinnedMsg();
+    }
+
     /**
      * 加载交易固定数据
      * @param chainID 社区链ID
@@ -818,7 +848,11 @@ public class TxViewModel extends AndroidViewModel {
         Disposable disposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
             List<UserAndTx> txs = new ArrayList<>();
             try {
-                txs = txRepo.queryCommunityPinnedTxs(chainID);
+                if (StringUtil.isNotEmpty(chainID)) {
+                    txs = txRepo.queryCommunityPinnedTxs(chainID);
+                } else {
+                    txs = txRepo.queryCommunityPinnedTxs();
+                }
                 logger.debug("loadPinnedTxsData messages.size::{}", txs.size());
             } catch (Exception e) {
                 logger.error("loadPinnedTxsData error::", e);
@@ -1029,5 +1063,9 @@ public class TxViewModel extends AndroidViewModel {
 
     public Observable<Tx> observeTxByTxID(String hash) {
         return txRepo.observeTxByTxID(hash);
+    }
+
+    public Observable<UserAndTx> observeNewsDetail(String txID) {
+        return txRepo.observeNewsDetail(txID);
     }
 }

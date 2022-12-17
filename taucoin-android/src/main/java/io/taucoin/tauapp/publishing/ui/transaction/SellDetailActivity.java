@@ -110,17 +110,17 @@ public class SellDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     private void showSellInfo(UserAndTx tx) {
-        String trusts = FmtMicrometer.fmtLong(tx.trusts);
-        trusts = getString(R.string.tx_sell_detail_trust, trusts);
-        binding.tvTrusts.setText(trusts);
-
-        binding.tvSellInfo.setText(TxUtils.createTxSpan(tx));
-
-        binding.llTrustMore.setVisibility(tx.trusts > 3 ? View.VISIBLE : View.GONE);
-        binding.llTrustHash.setVisibility(tx.trusts > 0 ? View.VISIBLE : View.GONE);
-        if (tx.trusts > 0) {
-            txViewModel.loadTrustTxsData(chainID, sellerPk, 0, 3);
-        }
+//        String trusts = FmtMicrometer.fmtLong(tx.trusts);
+//        trusts = getString(R.string.tx_sell_detail_trust, trusts);
+//        binding.tvTrusts.setText(trusts);
+//
+//        binding.tvSellInfo.setText(TxUtils.createTxSpan(tx));
+//
+//        binding.llTrustMore.setVisibility(tx.trusts > 3 ? View.VISIBLE : View.GONE);
+//        binding.llTrustHash.setVisibility(tx.trusts > 0 ? View.VISIBLE : View.GONE);
+//        if (tx.trusts > 0) {
+//            txViewModel.loadTrustTxsData(chainID, sellerPk, 0, 3);
+//        }
     }
 
     private void showUserInfo(UserAndFriend user) {
