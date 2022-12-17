@@ -40,7 +40,6 @@ public class Tx implements Parcelable {
     public String repliedHash;              // 针对与notes交易和news交易回复的hash
     public String repliedKey;               // 针对news交易回复的key
     public long queueID = -1;               // 交易对应的队列ID
-    public int sendStatus = 0;              // 交易发送状态 0: 已发送，1: 未发送（供本地显示）
     public long pinnedTime;                 // 置顶固定时间
     public long favoriteTime;               // 收藏时间
 
