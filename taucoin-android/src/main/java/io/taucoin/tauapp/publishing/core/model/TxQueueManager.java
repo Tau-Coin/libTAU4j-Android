@@ -103,10 +103,10 @@ class TxQueueManager {
     private void createQueueConsumer() {
         queueDisposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             Thread.currentThread().setName("TxQueueManager");
-            // 初始化需要转账的社区
+            // 初始化需要转账的社区, apk启动触发交易
             User currentUser = userRepos.getCurrentUser();
             if (currentUser != null) {
-                List<String> list = txQueueRepos.getNeedWiringTxCommunities(currentUser.publicKey);
+                List<String> list = txQueueRepos.getNeedSendingTxCommunities(currentUser.publicKey);
                 logger.info("init queue size::{}", null == list ? 0 : list.size());
                 if (list != null && list.size() > 0) {
                     for (String chainID : list) {
@@ -189,7 +189,7 @@ class TxQueueManager {
 		long nonce = account.getNonce() + 1;
         try {
 			//1. 先按照nonce搜索一遍, 没有则搜一个没有nonce的txQueue交易
-            TxQueueAndStatus txQueue = txQueueRepos.getNonceFirstTx(chainID, currentUser.publicKey, nonce);
+            TxQueueAndStatus txQueue = txQueueRepos.getTxByNonce(chainID, currentUser.publicKey, nonce);
             if (null == txQueue) {
                 logger.info("sendTxQueue queue null");
 				return false;
@@ -378,8 +378,9 @@ class TxQueueManager {
                 tx.pinnedTime = pinnedTime;
             }
             txRepo.addTransaction(tx);
-            logger.info("createTransaction in sendTxQueue chainID::{}, txID::{}, senderPk::{}, " +
-                            "receiverPk::{}, nonce::{}, memo::{}", tx.chainID, tx.txID, tx.senderPk, tx.receiverPk, tx.nonce, tx.memo);
+            logger.info("createTransaction in sendTxQueue chainID::{}, txID::{}, version::{}, senderPk::{}," +
+                        "receiverPk::{}, nonce::{}, status::{}, memo::{}", 
+                        tx.chainID, tx.txID, tx.version, tx.senderPk, tx.receiverPk, tx.nonce, tx.txStatus, tx.memo);
             addUserInfoToLocal(tx);
             addMemberInfoToLocal(tx);
             TxLog log = new TxLog(tx.txID, TxLogStatus.SENT.getStatus(), DateUtil.getMillisTime());

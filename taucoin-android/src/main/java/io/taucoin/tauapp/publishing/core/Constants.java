@@ -83,4 +83,10 @@ public class Constants {
     // Settled
     public static final int TX_STATUS_SETTLED = 2;
 
+    //TX type
+    public static final int UNKNOWN_TX_TYPE = 0;
+    public static final int NOTE_TX_TYPE = 1;
+    public static final int NEWS_TX_TYPE = 2;
+    public static final int WIRING_TX_TYPE = 3;
+
 }

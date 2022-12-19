@@ -44,18 +44,8 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
         db.txQueueDao().deleteQueue(tx);
     }
 
-    @Override
-    public Flowable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String userPk) {
-        return db.txQueueDao().observeCommunityTxQueue(chainID, userPk);
-    }
-
-    @Override
-    public List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String userPk) {
-        return db.txQueueDao().getCommunityTxQueue(chainID, userPk);
-    }
-
-    public TxQueueAndStatus getNonceFirstTx(String chainID, String userPk, long nonce) {
-        return db.txQueueDao().getNonceFirstTx(chainID, userPk, nonce);
+    public TxQueueAndStatus getTxByNonce(String chainID, String userPk, long nonce) {
+        return db.txQueueDao().getTxByNonce(chainID, userPk, nonce);
     }
 
     @Override
@@ -74,8 +64,18 @@ public class TxQueueRepositoryImpl implements TxQueueRepository {
     }
 
     @Override
-    public List<String> getNeedWiringTxCommunities(String userPk) {
-        return db.txQueueDao().getNeedWiringTxCommunities(userPk);
+    public List<String> getNeedSendingTxCommunities(String userPk) {
+        return db.txQueueDao().getNeedSendingTxCommunities(userPk);
+    }
+
+    @Override
+    public List<TxQueueAndStatus> getCommunityTxQueue(String chainID, String userPk) {
+        return db.txQueueDao().getCommunityTxQueue(chainID, userPk);
+    }
+
+    @Override
+    public Flowable<List<TxQueueAndStatus>> observeCommunityTxQueue(String chainID, String userPk) {
+        return db.txQueueDao().observeCommunityTxQueue(chainID, userPk);
     }
 
     @Override

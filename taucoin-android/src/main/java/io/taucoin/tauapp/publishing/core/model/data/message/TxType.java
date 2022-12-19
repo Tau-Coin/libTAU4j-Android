@@ -17,15 +17,17 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 package io.taucoin.tauapp.publishing.core.model.data.message;
 
 import io.taucoin.tauapp.publishing.R;
+import io.taucoin.tauapp.publishing.core.Constants;
 
 /**
  * 交易类型
  */
 public enum TxType {
-    UNKNOWN(0, R.string.community_view_unknown),
-    NOTE_TX(1, R.string.community_view_note),
-    NEWS_TX(2, R.string.community_view_news),
-    WIRING_TX(3, R.string.community_view_wiring);
+
+    UNKNOWN(Constants.UNKNOWN_TX_TYPE, R.string.community_view_unknown),
+    NOTE_TX(Constants.NOTE_TX_TYPE, R.string.community_view_note),
+    NEWS_TX(Constants.NEWS_TX_TYPE, R.string.community_view_news),
+    WIRING_TX(Constants.WIRING_TX_TYPE, R.string.community_view_wiring);
 
     private final int type;
     private final int name;
