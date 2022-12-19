@@ -218,6 +218,12 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                     isSame = StringUtil.isEquals(oldItem.sender.remark, newItem.sender.remark);
                 }
             }
+            if (isSame && oldItem.balance != newItem.balance) {
+                isSame = false;
+            }
+            if (isSame && oldItem.power != newItem.power) {
+                isSame = false;
+            }
             if (isSame && oldItem.repliesNum != newItem.repliesNum) {
                 isSame = false;
             }
