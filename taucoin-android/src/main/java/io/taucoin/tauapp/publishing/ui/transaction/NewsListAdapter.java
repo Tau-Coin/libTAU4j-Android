@@ -98,16 +98,18 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             userName = null == userName ? "" : userName;
             String communityName = ChainIDUtil.getName(tx.chainID);
             String communityCode = ChainIDUtil.getCode(tx.chainID);
-            SpannableStringBuilder name = new SpanUtils()
+            SpanUtils name = new SpanUtils()
                     .append(userName)
                     .setForegroundColor(nameColor)
                     .append(" @")
                     .append(UsersUtil.getLastPublicKey(tx.senderPk, 4))
                     .append(" · ")
                     .append(communityName)
-                    .append("(").append(communityCode).append(")")
-                    .create();
-            binding.tvName.setText(name);
+                    .append("(").append(communityCode).append(")");
+                    if (!isReply) {
+                        name.append(" · ").append(DateUtil.getNewsTime(tx.timestamp));
+                    }
+            binding.tvName.setText(name.create());
             setClickListener(binding, tx);
 
             boolean isMyself = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
