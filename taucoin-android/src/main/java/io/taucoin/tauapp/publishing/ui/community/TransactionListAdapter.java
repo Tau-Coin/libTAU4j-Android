@@ -79,7 +79,7 @@ public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, Tr
             boolean isMyself = StringUtil.isEquals(entry.senderOrMiner, myPublicKey);
             StringBuilder stringBuilder = new StringBuilder();
             if (isMyself && entry.txType != -1) {
-                if (entry.txType != 2) {
+                if (entry.txType == TxType.NEWS_TX.getType()) {
                     binding.tvName.setText(resources.getString(R.string.community_post_news));
                     binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.sender));
                 } else {
