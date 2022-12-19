@@ -112,13 +112,10 @@ public class CommunitiesPopUpDialog extends Dialog{
                 int bgColor = Utils.getGroupColor(member.chainID);
                 holder.binding.rbCommunity.setBgColor(bgColor);
 
-                boolean isLondonPMC = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID_1);
-                boolean isSanFrancisco = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID_2);
-                holder.binding.rbCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.GONE : View.VISIBLE);
-                holder.binding.ivCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.VISIBLE : View.GONE);
-                if (isLondonPMC) {
-                    holder.binding.ivCommunity.setImageRes(R.mipmap.icon_london_pmc);
-                } else if (isSanFrancisco) {
+                boolean isSanFrancisco = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID);
+                holder.binding.rbCommunity.setVisibility(isSanFrancisco ? View.GONE : View.VISIBLE);
+                holder.binding.ivCommunity.setVisibility(isSanFrancisco ? View.VISIBLE : View.GONE);
+                if (isSanFrancisco) {
                     holder.binding.ivCommunity.setImageRes(R.mipmap.icon_san_francisco);
                 }
                 String communityCode = ChainIDUtil.getCode(member.chainID);

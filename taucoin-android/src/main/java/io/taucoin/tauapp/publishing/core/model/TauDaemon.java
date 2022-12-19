@@ -486,17 +486,9 @@ public abstract class TauDaemon {
                 List<String> localChains = memberRepo.queryFollowedCommunities(userPk);
                 logger.info("checkAllChains localChain::{}, tauChains::{}",
                         localChains.size(), tauChains.size());
-                // 0、添加默认Cambridge Coin
-                String testChainID1 = BuildConfig.TEST_CHAIN_ID_1;
-                Community community1 = communityRepo.getCommunityByChainID(testChainID1);
-                if (null == community1) {
-                    String peer = BuildConfig.TEST_CHAIN_PEER;
-                    String tauTesting = LinkUtil.encodeChain(peer, testChainID1, peer);
-                    tauDaemonAlertHandler.addCommunity(tauTesting);
-                }
 
-                // 1、添加默认San Francisco
-                String testChainID2 = BuildConfig.TEST_CHAIN_ID_2;
+                // 0、添加默认San Francisco
+                String testChainID2 = BuildConfig.TEST_CHAIN_ID;
                 Community community2 = communityRepo.getCommunityByChainID(testChainID2);
                 if (null == community2) {
                     String peer = BuildConfig.TEST_CHAIN_PEER;
