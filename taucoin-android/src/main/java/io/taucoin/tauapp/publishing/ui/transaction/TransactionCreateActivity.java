@@ -150,6 +150,23 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
         } else {
             binding.llMembersSelect.setVisibility(View.GONE);
         }
+
+        txViewModel.getAddState().observe(this, result -> {
+            if (StringUtil.isNotEmpty(result)){
+                ToastUtils.showShortToast(result);
+            } else {
+                setResult(RESULT_OK);
+                if (txQueue != null) {
+                    onBackPressed();
+                } else {
+                    onBackPressed();
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    intent.putExtra(IntentExtra.IS_JOINED, true);
+                    ActivityUtil.startActivity(intent, this, ChainExplorerActivity.class);
+                }
+            }
+        });
     }
 
     private void loadFeeView(long averageTxFee) {
@@ -186,21 +203,6 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
     @Override
     public void onStart() {
         super.onStart();
-        txViewModel.getAddState().observe(this, result -> {
-            if (StringUtil.isNotEmpty(result)){
-                ToastUtils.showShortToast(result);
-            } else {
-                setResult(RESULT_OK);
-                if (txQueue != null) {
-                    onBackPressed();
-                } else {
-                    Intent intent = new Intent();
-                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                    intent.putExtra(IntentExtra.IS_JOINED, true);
-                    ActivityUtil.startActivity(intent, this, ChainExplorerActivity.class);
-                }
-            }
-        });
         if (null == txQueue) {
             loadData(0);
             disposables.add(userViewModel.observeUsersChanged()

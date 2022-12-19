@@ -13,7 +13,6 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.ChainStatus;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
-import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
@@ -139,6 +138,8 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         powerStr = String.format(powerStr, FmtMicrometer.fmtLong(power), FmtMicrometer.formatThreeDecimal(showPower));
         binding.itemMiningPower.setRightText(powerStr);
         //log2(2+ power)//
+
+        handleMemberTips(member);
     }
 
 //    /**
@@ -193,11 +194,6 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         super.onStart();
         loadMiningInfo();
 
-        disposables.add(viewModel.observeMemberTips()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleMemberTips));
-
         viewModel.getSetBlacklistState().observe(this, isSuccess -> {
             if (isSuccess) {
                 ToastUtils.showShortToast(R.string.blacklist_successfully);
@@ -209,10 +205,10 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         });
     }
 
-    private void handleMemberTips(MemberTips tips) {
-        boolean isShowTips = tips.pendingTime > 0;
+    private void handleMemberTips(MemberAndAmount member) {
+        boolean isShowTips = member != null && member.pendingTime > 0;
 		//Modified tc
-        //binding.viewTips.setVisibility(isShowTips ? View.VISIBLE : View.GONE);
+        binding.viewTips.setVisibility(isShowTips ? View.VISIBLE : View.GONE);
     }
 
     @Override
