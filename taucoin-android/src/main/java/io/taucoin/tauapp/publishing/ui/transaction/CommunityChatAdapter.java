@@ -140,8 +140,6 @@ public class CommunityChatAdapter extends ListAdapter<UserAndTx, CommunityChatAd
                         .append(" · ")
                         .append(communityName)
                         .append("(").append(communityCode).append(")")
-                        .append(" · ")
-                        .append(DateUtil.getNewsTime(tx.timestamp))
                         .create();
                 leftBinding.tvName.setText(name);
                 leftBinding.tvBlacklist.setOnClickListener(view -> {

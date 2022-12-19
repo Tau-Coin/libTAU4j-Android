@@ -11,6 +11,7 @@ import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.tauapp.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
@@ -103,7 +104,7 @@ public interface TxDao {
     String QUERY_GET_ALL_NEWS_REPLIES = "SELECT tx.*, 0 AS repliesNum, m.balance, m.power" +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            " WHERE tx.repliedHash = :txID" +
+            " WHERE tx.repliedHash = :txID AND txType =" + Constants.NEWS_TX_TYPE +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " ORDER BY tx.timestamp DESC" +
             " LIMIT :loadSize OFFSET :startPosition";

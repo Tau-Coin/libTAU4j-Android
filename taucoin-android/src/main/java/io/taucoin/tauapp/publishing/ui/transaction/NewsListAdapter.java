@@ -84,11 +84,13 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             binding.rlBottom.setVisibility(isReply ? View.GONE : View.VISIBLE);
             binding.ivArrow.setVisibility(isReply ? View.GONE : View.VISIBLE);
             binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
-            binding.tvReply.setVisibility(isReply ? View.VISIBLE : View.GONE);
-            if (isReply) {
+
+            boolean isShowRepliedKey = StringUtil.isNotEmpty(tx.repliedKey);
+            binding.tvReply.setVisibility(isReply && isShowRepliedKey ? View.VISIBLE : View.GONE);
+            if (isReply && isShowRepliedKey) {
                 SpannableStringBuilder reply = new SpanUtils()
                         .append("reply")
-                        .append("@" + UsersUtil.getLastPublicKey(tx.senderPk, 4))
+                        .append("@" + UsersUtil.getLastPublicKey(tx.repliedKey, 4))
                         .setForegroundColor(replyColor)
                         .create();
                 binding.tvReply.setText(reply);
@@ -105,10 +107,8 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                     .append(UsersUtil.getLastPublicKey(tx.senderPk, 4))
                     .append(" · ")
                     .append(communityName)
-                    .append("(").append(communityCode).append(")");
-                    if (!isReply) {
-                        name.append(" · ").append(DateUtil.getNewsTime(tx.timestamp));
-                    }
+                    .append("(").append(communityCode).append(")")
+                    .append(" · ").append(DateUtil.getNewsTime(tx.timestamp));
             binding.tvName.setText(name.create());
             setClickListener(binding, tx);
 
