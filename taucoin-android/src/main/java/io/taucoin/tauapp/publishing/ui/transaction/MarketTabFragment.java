@@ -3,7 +3,6 @@ package io.taucoin.tauapp.publishing.ui.transaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.style.URLSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,8 +35,6 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
 import io.taucoin.tauapp.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.tauapp.publishing.core.model.data.UserAndTx;
-import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
-import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.CopyManager;
 import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
@@ -71,7 +68,6 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     protected CompositeDisposable disposables = new CompositeDisposable();
     private CommunityViewModel communityViewModel;
     protected BaseActivity activity;
-    private SettingsRepository settingsRepo;
     private FloatMenu operationsMenu;
     private PopUpDialog retweetDialog;
     private String chainID;
@@ -108,7 +104,6 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         txViewModel = provider.get(TxViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
-        settingsRepo = RepositoryHelper.getSettingsRepository(activity.getApplicationContext());
         initParameter();
         initView();
     }
@@ -256,23 +251,17 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                 .subscribe(list -> {
                     boolean isHavePinnedMsg = list != null && list.size() > 0;
                     binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
-                    if (isHavePinnedMsg) {
-                        binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
-                    }
+//                    if (isHavePinnedMsg) {
+//                        binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
+//                    }
                 }));
-
-        handleSettingsChanged(getString(R.string.pref_key_dht_nodes));
-        disposables.add(settingsRepo.observeSettingsChanged()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleSettingsChanged));
     }
 
-    private void handleSettingsChanged(String key) {
-        if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
-            long nodes = settingsRepo.getLongValue(key, 0);
-            binding.llLowLinked.setVisibility(nodes < 3 ? View.VISIBLE : View.GONE);
+    public void showOrHideLowLinkedView(boolean show) {
+        if (null == binding) {
+            return;
         }
+        binding.llLowLinked.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void initScrollToTop() {

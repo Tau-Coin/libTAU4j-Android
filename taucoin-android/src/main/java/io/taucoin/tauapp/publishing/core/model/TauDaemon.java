@@ -871,6 +871,21 @@ public abstract class TauDaemon {
     }
 
     /**
+     * Active list
+     */
+    public List<String> getActiveList(String chainID) {
+        List<String> list = null;
+        if (isRunning) {
+            list = sessionManager.getActiveList(ChainIDUtil.encode(chainID));
+        }
+        if (null == list) {
+            list = new ArrayList<>();
+        }
+        logger.info("chainID::{} activeList::{} isRunning::{}", chainID, list.size(), isRunning);
+        return list;
+    }
+
+    /**
      * crash测试
      */
     public void crashTest() {

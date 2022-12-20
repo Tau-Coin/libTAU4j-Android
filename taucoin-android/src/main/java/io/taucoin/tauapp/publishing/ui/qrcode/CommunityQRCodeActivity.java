@@ -95,8 +95,8 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
                 .subscribe(miner -> {
                     String userPk = MainApplication.getInstance().getPublicKey();
                     chainUrl = LinkUtil.encodeChain(userPk, chainID, miner);
-                    String qrExplainShare = getString(R.string.setting_community_qr_share, Constants.TX_MAX_OVERDRAFT, chainUrl);
-                    String qrExplain = getString(R.string.setting_community_qr_explain, Constants.TX_MAX_OVERDRAFT, chainUrl, R.mipmap.icon_copy_text);
+                    String qrExplainShare = getString(R.string.setting_community_qr_share, showName, Constants.TX_MAX_OVERDRAFT, chainUrl);
+                    String qrExplain = getString(R.string.setting_community_qr_explain, showName, Constants.TX_MAX_OVERDRAFT, chainUrl, R.mipmap.icon_copy_text);
                     int size = getResources().getDimensionPixelSize(R.dimen.widget_size_16);
                     binding.tvQrExplain.setText(Html.fromHtml(qrExplain,
                         new Html.ImageGetter() {
@@ -144,7 +144,8 @@ public class CommunityQRCodeActivity extends ScanTriggerActivity implements View
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_share) {
-            String qrExplainShare = getString(R.string.setting_community_qr_share, Constants.TX_MAX_OVERDRAFT, chainUrl);
+            String communityName = ChainIDUtil.getName(chainID);
+            String qrExplainShare = getString(R.string.setting_community_qr_share, communityName, Constants.TX_MAX_OVERDRAFT, chainUrl);
             ActivityUtil.shareText(this, getString(R.string.contacts_share_qr_code), qrExplainShare);
 //            userViewModel.shareQRCode(this, binding.qrCode.ivQrCode.getDrawable(), 480);
         } else if (item.getItemId() == R.id.menu_scan) {

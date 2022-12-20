@@ -397,8 +397,8 @@ public class CommunityViewModel extends AndroidViewModel {
             daemon.updateUserInfo(currentUser);
 
             // 自动发送一笔Sell交易
-            String coinName = ChainIDUtil.getCoinName(community.chainID);
-            String description = appContext.getString(R.string.tx_community_creator_selling, coinName);
+            String communityName = ChainIDUtil.getName(community.chainID);
+            String description = appContext.getString(R.string.tx_community_creator_selling, communityName);
             NewsContent newsContent = new NewsContent(description, null, null, null);
             TxQueue newsTxQueue = new TxQueue(community.chainID, currentUser.publicKey, currentUser.publicKey, 0L,
                     Constants.NEWS_MIN_FEE.longValue(), TxType.NEWS_TX, newsContent.getEncoded());

@@ -50,7 +50,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/widget_size_5"
                         android:includeFontPadding="false"
-                        android:text="12333333333333"
                         android:onClick="onClick"
                         android:singleLine="true"
                         android:textStyle="bold"
@@ -174,10 +173,11 @@
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_crypto_cities"
-                        app:rightText="@string/drawer_crypto_cities"/>
+                        app:leftImage="@mipmap/icon_community_gray"
+                        app:rightText="@string/drawer_tau_communities"/>
 
                     <io.taucoin.tauapp.publishing.ui.customviews.ItemLineView
+                        android:visibility="gone"
                         android:id="@+id/item_paste_link"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

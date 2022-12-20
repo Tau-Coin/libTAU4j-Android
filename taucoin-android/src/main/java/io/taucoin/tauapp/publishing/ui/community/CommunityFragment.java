@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -26,19 +28,15 @@ import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
+import io.taucoin.tauapp.publishing.core.utils.ObservableUtil;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.databinding.ExternalAirdropLinkDialogBinding;
 import io.taucoin.tauapp.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
 import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
-import io.taucoin.tauapp.publishing.ui.transaction.CommunityTabFragment;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
 import io.taucoin.tauapp.publishing.ui.transaction.MarketTabFragment;
-import io.taucoin.tauapp.publishing.ui.transaction.NotesTabFragment;
-import io.taucoin.tauapp.publishing.ui.transaction.PinnedActivity;
-
-import static io.taucoin.tauapp.publishing.ui.transaction.CommunityTabFragment.TAB_MARKET;
 
 /**
  * 单个群组页面
@@ -58,7 +56,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private boolean isJoined = false;
     private boolean isNoBalance = true;
     private Statistics memberStatistics;
-    private int onlinePeers;
+    private int onlinePeers = -1;
     private long nodes = 0;
     private long miningTime = -1;
     private boolean isConnectChain = true;
@@ -103,7 +101,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private void initLayout() {
         Context context = activity.getApplicationContext();
         TauDaemonAlertHandler tauDaemonHandler = TauDaemon.getInstance(context).getTauDaemonHandler();
-        this.onlinePeers = tauDaemonHandler.getOnlinePeersCount(chainID);
         showCommunityTitle();
         showCommunitySubtitle();
         binding.toolbarInclude.ivBack.setOnClickListener(v -> {
@@ -131,15 +128,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     if (this.chainStopped != chainStopped) {
                         this.chainStopped = chainStopped;
                         showWarningView();
-                    }
-                });
-
-        tauDaemonHandler.getOnlinePeerData()
-                .observe(this.getViewLifecycleOwner(), set -> {
-                    int peers = tauDaemonHandler.getOnlinePeersCount(chainID);
-                    if (this.onlinePeers != peers) {
-                        this.onlinePeers = peers;
-//                        showCommunitySubtitle();
                     }
                 });
     }
@@ -236,6 +224,19 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
      * 订阅社区相关的被观察者
      */
     private void subscribeCommunityViewModel() {
+        TauDaemon tauDaemon = TauDaemon.getInstance(activity.getApplicationContext());
+        disposables.add(ObservableUtil.intervalSeconds(2, true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(l -> {
+                    List<String> activeList = tauDaemon.getActiveList(chainID);
+                    int activeListSize = activeList != null ? activeList.size() : 0;
+                    if (this.onlinePeers != activeListSize) {
+                        this.onlinePeers = activeListSize;
+                        currentFragment.showOrHideLowLinkedView(activeListSize < 3);
+                    }
+                }));
+
         communityViewModel.getSetBlacklistState().observe(this, state -> {
             if(state){
                 activity.goBack();

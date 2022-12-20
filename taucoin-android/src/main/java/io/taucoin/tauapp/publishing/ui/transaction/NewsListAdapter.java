@@ -103,9 +103,10 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             SpanUtils name = new SpanUtils()
                     .append(userName)
                     .setForegroundColor(nameColor)
-                    .append(" @")
+                    .append("(")
                     .append(UsersUtil.getLastPublicKey(tx.senderPk, 4))
-                    .append(" · ")
+                    .append(")")
+                    .append("@")
                     .append(communityName)
                     .append("(").append(communityCode).append(")")
                     .append(" · ").append(DateUtil.getNewsTime(tx.timestamp));
@@ -131,6 +132,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                 DrawablesUtil.setEndDrawable(binding.tvLink, R.mipmap.icon_share_link, linkDrawableSize);
             }
             binding.tvRepliesNum.setText(FmtMicrometer.fmtLong(tx.repliesNum));
+            binding.tvChatNum.setText(FmtMicrometer.fmtLong(tx.chatsNum));
             binding.tvMsg.requestLayout();
         }
 
@@ -225,6 +227,9 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                 isSame = false;
             }
             if (isSame && oldItem.repliesNum != newItem.repliesNum) {
+                isSame = false;
+            }
+            if (isSame && oldItem.chatsNum != newItem.chatsNum) {
                 isSame = false;
             }
             if (isSame && oldItem.pinnedTime != newItem.pinnedTime) {

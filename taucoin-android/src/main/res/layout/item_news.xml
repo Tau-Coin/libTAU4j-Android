@@ -70,7 +70,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/widget_size_1"
                         android:includeFontPadding="false"
-                        android:textColor="@color/gray_dark"
+                        android:textColor="@color/color_yellow"
                         android:textAppearance="@style/TextAppearanceBody2" />
 
                     <ImageView
@@ -140,6 +140,7 @@
                 android:id="@+id/tv_msg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_size_5"
                 android:layout_marginStart="@dimen/widget_size_10"
                 android:paddingTop="@dimen/widget_size_5"
                 android:includeFontPadding="false"
@@ -181,15 +182,33 @@
             android:id="@+id/rl_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_10"
+            android:layout_marginTop="@dimen/widget_size_15"
             android:layout_marginStart="@dimen/widget_size_55"
             android:layout_marginEnd="@dimen/widget_size_55">
+
+            <ImageView
+                android:id="@+id/iv_chat"
+                android:layout_width="@dimen/widget_size_22"
+                android:layout_height="@dimen/widget_size_22"
+                android:contentDescription="@null"
+                android:src="@mipmap/icon_chat"/>
+
+            <TextView
+                android:id="@+id/tv_chat_num"
+                android:layout_toEndOf="@+id/iv_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_5"
+                android:text="0"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody2"/>
 
             <ImageView
                 android:id="@+id/iv_reply"
                 android:layout_width="@dimen/widget_size_22"
                 android:layout_height="@dimen/widget_size_22"
                 android:contentDescription="@null"
+                android:layout_centerHorizontal="true"
                 android:src="@mipmap/icon_reply_news"/>
 
             <TextView
@@ -197,7 +216,7 @@
                 android:layout_toEndOf="@+id/iv_reply"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/widget_size_2"
+                android:layout_marginStart="@dimen/widget_size_3"
                 android:text="0"
                 android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody2"/>
@@ -206,17 +225,10 @@
                 android:id="@+id/iv_retweet"
                 android:layout_width="@dimen/widget_size_26"
                 android:layout_height="@dimen/widget_size_26"
-                android:layout_centerHorizontal="true"
+                android:layout_alignParentEnd="true"
                 android:contentDescription="@null"
                 android:src="@mipmap/icon_retweet"/>
 
-            <ImageView
-                android:id="@+id/iv_chat"
-                android:layout_width="@dimen/widget_size_22"
-                android:layout_height="@dimen/widget_size_22"
-                android:contentDescription="@null"
-                android:layout_alignParentEnd="true"
-                android:src="@mipmap/icon_chat"/>
         </RelativeLayout>
 
         <View

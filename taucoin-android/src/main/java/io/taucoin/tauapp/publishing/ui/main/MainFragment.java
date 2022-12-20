@@ -32,6 +32,7 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
+import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
 import io.taucoin.tauapp.publishing.core.utils.AppUtil;
 import io.taucoin.tauapp.publishing.core.utils.DeviceUtils;
 import io.taucoin.tauapp.publishing.core.utils.NetworkSetting;
@@ -44,6 +45,7 @@ import io.taucoin.tauapp.publishing.core.utils.bus.HomeFriendsData;
 import io.taucoin.tauapp.publishing.core.utils.bus.RxBus2;
 import io.taucoin.tauapp.publishing.databinding.FragmentMainBinding;
 import io.taucoin.tauapp.publishing.ui.BaseFragment;
+import io.taucoin.tauapp.publishing.ui.community.PasteLinkActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.setting.TrafficTipsActivity;
 import io.taucoin.tauapp.publishing.ui.transaction.NewsTabFragment;
@@ -255,6 +257,8 @@ MainFragment extends BaseFragment implements View.OnClickListener {
                     activity.startActivity(intent);
                 }
             }
+        } else if (view.getId() == R.id.tv_paste_link) {
+            ActivityUtil.startActivity(activity, PasteLinkActivity.class);
         }
     }
 

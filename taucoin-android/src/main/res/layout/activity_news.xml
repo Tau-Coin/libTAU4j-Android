@@ -103,7 +103,8 @@
             android:id="@+id/ll_communities"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/color_bg">
 
             <com.yanzhenjie.recyclerview.SwipeRecyclerView
                 android:id="@+id/joined_list"

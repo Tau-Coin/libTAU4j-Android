@@ -176,9 +176,10 @@ public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.
             SpannableStringBuilder name = new SpanUtils()
                     .append(userName)
                     .setForegroundColor(nameColor)
-                    .append(" @")
+                    .append("(")
                     .append(UsersUtil.getLastPublicKey(tx.senderPk, 4))
-                    .append(" · ")
+                    .append(")")
+                    .append("@")
                     .append(communityName)
                     .append("(").append(communityCode).append(")")
                     .append(" · ")
@@ -206,6 +207,9 @@ public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.
         }
         if (null == this.tx || this.tx.repliesNum != tx.repliesNum) {
             binding.news.tvRepliesNum.setText(FmtMicrometer.fmtLong(tx.repliesNum));
+        }
+        if (null == this.tx || this.tx.chatsNum != tx.chatsNum) {
+            binding.news.tvChatNum.setText(FmtMicrometer.fmtLong(tx.chatsNum));
         }
         this.tx = tx;
     }

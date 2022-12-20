@@ -44,6 +44,33 @@
                 android:textAppearance="@style/TextAppearanceBody1"/>
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_bg">
+
+            <TextView
+                android:id="@+id/tv_paste_link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/widget_size_35"
+                android:layout_marginTop="@dimen/widget_size_5"
+                android:layout_marginBottom="@dimen/widget_size_5"
+                android:layout_marginStart="@dimen/widget_size_10"
+                android:layout_marginEnd="@dimen/widget_size_10"
+                android:includeFontPadding="false"
+                android:paddingStart="@dimen/widget_size_20"
+                android:paddingEnd="@dimen/widget_size_20"
+                android:gravity="center_vertical|center"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/search_rect_round_bg"
+                android:text="@string/main_paste_link"
+                android:onClick="@{listener::onClick}"
+                android:textColor="@color/gray_dark"
+                android:textAppearance="@style/TextAppearanceBody1"/>
+
+        </LinearLayout>
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_height="@dimen/widget_size_40"

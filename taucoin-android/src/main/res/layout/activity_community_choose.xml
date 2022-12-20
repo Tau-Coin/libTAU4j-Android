@@ -19,16 +19,6 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/widget_size_10"
-            android:paddingBottom="@dimen/widget_size_10"
-            android:paddingStart="@dimen/widget_size_20"
-            android:paddingEnd="@dimen/widget_size_20"
-            android:text="@string/wallet_data_warning"
-            android:textAppearance="@style/TextAppearanceBody2"/>
-
         <com.yanzhenjie.recyclerview.SwipeRecyclerView
             android:id="@+id/joined_list"
             android:layout_width="match_parent"

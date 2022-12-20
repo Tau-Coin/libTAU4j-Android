@@ -2,6 +2,8 @@ package io.taucoin.tauapp.publishing.ui.main;
 
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
+import android.view.View;
+
 import androidx.databinding.DataBindingUtil;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
@@ -22,11 +24,11 @@ public class CryptoCitiesActivity extends BaseActivity {
      */
     private void initView() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.drawer_crypto_cities);
+        binding.toolbarInclude.toolbar.setTitle(R.string.drawer_tau_communities);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         SpannableStringBuilder spannableStringBuilder = new SpanUtils()
-                .append("Crypto Cities are public place for chats and news.  These groups have city logos. The coins arrangement is as following:")
+                .append("TAU Communities are public places for chats and news. These communities have logos.  The coins economics is as following:")
                 .append("\n\n")
                 .append("- Initial Volume: ")
                 .append("1,000,000")
@@ -34,30 +36,14 @@ public class CryptoCitiesActivity extends BaseActivity {
                 .setBold()
                 .setFontSize(20, true)
                 .append(" coins").append("\n")
-//                .append("- Airdrop: ")
-//                .append("60%")
-//                .setForegroundColor(getResources().getColor(R.color.color_yellow))
-//                .setBold()
-//                .setFontSize(20, true)
-//                .append(" for early adopters.").append("\n")
-//                .append("- TAU company reserves: ")
-//                .append("40%").append("\n")
-                .append("- Mining success reward: ")
+                .append("- Mining Rewards: ")
                 .append("10")
                 .setForegroundColor(getResources().getColor(R.color.color_yellow))
                 .setBold()
                 .setFontSize(20, true)
-                .append(" coins each 5 minutes, annually about 1 millions new coins added as always.").append("\n")
+                .append(" coins each 5 minutes for winner.").append("\n")
                 .append("\n")
-                .append("The current crypto cities are San Francisco and London.")
-//                .append("The Scarcity of London PMC")
-//                .setForegroundColor(getResources().getColor(R.color.color_black))
-//                .setFontSize(20, true).append("\n")
-//                .append("- Only one London city in the world.").append("\n")
-//                .append("- Limited initial coins volume.").append("\n")
-//                .append("- Only 10 new coins added to the world each 5 minutes.").append("\n")
-//                .append("- Only \"London PMC\" for London GPS region embedded natively in the PMC app.").append("\n")
-//                .append("- Phones in London will auto join the London PMC network through TAU app.")
+                .append("The first community is CBD community.")
                 .create();
         binding.tvLondonPmcDesc.setText(spannableStringBuilder);
     }

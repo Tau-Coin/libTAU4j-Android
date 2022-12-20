@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
-                    android:id="@+id/tv_pic"
+                    android:id="@+id/iv_pic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"

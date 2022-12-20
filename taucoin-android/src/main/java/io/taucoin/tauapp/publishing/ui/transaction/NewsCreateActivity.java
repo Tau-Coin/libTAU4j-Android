@@ -19,14 +19,14 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.Constants;
+import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.model.data.message.NewsContent;
 import io.taucoin.tauapp.publishing.core.model.data.message.TxType;
-import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
-import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
+import io.taucoin.tauapp.publishing.core.utils.ObservableUtil;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.Utils;
@@ -48,13 +48,13 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     private CommunityListAdapter adapter;
     private CommunityViewModel communityViewModel;
     private final CompositeDisposable disposables = new CompositeDisposable();
-    private SettingsRepository settingsRepo;
     private String chainID;
     private String repliedHash;
     private String repliedKey;
     private TxQueue txQueue;
     private CharSequence msg;
     private String link;
+    private int onlinePeers = -1;
     private final List<Member> communityList = new ArrayList<>();
     private CommunitiesPopUpDialog popUpDialog;
 
@@ -64,7 +64,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         ViewModelProvider provider = new ViewModelProvider(this);
         txViewModel = provider.get(TxViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
-        settingsRepo = RepositoryHelper.getSettingsRepository(getApplicationContext());
         binding = DataBindingUtil.setContentView(this, R.layout.activity_news);
         binding.setListener(this);
         initParameter();
@@ -123,8 +122,9 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         binding.joinedList.setLayoutManager(layoutManager);
         binding.joinedList.setAdapter(adapter);
 
-        binding.llCommunities.setVisibility(StringUtil.isEmpty(repliedHash) ? View.VISIBLE : View.GONE);
-        binding.tvInterimBalance.setVisibility(StringUtil.isNotEmpty(repliedHash) ? View.VISIBLE : View.GONE);
+        boolean isShowCommunities = StringUtil.isEmpty(chainID);
+        binding.llCommunities.setVisibility(isShowCommunities ? View.VISIBLE : View.GONE);
+        binding.tvInterimBalance.setVisibility(!isShowCommunities ? View.VISIBLE : View.GONE);
         if (StringUtil.isNotEmpty(repliedHash)) {
             binding.etNews.setHint(R.string.tx_your_reply);
         }
@@ -195,6 +195,21 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onStart() {
         super.onStart();
+        if (StringUtil.isNotEmpty(chainID)) {
+            TauDaemon tauDaemon = TauDaemon.getInstance(getApplicationContext());
+            disposables.add(ObservableUtil.intervalSeconds(2, true)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(l -> {
+                        List<String> activeList = tauDaemon.getActiveList(chainID);
+                        int activeListSize = activeList != null ? activeList.size() : 0;
+                        if (onlinePeers != activeListSize) {
+                            onlinePeers = activeListSize;
+                            showOrHideLowLinkedView(activeListSize < 3);
+                        }
+                    }));
+        }
+
         txViewModel.getAddState().observe(this, result -> {
             if (StringUtil.isNotEmpty(result)) {
                 ToastUtils.showShortToast(result);
@@ -209,7 +224,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::loadFeeView));
 
-        if (StringUtil.isEmpty(repliedHash)) {
+        if (StringUtil.isEmpty(chainID)) {
             disposables.add(communityViewModel.observerJoinedCommunityList()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -226,6 +241,11 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                                 }
                             }
                             if (adapter != null) {
+                                // 设置默认值
+                                if (list.size() > 0) {
+                                    this.chainID = list.get(0).chainID;
+                                    adapter.setChainID(this.chainID);
+                                }
                                 adapter.submitList(list);
                             }
                             binding.tvMore.setVisibility(communityList.size() > 2 ? View.VISIBLE : View.GONE);
@@ -245,19 +265,13 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                         loadInterimBalanceView(0);
                     }));
         }
-
-        handleSettingsChanged(getString(R.string.pref_key_dht_nodes));
-        disposables.add(settingsRepo.observeSettingsChanged()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleSettingsChanged));
     }
 
-    private void handleSettingsChanged(String key) {
-        if (StringUtil.isEquals(key, getString(R.string.pref_key_dht_nodes))) {
-            long nodes = settingsRepo.getLongValue(key, 0);
-            binding.llLowLinked.setVisibility(nodes < 3 ? View.VISIBLE : View.GONE);
+    public void showOrHideLowLinkedView(boolean show) {
+        if (null == binding) {
+            return;
         }
+        binding.llLowLinked.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void loadInterimBalanceView(long showBalance) {

@@ -135,9 +135,10 @@ public class CommunityChatAdapter extends ListAdapter<UserAndTx, CommunityChatAd
                 SpannableStringBuilder name = new SpanUtils()
                         .append(userName)
                         .setForegroundColor(nameColor)
-                        .append(" @")
+                        .append("(")
                         .append(UsersUtil.getLastPublicKey(tx.senderPk, 4))
-                        .append(" · ")
+                        .append(")")
+                        .append("@")
                         .append(communityName)
                         .append("(").append(communityCode).append(")")
                         .create();

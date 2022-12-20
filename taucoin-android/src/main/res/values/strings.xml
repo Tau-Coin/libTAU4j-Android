@@ -56,7 +56,7 @@
     <string name="main_empty_create_communities">Create Coin Group</string>
     <string name="main_exit">Click again to exit the application!</string>
     <string name="main_community_name">%1$s - %2$s</string>
-    <string name="main_community_chat">Chat</string>
+    <string name="main_community_chat">News Thread Chat</string>
     <string name="main_community_name_balance">%1$s(%2$s)-balance %3$s</string>
     <string name="main_community_name_discovered">%1$s - %2$s - Discovered</string>
     <string name="main_community_name_total">%1$s - %2$s(%3$d)</string>
@@ -81,6 +81,7 @@
     <string name="main_no_ipv4">IPv4 not found</string>
     <string name="main_data_used_up">Daily Data Limit Used - click to increase. </string>
     <string name="main_insufficient_device_space">Insufficient device space</string>
+    <string name="main_paste_link">Search or Paste Link</string>
 
     <string name="main_tab_all">Home</string>
     <string name="main_tab_community">Communities</string>
@@ -98,6 +99,7 @@
     <string name="drawer_new_community">Create Coin</string>
     <string name="drawer_airdrop_links">Airdrop Coins</string>
     <string name="drawer_crypto_cities">Crypto Cities</string>
+    <string name="drawer_tau_communities">TAU Communities</string>
     <string name="drawer_send_and_airdrop_coins">Airdrop Coins</string>
     <string name="drawer_balance">Balance</string>
     <string name="drawer_power">Power</string>
@@ -115,8 +117,6 @@
     <string name="drawer_data_cost">Data Cost</string>
     <string name="drawer_working_condition">Dashboard</string>
     <string name="drawer_share">Share TAU App</string>
-
-    <string name="wallet_data_warning">The more communities, the more data costs.</string>
 
     <!-- Strings used for menu -->
     <string name="menu_share">Share</string>
@@ -307,13 +307,11 @@
     <string name="community_tx_confidence" formatted="false"><Data><![CDATA[Confidence <font color="#f19322">%1$d</font>]]></Data></string>
 
     <string name="setting_title">Settings</string>
-    Please join my community in TAU, the unrestricted twitt from taucoin.io
-    You can paste the “tau link” to app to start with 100 coins balance.
 
-    <string name="setting_community_qr_explain" formatted="false"><Data><![CDATA[Please join my community in TAU, the unrestricted twitt from taucoin.io.
-You can paste the "tau link" to app to start with %1$d coins balance.<br/>%2$s <img src="%3$d">]]></Data></string>
-    <string name="setting_community_qr_share">Please join my community in TAU, the unrestricted twitt from taucoin.io.
-You can paste the "tau link" to app to start with %1$d coins balance.\n%2$s</string>
+    <string name="setting_community_qr_explain" formatted="false"><Data><![CDATA[Please join \"%1$s\" community in the TAU network, an unrestricted and serverless social media from taucoin.io;
+paste the following link to app search box and receive %2$d coins for posting news.<br/>%3$s <img src="%4$d">]]></Data></string>
+    <string name="setting_community_qr_share">Please join \"%1$s\" community in the TAU network, an unrestricted and serverless social media from taucoin.io;
+paste the following link to app search box and receive %2$d coins for posting news.\n%3$s</string>
     <string name="setting_key_explain">Address is the public key derived from your device random seed.</string>
     <string name="setting_account">Address</string>
     <string name="setting_nickname">Nickname</string>
@@ -466,7 +464,7 @@ You can paste the "tau link" to app to start with %1$d coins balance.\n%2$s</str
     <string name="tx_invitation_title">Title</string>
     <string name="tx_communities_more">More&#8230;</string>
     <string name="tx_what_happening">What\'s happening?</string>
-    <string name="tx_link_http">Https://(optional)</string>
+    <string name="tx_link_http">optional https://… or tau://… link</string>
     <string name="tx_your_reply">Your reply</string>
     <string name="tx_recent">Recent</string>
     <string name="tx_operation_reply">Reply</string>
@@ -533,7 +531,7 @@ You can paste the "tau link" to app to start with %1$d coins balance.\n%2$s</str
     <string name="tx_sell_direct_talk">Connect</string>
     <string name="tx_sell_add_friend">Add\nFriend</string>
     <string name="tx_unknown">Unknown Transaction</string>
-    <string name="tx_community_creator_selling">This is community creator. Contact me for %s matter. </string>
+    <string name="tx_community_creator_selling"> I am creator of "%s" community. Hello World. </string>
 
     <string name="escrow_now">Escrow Now</string>
     <string name="escrow_tip">Need an escrow service for p2p trading?\nConnect to the largest holder.</string>
