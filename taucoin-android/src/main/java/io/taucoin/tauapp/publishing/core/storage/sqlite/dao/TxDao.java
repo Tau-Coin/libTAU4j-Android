@@ -98,7 +98,6 @@ public interface TxDao {
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " WHERE tx.chainID = :chainID AND tx.nonce >= 1" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " AND tx.repliedHash IS NULL" +
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
