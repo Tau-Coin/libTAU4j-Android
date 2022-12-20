@@ -22,7 +22,8 @@ public class UserAndTx extends Tx {
             entityColumn = "publicKey")
     public User receiver;                   // 交易接受者对应的用户信息
 
-    public int repliesNum;
+    public int repliesNum; //news回复记录数
+    public int chatsNum; //聊天回复记录数
     public long balance;
     public long power;
 

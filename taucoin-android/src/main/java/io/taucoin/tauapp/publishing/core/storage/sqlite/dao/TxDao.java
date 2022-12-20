@@ -30,55 +30,91 @@ public interface TxDao {
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
-    // SQL:查询社区里的交易(MARKET交易，排除Trust Tx, 并且上链)
-    String QUERY_GET_MARKET_SELECT = "SELECT tx.*, t.repliesNum, m.balance, m.power" +
+    // SQL:查询news reply次数
+    String QUERY_NEWS_REPLY_COUNT =
+            " (SELECT count(txID) AS repliesNum, repliedHash FROM Txs" +
+            " WHERE repliedHash IS NOT NULL AND txType=" + Constants.NEWS_TX_TYPE +
+            " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " GROUP BY repliedHash) nrc";
+
+    // SQL:查询news chat次数
+    String QUERY_NEWS_CHAT_COUNT =
+            " (SELECT count(txID) AS chatsNum, repliedHash FROM Txs" +
+            " WHERE repliedHash IS NOT NULL AND txType=" + Constants.NOTE_TX_TYPE +
+            " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " GROUP BY repliedHash) ncc";
+
+    // SQL:联合查询news reply 和 news chat次数
+    String QUERY_NEWS_REPLY_AND_CHAT_COUNT = 
+            " LEFT JOIN" + 
+            QUERY_NEWS_REPLY_COUNT +
+            " ON tx.txID = nrc.repliedHash" +
+            " LEFT JOIN" + 
+            QUERY_NEWS_CHAT_COUNT +
+            " ON tx.txID = ncc.repliedHash";
+
+    // SQL:查询user and tx，care repliesNum and chatsNum
+    String QUERY_USER_AND_TX_CARE_NUM = "SELECT tx.*, nrc.repliesNum, ncc.chatsNum, m.balance, m.power";
+
+    // SQL:查询user and tx，not care repliesNum and chatsNum
+    String QUERY_USER_AND_TX = "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, m.balance, m.power";
+
+    // SQL:查询所有社区中的news tx
+    String QUERY_GET_ALL_NEWS =
+            QUERY_USER_AND_TX_CARE_NUM +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            " LEFT JOIN (SELECT count(txID) AS repliesNum, repliedHash FROM Txs" +
-            " WHERE chainID = :chainID AND repliedHash IS NOT NULL AND txType=" + Constants.NEWS_TX_TYPE +
-            " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " GROUP BY repliedHash) t" +
-            " ON tx.txID = t.repliedHash" +
+            " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
+            QUERY_NEWS_REPLY_AND_CHAT_COUNT +
+            " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
+            " AND c.isBanned = 0" +
+            QUERY_GET_TXS_ORDER;
+
+    // SQL:查询社区里的交易(MARKET交易)
+    String QUERY_GET_MARKET_SELECT = 
+            QUERY_USER_AND_TX_CARE_NUM +
+            " FROM Txs AS tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
+            QUERY_NEWS_REPLY_AND_CHAT_COUNT +
             " WHERE tx.chainID = :chainID";
 
-    String QUERY_GET_ALL_MARKET = QUERY_GET_MARKET_SELECT +
-            " AND tx.txType = 2" + QUERY_GET_TXS_ORDER;
+    String QUERY_GET_ALL_MARKET = QUERY_GET_MARKET_SELECT + " AND tx.txType =" + Constants.NEWS_TX_TYPE + QUERY_GET_TXS_ORDER;
 
     // SQL:查询社区news对应的notes交易
-    String QUERY_GET_ALL_NOTES = "SELECT tx.*, 0 AS repliesNum, m.balance, m.power" +
+    String QUERY_GET_ALL_NOTES = 
+            QUERY_USER_AND_TX +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            " WHERE txType = 1" +
+            " WHERE txType =" + Constants.NOTE_TX_TYPE +
             " AND tx.repliedHash = :repliesHash" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
-    // SQL:查询社区里的交易
-    String QUERY_GET_CHAIN_TXS_SELECT = "SELECT tx.*, 0 AS repliesNum, m.balance, m.power" +
+    // SQL:查询社区里的交易(包括未上链)
+    String QUERY_GET_CHAIN_ALL_TXS = 
+            QUERY_USER_AND_TX +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            " WHERE tx.chainID = :chainID AND tx.nonce >= 1";
-
-    // SQL:查询社区里的交易(上链)
-    String QUERY_GET_CHAIN_ALL_TXS = QUERY_GET_CHAIN_TXS_SELECT + QUERY_GET_TXS_ORDER;
+            " WHERE tx.chainID = :chainID AND tx.nonce >= 1" +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " AND tx.repliedHash IS NULL" +
+            " ORDER BY tx.timestamp DESC" +
+            " limit :loadSize offset :startPosition";
 
     // SQL:查询社区里的置顶交易(目前只显示News交易)
     String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " AND tx.txType = 2 AND pinnedTime > 0" +
+            " AND tx.txType =" + Constants.NEWS_TX_TYPE + " AND pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
-    String QUERY_GET_ALL_MARKET_PINNED_TXS = "SELECT tx.*, t.repliesNum, m.balance, m.power" +
+    String QUERY_GET_ALL_MARKET_PINNED_TXS =
+        QUERY_USER_AND_TX_CARE_NUM +
         " FROM Txs AS tx" +
         " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
         " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
-        " LEFT JOIN (SELECT count(txID) AS repliesNum, chainID, repliedHash FROM Txs" +
-        " WHERE repliedHash IS NOT NULL AND txType=" + Constants.NEWS_TX_TYPE +
-        " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-        " GROUP BY repliedHash) t" +
-        " ON tx.txID = t.repliedHash  " +
-        " WHERE tx.txType = 2 AND pinnedTime > 0" +
+        QUERY_NEWS_REPLY_AND_CHAT_COUNT + 
+        " WHERE tx.txType =" + Constants.NEWS_TX_TYPE + " AND pinnedTime > 0" +
         " AND c.isBanned = 0" +
         " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
         " ORDER BY tx.pinnedTime DESC";
@@ -101,7 +137,8 @@ public interface TxDao {
             " ORDER BY createTime DESC" +
             " LIMIT :loadSize OFFSET :startPosition";
 
-    String QUERY_GET_ALL_NEWS_REPLIES = "SELECT tx.*, 0 AS repliesNum, m.balance, m.power" +
+    String QUERY_GET_ALL_NEWS_REPLIES = 
+            QUERY_USER_AND_TX +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " WHERE tx.repliedHash = :txID AND txType =" + Constants.NEWS_TX_TYPE +
@@ -109,27 +146,12 @@ public interface TxDao {
             " ORDER BY tx.timestamp DESC" +
             " LIMIT :loadSize OFFSET :startPosition";
 
-    String QUERY_GET_ALL_NEWS = "SELECT tx.*, t.repliesNum, m.balance, m.power" +
+    String QUERY_GET_NEWS_DETAIL =
+            QUERY_USER_AND_TX_CARE_NUM +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
-            " LEFT JOIN (SELECT count(txID) AS repliesNum, chainID, repliedHash FROM Txs" +
-            " WHERE repliedHash IS NOT NULL AND txType=" + Constants.NEWS_TX_TYPE +
-            " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " GROUP BY repliedHash) t" +
-            " ON tx.txID = t.repliedHash  " +
-            " WHERE tx.txType = 2" +
-            " AND c.isBanned = 0" +
-            QUERY_GET_TXS_ORDER;
-
-    String QUERY_GET_NEWS_DETAIL = "SELECT tx.*, t.repliesNum, m.balance, m.power" +
-            " FROM Txs AS tx" +
-            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
-            " LEFT JOIN (SELECT count(txID) AS repliesNum, repliedHash FROM Txs" +
-            " WHERE repliedHash = :txID AND txType=" + Constants.NEWS_TX_TYPE +
-            " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST + ") t" +
-            " ON tx.txID = t.repliedHash  " +
+            QUERY_NEWS_REPLY_AND_CHAT_COUNT +
             " WHERE tx.txID = :txID AND c.isBanned = 0";
 
     String QUERY_UNREAD_NEWS = "SELECT SUM(newsUnread) FROM Members m" +
@@ -153,12 +175,9 @@ public interface TxDao {
     // SQL:查询未上链并且未过期的txID
     String QUERY_PENDING_TX_IDS_NOT_EXPIRED = "SELECT txID FROM Txs" + QUERY_PENDING_TXS_NOT_EXPIRED_WHERE;
 
-    String QUERY_GET_TX_BY_TX_ID = "SELECT * FROM Txs" +
-            " WHERE txID = :txID";
+    String QUERY_GET_TX_BY_TX_ID = "SELECT * FROM Txs WHERE txID = :txID";
 
-    String QUERY_GET_TX_BY_TX_QUEUE = "SELECT * FROM Txs" +
-            " WHERE queueID = :queueID";
-    //        " WHERE queueID = :queueID AND timestamp = :timestamp";
+    String QUERY_GET_TX_BY_TX_QUEUE = "SELECT * FROM Txs WHERE queueID = :queueID";
 
     String QUERY_GET_NOT_ON_CHAIN_TX = "SELECT * FROM Txs" +
             " WHERE chainID = :chainID AND txType = :txType AND nonce = :nonce" +
@@ -173,7 +192,8 @@ public interface TxDao {
     String QUERY_SET_MESSAGE_FAVORITE = "UPDATE Txs SET favoriteTime = :favoriteTime" +
             " WHERE txID = :txID";
 
-    String QUERY_GET_FAVORITE_TXS = "SELECT tx.*, 0 AS repliesNum, m.balance, m.power" +
+    String QUERY_GET_FAVORITE_TXS = 
+            QUERY_USER_AND_TX +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " WHERE favoriteTime > 0 " +
@@ -238,6 +258,7 @@ public interface TxDao {
     @Transaction
     @Query(QUERY_GET_NEWS_DETAIL)
     Observable<UserAndTx> observeNewsDetail(String txID);
+
     /**
      * 根据chainID获取社区中的交易的被观察者
      * @param chainID 社区链id
