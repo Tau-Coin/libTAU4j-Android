@@ -35,7 +35,7 @@ public interface TxDao {
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " LEFT JOIN (SELECT count(txID) AS repliesNum, repliedHash FROM Txs" +
-            " WHERE chainID = :chainID AND repliedHash IS NOT NULL" +
+            " WHERE chainID = :chainID AND repliedHash IS NOT NULL AND txType=" + Constants.NEWS_TX_TYPE +
             " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " GROUP BY repliedHash) t" +
             " ON tx.txID = t.repliedHash" +
@@ -74,7 +74,7 @@ public interface TxDao {
         " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
         " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
         " LEFT JOIN (SELECT count(txID) AS repliesNum, chainID, repliedHash FROM Txs" +
-        " WHERE repliedHash IS NOT NULL" +
+        " WHERE repliedHash IS NOT NULL AND txType=" + Constants.NEWS_TX_TYPE +
         " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
         " GROUP BY repliedHash) t" +
         " ON tx.txID = t.repliedHash  " +
@@ -114,7 +114,7 @@ public interface TxDao {
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
             " LEFT JOIN (SELECT count(txID) AS repliesNum, chainID, repliedHash FROM Txs" +
-            " WHERE repliedHash IS NOT NULL" +
+            " WHERE repliedHash IS NOT NULL AND txType=" + Constants.NEWS_TX_TYPE +
             " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " GROUP BY repliedHash) t" +
             " ON tx.txID = t.repliedHash  " +
@@ -127,7 +127,7 @@ public interface TxDao {
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
             " LEFT JOIN (SELECT count(txID) AS repliesNum, repliedHash FROM Txs" +
-            " WHERE repliedHash = :txID" +
+            " WHERE repliedHash = :txID AND txType=" + Constants.NEWS_TX_TYPE +
             " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST + ") t" +
             " ON tx.txID = t.repliedHash  " +
             " WHERE tx.txID = :txID AND c.isBanned = 0";
