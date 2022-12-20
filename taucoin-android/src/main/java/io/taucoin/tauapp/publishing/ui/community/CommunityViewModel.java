@@ -40,6 +40,7 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -62,6 +63,7 @@ import io.taucoin.tauapp.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.tauapp.publishing.core.model.data.DataChanged;
 import io.taucoin.tauapp.publishing.core.model.data.DrawBean;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.tauapp.publishing.core.model.data.HomeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndFriend;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndTime;
@@ -1310,5 +1312,9 @@ public class CommunityViewModel extends AndroidViewModel {
 
     public void touchChain(String chainID) {
         daemon.touchChain(chainID);
+    }
+
+    public Observable<HomeStatistics> observeCommunitiesAndContacts() {
+        return communityRepo.observeCommunitiesAndContacts();
     }
 }

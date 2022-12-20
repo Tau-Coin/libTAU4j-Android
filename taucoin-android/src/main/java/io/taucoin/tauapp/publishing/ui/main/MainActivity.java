@@ -42,6 +42,8 @@ import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.storage.RepositoryHelper;
 import io.taucoin.tauapp.publishing.core.storage.sp.SettingsRepository;
 import io.taucoin.tauapp.publishing.core.utils.ActivityUtil;
+import io.taucoin.tauapp.publishing.core.utils.DrawablesUtil;
+import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.CopyManager;
 import io.taucoin.tauapp.publishing.core.utils.LocationManagerUtil;
@@ -210,6 +212,10 @@ public class MainActivity extends ScanTriggerActivity {
             binding.mainRightFragment.setVisibility(View.GONE);
 //            ViewUtils.updateViewWeight(binding.mainRightFragment, 0);
         }
+
+        int size = getResources().getDimensionPixelSize(R.dimen.widget_size_18);
+        DrawablesUtil.setStartDrawable(binding.drawer.tvCommunities, R.mipmap.icon_community_gray, size);
+        DrawablesUtil.setStartDrawable(binding.drawer.tvContacts, R.mipmap.icon_contacts_gray, size);
     }
 
     @Override
@@ -264,9 +270,11 @@ public class MainActivity extends ScanTriggerActivity {
         MainApplication.getInstance().setCurrentUser(user);
         logger.info("Update userPk::{}", user.publicKey);
         this.user = user;
-        binding.drawer.tvPublicKey.setText(UsersUtil.getMidHideName(user.publicKey));
+        DrawablesUtil.setEndDrawable(binding.drawer.tvPublicKey, R.mipmap.icon_copy_text,
+                getResources().getDimensionPixelSize(R.dimen.widget_size_18));
+        binding.drawer.tvPublicKey.setText(getString(R.string.main_public_key,
+                UsersUtil.getMidHideName(user.publicKey)));
         binding.drawer.tvPublicKey.setTag(user.publicKey);
-        binding.drawer.ivPublicKeyCopy.setTag(user.publicKey);
         String showName = UsersUtil.getCurrentUserName(user);
         binding.drawer.tvNoteName.setText(showName);
         binding.drawer.roundButton.setImageBitmap(UsersUtil.getHeadPic(user));
@@ -289,6 +297,20 @@ public class MainActivity extends ScanTriggerActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleMemberTips));
+
+        disposables.add(communityViewModel.observeCommunitiesAndContacts()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(statistics -> {
+                    int communities = ViewUtils.getIntTag(binding.drawer.tvCommunities);
+                    if (statistics != null && statistics.getCommunities() != communities) {
+                        binding.drawer.tvCommunities.setText(FmtMicrometer.fmtLong(statistics.getCommunities()));
+                    }
+                    int contacts = ViewUtils.getIntTag(binding.drawer.tvContacts);
+                    if (statistics != null && statistics.getContacts() != contacts) {
+                        binding.drawer.tvContacts.setText(FmtMicrometer.fmtLong(statistics.getContacts()));
+                    }
+                }));
     }
 
     private void handleMemberTips(MemberTips tips) {
@@ -342,15 +364,13 @@ public class MainActivity extends ScanTriggerActivity {
         }
         switch (view.getId()) {
             case R.id.iv_user_qr_code:
-            case R.id.tv_public_key:
-            case R.id.tv_public_key_title:
             case R.id.tv_note_name:
                 ActivityUtil.startActivity(this, UserQRCodeActivity.class);
                 break;
             case R.id.round_button:
                 MediaUtil.openGalleryAndCamera(this);
                 break;
-            case R.id.iv_public_key_copy:
+            case R.id.tv_public_key:
                 String publicKey = ViewUtils.getStringTag(view);
                 CopyManager.copyText(publicKey);
                 ToastUtils.showShortToast(R.string.copy_public_key);

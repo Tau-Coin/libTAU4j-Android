@@ -9,10 +9,12 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.tauapp.publishing.core.model.data.HomeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
 import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Community;
@@ -209,6 +211,10 @@ public interface CommunityDao {
             " ON c.chainID = m.chainID" +
             " WHERE c.isBanned = 0 AND m.num = 2";
 
+    String QUERY_COMMUNITIES_CONTACTS = "SELECT a.communities, b.contacts" +
+            " FROM (SELECT count(*) AS communities FROM Communities WHERE isBanned = 0) AS a," +
+            " (SELECT count(*) AS contacts FROM Users WHERE isBanned = 0 AND isCurrentUser != 1) AS b";
+
     /**
      * 添加新的社区
      */
@@ -306,4 +312,7 @@ public interface CommunityDao {
 
     @Query(QUERY_GET_SAME_COMMUNITY)
     List<Community> getSameCommunity(String userPk, String friendPk);
+
+    @Query(QUERY_COMMUNITIES_CONTACTS)
+    Observable<HomeStatistics> observeCommunitiesAndContacts();
 }

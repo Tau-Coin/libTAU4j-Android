@@ -92,6 +92,7 @@
     <string name="main_operation_ban_community">Ban this community</string>
     <string name="main_operation_share_community">Share Community</string>
     <string name="main_operation_ban_friend">Ban this friend</string>
+    <string name="main_public_key">Address:%1$s</string>
 
     <!-- Strings used for main drawer content -->
     <string name="drawer_new_community">Create Coin</string>

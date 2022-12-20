@@ -8,12 +8,14 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.room.RxRoom;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.taucoin.tauapp.publishing.MainApplication;
 import io.taucoin.tauapp.publishing.core.Constants;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndAccount;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndFriend;
 import io.taucoin.tauapp.publishing.core.model.data.CommunityAndMember;
+import io.taucoin.tauapp.publishing.core.model.data.HomeStatistics;
 import io.taucoin.tauapp.publishing.core.model.data.MemberAndAmount;
 import io.taucoin.tauapp.publishing.core.model.data.MemberTips;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.AppDatabase;
@@ -207,5 +209,10 @@ public class CommunityRepositoryImpl implements CommunityRepository{
     @Override
     public List<Community> getSameCommunity(String userPk, String friendPk) {
         return db.communityDao().getSameCommunity(userPk, friendPk);
+    }
+
+    @Override
+    public Observable<HomeStatistics> observeCommunitiesAndContacts() {
+        return db.communityDao().observeCommunitiesAndContacts();
     }
 }
