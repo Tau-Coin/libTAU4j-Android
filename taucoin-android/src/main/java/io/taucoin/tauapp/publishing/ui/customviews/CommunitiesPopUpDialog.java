@@ -116,7 +116,7 @@ public class CommunitiesPopUpDialog extends Dialog{
                 holder.binding.rbCommunity.setVisibility(isSanFrancisco ? View.GONE : View.VISIBLE);
                 holder.binding.ivCommunity.setVisibility(isSanFrancisco ? View.VISIBLE : View.GONE);
                 if (isSanFrancisco) {
-                    holder.binding.ivCommunity.setImageRes(R.mipmap.icon_san_francisco);
+                    holder.binding.ivCommunity.setImageRes(R.mipmap.icon_cbd_logo);
                 }
                 String communityCode = ChainIDUtil.getCode(member.chainID);
                 String balance = FmtMicrometer.fmtBalance(member.balance);
