@@ -105,7 +105,7 @@ import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.tauapp.publishing.databinding.BlacklistDialogBinding;
 import io.taucoin.tauapp.publishing.databinding.ExternalAirdropLinkDialogBinding;
-import io.taucoin.tauapp.publishing.ui.chat.ChatViewModel;
+import io.taucoin.tauapp.publishing.ui.ExternalLinkActivity;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
 import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
@@ -1182,7 +1182,7 @@ public class CommunityViewModel extends AndroidViewModel {
         return showLongTimeCreateDialog(activity, link, false, listener);
     }
 
-    public ConfirmDialog showLongTimeCreateDialog(FragmentActivity activity, LinkUtil.Link link,
+    public static ConfirmDialog showLongTimeCreateDialog(FragmentActivity activity, LinkUtil.Link link,
                                   boolean isQrCode, ConfirmDialog.ClickListener listener) {
         if (link.getTimestamp() <= 0) {
             if (listener != null) {
@@ -1232,6 +1232,9 @@ public class CommunityViewModel extends AndroidViewModel {
                 } else {
                     listener.close();
                 }
+            }
+            if (activity instanceof ExternalLinkActivity) {
+                activity.finish();
             }
         });
         dialogBinding.tvJoin.setOnClickListener(view -> {

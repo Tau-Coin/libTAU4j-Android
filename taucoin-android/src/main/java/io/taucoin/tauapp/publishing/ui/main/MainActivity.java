@@ -57,7 +57,6 @@ import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
 import io.taucoin.tauapp.publishing.core.utils.media.MediaUtil;
 import io.taucoin.tauapp.publishing.databinding.ActivityMainDrawerBinding;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.User;
-import io.taucoin.tauapp.publishing.databinding.ExternalErrorLinkDialogBinding;
 import io.taucoin.tauapp.publishing.databinding.PromptDialogBinding;
 import io.taucoin.tauapp.publishing.receiver.NotificationReceiver;
 import io.taucoin.tauapp.publishing.service.WorkloadManager;
@@ -72,7 +71,6 @@ import io.taucoin.tauapp.publishing.ui.community.CommunityCreateActivity;
 import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
-import io.taucoin.tauapp.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.tauapp.publishing.ui.download.DownloadViewModel;
 import io.taucoin.tauapp.publishing.ui.friends.AirdropCommunityActivity;
 import io.taucoin.tauapp.publishing.ui.friends.FriendsActivity;
@@ -95,12 +93,10 @@ public class MainActivity extends ScanTriggerActivity {
     private DownloadViewModel downloadViewModel;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private final Subject<Integer> mBackClick = PublishSubject.create();
-    private CommonDialog linkDialog;
     private CommonDialog joinDialog;
     private User user;
     private BaseFragment currentFragment;
     private SettingsRepository settingsRepo;
-    private ConfirmDialog longTimeCreateDialog;
     private boolean isFriendLink = false;
 //    private BadgeActionProvider badgeProvider;
 
@@ -137,26 +133,22 @@ public class MainActivity extends ScanTriggerActivity {
             logger.info("MainActivity::chain link clicked");
             if (intent.hasExtra(IntentExtra.LINK)) {
                 String chainLink = intent.getStringExtra(IntentExtra.LINK);
-                showLongTimeCreateDialog(LinkUtil.decode(chainLink));
+                onLinkClick(LinkUtil.decode(chainLink));
             }
         } else if (StringUtil.isNotEmpty(action) && StringUtil.isEquals(action,
                 ExternalLinkActivity.ACTION_AIRDROP_LINK_CLICK)) {
             logger.info("MainActivity::airdrop link clicked");
             if (intent.hasExtra(IntentExtra.LINK)) {
                 String airdropLink = intent.getStringExtra(IntentExtra.LINK);
-                showLongTimeCreateDialog(LinkUtil.decode(airdropLink));
+                onLinkClick(LinkUtil.decode(airdropLink));
             }
         } else if (StringUtil.isNotEmpty(action) && StringUtil.isEquals(action,
                 ExternalLinkActivity.ACTION_FRIEND_LINK_CLICK)) {
             logger.info("MainActivity::airdrop link clicked");
             if (intent.hasExtra(IntentExtra.LINK)) {
                 String friendLink = intent.getStringExtra(IntentExtra.LINK);
-                showLongTimeCreateDialog(LinkUtil.decode(friendLink));
+                onLinkClick(LinkUtil.decode(friendLink));
             }
-        } else if (StringUtil.isNotEmpty(action) && StringUtil.isEquals(action,
-                ExternalLinkActivity.ACTION_ERROR_LINK_CLICK)) {
-            logger.info("MainActivity::error link clicked");
-            showErrorLinkDialog();
         } else if (0 != (Intent.FLAG_ACTIVITY_CLEAR_TOP & intent.getFlags())) {
             Bundle bundle = new Bundle();
             bundle.putString(IntentExtra.ID, intent.getStringExtra(IntentExtra.CHAIN_ID));
@@ -338,14 +330,8 @@ public class MainActivity extends ScanTriggerActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (linkDialog != null) {
-            linkDialog.closeDialog();
-        }
         if (joinDialog != null) {
             joinDialog.closeDialog();
-        }
-        if (longTimeCreateDialog != null) {
-            longTimeCreateDialog.closeDialog();
         }
         if (currentFragment != null) {
             FragmentManager fm = getSupportFragmentManager();
@@ -401,21 +387,6 @@ public class MainActivity extends ScanTriggerActivity {
         if (binding != null) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
         }
-    }
-
-    private void showErrorLinkDialog() {
-        ExternalErrorLinkDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
-                R.layout.external_error_link_dialog, null, false);
-        dialogBinding.tvClose.setOnClickListener(v -> {
-            if(linkDialog != null){
-                linkDialog.closeDialog();
-            }
-        });
-        linkDialog = new CommonDialog.Builder(this)
-                .setContentView(dialogBinding.getRoot())
-                .setCanceledOnTouchOutside(false)
-                .create();
-        linkDialog.show();
     }
 
     private void initJoinSuccessDialog(String airdropPeer) {
@@ -590,25 +561,6 @@ public class MainActivity extends ScanTriggerActivity {
         } else if (link.isFriendLink()) {
             openExternalFriendLink(link);
         }
-    }
-
-    private void showLongTimeCreateDialog(LinkUtil.Link link) {
-        if (longTimeCreateDialog != null && longTimeCreateDialog.isShowing()) {
-            longTimeCreateDialog.closeDialog();
-        }
-        longTimeCreateDialog = communityViewModel.showLongTimeCreateDialog(this, link,
-                new ConfirmDialog.ClickListener() {
-                    @Override
-                    public void proceed() {
-                        onLinkClick(link);
-                    }
-
-                    @Override
-                    public void close() {
-
-                    }
-                }
-        );
     }
 
     /**

@@ -309,7 +309,7 @@
         <activity android:name=".ui.ExternalLinkActivity"
             android:label="@string/app_name"
             android:icon="@drawable/icon_share_tau"
-            android:theme="@android:style/Theme.NoDisplay"
+            android:theme="@style/transparent"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
