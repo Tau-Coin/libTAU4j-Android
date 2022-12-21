@@ -251,9 +251,9 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                 .subscribe(list -> {
                     boolean isHavePinnedMsg = list != null && list.size() > 0;
                     binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
-//                    if (isHavePinnedMsg) {
-//                        binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
-//                    }
+                    if (isHavePinnedMsg) {
+                        binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
+                    }
                 }));
     }
 

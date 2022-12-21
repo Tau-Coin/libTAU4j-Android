@@ -19,22 +19,12 @@
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/widget_size_15"
             android:paddingEnd="@dimen/widget_size_15"
-            android:paddingTop="@dimen/widget_size_10"
-            android:paddingBottom="@dimen/widget_size_10"
+            android:paddingTop="@dimen/widget_size_5"
+            android:paddingBottom="@dimen/widget_size_5"
             android:layout_marginTop="@dimen/widget_size_0"
             android:layout_marginBottom="@dimen/widget_size_1"
             android:onClick="@{listener::onClick}"
             android:background="@color/color_white">
-
-            <TextView
-                android:layout_toStartOf="@+id/iv_close"
-                android:id="@+id/tv_pinned_message"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/community_pinned_message"
-                android:textColor="@color/color_yellow"
-                android:includeFontPadding="false"
-                android:textAppearance="@style/TextAppearanceBody2"/>
 
             <ImageView
                 android:id="@+id/iv_close"
@@ -42,12 +32,12 @@
                 android:layout_height="@dimen/widget_size_12"
                 android:layout_marginStart="@dimen/widget_size_10"
                 android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:contentDescription="@null"
                 android:src="@mipmap/icon_pinned"/>
 
             <LinearLayout
-                android:visibility="gone"
-                android:layout_below="@+id/tv_pinned_message"
+                android:layout_toStartOf="@+id/iv_close"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
