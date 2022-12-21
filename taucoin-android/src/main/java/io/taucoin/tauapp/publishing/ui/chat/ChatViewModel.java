@@ -419,7 +419,7 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     /**
-     * 周期性重发消息，24小时，30分钟一次；48小时，1个小时1次
+     * 周期性重发消息，12小时，30分钟一次
      */
 	public static void resendRegularMessages(Context context) {
         FriendRepository friendRepo = RepositoryHelper.getFriendsRepository(context);
@@ -435,8 +435,8 @@ public class ChatViewModel extends AndroidViewModel {
 					for(ChatMsgLog msgLog: msgLogs) {
 						ChatMsg chatMsg = chatRepo.queryChatMsg(msgLog.hash);
 						long timestamp = chatMsg.timestamp;
-						//24小时，30分钟一次；48小时，1个小时1次
-						if(timestamp_now - timestamp >= 48*3600*1000 && timestamp_now/10000000%2!=0)
+						//12小时，30分钟一次
+						if(timestamp_now - timestamp >= 12*3600*1000)
 							continue;
 						String sender = chatMsg.senderPk;
 						String receiver = chatMsg.receiverPk;
@@ -447,6 +447,7 @@ public class ChatViewModel extends AndroidViewModel {
 						Message message = new Message(timestamp, ByteUtil.toByte(sender),
 								ByteUtil.toByte(receiver), encoded);
 						boolean isSuccess = daemon.addNewMessage(message);
+				        logger.info("resend regular msg hash::{}", logicMsgHash);
 						if(!isSuccess){
 							logger.debug("Regular send unreceived msgs failed");
 						}
