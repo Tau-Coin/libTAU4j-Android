@@ -1,10 +1,14 @@
 package io.taucoin.tauapp.publishing.ui.transaction;
 
+import android.graphics.drawable.Drawable;
 import android.text.SpannableStringBuilder;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -19,11 +23,13 @@ import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
 import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.DrawablesUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
+import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.Logarithm;
 import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.databinding.ItemNewsBinding;
+import io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView;
 
 /**
  * Market 列表显示的Adapter
@@ -73,8 +79,10 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             this.listener = listener;
             this.nameColor = binding.getRoot().getResources().getColor(R.color.color_black);
             this.replyColor = binding.getRoot().getResources().getColor(R.color.color_blue_link);
-            this.linkDrawableSize = binding.getRoot().getResources().getDimensionPixelSize(R.dimen.widget_size_14);
             this.isReply = isReply;
+            this.linkDrawableSize = binding.getRoot().getResources().getDimensionPixelSize(R.dimen.widget_size_14);
+//            this.drawable = DrawablesUtil.getDrawable(binding.getRoot().getContext(),
+//                    R.mipmap.icon_share_link, linkDrawableSize, linkDrawableSize);
         }
 
         void bind(ViewHolder holder, UserAndTx tx) {
@@ -122,18 +130,64 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             binding.tvBalance.setText(balance);
             binding.tvPower.setText(power);
 
-            binding.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+            SpannableStringBuilder msg = TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS)
+                    .append(" ");
+            binding.tvMsg.setText(msg);
 
             boolean isShowLink = StringUtil.isNotEmpty(tx.link);
             binding.tvLink.setText(tx.link);
             binding.tvLink.setVisibility(isShowLink ? View.VISIBLE : View.GONE);
+
+            binding.tvRepliesNum.setText(FmtMicrometer.fmtLong(tx.repliesNum));
+            binding.tvChatNum.setText(FmtMicrometer.fmtLong(tx.chatsNum));
+
+            // 添加link解析
+            binding.tvMsg.setAutoLinkMask(0);
+            Linkify.addLinks(binding.tvMsg, Linkify.WEB_URLS);
+            Pattern referral = Pattern.compile(LinkUtil.REFERRAL_PATTERN, 0);
+            Linkify.addLinks(binding.tvMsg, referral, null);
+            Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
+            Linkify.addLinks(binding.tvMsg, airdrop, null);
+            Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
+            Linkify.addLinks(binding.tvMsg, chain, null);
+            Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
+            Linkify.addLinks(binding.tvMsg, friend, null);
+            binding.tvMsg.requestLayout();
+
             if (isShowLink) {
                 DrawablesUtil.setUnderLine(binding.tvLink);
                 DrawablesUtil.setEndDrawable(binding.tvLink, R.mipmap.icon_share_link, linkDrawableSize);
+                binding.tvLink.requestLayout();
             }
-            binding.tvRepliesNum.setText(FmtMicrometer.fmtLong(tx.repliesNum));
-            binding.tvChatNum.setText(FmtMicrometer.fmtLong(tx.chatsNum));
-            binding.tvMsg.requestLayout();
+
+            setAutoLinkListener(binding.tvMsg, tx);
+        }
+
+        public void setAutoLinkListener(AutoLinkTextView autoLinkTextView, UserAndTx tx) {
+            AutoLinkTextView.AutoLinkListener autoLinkListener = new AutoLinkTextView.AutoLinkListener() {
+
+                @Override
+                public void onClick(AutoLinkTextView view) {
+                    if (listener != null) {
+                        ((ClickListener) listener).onItemClicked(tx);
+                    }
+                }
+
+                @Override
+                public void onLongClick(AutoLinkTextView view) {
+                    if (listener != null) {
+                        listener.onItemLongClicked(view, tx);
+                    }
+                }
+
+                @Override
+                public void onLinkClick(String link) {
+                    if (listener != null) {
+                        listener.onLinkClick(link);
+                    }
+                }
+            };
+            autoLinkTextView.setAutoLinkListener(autoLinkListener);
         }
 
         private void setClickListener(ItemNewsBinding binding, UserAndTx tx) {

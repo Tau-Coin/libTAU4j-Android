@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import com.noober.menu.FloatMenu;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -34,6 +36,7 @@ import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.DrawablesUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
+import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.Logarithm;
 import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
@@ -44,6 +47,7 @@ import io.taucoin.tauapp.publishing.databinding.ItemNewsBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
+import io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView;
 import io.taucoin.tauapp.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
@@ -194,6 +198,17 @@ public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.
             binding.news.tvPower.setText(power);
 
             binding.news.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+            // 添加link解析
+            binding.news.tvMsg.setAutoLinkMask(0);
+            Linkify.addLinks(binding.news.tvMsg, Linkify.WEB_URLS);
+            Pattern referral = Pattern.compile(LinkUtil.REFERRAL_PATTERN, 0);
+            Linkify.addLinks(binding.news.tvMsg, referral, null);
+            Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
+            Linkify.addLinks(binding.news.tvMsg, airdrop, null);
+            Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
+            Linkify.addLinks(binding.news.tvMsg, chain, null);
+            Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
+            Linkify.addLinks(binding.news.tvMsg, friend, null);
 
             boolean isShowLink = StringUtil.isNotEmpty(tx.link);
             binding.news.tvLink.setText(tx.link);
@@ -204,6 +219,7 @@ public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.
                 DrawablesUtil.setEndDrawable(binding.news.tvLink, R.mipmap.icon_share_link, linkDrawableSize);
             }
             setClickListener(binding.news, tx);
+            setAutoLinkListener(binding.news.tvMsg, tx);
         }
         if (null == this.tx || this.tx.repliesNum != tx.repliesNum) {
             binding.news.tvRepliesNum.setText(FmtMicrometer.fmtLong(tx.repliesNum));
@@ -212,6 +228,28 @@ public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.
             binding.news.tvChatNum.setText(FmtMicrometer.fmtLong(tx.chatsNum));
         }
         this.tx = tx;
+    }
+
+    public void setAutoLinkListener(AutoLinkTextView autoLinkTextView, UserAndTx tx) {
+        AutoLinkTextView.AutoLinkListener autoLinkListener = new AutoLinkTextView.AutoLinkListener() {
+
+            @Override
+            public void onClick(AutoLinkTextView view) {
+
+            }
+
+            @Override
+            public void onLongClick(AutoLinkTextView view) {
+
+            }
+
+            @Override
+            public void onLinkClick(String link) {
+                KeyboardUtils.hideSoftInput(NewsDetailActivity.this);
+                ActivityUtil.openUri(NewsDetailActivity.this, link);
+            }
+        };
+        autoLinkTextView.setAutoLinkListener(autoLinkListener);
     }
 
     private void setClickListener(ItemNewsBinding binding, UserAndTx tx) {
@@ -374,7 +412,7 @@ public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.
             int resId = item.getResId();
             switch (resId) {
                 case R.string.tx_operation_copy:
-                    CopyManager.copyText(view.getText());
+                    CopyManager.copyText(tx.memo);
                     ToastUtils.showShortToast(R.string.copy_successfully);
                     break;
                 case R.string.tx_operation_reply:

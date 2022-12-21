@@ -380,7 +380,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
             int resId = item.getResId();
             switch (resId) {
                 case R.string.tx_operation_copy:
-                    CopyManager.copyText(view.getText());
+                    CopyManager.copyText(tx.memo);
                     ToastUtils.showShortToast(R.string.copy_successfully);
                     break;
                 case R.string.tx_operation_copy_link:

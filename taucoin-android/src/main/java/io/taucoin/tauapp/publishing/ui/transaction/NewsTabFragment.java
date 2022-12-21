@@ -1,11 +1,9 @@
 package io.taucoin.tauapp.publishing.ui.transaction;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.style.URLSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -320,7 +318,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
             int resId = item.getResId();
             switch (resId) {
                 case R.string.tx_operation_copy:
-                    CopyManager.copyText(view.getText());
+                    CopyManager.copyText(tx.memo);
                     ToastUtils.showShortToast(R.string.copy_successfully);
                     break;
                 case R.string.tx_operation_copy_link:

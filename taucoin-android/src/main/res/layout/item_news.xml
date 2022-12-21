@@ -118,30 +118,31 @@
                 android:padding="@dimen/widget_size_5"
                 android:layout_marginStart="@dimen/widget_size_10"
                 android:contentDescription="@null"
-                android:src="@mipmap/icon_ban"/>
+                android:src="@mipmap/icon_ban_gray"/>
 
             <TextView
-                android:visibility="gone"
                 android:layout_toEndOf="@+id/iv_ban"
-                android:layout_toStartOf="@+id/iv_arrow"
+                android:visibility="gone"
                 android:id="@+id/tv_reply"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/widget_size_10"
+                android:layout_marginEnd="@dimen/widget_size_50"
                 android:paddingTop="@dimen/widget_size_5"
                 android:includeFontPadding="false"
                 android:textColor="@color/gray_dark"
                 android:textAppearance="@style/TextAppearanceBody1" />
 
-            <TextView
-                android:layout_below="@+id/tv_reply"
+            <io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView
                 android:layout_toEndOf="@+id/iv_ban"
-                android:layout_toStartOf="@+id/iv_arrow"
+                android:layout_below="@+id/tv_reply"
                 android:id="@+id/tv_msg"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/widget_size_5"
                 android:layout_marginStart="@dimen/widget_size_10"
+                android:layout_marginEnd="@dimen/widget_size_50"
+                android:textColorLink="@color/color_blue_link"
                 android:paddingTop="@dimen/widget_size_5"
                 android:includeFontPadding="false"
                 android:textAppearance="@style/TextAppearanceBody1" />
@@ -154,14 +155,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/widget_size_80"
                 android:layout_marginStart="@dimen/widget_size_10"
-                android:paddingTop="@dimen/widget_size_5"
                 android:textColor="@color/color_blue_link"
+                android:textColorLink="@color/color_blue_link"
+                android:layout_marginTop="@dimen/widget_size_5"
                 android:drawablePadding="@dimen/widget_size_2"
-                android:maxLines="1"
+                android:gravity="center_vertical"
                 android:singleLine="true"
-                android:ellipsize="middle"
-                android:breakStrategy="simple"
-                android:hyphenationFrequency="normal"
+                android:ellipsize="end"
                 android:includeFontPadding="false"
                 android:textAppearance="@style/TextAppearanceBody1" />
 
@@ -174,7 +174,7 @@
                 android:layout_marginEnd="@dimen/widget_size_10"
                 android:contentDescription="@null"
                 android:layout_centerVertical="true"
-                android:src="@mipmap/icon_arrow"/>
+                android:src="@mipmap/icon_detail"/>
 
         </RelativeLayout>
 

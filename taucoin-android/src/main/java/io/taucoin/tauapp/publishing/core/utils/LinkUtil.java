@@ -37,6 +37,7 @@ public class LinkUtil {
     public static final String CHAIN_PATTERN = PATTERN_PREFIX + LINK_CHAIN + CHAIN_PATTERN_SUFFIX;
     public static final String AIRDROP_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + AIRDROP_PATTERN_SUFFIX;
     public static final String REFERRAL_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + REFERRAL_PATTERN_SUFFIX;
+    public static final String ALL_PATTERN = "[^\\s]*";
 
     public static boolean isTauUrl(String url) {
         return StringUtil.isNotEmpty(url) && url.startsWith("tau");
