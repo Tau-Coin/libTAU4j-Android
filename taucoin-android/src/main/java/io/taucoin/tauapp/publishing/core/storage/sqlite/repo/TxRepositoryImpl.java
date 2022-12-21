@@ -63,12 +63,12 @@ public class TxRepositoryImpl implements TxRepository{
 
     @Override
     public Flowable<List<UserAndTx>> observeLatestPinnedMsg(String chainID) {
-        return db.txDao().queryCommunityMarketLatestPinnedTx(chainID);
+        return db.txDao().queryCommunityLatestPinnedTx(chainID);
     }
 
     @Override
     public Flowable<List<UserAndTx>> observeLatestPinnedMsg() {
-        return db.txDao().queryCommunityMarketLatestPinnedTx();
+        return db.txDao().queryCommunityLatestPinnedTx();
     }
 
     @Override
@@ -102,12 +102,12 @@ public class TxRepositoryImpl implements TxRepository{
      */
     @Override
     public List<UserAndTx> queryCommunityPinnedTxs(String chainID) {
-        return db.txDao().queryCommunityMarketPinnedTxs(chainID);
+        return db.txDao().queryCommunityPinnedTxs(chainID);
     }
 
     @Override
     public List<UserAndTx> queryCommunityPinnedTxs() {
-        return db.txDao().queryCommunityMarketPinnedTxs();
+        return db.txDao().queryCommunityPinnedTxs();
     }
 
     /**

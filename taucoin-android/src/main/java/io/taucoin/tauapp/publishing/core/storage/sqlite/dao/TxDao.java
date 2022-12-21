@@ -24,12 +24,6 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.TxLog;
 @Dao
 public interface TxDao {
 
-    String QUERY_GET_TXS_ORDER =
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " AND tx.repliedHash IS NULL" +
-            " ORDER BY tx.timestamp DESC" +
-            " limit :loadSize offset :startPosition";
-
     // SQL:查询news reply次数
     String QUERY_NEWS_REPLY_COUNT =
             " (SELECT count(txID) AS repliesNum, repliedHash FROM Txs" +
@@ -54,61 +48,78 @@ public interface TxDao {
             " ON tx.txID = ncc.repliedHash";
 
     // SQL:查询user and tx，care repliesNum and chatsNum
-    String QUERY_USER_AND_TX_CARE_NUM = "SELECT tx.*, nrc.repliesNum, ncc.chatsNum, m.balance, m.power";
+    String QUERY_USER_AND_TX_CARE_NUM_AND_STATE = "SELECT tx.*, nrc.repliesNum, ncc.chatsNum, m.balance, m.power";
 
-    // SQL:查询user and tx，not care repliesNum and chatsNum
-    String QUERY_USER_AND_TX = "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, m.balance, m.power";
+    // SQL:查询user and tx，care member's state
+    String QUERY_USER_AND_TX_CARE_STATE = "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, m.balance, m.power";
 
-    // SQL:查询所有社区中的news tx
-    String QUERY_GET_ALL_NEWS =
-            QUERY_USER_AND_TX_CARE_NUM +
-            " FROM Txs AS tx" +
-            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
-            QUERY_NEWS_REPLY_AND_CHAT_COUNT +
-            " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
-            " AND c.isBanned = 0" +
-            QUERY_GET_TXS_ORDER;
+    // SQL:查询user and tx，only care tx
+    String QUERY_USER_AND_TX = "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, 0 AS balance, 0 AS power";
 
-    // SQL:查询社区里的交易(MARKET交易)
-    String QUERY_GET_MARKET_SELECT = 
-            QUERY_USER_AND_TX_CARE_NUM +
-            " FROM Txs AS tx" +
-            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            QUERY_NEWS_REPLY_AND_CHAT_COUNT +
-            " WHERE tx.chainID = :chainID";
-
-    String QUERY_GET_ALL_MARKET = QUERY_GET_MARKET_SELECT + " AND tx.txType =" + Constants.NEWS_TX_TYPE + QUERY_GET_TXS_ORDER;
-
-    // SQL:查询社区news对应的notes交易
-    String QUERY_GET_ALL_NOTES = 
-            QUERY_USER_AND_TX +
-            " FROM Txs AS tx" +
-            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            " WHERE txType =" + Constants.NOTE_TX_TYPE +
-            " AND tx.repliedHash = :repliesHash" +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " ORDER BY tx.timestamp DESC" +
-            " limit :loadSize offset :startPosition";
-
-    // SQL:查询社区里的交易(包括未上链)
+    // SQL:查询特定社区里的交易(包括未上链)
     String QUERY_GET_CHAIN_ALL_TXS = 
             QUERY_USER_AND_TX +
             " FROM Txs AS tx" +
-            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " WHERE tx.chainID = :chainID AND tx.nonce >= 1" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
-    // SQL:查询社区里的置顶交易(目前只显示News交易)
-    String QUERY_GET_MARKET_PINNED_TXS = QUERY_GET_MARKET_SELECT +
+    // SQL:查询社区news对应的notes交易
+    String QUERY_GET_ALL_NOTES = 
+            QUERY_USER_AND_TX +
+            " FROM Txs AS tx" +
+            " WHERE txType =" + Constants.NOTE_TX_TYPE +
+            " AND tx.repliedHash = :repiledHash" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " AND tx.txType =" + Constants.NEWS_TX_TYPE + " AND pinnedTime > 0" +
+            " ORDER BY tx.timestamp DESC" +
+            " limit :loadSize offset :startPosition";
+
+    // SQL:查询所有favorites
+    String QUERY_GET_FAVORITE_TXS = 
+            QUERY_USER_AND_TX +
+            " FROM Txs AS tx" +
+            " WHERE tx.favoriteTime > 0 " +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " ORDER BY tx.favoriteTime DESC";
+
+    // SQL: 页面展示(时间倒序, 有限数量)
+    String QUERY_GET_TXS_ORDER = " ORDER BY tx.timestamp DESC limit :loadSize offset :startPosition";
+
+    // SQL:查询所有社区中的一级news tx
+    String QUERY_GET_ALL_MARKET =
+            QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
+            " FROM Txs AS tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
+            " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
+            QUERY_NEWS_REPLY_AND_CHAT_COUNT +
+            " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
+            " AND tx.repliedHash IS NULL" +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " AND c.isBanned = 0" +
+            QUERY_GET_TXS_ORDER;
+
+    // SQL:查询特定社区里的一级news tx
+    String QUERY_GET_CHAIN_MARKET = 
+            QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
+            " FROM Txs AS tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
+            QUERY_NEWS_REPLY_AND_CHAT_COUNT +
+            " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
+            " AND tx.repliedHash IS NULL" +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " AND tx.chainID = :chainID";
+
+    String QUERY_GET_CHAIN_ALL_MARKET = QUERY_GET_CHAIN_MARKET + QUERY_GET_TXS_ORDER;
+
+    // SQL:查询特定社区里的置顶交易(目前只显示News交易)
+    String QUERY_GET_MARKET_PINNED_TXS =
+            QUERY_GET_CHAIN_MARKET +
+            " AND tx.pinnedTime > 0" +
             " ORDER BY tx.pinnedTime DESC";
 
-    String QUERY_GET_ALL_MARKET_PINNED_TXS =
-        QUERY_USER_AND_TX_CARE_NUM +
+    String QUERY_GET_ALL_PINNED_TXS =
+        QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
         " FROM Txs AS tx" +
         " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
         " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
@@ -137,7 +148,7 @@ public interface TxDao {
             " LIMIT :loadSize OFFSET :startPosition";
 
     String QUERY_GET_ALL_NEWS_REPLIES = 
-            QUERY_USER_AND_TX +
+            QUERY_USER_AND_TX_CARE_STATE +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " WHERE tx.repliedHash = :txID AND txType =" + Constants.NEWS_TX_TYPE +
@@ -146,7 +157,7 @@ public interface TxDao {
             " LIMIT :loadSize OFFSET :startPosition";
 
     String QUERY_GET_NEWS_DETAIL =
-            QUERY_USER_AND_TX_CARE_NUM +
+            QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
@@ -190,14 +201,6 @@ public interface TxDao {
 
     String QUERY_SET_MESSAGE_FAVORITE = "UPDATE Txs SET favoriteTime = :favoriteTime" +
             " WHERE txID = :txID";
-
-    String QUERY_GET_FAVORITE_TXS = 
-            QUERY_USER_AND_TX +
-            " FROM Txs AS tx" +
-            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
-            " WHERE favoriteTime > 0 " +
-            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
-            " ORDER BY tx.favoriteTime DESC";
 
     String QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH = "SELECT * FROM Txs" +
             " WHERE txStatus = 1 AND blockHash = :blockHash";
@@ -246,8 +249,99 @@ public interface TxDao {
     @Update
     int updateTransaction(Tx tx);
 
+    /**
+     * 根据txID查询交易
+     * @param txID 交易ID
+     */
+    @Query(QUERY_GET_TX_BY_TX_ID)
+    Tx getTxByTxID(String txID);
+
+    /**
+     * 根据TXID观察社区的交易的变化
+     */
+    @Query(QUERY_GET_TX_BY_TX_ID)
+    Observable<Tx> observeTxByTxID(String txID);
+
+    /**
+     * 根据queueID查询交易
+     * @param queueID 交易队列ID
+     */
+    @Query(QUERY_GET_TX_BY_TX_QUEUE)
+    Tx getTxByQueueID(long queueID);
+
+    /**
+     * 根据queueID删除交易
+     * @param queueID 交易队列ID
+     */
+    @Query(DELETE_TX_BY_QUEUEID)
+    void deleteTxByQueueID(long queueID);
+
+    /**
+     * 设置置顶信息(news tx)
+     */
+    @Query(QUERY_SET_MESSAGE_PINNED)
+    void setMessagePinned(String txID, long pinnedTime);
+
+    /**
+     * 设置喜爱信息(news tx)
+     */
+    @Query(QUERY_SET_MESSAGE_FAVORITE)
+    void setMessageFavorite(String txID, long favoriteTime);
+
+    /**
+     * 获取所有的置顶消息
+     */
     @Transaction
-    @Query(QUERY_GET_ALL_NEWS)
+    @Query(QUERY_GET_ALL_PINNED_TXS)
+    List<UserAndTx> queryCommunityPinnedTxs();
+
+    /**
+     * 获取某条链下的置顶消息
+     * @param chainID 社区链ID
+     */
+    @Transaction
+    @Query(QUERY_GET_MARKET_PINNED_TXS)
+    List<UserAndTx> queryCommunityPinnedTxs(String chainID);
+
+    /**
+     * 获取最近的置顶消息
+     */
+    @Transaction
+    @Query(QUERY_GET_ALL_PINNED_TXS + " limit 1")
+    Flowable<List<UserAndTx>> queryCommunityLatestPinnedTx();
+
+    /**
+     * 获取某条链下最近的置顶消息
+     * @param chainID 社区链ID
+     */
+    @Transaction
+    @Query(QUERY_GET_MARKET_PINNED_TXS + " limit 1")
+    Flowable<List<UserAndTx>> queryCommunityLatestPinnedTx(String chainID);
+
+    /**
+     * 根据chainID获取社区中的交易(包括正需要上链的)
+     * @param chainID 社区链id
+     */
+    @Transaction
+    @Query(QUERY_GET_CHAIN_ALL_TXS)
+    List<UserAndTx> loadChainTxsData(String chainID, int startPosition, int loadSize);
+
+    /**
+     * 根据repliedHash来索引对话框下的chats记录(note txs)
+     */
+    @Transaction
+    @Query(QUERY_GET_ALL_NOTES)
+    List<UserAndTx> loadAllNotesData(String repiledHash, int startPosition, int loadSize);
+
+    /**
+     * 查询favorites
+     */
+    @Transaction
+    @Query(QUERY_GET_FAVORITE_TXS)
+    DataSource.Factory<Integer, UserAndTx> queryFavorites();
+
+    @Transaction
+    @Query(QUERY_GET_ALL_MARKET)
     List<UserAndTx> loadNewsData(int startPosition, int loadSize);
 
     @Transaction
@@ -259,36 +353,11 @@ public interface TxDao {
     Observable<UserAndTx> observeNewsDetail(String txID);
 
     /**
-     * 根据chainID获取社区中的交易的被观察者
-     * @param chainID 社区链id
+     * 查询特定链下的所有第一级news tx
      */
     @Transaction
-    @Query(QUERY_GET_CHAIN_ALL_TXS)
-    List<UserAndTx> loadChainTxsData(String chainID, int startPosition, int loadSize);
-
-    @Transaction
-    @Query(QUERY_GET_ALL_MARKET)
+    @Query(QUERY_GET_CHAIN_ALL_MARKET)
     List<UserAndTx> loadAllMarketData(String chainID, int startPosition, int loadSize);
-
-    @Transaction
-    @Query(QUERY_GET_ALL_NOTES)
-    List<UserAndTx> loadAllNotesData(String repliesHash, int startPosition, int loadSize);
-
-    @Transaction
-    @Query(QUERY_GET_MARKET_PINNED_TXS)
-    List<UserAndTx> queryCommunityMarketPinnedTxs(String chainID);
-
-    @Transaction
-    @Query(QUERY_GET_ALL_MARKET_PINNED_TXS)
-    List<UserAndTx> queryCommunityMarketPinnedTxs();
-
-    @Transaction
-    @Query(QUERY_GET_MARKET_PINNED_TXS + " limit 1")
-    Flowable<List<UserAndTx>> queryCommunityMarketLatestPinnedTx(String chainID);
-
-    @Transaction
-    @Query(QUERY_GET_ALL_MARKET_PINNED_TXS + " limit 1")
-    Flowable<List<UserAndTx>> queryCommunityMarketLatestPinnedTx();
 
     @Transaction
     @Query(QUERY_GET_WALLET_INCOME_AND_EXPENDITURE)
@@ -298,37 +367,11 @@ public interface TxDao {
     @Query(QUERY_MINING_INCOME)
     Flowable<List<IncomeAndExpenditure>> observeMiningIncome(String chainID);
 
-    /**
-     * 根据txID查询交易
-     * @param txID 交易ID
-     */
-    @Query(QUERY_GET_TX_BY_TX_ID)
-    Tx getTxByTxID(String txID);
-
-    @Query(QUERY_GET_TX_BY_TX_ID)
-    Observable<Tx> observeTxByTxID(String txID);
-
-    @Query(QUERY_GET_TX_BY_TX_QUEUE)
-    Tx getTxByQueueID(long queueID);
-
-    @Query(QUERY_SET_MESSAGE_PINNED)
-    void setMessagePinned(String txID, long pinnedTime);
-
-    @Query(QUERY_SET_MESSAGE_FAVORITE)
-    void setMessageFavorite(String txID, long favoriteTime);
-
-    @Transaction
-    @Query(QUERY_GET_FAVORITE_TXS)
-    DataSource.Factory<Integer, UserAndTx> queryFavorites();
-
     @Query(QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH)
     List<Tx> getOnChainTxsByBlockHash(String blockHash);
 
     @Query(QUERY_TX_SENDERS_IN_RECEIVER)
     List<String> queryTxSendersReceived(String chainID, String receiverPk);
-
-    @Query(DELETE_TX_BY_QUEUEID)
-    void deleteTxByQueueID(long queueID);
 
     @Insert()
     void addTxLog(TxLog log);

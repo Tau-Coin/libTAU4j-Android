@@ -28,33 +28,6 @@ public interface TxRepository {
     int updateTransaction(Tx transaction);
 
     /**
-     * 加载交易固定数据
-     * @param chainID 社区链ID
-     */
-    List<UserAndTx> queryCommunityPinnedTxs(String chainID);
-
-    List<UserAndTx> queryCommunityPinnedTxs();
-
-    /**
-     * 根据txID查询交易
-     * @param txID 交易ID
-     */
-    Tx getTxByTxID(String txID);
-
-    Observable<Tx> observeTxByTxID(String txID);
-
-    /**
-     * 根据queueID查询交易
-     * @param queueID 交易queueID
-     */
-    Tx getTxByQueueID(long queueID);
-
-    /**
-     * 观察社区的交易的变化
-     */
-    Observable<DataChanged> observeDataSetChanged();
-
-    /**
      * 提交数据变化
      */
     void submitDataSetChanged(Tx tx);
@@ -64,21 +37,81 @@ public interface TxRepository {
      */
     void submitDataSetChanged();
 
+    /**
+     * 观察社区的交易的变化
+     */
+    Observable<DataChanged> observeDataSetChanged();
+
+    /**
+     * 根据txID查询交易
+     * @param txID 交易ID
+     */
+    Tx getTxByTxID(String txID);
+
+    /**
+     * 根据TXID观察社区的交易的变化
+     */
+    Observable<Tx> observeTxByTxID(String txID);
+
+    /**
+     * 根据queueID查询交易
+     * @param queueID 交易queueID
+     */
+    Tx getTxByQueueID(long queueID);
+
+    /**
+     * 根据queueID删除交易
+     * @param queueID 交易queueID
+     */
+    void deleteTxByQueueID(long queueID);
+
+    /**
+     * 设置置顶信息
+     */
     void setMessagePinned(String txID, long pinnedTime, boolean isRefresh);
 
+    /**
+     * 设置喜爱信息
+     */
     void setMessageFavorite(String txID, long pinnedTime, boolean isRefresh);
 
+    /**
+     * 获取置顶消息
+     */
+    List<UserAndTx> queryCommunityPinnedTxs();
+
+    /**
+     * 获取某条链下的置顶消息
+     * @param chainID 社区链ID
+     */
+    List<UserAndTx> queryCommunityPinnedTxs(String chainID);
+
+    /**
+     * 获取最近置顶消息
+     */
+    Flowable<List<UserAndTx>> observeLatestPinnedMsg();
+
+    /**
+     * 获取某条链下最近的置顶消息
+     * @param chainID 社区链ID
+     */
     Flowable<List<UserAndTx>> observeLatestPinnedMsg(String chainID);
 
-    Flowable<List<UserAndTx>> observeLatestPinnedMsg();
+    /** 
+     * 根据chainID获取社区中的有nonce交易(包括正需要上链的news and wiring coins)
+     * @param chainID 社区链id
+     */
+    List<UserAndTx> loadChainTxsData(String chainID, int pos, int pageSize);
+
+    /**
+     * 获取所有链的news消息
+     * @param chainID 社区链ID
+     */
+    List<UserAndTx> loadNewsData(int pos, int pageSize);
 
     List<UserAndTx> loadAllNotesData(String repliesHash, int pos, int pageSize);
 
     List<UserAndTx> loadAllMarketData(String chainID, int pos, int pageSize);
-
-    List<UserAndTx> loadChainTxsData(String chainID, int pos, int pageSize);
-
-    List<UserAndTx> loadNewsData(int pos, int pageSize);
 
     List<UserAndTx> loadNewsRepliesData(String txID, int pos, int pageSize);
 
@@ -93,8 +126,6 @@ public interface TxRepository {
     TxLog getTxLog(String txID, int status);
 
     Observable<List<TxLog>> observerTxLogs(String txID);
-
-    void deleteTxByQueueID(long queueID);
 
     List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize);
 
