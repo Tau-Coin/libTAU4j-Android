@@ -215,11 +215,13 @@ public interface TxDao {
 
     String QUERY_TX_LOGS = "SELECT * FROM TxLogs WHERE hash = :hash ORDER BY status DESC";
 
-    String UPDATE_ALL_OFF_CHAIN_TXS = "UPDATE Txs SET txStatus = 0" +
+    String UPDATE_ALL_OFF_CHAIN_TXS =
+            " UPDATE Txs SET txStatus = " + Constants.TX_STATUS_PENDING +
             " WHERE chainID = :chainID AND senderPk = :userPk" +
             " AND txType IN (2, 3) AND nonce > :nonce";
 
-    String UPDATE_ALL_ON_CHAIN_TXS = "UPDATE Txs SET txStatus = 2" +
+    String UPDATE_ALL_ON_CHAIN_TXS =
+            " UPDATE Txs SET txStatus = " + Constants.TX_STATUS_SETTLED +
             " WHERE chainID = :chainID AND senderPk = :userPk" +
             " AND txType IN (2, 3) AND nonce <= :nonce";
 
