@@ -2,13 +2,18 @@ package io.taucoin.tauapp.publishing.ui.community;
 
 import android.os.Bundle;
 
+import java.util.List;
+
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.TauDaemon;
 import io.taucoin.tauapp.publishing.core.model.TauDaemonAlertHandler;
+import io.taucoin.tauapp.publishing.core.utils.ObservableUtil;
 import io.taucoin.tauapp.publishing.databinding.ActivityListBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
@@ -19,19 +24,18 @@ import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 public class AccessListActivity extends BaseActivity implements AccessListAdapter.ClickListener{
 
     protected static final int ACCESS_LIST_TYPE = 0x01;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private ActivityListBinding binding;
     private AccessListAdapter adapter;
-    private CommunityViewModel communityViewModel;
     private String chainID;
-    private int currentType;
+    private TauDaemon tauDaemon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(this);
-        communityViewModel = provider.get(CommunityViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_list);
+        tauDaemon = TauDaemon.getInstance(getApplicationContext());
         initParameter();
         initLayout();
     }
@@ -42,7 +46,6 @@ public class AccessListActivity extends BaseActivity implements AccessListAdapte
     private void initParameter() {
         if (getIntent() != null) {
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
-            currentType = getIntent().getIntExtra(IntentExtra.TYPE, ACCESS_LIST_TYPE);
         }
     }
 
@@ -59,18 +62,20 @@ public class AccessListActivity extends BaseActivity implements AccessListAdapte
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.recyclerView.setLayoutManager(layoutManager);
         binding.recyclerView.setAdapter(adapter);
-
-        TauDaemonAlertHandler tauDaemonHandler = TauDaemon.getInstance(getApplicationContext()).getTauDaemonHandler();
-        adapter.submitList(tauDaemonHandler.getOnlinePeersList(chainID));
-        tauDaemonHandler.getOnlinePeerData()
-                .observe(this, set -> {
-                    adapter.submitList(tauDaemonHandler.getOnlinePeersList(chainID));
-                });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        disposables.add(ObservableUtil.intervalSeconds(2, true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(l -> {
+                    List<String> activeList = tauDaemon.getActiveList(chainID);
+                    if (activeList != null && activeList.size() > 0) {
+                        adapter.submitList(activeList);
+                    }
+                }));
     }
 
     @Override
