@@ -186,11 +186,11 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
             retweetDialog.closeDialog();
         }
         retweetDialog = new PopUpDialog.Builder(this)
-                .addItems(R.mipmap.icon_retweet, getString(R.string.common_retweet))
+                .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet))
                 .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share))
                 .setOnItemClickListener((dialog, name, code) -> {
                     dialog.cancel();
-                    if (code == R.mipmap.icon_retweet) {
+                    if (code == R.mipmap.icon_retwitt) {
                         Intent intent = new Intent();
                         intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
                         intent.putExtra(IntentExtra.LINK, tx.link);

@@ -60,7 +60,6 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
         private final ItemNewsBinding binding;
         private final ClickListener listener;
         private final int nameColor;
-        private final int replyColor;
         private final int linkDrawableSize;
 
         ViewHolder(ItemNewsBinding binding, ClickListener listener) {
@@ -68,7 +67,6 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             this.binding = binding;
             this.listener = listener;
             this.nameColor = binding.getRoot().getResources().getColor(R.color.color_black);
-            this.replyColor = binding.getRoot().getResources().getColor(R.color.color_blue_link);
             this.linkDrawableSize = binding.getRoot().getResources().getDimensionPixelSize(R.dimen.widget_size_14);
 //            this.drawable = DrawablesUtil.getDrawable(binding.getRoot().getContext(),
 //                    R.mipmap.icon_share_link, linkDrawableSize, linkDrawableSize);

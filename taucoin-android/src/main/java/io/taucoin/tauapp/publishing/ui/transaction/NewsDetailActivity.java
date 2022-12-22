@@ -38,6 +38,7 @@ import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.KeyboardUtils;
 import io.taucoin.tauapp.publishing.core.utils.LinkUtil;
 import io.taucoin.tauapp.publishing.core.utils.Logarithm;
+import io.taucoin.tauapp.publishing.core.utils.ObservableUtil;
 import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
@@ -69,6 +70,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
     private int currentPos = 0;
     private boolean isScrollToTop = true;
     private boolean isLoadMore = false;
+    private boolean dataChanged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,6 +153,15 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         });
         loadData(0);
 
+        disposables.add(ObservableUtil.intervalSeconds(1)
+                .subscribeOn(Schedulers.io())
+                .subscribe(o -> {
+                    if (dataChanged) {
+                        loadData(0);
+                        dataChanged = false;
+                    }
+                }));
+
         disposables.add(txViewModel.observeDataSetChanged()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -158,7 +169,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
                     // 跟当前用户有关系的才触发刷新
                     if (result != null && StringUtil.isNotEmpty(result.getMsg())) {
                         // 立即执行刷新
-                        loadData(0);
+                        dataChanged = true;
                     }
                 }));
     }
@@ -259,11 +270,11 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
                 retweetDialog.closeDialog();
             }
             retweetDialog = new PopUpDialog.Builder(this)
-                    .addItems(R.mipmap.icon_retweet, getString(R.string.common_retweet))
+                    .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet))
                     .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share))
                     .setOnItemClickListener((dialog, name, code) -> {
                         dialog.cancel();
-                        if (code == R.mipmap.icon_retweet) {
+                        if (code == R.mipmap.icon_retwitt) {
                             Intent intent = new Intent();
                             intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
                             intent.putExtra(IntentExtra.LINK, tx.link);

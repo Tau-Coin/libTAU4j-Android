@@ -21,7 +21,7 @@
             android:layout_height="@dimen/widget_size_24"
             android:layout_marginEnd="@dimen/widget_size_5"
             android:contentDescription="@null"
-            android:src="@mipmap/icon_retweet"/>
+            android:src="@mipmap/icon_retwitt"/>
 
         <TextView
             android:id="@+id/tv_item_title"

@@ -170,8 +170,8 @@
 
                 <ImageView
                     android:id="@+id/iv_ban"
-                    android:layout_width="@dimen/widget_size_22"
-                    android:layout_height="@dimen/widget_size_22"
+                    android:layout_width="@dimen/widget_size_20"
+                    android:layout_height="@dimen/widget_size_20"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@null"
                     android:src="@mipmap/icon_ban_gray"/>
@@ -179,15 +179,15 @@
             </FrameLayout>
 
             <LinearLayout
-                android:gravity="center_horizontal"
+                android:gravity="center_horizontal|center"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/iv_chat"
-                    android:layout_width="@dimen/widget_size_22"
-                    android:layout_height="@dimen/widget_size_22"
+                    android:layout_width="@dimen/widget_size_20"
+                    android:layout_height="@dimen/widget_size_20"
                     android:contentDescription="@null"
                     android:src="@mipmap/icon_chat"/>
 
@@ -203,15 +203,15 @@
             </LinearLayout>
 
             <LinearLayout
-                android:gravity="center_horizontal"
+                android:gravity="center_horizontal|center"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/iv_reply"
-                    android:layout_width="@dimen/widget_size_22"
-                    android:layout_height="@dimen/widget_size_22"
+                    android:layout_width="@dimen/widget_size_20"
+                    android:layout_height="@dimen/widget_size_20"
                     android:contentDescription="@null"
                     android:src="@mipmap/icon_reply_news"/>
 
@@ -233,8 +233,8 @@
 
                 <ImageView
                     android:id="@+id/iv_retweet"
-                    android:layout_width="@dimen/widget_size_26"
-                    android:layout_height="@dimen/widget_size_26"
+                    android:layout_width="@dimen/widget_size_24"
+                    android:layout_height="@dimen/widget_size_24"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@null"
                     android:src="@mipmap/icon_retwitt"/>
