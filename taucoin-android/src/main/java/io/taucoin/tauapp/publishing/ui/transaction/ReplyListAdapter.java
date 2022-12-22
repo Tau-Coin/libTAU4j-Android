@@ -27,17 +27,17 @@ import io.taucoin.tauapp.publishing.core.utils.Logarithm;
 import io.taucoin.tauapp.publishing.core.utils.SpanUtils;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
-import io.taucoin.tauapp.publishing.databinding.ItemNewsBinding;
+import io.taucoin.tauapp.publishing.databinding.ItemReplyBinding;
 import io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView;
 
 /**
  * Market 列表显示的Adapter
  */
-public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.ViewHolder> {
+public class ReplyListAdapter extends ListAdapter<UserAndTx, ReplyListAdapter.ViewHolder> {
 
     private final ClickListener listener;
 
-    NewsListAdapter(ClickListener listener) {
+    ReplyListAdapter(ClickListener listener) {
         super(diffCallback);
         this.listener = listener;
     }
@@ -46,8 +46,8 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ItemNewsBinding binding = DataBindingUtil.inflate(inflater,
-                R.layout.item_news, parent, false);
+        ItemReplyBinding binding = DataBindingUtil.inflate(inflater,
+                R.layout.item_reply, parent, false);
         return new ViewHolder(binding, listener);
     }
 
@@ -57,13 +57,13 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private final ItemNewsBinding binding;
+        private final ItemReplyBinding binding;
         private final ClickListener listener;
         private final int nameColor;
         private final int replyColor;
         private final int linkDrawableSize;
 
-        ViewHolder(ItemNewsBinding binding, ClickListener listener) {
+        ViewHolder(ItemReplyBinding binding, ClickListener listener) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
@@ -79,6 +79,17 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                 return;
             }
             binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
+
+            boolean isShowRepliedKey = StringUtil.isNotEmpty(tx.repliedKey);
+            binding.tvReply.setVisibility(isShowRepliedKey ? View.VISIBLE : View.GONE);
+            if (isShowRepliedKey) {
+                SpannableStringBuilder reply = new SpanUtils()
+                        .append("reply")
+                        .append("@" + UsersUtil.getLastPublicKey(tx.repliedKey, 4))
+                        .setForegroundColor(replyColor)
+                        .create();
+                binding.tvReply.setText(reply);
+            }
 
             String userName = UsersUtil.getShowName(tx.sender);
             userName = null == userName ? "" : userName;
@@ -114,9 +125,6 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             binding.tvLink.setText(tx.link);
             binding.tvLink.setVisibility(isShowLink ? View.VISIBLE : View.GONE);
 
-            binding.tvRepliesNum.setText(FmtMicrometer.fmtLong(tx.repliesNum));
-            binding.tvChatNum.setText(FmtMicrometer.fmtLong(tx.chatsNum));
-
             // 添加link解析
             binding.tvMsg.setAutoLinkMask(0);
             Linkify.addLinks(binding.tvMsg, Linkify.WEB_URLS);
@@ -144,9 +152,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
 
                 @Override
                 public void onClick(AutoLinkTextView view) {
-                    if (listener != null) {
-                        ((ClickListener) listener).onItemClicked(tx);
-                    }
+
                 }
 
                 @Override
@@ -166,26 +172,10 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             autoLinkTextView.setAutoLinkListener(autoLinkListener);
         }
 
-        private void setClickListener(ItemNewsBinding binding, UserAndTx tx) {
+        private void setClickListener(ItemReplyBinding binding, UserAndTx tx) {
             binding.ivHeadPic.setOnClickListener(view ->{
                 if (listener != null) {
                     listener.onUserClicked(tx.senderPk);
-                }
-            });
-
-            binding.ivRetweet.setOnClickListener(view -> {
-                if (listener != null) {
-                    listener.onRetweetClicked(tx);
-                }
-            });
-            binding.ivReply.setOnClickListener(view -> {
-                if (listener != null) {
-                    listener.onReplyClicked(tx);
-                }
-            });
-            binding.ivChat.setOnClickListener(view -> {
-                if (listener != null) {
-                    listener.onChatClicked(tx);
                 }
             });
             binding.ivLongPress.setOnClickListener(view -> {
@@ -201,11 +191,6 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             binding.tvLink.setOnClickListener(view -> {
                 if (listener != null) {
                     listener.onLinkClick(tx.link);
-                }
-            });
-            binding.getRoot().setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onItemClicked(tx);
                 }
             });
             binding.getRoot().setOnLongClickListener(v -> {
@@ -225,10 +210,6 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
     }
 
     public interface ClickListener {
-        void onRetweetClicked(UserAndTx tx);
-        void onReplyClicked(UserAndTx tx);
-        void onChatClicked(UserAndTx tx);
-        void onItemClicked(UserAndTx tx);
         void onUserClicked(String publicKey);
         void onItemLongClicked(TextView view, UserAndTx tx);
         void onLinkClick(String link);

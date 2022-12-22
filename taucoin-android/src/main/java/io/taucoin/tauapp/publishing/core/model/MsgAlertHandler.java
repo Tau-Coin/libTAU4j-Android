@@ -221,7 +221,7 @@ class MsgAlertHandler {
         // airdrop coins
         String memo = appContext.getString(R.string.tx_memo_airdrop);
         long amount = member.airdropCoins;
-        long fee = getAverageTxFee(chainID, TxType.WIRING_TX);;
+        long fee = getAverageTxFee(chainID);
         TxContent txContent = new TxContent(TxType.WIRING_TX.getType(), memo);
         TxQueue tx = new TxQueue(chainID, currentPk, friendPk, amount, fee, 1,
                 TxType.WIRING_TX.getType(), txContent.getEncoded());
@@ -281,26 +281,16 @@ class MsgAlertHandler {
         daemon.updateTxQueue(tx.chainID);
     }
 
-    private long getAverageTxFee(String chainID, TxType type) {
+    private long getAverageTxFee(String chainID) {
         long txFee;
         try {
             TxFreeStatistics statistics = txRepo.queryAverageTxsFee(chainID);
-            if (type == WIRING_TX) {
-                txFee = Constants.WIRING_MIN_FEE.longValue();
-                if (statistics != null) {
-                    float wiringRate = statistics.getWiringCount() * 100f / statistics.getTotal();
-                    if (wiringRate >= 50) {
-                        long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
-                        txFee = averageTxsFee + Constants.COIN.longValue();
-                    }
-                }
-            } else {
-                txFee = Constants.NEWS_MIN_FEE.longValue();
-                if (statistics != null) {
+            txFee = Constants.WIRING_MIN_FEE.longValue();
+            if (statistics != null) {
+                float wiringRate = statistics.getWiringCount() * 100f / statistics.getTotal();
+                if (wiringRate >= 50) {
                     long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
-                    if (averageTxsFee > Constants.NEWS_MIN_FEE.longValue()) {
-                        txFee = averageTxsFee + Constants.COIN.longValue();
-                    }
+                    txFee = averageTxsFee + Constants.COIN.longValue();
                 }
             }
         } catch (Exception e) {

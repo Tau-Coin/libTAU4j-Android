@@ -81,7 +81,7 @@
     <string name="main_no_ipv4">IPv4 not found</string>
     <string name="main_data_used_up">Daily Data Limit Used - click to increase. </string>
     <string name="main_insufficient_device_space">Insufficient device space</string>
-    <string name="main_paste_link">Search or Paste Link</string>
+    <string name="main_paste_link">Paste Link</string>
 
     <string name="main_tab_all">Home</string>
     <string name="main_tab_community">Communities</string>
@@ -309,9 +309,9 @@
     <string name="setting_title">Settings</string>
 
     <string name="setting_community_qr_explain" formatted="false"><Data><![CDATA[Please join \"%1$s\" community in the TAU network, an unrestricted and serverless social media from taucoin.io;
-paste the following link to app search box and receive %2$d coins for posting news.<br/>%3$s <img src="%4$d">]]></Data></string>
+paste the following link to app search box and receive %2$d coins for posting news.<br/><br/>%3$s <img src="%4$d">]]></Data></string>
     <string name="setting_community_qr_share">Please join \"%1$s\" community in the TAU network, an unrestricted and serverless social media from taucoin.io;
-paste the following link to app search box and receive %2$d coins for posting news.\n%3$s</string>
+paste the following link to app search box and receive %2$d coins for posting news.\n\n%3$s</string>
     <string name="setting_key_explain">Address is the public key derived from your device random seed.</string>
     <string name="setting_account">Address</string>
     <string name="setting_nickname">Nickname</string>
@@ -463,6 +463,7 @@ paste the following link to app search box and receive %2$d coins for posting ne
     <string name="tx_select_community">Community</string>
     <string name="tx_invitation_title">Title</string>
     <string name="tx_communities_more">More&#8230;</string>
+    <string name="tx_select_target_community">Select target community:</string>
     <string name="tx_what_happening">What\'s happening?</string>
     <string name="tx_link_http">optional https://… or tau://… link</string>
     <string name="tx_your_reply">Your reply</string>
@@ -492,7 +493,7 @@ paste the following link to app search box and receive %2$d coins for posting ne
     <string name="tx_error_invalid_airdrop_link">Invalid airdrop link</string>
     <string name="tx_error_invalid_free">Invalid Transaction free</string>
     <string name="tx_error_min_free">Transaction fee cannot be less than %1$s</string>
-    <string name="tx_error_wiring_balance_no_enough">Insufficient Balance :\nBalance &#60;= 100</string>
+    <string name="tx_error_wiring_balance_no_enough">You need more than 100 coins to wire others.</string>
     <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Balance</string>
     <string name="tx_error_no_enough_coins_for_fee">Insufficient Balance :\nTransaction Fee > Balance</string>
     <string name="tx_error_insufficient_balance">Insufficient Balance</string>
@@ -531,7 +532,7 @@ paste the following link to app search box and receive %2$d coins for posting ne
     <string name="tx_sell_direct_talk">Connect</string>
     <string name="tx_sell_add_friend">Add\nFriend</string>
     <string name="tx_unknown">Unknown Transaction</string>
-    <string name="tx_community_creator_selling"> I am creator of "%s" community. Hello World. </string>
+    <string name="tx_community_creator_selling">I am creator of %s community.\nHello World.</string>
 
     <string name="escrow_now">Escrow Now</string>
     <string name="escrow_tip">Need an escrow service for p2p trading?\nConnect to the largest holder.</string>

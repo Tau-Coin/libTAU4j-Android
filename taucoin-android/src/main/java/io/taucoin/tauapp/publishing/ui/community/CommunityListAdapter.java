@@ -7,6 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
@@ -80,31 +83,12 @@ public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapt
                 return;
             }
             String communityName = ChainIDUtil.getName(member.chainID);
-//            String firstLetters = StringUtil.getFirstLettersOfName(communityName);
-//            binding.rbCommunity.setText(firstLetters);
-//            int bgColor = Utils.getGroupColor(member.chainID);
-//            binding.rbCommunity.setBgColor(bgColor);
-//
-//            boolean isLondonPMC = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID_1);
-//            boolean isSanFrancisco = StringUtil.isEquals(member.chainID, BuildConfig.TEST_CHAIN_ID_2);
-//            binding.rbCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.GONE : View.VISIBLE);
-//            binding.ivCommunity.setVisibility(isLondonPMC || isSanFrancisco ? View.VISIBLE : View.GONE);
-//            if (isLondonPMC) {
-//                binding.ivCommunity.setImageRes(R.mipmap.icon_london_pmc);
-//            } else if (isSanFrancisco) {
-//                binding.ivCommunity.setImageRes(R.mipmap.icon_san_francisco);
-//            }
             String communityCode = ChainIDUtil.getCode(member.chainID);
             String balance = FmtMicrometer.fmtBalance(member.balance);
             binding.tvName.setText(context.getString(R.string.main_community_name_balance,
                     communityName, communityCode, balance));
             binding.ivSelected.setVisibility(StringUtil.isEquals(adapter.getChainID(), member.chainID)
                     ? View.VISIBLE : View.INVISIBLE);
-            binding.getRoot().setOnClickListener(v -> {
-                adapter.setChainID(member.chainID);
-                binding.ivSelected.setVisibility(View.VISIBLE);
-                adapter.notifyDataSetChanged();
-            });
         }
     }
 
