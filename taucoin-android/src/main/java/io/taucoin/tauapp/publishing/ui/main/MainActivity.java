@@ -405,7 +405,7 @@ public class MainActivity extends ScanTriggerActivity {
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        updateViewChanged();
+//        updateViewChanged();
     }
 
     private boolean isEmptyView() {
