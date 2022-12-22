@@ -55,12 +55,12 @@ import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 /**
  * news detail
  */
-public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.BaseClickListener,
+public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter.ClickListener,
         BGARefreshLayout.BGARefreshLayoutDelegate {
     private ActivityNewsDetailBinding binding;
     private TxViewModel txViewModel;
     private UserViewModel userViewModel;
-    private NewsListAdapter adapter;
+    private ReplyListAdapter adapter;
     private FloatMenu operationsMenu;
     private PopUpDialog retweetDialog;
     private final CompositeDisposable disposables = new CompositeDisposable();
@@ -109,7 +109,7 @@ public class NewsDetailActivity extends BaseActivity implements NewsListAdapter.
             getRecyclerView().setLayoutManager(layoutManager);
             getRecyclerView().setItemAnimator(null);
         }
-        adapter = new NewsListAdapter(this, true);
+        adapter = new ReplyListAdapter(this);
         binding.txList.setAdapter(adapter);
     }
 

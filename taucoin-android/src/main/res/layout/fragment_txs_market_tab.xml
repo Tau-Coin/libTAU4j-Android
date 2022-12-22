@@ -94,8 +94,8 @@
             android:gravity="center_vertical"
             android:paddingStart="@dimen/widget_size_10"
             android:paddingEnd="@dimen/widget_size_10"
-            android:paddingTop="@dimen/widget_size_5"
-            android:paddingBottom="@dimen/widget_size_5"
+            android:paddingTop="@dimen/widget_size_8"
+            android:paddingBottom="@dimen/widget_size_8"
             android:layout_marginBottom="@dimen/widget_size_1"
             android:background="@color/color_white">
 
@@ -103,7 +103,7 @@
                 android:layout_width="@dimen/widget_size_16"
                 android:layout_height="@dimen/widget_size_16"
                 android:contentDescription="@null"
-                android:src="@mipmap/icon_notice_red"/>
+                android:src="@mipmap/icon_warning_orange"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -111,8 +111,10 @@
                 android:layout_marginStart="@dimen/widget_size_5"
                 android:includeFontPadding="false"
                 android:text="@string/community_low_linked"
-                android:textAppearance="@style/TextAppearanceBody3"
-                android:textColor="@color/color_red" />
+                android:textAppearance="@style/TextAppearanceBody2"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="@color/color_yellow" />
 
         </LinearLayout>
 

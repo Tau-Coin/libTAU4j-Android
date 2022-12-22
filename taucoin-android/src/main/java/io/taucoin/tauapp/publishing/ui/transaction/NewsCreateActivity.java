@@ -48,6 +48,8 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     private CommunityListAdapter adapter;
     private CommunityViewModel communityViewModel;
     private final CompositeDisposable disposables = new CompositeDisposable();
+    private final List<Member> communityList = new ArrayList<>();
+    private CommunitiesPopUpDialog popUpDialog;
     private String chainID;
     private String repliedHash;
     private String repliedKey;
@@ -55,8 +57,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     private CharSequence msg;
     private String link;
     private int onlinePeers = -1;
-    private final List<Member> communityList = new ArrayList<>();
-    private CommunitiesPopUpDialog popUpDialog;
+    private boolean isReteitt = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,10 +109,14 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
             binding.etLink.setText(txContent.getLinkStr());
             binding.etLink.setSelection(binding.etLink.getText().length());
             binding.etLink.setEnabled(false);
+            isReteitt = txQueue.queueType == 3;
         } else if (StringUtil.isNotEmpty(msg)) {
             binding.etLink.setText(link);
             binding.etNews.setText(msg.toString());
             binding.etNews.setSelection(binding.etNews.getText().length());
+            isReteitt = true;
+        }
+        if (isReteitt) {
             binding.tvPost.setText(R.string.common_retweet);
         }
         binding.etNews.setOnFocusChangeListener(this);
@@ -120,6 +125,17 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         adapter = new CommunityListAdapter();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.joinedList.setLayoutManager(layoutManager);
+        binding.joinedList.setOnItemClickListener((view, adapterPosition) -> {
+            Member member = adapter.getCurrentList().get(adapterPosition);
+            this.chainID = member.chainID;
+            adapter.setChainID(member.chainID);
+            List<Member> list = new ArrayList<>(adapter.getCurrentList());
+            list.remove(member);
+            list.add(0, member);
+            adapter.submitList(list);
+            adapter.notifyDataSetChanged();
+            loadAverageTxFee();
+        });
         binding.joinedList.setAdapter(adapter);
 
         boolean isShowCommunities = StringUtil.isEmpty(chainID);
@@ -219,11 +235,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
             }
         });
 
-        disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.NEWS_TX)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::loadFeeView));
-
         if (StringUtil.isEmpty(chainID)) {
             disposables.add(communityViewModel.observerJoinedCommunityList()
                     .subscribeOn(Schedulers.io())
@@ -245,6 +256,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                                 if (list.size() > 0) {
                                     this.chainID = list.get(0).chainID;
                                     adapter.setChainID(this.chainID);
+                                    loadAverageTxFee();
                                 }
                                 adapter.submitList(list);
                             }
@@ -264,7 +276,15 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                     }, it -> {
                         loadInterimBalanceView(0);
                     }));
+            loadAverageTxFee();
         }
+    }
+
+    private void loadAverageTxFee() {
+        disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.NEWS_TX, isReteitt)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::loadFeeView));
     }
 
     public void showOrHideLowLinkedView(boolean show) {
@@ -309,6 +329,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         NewsContent content = new NewsContent(news, link, repliedHash, repliedKey);
         TxQueue tx = new TxQueue(chainID, senderPk, senderPk, 0L,
                 FmtMicrometer.fmtTxLongValue(fee), TxType.NEWS_TX, content.getEncoded());
+        tx.queueType = isReteitt ? 3 : 0;
         if (txQueue != null) {
             tx.queueID = txQueue.queueID;
             tx.queueTime = txQueue.queueTime;
@@ -379,6 +400,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                     this.chainID = member.chainID;
                     adapter.setChainID(member.chainID);
                     adapter.notifyDataSetChanged();
+                    loadAverageTxFee();
                 }).create();
         popUpDialog.show();
     }

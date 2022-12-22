@@ -207,7 +207,7 @@ class TxQueueManager {
         boolean isSendMessage = false;
 		//1. 自动airdrop tx; 2. 自动referal tx
         if (txQueue.queueType == 1 || txQueue.queueType == 2) {
-            long medianFee = getAverageTxFee(txQueue.chainID, TxType.WIRING_TX);
+            long medianFee = getAverageTxFee(txQueue.chainID);
             if (txQueue.fee != medianFee) {
                 txQueue.fee = medianFee;
                 // 更新airdrop的交易费
@@ -227,26 +227,16 @@ class TxQueueManager {
         return false;
     }
 
-    private long getAverageTxFee(String chainID, TxType type) {
+    private long getAverageTxFee(String chainID) {
         long txFee;
         try {
             TxFreeStatistics statistics = txRepo.queryAverageTxsFee(chainID);
-            if (type == WIRING_TX) {
-                txFee = Constants.WIRING_MIN_FEE.longValue();
-                if (statistics != null) {
-                    float wiringRate = statistics.getWiringCount() * 100f / statistics.getTotal();
-                    if (wiringRate >= 50) {
-                        long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
-                        txFee = averageTxsFee + Constants.COIN.longValue();
-                    }
-                }
-            } else {
-                txFee = Constants.NEWS_MIN_FEE.longValue();
-                if (statistics != null) {
+            txFee = Constants.WIRING_MIN_FEE.longValue();
+            if (statistics != null) {
+                float wiringRate = statistics.getWiringCount() * 100f / statistics.getTotal();
+                if (wiringRate >= 50) {
                     long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
-                    if (averageTxsFee > Constants.NEWS_MIN_FEE.longValue()) {
-                        txFee = averageTxsFee + Constants.COIN.longValue();
-                    }
+                    txFee = averageTxsFee + Constants.COIN.longValue();
                 }
             }
         } catch (Exception e) {

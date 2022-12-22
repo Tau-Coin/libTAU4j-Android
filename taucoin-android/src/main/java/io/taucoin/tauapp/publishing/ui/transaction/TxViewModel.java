@@ -425,13 +425,14 @@ public class TxViewModel extends AndroidViewModel {
                 return false;
             }
         } else {
+            long minTxFee = tx.txType == 3 ? Constants.RETWITT_MIN_FEE.longValue() : Constants.NEWS_MIN_FEE.longValue();
             //TODO: news tx valid?
             if (tx.fee < 0) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_free);
                 return false;
-            } else if (tx.fee < Constants.NEWS_MIN_FEE.longValue()) {
+            } else if (tx.fee < minTxFee) {
                 String minFee = getApplication().getString(R.string.tx_error_min_free,
-                        FmtMicrometer.fmtFeeValue(Constants.NEWS_MIN_FEE.longValue()));
+                        FmtMicrometer.fmtFeeValue(minTxFee));
                 ToastUtils.showShortToast(minFee);
                 return false;
             } else if (tx.fee > displayBalance) {
@@ -495,11 +496,14 @@ public class TxViewModel extends AndroidViewModel {
 
     /**
      * 1、转账交易费默认还是1；只有达到50%才平均交易费+1；
-     * 2、news最小交易费为5，平均交易费超过5，就+1；
+     * 2、news最小交易费为10，平均交易费超过10，就+1；
      * 3、这里只是设置默认值，只能动态修改airdrop和referral的交易费；
      * @param chainID 交易所属的社区chainID
      */
     public Observable<Long> observeAverageTxFee(String chainID, TxType type) {
+        return observeAverageTxFee(chainID, type, false);
+    }
+    public Observable<Long> observeAverageTxFee(String chainID, TxType type, boolean isRetwitt) {
         return Observable.create((ObservableOnSubscribe<Long>) emitter -> {
             long txFee;
             try {
@@ -522,7 +526,7 @@ public class TxViewModel extends AndroidViewModel {
                         }
                     }
                 } else {
-                    txFee = Constants.NEWS_MIN_FEE.longValue();
+                    txFee = isRetwitt ? Constants.RETWITT_MIN_FEE.longValue() : Constants.NEWS_MIN_FEE.longValue();
                     if (statistics != null && statistics.getTxsCount() > 0) {
                         long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
                         if (averageTxsFee > Constants.NEWS_MIN_FEE.longValue()) {
