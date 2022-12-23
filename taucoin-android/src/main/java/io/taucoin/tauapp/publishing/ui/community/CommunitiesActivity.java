@@ -114,21 +114,17 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         long balance = 0;
         long pendingBalance = 0;
         long power = 0;
-        long mIncomePending = 0;
         if (member != null) {
             power = member.power;
-            long onChainBalance = member.mIncomePending + member.txIncome - member.txExpenditure;
-            pendingBalance = onChainBalance + member.txIncomePending - member.txExpenditurePending;
+            pendingBalance = member.txIncomePending - member.txExpenditurePending;
             // 余额根据libTAU balance减去计算上链为100%的金额
             //balance = member.balance - onChainBalance;
             balance = member.getDisplayBalance();
             balance = Math.max(0, balance);
 
-            logger.debug("loadMemberData balance::{}, showBalance::{}, onChainBalance::{}," +
-                            " pendingBalance::{}, mIncomePending::{}",
-                    member.balance, balance, onChainBalance, pendingBalance, member.mIncomePending);
-
-            mIncomePending = member.mIncomePending;
+            logger.debug("loadMemberData balance::{}, showBalance::{}, pendingBalance::{}," +
+                            " incomePending::{}, expenditurePending::{}",
+                    member.balance, balance, pendingBalance, member.txIncomePending, member.txExpenditurePending);
         }
 		//Modified tc
         binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));

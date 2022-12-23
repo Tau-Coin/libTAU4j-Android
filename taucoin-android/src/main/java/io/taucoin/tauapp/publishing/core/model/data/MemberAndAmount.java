@@ -7,9 +7,6 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
  * Room: 成员和Pending金额
  */
 public class MemberAndAmount extends Member {
-    public long mIncomePending;             // 上链挖矿上链收入：rate < 100%
-    public long txIncome;                   // 上链转账交易收入：rate < 100%
-    public long txExpenditure;              // 上链转账交易支出：rate < 100%
     public long txIncomePending;            // 未上链转账交易收入
     public long txExpenditurePending;       // 未上链转账交易支出
 
