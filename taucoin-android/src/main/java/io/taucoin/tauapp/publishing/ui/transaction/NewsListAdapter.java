@@ -8,7 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -35,7 +36,7 @@ import io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView;
  * Market 列表显示的Adapter
  */
 public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.ViewHolder> {
-
+    private static final Logger logger = LoggerFactory.getLogger("NewsListAdapter");
     private final ClickListener listener;
 
     NewsListAdapter(ClickListener listener) {
@@ -46,15 +47,22 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        long startTime = System.currentTimeMillis();
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ItemNewsBinding binding = DataBindingUtil.inflate(inflater,
                 R.layout.item_news, parent, false);
-        return new ViewHolder(binding, listener);
+        long endTime = System.currentTimeMillis();
+        ViewHolder viewHolder = new ViewHolder(binding, listener);
+        logger.debug("onCreateViewHolder::{}ms", endTime - startTime);
+        return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        long startTime = System.currentTimeMillis();
         holder.bind(holder, getItem(position));
+        long endTime = System.currentTimeMillis();
+        logger.debug("onBindViewHolder pos::{}, ::{}ms", position, endTime - startTime);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
