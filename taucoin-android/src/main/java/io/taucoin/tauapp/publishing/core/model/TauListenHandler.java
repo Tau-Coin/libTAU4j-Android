@@ -151,24 +151,39 @@ public class TauListenHandler {
                 // 处理区块回滚，
                 // 1、交易nonce大于libTAU的nonce，都置为未上链；
                 long nonce = account.getNonce();
-                int count = txRepo.updateAllOffChainTxs(chainID, userPk, nonce);
+                int count = txRepo.updateAllOffChainTxs(chainID, senderPk, nonce);
                 logger.info("onNewHeadBlock updateAllOffChainTxs count::{}, chainID::{}, userPk::{}, nonce::{}",
-                    count, chainID, userPk, nonce);
-                // 2、区块blockNumber大于最新head block的区块状态置为未上链；
-                long headBlock = block.getBlockNumber();
-                count = blockRepo.updateAllOffChainBlocks(chainID, headBlock);
-                logger.info("onNewHeadBlock updateAllOffChainBlocks count::{}, chainID::{}, headBlock::{}",
-                        count, chainID, headBlock);
+                    count, chainID, senderPk, nonce);
             }
+            // 2、区块blockNumber大于最新head block的区块状态置为未上链；
+            long headBlock = block.getBlockNumber();
+            long count = blockRepo.updateAllOffChainBlocks(chainID, headBlock);
+            logger.info("onNewHeadBlock updateAllOffChainBlocks count::{}, chainID::{}, headBlock::{}",
+                        count, chainID, headBlock);
         }
 
         handleBlockData(block, BlockStatus.NEW_BLOCK);
 
         updateTxQueue(block);
 
-        // 更新所有账户的信息
+        // 更新账户的信息
         if(accounts.size() > 0) {
+            // consensus state，更新所有用户
             onStateArray(block.getChainID(), accounts, true);
+        } else {
+            // 3.调整total offchain coins, 只调整当前用户
+            Account account = daemon.getAccountInfo(block.getChainID(), userPk);
+            if (account != null) {
+                long offchainCoins = txRepo.getChainTotalCoinsByNonce(chainID, userPk, account.getNonce());
+                Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
+                if (member != null) {
+                        member.balance = account.getBalance();
+                        member.totalOffchainCoins = offchainCoins;
+                        member.nonce = account.getNonce();
+                        member.power = account.getPower();
+                        memberRepo.updateMember(member);
+                    }
+                }
         }
 
         // 更新社区用户账户信息
@@ -702,30 +717,39 @@ public class TauListenHandler {
                 String peer = ByteUtil.toHexString(account.getPeer());
                 logger.info("UpdateMember onStateArray chainID::{}, publicKey::{}, balance::{}, nonce::{}, power::{}",
                         chainID, peer, account.getBalance(), account.getNonce(), account.getPower());
+
+                //txrepo交互
+                long offchainCoins = 0;
+                //只更新当前用户
+                if(peer.equals(MainApplication.getInstance().getPublicKey()))
+                    offchainCoins = txRepo.getChainTotalCoinsByNonce(chainID, peer, account.getNonce());
+
+                //Update txs
+                txRepo.updateAllOffChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Pending
+                txRepo.updateAllOnChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Settled
+
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, peer);
                 if (member != null) {
-                    if (member.balUpdateTime == 0 || member.balance != account.getBalance() ||
-                            member.nonce != account.getNonce() || member.power != account.getPower()) {
-                        member.balance = account.getBalance();
-                        member.balUpdateTime = modifiedTime;
-                        member.nonce = account.getNonce();
-                        member.power = account.getPower();
-                        memberRepo.updateMember(member);
-                    }
+                    member.consensusBalance = account.getBalance(); //consensusBalance只在这里更新
+                    member.balance = account.getBalance();
+                    member.totalPendingCoins = offchainCoins;
+                    member.totalOffchainCoins = offchainCoins;
+                    member.balUpdateTime = modifiedTime;
+                    member.nonce = account.getNonce();
+                    member.power = account.getPower();
+                    memberRepo.updateMember(member);
                 } else {
                     saveUserInfo(peer);
                     member = new Member(chainID, peer);
+                    member.consensusBalance = account.getBalance(); //consensusBalance只在这里更新
                     member.balance = account.getBalance();
+                    member.totalPendingCoins = offchainCoins;
+                    member.totalOffchainCoins = offchainCoins;
                     member.balUpdateTime = modifiedTime;
                     member.nonce = account.getNonce();
                     member.power = account.getPower();
                     memberRepo.addMember(member);
                 }
-
-                //Update txs
-                txRepo.updateAllOffChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Pending
-
-                txRepo.updateAllOnChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Settled
             }
 
             //遇到consensus block state清空

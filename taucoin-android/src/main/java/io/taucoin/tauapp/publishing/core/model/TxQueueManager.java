@@ -373,6 +373,7 @@ class TxQueueManager {
                         tx.chainID, tx.txID, tx.version, tx.senderPk, tx.receiverPk, tx.nonce, tx.txStatus, tx.memo);
             addUserInfoToLocal(tx);
             addMemberInfoToLocal(tx);
+            addPendingAndOffchainCoins(tx);
             TxLog log = new TxLog(tx.txID, TxLogStatus.SENT.getStatus(), DateUtil.getMillisTime());
             txRepo.addTxLog(log);
         }
@@ -394,6 +395,18 @@ class TxQueueManager {
         }
     }
 
+    /**
+     * 更新pending coins amount
+     */
+    private void addPendingAndOffchainCoins(Tx tx){
+        Member member = memberRepo.getMemberByChainIDAndPk(tx.chainID, tx.senderPk);
+        if(member != null) {
+            if(tx.txType == Constants.NEWS_TX_TYPE)
+                memberRepo.addPendingAndOffchainCoins(tx.chainID, tx.senderPk, tx.fee);
+            else if(tx.txType == Constants.WIRING_TX_TYPE)
+                memberRepo.addPendingAndOffchainCoins(tx.chainID, tx.senderPk, tx.fee + tx.amount);
+        }
+    }
     /**
      * 添加社区成员信息
      * @param tx 交易

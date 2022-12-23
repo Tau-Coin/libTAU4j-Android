@@ -83,6 +83,11 @@ public interface MemberDao {
             " UPDATE Members SET newsUnread = 0, balance = 0, power = 0, nonce = 0" +
             " WHERE chainID = :chainID AND balUpdateTime < :time";
 
+    String UPDATE_PENDING_OFFCHAIN_COINS= 
+            " UPDATE Members SET totalPendingCoins = totalPendingCoins + :amount," +
+            " totalOffchainCoins = totalOffchainCoins + :amount" +
+            " WHERE chainID = :chainID AND publicKey = :publicKey";
+
     String QUERY_CLEAR_NEWS_UNREAD = "UPDATE Members SET newsUnread = 0" +
             " WHERE publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
 
@@ -157,6 +162,9 @@ public interface MemberDao {
 
     @Query(QUERY_GET_MEMBER_BY_CHAIN_ID_PK)
     Single<Member> getMemberSingle(String chainID, String publicKey);
+
+    @Query(UPDATE_PENDING_OFFCHAIN_COINS)
+    void addPendingAndOffchainCoins(String chainID, String publicKey, long amount);
 
     @Query(RESET_MEMBER_STATE)
     void resetMembers(String chainID, long time);

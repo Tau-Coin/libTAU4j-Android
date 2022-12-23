@@ -18,7 +18,10 @@ public class Member implements Parcelable {
     public String chainID;              // 成员所属社区的chainID
     @NonNull
     public String publicKey;            // 成员的公钥
-    public long balance;                // 成员的balance
+    public long consensusBalance;       // 成员的consensusBalance
+    public long balance;                // 成员的balance, from libTAU getAccountInfo
+    public long totalPendingCoins;      // 成员花费的钱，包括交易费和给其他人的钱，onchain + offchain
+    public long totalOffchainCoins;     // 成员花费的钱，包括交易费和给其他人的钱，offchain
     public long balUpdateTime;          // 成员的balance更新时间
     public long power;                  // 成员的power
     public long pendingTime;            // 成员收到朋友转账动作（未上链）

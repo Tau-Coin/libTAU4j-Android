@@ -48,10 +48,10 @@ public interface TxDao {
             " ON tx.txID = ncc.repliedHash";
 
     // SQL:查询user and tx，care repliesNum and chatsNum
-    String QUERY_USER_AND_TX_CARE_NUM_AND_STATE = "SELECT tx.*, nrc.repliesNum, ncc.chatsNum, m.balance, m.power";
+    String QUERY_USER_AND_TX_CARE_NUM_AND_STATE = "SELECT tx.*, nrc.repliesNum, ncc.chatsNum, (m.balance-m.totalOffchainCoins) as balance, m.power";
 
     // SQL:查询user and tx，care member's state
-    String QUERY_USER_AND_TX_CARE_STATE = "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, m.balance, m.power";
+    String QUERY_USER_AND_TX_CARE_STATE = "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, (m.balance-m.totalOffchainCoins) as balance, m.power";
 
     // SQL:查询user and tx，only care tx
     String QUERY_USER_AND_TX = "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, 0 AS balance, 0 AS power";
@@ -239,6 +239,10 @@ public interface TxDao {
 			" AND senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " ORDER BY timestamp DESC limit 1";
 
+    String QUERY_TOTAL_COINS_BY_NONCE =
+            " SELECT SUM(fee)+SUM(amount) from Txs" +
+            " WHERE chainID = :chainID" +
+            " AND txType IN (2, 3) AND senderPk = :userPk AND nonce > :nonce";
     /**
      * 添加新的交易
      */
@@ -396,6 +400,10 @@ public interface TxDao {
 	//update status into ON_CHAIN
     @Query(UPDATE_ALL_ON_CHAIN_TXS)
     int updateAllOnChainTxs(String chainID, String userPk, long nonce);
+
+    //nonce前的交易总和
+    @Query(QUERY_TOTAL_COINS_BY_NONCE)
+    long getChainTotalCoinsByNonce(String chainID, String userPk, long nonce);
 
 	//获取最大的nonce
     @Query(QUERY_CHAIN_MAX_NONCE)

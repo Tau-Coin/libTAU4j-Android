@@ -242,6 +242,12 @@ public class TxRepositoryImpl implements TxRepository{
         return db.txDao().updateAllOnChainTxs(chainID, userPk, nonce);
     }
 
+    //nonce前的交易总和
+    @Override
+    public long getChainTotalCoinsByNonce(String chainID, String userPk, long nonce) {
+        return db.txDao().getChainTotalCoinsByNonce(chainID, userPk, nonce);
+    }
+
     @Override
     public long getChainMaxNonce(String chainID, String userPk) {
         return db.txDao().getChainMaxNonce(chainID, userPk);

@@ -159,6 +159,11 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
+    public void addPendingAndOffchainCoins(String chainID, String publicKey, long amount) {
+        db.memberDao().addPendingAndOffchainCoins(chainID, publicKey, amount);
+    }
+
+    @Override
     public void resetMembers(String chainID, long time) {
         db.memberDao().resetMembers(chainID, time);
     }

@@ -89,5 +89,10 @@ public interface MemberRepository {
      */
     void resetMembers(String chainID, long time);
     
+    /**
+     * 成员PendingAndOffchain Coins加 amount
+     */
+    void addPendingAndOffchainCoins(String chainID, String publicKey, long amount);
+    
     void clearNewsUnread();
 }
