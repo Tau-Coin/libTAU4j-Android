@@ -87,13 +87,13 @@ public class TxUtils {
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
                     .append(HashUtil.hashMiddleHide(tx.senderPk));
-            if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
-                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
-            } else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
-                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
-            }
+//            if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
+//                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
+//                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
+//            } else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
+//                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
+//                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
+//            }
         } else {
             msg.append(tx.memo);
         }
@@ -119,6 +119,12 @@ public class TxUtils {
                         .append("\n");
             }
         }
+        msg.append("Description: ").setForegroundColor(titleColor)
+                .append(tx.memo);
+        if (StringUtil.isNotEmpty(tx.link)) {
+            msg.append("\n").append("Link: ").setForegroundColor(titleColor)
+                    .append(tx.link);
+        }
         msg.append(tx.memo);
         if (tab == CommunityTabFragment.TAB_CHAIN) {
             msg.append("\n").append("Nonce: ").setForegroundColor(titleColor)
@@ -130,13 +136,13 @@ public class TxUtils {
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
                     .append(HashUtil.hashMiddleHide(tx.senderPk));
-            if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
-                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
-            } else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
-                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
-            }
+//            if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
+//                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
+//                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
+//            } else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
+//                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
+//                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
+//            }
         }
         return msg.create();
     }
@@ -171,13 +177,13 @@ public class TxUtils {
                 .append(HashUtil.hashMiddleHide(tx.receiverPk))
                 .append("\n").append("Hash: ").setForegroundColor(titleColor)
                 .append(HashUtil.hashMiddleHide(tx.txID));
-        if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN && showStatus) {
-            msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-                    .append(FmtMicrometer.fmtLong(tx.blockNumber));
-        } else if (tx.txStatus == Constants.TX_STATUS_SETTLED && showStatus) {
-            msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-                    .append(FmtMicrometer.fmtLong(tx.blockNumber));
-		}
+//        if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN && showStatus) {
+//            msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
+//                    .append(FmtMicrometer.fmtLong(tx.blockNumber));
+//        } else if (tx.txStatus == Constants.TX_STATUS_SETTLED && showStatus) {
+//            msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
+//                    .append(FmtMicrometer.fmtLong(tx.blockNumber));
+//		}
         msg.append("\n").append("Nonce: ").setForegroundColor(titleColor)
                 .append(FmtMicrometer.fmtLong(tx.nonce))
                 .append("\n").append("Memo: ").setForegroundColor(titleColor)
@@ -266,7 +272,10 @@ public class TxUtils {
                 }
             } else if (txType == TxType.NEWS_TX.getType()) {
                 NewsContent newsContent = new NewsContent(tx.content);
-                msg.append("\n").append(newsContent.getMemo());
+                msg.append("\n").append("Description::").append(newsContent.getMemo());
+                if (StringUtil.isNotEmpty(newsContent.getLinkStr())) {
+                    msg.append("\n").append("Link::").append(newsContent.getLinkStr());
+                }
             }
         }
         return msg.create();
