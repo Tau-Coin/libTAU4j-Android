@@ -14,7 +14,7 @@
         android:background="@color/color_chat_bg">
 
         <RelativeLayout
-            android:visibility="visible"
+            android:visibility="gone"
             android:id="@+id/ll_pinned_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

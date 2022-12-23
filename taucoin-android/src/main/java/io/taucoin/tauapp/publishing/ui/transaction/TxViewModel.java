@@ -659,26 +659,40 @@ public class TxViewModel extends AndroidViewModel {
             loadViewDisposable.dispose();
         }
         loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
-                    List<UserAndTx> txs = new ArrayList<>();
-                    try {
-                        int pageSize = Page.PAGE_SIZE;
-                        if (pos == 0 && initSize > pageSize) {
-                            pageSize = initSize;
-                        }
-                        txs = txRepo.loadNewsData(pos, pageSize);
-                        logger.debug("loadNewsData pos::{}, pageSize::{}, messages.size::{}",
-                                pos, pageSize, txs.size());
-//                        Collections.reverse(txs);
-                    } catch (Exception e) {
-                        logger.error("loadNewsData error::", e);
+            List<UserAndTx> txs = new ArrayList<>();
+            try {
+                int pageSize = Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
+                long startTime = System.currentTimeMillis();
+                txs = txRepo.loadNewsData(pos, pageSize);
+                long endTime = System.currentTimeMillis();
+                logger.debug("loadNewsData time::{}ms", endTime - startTime);
+                int preloadLoadSize = 8;
+                if (pos == 0 && txs != null && txs.size() > preloadLoadSize && txs.size() <= pageSize) {
+                    List<UserAndTx> preloadLoad = new ArrayList<>();
+                    for (int i = 0; i < preloadLoadSize; i++) {
+                        preloadLoad.add(txs.get(i));
                     }
-                    emitter.onNext(txs);
-                    emitter.onComplete();
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(messages -> {
-                    chainTxs.postValue(messages);
-                });
+                    emitter.onNext(preloadLoad);
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ignore) {}
+                }
+                logger.debug("loadNewsData pos::{}, pageSize::{}, messages.size::{}",
+                        pos, pageSize, txs.size());
+//                        Collections.reverse(txs);
+            } catch (Exception e) {
+                logger.error("loadNewsData error::", e);
+            }
+            emitter.onNext(txs);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(messages -> {
+            chainTxs.postValue(messages);
+        });
     }
 
     /**
@@ -691,25 +705,36 @@ public class TxViewModel extends AndroidViewModel {
             loadViewDisposable.dispose();
         }
         loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
-                    List<UserAndTx> txs = new ArrayList<>();
-                    try {
-                        int pageSize = Page.PAGE_SIZE;
-                        if (pos == 0 && initSize > pageSize) {
-                            pageSize = initSize;
-                        }
-                        txs = txRepo.loadNewsRepliesData(txID, pos, pageSize);
-                        logger.debug("loadNewsRepliesData txID::{}, pos::{}, pageSize::{}, messages.size::{}",
-                                txID, pos, pageSize, txs.size());
-                    } catch (Exception e) {
-                        logger.error("loadNewsRepliesData error::", e);
+            List<UserAndTx> txs = new ArrayList<>();
+            try {
+                int pageSize = Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
+                txs = txRepo.loadNewsRepliesData(txID, pos, pageSize);
+                int preloadLoadSize = 8;
+                if (pos == 0 && txs != null && txs.size() > preloadLoadSize && txs.size() <= pageSize) {
+                    List<UserAndTx> preloadLoad = new ArrayList<>();
+                    for (int i = 0; i < preloadLoadSize; i++) {
+                        preloadLoad.add(txs.get(i));
                     }
-                    emitter.onNext(txs);
-                    emitter.onComplete();
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(messages -> {
-                    chainTxs.postValue(messages);
-                });
+                    emitter.onNext(preloadLoad);
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ignore) {}
+                }
+                logger.debug("loadNewsRepliesData txID::{}, pos::{}, pageSize::{}, messages.size::{}",
+                        txID, pos, pageSize, txs.size());
+            } catch (Exception e) {
+                logger.error("loadNewsRepliesData error::", e);
+            }
+            emitter.onNext(txs);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(messages -> {
+            chainTxs.postValue(messages);
+        });
     }
 
     /**
@@ -729,7 +754,21 @@ public class TxViewModel extends AndroidViewModel {
                 if (pos == 0 && initSize > pageSize) {
                     pageSize = initSize;
                 }
+                long startTime = System.currentTimeMillis();
                 txs = txRepo.loadAllMarketData(chainID, pos, pageSize);
+                long endTime = System.currentTimeMillis();
+                logger.debug("loadMarketData time::{}ms", endTime - startTime);
+                int preloadLoadSize = 8;
+                if (pos == 0 && txs != null && txs.size() > preloadLoadSize && txs.size() <= pageSize) {
+                    List<UserAndTx> preloadLoad = new ArrayList<>();
+                    for (int i = 0; i < preloadLoadSize; i++) {
+                        preloadLoad.add(txs.get(i));
+                    }
+                    emitter.onNext(preloadLoad);
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ignore) {}
+                }
                 logger.debug("loadMarketData chainID::{}, pos::{}, pageSize::{}, messages.size::{}",
                         chainID, pos, pageSize, txs.size());
             } catch (Exception e) {

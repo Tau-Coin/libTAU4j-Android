@@ -1,5 +1,6 @@
 package io.taucoin.tauapp.publishing.ui.transaction;
 
+import android.graphics.drawable.Drawable;
 import android.text.SpannableStringBuilder;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -61,6 +62,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
         private final ClickListener listener;
         private final int nameColor;
         private final int linkDrawableSize;
+        private final Drawable drawable;
 
         ViewHolder(ItemNewsBinding binding, ClickListener listener) {
             super(binding.getRoot());
@@ -68,8 +70,8 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             this.listener = listener;
             this.nameColor = binding.getRoot().getResources().getColor(R.color.color_black);
             this.linkDrawableSize = binding.getRoot().getResources().getDimensionPixelSize(R.dimen.widget_size_14);
-//            this.drawable = DrawablesUtil.getDrawable(binding.getRoot().getContext(),
-//                    R.mipmap.icon_share_link, linkDrawableSize, linkDrawableSize);
+            this.drawable = DrawablesUtil.getDrawable(binding.getRoot().getContext(),
+                    R.mipmap.icon_share_link, linkDrawableSize, linkDrawableSize);
         }
 
         void bind(ViewHolder holder, UserAndTx tx) {
@@ -118,51 +120,50 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             // 添加link解析
             binding.tvMsg.setAutoLinkMask(0);
             Linkify.addLinks(binding.tvMsg, Linkify.WEB_URLS);
-            Pattern referral = Pattern.compile(LinkUtil.REFERRAL_PATTERN, 0);
-            Linkify.addLinks(binding.tvMsg, referral, null);
-            Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
-            Linkify.addLinks(binding.tvMsg, airdrop, null);
-            Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
-            Linkify.addLinks(binding.tvMsg, chain, null);
-            Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
-            Linkify.addLinks(binding.tvMsg, friend, null);
+            Linkify.addLinks(binding.tvMsg, LinkUtil.REFERRAL, null);
+            Linkify.addLinks(binding.tvMsg, LinkUtil.AIRDROP, null);
+            Linkify.addLinks(binding.tvMsg, LinkUtil.CHAIN, null);
+            Linkify.addLinks(binding.tvMsg, LinkUtil.FRIEND, null);
             binding.tvMsg.requestLayout();
 
             if (isShowLink) {
                 DrawablesUtil.setUnderLine(binding.tvLink);
-                DrawablesUtil.setEndDrawable(binding.tvLink, R.mipmap.icon_share_link, linkDrawableSize);
+                DrawablesUtil.setEndDrawable(binding.tvLink, drawable);
                 binding.tvLink.requestLayout();
             }
-
-            setAutoLinkListener(binding.tvMsg, tx);
+            binding.tvMsg.setTag(tx);
+            binding.tvMsg.setAutoLinkListener(autoLinkListener);
         }
 
-        public void setAutoLinkListener(AutoLinkTextView autoLinkTextView, UserAndTx tx) {
-            AutoLinkTextView.AutoLinkListener autoLinkListener = new AutoLinkTextView.AutoLinkListener() {
+        AutoLinkTextView.AutoLinkListener autoLinkListener = new AutoLinkTextView.AutoLinkListener() {
 
-                @Override
-                public void onClick(AutoLinkTextView view) {
-                    if (listener != null) {
-                        ((ClickListener) listener).onItemClicked(tx);
+            @Override
+            public void onClick(AutoLinkTextView view) {
+                if (listener != null) {
+                    Object tag = view.getTag();
+                    if (tag != null) {
+                        UserAndTx tx = (UserAndTx) view.getTag();
+                        listener.onItemClicked(tx);
                     }
                 }
+            }
 
-                @Override
-                public void onLongClick(AutoLinkTextView view) {
-                    if (listener != null) {
-                        listener.onItemLongClicked(view, tx);
-                    }
+            @Override
+            public void onLongClick(AutoLinkTextView view) {
+                Object tag = view.getTag();
+                if (tag != null) {
+                    UserAndTx tx = (UserAndTx) view.getTag();
+                    listener.onItemLongClicked(view, tx);
                 }
+            }
 
-                @Override
-                public void onLinkClick(String link) {
-                    if (listener != null) {
-                        listener.onLinkClick(link);
-                    }
+            @Override
+            public void onLinkClick(String link) {
+                if (listener != null) {
+                    listener.onLinkClick(link);
                 }
-            };
-            autoLinkTextView.setAutoLinkListener(autoLinkListener);
-        }
+            }
+        };
 
         private void setClickListener(ItemNewsBinding binding, UserAndTx tx) {
             binding.ivHeadPic.setOnClickListener(view ->{

@@ -35,6 +35,10 @@ public class DrawablesUtil {
         view.setCompoundDrawables(null, mDrawable, null, null);
     }
 
+    public static void setEndDrawable(TextView view, Drawable mDrawable) {
+        view.setCompoundDrawables(null, null, mDrawable, null);
+    }
+
     public static void setEndDrawable(TextView view, int drawable, float size) {
         Drawable mDrawable = getDrawable(view, drawable, size, size);
         view.setCompoundDrawables(null, null, mDrawable, null);

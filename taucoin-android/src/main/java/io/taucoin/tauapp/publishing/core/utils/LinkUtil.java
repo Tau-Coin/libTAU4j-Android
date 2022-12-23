@@ -39,6 +39,11 @@ public class LinkUtil {
     public static final String REFERRAL_PATTERN = PATTERN_PREFIX + LINK_AIRDROP + REFERRAL_PATTERN_SUFFIX;
     public static final String ALL_PATTERN = "[^\\s]*";
 
+    public static final Pattern REFERRAL = Pattern.compile(LinkUtil.REFERRAL_PATTERN, 0);
+    public static final Pattern AIRDROP = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
+    public static final Pattern CHAIN = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
+    public static final Pattern FRIEND = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
+
     public static boolean isTauUrl(String url) {
         return StringUtil.isNotEmpty(url) && url.startsWith("tau");
     }
