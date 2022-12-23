@@ -67,7 +67,7 @@
                     android:minHeight="@dimen/widget_size_44"
                     android:gravity="center_vertical"
                     android:onClick="onClick"
-                    app:lineLeftText="@string/community_added_members"
+                    app:lineLeftText="@string/community_added_members_title"
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
                 <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView

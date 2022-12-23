@@ -296,7 +296,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
 
     private void loadInterimBalanceView(long showBalance) {
         binding.tvInterimBalance.setText(getString(R.string.tx_interim_balance,
-                FmtMicrometer.fmtFeeValue(showBalance),
+                FmtMicrometer.fmtLong(showBalance),
                 ChainIDUtil.getCoinName(chainID)));
         binding.tvInterimBalance.setTag(showBalance);
     }
