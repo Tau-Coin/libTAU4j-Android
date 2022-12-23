@@ -56,7 +56,7 @@
     <string name="main_empty_create_communities">Create Coin Group</string>
     <string name="main_exit">Click again to exit the application!</string>
     <string name="main_community_name">%1$s - %2$s</string>
-    <string name="main_community_chat">News Thread Chat</string>
+    <string name="main_community_chat">News Topic Chat</string>
     <string name="main_community_name_balance">%1$s(%2$s)-balance %3$s</string>
     <string name="main_community_name_discovered">%1$s - %2$s - Discovered</string>
     <string name="main_community_name_total">%1$s - %2$s(%3$d)</string>
@@ -146,7 +146,7 @@
     <string name="community_renewal_date">Auto Renewal Date</string>
     <string name="community_info">Info</string>
     <string name="community_invite_link">Invite Link</string>
-    <string name="community_qr_code">Share Community and QR</string>
+    <string name="community_qr_code">Share This Community</string>
     <string name="community_blacklist_tip" formatted="false"><Data><![CDATA[No messages from <font color="#477df9">%1$s</font> until
     removed from \"setting>privacy>blacklist\".]]></Data></string>
 
@@ -268,6 +268,7 @@
     <string name="community_info_tips">* Mining Power is your total number of blocks mined, the higher
         the faster you may generate new blocks and get 10 coins reward. Any one can mine start with 0 power.\n*
         Difficulty measures chain security level, the higher the better.</string>
+    <string name="community_added_members_title">Add Members From Contacts</string>
     <string name="community_added_members">Add Members</string>
     <string name="community_added_members_empty">Please add or select friends first!</string>
     <string name="community_custom_airdrop_tips">Custom airdrop coins to friends</string>
@@ -308,10 +309,10 @@
 
     <string name="setting_title">Settings</string>
 
-    <string name="setting_community_qr_explain" formatted="false"><Data><![CDATA[Please join \"%1$s\" community in the TAU network, an unrestricted and serverless social media from taucoin.io;
-paste the following link to app search box and receive %2$d coins for posting news.<br/><br/>%3$s <img src="%4$d">]]></Data></string>
-    <string name="setting_community_qr_share">Please join \"%1$s\" community in the TAU network, an unrestricted and serverless social media from taucoin.io;
-paste the following link to app search box and receive %2$d coins for posting news.\n\n%3$s</string>
+    <string name="setting_community_qr_explain" formatted="false"><Data><![CDATA[Please join \"%1$s\" community in the TAU network, an unrestricted and serverless social media from https://taucoin.io;
+download the app and paste the following link to app search box and receive %2$d coins for posting news.<br/><br/>%3$s <img src="%4$d">]]></Data></string>
+    <string name="setting_community_qr_share">Please join \"%1$s\" community in the TAU network, an unrestricted and serverless social media from https://taucoin.io;
+download the app and paste the following link to app search box and receive %2$d coins for posting news.\n\n%3$s</string>
     <string name="setting_key_explain">Address is the public key derived from your device random seed.</string>
     <string name="setting_account">Address</string>
     <string name="setting_nickname">Nickname</string>
@@ -465,7 +466,7 @@ paste the following link to app search box and receive %2$d coins for posting ne
     <string name="tx_communities_more">More&#8230;</string>
     <string name="tx_select_target_community">Select target community:</string>
     <string name="tx_what_happening">What\'s happening?</string>
-    <string name="tx_link_http">optional https://… or tau://… link</string>
+    <string name="tx_link_http">optional https or tau link &#8230;</string>
     <string name="tx_your_reply">Your reply</string>
     <string name="tx_recent">Recent</string>
     <string name="tx_operation_reply">Reply</string>
