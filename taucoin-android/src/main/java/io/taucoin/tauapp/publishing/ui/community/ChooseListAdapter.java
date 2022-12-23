@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
-import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.databinding.ItemCommunityChooseBinding;
 
@@ -65,7 +64,7 @@ public class ChooseListAdapter extends ListAdapter<Member, ChooseListAdapter.Vie
             String communityCode = ChainIDUtil.getCode(member.chainID);
             binding.tvName.setText(context.getString(R.string.main_community_name, communityName, communityCode));
 
-            String balance = FmtMicrometer.fmtBalance(member.getDisplayBalance());
+            String balance = FmtMicrometer.fmtBalance(member.getInterimBalance());
 //            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
             String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_color_no_title,
                     balance);
@@ -98,6 +97,7 @@ public class ChooseListAdapter extends ListAdapter<Member, ChooseListAdapter.Vie
         public boolean areContentsTheSame(@NonNull Member oldItem, @NonNull Member newItem) {
             return oldItem.equals(newItem) &&
                     oldItem.balance == newItem.balance &&
+                    oldItem.totalOffchainCoins == newItem.totalOffchainCoins &&
                     oldItem.balUpdateTime == newItem.balUpdateTime &&
                     oldItem.pendingTime == newItem.pendingTime;
 //                    oldItem.rewardTime == newItem.rewardTime &&

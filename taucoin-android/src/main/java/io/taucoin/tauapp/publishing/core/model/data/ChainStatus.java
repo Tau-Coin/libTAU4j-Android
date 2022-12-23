@@ -20,7 +20,7 @@ public class ChainStatus {
     public long balUpdateTime;                   // 当前链用户余额更新时间
     public String forkPoint;                     // 当前链分叉点
 
-    public long getDisplayBalance() {
+    public long getInterimBalance() {
         return balance + Constants.TX_MAX_OVERDRAFT;
     }
 

@@ -65,7 +65,7 @@ public class UserCommunityListAdapter extends ListAdapter<MemberAndTime, UserCom
             String communityName = ChainIDUtil.getName(member.chainID);
             holder.binding.tvName.setText(communityName);
 
-            String balance = FmtMicrometer.fmtBalance(member.getDisplayBalance());
+            String balance = FmtMicrometer.fmtBalance(member.getInterimBalance());
 //            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
             String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time,
                     balance);

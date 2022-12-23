@@ -2,9 +2,7 @@ package io.taucoin.tauapp.publishing.ui.transaction;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.SpannableStringBuilder;
-import android.text.style.URLSpan;
 import android.text.util.Linkify;
 import android.view.View;
 import android.widget.TextView;
@@ -204,7 +202,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
 
             double showPower = Logarithm.log2(2 + tx.power);
             String power = FmtMicrometer.formatThreeDecimal(showPower);
-            String balance = FmtMicrometer.fmtBalance(tx.getDisplayBalance());
+            String balance = FmtMicrometer.fmtBalance(tx.getInterimBalance());
             binding.news.tvBalance.setText(balance);
             binding.news.tvPower.setText(power);
 

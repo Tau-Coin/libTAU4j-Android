@@ -238,11 +238,11 @@ public class TxViewModel extends AndroidViewModel {
         try {
             // 获取当前用户在社区中链上nonce值
             byte[] chainID = ChainIDUtil.encode(tx.chainID);
-            Account account = daemon.getAccountInfo(chainID, currentUser.publicKey);
-            if (null == account) {
-                result = context.getString(R.string.tx_error_send_failed);
-                return result;
-            }
+//            Account account = daemon.getAccountInfo(chainID, currentUser.publicKey);
+//            if (null == account) {
+//                result = context.getString(R.string.tx_error_send_failed);
+//                return result;
+//            }
             byte[] receiverPk = StringUtil.isEmpty(tx.receiverPk) ? null : ByteUtil.toByte(tx.receiverPk);
             long timestamp = isResend ? tx.timestamp : daemon.getSessionTime();
             byte[] txEncoded = null;
@@ -390,17 +390,12 @@ public class TxViewModel extends AndroidViewModel {
         return "";
     }
 
-    boolean validateTx(TxQueue tx) {
+    boolean validateTx(TxQueue tx, long paymentBalance) {
         if (StringUtil.isEmpty(tx.chainID)) {
             ToastUtils.showShortToast(R.string.tx_error_no_select_community);
             return false;
         }
-        byte[] chainID = ChainIDUtil.encode(tx.chainID);
-        String senderPk = MainApplication.getInstance().getPublicKey();
-        Account account = daemon.getAccountInfo(chainID, senderPk);
-        long balance = account != null ? account.getBalance() : 0;
         int type = tx.txType;
-        long displayBalance = balance + Constants.TX_MAX_OVERDRAFT;
         if (type == WIRING_TX.getType()) {
             if (StringUtil.isEmpty(tx.receiverPk) ||
                     ByteUtil.toByte(tx.receiverPk).length != Ed25519.PUBLIC_KEY_SIZE) {
@@ -417,10 +412,7 @@ public class TxViewModel extends AndroidViewModel {
                         FmtMicrometer.fmtFeeValue(Constants.WIRING_MIN_FEE.longValue()));
                 ToastUtils.showShortToast(minFee);
                 return false;
-            } else if (displayBalance > 0 && displayBalance <= Constants.TX_MAX_OVERDRAFT) {
-                ToastUtils.showShortToast(R.string.tx_error_wiring_balance_no_enough);
-                return false;
-            } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
+            } else if (tx.amount > paymentBalance || tx.amount + tx.fee > paymentBalance) {
                 ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
                 return false;
             }
@@ -435,7 +427,7 @@ public class TxViewModel extends AndroidViewModel {
                         FmtMicrometer.fmtFeeValue(minTxFee));
                 ToastUtils.showShortToast(minFee);
                 return false;
-            } else if (tx.fee > displayBalance) {
+            } else if (tx.fee > paymentBalance) {
                 ToastUtils.showShortToast(R.string.tx_error_no_enough_coins_for_fee);
                 return false;
             }
@@ -561,12 +553,12 @@ public class TxViewModel extends AndroidViewModel {
                 totalPay += friendPks.size() * txFee;
 
                 String senderPk = MainApplication.getInstance().getPublicKey();
-                Account account = daemon.getAccountInfo(ChainIDUtil.encode(chainID), senderPk);
-                long balance = 0L;
-                if (account != null) {
-                    balance = account.getBalance();
+                Member member = memberRepo.getMemberByChainIDAndPk(chainID, senderPk);
+                long paymentBalance = 0L;
+                if (member != null) {
+                    paymentBalance = member.getWiringPaymentBalance();
                 }
-                if (totalPay > balance) {
+                if (totalPay > paymentBalance) {
                     result.setFailMsg(application.getString(R.string.tx_error_insufficient_balance));
                 } else {
                     Set<String> friends = friendPks.keySet();

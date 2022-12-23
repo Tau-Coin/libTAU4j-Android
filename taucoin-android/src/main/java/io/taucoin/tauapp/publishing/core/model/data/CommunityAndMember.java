@@ -9,6 +9,7 @@ import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Community;
  */
 public class CommunityAndMember extends Community {
     public long balance;
+    public long paymentBalance;
     public long nonce;
     public int joined;
     public int msgUnread;
@@ -21,7 +22,7 @@ public class CommunityAndMember extends Community {
     }
 
     public boolean noBalance() {
-        return balance <= 0;
+        return paymentBalance <= 0;
     }
 
     public boolean isJoined() {
@@ -36,7 +37,15 @@ public class CommunityAndMember extends Community {
         return onChain() && nearExpired == 1;
     }
 
-    public long getDisplayBalance() {
+    public long getInterimBalance() {
         return balance + Constants.TX_MAX_OVERDRAFT;
+    }
+
+    public long getWiringPaymentBalance() {
+        return paymentBalance;
+    }
+
+    public long getNewsPaymentBalance() {
+        return paymentBalance + Constants.TX_MAX_OVERDRAFT;
     }
 }

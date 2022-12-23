@@ -117,7 +117,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
 //                } else {
                     double showPower = Logarithm.log2(2 + bean.power);
                     String power = FmtMicrometer.formatThreeDecimal(showPower);
-                    String balance = FmtMicrometer.fmtBalance(bean.getDisplayBalance());
+                    String balance = FmtMicrometer.fmtBalance(bean.getInterimBalance());
 //                    String time = DateUtil.formatTime(bean.balUpdateTime, DateUtil.pattern14);
                     String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_color,
                             balance, power);

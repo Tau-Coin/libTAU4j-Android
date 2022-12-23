@@ -45,7 +45,7 @@ public class UserAndTx extends Tx {
         return super.equals(o);
     }
 
-    public long getDisplayBalance() {
+    public long getInterimBalance() {
         return balance + Constants.TX_MAX_OVERDRAFT;
     }
 }

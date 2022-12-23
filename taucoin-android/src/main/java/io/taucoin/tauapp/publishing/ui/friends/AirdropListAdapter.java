@@ -16,7 +16,6 @@ import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.tauapp.publishing.core.utils.ChainIDUtil;
-import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.StringUtil;
 import io.taucoin.tauapp.publishing.databinding.ItemAirdropBinding;
@@ -94,7 +93,7 @@ public class AirdropListAdapter extends ListAdapter<Member, AirdropListAdapter.V
                 }
             });
             String name = ChainIDUtil.getName(member.chainID);
-            String balance = FmtMicrometer.fmtBalance(member.getDisplayBalance());
+            String balance = FmtMicrometer.fmtBalance(member.getInterimBalance());
             String nameAndBalance = context.getResources().getString(R.string.drawer_balance_name_color,
                     name, balance);
             binding.tvLeft.setText(Html.fromHtml(nameAndBalance));

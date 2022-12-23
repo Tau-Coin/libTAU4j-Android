@@ -98,7 +98,15 @@ public class Member implements Parcelable {
                         chainID.equals(((Member)o).chainID)));
     }
 
-    public long getDisplayBalance() {
-        return balance + Constants.TX_MAX_OVERDRAFT;
+    public long getInterimBalance() {
+        return balance + Constants.TX_MAX_OVERDRAFT - totalOffchainCoins;
+    }
+
+    public long getNewsPaymentBalance() {
+        return consensusBalance + Constants.TX_MAX_OVERDRAFT - totalPendingCoins;
+    }
+
+    public long getWiringPaymentBalance() {
+        return consensusBalance - totalPendingCoins;
     }
 }

@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.tauapp.publishing.R;
 import io.taucoin.tauapp.publishing.core.storage.sqlite.entity.Member;
-import io.taucoin.tauapp.publishing.core.utils.DateUtil;
 import io.taucoin.tauapp.publishing.core.utils.FmtMicrometer;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.core.utils.ViewUtils;
@@ -66,7 +65,7 @@ public class TopPeersAdapter extends ListAdapter<Member, TopPeersAdapter.ViewHol
             holder.binding.tvCol2.setText(midHideName);
             holder.binding.tvCol2.setTextColor(binding.getRoot().getResources().getColor(R.color.color_yellow));
 
-            String balance = FmtMicrometer.fmtBalance(member.getDisplayBalance());
+            String balance = FmtMicrometer.fmtBalance(member.getInterimBalance());
 //            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
 //            String balanceAndTime = appContext.getResources().getString(R.string.drawer_balance_time_no_title,
 //                    balance);

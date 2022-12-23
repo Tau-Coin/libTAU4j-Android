@@ -55,7 +55,7 @@ public interface CommunityDao {
             " ORDER BY timestamp, logicMsgHash COLLATE UNICODE)" +
             " GROUP BY receiverPkTemp)";
 
-    String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.balUpdateTime, b.power, b.nonce," +
+    String QUERY_COMMUNITIES_ASC = "SELECT a.chainID AS ID, a.headBlock, (b.balance - b.totalOffchainCoins) AS balance, b.balUpdateTime, b.power, b.nonce," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk," +
 //            " (CASE WHEN b.msgUnread = 1 THEN b.msgUnread ELSE b.newsUnread END) AS msgUnread," +
@@ -70,7 +70,7 @@ public interface CommunityDao {
             " ON a.chainID = c.chainID" +
             " WHERE isBanned == 0";
 
-    String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, b.balance, b.balUpdateTime, b.power, b.nonce," +
+    String QUERY_COMMUNITIES_DESC = "SELECT a.chainID AS ID, a.headBlock, (b.balance - b.totalOffchainCoins) AS balance, b.balUpdateTime, b.power, b.nonce," +
             " (CASE WHEN b.publicKey IS NULL THEN 0 ELSE 1 END) AS joined," +
             " 0 AS type, '' AS senderPk, '' AS receiverPk," +
 //            " (CASE WHEN b.msgUnread = 1 THEN b.msgUnread ELSE b.newsUnread END) AS msgUnread," +
@@ -164,7 +164,8 @@ public interface CommunityDao {
     String QUERY_COMMUNITY_ACCOUNT_EXPIRED = "SELECT rank.publicKey FROM (" + QUERY_COMMUNITY_ACCOUNT_ORDER + " LIMIT :limit) AS rank" +
             " WHERE rank.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
 
-    String QUERY_CURRENT_COMMUNITY_MEMBER = "SELECT c.*, m.balance, m.nonce, m.msgUnread, m.newsUnread," +
+    String QUERY_CURRENT_COMMUNITY_MEMBER = "SELECT c.*, (m.balance - m.totalOffchainCoins) AS balance," +
+            " (m.consensusBalance - m.totalPendingCoins) AS paymentBalance, m.nonce, m.msgUnread, m.newsUnread," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined, " +
             " (CASE WHEN order1.publicKey IS NULL THEN 0 ELSE 1 END) AS notExpired," +
             " (CASE WHEN order2.publicKey IS NULL THEN 1 ELSE 0 END) AS nearExpired" +
@@ -180,7 +181,7 @@ public interface CommunityDao {
             " WHERE chainID = :chainID" +
             " ORDER BY balance DESC, nonce DESC, publicKey COLLATE UNICODE DESC LIMIT :topNum";
 
-    String QUERY_COMMUNITIES = "SELECT c.*, m.balance, m.balUpdateTime, m.nonce, m.msgUnread," +
+    String QUERY_COMMUNITIES = "SELECT c.*, (m.balance - m.totalOffchainCoins) AS balance, m.balUpdateTime, m.nonce, m.msgUnread," +
             " (CASE WHEN m.publicKey IS NULL THEN 0 ELSE 1 END) AS joined" +
             " FROM Communities c" +
             " LEFT JOIN Members m ON c.chainID = m.chainID AND m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +

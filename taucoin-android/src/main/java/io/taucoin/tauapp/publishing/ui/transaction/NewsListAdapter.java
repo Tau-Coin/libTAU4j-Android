@@ -110,7 +110,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
 
             double showPower = Logarithm.log2(2 + tx.power);
             String power = FmtMicrometer.formatThreeDecimal(showPower);
-            String balance = FmtMicrometer.fmtBalance(tx.getDisplayBalance());
+            String balance = FmtMicrometer.fmtBalance(tx.getInterimBalance());
             binding.tvBalance.setText(balance);
             binding.tvPower.setText(power);
 

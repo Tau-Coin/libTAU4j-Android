@@ -218,7 +218,6 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
                             dataChanged = false;
                         }
                     }));
-
         }
         disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.WIRING_TX)
                 .subscribeOn(Schedulers.io())
@@ -231,7 +230,7 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
                 .subscribe(member -> {
                     long balance = ViewUtils.getLongTag(binding.tvAvailableBalance);
                     if (member != null && member.balance != balance) {
-                        loadAvailableBalanceView(member.balance);
+                        loadAvailableBalanceView(member.getWiringPaymentBalance());
                     }
                 }, it -> {
                     loadAvailableBalanceView(0);
@@ -240,8 +239,8 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
 
     private void loadAvailableBalanceView(long balance) {
         long showBalance = balance >= 0 ? balance : 0;
-        binding.tvAvailableBalance.setText(getString(R.string.tx_available_balance,
-                FmtMicrometer.fmtFeeValue(showBalance),
+        binding.tvAvailableBalance.setText(getString(R.string.tx_payment_balance,
+                FmtMicrometer.fmtLong(showBalance),
                 ChainIDUtil.getCoinName(chainID)));
         binding.tvAvailableBalance.setTag(balance);
     }
@@ -269,7 +268,8 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
         // 交易创建事件
         if (item.getItemId() == R.id.menu_done) {
             TxQueue tx = buildTx();
-            if (txViewModel.validateTx(tx)) {
+            long paymentBalance = ViewUtils.getLongTag(binding.tvAvailableBalance);
+            if (txViewModel.validateTx(tx, paymentBalance)) {
                 txViewModel.addTransaction(tx, txQueue);
             }
         }

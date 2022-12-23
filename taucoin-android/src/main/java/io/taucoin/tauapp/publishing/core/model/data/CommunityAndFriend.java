@@ -107,7 +107,7 @@ public class CommunityAndFriend implements Parcelable {
         return balance > 0 || nonce > 0;
     }
 
-    public long getDisplayBalance() {
+    public long getInterimBalance() {
         return balance + Constants.TX_MAX_OVERDRAFT;
     }
 }

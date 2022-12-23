@@ -67,7 +67,7 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
     private boolean dataChanged = false;
     private int currentPos = 0;
     private boolean isLoadMore = false;
-    private long availableBalance = 0;
+    private long paymentBalance = 0;
 
     @Nullable
     @Override
@@ -214,8 +214,8 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
         }
         ViewConfirmDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.view_confirm_dialog, null, false);
-        binding.tvAvailableBalance.setText(getString(R.string.tx_available_balance,
-                FmtMicrometer.fmtFeeValue(availableBalance),
+        binding.tvAvailableBalance.setText(getString(R.string.tx_payment_balance,
+                FmtMicrometer.fmtLong(paymentBalance),
                 ChainIDUtil.getCoinName(chainID)));
         MembersConfirmAdapter adapter = new MembersConfirmAdapter(getSelectedMap());
         LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
@@ -304,7 +304,7 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
                     if (member != null) {
-                        availableBalance =   member.balance >= 0 ? member.balance : 0;
+                        paymentBalance = member.getWiringPaymentBalance() >= 0 ? member.getWiringPaymentBalance() : 0;
                     }
                 }, it -> {}));
     }

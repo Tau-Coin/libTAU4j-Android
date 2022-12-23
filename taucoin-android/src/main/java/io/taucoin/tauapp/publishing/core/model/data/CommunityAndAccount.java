@@ -18,7 +18,7 @@ public class CommunityAndAccount extends Community {
         super(chainID, communityName);
     }
 
-    public long getDisplayBalance() {
+    public long getInterimBalance() {
         return balance + Constants.TX_MAX_OVERDRAFT;
     }
 }

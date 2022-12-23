@@ -84,7 +84,7 @@ public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapt
             }
             String communityName = ChainIDUtil.getName(member.chainID);
             String communityCode = ChainIDUtil.getCode(member.chainID);
-            String balance = FmtMicrometer.fmtBalance(member.balance);
+            String balance = FmtMicrometer.fmtBalance(member.getNewsPaymentBalance());
             binding.tvName.setText(context.getString(R.string.main_community_name_balance,
                     communityName, communityCode, balance));
             binding.ivSelected.setVisibility(StringUtil.isEquals(adapter.getChainID(), member.chainID)
