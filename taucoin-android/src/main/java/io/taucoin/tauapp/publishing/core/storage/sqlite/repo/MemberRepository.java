@@ -84,5 +84,10 @@ public interface MemberRepository {
 
     List<MemberAndTime> getJoinedCommunityList(String publicKey);
 
+    /**
+     * 重置成员状态（小于传入时间的重置）
+     */
+    void resetMembers(String chainID, long time);
+    
     void clearNewsUnread();
 }

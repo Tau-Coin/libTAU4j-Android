@@ -79,6 +79,10 @@ public interface MemberDao {
             " WHERE chainID = :chainID AND" +
             " publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
 
+    String RESET_MEMBER_STATE= 
+            " UPDATE Members SET newsUnread = 0, balance = 0, power = 0, nonce = 0" +
+            " WHERE chainID = :chainID AND balUpdateTime < :time";
+
     String QUERY_CLEAR_NEWS_UNREAD = "UPDATE Members SET newsUnread = 0" +
             " WHERE publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
 
@@ -153,6 +157,9 @@ public interface MemberDao {
 
     @Query(QUERY_GET_MEMBER_BY_CHAIN_ID_PK)
     Single<Member> getMemberSingle(String chainID, String publicKey);
+
+    @Query(RESET_MEMBER_STATE)
+    void resetMembers(String chainID, long time);
 
     @Query(QUERY_CLEAR_NEWS_UNREAD)
     void clearNewsUnread();

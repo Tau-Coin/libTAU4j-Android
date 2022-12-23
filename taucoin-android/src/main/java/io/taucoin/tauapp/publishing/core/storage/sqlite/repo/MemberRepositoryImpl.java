@@ -159,6 +159,11 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
+    public void resetMembers(String chainID, long time) {
+        db.memberDao().resetMembers(chainID, time);
+    }
+
+    @Override
     public void clearNewsUnread() {
         db.memberDao().clearNewsUnread();
     }

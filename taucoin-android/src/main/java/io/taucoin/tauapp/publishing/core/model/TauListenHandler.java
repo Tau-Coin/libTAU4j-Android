@@ -125,7 +125,7 @@ public class TauListenHandler {
      * libTAU上报新head block
      * @param block head Block
      */
-    void onNewHeadBlock(Block block, String userPk) {
+    void onNewHeadBlock(Block block, String userPk, List<Account> accounts) {
         logger.info("onNewHeadBlock");
         String chainID = ChainIDUtil.decode(block.getChainID());
         Community community = communityRepo.getCommunityByChainID(chainID);
@@ -165,6 +165,11 @@ public class TauListenHandler {
         handleBlockData(block, BlockStatus.NEW_BLOCK);
 
         updateTxQueue(block);
+
+        // 更新所有账户的信息
+        if(accounts.size() > 0) {
+            onStateArray(block.getChainID(), accounts, true);
+        }
 
         // 更新社区用户账户信息
         daemon.getMyAccountManager().update(chainID);
@@ -687,11 +692,12 @@ public class TauListenHandler {
      * @param chainIDBytes 链ID
      * @param accounts 账户列表
      */
-    public void onStateArray(byte[] chainIDBytes, List<Account> accounts) {
+    public void onStateArray(byte[] chainIDBytes, List<Account> accounts, boolean reset) {
         String chainID = ChainIDUtil.decode(chainIDBytes);
         int accountSize = null == accounts ? 0 : accounts.size();
         logger.info("onStateArray chainID::{}, accounts::{}", chainID, accountSize);
         if (accountSize > 0) {
+            long modifiedTime = DateUtil.getTime();
             for (Account account : accounts) {
                 String peer = ByteUtil.toHexString(account.getPeer());
                 logger.info("UpdateMember onStateArray chainID::{}, publicKey::{}, balance::{}, nonce::{}, power::{}",
@@ -701,7 +707,7 @@ public class TauListenHandler {
                     if (member.balUpdateTime == 0 || member.balance != account.getBalance() ||
                             member.nonce != account.getNonce() || member.power != account.getPower()) {
                         member.balance = account.getBalance();
-                        member.balUpdateTime = DateUtil.getTime();
+                        member.balUpdateTime = modifiedTime;
                         member.nonce = account.getNonce();
                         member.power = account.getPower();
                         memberRepo.updateMember(member);
@@ -710,7 +716,7 @@ public class TauListenHandler {
                     saveUserInfo(peer);
                     member = new Member(chainID, peer);
                     member.balance = account.getBalance();
-                    member.balUpdateTime = DateUtil.getTime();
+                    member.balUpdateTime = modifiedTime;
                     member.nonce = account.getNonce();
                     member.power = account.getPower();
                     memberRepo.addMember(member);
@@ -720,6 +726,13 @@ public class TauListenHandler {
                 txRepo.updateAllOffChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Pending
 
                 txRepo.updateAllOnChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Settled
+            }
+
+            //遇到consensus block state清空
+            if(reset) {
+                //未修改的member说明不在consensus state中，重置为0
+                memberRepo.resetMembers(chainID, modifiedTime);
+                return;
             }
         }
     }

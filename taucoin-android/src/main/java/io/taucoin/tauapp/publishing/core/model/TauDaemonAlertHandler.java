@@ -387,7 +387,8 @@ public class TauDaemonAlertHandler {
         BlockChainNewHeadBlockAlert a = (BlockChainNewHeadBlockAlert) alert;
         logger.info(a.get_message());
         Block block = a.get_new_block();
-        tauListenHandler.onNewHeadBlock(block, userPk);
+        List<Account> accounts = a.get_accounts();
+        tauListenHandler.onNewHeadBlock(block, userPk, accounts);
     }
 
     /**
@@ -432,7 +433,7 @@ public class TauDaemonAlertHandler {
         logger.info(a.get_message());
         byte[] chainId = a.get_chain_id();
         List<Account> accounts = a.get_accounts();
-        tauListenHandler.onStateArray(chainId, accounts);
+        tauListenHandler.onStateArray(chainId, accounts, false);
     }
 
     /**
