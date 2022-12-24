@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:background="@color/color_white">
 
-            <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+            <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                 android:id="@+id/ll_exchange_qr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
                 android:layout_marginStart="@dimen/widget_size_20"
                 android:layout_marginEnd="@dimen/widget_size_20"/>
 
-            <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+            <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                 android:id="@+id/ll_add_friend"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
             android:onClick="@{listener::onClick}"
             android:background="@color/color_white">
 
-            <io.taucoin.tauapp.publishing.ui.customviews.RoundImageView
+            <io.taucoin.news.publishing.ui.customviews.RoundImageView
                 android:id="@+id/iv_head_pic"
                 android:layout_width="@dimen/widget_size_45"
                 android:layout_height="@dimen/widget_size_45"

@@ -28,7 +28,7 @@
                 android:layout_marginTop="@dimen/widget_size_4"
                 android:background="@drawable/bg_rect_round_bg"/>
 
-            <io.taucoin.tauapp.publishing.ui.customviews.CornerImageView
+            <io.taucoin.news.publishing.ui.customviews.CornerImageView
                 android:id="@+id/iv_community"
                 android:layout_width="@dimen/widget_size_40"
                 android:layout_height="@dimen/widget_size_40"
@@ -37,7 +37,7 @@
                 android:layout_marginTop="@dimen/widget_size_5"
                 android:src="@mipmap/icon_london_pmc"/>
 
-            <io.taucoin.tauapp.publishing.ui.customviews.RoundButton
+            <io.taucoin.news.publishing.ui.customviews.RoundButton
                 android:visibility="gone"
                 android:id="@+id/rb_community"
                 android:layout_width="@dimen/widget_size_40"

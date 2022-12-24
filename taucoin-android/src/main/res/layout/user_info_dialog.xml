@@ -28,7 +28,7 @@
                 android:contentDescription="@null"
                 android:src="@mipmap/icon_close" />
 
-            <io.taucoin.tauapp.publishing.ui.customviews.RoundButton
+            <io.taucoin.news.publishing.ui.customviews.RoundButton
                 android:layout_below="@+id/iv_close"
                 android:id="@+id/left_view"
                 android:layout_width="@dimen/widget_size_50"

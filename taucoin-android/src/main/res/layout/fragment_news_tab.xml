@@ -100,7 +100,7 @@
 
         </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
 
-        <io.taucoin.tauapp.publishing.ui.customviews.ThemedSpeedDialView
+        <io.taucoin.news.publishing.ui.customviews.ThemedSpeedDialView
             android:id="@+id/fab_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

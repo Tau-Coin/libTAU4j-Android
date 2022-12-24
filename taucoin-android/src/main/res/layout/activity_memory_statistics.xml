@@ -102,7 +102,7 @@
 
         </LinearLayout>
 
-        <io.taucoin.tauapp.publishing.ui.customviews.EmptyRecyclerView
+        <io.taucoin.news.publishing.ui.customviews.EmptyRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"

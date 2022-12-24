@@ -200,7 +200,7 @@
             android:layout_marginStart="@dimen/widget_size_20"
             android:layout_marginEnd="@dimen/widget_size_20"/>
 
-        <io.taucoin.tauapp.publishing.ui.customviews.EmptyRecyclerView
+        <io.taucoin.news.publishing.ui.customviews.EmptyRecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"

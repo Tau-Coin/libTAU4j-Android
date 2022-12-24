@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/tv_progress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
                     app:lineLeftTextColor="@color/gray_dark"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/tv_coins_usage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
                     app:lineLeftTextColor="@color/gray_dark"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                     android:visibility="gone"
                     android:id="@+id/tv_referral_bnous"
                     android:layout_width="match_parent"

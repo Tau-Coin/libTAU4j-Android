@@ -34,7 +34,7 @@
                 android:onClick="@{listener::onClick}"
                 android:src="@mipmap/icon_choose_contact"/>
 
-            <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
+            <io.taucoin.news.publishing.ui.customviews.FilterEditText
                 android:id="@+id/et_link"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
 
         </RelativeLayout>
 
-        <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
+        <io.taucoin.news.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
                 android:onClick="@{listener::onClick}"
                 android:src="@mipmap/icon_choose_contact"/>
 
-            <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
+            <io.taucoin.news.publishing.ui.customviews.FilterEditText
                 android:id="@+id/et_community"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -46,7 +46,7 @@
                 android:contentDescription="@null"
                 android:src="@mipmap/icon_warning"/>
 
-            <io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView
+            <io.taucoin.news.publishing.ui.customviews.AutoLinkTextView
                 android:id="@+id/tv_msg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

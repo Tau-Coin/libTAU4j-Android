@@ -28,7 +28,7 @@
                 android:layout_marginEnd="@dimen/widget_size_5"
                 android:textAppearance="@style/TextAppearanceBody2"/>
 
-            <io.taucoin.tauapp.publishing.ui.customviews.ViewPager
+            <io.taucoin.news.publishing.ui.customviews.ViewPager
                 android:id="@+id/view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>

@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_interim_balance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
                     app:lineRightTextColor="@color/color_yellow"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_pending_amount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
                     app:lineLeftText="@string/community_pending_amount"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_payment_balance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
                     app:lineLeftText="@string/community_payment_balance"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_mining_income_pending"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                     app:lineLeftText="@string/community_mining_income_pending"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_mining_power"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
                     app:lineLeftText="@string/community_mining_power"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_last_block"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
                     app:lineLeftText="@string/community_head_block"
                     app:lineVisibility="false"/>
 
-                <io.taucoin.tauapp.publishing.ui.customviews.LeftRightLineView
+                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_difficulty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
