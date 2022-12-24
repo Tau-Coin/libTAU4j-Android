@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.util.Linkify;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
@@ -43,6 +44,7 @@ import io.taucoin.tauapp.publishing.core.utils.ToastUtils;
 import io.taucoin.tauapp.publishing.core.utils.UsersUtil;
 import io.taucoin.tauapp.publishing.databinding.ActivityNewsDetailBinding;
 import io.taucoin.tauapp.publishing.databinding.ItemNewsBinding;
+import io.taucoin.tauapp.publishing.databinding.ItemNewsDetailHeaderBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
@@ -62,6 +64,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
     private ReplyListAdapter adapter;
     private FloatMenu operationsMenu;
     private PopUpDialog retweetDialog;
+    private ItemNewsDetailHeaderBinding headerBinding;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private String txID;
     private UserAndTx tx;
@@ -100,11 +103,6 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         binding.toolbarInclude.toolbar.setTitle(R.string.main_title);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        binding.news.ivBan.setImageResource(R.mipmap.icon_ban_disabled);
-        binding.news.ivBan.setEnabled(false);
-        binding.news.ivLongPress.setVisibility(View.INVISIBLE);
-        binding.news.ivArrow.setVisibility(View.INVISIBLE);
-
         if (getRecyclerView() != null) {
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             getRecyclerView().setLayoutManager(layoutManager);
@@ -112,6 +110,14 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         }
         adapter = new ReplyListAdapter(this);
         binding.txList.setAdapter(adapter);
+
+        headerBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
+                R.layout.item_news_detail_header, null, false);
+        headerBinding.news.ivBan.setImageResource(R.mipmap.icon_ban_disabled);
+        headerBinding.news.ivBan.setEnabled(false);
+        headerBinding.news.ivLongPress.setVisibility(View.INVISIBLE);
+        headerBinding.news.ivArrow.setVisibility(View.INVISIBLE);
+        binding.txList.addHeaderView(headerBinding.getRoot());
     }
 
     private void initRefreshLayout() {
@@ -181,12 +187,12 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
 
     private void showNewsDetail(UserAndTx tx) {
         if (null == this.tx) {
-            binding.news.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
+            headerBinding.news.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
             String userName = UsersUtil.getShowName(tx.sender);
             userName = null == userName ? "" : userName;
             String communityName = ChainIDUtil.getName(tx.chainID);
             String communityCode = ChainIDUtil.getCode(tx.chainID);
-            int nameColor = binding.getRoot().getResources().getColor(R.color.color_black);
+            int nameColor = getResources().getColor(R.color.color_black);
             SpannableStringBuilder name = new SpanUtils()
                     .append(userName)
                     .setForegroundColor(nameColor)
@@ -199,43 +205,43 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
                     .append(" · ")
                     .append(DateUtil.getNewsTime(tx.timestamp))
                     .create();
-            binding.news.tvName.setText(name);
+            headerBinding.news.tvName.setText(name);
 
             double showPower = Logarithm.log2(2 + tx.power);
             String power = FmtMicrometer.formatThreeDecimal(showPower);
             String balance = FmtMicrometer.fmtBalance(tx.getInterimBalance());
-            binding.news.tvBalance.setText(balance);
-            binding.news.tvPower.setText(power);
+            headerBinding.news.tvBalance.setText(balance);
+            headerBinding.news.tvPower.setText(power);
 
-            binding.news.tvMsg.setText(TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+            headerBinding.news.tvMsg.setText(tx.memo);
             // 添加link解析
-            binding.news.tvMsg.setAutoLinkMask(0);
-            Linkify.addLinks(binding.news.tvMsg, Linkify.WEB_URLS);
+            headerBinding.news.tvMsg.setAutoLinkMask(0);
+            Linkify.addLinks(headerBinding.news.tvMsg, Linkify.WEB_URLS);
             Pattern referral = Pattern.compile(LinkUtil.REFERRAL_PATTERN, 0);
-            Linkify.addLinks(binding.news.tvMsg, referral, null);
+            Linkify.addLinks(headerBinding.news.tvMsg, referral, null);
             Pattern airdrop = Pattern.compile(LinkUtil.AIRDROP_PATTERN, 0);
-            Linkify.addLinks(binding.news.tvMsg, airdrop, null);
+            Linkify.addLinks(headerBinding.news.tvMsg, airdrop, null);
             Pattern chain = Pattern.compile(LinkUtil.CHAIN_PATTERN, 0);
-            Linkify.addLinks(binding.news.tvMsg, chain, null);
+            Linkify.addLinks(headerBinding.news.tvMsg, chain, null);
             Pattern friend = Pattern.compile(LinkUtil.FRIEND_PATTERN, 0);
-            Linkify.addLinks(binding.news.tvMsg, friend, null);
+            Linkify.addLinks(headerBinding.news.tvMsg, friend, null);
 
             boolean isShowLink = StringUtil.isNotEmpty(tx.link);
-            binding.news.tvLink.setText(tx.link);
-            binding.news.tvLink.setVisibility(isShowLink ? View.VISIBLE : View.GONE);
+            headerBinding.news.tvLink.setText(tx.link);
+            headerBinding.news.tvLink.setVisibility(isShowLink ? View.VISIBLE : View.GONE);
             if (isShowLink) {
-                DrawablesUtil.setUnderLine(binding.news.tvLink);
+                DrawablesUtil.setUnderLine(headerBinding.news.tvLink);
                 int linkDrawableSize = binding.getRoot().getResources().getDimensionPixelSize(R.dimen.widget_size_14);
-                DrawablesUtil.setEndDrawable(binding.news.tvLink, R.mipmap.icon_share_link, linkDrawableSize);
+                DrawablesUtil.setEndDrawable(headerBinding.news.tvLink, R.mipmap.icon_share_link, linkDrawableSize);
             }
-            setClickListener(binding.news, tx);
-            setAutoLinkListener(binding.news.tvMsg, tx);
+            setClickListener(headerBinding.news, tx);
+            setAutoLinkListener(headerBinding.news.tvMsg, tx);
         }
         if (null == this.tx || this.tx.repliesNum != tx.repliesNum) {
-            binding.news.tvRepliesNum.setText(FmtMicrometer.fmtLong(tx.repliesNum));
+            headerBinding.news.tvRepliesNum.setText(FmtMicrometer.fmtLong(tx.repliesNum));
         }
         if (null == this.tx || this.tx.chatsNum != tx.chatsNum) {
-            binding.news.tvChatNum.setText(FmtMicrometer.fmtLong(tx.chatsNum));
+            headerBinding.news.tvChatNum.setText(FmtMicrometer.fmtLong(tx.chatsNum));
         }
         this.tx = tx;
     }
@@ -327,12 +333,12 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         if (null == getRecyclerView()) {
             return;
         }
-        LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
-        if (layoutManager != null) {
-            int bottomPosition = getItemCount() - 1;
-            int position = bottomPosition - currentPos;
-            layoutManager.scrollToPositionWithOffset(position, 0);
-        }
+//        LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
+//        if (layoutManager != null) {
+//            int bottomPosition = getItemCount() - 1;
+//            int position = bottomPosition - currentPos;
+//            layoutManager.scrollToPositionWithOffset(position, 0);
+//        }
     };
 
     private int getItemCount() {

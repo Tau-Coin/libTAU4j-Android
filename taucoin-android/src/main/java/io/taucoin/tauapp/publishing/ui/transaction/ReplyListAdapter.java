@@ -117,7 +117,8 @@ public class ReplyListAdapter extends ListAdapter<UserAndTx, ReplyListAdapter.Vi
             binding.tvBalance.setText(balance);
             binding.tvPower.setText(power);
 
-            SpannableStringBuilder msg = TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS)
+            SpannableStringBuilder msg = new SpannableStringBuilder()
+                    .append(tx.memo)
                     .append(" ");
             binding.tvMsg.setText(msg);
 

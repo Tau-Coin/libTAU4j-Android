@@ -17,53 +17,13 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <include
-            android:id="@+id/news"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_size_10"
-            android:paddingBottom="@dimen/widget_size_50"
-            layout="@layout/item_news"/>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/widget_size_5"
-            android:paddingBottom="@dimen/widget_size_5"
-            android:background="@color/color_white"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/widget_size_15"
-                android:includeFontPadding="false"
-                android:text="@string/tx_recent"
-                android:textAppearance="@style/TextAppearanceBody1"/>
-
-            <ImageView
-                android:layout_width="@dimen/widget_size_12"
-                android:layout_height="@dimen/widget_size_12"
-                android:layout_marginStart="@dimen/widget_size_5"
-                android:contentDescription="@null"
-                android:rotation="90"
-                android:src="@mipmap/icon_arrow"/>
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_1"
-            android:background="@color/color_bg"/>
-
         <cn.bingoogolapple.refreshlayout.BGARefreshLayout
             android:id="@+id/refresh_layout"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:background="@color/color_bg">
 
-            <androidx.recyclerview.widget.RecyclerView
+            <com.yanzhenjie.recyclerview.SwipeRecyclerView
                 android:background="@color/color_white"
                 android:id="@+id/tx_list"
                 android:layout_width="match_parent"
