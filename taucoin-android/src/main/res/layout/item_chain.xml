@@ -33,7 +33,7 @@
             android:layout_marginEnd="@dimen/widget_size_15"
             android:background="@drawable/white_rect_round_bg_middle_radius">
 
-            <io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView
+            <io.taucoin.news.publishing.ui.customviews.AutoLinkTextView
                 android:id="@+id/tv_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

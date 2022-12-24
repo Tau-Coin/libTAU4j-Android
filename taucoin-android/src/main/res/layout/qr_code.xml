@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <io.taucoin.tauapp.publishing.ui.customviews.SquareImageView
+            <io.taucoin.news.publishing.ui.customviews.SquareImageView
                 android:background="@color/color_white"
                 android:id="@+id/iv_qr_code"
                 android:layout_width="match_parent"

@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <io.taucoin.tauapp.publishing.ui.customviews.EmptyRecyclerView
+        <io.taucoin.news.publishing.ui.customviews.EmptyRecyclerView
             android:id="@+id/tx_list"
             android:layout_width="match_parent"
             android:layout_weight="1"
@@ -113,7 +113,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <io.taucoin.tauapp.publishing.ui.customviews.FilterEditText
+            <io.taucoin.news.publishing.ui.customviews.FilterEditText
                 android:id="@+id/et_message"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

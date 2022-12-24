@@ -33,7 +33,7 @@
                     <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/main_left_fragment"
                         android:layout_below="@+id/toolbar_include"
-                        android:name="io.taucoin.tauapp.publishing.ui.main.MainFragment"
+                        android:name="io.taucoin.news.publishing.ui.main.MainFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
 
@@ -47,7 +47,7 @@
                 </RelativeLayout>
 
                 <androidx.fragment.app.FragmentContainerView
-                    android:name="io.taucoin.tauapp.publishing.ui.main.EmptyFragment"
+                    android:name="io.taucoin.news.publishing.ui.main.EmptyFragment"
                     android:id="@+id/main_right_fragment"
                     android:layout_width="0dp"
                     android:layout_weight="6.5"
