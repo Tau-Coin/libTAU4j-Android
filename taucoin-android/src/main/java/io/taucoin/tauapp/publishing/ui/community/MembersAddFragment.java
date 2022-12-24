@@ -304,7 +304,7 @@ public class MembersAddFragment extends BaseFragment implements BGARefreshLayout
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
                     if (member != null) {
-                        paymentBalance = member.getWiringPaymentBalance() >= 0 ? member.getWiringPaymentBalance() : 0;
+                        paymentBalance = member.getPaymentBalance() >= 0 ? member.getPaymentBalance() : 0;
                     }
                 }, it -> {}));
     }

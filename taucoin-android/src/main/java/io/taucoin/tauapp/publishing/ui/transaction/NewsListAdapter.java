@@ -8,9 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
@@ -36,7 +33,6 @@ import io.taucoin.tauapp.publishing.ui.customviews.AutoLinkTextView;
  * Market 列表显示的Adapter
  */
 public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.ViewHolder> {
-    private static final Logger logger = LoggerFactory.getLogger("NewsListAdapter");
     private final ClickListener listener;
 
     NewsListAdapter(ClickListener listener) {
@@ -47,22 +43,15 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        long startTime = System.currentTimeMillis();
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ItemNewsBinding binding = DataBindingUtil.inflate(inflater,
                 R.layout.item_news, parent, false);
-        long endTime = System.currentTimeMillis();
-        ViewHolder viewHolder = new ViewHolder(binding, listener);
-        logger.debug("onCreateViewHolder::{}ms", endTime - startTime);
-        return viewHolder;
+        return new ViewHolder(binding, listener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        long startTime = System.currentTimeMillis();
         holder.bind(holder, getItem(position));
-        long endTime = System.currentTimeMillis();
-        logger.debug("onBindViewHolder pos::{}, ::{}ms", position, endTime - startTime);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -106,7 +95,8 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             setClickListener(binding, tx);
 
             boolean isMyself = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
-            binding.ivBan.setVisibility(isMyself ? View.INVISIBLE : View.VISIBLE);
+            binding.ivBan.setImageResource(isMyself ? R.mipmap.icon_ban_disabled : R.mipmap.icon_ban_gray);
+            binding.ivBan.setEnabled(!isMyself);
 
             double showPower = Logarithm.log2(2 + tx.power);
             String power = FmtMicrometer.formatThreeDecimal(showPower);
@@ -114,7 +104,8 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             binding.tvBalance.setText(balance);
             binding.tvPower.setText(power);
 
-            SpannableStringBuilder msg = TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS)
+            SpannableStringBuilder msg = new SpannableStringBuilder()
+                    .append(tx.memo)
                     .append(" ");
             binding.tvMsg.setText(msg);
 

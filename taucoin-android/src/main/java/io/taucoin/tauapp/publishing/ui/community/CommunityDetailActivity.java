@@ -87,7 +87,7 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         if (!isJoined || noBalance) {
-            binding.itemAddMember.setVisibility(View.GONE);
+//            binding.itemAddMember.setVisibility(View.GONE);
 //            binding.itemAirdropCoins.setVisibility(View.GONE);
         }
 

@@ -167,6 +167,7 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
                 }
             }
         });
+        loadPaymentBalanceView(0);
     }
 
     private void loadFeeView(long averageTxFee) {
@@ -228,21 +229,21 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
-                    long balance = ViewUtils.getLongTag(binding.tvAvailableBalance);
+                    long balance = ViewUtils.getLongTag(binding.tvPaymentBalance);
                     if (member != null && member.balance != balance) {
-                        loadAvailableBalanceView(member.getWiringPaymentBalance());
+                        loadPaymentBalanceView(member.getPaymentBalance());
                     }
                 }, it -> {
-                    loadAvailableBalanceView(0);
+                    loadPaymentBalanceView(0);
                 }));
     }
 
-    private void loadAvailableBalanceView(long balance) {
+    private void loadPaymentBalanceView(long balance) {
         long showBalance = balance >= 0 ? balance : 0;
-        binding.tvAvailableBalance.setText(getString(R.string.tx_payment_balance,
+        binding.tvPaymentBalance.setText(getString(R.string.tx_payment_balance,
                 FmtMicrometer.fmtLong(showBalance),
                 ChainIDUtil.getCoinName(chainID)));
-        binding.tvAvailableBalance.setTag(balance);
+        binding.tvPaymentBalance.setTag(balance);
     }
 
     @Override
@@ -268,7 +269,7 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
         // 交易创建事件
         if (item.getItemId() == R.id.menu_done) {
             TxQueue tx = buildTx();
-            long paymentBalance = ViewUtils.getLongTag(binding.tvAvailableBalance);
+            long paymentBalance = ViewUtils.getLongTag(binding.tvPaymentBalance);
             if (txViewModel.validateTx(tx, paymentBalance)) {
                 txViewModel.addTransaction(tx, txQueue);
             }

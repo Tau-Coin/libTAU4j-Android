@@ -59,7 +59,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     private int onlinePeers = -1;
     private boolean isReteitt = false;
     private boolean isShowCommunities;
-    private long paymentBalance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +129,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         binding.joinedList.setOnItemClickListener((view, adapterPosition) -> {
             Member member = adapter.getCurrentList().get(adapterPosition);
             this.chainID = member.chainID;
+            enabledOrDisabledPost();
             adapter.setChainID(member.chainID);
             List<Member> list = new ArrayList<>(adapter.getCurrentList());
             list.remove(member);
@@ -146,6 +146,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         if (StringUtil.isNotEmpty(repliedHash)) {
             binding.etNews.setHint(R.string.tx_your_reply);
         }
+        loadInterimBalanceView(0);
     }
 
     private final TextWatcher newsWatcher = new TextWatcher() {
@@ -156,8 +157,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            boolean isEmpty = StringUtil.isEmpty(s);
-            binding.tvPost.setEnabled(!isEmpty);
+            enabledOrDisabledPost();
             loadBytesCount();
         }
 
@@ -166,6 +166,11 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
 
         }
     };
+
+    private void enabledOrDisabledPost() {
+        boolean isEmpty = StringUtil.isEmpty(ViewUtils.getText(binding.etNews));
+        binding.tvPost.setEnabled(!isEmpty && StringUtil.isNotEmpty(chainID));
+    }
 
     private final TextWatcher linkWatcher = new TextWatcher() {
         @Override
@@ -254,12 +259,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                                 }
                             }
                             if (adapter != null) {
-                                // 设置默认值
-                                if (list.size() > 0) {
-                                    this.chainID = list.get(0).chainID;
-                                    adapter.setChainID(this.chainID);
-                                    loadAverageTxFee();
-                                }
                                 adapter.submitList(list);
                             }
                             binding.tvMore.setVisibility(communityList.size() > 2 ? View.VISIBLE : View.GONE);
@@ -273,13 +272,13 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                     .subscribe(member -> {
                         long balance = ViewUtils.getLongTag(binding.tvInterimBalance);
                         if (member != null && member.getInterimBalance() != balance) {
-                            loadPaymentBalanceView(member.getNewsPaymentBalance());
+                            loadInterimBalanceView(member.getInterimBalance());
                         }
                     }, it -> {
-                        loadPaymentBalanceView(0);
+                        loadInterimBalanceView(0);
                     }));
-            loadAverageTxFee();
         }
+        loadAverageTxFee();
     }
 
     private void loadAverageTxFee() {
@@ -296,11 +295,11 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         binding.llLowLinked.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
-    private void loadPaymentBalanceView(long paymentBalance) {
-        binding.tvInterimBalance.setText(getString(R.string.tx_payment_balance,
-                FmtMicrometer.fmtLong(paymentBalance),
+    private void loadInterimBalanceView(long interimBalance) {
+        binding.tvInterimBalance.setText(getString(R.string.tx_interim_balance,
+                FmtMicrometer.fmtLong(interimBalance),
                 ChainIDUtil.getCoinName(chainID)));
-        binding.tvInterimBalance.setTag(paymentBalance);
+        binding.tvInterimBalance.setTag(interimBalance);
     }
 
     @Override
@@ -347,16 +346,16 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.tv_post:
                 TxQueue tx = buildTx();
-                long paymentBalance = 0;
+                long interimBalance = 0;
                 if (isShowCommunities) {
                     List<Member> currentList = adapter.getCurrentList();
                     if (currentList.size() > 0) {
-                        paymentBalance = currentList.get(0).getNewsPaymentBalance();
+                        interimBalance = currentList.get(0).getInterimBalance();
                     }
                 } else {
-                    paymentBalance = ViewUtils.getLongTag(binding.tvInterimBalance);
+                    interimBalance = ViewUtils.getLongTag(binding.tvInterimBalance);
                 }
-                if (txViewModel.validateTx(tx, paymentBalance)) {
+                if (txViewModel.validateTx(tx, interimBalance)) {
                     txViewModel.addTransaction(tx, txQueue);
                 }
                 break;
@@ -409,6 +408,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                         }
                     }
                     this.chainID = member.chainID;
+                    enabledOrDisabledPost();
                     adapter.setChainID(member.chainID);
                     adapter.notifyDataSetChanged();
                     loadAverageTxFee();

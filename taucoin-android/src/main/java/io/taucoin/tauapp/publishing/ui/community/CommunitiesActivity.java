@@ -23,7 +23,9 @@ import io.taucoin.tauapp.publishing.databinding.ActivityCommunitiesBinding;
 import io.taucoin.tauapp.publishing.ui.BaseActivity;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.customviews.CommonDialog;
+import io.taucoin.tauapp.publishing.ui.friends.FriendsActivity;
 import io.taucoin.tauapp.publishing.ui.main.MainActivity;
+import io.taucoin.tauapp.publishing.ui.qrcode.CommunityQRCodeActivity;
 import io.taucoin.tauapp.publishing.ui.transaction.TransactionCreateActivity;
 
 /**
@@ -111,23 +113,29 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
      * 加载社区当前登陆用户数据
      */
     private void loadMemberData(MemberAndAmount member) {
-        long balance = 0;
-        long pendingBalance = 0;
+        long interimBalance = 0;
+        long pendingAmount = 0;
+        long paymentBalance = 0;
         long power = 0;
         if (member != null) {
             power = member.power;
-            pendingBalance = member.txIncomePending - member.txExpenditurePending;
+            pendingAmount = member.txIncomePending - member.txExpenditurePending;
             // 余额根据libTAU balance减去计算上链为100%的金额
             //balance = member.balance - onChainBalance;
-            balance = member.getInterimBalance();
-            balance = Math.max(0, balance);
+            interimBalance = member.getInterimBalance();
+            interimBalance = Math.max(0, interimBalance);
 
-            logger.debug("loadMemberData balance::{}, showBalance::{}, pendingBalance::{}," +
+            paymentBalance = member.getPaymentBalance();
+            paymentBalance = Math.max(0, paymentBalance);
+
+            logger.debug("loadMemberData interimBalance::{}, pendingAmount::{}, paymentBalance::{}," +
                             " incomePending::{}, expenditurePending::{}",
-                    member.balance, balance, pendingBalance, member.txIncomePending, member.txExpenditurePending);
+                    interimBalance, pendingAmount, paymentBalance, member.txIncomePending, member.txExpenditurePending);
         }
 		//Modified tc
-        binding.itemBalance.setRightText(FmtMicrometer.fmtLong(balance) + "/" +FmtMicrometer.fmtLong(pendingBalance));
+        binding.itemInterimBalance.setRightText(FmtMicrometer.fmtLong(interimBalance));
+        binding.itemPendingAmount.setRightText(FmtMicrometer.fmtLong(pendingAmount));
+        binding.itemPaymentBalance.setRightText(FmtMicrometer.fmtLong(paymentBalance));
         binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(power*10));
         double showPower = Logarithm.log2(2 + power);
         String powerStr = "log2(2+%s)=%s";
@@ -181,6 +189,17 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                 break;
             case R.id.rl_ban_community:
                 blacklistDialog = viewModel.showBanCommunityTipsDialog(this, chainID);
+                break;
+            case R.id.rl_added_members:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_ADD_MEMBERS);
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, FriendsActivity.class);
+                break;
+            case R.id.rl_share_community:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                ActivityUtil.startActivity(intent, this, CommunityQRCodeActivity.class);
                 break;
         }
     }

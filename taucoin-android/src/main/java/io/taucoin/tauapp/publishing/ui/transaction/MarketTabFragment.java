@@ -50,6 +50,8 @@ import io.taucoin.tauapp.publishing.ui.community.CommunityViewModel;
 import io.taucoin.tauapp.publishing.ui.constant.IntentExtra;
 import io.taucoin.tauapp.publishing.ui.constant.Page;
 import io.taucoin.tauapp.publishing.ui.customviews.PopUpDialog;
+import io.taucoin.tauapp.publishing.ui.friends.FriendsActivity;
+import io.taucoin.tauapp.publishing.ui.qrcode.CommunityQRCodeActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserDetailActivity;
 import io.taucoin.tauapp.publishing.ui.user.UserViewModel;
 
@@ -262,7 +264,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                     boolean isHavePinnedMsg = list != null && list.size() > 0;
                     binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
                     if (isHavePinnedMsg) {
-                        binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
+                        binding.tvPinnedContent.setText(list.get(0).memo);
                     }
                 }));
     }
@@ -378,6 +380,8 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
             menuList.add(new OperationMenuItem(R.string.tx_operation_blacklist));
         }
         menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
+        menuList.add(new OperationMenuItem(R.string.community_added_members));
+        menuList.add(new OperationMenuItem(R.string.community_transaction));
         if (tx.favoriteTime <= 0) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_favorite));
         }
@@ -413,6 +417,17 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                     String msgHash = tx.txID;
                     CopyManager.copyText(msgHash);
                     ToastUtils.showShortToast(R.string.copy_message_hash);
+                    break;
+                case R.string.community_added_members:
+                    Intent intent = new Intent();
+                    intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_ADD_MEMBERS);
+                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    ActivityUtil.startActivity(intent, this, FriendsActivity.class);
+                    break;
+                case R.string.community_transaction:
+                    intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                    ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
                     break;
 
             }

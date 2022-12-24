@@ -390,7 +390,7 @@ public class TxViewModel extends AndroidViewModel {
         return "";
     }
 
-    boolean validateTx(TxQueue tx, long paymentBalance) {
+    boolean validateTx(TxQueue tx, long balance) {
         if (StringUtil.isEmpty(tx.chainID)) {
             ToastUtils.showShortToast(R.string.tx_error_no_select_community);
             return false;
@@ -412,8 +412,11 @@ public class TxViewModel extends AndroidViewModel {
                         FmtMicrometer.fmtFeeValue(Constants.WIRING_MIN_FEE.longValue()));
                 ToastUtils.showShortToast(minFee);
                 return false;
-            } else if (tx.amount > paymentBalance || tx.amount + tx.fee > paymentBalance) {
-                ToastUtils.showShortToast(R.string.tx_error_no_enough_coins);
+            } else if (balance <= Constants.TX_MAX_OVERDRAFT) {
+                ToastUtils.showShortToast(getApplication().getString(R.string.tx_error_wiring_balance_no_enough, Constants.TX_MAX_OVERDRAFT));
+                return false;
+            } else if (tx.amount > balance - Constants.TX_MAX_OVERDRAFT || tx.amount + tx.fee > balance - Constants.TX_MAX_OVERDRAFT) {
+                ToastUtils.showShortToast(getApplication().getString(R.string.tx_error_no_enough_coins, Constants.TX_MAX_OVERDRAFT));
                 return false;
             }
         } else {
@@ -427,7 +430,7 @@ public class TxViewModel extends AndroidViewModel {
                         FmtMicrometer.fmtFeeValue(minTxFee));
                 ToastUtils.showShortToast(minFee);
                 return false;
-            } else if (tx.fee > paymentBalance) {
+            } else if (tx.fee > balance) {
                 ToastUtils.showShortToast(R.string.tx_error_no_enough_coins_for_fee);
                 return false;
             }
@@ -458,9 +461,6 @@ public class TxViewModel extends AndroidViewModel {
      * 显示编辑交易费的对话框
      */
     void showEditFeeDialog(BaseActivity activity, TextView tvFee, String chainID) {
-        if(StringUtil.isEmpty(chainID)){
-            return;
-        }
         EditFeeDialogBinding editFeeBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.edit_fee_dialog, null, false);
         String fee = tvFee.getTag().toString();
@@ -499,7 +499,10 @@ public class TxViewModel extends AndroidViewModel {
         return Observable.create((ObservableOnSubscribe<Long>) emitter -> {
             long txFee;
             try {
-                TxFreeStatistics statistics = txRepo.queryAverageTxsFee(chainID);
+                TxFreeStatistics statistics = null;
+                if (StringUtil.isNotEmpty(chainID)) {
+                    statistics = txRepo.queryAverageTxsFee(chainID);
+                }
                 if (statistics != null) {
                     logger.debug("observeAverageTxFee Total::{}, TotalFee::{}, TxsCount::{}, WiringCount::{}",
                             statistics.getTotal(), statistics.getTotalFee(), statistics.getTxsCount(), statistics.getWiringCount());
@@ -521,7 +524,7 @@ public class TxViewModel extends AndroidViewModel {
                     txFee = isRetwitt ? Constants.RETWITT_MIN_FEE.longValue() : Constants.NEWS_MIN_FEE.longValue();
                     if (statistics != null && statistics.getTxsCount() > 0) {
                         long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
-                        if (averageTxsFee > Constants.NEWS_MIN_FEE.longValue()) {
+                        if (averageTxsFee > txFee) {
                             txFee = averageTxsFee + Constants.COIN.longValue();
                         }
                     }
@@ -556,10 +559,12 @@ public class TxViewModel extends AndroidViewModel {
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, senderPk);
                 long paymentBalance = 0L;
                 if (member != null) {
-                    paymentBalance = member.getWiringPaymentBalance();
+                    paymentBalance = member.getPaymentBalance();
                 }
-                if (totalPay > paymentBalance) {
-                    result.setFailMsg(application.getString(R.string.tx_error_insufficient_balance));
+                if (paymentBalance <= Constants.TX_MAX_OVERDRAFT) {
+                    result.setFailMsg(application.getString(R.string.tx_error_wiring_balance_no_enough, Constants.TX_MAX_OVERDRAFT));
+                } else if (totalPay > paymentBalance - Constants.TX_MAX_OVERDRAFT) {
+                    result.setFailMsg(application.getString(R.string.tx_error_add_members_no_enough_coins, Constants.TX_MAX_OVERDRAFT));
                 } else {
                     Set<String> friends = friendPks.keySet();
                     for (String friend : friends) {

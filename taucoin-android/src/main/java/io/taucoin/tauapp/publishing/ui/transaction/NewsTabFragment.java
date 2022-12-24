@@ -273,7 +273,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                     boolean isHavePinnedMsg = list != null && list.size() > 0;
                     binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
                     if (isHavePinnedMsg) {
-                        binding.tvPinnedContent.setText(TxUtils.createTxSpan(list.get(0)));
+                        binding.tvPinnedContent.setText(list.get(0).memo);
                     }
                 }));
     }

@@ -41,11 +41,7 @@ public class CommunityAndMember extends Community {
         return balance + Constants.TX_MAX_OVERDRAFT;
     }
 
-    public long getWiringPaymentBalance() {
-        return paymentBalance;
-    }
-
-    public long getNewsPaymentBalance() {
+    public long getPaymentBalance() {
         return paymentBalance + Constants.TX_MAX_OVERDRAFT;
     }
 }

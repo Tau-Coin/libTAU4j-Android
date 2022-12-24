@@ -119,7 +119,7 @@ public class CommunitiesPopUpDialog extends Dialog{
                     holder.binding.ivCommunity.setImageRes(R.mipmap.icon_cbd_logo);
                 }
                 String communityCode = ChainIDUtil.getCode(member.chainID);
-                String balance = FmtMicrometer.fmtBalance(member.balance);
+                String balance = FmtMicrometer.fmtBalance(member.getInterimBalance());
                 holder.binding.tvName.setText(holder.itemView.getContext().getString(R.string.main_community_name_balance,
                         communityName, communityCode, balance));
                 holder.itemView.setOnClickListener(v -> {

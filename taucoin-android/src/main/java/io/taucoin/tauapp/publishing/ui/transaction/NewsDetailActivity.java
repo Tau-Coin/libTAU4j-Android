@@ -100,7 +100,8 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         binding.toolbarInclude.toolbar.setTitle(R.string.main_title);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        binding.news.ivBan.setVisibility(View.INVISIBLE);
+        binding.news.ivBan.setImageResource(R.mipmap.icon_ban_disabled);
+        binding.news.ivBan.setEnabled(false);
         binding.news.ivLongPress.setVisibility(View.INVISIBLE);
         binding.news.ivArrow.setVisibility(View.INVISIBLE);
 

@@ -102,11 +102,7 @@ public class Member implements Parcelable {
         return balance + Constants.TX_MAX_OVERDRAFT - totalOffchainCoins;
     }
 
-    public long getNewsPaymentBalance() {
+    public long getPaymentBalance() {
         return consensusBalance + Constants.TX_MAX_OVERDRAFT - totalPendingCoins;
-    }
-
-    public long getWiringPaymentBalance() {
-        return consensusBalance - totalPendingCoins;
     }
 }
