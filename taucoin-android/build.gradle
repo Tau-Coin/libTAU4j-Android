@@ -124,10 +124,10 @@ android {
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "20000"             // Level.INFO
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "6"
             // TauLogLevel.INFO
-            buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://58f39fc2243907dd122b9f32d551d" +
-                    "bd2c5f24ed153b71be589ce9fb23b7c08d1@13.229.53.249:3882\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"fdb4128330303030CBD\""
-            buildConfigField "String", "TEST_CHAIN_PEER", "\"283cb209f470b7916fc311a259b65dc2a3ca4a234bfd58ba6479509f0fceb66e\""
+            buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://a0105869108acecdb416953e803b8" +
+                    "80591815f22dde8ba95243276c607842109@13.229.53.249:23882\""
+            buildConfigField "String", "TEST_CHAIN_ID", "\"a532079e30303030CBD\""
+            buildConfigField "String", "TEST_CHAIN_PEER", "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
             signingConfig signingConfigs.releaseConfig
         }
 
@@ -138,10 +138,10 @@ android {
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "30000"             // Level.WARN
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "4"
             // TauLogLevel.WARN
-            buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://58f39fc2243907dd122b9f32d551d" +
-                    "bd2c5f24ed153b71be589ce9fb23b7c08d1@13.229.53.249:3882\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"fdb4128330303030CBD\""
-            buildConfigField "String", "TEST_CHAIN_PEER", "\"283cb209f470b7916fc311a259b65dc2a3ca4a234bfd58ba6479509f0fceb66e\""
+            buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://a0105869108acecdb416953e803b8" +
+                    "80591815f22dde8ba95243276c607842109@13.229.53.249:23882\""
+            buildConfigField "String", "TEST_CHAIN_ID", "\"a532079e30303030CBD\""
+            buildConfigField "String", "TEST_CHAIN_PEER", "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
             signingConfig signingConfigs.releaseConfig
         }
 
