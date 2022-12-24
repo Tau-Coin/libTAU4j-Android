@@ -1,5 +1,7 @@
 package io.taucoin.tauapp.publishing.core.utils;
 
+import android.util.Log;
+
 import io.reactivex.Observable;
 
 public class ObservableUtil {
@@ -29,7 +31,7 @@ public class ObservableUtil {
     }
 
     public static Observable<Long> intervalSeconds(long seconds) {
-        return intervalSeconds(seconds * 1000, false);
+        return intervalSeconds(seconds, false);
     }
 
     public static Observable<Long> intervalSeconds(long seconds, boolean initSend) {

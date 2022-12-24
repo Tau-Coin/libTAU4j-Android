@@ -257,10 +257,8 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
 
         disposables.add(txViewModel.observeDataSetChanged()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {
-                    // 跟当前用户有关系的才触发刷新
-                    if (result != null && StringUtil.isNotEmpty(result.getMsg())) {
+                    if (result != null) {
                         // 立即执行刷新
                         dataChanged = true;
                     }
