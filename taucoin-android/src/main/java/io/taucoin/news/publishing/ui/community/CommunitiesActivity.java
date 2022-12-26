@@ -181,11 +181,6 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, TransactionsActivity.class);
                 break;
-            case R.id.item_mining_income_pending:
-                intent = new Intent();
-                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                ActivityUtil.startActivity(intent, this, MiningIncomeActivity.class);
-                break;
             case R.id.rl_pay_people:
                 intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);

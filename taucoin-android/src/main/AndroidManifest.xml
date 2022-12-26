@@ -92,10 +92,6 @@
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.MiningIncomeActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
-
-        <activity
             android:name="io.taucoin.news.publishing.ui.community.CommunityDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
