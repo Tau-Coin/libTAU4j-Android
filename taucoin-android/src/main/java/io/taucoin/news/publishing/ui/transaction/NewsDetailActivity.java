@@ -275,13 +275,13 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
                 retweetDialog.closeDialog();
             }
             retweetDialog = new PopUpDialog.Builder(this)
-                    .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet))
-                    .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share))
+                    .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet_other))
+                    .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share_external))
                     .setOnItemClickListener((dialog, name, code) -> {
                         dialog.cancel();
                         if (code == R.mipmap.icon_retwitt) {
                             Intent intent = new Intent();
-                            intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+                            intent.putExtra(IntentExtra.DATA, tx.memo);
                             intent.putExtra(IntentExtra.LINK, tx.link);
                             ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
                         } else if (code == R.mipmap.icon_share_gray) {
@@ -419,7 +419,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         if (tx.favoriteTime <= 0) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_favorite));
         }
-        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
+//        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
 
         operationsMenu = new FloatMenu(this);
         operationsMenu.items(menuList);

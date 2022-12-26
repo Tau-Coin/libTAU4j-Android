@@ -2,6 +2,7 @@ package io.taucoin.news.publishing.ui.customviews;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.text.Html;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,11 +87,13 @@ public class CommunitiesPopUpDialog extends Dialog{
         private List<Member> items;
         private OnItemClickListener listener;
         private CommunitiesPopUpDialog popUpDialog;
+        private final String nameFormat;
         ItemAdapter(CommunitiesPopUpDialog popUpDialog, List<Member> items, OnItemClickListener listener) {
             super(diffCallback);
             this.popUpDialog = popUpDialog;
             this.items = items;
             this.listener = listener;
+            this.nameFormat = popUpDialog.getContext().getString(R.string.main_community_name_balance);
         }
 
         @NonNull
@@ -120,8 +123,8 @@ public class CommunitiesPopUpDialog extends Dialog{
                 }
                 String communityCode = ChainIDUtil.getCode(member.chainID);
                 String balance = FmtMicrometer.fmtBalance(member.getInterimBalance());
-                holder.binding.tvName.setText(holder.itemView.getContext().getString(R.string.main_community_name_balance,
-                        communityName, communityCode, balance));
+                String name = String.format(nameFormat, communityName, communityCode, balance);
+                holder.binding.tvName.setText(Html.fromHtml(name));
                 holder.itemView.setOnClickListener(v -> {
                     if(listener != null){
                         listener.onItemClick(popUpDialog, member);

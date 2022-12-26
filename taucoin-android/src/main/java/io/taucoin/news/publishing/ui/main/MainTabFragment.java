@@ -33,7 +33,9 @@ import io.taucoin.news.publishing.databinding.FragmentMainTabBinding;
 import io.taucoin.news.publishing.ui.BaseFragment;
 import io.taucoin.news.publishing.ui.community.CommunityViewModel;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
+import io.taucoin.news.publishing.ui.friends.FriendsActivity;
 import io.taucoin.news.publishing.ui.qrcode.CommunityQRCodeActivity;
+import io.taucoin.news.publishing.ui.transaction.TransactionCreateActivity;
 import io.taucoin.news.publishing.ui.user.UserDetailActivity;
 import io.taucoin.news.publishing.ui.user.UserViewModel;
 
@@ -155,6 +157,8 @@ public class MainTabFragment extends BaseFragment implements MainListAdapter.Cli
         }
         if (bean.type == 0) {
             menuList.add(new OperationMenuItem(R.string.main_operation_share_community));
+            menuList.add(new OperationMenuItem(R.string.community_added_members));
+            menuList.add(new OperationMenuItem(R.string.community_transaction));
         }
         if (bean.stickyTop == 1) {
             menuList.add(new OperationMenuItem(R.string.main_operation_remove_top));
@@ -203,6 +207,17 @@ public class MainTabFragment extends BaseFragment implements MainListAdapter.Cli
                     break;
                 case R.string.main_operation_ban_friend:
                     userViewModel.setUserBlacklist(bean.ID, true);
+                    break;
+                case R.string.community_added_members:
+                    intent = new Intent();
+                    intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_ADD_MEMBERS);
+                    intent.putExtra(IntentExtra.CHAIN_ID, bean.ID);
+                    ActivityUtil.startActivity(intent, this, FriendsActivity.class);
+                    break;
+                case R.string.community_transaction:
+                    intent = new Intent();
+                    intent.putExtra(IntentExtra.CHAIN_ID, bean.ID);
+                    ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
                     break;
             }
         });

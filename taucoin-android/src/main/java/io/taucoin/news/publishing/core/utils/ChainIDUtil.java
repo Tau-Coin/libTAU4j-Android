@@ -2,6 +2,8 @@ package io.taucoin.news.publishing.core.utils;
 
 import org.libTAU4j.ChainURL;
 
+import io.taucoin.news.publishing.BuildConfig;
+
 /**
  * ChainID工具类
  */
@@ -36,7 +38,12 @@ public class ChainIDUtil {
 
     public static String getCoinName(String chainID) {
         String name = getName(chainID);
-        String firstLetters = StringUtil.getFirstLettersOfName(name);
+        String firstLetters;
+        if (StringUtil.isEquals(chainID, BuildConfig.TEST_CHAIN_ID)) {
+            firstLetters = name;
+        } else {
+            firstLetters = StringUtil.getFirstLettersOfName(name);
+        }
         return firstLetters + "coin";
     }
 

@@ -59,7 +59,7 @@
                 android:maxWidth="@dimen/widget_size_220"
                 android:gravity="start"
                 android:textColorLink="@color/color_blue_link"
-                android:textAppearance="@style/TextAppearanceBody2" />
+                android:textAppearance="@style/TextAppearanceBody1" />
 
             <io.taucoin.news.publishing.ui.customviews.RoundImageView
                 android:id="@+id/iv_head_pic"

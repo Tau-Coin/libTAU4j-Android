@@ -121,7 +121,7 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
             menuList.add(new OperationMenuItem(R.string.tx_operation_copy_link));
         }
         menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
-        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
+//        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
 
         operationsMenu = new FloatMenu(this);
         operationsMenu.items(menuList);
@@ -186,13 +186,13 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
             retweetDialog.closeDialog();
         }
         retweetDialog = new PopUpDialog.Builder(this)
-                .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet))
-                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share))
+                .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet_other))
+                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share_external))
                 .setOnItemClickListener((dialog, name, code) -> {
                     dialog.cancel();
                     if (code == R.mipmap.icon_retwitt) {
                         Intent intent = new Intent();
-                        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+                        intent.putExtra(IntentExtra.DATA, tx.memo);
                         intent.putExtra(IntentExtra.LINK, tx.link);
                         ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
                     } else if (code == R.mipmap.icon_share_gray) {

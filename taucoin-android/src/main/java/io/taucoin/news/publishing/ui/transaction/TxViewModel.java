@@ -412,15 +412,12 @@ public class TxViewModel extends AndroidViewModel {
                         FmtMicrometer.fmtFeeValue(Constants.WIRING_MIN_FEE.longValue()));
                 ToastUtils.showShortToast(minFee);
                 return false;
-            } else if (balance <= Constants.TX_MAX_OVERDRAFT) {
-                ToastUtils.showShortToast(getApplication().getString(R.string.tx_error_wiring_balance_no_enough, Constants.TX_MAX_OVERDRAFT));
-                return false;
-            } else if (tx.amount > balance - Constants.TX_MAX_OVERDRAFT || tx.amount + tx.fee > balance - Constants.TX_MAX_OVERDRAFT) {
-                ToastUtils.showShortToast(getApplication().getString(R.string.tx_error_no_enough_coins, Constants.TX_MAX_OVERDRAFT));
+            } else if (tx.amount > balance || tx.amount + tx.fee > balance) {
+                ToastUtils.showShortToast(getApplication().getString(R.string.tx_error_no_enough_coins));
                 return false;
             }
         } else {
-            long minTxFee = tx.txType == 3 ? Constants.RETWITT_MIN_FEE.longValue() : Constants.NEWS_MIN_FEE.longValue();
+            long minTxFee = tx.queueType == 3 ? Constants.RETWITT_MIN_FEE.longValue() : Constants.NEWS_MIN_FEE.longValue();
             //TODO: news tx valid?
             if (tx.fee < 0) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_free);
@@ -561,10 +558,8 @@ public class TxViewModel extends AndroidViewModel {
                 if (member != null) {
                     paymentBalance = member.getPaymentBalance();
                 }
-                if (paymentBalance <= Constants.TX_MAX_OVERDRAFT) {
-                    result.setFailMsg(application.getString(R.string.tx_error_wiring_balance_no_enough, Constants.TX_MAX_OVERDRAFT));
-                } else if (totalPay > paymentBalance - Constants.TX_MAX_OVERDRAFT) {
-                    result.setFailMsg(application.getString(R.string.tx_error_add_members_no_enough_coins, Constants.TX_MAX_OVERDRAFT));
+                if (totalPay > paymentBalance) {
+                    result.setFailMsg(application.getString(R.string.tx_error_add_members_no_enough_coins));
                 } else {
                     Set<String> friends = friendPks.keySet();
                     for (String friend : friends) {

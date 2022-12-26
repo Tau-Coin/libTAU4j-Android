@@ -19,10 +19,10 @@
             layout="@layout/toolbar" />
 
         <com.yanzhenjie.recyclerview.SwipeRecyclerView
+            android:background="@color/color_white"
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="@dimen/widget_size_10"
+            android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:scrollbars="vertical"
             android:focusable="true"

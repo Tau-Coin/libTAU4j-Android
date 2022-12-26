@@ -53,7 +53,7 @@
                 android:gravity="start"
                 android:maxWidth="@dimen/widget_size_220"
                 android:textColorLink="@color/color_blue_link"
-                android:textAppearance="@style/TextAppearanceBody2" />
+                android:textAppearance="@style/TextAppearanceBody1" />
 
 
         </LinearLayout>

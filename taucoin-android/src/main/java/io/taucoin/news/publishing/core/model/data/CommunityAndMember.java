@@ -42,6 +42,6 @@ public class CommunityAndMember extends Community {
     }
 
     public long getPaymentBalance() {
-        return paymentBalance + Constants.TX_MAX_OVERDRAFT;
+        return paymentBalance;
     }
 }

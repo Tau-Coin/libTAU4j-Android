@@ -379,12 +379,10 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
             menuList.add(new OperationMenuItem(R.string.tx_operation_blacklist));
         }
         menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
-        menuList.add(new OperationMenuItem(R.string.community_added_members));
-        menuList.add(new OperationMenuItem(R.string.community_transaction));
         if (tx.favoriteTime <= 0) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_favorite));
         }
-        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
+//        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
 
         operationsMenu = new FloatMenu(activity);
         operationsMenu.items(menuList);
@@ -416,17 +414,6 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                     String msgHash = tx.txID;
                     CopyManager.copyText(msgHash);
                     ToastUtils.showShortToast(R.string.copy_message_hash);
-                    break;
-                case R.string.community_added_members:
-                    Intent intent = new Intent();
-                    intent.putExtra(IntentExtra.TYPE, FriendsActivity.PAGE_ADD_MEMBERS);
-                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                    ActivityUtil.startActivity(intent, this, FriendsActivity.class);
-                    break;
-                case R.string.community_transaction:
-                    intent = new Intent();
-                    intent.putExtra(IntentExtra.CHAIN_ID, chainID);
-                    ActivityUtil.startActivity(intent, this, TransactionCreateActivity.class);
                     break;
 
             }
@@ -480,13 +467,13 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
             retweetDialog.closeDialog();
         }
         retweetDialog = new PopUpDialog.Builder(activity)
-                .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet))
-                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share))
+                .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet_other))
+                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share_external))
                 .setOnItemClickListener((dialog, name, code) -> {
                     dialog.cancel();
                     if (code == R.mipmap.icon_retwitt) {
                         Intent intent = new Intent();
-                        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+                        intent.putExtra(IntentExtra.DATA, tx.memo);
                         intent.putExtra(IntentExtra.LINK, tx.link);
                         ActivityUtil.startActivity(intent, activity, NewsCreateActivity.class);
                     } else if (code == R.mipmap.icon_share_gray) {

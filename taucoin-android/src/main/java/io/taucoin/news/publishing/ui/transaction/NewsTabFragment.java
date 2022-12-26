@@ -48,6 +48,7 @@ import io.taucoin.news.publishing.ui.BaseFragment;
 import io.taucoin.news.publishing.ui.community.CommunityViewModel;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
 import io.taucoin.news.publishing.ui.constant.Page;
+import io.taucoin.news.publishing.ui.customviews.CommonDialog;
 import io.taucoin.news.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.news.publishing.ui.main.MainActivity;
 import io.taucoin.news.publishing.ui.user.UserDetailActivity;
@@ -72,6 +73,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     protected CommunityViewModel communityViewModel;
     private FloatMenu operationsMenu;
     private PopUpDialog retweetDialog;
+    private CommonDialog banCommunityDialog;
 
     private int currentPos = 0;
     private boolean isScrollToTop = true;
@@ -223,6 +225,12 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     @Override
     public void onStart() {
         super.onStart();
+        communityViewModel.getSetBlacklistState().observe(this, isSuccess -> {
+            if (isSuccess) {
+                loadData(0);
+            }
+        });
+
         txViewModel.observerChainTxs().observe(this, txs -> {
             List<UserAndTx> currentList = new ArrayList<>(txs);
             int size;
@@ -314,11 +322,12 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                 MainApplication.getInstance().getPublicKey())){
             menuList.add(new OperationMenuItem(R.string.tx_operation_blacklist));
         }
+        menuList.add(new OperationMenuItem(R.string.tx_operation_ban_community));
         menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
         if (tx.favoriteTime <= 0) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_favorite));
         }
-        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
+//        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
 
         operationsMenu = new FloatMenu(activity);
         operationsMenu.items(menuList);
@@ -338,6 +347,9 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                     KeyboardUtils.hideSoftInput(activity);
                     String showName = UsersUtil.getShowName(tx.sender, tx.senderPk);
                     userViewModel.showBanDialog(activity, tx.senderPk, showName);
+                    break;
+                case R.string.tx_operation_ban_community:
+                    banCommunityDialog = communityViewModel.showBanCommunityTipsDialog(activity, tx.chainID);
                     break;
                 case R.string.tx_operation_pin:
                 case R.string.tx_operation_unpin:
@@ -382,13 +394,13 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
             retweetDialog.closeDialog();
         }
         retweetDialog = new PopUpDialog.Builder(activity)
-                .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet))
-                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share))
+                .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet_other))
+                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share_external))
                 .setOnItemClickListener((dialog, name, code) -> {
                     dialog.cancel();
                     if (code == R.mipmap.icon_retwitt) {
                         Intent intent = new Intent();
-                        intent.putExtra(IntentExtra.DATA, TxUtils.createTxSpan(tx, CommunityTabFragment.TAB_NEWS));
+                        intent.putExtra(IntentExtra.DATA, tx.memo);
                         intent.putExtra(IntentExtra.LINK, tx.link);
                         ActivityUtil.startActivityForResult(intent, activity, NewsCreateActivity.class,
                                 CHOOSE_REQUEST_CODE);
@@ -462,6 +474,9 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         }
         if (retweetDialog != null && retweetDialog.isShowing()) {
             retweetDialog.closeDialog();
+        }
+        if (banCommunityDialog != null && banCommunityDialog.isShowing()) {
+            banCommunityDialog.closeDialog();
         }
     }
 

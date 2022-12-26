@@ -147,15 +147,21 @@
 
         </RelativeLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/widget_size_10"
+            android:background="@color/color_bg"/>
+
         <LinearLayout
             android:id="@+id/rl_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:weightSum="4"
-            android:layout_marginTop="@dimen/widget_size_10"
             android:layout_marginStart="@dimen/widget_size_15"
-            android:layout_marginEnd="@dimen/widget_size_15">
+            android:layout_marginEnd="@dimen/widget_size_15"
+            android:layout_marginTop="@dimen/widget_size_5">
 
             <FrameLayout
                 android:layout_width="0dp"
@@ -164,8 +170,9 @@
 
                 <ImageView
                     android:id="@+id/iv_ban"
-                    android:layout_width="@dimen/widget_size_20"
-                    android:layout_height="@dimen/widget_size_20"
+                    android:layout_width="@dimen/widget_size_26"
+                    android:layout_height="@dimen/widget_size_26"
+                    android:padding="@dimen/widget_size_4"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@null"
                     android:src="@mipmap/icon_ban_gray"/>
@@ -180,8 +187,9 @@
 
                 <ImageView
                     android:id="@+id/iv_chat"
-                    android:layout_width="@dimen/widget_size_20"
-                    android:layout_height="@dimen/widget_size_20"
+                    android:layout_width="@dimen/widget_size_26"
+                    android:layout_height="@dimen/widget_size_26"
+                    android:padding="@dimen/widget_size_4"
                     android:contentDescription="@null"
                     android:src="@mipmap/icon_chat"/>
 
@@ -189,7 +197,6 @@
                     android:id="@+id/tv_chat_num"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_5"
                     android:text="0"
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody1"/>
@@ -204,8 +211,9 @@
 
                 <ImageView
                     android:id="@+id/iv_reply"
-                    android:layout_width="@dimen/widget_size_20"
-                    android:layout_height="@dimen/widget_size_20"
+                    android:layout_width="@dimen/widget_size_26"
+                    android:layout_height="@dimen/widget_size_26"
+                    android:padding="@dimen/widget_size_4"
                     android:contentDescription="@null"
                     android:src="@mipmap/icon_reply_news"/>
 
@@ -213,7 +221,6 @@
                     android:id="@+id/tv_replies_num"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_3"
                     android:text="0"
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody1"/>
@@ -227,8 +234,9 @@
 
                 <ImageView
                     android:id="@+id/iv_retweet"
-                    android:layout_width="@dimen/widget_size_24"
-                    android:layout_height="@dimen/widget_size_24"
+                    android:layout_width="@dimen/widget_size_28"
+                    android:layout_height="@dimen/widget_size_28"
+                    android:padding="@dimen/widget_size_4"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@null"
                     android:src="@mipmap/icon_retwitt"/>
@@ -240,7 +248,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_1"
-            android:layout_marginTop="@dimen/widget_size_7"
+            android:layout_marginTop="@dimen/widget_size_5"
             android:background="@color/color_bg"/>
 
     </LinearLayout>

@@ -271,9 +271,9 @@ public class TxUtils {
                 }
             } else if (txType == TxType.NEWS_TX.getType()) {
                 NewsContent newsContent = new NewsContent(tx.content);
-                msg.append("\n").append("Description::").append(newsContent.getMemo());
+                msg.append("\n").append("Description:").append(newsContent.getMemo());
                 if (StringUtil.isNotEmpty(newsContent.getLinkStr())) {
-                    msg.append("\n").append("Link::").append(newsContent.getLinkStr());
+                    msg.append("\n").append("Link:").append(newsContent.getLinkStr());
                 }
             }
         }

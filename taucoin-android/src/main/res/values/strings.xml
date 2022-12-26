@@ -46,6 +46,8 @@
     <string name="common_done">Done</string>
     <string name="common_post">Post</string>
     <string name="common_retweet">Retwitt</string>
+    <string name="common_retweet_other">Retwitt to other community</string>
+    <string name="common_share_external">Shate to external</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
@@ -57,7 +59,7 @@
     <string name="main_exit">Click again to exit the application!</string>
     <string name="main_community_name">%1$s - %2$s</string>
     <string name="main_community_chat">News Topic Chat</string>
-    <string name="main_community_name_balance">%1$s(%2$s)-balance %3$s</string>
+    <string name="main_community_name_balance" formatted="false"><Data><![CDATA[%1$s(%2$s) <font color="#f19322">%3$s</font>]]></Data></string>
     <string name="main_community_name_discovered">%1$s - %2$s - Discovered</string>
     <string name="main_community_name_total">%1$s - %2$s(%3$d)</string>
     <string name="main_community_in_mining">In Mining &#8230;</string>
@@ -480,7 +482,8 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_operation_select_all">Select All</string>
     <string name="tx_operation_copy_link">Copy link</string>
     <string name="tx_operation_forward">Forward</string>
-    <string name="tx_operation_blacklist">Blacklist</string>
+    <string name="tx_operation_blacklist">Ban Sender</string>
+    <string name="tx_operation_ban_community">Ban Community</string>
     <string name="tx_operation_favorite">Favorite</string>
     <string name="tx_operation_favorite_delete">Delete Favorite</string>
     <string name="tx_operation_msg_hash">Message Hash</string>
@@ -496,9 +499,8 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_error_invalid_airdrop_link">Invalid airdrop link</string>
     <string name="tx_error_invalid_free">Invalid Transaction free</string>
     <string name="tx_error_min_free">Transaction fee cannot be less than %1$s</string>
-    <string name="tx_error_wiring_balance_no_enough">You need more than %d coins to wire others.</string>
-    <string name="tx_error_add_members_no_enough_coins">Insufficient Balance :\ncoins + Fee > Payment Balance - %d</string>
-    <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Payment Balance - %d</string>
+    <string name="tx_error_add_members_no_enough_coins">Insufficient Balance :\ncoins + Fee > Payment Balance</string>
+    <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Payment Balance</string>
     <string name="tx_error_no_enough_coins_for_fee">Insufficient Balance :\nTransaction Fee > Interim Balance</string>
     <string name="tx_error_insufficient_balance">Insufficient Balance</string>
     <string name="tx_error_nonce_conflict">Invalidation: nonce conflict</string>

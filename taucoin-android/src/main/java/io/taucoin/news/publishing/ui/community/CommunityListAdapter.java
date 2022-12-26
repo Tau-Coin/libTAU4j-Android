@@ -1,6 +1,7 @@
 package io.taucoin.news.publishing.ui.community;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,12 +61,14 @@ public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapt
         private final ItemCommunitySelectBinding binding;
         private final CommunityListAdapter adapter;
         private final Context context;
+        private final String nameFormat;
 
         ViewHolder(CommunityListAdapter adapter, ItemCommunitySelectBinding binding) {
             super(binding.getRoot());
             this.adapter = adapter;
             this.binding = binding;
             this.context = binding.getRoot().getContext();
+            this.nameFormat = context.getString(R.string.main_community_name_balance);
         }
 
         /**
@@ -78,8 +81,8 @@ public class CommunityListAdapter extends ListAdapter<Member, CommunityListAdapt
             String communityName = ChainIDUtil.getName(member.chainID);
             String communityCode = ChainIDUtil.getCode(member.chainID);
             String balance = FmtMicrometer.fmtBalance(member.getInterimBalance());
-            binding.tvName.setText(context.getString(R.string.main_community_name_balance,
-                    communityName, communityCode, balance));
+            String name = String.format(nameFormat, communityName, communityCode, balance);
+            binding.tvName.setText(Html.fromHtml(name));
             binding.ivSelected.setVisibility(StringUtil.isEquals(adapter.getChainID(), member.chainID)
                     ? View.VISIBLE : View.INVISIBLE);
         }

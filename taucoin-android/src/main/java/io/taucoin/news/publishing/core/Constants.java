@@ -19,9 +19,11 @@ public class Constants {
     // 转账交易最小为1 COIN
     public static final BigInteger WIRING_MIN_FEE = COIN;
     // 消息交易最小为10 COIN
-    public static final BigInteger NEWS_MIN_FEE = new BigInteger("10", 10).multiply(COIN);
-    // 消息交易最小为10 COIN
+    public static final BigInteger NEWS_MIN_FEE = new BigInteger("20", 10).multiply(COIN);
+    // 转发news交易最小为5 COIN
     public static final BigInteger RETWITT_MIN_FEE = new BigInteger("5", 10).multiply(COIN);
+    // 回复news交易最小为5 COIN
+    public static final BigInteger REPLY_MIN_FEE = new BigInteger("5", 10).multiply(COIN);
     // 挖矿奖励
     public static final BigInteger MINING_REWARDS = new BigInteger("10", 10).multiply(COIN);
 
@@ -74,7 +76,7 @@ public class Constants {
     public static final BigInteger PERCENTAGE = new BigInteger("100", 10);
 
     // 默认字体缩放大小
-    public static final float DEFAULT_FONT_SCALE_SIZE = 1.1f;
+    public static final float DEFAULT_FONT_SCALE_SIZE = 1.0f;
 
     // Pending
     public static final int TX_STATUS_PENDING = 0;

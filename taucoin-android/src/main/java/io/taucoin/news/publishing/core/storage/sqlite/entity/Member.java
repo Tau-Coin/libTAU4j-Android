@@ -103,6 +103,6 @@ public class Member implements Parcelable {
     }
 
     public long getPaymentBalance() {
-        return consensusBalance + Constants.TX_MAX_OVERDRAFT - totalPendingCoins;
+        return consensusBalance - totalPendingCoins;
     }
 }

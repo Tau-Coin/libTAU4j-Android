@@ -180,7 +180,7 @@ public class CommunityViewModel extends AndroidViewModel {
      * 获取设置黑名单状态的被观察者
      * @return 被观察者
      */
-    LiveData<Boolean> getSetBlacklistState() {
+    public LiveData<Boolean> getSetBlacklistState() {
         return setBlacklistState;
     }
 
@@ -468,7 +468,7 @@ public class CommunityViewModel extends AndroidViewModel {
      * 显示拉黑社区提示对话框
      * @param chainID 社区chainID
      */
-    CommonDialog showBanCommunityTipsDialog(FragmentActivity activity, String chainID) {
+    public CommonDialog showBanCommunityTipsDialog(FragmentActivity activity, String chainID) {
         BlacklistDialogBinding dialogBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
                 R.layout.blacklist_dialog, null, false);
         String blacklistTip = activity.getString(R.string.community_blacklist_tip, ChainIDUtil.getName(chainID));
