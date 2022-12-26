@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import androidx.databinding.DataBindingUtil;
@@ -32,6 +33,7 @@ public class ItemLineView extends RelativeLayout {
     private String rightText2;
     private int rightTextColor;
     private int leftImage;
+    private int leftImageSize;
     private int rightImage;
     private int rightPoint;
     private ViewItemLineBinding binding;
@@ -53,6 +55,7 @@ public class ItemLineView extends RelativeLayout {
     private void initData(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ItemLineView);
         this.leftImage = a.getResourceId(R.styleable.ItemLineView_leftImage, -1);
+        this.leftImageSize = a.getDimensionPixelSize(R.styleable.ItemLineView_leftImageSize, -1);
         this.rightImage = a.getResourceId(R.styleable.ItemLineView_rightImage, -1);
         this.leftText = a.getString(R.styleable.ItemLineView_leftText);
         this.rightText = a.getString(R.styleable.ItemLineView_rightText);
@@ -67,6 +70,12 @@ public class ItemLineView extends RelativeLayout {
         binding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.view_item_line, this, true);
         if(leftImage != -1){
             binding.ivLeft.setImageResource(leftImage);
+            if (leftImageSize != -1) {
+                ViewGroup.LayoutParams layoutParams = binding.ivLeft.getLayoutParams();
+                layoutParams.width = leftImageSize;
+                layoutParams.height = leftImageSize;
+                binding.ivLeft.setLayoutParams(layoutParams);
+            }
         }
         if(rightImage != -1){
             binding.ivRight.setImageResource(rightImage);
