@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+
 import io.taucoin.news.publishing.core.Constants;
 import io.taucoin.news.publishing.core.utils.DateUtil;
 
@@ -23,6 +24,7 @@ public class Member implements Parcelable {
     public long totalPendingCoins;      // 成员花费的钱，包括交易费和给其他人的钱，onchain + offchain
     public long totalOffchainCoins;     // 成员花费的钱，包括交易费和给其他人的钱，offchain
     public long balUpdateTime;          // 成员的balance更新时间
+    public long consensusPower;         // 成员的consensusPower
     public long power;                  // 成员的power
     public long pendingTime;            // 成员收到朋友转账动作（未上链）
     public long nonce;                  // 成员的nonce
@@ -104,5 +106,9 @@ public class Member implements Parcelable {
 
     public long getPaymentBalance() {
         return Math.max(0, consensusBalance - totalPendingCoins);
+    }
+
+    public long getMiningRewards() {
+        return Math.max(0, (consensusPower - power) * Constants.MINING_REWARDS.longValue());
     }
 }

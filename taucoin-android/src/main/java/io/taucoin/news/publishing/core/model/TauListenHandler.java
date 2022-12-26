@@ -734,6 +734,7 @@ public class TauListenHandler {
                     member.totalOffchainCoins = offchainCoins;
                     member.balUpdateTime = modifiedTime;
                     member.nonce = account.getNonce();
+                    member.consensusPower = account.getPower();
                     member.power = account.getPower();
                     memberRepo.updateMember(member);
                 } else {
@@ -745,6 +746,7 @@ public class TauListenHandler {
                     member.totalOffchainCoins = offchainCoins;
                     member.balUpdateTime = modifiedTime;
                     member.nonce = account.getNonce();
+                    member.consensusPower = account.getPower();
                     member.power = account.getPower();
                     memberRepo.addMember(member);
                 }
