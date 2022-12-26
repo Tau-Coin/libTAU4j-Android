@@ -268,20 +268,33 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     /**
-     * 同步给朋友发转账任务
+     * 发交易时同步给朋友发转账任务 0
      * @param context Context
+     * @param TxQueue tx
+     * @param QueueOperation operation
      */
     public static Result syncSendMessageTask(Context context, TxQueue tx, QueueOperation operation) {
         return syncSendMessageTask(context, tx, null, operation);
     }
 
+
+    /**
+     * 同步给朋友发转账任务 
+     * @param context Context
+     * @param TxQueue tx
+     * @param String  referralLink(从发交易入口，该参数null)
+     * @param QueueOperation operation
+     */
     public static Result syncSendMessageTask(Context context, TxQueue tx, String referralLink, QueueOperation operation) {
-        // 自己发给自己的wiring交易，并且交易金额为0；不发送点对点消息
+        // 自己发给自己的交易，并且交易金额为0(排除News交易)；不发送点对点消息
         if (null == tx || (operation == QueueOperation.INSERT && tx.txType == TxType.WIRING_TX.getType() &&
                 StringUtil.isEquals(tx.senderPk, tx.receiverPk) && tx.amount <= 0 )) {
             return null;
         }
+
+        //创建消息内容(也有可能是referral机制产生)
         String text = TxUtils.createSpanTxQueue(tx, referralLink, operation).toString();
+
         return syncSendMessageTask(context, tx.senderPk, tx.receiverPk, text,
                 MessageType.WIRING.getType(), tx.chainID, null);
     }

@@ -365,6 +365,9 @@ public interface TxDao {
     @Query(QUERY_GET_CHAIN_ALL_MARKET)
     List<UserAndTx> loadAllMarketData(String chainID, int startPosition, int loadSize);
 
+    /**
+     * 获取wallet中所有交易(支出、收入; 上链、未上链)
+     */
     @Transaction
     @Query(QUERY_GET_WALLET_INCOME_AND_EXPENDITURE)
     List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize);
