@@ -282,7 +282,8 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     }
 
     private void loadAverageTxFee() {
-        disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.NEWS_TX, isReteitt)
+        boolean isReply = StringUtil.isNotEmpty(repliedHash);
+        disposables.add(txViewModel.observeAverageTxFee(chainID, TxType.NEWS_TX, isReteitt, isReply)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::loadFeeView));
