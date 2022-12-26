@@ -42,6 +42,6 @@ public class CommunityAndMember extends Community {
     }
 
     public long getPaymentBalance() {
-        return paymentBalance;
+        return Math.max(0, paymentBalance);
     }
 }
