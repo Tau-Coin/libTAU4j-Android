@@ -129,21 +129,16 @@ public interface TxDao {
         " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
         " ORDER BY tx.pinnedTime DESC";
 
-    // 查询钱包交易记录
-    String QUERY_GET_WALLET_TRANSACTIONS = "SELECT " +
-            " t.txID AS hash, t.senderPk AS senderOrMiner, t.receiverPk, -1 AS blockNumber, t.txType, t.amount, t.fee," +
-            " t.timestamp / 1000 AS createTime, b.timestamp AS onlineTime, t.txStatus AS onlineStatus" +
+    // 查询钱包的收入和支出
+    String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = 
+            " SELECT t.txID AS hash, t.senderPk AS senderOrMiner, t.receiverPk, -1 AS blockNumber, t.txType, t.amount, t.fee," +
+            " t.timestamp / 1000 AS createTime, 0 AS onlineTime, t.txStatus AS onlineStatus" +
             " FROM Txs AS t" +
-            " LEFT JOIN (SELECT txID, timestamp FROM Blocks WHERE chainID = :chainID" +
-            " AND txID IS NOT NULL AND status = 1 GROUP BY txID) AS b ON t.txID = b.txID" +
             " WHERE t.chainID = :chainID" +
             " AND (t.senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " OR t.receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
-            " AND t.txType IN (2, 3)";
-
-    // 查询钱包的收入和支出
-    String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = "SELECT * FROM" +
-            " (" + QUERY_GET_WALLET_TRANSACTIONS +")" +
+            " AND t.txType IN (" + Constants.WIRING_TX_TYPE + ", " + Constants.NEWS_TX_TYPE + ")" +
+            " AND t.txStatus <=" + Constants.TX_STATUS_ON_CHAIN + 
             " ORDER BY createTime DESC" +
             " LIMIT :loadSize OFFSET :startPosition";
 

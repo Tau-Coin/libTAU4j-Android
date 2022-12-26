@@ -994,12 +994,16 @@ public class TxViewModel extends AndroidViewModel {
                 if (pos == 0 && initSize > pageSize) {
                     pageSize = initSize;
                 }
-                long startTime = System.currentTimeMillis();
                 list = txRepo.observeWalletTransactions(chainID, pos, pageSize);
-                long getMessagesTime = System.currentTimeMillis();
+
+                //walletTxs加入pending 状态的mining rewards
+                User currentUser = userRepo.getCurrentUser();
+                Member member = memberRepo.getMemberByChainIDAndPk(chainID, currentUser.publicKey);
+                IncomeAndExpenditure miningRewards = new IncomeAndExpenditure(currentUser.publicKey, -1, member.getMiningRewards(), daemon.getSessionTime()/1000);
+                list.add(miningRewards);
                 logger.debug("queryWalletIncomeAndExpenditure pos::{}, pageSize::{}, size::{}",
                         pos, pageSize, list.size());
-                logger.debug("queryWalletIncomeAndExpenditure getMessagesTime::{}", getMessagesTime - startTime);
+
             } catch (Exception e) {
                 logger.error("queryWalletIncomeAndExpenditure error::", e);
             }
@@ -1010,6 +1014,7 @@ public class TxViewModel extends AndroidViewModel {
                 .subscribe(list -> {
                     walletTxs.postValue(list);
                 });
+
         disposables.add(disposable);
     }
 

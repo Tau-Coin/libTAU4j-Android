@@ -75,36 +75,44 @@ public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, Tr
             if (null == entry) {
                 return;
             }
-            // Transfer from
             boolean isMyself = StringUtil.isEquals(entry.senderOrMiner, myPublicKey);
             StringBuilder stringBuilder = new StringBuilder();
-            if (isMyself && entry.txType != -1) {
-                if (entry.txType == TxType.NEWS_TX.getType()) {
-                    binding.tvName.setText(resources.getString(R.string.community_post_news));
-                    binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.sender));
-                } else {
-                    String name = UsersUtil.getShowName(entry.receiver);
-                    binding.tvName.setText(resources.getString(R.string.community_transfer_to, name));
-                    binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.receiver));
-                }
-                stringBuilder.append("-");
-                stringBuilder.append(FmtMicrometer.fmtMiningIncome(entry.amount + entry.fee));
-                binding.tvAmount.setTextColor(resources.getColor(R.color.color_red));
-            } else { //txType == -1是mining rewards
-                binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.sender));
+            if (isMyself) {
+                //txType == -1是mining rewards
                 if (entry.txType == -1) {
                     binding.tvName.setText(resources.getString(R.string.community_mining_rewards,
-                            FmtMicrometer.fmtLong(entry.blockNumber)));
+                            FmtMicrometer.fmtLong(entry.amount)));
                 } else {
-                    String name = UsersUtil.getShowName(entry.sender);
-                    binding.tvName.setText(resources.getString(R.string.community_transfer_from, name));
+                    if (entry.txType == TxType.NEWS_TX.getType()) {
+                        binding.tvName.setText(resources.getString(R.string.community_post_news));
+                        binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.sender));
+                    } else if (entry.txType == TxType.WIRING_TX.getType()){
+                        boolean isSendToSelf = StringUtil.isEquals(entry.senderOrMiner, entry.receiverPk);
+                        //自己发给自己的交易, 显示交易费
+                        if (isSendToSelf) {
+                            binding.tvName.setText(resources.getString(R.string.community_transfer_to_self));
+                            stringBuilder.append("-");
+                            stringBuilder.append(FmtMicrometer.fmtMiningIncome(entry.fee));
+                            binding.tvAmount.setTextColor(resources.getColor(R.color.color_red));
+                        } else {
+                            String name = UsersUtil.getShowName(entry.receiver);
+                            binding.tvName.setText(resources.getString(R.string.community_transfer_to, name));
+                            binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.receiver));
+                            stringBuilder.append("-");
+                            stringBuilder.append(FmtMicrometer.fmtMiningIncome(entry.amount + entry.fee));
+                            binding.tvAmount.setTextColor(resources.getColor(R.color.color_red));
+                        }
+                    }
                 }
+            } else {
+                binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.sender));
+                String name = UsersUtil.getShowName(entry.sender);
+                binding.tvName.setText(resources.getString(R.string.community_transfer_from, name));
                 stringBuilder.append("+");
                 stringBuilder.append(FmtMicrometer.fmtMiningIncome(entry.amount));
                 binding.tvAmount.setTextColor(resources.getColor(R.color.color_yellow));
             }
             binding.tvAmount.setText(stringBuilder.toString());
-
             if (entry.onlineStatus >= Constants.TX_STATUS_ON_CHAIN) {
                 binding.tvConfirmRate.setVisibility(View.VISIBLE);
                 long currentTime = DateUtil.getTime();

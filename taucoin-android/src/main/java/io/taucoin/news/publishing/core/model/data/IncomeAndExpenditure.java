@@ -26,6 +26,14 @@ public class IncomeAndExpenditure {
     public long onlineTime;                 // 区块时间（交易或区块上链时间）
     public int onlineStatus;                // 交易或区块是否上链
 
+    //add for mining rewards
+    public IncomeAndExpenditure(String senderOrMiner, int txType, long amount, long createTime) {
+        this.senderOrMiner = senderOrMiner;
+        this.txType = txType;
+        this.amount = amount;
+        this.createTime = createTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         return o instanceof IncomeAndExpenditure && (o == this ||

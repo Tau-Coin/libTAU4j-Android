@@ -135,7 +135,7 @@ public class CommunityRepositoryImpl implements CommunityRepository{
 
     @Override
     public Flowable<MemberAndAmount> observerMemberAndAmount(String chainID) {
-        return db.communityDao().observeMemberAndAmount(chainID);
+        return db.communityDao().observerMemberAndAmount(chainID);
     }
 
     /**

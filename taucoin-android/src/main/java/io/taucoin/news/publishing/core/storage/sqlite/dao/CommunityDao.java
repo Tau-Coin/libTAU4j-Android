@@ -131,23 +131,21 @@ public interface CommunityDao {
             " WHERE m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " AND c.isBanned = 0";
 
-    String QUERY_COMMUNITY_MEMBER = "SELECT m.*, e.txIncomePending, f.txExpenditurePending" +
+    String QUERY_COMMUNITY_MEMBER_STATE = "SELECT m.*, e.txIncomePending, f.txExpenditurePending" +
             " FROM Members m" +
-            " LEFT JOIN Communities cc ON m.chainID = cc.chainID" +
-
+            // 收入包括: 别人的转账收入，onchain + offchain
             " LEFT JOIN (SELECT chainID, SUM(amount) AS txIncomePending FROM Txs" +
             " WHERE chainID = :chainID AND txType = " + Constants.WIRING_TX_TYPE + " AND receiverPk =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " AND txStatus = 0 AND datetime(timestamp / 1000, 'unixepoch', 'localtime') > datetime('now','-24 hour','localtime')" +
+            " AND txStatus <= " + Constants.TX_STATUS_ON_CHAIN +
             ") AS e ON m.chainID = e.chainID" +
-
+            // 支出包括: 交易费+转账金额，onchain + offchain
             " LEFT JOIN (SELECT chainID, SUM(amount + fee) AS txExpenditurePending FROM Txs" +
             " WHERE chainID = :chainID AND txType IN (" + Constants.WIRING_TX_TYPE + ", " + Constants.NEWS_TX_TYPE + ")" +
             " AND senderPk =(" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " AND txStatus = 0 AND datetime(timestamp / 1000, 'unixepoch', 'localtime') > datetime('now','-24 hour','localtime')" +
+            " AND txStatus <= " + Constants.TX_STATUS_ON_CHAIN +
             ") AS f ON m.chainID = f.chainID" +
 
-            " WHERE m.chainID =:chainID AND m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
-            " AND cc.isBanned = 0 limit 1";
+            " WHERE m.chainID =:chainID AND m.publicKey = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")";
 
     String QUERY_ALL_JOINED_COMMUNITY = "SELECT c.*" +
             " FROM Communities c" +
@@ -258,8 +256,11 @@ public interface CommunityDao {
     @Query(QUERY_JOINED_COMMUNITY)
     Flowable<List<Member>> observeJoinedCommunityList();
 
-    @Query(QUERY_COMMUNITY_MEMBER)
-    Flowable<MemberAndAmount> observeMemberAndAmount(String chainID);
+    /**
+     * 获取当前用户当前链的状态(wallet显示, txIncomePending, txExpenditurePending)
+     */
+    @Query(QUERY_COMMUNITY_MEMBER_STATE)
+    Flowable<MemberAndAmount> observerMemberAndAmount(String chainID);
 
     @Query(QUERY_ALL_JOINED_COMMUNITY)
     List<Community> getAllJoinedCommunityList();

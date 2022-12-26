@@ -101,6 +101,11 @@ public interface CommunityRepository {
      */
     Flowable<CommunityAndMember> observerCurrentMember(String chainID, String publicKey);
 
+    /**
+     * 观察当前成员某条链下的状态（用于显示在wallet侧边栏）
+     * @param chainID
+     * @return
+     */
     Flowable<MemberAndAmount> observerMemberAndAmount(String chainID);
 
     String queryCommunityAccountExpired(String chainID);
