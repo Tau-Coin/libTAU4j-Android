@@ -165,5 +165,11 @@ public interface TxRepository {
      */
     Flowable<Integer> observeUnreadNews();
 
+    /**
+     * 获取社区中最大chatnum的news
+     * @return
+     */
+    Flowable<UserAndTx> observeMaxChatNumNews();
+
     Observable<UserAndTx> observeNewsDetail(String txID);
 }

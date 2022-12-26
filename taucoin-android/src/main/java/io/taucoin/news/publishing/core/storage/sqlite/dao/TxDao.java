@@ -99,6 +99,19 @@ public interface TxDao {
             " AND c.isBanned = 0" +
             QUERY_GET_TXS_ORDER;
 
+    // SQL:查询所有社区中的一级news tx
+    String QUERY_GET_MARKET_MAX_CHAT_NUM_NEWS =
+            QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
+            " FROM Txs AS tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
+            " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
+            QUERY_NEWS_REPLY_AND_CHAT_COUNT +
+            " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
+            " AND tx.repliedHash IS NULL" +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " AND c.isBanned = 0" +
+            " ORDER BY ncc.chatsNum, tx.timestamp DESC limit 1";
+
     // SQL:查询特定社区里的一级news tx
     String QUERY_GET_CHAIN_MARKET = 
             QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
@@ -420,4 +433,12 @@ public interface TxDao {
 
     @Query(QUERY_UNREAD_NEWS)
     Flowable<Integer> observeUnreadNews();
+
+    /**
+     * 获取社区中最大chatnum的news
+     * @return
+     */
+    @Query(QUERY_GET_MARKET_MAX_CHAT_NUM_NEWS)
+    Flowable<UserAndTx> observeMaxChatNumNews();
+
 }

@@ -269,6 +269,11 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
+    public Flowable<UserAndTx> observeMaxChatNumNews() {
+        return db.txDao().observeMaxChatNumNews();
+    }
+
+    @Override
     public Observable<UserAndTx> observeNewsDetail(String txID) {
         return db.txDao().observeNewsDetail(txID);
     }
