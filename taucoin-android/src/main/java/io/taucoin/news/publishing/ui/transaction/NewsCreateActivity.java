@@ -41,7 +41,7 @@ import io.taucoin.news.publishing.ui.customviews.CommunitiesPopUpDialog;
 /**
  * 发布News页面
  */
-public class NewsCreateActivity extends BaseActivity implements View.OnClickListener, View.OnFocusChangeListener {
+public class NewsCreateActivity extends BaseActivity implements View.OnClickListener {
 
     private ActivityNewsBinding binding;
     private TxViewModel txViewModel;
@@ -96,7 +96,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         binding.tvBytesCount.setTextColor(getResources().getColor(R.color.color_gray_dark));
         binding.etNews.addTextChangedListener(newsWatcher);
         binding.etLink.addTextChangedListener(linkWatcher);
-        binding.etNews.setMaxBytesLimit(Constants.NEWS_TX_MAX_BYTE_SIZE);
 
         binding.ivCancel.setOnClickListener(v -> onBackPressed());
 
@@ -120,8 +119,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         if (isReteitt) {
             binding.tvPost.setText(R.string.common_retweet);
         }
-        binding.etNews.setOnFocusChangeListener(this);
-        binding.etLink.setOnFocusChangeListener(this);
 
         adapter = new CommunityListAdapter();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -362,30 +359,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.tv_more:
                 showCommunityPopWindow();
-                break;
-        }
-    }
-
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        switch (v.getId()){
-            case R.id.et_news:
-                if (hasFocus) {
-                    String link = ViewUtils.getText(binding.etLink);
-                    byte[] linkBytes = Utils.textStringToBytes(link);
-                    int bytesCount = linkBytes != null ? linkBytes.length : 0;
-                    int maxBytesLimit = Constants.NEWS_TX_MAX_BYTE_SIZE - bytesCount;
-                    binding.etNews.setMaxBytesLimit(maxBytesLimit);
-                }
-                break;
-            case R.id.et_link:
-                if (hasFocus) {
-                    String news = ViewUtils.getText(binding.etNews);
-                    byte[] newsBytes = Utils.textStringToBytes(news);
-                    int bytesCount = newsBytes != null ? newsBytes.length : 0;
-                    int maxBytesLimit = Constants.NEWS_TX_MAX_BYTE_SIZE - bytesCount;
-                    binding.etLink.setMaxBytesLimit(maxBytesLimit);
-                }
                 break;
         }
     }

@@ -498,6 +498,7 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_error_invalid_amount">Invalid Transaction amount</string>
     <string name="tx_error_invalid_airdrop_link">Invalid airdrop link</string>
     <string name="tx_error_invalid_free">Invalid Transaction free</string>
+    <string name="tx_error_invalid_news">News cannot exceed %d bytes</string>
     <string name="tx_error_min_free">Transaction fee cannot be less than %1$s</string>
     <string name="tx_error_add_members_no_enough_coins">Insufficient Balance :\ncoins + Fee > Payment Balance</string>
     <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Payment Balance</string>
