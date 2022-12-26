@@ -27,6 +27,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import cn.bingoogolapple.refreshlayout.BGAStickinessRefreshViewHolder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -48,6 +49,7 @@ import io.taucoin.news.publishing.ui.community.CommunityViewModel;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
 import io.taucoin.news.publishing.ui.constant.Page;
 import io.taucoin.news.publishing.ui.customviews.CommonDialog;
+import io.taucoin.news.publishing.ui.customviews.CustomXRefreshViewFooter;
 import io.taucoin.news.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.news.publishing.ui.main.MainActivity;
 import io.taucoin.news.publishing.ui.user.UserDetailActivity;
@@ -128,6 +130,31 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         binding.refreshLayout.setAutoLoadMore(true);
         binding.refreshLayout.setMoveForHorizontal(true);
         binding.refreshLayout.enableRecyclerViewPullUp(true);
+
+        CustomXRefreshViewFooter footer = new CustomXRefreshViewFooter(getContext());
+        binding.refreshLayout.setCustomFooterView(footer);
+
+        txViewModel.observerChainTxs().observe(this, txs -> {
+            List<UserAndTx> currentList = new ArrayList<>(txs);
+            int size;
+            if (currentPos == 0) {
+                adapter.submitList(currentList, handleUpdateAdapter);
+                size = currentList.size();
+                isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
+            } else {
+                currentList.addAll(0, adapter.getCurrentList());
+                adapter.submitList(currentList, handlePullAdapter);
+                isLoadMore = txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0;
+            }
+            binding.refreshLayout.setLoadComplete(!isLoadMore);
+            binding.refreshLayout.stopLoadMore();
+            if (isVisibleToUser) {
+                communityViewModel.clearNewsUnread();
+            }
+//            logger.debug("txs.size::{}", txs.size());
+//            closeProgressDialog();\
+//            TauNotifier.getInstance().cancelNotify(chainID);
+        });
     }
 
     private final Runnable handleUpdateAdapter = () -> {
@@ -223,27 +250,6 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
             }
         });
 
-        txViewModel.observerChainTxs().observe(this, txs -> {
-            List<UserAndTx> currentList = new ArrayList<>(txs);
-            int size;
-            if (currentPos == 0) {
-                adapter.submitList(currentList, handleUpdateAdapter);
-                size = currentList.size();
-                isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
-            } else {
-                currentList.addAll(0, adapter.getCurrentList());
-                adapter.submitList(currentList, handlePullAdapter);
-                isLoadMore = txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0;
-            }
-            binding.refreshLayout.setLoadComplete(!isLoadMore);
-            binding.refreshLayout.stopLoadMore();
-            if (isVisibleToUser) {
-                communityViewModel.clearNewsUnread();
-            }
-//            logger.debug("txs.size::{}", txs.size());
-//            closeProgressDialog();\
-//            TauNotifier.getInstance().cancelNotify(chainID);
-        });
         loadData(0);
 
         disposables.add(ObservableUtil.intervalSeconds(1)

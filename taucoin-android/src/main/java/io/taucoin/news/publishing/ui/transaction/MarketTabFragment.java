@@ -48,6 +48,7 @@ import io.taucoin.news.publishing.ui.TauNotifier;
 import io.taucoin.news.publishing.ui.community.CommunityViewModel;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
 import io.taucoin.news.publishing.ui.constant.Page;
+import io.taucoin.news.publishing.ui.customviews.CustomXRefreshViewFooter;
 import io.taucoin.news.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.news.publishing.ui.user.UserDetailActivity;
 import io.taucoin.news.publishing.ui.user.UserViewModel;
@@ -137,6 +138,9 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         binding.refreshLayout.setPullLoadEnable(true);
         binding.refreshLayout.setMoveForHorizontal(true);
         binding.refreshLayout.setAutoLoadMore(true);
+
+        CustomXRefreshViewFooter footer = new CustomXRefreshViewFooter(getContext());
+        binding.refreshLayout.setCustomFooterView(footer);
 
         txViewModel.observerChainTxs().observe(getViewLifecycleOwner(), txs -> {
             List<UserAndTx> currentList = new ArrayList<>(txs);
