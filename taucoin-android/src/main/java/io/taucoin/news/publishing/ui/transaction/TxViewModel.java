@@ -417,8 +417,17 @@ public class TxViewModel extends AndroidViewModel {
                 return false;
             }
         } else {
-            long minTxFee = tx.queueType == 3 ? Constants.RETWITT_MIN_FEE.longValue() : Constants.NEWS_MIN_FEE.longValue();
-            //TODO: news tx valid?
+            long minTxFee;
+            if (tx.queueType == 3) {
+                minTxFee = Constants.RETWITT_MIN_FEE.longValue();
+            } else {
+                NewsContent content = new NewsContent(tx.content);
+                if (StringUtil.isNotEmpty(content.getRepliedHashStr())) {
+                    minTxFee = Constants.REPLY_MIN_FEE.longValue();
+                } else {
+                    minTxFee = Constants.NEWS_MIN_FEE.longValue();
+                }
+            }
             if (tx.fee < 0) {
                 ToastUtils.showShortToast(R.string.tx_error_invalid_free);
                 return false;
@@ -490,9 +499,9 @@ public class TxViewModel extends AndroidViewModel {
      * @param chainID 交易所属的社区chainID
      */
     public Observable<Long> observeAverageTxFee(String chainID, TxType type) {
-        return observeAverageTxFee(chainID, type, false);
+        return observeAverageTxFee(chainID, type, false, false);
     }
-    public Observable<Long> observeAverageTxFee(String chainID, TxType type, boolean isRetwitt) {
+    public Observable<Long> observeAverageTxFee(String chainID, TxType type, boolean isRetwitt, boolean isReply) {
         return Observable.create((ObservableOnSubscribe<Long>) emitter -> {
             long txFee;
             try {
@@ -518,7 +527,15 @@ public class TxViewModel extends AndroidViewModel {
                         }
                     }
                 } else {
-                    txFee = isRetwitt ? Constants.RETWITT_MIN_FEE.longValue() : Constants.NEWS_MIN_FEE.longValue();
+                    if (isRetwitt) {
+                        txFee = Constants.RETWITT_MIN_FEE.longValue();
+                    } else {
+                        if (isReply) {
+                            txFee = Constants.REPLY_MIN_FEE.longValue();
+                        } else {
+                            txFee = Constants.NEWS_MIN_FEE.longValue();
+                        }
+                    }
                     if (statistics != null && statistics.getTxsCount() > 0) {
                         long averageTxsFee = statistics.getTotalFee() / statistics.getTxsCount();
                         if (averageTxsFee > txFee) {
