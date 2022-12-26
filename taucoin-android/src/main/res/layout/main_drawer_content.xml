@@ -174,6 +174,7 @@
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
                         app:leftImage="@mipmap/icon_community"
+                        app:leftImageSize="@dimen/widget_size_22"
                         app:rightText="@string/drawer_tau_communities"/>
 
                     <io.taucoin.news.publishing.ui.customviews.ItemLineView
