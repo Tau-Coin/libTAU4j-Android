@@ -116,6 +116,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         long interimBalance = 0;
         long pendingAmount = 0;
         long paymentBalance = 0;
+        long miningRewards = 0;
         long power = 0;
         if (member != null) {
             power = member.power;
@@ -128,6 +129,9 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             paymentBalance = member.getPaymentBalance();
             paymentBalance = Math.max(0, paymentBalance);
 
+            miningRewards = member.getMiningRewards();
+            miningRewards = Math.max(0, miningRewards);
+
             logger.debug("loadMemberData interimBalance::{}, pendingAmount::{}, paymentBalance::{}," +
                             " incomePending::{}, expenditurePending::{}",
                     interimBalance, pendingAmount, paymentBalance, member.txIncomePending, member.txExpenditurePending);
@@ -136,7 +140,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         binding.itemInterimBalance.setRightText(FmtMicrometer.fmtLong(interimBalance));
         binding.itemPendingAmount.setRightText(FmtMicrometer.fmtLong(pendingAmount));
         binding.itemPaymentBalance.setRightText(FmtMicrometer.fmtLong(paymentBalance));
-        binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(power*10));
+        binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(miningRewards));
         double showPower = Logarithm.log2(2 + power);
         String powerStr = "log2(2+%s)=%s";
         powerStr = String.format(powerStr, FmtMicrometer.fmtLong(power), FmtMicrometer.formatThreeDecimal(showPower));
