@@ -163,7 +163,7 @@
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_mining"
+                        app:leftImage="@mipmap/icon_wallet"
                         app:rightText="@string/drawer_wallet"/>
 
                     <io.taucoin.news.publishing.ui.customviews.ItemLineView
@@ -173,7 +173,7 @@
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_community_gray"
+                        app:leftImage="@mipmap/icon_community"
                         app:rightText="@string/drawer_tau_communities"/>
 
                     <io.taucoin.news.publishing.ui.customviews.ItemLineView
@@ -194,7 +194,7 @@
                         android:gravity="center_vertical"
                         android:minHeight="@dimen/widget_size_44"
                         android:onClick="onClick"
-                        app:leftImage="@mipmap/icon_friends"
+                        app:leftImage="@mipmap/icon_contacts"
                         app:rightText="@string/drawer_peers"/>
 
                     <io.taucoin.news.publishing.ui.customviews.ItemLineView

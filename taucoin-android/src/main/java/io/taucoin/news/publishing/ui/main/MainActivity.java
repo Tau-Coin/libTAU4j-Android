@@ -206,8 +206,8 @@ public class MainActivity extends ScanTriggerActivity {
         }
 
         int size = getResources().getDimensionPixelSize(R.dimen.widget_size_18);
-        DrawablesUtil.setStartDrawable(binding.drawer.tvCommunities, R.mipmap.icon_community_gray, size);
-        DrawablesUtil.setStartDrawable(binding.drawer.tvContacts, R.mipmap.icon_contacts_gray, size);
+        DrawablesUtil.setStartDrawable(binding.drawer.tvCommunities, R.mipmap.icon_community, size);
+        DrawablesUtil.setStartDrawable(binding.drawer.tvContacts, R.mipmap.icon_contacts, size);
     }
 
     @Override
