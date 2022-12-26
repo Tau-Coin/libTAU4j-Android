@@ -110,7 +110,7 @@
             android:layout_height="@dimen/widget_size_2"
             android:background="@color/color_bg"/>
 
-        <androidx.viewpager2.widget.ViewPager2
+        <androidx.viewpager.widget.ViewPager
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

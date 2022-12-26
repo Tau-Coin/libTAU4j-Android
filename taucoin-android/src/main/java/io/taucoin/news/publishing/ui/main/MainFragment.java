@@ -23,7 +23,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -46,6 +45,7 @@ import io.taucoin.news.publishing.databinding.FragmentMainBinding;
 import io.taucoin.news.publishing.ui.BaseFragment;
 import io.taucoin.news.publishing.ui.community.PasteLinkActivity;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
+import io.taucoin.news.publishing.ui.customviews.FragmentStatePagerAdapter;
 import io.taucoin.news.publishing.ui.setting.TrafficTipsActivity;
 import io.taucoin.news.publishing.ui.transaction.NewsTabFragment;
 
@@ -90,23 +90,24 @@ MainFragment extends BaseFragment implements View.OnClickListener {
         });
 
         //自定义的Adapter继承自FragmentPagerAdapter
-        StateAdapter stateAdapter = new StateAdapter(this,
+        StateAdapter stateAdapter = new StateAdapter(this.getChildFragmentManager(),
                 binding.tabLayout.getTabCount());
         // ViewPager设置Adapter
         binding.viewPager.setAdapter(stateAdapter);
         binding.viewPager.setOffscreenPageLimit(3);
+        binding.tabLayout.setupWithViewPager(binding.viewPager);
 
-        TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(binding.tabLayout,
-                binding.viewPager, (tab, position) -> {
-                    if (position == 1) {
-                        tab.setText(getString(R.string.main_tab_community));
-                    } else if (position == 2) {
-                        tab.setText(getString(R.string.main_tab_personal));
-                    } else {
-                        tab.setText(getString(R.string.main_tab_all));
-                    }
-                });
-        tabLayoutMediator.attach();
+//        TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(binding.tabLayout,
+//                binding.viewPager, (tab, position) -> {
+//                    if (position == 1) {
+//                        tab.setText(getString(R.string.main_tab_community));
+//                    } else if (position == 2) {
+//                        tab.setText(getString(R.string.main_tab_personal));
+//                    } else {
+//                        tab.setText(getString(R.string.main_tab_all));
+//                    }
+//                });
+//        tabLayoutMediator.attach();
 
         binding.tabLayout.addOnTabSelectedListener(onTabSelectedListener);
 
@@ -126,6 +127,8 @@ MainFragment extends BaseFragment implements View.OnClickListener {
             }
         }
         updateTabBadgeDrawable(0, true, false);
+
+        binding.viewPager.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
     }
 
     private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -277,25 +280,57 @@ MainFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
-    public class StateAdapter extends FragmentStateAdapter {
+    public class StateAdapter extends FragmentStatePagerAdapter {
 
         private final int count;
-        public StateAdapter(@NonNull Fragment fragment, int count) {
-            super(fragment);
+        public StateAdapter(@NonNull FragmentManager fm, int count) {
+            super(fm, count);
             this.count = count;
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position == 1) {
+                return getString(R.string.main_tab_community);
+            } else if (position == 2) {
+                return getString(R.string.main_tab_personal);
+            } else {
+                return getString(R.string.main_tab_all);
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return count;
         }
 
         @NonNull
         @Override
-        public Fragment createFragment(int position) {
+        public Fragment getItem(int position) {
             return createFragmentView(position);
         }
-
-        @Override
-        public int getItemCount() {
-            return count;
-        }
     }
+
+//    public class StateAdapter extends FragmentStateAdapter {
+//
+//        private final int count;
+//        public StateAdapter(@NonNull Fragment fragment, int count) {
+//            super(fragment);
+//            this.count = count;
+//        }
+//
+//        @NonNull
+//        @Override
+//        public Fragment createFragment(int position) {
+//            return createFragmentView(position);
+//        }
+//
+//        @Override
+//        public int getItemCount() {
+//            return count;
+//        }
+//    }
 
     private void showFragmentData() {
         int pos = binding.tabLayout.getSelectedTabPosition();

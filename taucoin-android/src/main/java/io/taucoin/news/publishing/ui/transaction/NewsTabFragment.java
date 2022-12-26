@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.andview.refreshview.XRefreshView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.noober.menu.FloatMenu;
 
@@ -26,8 +27,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
-import cn.bingoogolapple.refreshlayout.BGAStickinessRefreshViewHolder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -58,7 +57,7 @@ import io.taucoin.news.publishing.ui.user.UserViewModel;
  * 主页所有上链news或notes, 以及自己发的未上链news Tab页
  */
 public class NewsTabFragment extends BaseFragment implements View.OnClickListener, NewsListAdapter.ClickListener,
-        BGARefreshLayout.BGARefreshLayoutDelegate {
+        XRefreshView.XRefreshViewListener {
 
     protected static final Logger logger = LoggerFactory.getLogger("NewsTabFragment");
     private NewsListAdapter adapter;
@@ -106,19 +105,6 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         userViewModel = provider.get(UserViewModel.class);
         communityViewModel = provider.get(CommunityViewModel.class);
         initView();
-        initRefreshLayout();
-    }
-
-    private void initRefreshLayout() {
-        binding.refreshLayout.setDelegate(this);
-        BGAStickinessRefreshViewHolder refreshViewHolder = new BGAStickinessRefreshViewHolder(activity.getApplicationContext(), true);
-        refreshViewHolder.setRotateImage(R.mipmap.ic_launcher_foreground);
-        refreshViewHolder.setStickinessColor(R.color.color_yellow);
-
-        refreshViewHolder.setLoadingMoreText(getString(R.string.common_loading));
-        binding.refreshLayout.setPullDownRefreshEnable(false);
-
-        binding.refreshLayout.setRefreshViewHolder(refreshViewHolder);
     }
 
     /**
@@ -135,9 +121,16 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         binding.txList.setAdapter(adapter);
 
         initFabSpeedDial();
+
+        binding.refreshLayout.setXRefreshViewListener(this);
+        binding.refreshLayout.setPullRefreshEnable(false);
+        binding.refreshLayout.setPullLoadEnable(true);
+        binding.refreshLayout.setAutoLoadMore(true);
+        binding.refreshLayout.setMoveForHorizontal(true);
+        binding.refreshLayout.enableRecyclerViewPullUp(true);
     }
 
-    final Runnable handleUpdateAdapter = () -> {
+    private final Runnable handleUpdateAdapter = () -> {
         if (null == getRecyclerView()) {
             return;
         }
@@ -152,23 +145,21 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         }
     };
 
-    final Runnable handlePullAdapter = () -> {
+    private final Runnable handlePullAdapter = () -> {
         if (null == getRecyclerView()) {
             return;
         }
-        LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
-        if (layoutManager != null) {
-            int bottomPosition = getItemCount() - 1;
-            int position = bottomPosition - currentPos;
-            layoutManager.scrollToPositionWithOffset(position, 0);
-        }
+        int dx = binding.txList.getScrollX();
+        int dy = binding.txList.getScrollY();
+        int offset = getResources().getDimensionPixelSize(R.dimen.widget_size_100);
+        getRecyclerView().smoothScrollBy(dx, dy + offset);
     };
 
     public RecyclerView getRecyclerView() {
         return binding.txList;
     }
 
-    public BGARefreshLayout getRefreshLayout() {
+    public XRefreshView getRefreshLayout() {
         return binding.refreshLayout;
     }
 
@@ -183,6 +174,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         mainFab.setCustomSize(getResources().getDimensionPixelSize(R.dimen.widget_size_44));
 
         binding.fabButton.getMainFab().setOnClickListener(v -> {
+            isScrollToTop = true;
             Intent intent = new Intent();
             ActivityUtil.startActivity(intent, activity, NewsCreateActivity.class);
         });
@@ -235,7 +227,6 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
             List<UserAndTx> currentList = new ArrayList<>(txs);
             int size;
             if (currentPos == 0) {
-                initScrollToTop();
                 adapter.submitList(currentList, handleUpdateAdapter);
                 size = currentList.size();
                 isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
@@ -244,7 +235,8 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                 adapter.submitList(currentList, handlePullAdapter);
                 isLoadMore = txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0;
             }
-            binding.refreshLayout.endLoadingMore();
+            binding.refreshLayout.setLoadComplete(!isLoadMore);
+            binding.refreshLayout.stopLoadMore();
             if (isVisibleToUser) {
                 communityViewModel.clearNewsUnread();
             }
@@ -481,39 +473,6 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     }
 
     @Override
-    public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout refreshLayout) {
-        refreshLayout.endRefreshing();
-        refreshLayout.setPullDownRefreshEnable(false);
-    }
-
-    @Override
-    public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout refreshLayout) {
-        logger.debug("LoadingMore isLoadMore::{}", isLoadMore);
-        if (isLoadMore) {
-            loadData(getItemCount());
-            return true;
-        } else {
-            refreshLayout.endLoadingMore();
-            return false;
-        }
-    }
-
-    void initScrollToTop() {
-        if (!isScrollToTop) {
-            if (null == getRecyclerView()) {
-                return;
-            }
-            LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
-            if (layoutManager != null) {
-                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-                this.isScrollToTop = firstVisibleItemPosition < 2;
-                logger.debug("handleUpdateAdapter firstVisibleItemPosition::{}, isScrollToTop::{}",
-                        firstVisibleItemPosition, isScrollToTop);
-            }
-        }
-    }
-
-    @Override
     public void onFragmentResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onFragmentResult(requestCode, resultCode, data);
         if (requestCode == TX_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
@@ -531,5 +490,25 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                 }
             }
         }
+    }
+
+    @Override
+    public void onRefresh(boolean b) {
+
+    }
+
+    @Override
+    public void onLoadMore(boolean b) {
+        loadData(getItemCount());
+    }
+
+    @Override
+    public void onRelease(float v) {
+
+    }
+
+    @Override
+    public void onHeaderMove(double v, int i) {
+
     }
 }

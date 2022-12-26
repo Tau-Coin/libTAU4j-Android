@@ -548,4 +548,6 @@ dependencies {
 
     // file compress
     implementation 'org.apache.commons:commons-compress:1.18'
+
+    implementation 'com.huxq17.xrefreshview:xrefreshview:3.6.9'
 }

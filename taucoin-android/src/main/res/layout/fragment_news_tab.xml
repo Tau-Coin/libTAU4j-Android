@@ -8,7 +8,8 @@
             type="android.view.View.OnClickListener" />
     </data>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/color_chat_bg">
@@ -86,30 +87,36 @@
 
         </RelativeLayout>
 
-        <cn.bingoogolapple.refreshlayout.BGARefreshLayout
-            android:layout_below="@+id/ll_pinned_message"
-            android:id="@+id/refresh_layout"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_width="match_parent">
+            android:background="@color/color_chat_bg">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:background="@color/color_white"
-                android:id="@+id/tx_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+            <com.andview.refreshview.XRefreshView
+                android:id="@+id/refresh_layout"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent">
 
-        </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:background="@color/color_white"
+                    android:id="@+id/tx_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-        <io.taucoin.news.publishing.ui.customviews.ThemedSpeedDialView
-            android:id="@+id/fab_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:gravity="center_horizontal|center"
-            app:sdMainFabClosedSrc="@drawable/ic_add_36dp"
-            app:sdMainFabAnimationRotateAngle="45" />
+            </com.andview.refreshview.XRefreshView>
 
-    </RelativeLayout>
+            <io.taucoin.news.publishing.ui.customviews.ThemedSpeedDialView
+                android:id="@+id/fab_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:gravity="center_horizontal|center"
+                app:sdMainFabClosedSrc="@drawable/ic_add_36dp"
+                app:sdMainFabAnimationRotateAngle="45" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
 </layout>

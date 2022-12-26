@@ -121,10 +121,12 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:descendantFocusability="blocksDescendants"
             android:background="@color/color_chat_bg">
 
-            <cn.bingoogolapple.refreshlayout.BGARefreshLayout
+            <com.andview.refreshview.XRefreshView
                 android:id="@+id/refresh_layout"
+                android:descendantFocusability="blocksDescendants"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent">
 
@@ -132,9 +134,9 @@
                     android:background="@color/color_white"
                     android:id="@+id/tx_list"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="match_parent" />
 
-            </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
+            </com.andview.refreshview.XRefreshView>
 
             <io.taucoin.news.publishing.ui.customviews.ThemedSpeedDialView
                 android:id="@+id/fab_button"

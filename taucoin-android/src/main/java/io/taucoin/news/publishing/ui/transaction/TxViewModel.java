@@ -687,17 +687,6 @@ public class TxViewModel extends AndroidViewModel {
                 txs = txRepo.loadNewsData(pos, pageSize);
                 long endTime = System.currentTimeMillis();
                 logger.debug("loadNewsData time::{}ms", endTime - startTime);
-                int preloadLoadSize = 8;
-                if (pos == 0 && txs != null && txs.size() > preloadLoadSize && txs.size() <= pageSize) {
-                    List<UserAndTx> preloadLoad = new ArrayList<>();
-                    for (int i = 0; i < preloadLoadSize; i++) {
-                        preloadLoad.add(txs.get(i));
-                    }
-                    emitter.onNext(preloadLoad);
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException ignore) {}
-                }
                 logger.debug("loadNewsData pos::{}, pageSize::{}, messages.size::{}",
                         pos, pageSize, txs.size());
 //                        Collections.reverse(txs);
@@ -730,17 +719,6 @@ public class TxViewModel extends AndroidViewModel {
                     pageSize = initSize;
                 }
                 txs = txRepo.loadNewsRepliesData(txID, pos, pageSize);
-                int preloadLoadSize = 8;
-                if (pos == 0 && txs != null && txs.size() > preloadLoadSize && txs.size() <= pageSize) {
-                    List<UserAndTx> preloadLoad = new ArrayList<>();
-                    for (int i = 0; i < preloadLoadSize; i++) {
-                        preloadLoad.add(txs.get(i));
-                    }
-                    emitter.onNext(preloadLoad);
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException ignore) {}
-                }
                 logger.debug("loadNewsRepliesData txID::{}, pos::{}, pageSize::{}, messages.size::{}",
                         txID, pos, pageSize, txs.size());
             } catch (Exception e) {
@@ -776,17 +754,6 @@ public class TxViewModel extends AndroidViewModel {
                 txs = txRepo.loadAllMarketData(chainID, pos, pageSize);
                 long endTime = System.currentTimeMillis();
                 logger.debug("loadMarketData time::{}ms", endTime - startTime);
-                int preloadLoadSize = 8;
-                if (pos == 0 && txs != null && txs.size() > preloadLoadSize && txs.size() <= pageSize) {
-                    List<UserAndTx> preloadLoad = new ArrayList<>();
-                    for (int i = 0; i < preloadLoadSize; i++) {
-                        preloadLoad.add(txs.get(i));
-                    }
-                    emitter.onNext(preloadLoad);
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException ignore) {}
-                }
                 logger.debug("loadMarketData chainID::{}, pos::{}, pageSize::{}, messages.size::{}",
                         chainID, pos, pageSize, txs.size());
             } catch (Exception e) {
