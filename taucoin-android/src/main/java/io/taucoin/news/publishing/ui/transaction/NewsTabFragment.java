@@ -26,8 +26,6 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import cn.bingoogolapple.refreshlayout.BGAStickinessRefreshViewHolder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -43,6 +41,7 @@ import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
 import io.taucoin.news.publishing.core.utils.UsersUtil;
 import io.taucoin.news.publishing.databinding.FragmentNewsTabBinding;
+import io.taucoin.news.publishing.databinding.ItemNewsBinding;
 import io.taucoin.news.publishing.ui.BaseActivity;
 import io.taucoin.news.publishing.ui.BaseFragment;
 import io.taucoin.news.publishing.ui.community.CommunityViewModel;
@@ -75,6 +74,8 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     private FloatMenu operationsMenu;
     private PopUpDialog retweetDialog;
     private CommonDialog banCommunityDialog;
+    private ItemNewsBinding headerBinding;
+    private UserAndTx headerData;
 
     private int currentPos = 0;
     private boolean isScrollToTop = true;
@@ -113,39 +114,41 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
      * 初始化视图
      */
     public void initView() {
-        if (getRecyclerView() != null) {
-            LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
-//        layoutManager.setStackFromEnd(true);
-            getRecyclerView().setLayoutManager(layoutManager);
-            getRecyclerView().setItemAnimator(null);
-        }
+        LinearLayoutManager layoutManager = new LinearLayoutManager(activity);
+//      layoutManager.setStackFromEnd(true);
+        binding.txList.setLayoutManager(layoutManager);
+        binding.txList.setItemAnimator(null);
         adapter = new NewsListAdapter(this);
         binding.txList.setAdapter(adapter);
 
         initFabSpeedDial();
+        initRefreshLayout();
 
-        binding.refreshLayout.setXRefreshViewListener(this);
-        binding.refreshLayout.setPullRefreshEnable(false);
-        binding.refreshLayout.setPullLoadEnable(true);
-        binding.refreshLayout.setAutoLoadMore(true);
-        binding.refreshLayout.setMoveForHorizontal(true);
-        binding.refreshLayout.enableRecyclerViewPullUp(true);
-
-        CustomXRefreshViewFooter footer = new CustomXRefreshViewFooter(getContext());
-        binding.refreshLayout.setCustomFooterView(footer);
-
-        txViewModel.observerChainTxs().observe(this, txs -> {
+        txViewModel.observerChainTxs().observe(getViewLifecycleOwner(), txs -> {
             List<UserAndTx> currentList = new ArrayList<>(txs);
             int size;
             if (currentPos == 0) {
-                adapter.submitList(currentList, handleUpdateAdapter);
                 size = currentList.size();
                 isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
+
+                int headerDataIndex = currentList.indexOf(headerData);
+                logger.debug("headerDataIndex::{}", headerDataIndex);
+                if (headerDataIndex >= 0) {
+                    currentList.remove(headerDataIndex);
+                }
+                adapter.submitList(currentList, handleUpdateAdapter);
             } else {
                 currentList.addAll(0, adapter.getCurrentList());
-                adapter.submitList(currentList, handlePullAdapter);
                 isLoadMore = txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0;
+
+                int headerDataIndex = currentList.indexOf(headerData);
+                logger.debug("headerDataIndex::{}", headerDataIndex);
+                if (headerDataIndex >= 0) {
+                    currentList.remove(headerDataIndex);
+                }
+                adapter.submitList(currentList, handlePullAdapter);
             }
+
             binding.refreshLayout.setLoadComplete(!isLoadMore);
             binding.refreshLayout.stopLoadMore();
             if (isVisibleToUser) {
@@ -157,11 +160,20 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         });
     }
 
+    private void initRefreshLayout() {
+        binding.refreshLayout.setXRefreshViewListener(this);
+        binding.refreshLayout.setPullRefreshEnable(false);
+        binding.refreshLayout.setPullLoadEnable(true);
+        binding.refreshLayout.setAutoLoadMore(true);
+        binding.refreshLayout.setMoveForHorizontal(true);
+        binding.refreshLayout.enableRecyclerViewPullUp(true);
+
+        CustomXRefreshViewFooter footer = new CustomXRefreshViewFooter(getContext());
+        binding.refreshLayout.setCustomFooterView(footer);
+    }
+
     private final Runnable handleUpdateAdapter = () -> {
-        if (null == getRecyclerView()) {
-            return;
-        }
-        LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
+        LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
         if (layoutManager != null) {
             logger.debug("handleUpdateAdapter isScrollToTop::{}", isScrollToTop);
             if (isScrollToTop) {
@@ -173,22 +185,11 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     };
 
     private final Runnable handlePullAdapter = () -> {
-        if (null == getRecyclerView()) {
-            return;
-        }
         int dx = binding.txList.getScrollX();
         int dy = binding.txList.getScrollY();
         int offset = getResources().getDimensionPixelSize(R.dimen.widget_size_100);
-        getRecyclerView().smoothScrollBy(dx, dy + offset);
+        binding.txList.smoothScrollBy(dx, dy + offset);
     };
-
-    public RecyclerView getRecyclerView() {
-        return binding.txList;
-    }
-
-    public XRefreshView getRefreshLayout() {
-        return binding.refreshLayout;
-    }
 
     /**
      * 初始化右下角悬浮按钮组件
@@ -280,6 +281,28 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                         binding.tvPinnedContent.setText(list.get(0).memo);
                     }
                 }));
+        disposables.add(txViewModel.observeMaxChatNumNews()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::loadHomeHeaderView));
+    }
+
+    private void loadHomeHeaderView(UserAndTx tx) {
+        if (null == headerBinding) {
+            headerBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
+                    R.layout.item_news, null, false);
+            binding.txList.addHeaderView(headerBinding.getRoot());
+        }
+        NewsListAdapter.ViewHolder viewHolder = new NewsListAdapter.ViewHolder(headerBinding, this);
+        viewHolder.bind(tx);
+        this.headerData = tx;
+        int headerDataIndex = adapter.getCurrentList().indexOf(tx);
+        logger.debug("headerDataIndex::{}", headerDataIndex);
+        if (headerDataIndex >= 0) {
+            List<UserAndTx> list = new ArrayList<>(adapter.getCurrentList());
+            list.remove(headerDataIndex);
+            adapter.submitList(list);
+        }
     }
 
     @Override
@@ -312,7 +335,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         KeyboardUtils.hideSoftInput(activity);
         List<OperationMenuItem> menuList = new ArrayList<>();
         menuList.add(new OperationMenuItem(R.string.tx_operation_copy));
-        if (tx != null && StringUtil.isNotEmpty(tx.link)) {
+        if (StringUtil.isNotEmpty(tx.link)) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_copy_link));
         }
         // 用户不能拉黑自己

@@ -999,4 +999,8 @@ public class TxViewModel extends AndroidViewModel {
     public Observable<UserAndTx> observeNewsDetail(String txID) {
         return txRepo.observeNewsDetail(txID);
     }
+
+    public Flowable<UserAndTx> observeMaxChatNumNews() {
+        return txRepo.observeMaxChatNumNews();
+    }
 }

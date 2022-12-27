@@ -97,7 +97,7 @@
                 android:layout_height="match_parent"
                 android:layout_width="match_parent">
 
-                <androidx.recyclerview.widget.RecyclerView
+                <com.yanzhenjie.recyclerview.SwipeRecyclerView
                     android:background="@color/color_white"
                     android:id="@+id/tx_list"
                     android:layout_width="match_parent"

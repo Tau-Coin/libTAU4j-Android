@@ -51,7 +51,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(holder, getItem(position));
+        holder.bind(getItem(position));
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -71,8 +71,8 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                     R.mipmap.icon_share_link, linkDrawableSize, linkDrawableSize);
         }
 
-        void bind(ViewHolder holder, UserAndTx tx) {
-            if(null == binding || null == holder || null == tx){
+        void bind(UserAndTx tx) {
+            if(null == binding || null == tx){
                 return;
             }
             binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));

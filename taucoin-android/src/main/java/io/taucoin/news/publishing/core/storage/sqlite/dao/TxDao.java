@@ -110,7 +110,7 @@ public interface TxDao {
             " AND tx.repliedHash IS NULL" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " AND c.isBanned = 0" +
-            " ORDER BY ncc.chatsNum, tx.timestamp DESC limit 1";
+            " ORDER BY ncc.chatsNum DESC, tx.timestamp DESC limit 1";
 
     // SQL:查询特定社区里的一级news tx
     String QUERY_GET_CHAIN_MARKET = 

@@ -68,7 +68,7 @@ public class Constants {
     public static int TX_MAX_OVERDRAFT = 100;
 
     // news交易内容最大字节大小509，取整数500
-    public static final int NEWS_TX_MAX_BYTE_SIZE = TX_MAX_BYTE_SIZE - 200;
+    public static final int NEWS_TX_MAX_BYTE_SIZE = TX_MAX_BYTE_SIZE - 250;
 
     // 消息最大字节大小
     public static final int MSG_MAX_BYTE_SIZE = 821;
