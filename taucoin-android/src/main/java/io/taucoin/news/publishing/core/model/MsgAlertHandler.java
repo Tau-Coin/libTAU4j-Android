@@ -33,6 +33,7 @@ import io.taucoin.news.publishing.core.storage.sqlite.entity.Device;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.TxQueue;
+import io.taucoin.news.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.news.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.news.publishing.core.storage.sqlite.repo.CommunityRepository;
@@ -119,9 +120,9 @@ class MsgAlertHandler {
                 String logicMsgHash = msgContent.getLogicHash();
                 byte[] content = msgContent.getContent();
                 chatMsg = new ChatMsg(hash, senderPk, receiverPk, content, msgContent.getType(),
-                        sentTime, logicMsgHash, msgContent.getAirdropChain(), msgContent.getReferralPeer());
+                        sentTime, logicMsgHash, msgContent.getChainID(), msgContent.getReferralPeer());
                 chatRepo.addChatMsg(chatMsg);
-
+                
                 // 标记消息未读, 更新上次交流的时间
                 Friend friend = friendRepo.queryFriend(user.publicKey, friendPkStr);
                 boolean isNeedUpdate = false;
@@ -162,16 +163,49 @@ class MsgAlertHandler {
                     }
                 }
 
-                // 如果是Airdrop, 则给此消息的发送者airdrop coins
+                // 如果是Airdrop, 则给此消息的发送者airdrop coins, 目前airdrop机制不在了
+                /*
                 if (msgContent.getType() == MessageType.AIRDROP.getType()) {
-                    String chainID = msgContent.getAirdropChain();
+                    String chainID = msgContent.getChainID();
                     handleAirdropCoins(chainID, userPk, senderPk, msgContent.getReferralPeer());
+                }
+    `           */
+
+                String contentStr = Utils.textBytesToString(content);
+
+                //如果是转账交易下的点对点, 数据库存入转账消息, 目前是紧绑定 TODO: TC
+                if (msgContent.getType() == MessageType.WIRING.getType()) {
+                    String endl = "\n";
+                    String space = " ";
+                    //获取txid
+                    String txIDTag = "Transmission ID: ";
+                    int indexStart = contentStr.indexOf(txIDTag) + txIDTag.length();
+                    int indexEnd = contentStr.indexOf(endl, indexStart);
+                    String txID = contentStr.substring(indexStart, indexEnd);
+                    //获取chainID
+                    String chainID = msgContent.getChainID();
+                    //获取sender senderPk
+                    //获取receiver userPk
+                    //获取交易金额
+                    String amountTag = "Amount: ";
+                    indexStart = contentStr.indexOf(amountTag) + txIDTag.length();
+                    indexEnd = contentStr.indexOf(space, indexStart);
+                    long  amount = FmtMicrometer.fmtTxLongValue(contentStr.substring(indexStart, indexEnd));
+                    //获取交易费
+                    String feeTag = "Fee: ";
+                    indexStart = contentStr.indexOf(feeTag) + feeTag.length();
+                    indexEnd = contentStr.indexOf(space, indexStart);
+                    long  fee = FmtMicrometer.fmtTxLongValue(contentStr.substring(indexStart, indexEnd));
+                    Tx tx = new Tx(chainID, userPk, amount, fee, TxType.WIRING_TX.getType(), "p2p income");
+                    tx.txID = txID;
+                    tx.senderPk = senderPk;
+                    txRepo.addTransaction(tx);
                 }
 
                 // 创建通知栏消息
                 User friendUser = userRepo.getUserByPublicKey(senderPk);
-                if (friendUser != null && !friendUser.isBanned && content != null) {
-                    TauNotifier.getInstance().makeChatNotify(friendUser, Utils.textBytesToString(content));
+                if (friendUser != null && !friendUser.isBanned && contentStr.length() > 0) {
+                    TauNotifier.getInstance().makeChatNotify(friendUser, contentStr);
                 }
             }
         } catch (Exception e) {
@@ -185,6 +219,7 @@ class MsgAlertHandler {
      * @param friendPk 接受airdrop的朋友
      */
     private void handleAirdropCoins(String chainID, String currentPk, String friendPk, String referralPeer) {
+        /*
         logger.info("handleAirdropCoins: yourself::{}, currentPk::{}, friendPk::{}, chainID::{}, referralPeer::{}",
                 StringUtil.isEquals(currentPk, friendPk), currentPk, friendPk, chainID, referralPeer);
         if (StringUtil.isEquals(currentPk, friendPk)) {
@@ -277,6 +312,7 @@ class MsgAlertHandler {
             }
         }
         daemon.updateTxQueue(tx.chainID);
+        */
     }
 
     private long getAverageTxFee(String chainID) {

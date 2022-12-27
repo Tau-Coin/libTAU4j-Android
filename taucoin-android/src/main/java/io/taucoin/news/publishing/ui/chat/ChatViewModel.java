@@ -273,7 +273,7 @@ public class ChatViewModel extends AndroidViewModel {
      * @param TxQueue tx
      * @param QueueOperation operation
      */
-    public static Result syncSendMessageTask(Context context, TxQueue tx, QueueOperation operation) {
+    public static Result syncSendMessageTask(Context context, Tx tx, QueueOperation operation) {
         return syncSendMessageTask(context, tx, null, operation);
     }
 
@@ -285,7 +285,7 @@ public class ChatViewModel extends AndroidViewModel {
      * @param String  referralLink(从发交易入口，该参数null)
      * @param QueueOperation operation
      */
-    public static Result syncSendMessageTask(Context context, TxQueue tx, String referralLink, QueueOperation operation) {
+    public static Result syncSendMessageTask(Context context, Tx tx, String referralLink, QueueOperation operation) {
         // 自己发给自己的交易，并且交易金额为0(排除News交易)；不发送点对点消息
         if (null == tx || (operation == QueueOperation.INSERT && tx.txType == TxType.WIRING_TX.getType() &&
                 StringUtil.isEquals(tx.senderPk, tx.receiverPk) && tx.amount <= 0 )) {
@@ -334,8 +334,8 @@ public class ChatViewModel extends AndroidViewModel {
                 long friendLastSendTime = chatRepo.getLastSendTime(friendPk, senderPk);
                 // 自己的最后一条信息的时间
                 long myLastSendTime = chatRepo.getLastSendTime(senderPk, friendPk);
-                for (int nonce = 0; nonce < contentSize; nonce++) {
-                    byte[] content = contents.get(nonce);
+                for (int ic = 0; ic < contentSize; ic++) {
+                    byte[] content = contents.get(ic);
                     long currentTime = daemon.getSessionTime();
                     // 1、先取当前时间和朋友的最后一条信息时间加1的最大值（防止朋友的时钟比自己本地的快）
                     currentTime = Math.max(currentTime, friendLastSendTime + 1);
@@ -349,15 +349,15 @@ public class ChatViewModel extends AndroidViewModel {
                             ByteUtil.toByte(friendPk), encoded);
                     String hash = message.msgId();
                     logger.info("sendMessageTask newMsgHash::{}, contentType::{}, " +
-                                    "nonce::{}, rawLength::{}, logicMsgHash::{}, millisTime::{}",
-                            hash, type, nonce, content.length, logicMsgHash,
+                                    "ic::{}, rawLength::{}, logicMsgHash::{}, millisTime::{}",
+                            hash, type, ic, content.length, logicMsgHash,
                             DateUtil.format(currentTime, DateUtil.pattern9));
 
                     boolean isSuccess = daemon.addNewMessage(message);
                     // 组织Message的结构，并发送到DHT和数据入库
                     ChatMsg chatMsg = new ChatMsg(hash, senderPk, friendPk, content, type,
                             currentTime, logicMsgHash, chainID, referralPeer);
-                    messages[nonce] = chatMsg;
+                    messages[ic] = chatMsg;
 
                     // 更新消息日志信息
                     // 如何是自己给自己发，直接确认接收
@@ -372,7 +372,7 @@ public class ChatViewModel extends AndroidViewModel {
                         status = ChatMsgStatus.SENT;
                     }
                     // 确认接收的时间精确到秒
-                    chatMsgLogs[nonce] = new ChatMsgLog(hash,
+                    chatMsgLogs[ic] = new ChatMsgLog(hash,
                             status.getStatus(), currentTime / 1000);
                 }
                 // 批量添加到数据库

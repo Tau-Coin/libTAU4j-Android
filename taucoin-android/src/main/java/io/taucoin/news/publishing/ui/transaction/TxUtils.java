@@ -191,83 +191,96 @@ public class TxUtils {
     }
 
     public static SpannableStringBuilder createSpanTxQueue(TxQueueAndStatus tx, boolean isShowNonce) {
-        return createSpanTxQueue(tx, tx.nonce, isShowNonce, null, null);
+        return createSpanTxQueue(tx, tx.nonce, isShowNonce);
     }
 
-    public static SpannableStringBuilder createSpanTxQueue(TxQueue tx, String referralLink, QueueOperation operation) {
-//        if (operation == QueueOperation.INSERT) {
-//            SpanUtils msg = new SpanUtils();
-//            String coinName = ChainIDUtil.getCoinName(tx.chainID);
-//            String communityName = ChainIDUtil.getName(tx.chainID);
-//            if (tx.txType == TxType.WIRING_TX.getType()) {
-//                msg.append("I am sending you ");
-//                msg.append(FmtMicrometer.fmtBalance(tx.amount)).append(" ").append(coinName);
-//            } else {
-//                msg.append("I am posting news ");
-//            }
-//            msg.append(" of ").append(communityName);
-//            msg.append(" community with ");
-//            msg.append(FmtMicrometer.fmtFeeValue(tx.fee)).append(" ").append(coinName);
-//            msg.append(" as miner fee.");
-//            return msg.create();
-//        }
-        return createSpanTxQueue(tx, 0, false, referralLink, operation);
+    //构建Wiring消息内容，交易通知
+    /* 0. Funds update:
+     * 1. Community: 
+     * 2. Transmission ID: 
+     * 3. Amount: 
+     * 4. Fee: 
+     * 5. Description: 
+     * 6. Community Link:
+     */
+    public static SpannableStringBuilder createSpanTxQueue(Tx tx, String referralLink, QueueOperation operation) {
+        String coinName = ChainIDUtil.getCoinName(tx.chainID);
+        SpanUtils msg = new SpanUtils();
+        int txType = tx.txType;
+        if (operation != null) {
+            msg.append("Funds update: ");
+            if (operation == QueueOperation.INSERT) {
+                if (tx.txType == TxType.WIRING_TX.getType()) {
+                    msg.append(FmtMicrometer.fmtBalance(tx.amount))
+                            .append(" ")
+                            .append(coinName);
+                    msg.append(" is sent to you.");
+                } else {
+                    msg.append("a news transaction is posted.");
+                }
+            } else if (operation == QueueOperation.UPDATE) {
+                msg.append("transaction pending on settlement");
+            } else if (operation == QueueOperation.DELETE) {
+                msg.append("sender cancels wiring");
+            }
+            msg.append("\n").append("Community: ")
+                .append(ChainIDUtil.getName(tx.chainID))
+                .append("\n").append("Transmission ID: ")
+                .append(String.valueOf(tx.txID))
+                .append("\n");
+        }
+        //转账交易, 交易金额
+        if (txType == TxType.WIRING_TX.getType() && tx.amount > 0) {
+            msg.append("Amount: ").append(FmtMicrometer.fmtBalance(tx.amount))
+                    .append(" ").append(coinName)
+                    .append("\n");
+        }
+        //交易, 交易费
+        msg.append("Fee: ").append(FmtMicrometer.fmtFeeValue(tx.fee))
+                .append(" ").append(coinName);
+
+        if (txType == TxType.WIRING_TX.getType()) {
+            if (StringUtil.isNotEmpty(tx.memo)) {
+                msg.append("\n").append("Description: ").append(tx.memo);
+            }
+            if (operation == QueueOperation.INSERT) {
+                if (StringUtil.isNotEmpty(referralLink)) {
+                    msg.append("\n").append("\n").append("Referral and Bonus Link: ").append(referralLink);
+                } else {
+                    msg.append("\n").append("Community Link: ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID, tx.senderPk));
+                }
+            }
+        }
+        return msg.create();
     }
 
-    private static SpannableStringBuilder createSpanTxQueue(TxQueue tx, long nonce, boolean isShowNonce,
-                                                            String referralLink, QueueOperation operation) {
+    //区块浏览器
+    private static SpannableStringBuilder createSpanTxQueue(TxQueue tx, long nonce, boolean isShowNonce) {
         String coinName = ChainIDUtil.getCoinName(tx.chainID);
         SpanUtils msg = new SpanUtils();
         if (tx.content != null) {
             TxContent txContent = new TxContent(tx.content);
             int txType = txContent.getType();
-            if (operation != null) {
-                msg.append("Funds update: ");
-                if (operation == QueueOperation.INSERT) {
-                    if (tx.txType == TxType.WIRING_TX.getType()) {
-                        msg.append(FmtMicrometer.fmtBalance(tx.amount))
-                                .append(" ")
-                                .append(coinName);
-                        msg.append(" is sent to you.");
-                    } else {
-                        msg.append("a news transaction is posted.");
-                    }
-                } else if (operation == QueueOperation.UPDATE) {
-                    msg.append("transaction pending on settlement");
-                } else if (operation == QueueOperation.DELETE) {
-                    msg.append("sender cancels wiring");
-                }
-                msg.append("\n").append("Community: ")
-                    .append(ChainIDUtil.getName(tx.chainID))
-                    .append("\n").append("Transmission ID: ")
-                    .append(HashUtil.hashMiddleHide(String.valueOf(tx.queueTime)))
-                    .append("\n");
-            }
+            //转账交易, 交易金额
             if (txType == TxType.WIRING_TX.getType() && tx.amount > 0) {
                 msg.append("Amount: ").append(FmtMicrometer.fmtBalance(tx.amount))
                         .append(" ").append(coinName)
                         .append("\n");
             }
+            //交易, 交易费
             msg.append("Fee: ").append(FmtMicrometer.fmtFeeValue(tx.fee))
                     .append(" ").append(coinName);
+
             if (isShowNonce && nonce > 0) {
                 msg.append("\n").append("Nonce: ").append(FmtMicrometer.fmtLong(nonce));
             }
+
             if (txType == TxType.WIRING_TX.getType()) {
-                if (null == operation) {
-                    msg.append("\n").append("To: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
-                }
+                msg.append("\n").append("To: ").append(HashUtil.hashMiddleHide(tx.receiverPk));
                 if (StringUtil.isNotEmpty(txContent.getMemo())) {
                     msg.append("\n").append("Description: ").append(txContent.getMemo());
                 } else if (StringUtil.isNotEmpty(tx.memo)) {
                     msg.append("\n").append("Description: ").append(tx.memo);
-                }
-                if (operation == QueueOperation.INSERT) {
-                    if (StringUtil.isNotEmpty(referralLink)) {
-                        msg.append("\n").append("\n").append("Referral and Bonus Link: ").append(referralLink);
-                    } else {
-                        msg.append("\n").append("Community Link: ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID, tx.senderPk));
-                    }
                 }
             } else if (txType == TxType.NEWS_TX.getType()) {
                 NewsContent newsContent = new NewsContent(tx.content);

@@ -74,7 +74,7 @@ public class MsgContent {
         return content;
     }
 
-    public String getAirdropChain() {
+    public String getChainID() {
         return airdropChain;
     }
 

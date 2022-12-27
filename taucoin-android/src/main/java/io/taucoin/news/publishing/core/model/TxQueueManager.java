@@ -219,9 +219,6 @@ class TxQueueManager {
                     txQueue.fee, account.getBalance());
             return false;
         }
-        if (isSendMessage) {
-            ChatViewModel.syncSendMessageTask(appContext, txQueue, QueueOperation.UPDATE);
-        }
         sendTxQueue(account, txQueue, true, 0, mode);
         return false;
     }
@@ -373,6 +370,9 @@ class TxQueueManager {
             addUserInfoToLocal(tx);
             addMemberInfoToLocal(tx);
             addPendingAndOffchainCoins(tx);
+            //如果是转账交易，通知对方
+            if(txType == WIRING_TX.getType())
+                ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.UPDATE);
             TxLog log = new TxLog(tx.txID, TxLogStatus.SENT.getStatus(), DateUtil.getMillisTime());
             txRepo.addTxLog(log);
         }

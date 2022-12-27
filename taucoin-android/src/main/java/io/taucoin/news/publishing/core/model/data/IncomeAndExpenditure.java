@@ -1,7 +1,8 @@
 package io.taucoin.news.publishing.core.model.data;
 
-import androidx.room.Relation;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.User;
+
+import androidx.room.Relation;
 
 /**
  * Room: 钱包的收入和支出实体类
@@ -15,7 +16,7 @@ public class IncomeAndExpenditure {
             entityColumn = "publicKey")
     public User receiver;                   // 交易接受者对应的用户信息
 
-    public String hash;                     // 交易或区块hash
+    public String hash;                     // 交易hash
     public String senderOrMiner;            // 交易发生者或矿工
     public String receiverPk;               // 交易的接收者
     public long blockNumber;                // 区块号
@@ -27,9 +28,9 @@ public class IncomeAndExpenditure {
     public int onlineStatus;                // 交易或区块是否上链
 
     //add for mining rewards
-    public IncomeAndExpenditure(String senderOrMiner, int txType, long amount, long createTime) {
+    public IncomeAndExpenditure(String senderOrMiner, long amount, long createTime) {
         this.senderOrMiner = senderOrMiner;
-        this.txType = txType;
+        this.txType = -1;
         this.amount = amount;
         this.createTime = createTime;
         this.hash = "0000000000000000000000000000000000000000";
