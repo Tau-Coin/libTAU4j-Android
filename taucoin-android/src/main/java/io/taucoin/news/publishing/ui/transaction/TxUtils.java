@@ -247,10 +247,13 @@ public class TxUtils {
                 if (StringUtil.isNotEmpty(referralLink)) {
                     msg.append("\n").append("\n").append("Referral and Bonus Link: ").append(referralLink);
                 } else {
-                    msg.append("\n").append("Community Link: ").append(LinkUtil.encodeChain(tx.senderPk, tx.chainID, tx.senderPk));
+                    msg.append("\n").append("Community Link: ")
+                       .append(LinkUtil.encodeChain(tx.senderPk, tx.chainID, tx.senderPk));
                 }
             }
         }
+        //交易时间
+        msg.append("\n").append("Tx Created Time: ").append(FmtMicrometer.fmtFeeValue(tx.timestamp));
         return msg.create();
     }
 

@@ -172,40 +172,47 @@ class MsgAlertHandler {
     `           */
 
                 String contentStr = Utils.textBytesToString(content);
+                String txIDTag = "Transmission ID: ";
+                String amountTag = "Amount: ";
+                String feeTag = "Fee: ";
+                String timeTag = "Tx Created Time: ";
 
                 //如果是转账交易下的点对点, 数据库存入转账消息, 目前是紧绑定 TODO: TC
                 if (msgContent.getType() == MessageType.WIRING.getType()) {
                     String endl = "\n";
                     String space = " ";
                     //获取txid
-                    String txIDTag = "Transmission ID: ";
                     int indexStart = contentStr.indexOf(txIDTag) + txIDTag.length();
                     int indexEnd = contentStr.indexOf(endl, indexStart);
                     String txID = contentStr.substring(indexStart, indexEnd);
-                    //获取chainID
-                    String chainID = msgContent.getChainID();
-                    //获取sender senderPk
-                    //获取receiver userPk
-                    //获取交易金额
-                    String amountTag = "Amount: ";
-                    indexStart = contentStr.indexOf(amountTag) + txIDTag.length();
-                    indexEnd = contentStr.indexOf(space, indexStart);
-                    long  amount = FmtMicrometer.fmtTxLongValue(contentStr.substring(indexStart, indexEnd));
-                    //获取交易费
-                    String feeTag = "Fee: ";
-                    indexStart = contentStr.indexOf(feeTag) + feeTag.length();
-                    indexEnd = contentStr.indexOf(space, indexStart);
-                    long  fee = FmtMicrometer.fmtTxLongValue(contentStr.substring(indexStart, indexEnd));
-                    Tx tx = new Tx(chainID, userPk, amount, fee, TxType.WIRING_TX.getType(), "p2p income");
-                    tx.txID = txID;
-                    tx.senderPk = senderPk;
-                    txRepo.addTransaction(tx);
+                    Tx tx = txRepo.getTxByTxID(txID);
+                    if(tx == null) {
+                        //获取chainID
+                        String chainID = msgContent.getChainID();
+                        //获取sender senderPk
+                        //获取receiver userPk
+                        //获取交易金额
+                        indexStart = contentStr.indexOf(amountTag) + amountTag.length();
+                        indexEnd = contentStr.indexOf(space, indexStart);
+                        long  amount = FmtMicrometer.fmtTxLongValue(contentStr.substring(indexStart, indexEnd));
+                        //获取交易费
+                        indexStart = contentStr.indexOf(feeTag) + feeTag.length();
+                        indexEnd = contentStr.indexOf(space, indexStart);
+                        long  fee = FmtMicrometer.fmtTxLongValue(contentStr.substring(indexStart, indexEnd));
+                        //获取交易时间
+                        indexStart = contentStr.indexOf(timeTag) + timeTag.length();
+                        indexEnd = contentStr.length();
+                        long  timestamp = FmtMicrometer.fmtTxLongValue(contentStr.substring(indexStart, indexEnd));
+                        logger.debug("p2p msg txid::{}, amount::{}, fee::{}, timestamp::{}", txID, amount, fee, timestamp);
+                        tx = new Tx(txID, chainID, senderPk, userPk, amount, fee, timestamp, TxType.WIRING_TX.getType());
+                        txRepo.addTransaction(tx);
+                    }
                 }
 
                 // 创建通知栏消息
                 User friendUser = userRepo.getUserByPublicKey(senderPk);
                 if (friendUser != null && !friendUser.isBanned && contentStr.length() > 0) {
-                    TauNotifier.getInstance().makeChatNotify(friendUser, contentStr);
+                    TauNotifier.getInstance().makeChatNotify(friendUser, contentStr.substring(0, contentStr.indexOf(timeTag)));
                 }
             }
         } catch (Exception e) {

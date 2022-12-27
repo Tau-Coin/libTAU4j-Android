@@ -142,7 +142,7 @@ public interface TxDao {
         " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
         " ORDER BY tx.pinnedTime DESC";
 
-    // 查询钱包的收入和支出
+    // 查询钱包的收入和支出 onlineTime block时间，计算confidence
     String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = 
             " SELECT t.txID AS hash, t.senderPk AS senderOrMiner, t.receiverPk, -1 AS blockNumber, t.txType, t.amount, t.fee," +
             " t.timestamp / 1000 AS createTime, 0 AS onlineTime, t.txStatus AS onlineStatus" +
@@ -379,10 +379,6 @@ public interface TxDao {
     @Transaction
     @Query(QUERY_GET_WALLET_INCOME_AND_EXPENDITURE)
     List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize);
-
-    @Transaction
-    @Query(QUERY_MINING_INCOME)
-    Flowable<List<IncomeAndExpenditure>> observeMiningIncome(String chainID);
 
     @Query(QUERY_ON_CHAIN_TXS_BY_BLOCK_HASH)
     List<Tx> getOnChainTxsByBlockHash(String blockHash);

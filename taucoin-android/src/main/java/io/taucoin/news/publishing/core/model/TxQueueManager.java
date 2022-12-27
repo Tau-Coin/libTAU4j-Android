@@ -372,7 +372,7 @@ class TxQueueManager {
             addPendingAndOffchainCoins(tx);
             //如果是转账交易，通知对方
             if(txType == WIRING_TX.getType())
-                ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.UPDATE);
+                ChatViewModel.syncSendMessageTask(appContext, tx, QueueOperation.INSERT);
             TxLog log = new TxLog(tx.txID, TxLogStatus.SENT.getStatus(), DateUtil.getMillisTime());
             txRepo.addTxLog(log);
         }

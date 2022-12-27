@@ -53,6 +53,19 @@ public class Tx implements Parcelable {
         this.memo = memo;
     }
 
+    @Ignore
+    public Tx(@NonNull String txid, @NonNull String chainID, String senderPk, String receiverPk,
+              long amount, long fee, long timestamp, int txType){
+        this.txID = txid;
+        this.chainID = chainID;
+        this.senderPk = senderPk;
+        this.receiverPk = receiverPk;
+        this.amount = amount;
+        this.fee = fee;
+        this.txType = txType;
+        this.timestamp = timestamp;
+    }
+
     // notes
     @Ignore
     public Tx(@NonNull String chainID, long fee, int txType, String memo){

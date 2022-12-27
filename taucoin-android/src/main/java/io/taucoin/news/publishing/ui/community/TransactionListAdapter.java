@@ -12,6 +12,10 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.taucoin.news.publishing.MainApplication;
 import io.taucoin.news.publishing.R;
 import io.taucoin.news.publishing.core.Constants;
@@ -28,6 +32,7 @@ import io.taucoin.news.publishing.databinding.ItemTransactionListBinding;
  */
 public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, TransactionListAdapter.ViewHolder> {
 
+    private static final Logger logger = LoggerFactory.getLogger("TransactionListAdapter");
     private ClickListener listener;
     public TransactionListAdapter(ClickListener listener) {
         super(diffCallback);
@@ -111,6 +116,7 @@ public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, Tr
                 stringBuilder.append("+");
                 stringBuilder.append(FmtMicrometer.fmtMiningIncome(entry.amount));
                 binding.tvAmount.setTextColor(resources.getColor(R.color.color_yellow));
+                logger.debug("wallet tx list received coins txid::{}", entry.hash);
             }
             binding.tvAmount.setText(stringBuilder.toString());
             if (entry.onlineStatus >= Constants.TX_STATUS_ON_CHAIN) {

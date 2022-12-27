@@ -216,11 +216,6 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public Flowable<List<IncomeAndExpenditure>> observeMiningIncome(String chainID) {
-        return db.txDao().observeMiningIncome(chainID);
-    }
-
-    @Override
     public Flowable<Object> observeWalletChanged() {
         String[] tables = new String[]{"Users", "Txs","Blocks"};
         return RxRoom.createFlowable(db, tables);

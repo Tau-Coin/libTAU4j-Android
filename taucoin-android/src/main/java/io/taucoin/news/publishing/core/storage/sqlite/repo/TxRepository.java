@@ -129,8 +129,6 @@ public interface TxRepository {
 
     List<IncomeAndExpenditure> observeWalletTransactions(String chainID, int startPosition, int loadSize);
 
-    Flowable<List<IncomeAndExpenditure>> observeMiningIncome(String chainID);
-
     Flowable<Object> observeWalletChanged();
 
     /**

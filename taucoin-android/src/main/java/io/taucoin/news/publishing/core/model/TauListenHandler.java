@@ -349,8 +349,18 @@ public class TauListenHandler {
                     status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
                 }
                 tx.txStatus = status;
+                //之所以要更新这么多，是因为P2P点对点转账有部分交易要补全信息
+                tx.version = txMsg.getVersion();
                 tx.blockNumber = block.getBlockNumber();
                 tx.blockHash = block.Hash();
+                TxContent txContent = new TxContent(txMsg.getPayload());
+                tx.txType = txContent.getType();
+                tx.memo = txContent.getMemo();
+                tx.previousHash = txMsg.getPreviousHash().to_hex();
+                tx.timestamp = txMsg.getTimestamp();
+                tx.nonce = txMsg.getNonce();
+                tx.receiverPk = ByteUtil.toHexString(txMsg.getReceiver());
+                tx.amount = txMsg.getAmount();
                 txRepo.updateTransaction(tx);
             } else {
                 handleTransactionData(block.getBlockNumber(), block.Hash(), txMsg,
