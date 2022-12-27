@@ -120,9 +120,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         long power = 0;
         if (member != null) {
             power = member.power;
-            pendingAmount = member.txIncomePending - member.txExpenditurePending;
             // 余额根据libTAU balance减去计算上链为100%的金额
-            //balance = member.balance - onChainBalance;
             interimBalance = member.getInterimBalance();
             interimBalance = Math.max(0, interimBalance);
 
@@ -131,6 +129,9 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
 
             miningRewards = member.getMiningRewards();
             miningRewards = Math.max(0, miningRewards);
+
+            //pendingAmount分为两部分: mining + 交易额差
+            pendingAmount = miningRewards + member.txIncomePending - member.txExpenditurePending;
 
             logger.debug("loadMemberData interimBalance::{}, pendingAmount::{}, paymentBalance::{}," +
                             " incomePending::{}, expenditurePending::{}",

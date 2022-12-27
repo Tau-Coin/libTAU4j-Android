@@ -967,9 +967,8 @@ public class TxViewModel extends AndroidViewModel {
                 User currentUser = userRepo.getCurrentUser();
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, currentUser.publicKey);
                 IncomeAndExpenditure miningRewards = new IncomeAndExpenditure(currentUser.publicKey, -1, member.getMiningRewards(), daemon.getSessionTime()/1000);
-                list.add(miningRewards);
-                logger.debug("queryWalletIncomeAndExpenditure pos::{}, pageSize::{}, size::{}",
-                        pos, pageSize, list.size());
+                list.add(0, miningRewards);
+                logger.debug("queryWalletIncomeAndExpenditure pos::{}, pageSize::{}, size::{}", pos, pageSize, list.size());
 
             } catch (Exception e) {
                 logger.error("queryWalletIncomeAndExpenditure error::", e);

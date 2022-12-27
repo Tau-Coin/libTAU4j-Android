@@ -32,6 +32,7 @@ public class IncomeAndExpenditure {
         this.txType = txType;
         this.amount = amount;
         this.createTime = createTime;
+        this.hash = "0000000000000000000000000000000000000000";
     }
 
     @Override
