@@ -33,6 +33,7 @@ import io.taucoin.news.publishing.core.model.data.DataChanged;
 import io.taucoin.news.publishing.core.model.data.FriendAndUser;
 import io.taucoin.news.publishing.core.model.data.Result;
 import io.taucoin.news.publishing.core.model.data.message.MsgContent;
+import io.taucoin.news.publishing.core.model.data.message.MessageType;
 import io.taucoin.news.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.news.publishing.core.model.data.message.TxType;
 import io.taucoin.news.publishing.core.storage.sqlite.AppDatabase;
@@ -52,8 +53,7 @@ import io.taucoin.news.publishing.core.utils.MsgSplitUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.news.publishing.ui.constant.Page;
-import io.taucoin.news.publishing.core.model.data.message.MessageType;
-import io.taucoin.news.publishing.ui.transaction.TxUtils;
+import io.taucoin.news.publishing.ui.transaction.WiringCoinsMsg;
 
 /**
  * 聊天相关的ViewModel
@@ -274,18 +274,6 @@ public class ChatViewModel extends AndroidViewModel {
      * @param QueueOperation operation
      */
     public static Result syncSendMessageTask(Context context, Tx tx, QueueOperation operation) {
-        return syncSendMessageTask(context, tx, null, operation);
-    }
-
-
-    /**
-     * 同步给朋友发转账任务 
-     * @param context Context
-     * @param TxQueue tx
-     * @param String  referralLink(从发交易入口，该参数null)
-     * @param QueueOperation operation
-     */
-    public static Result syncSendMessageTask(Context context, Tx tx, String referralLink, QueueOperation operation) {
         // 自己发给自己的交易，并且交易金额为0(排除News交易)；不发送点对点消息
         if (null == tx || (operation == QueueOperation.INSERT && tx.txType == TxType.WIRING_TX.getType() &&
                 StringUtil.isEquals(tx.senderPk, tx.receiverPk) && tx.amount <= 0 )) {
@@ -293,18 +281,8 @@ public class ChatViewModel extends AndroidViewModel {
         }
 
         //创建消息内容(也有可能是referral机制产生)
-        String text = TxUtils.createSpanTxQueue(tx, referralLink, operation).toString();
+        String text = WiringCoinsMsg.createWiringCoinsMsg(tx, operation).toString();
 
-        return syncSendMessageTask(context, tx.senderPk, tx.receiverPk, text,
-                MessageType.WIRING.getType(), tx.chainID, null);
-    }
-
-    /**
-     * 同步给朋友发转账任务
-     * @param context Context
-     */
-    public static Result syncSendMessageTask(Context context, Tx tx, long timestamp, QueueOperation operation) {
-        String text = TxUtils.createSpanTxQueue(tx, timestamp, operation).toString();
         return syncSendMessageTask(context, tx.senderPk, tx.receiverPk, text,
                 MessageType.WIRING.getType(), tx.chainID, null);
     }

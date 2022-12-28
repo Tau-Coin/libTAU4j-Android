@@ -22,6 +22,7 @@ import io.taucoin.news.publishing.MainApplication;
 import io.taucoin.news.publishing.R;
 import io.taucoin.news.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.news.publishing.core.model.data.ChatMsgStatus;
+import io.taucoin.news.publishing.core.model.data.message.MessageType;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.ChatMsg;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.ChatMsgLog;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.User;
@@ -35,6 +36,7 @@ import io.taucoin.news.publishing.databinding.ItemTextBinding;
 import io.taucoin.news.publishing.databinding.ItemTextRightBinding;
 import io.taucoin.news.publishing.ui.customviews.AutoLinkTextView;
 import io.taucoin.news.publishing.ui.customviews.RoundImageView;
+import io.taucoin.news.publishing.ui.transaction.WiringCoinsMsg;
 
 /**
  * 聊天消息的Adapter
@@ -189,7 +191,13 @@ public class ChatListAdapter extends ListAdapter<ChatMsgAndLog, ChatListAdapter.
             if (null == msg) {
                 return;
             }
-            String contentStr = Utils.textBytesToString(msg.content);
+            String contentStr = "";
+            if(msg.contentType == MessageType.WIRING.getType())
+            {
+                contentStr = WiringCoinsMsg.decodeContentStr(msg.content);
+            } else {
+                contentStr = Utils.textBytesToString(msg.content);
+            }
             tvMsg.setText(contentStr);
 
             Linkify.addLinks(tvMsg, Linkify.WEB_URLS);

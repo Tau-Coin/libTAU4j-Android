@@ -403,17 +403,6 @@ public class CommunityViewModel extends AndroidViewModel {
             TxViewModel txViewModel = new TxViewModel(MainApplication.getInstance());
             txViewModel.addTransactionTask(newsTxQueue, null, DateUtil.getMillisTime());
 
-            // 发送通知 取消通知
-//            if (accounts.size() > 0) {
-//                String memo = appContext.getString(R.string.community_added_members);
-//                for (Account acc : accounts) {
-//                    String key = ByteUtil.toHexString(acc.getPeer());
-//                    long amount = acc.getBalance();
-//                    Tx tx = new Tx(community.chainID, key, amount, 0L, TxType.WIRING_TX.getType(), memo);
-//                    tx.senderPk = currentUser.publicKey;
-//                    ChatViewModel.syncSendMessageTask(appContext, tx, DateUtil.getMillisTime(), QueueOperation.ON_CHAIN);
-//                }
-//            }
         } catch (Exception e) {
             result.setFailMsg(e.getMessage());
         }

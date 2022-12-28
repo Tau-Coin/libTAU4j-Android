@@ -879,7 +879,6 @@ public class TxViewModel extends AndroidViewModel {
             try {
                 txQueueRepo.deleteQueue(tx);
                 txRepo.deleteTxByQueueID(tx.queueID);
-                //ChatViewModel.syncSendMessageTask(getApplication(), tx, QueueOperation.DELETE);
             } catch (Exception e) {
                 logger.error("deleteTxQueue error::", e);
             }
