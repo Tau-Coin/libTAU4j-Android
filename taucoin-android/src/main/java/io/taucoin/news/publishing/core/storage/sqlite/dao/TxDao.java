@@ -145,8 +145,10 @@ public interface TxDao {
     // 查询钱包的收入和支出 onlineTime block时间，计算confidence
     String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = 
             " SELECT t.txID AS hash, t.senderPk AS senderOrMiner, t.receiverPk, -1 AS blockNumber, t.txType, t.amount, t.fee," +
-            " t.timestamp / 1000 AS createTime, 0 AS onlineTime, t.txStatus AS onlineStatus" +
+            " t.timestamp / 1000 AS createTime, b.timestamp AS onlineTime, t.txStatus AS onlineStatus" +
             " FROM Txs AS t" +
+            " LEFT JOIN (SELECT txID, timestamp FROM Blocks WHERE chainID = :chainID" +
+            " AND txID IS NOT NULL AND status = 1 GROUP BY txID) AS b ON t.txID = b.txID" +
             " WHERE t.chainID = :chainID" +
             " AND (t.senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " OR t.receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +

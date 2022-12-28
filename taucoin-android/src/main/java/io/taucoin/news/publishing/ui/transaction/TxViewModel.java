@@ -963,8 +963,11 @@ public class TxViewModel extends AndroidViewModel {
                 //walletTxs加入pending 状态的mining rewards
                 User currentUser = userRepo.getCurrentUser();
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, currentUser.publicKey);
-                IncomeAndExpenditure miningRewards = new IncomeAndExpenditure(currentUser.publicKey, member.getMiningRewards(), daemon.getSessionTime()/1000);
-                list.add(0, miningRewards);
+                long miningRewards = member.getMiningRewards();
+                if( miningRewards > 0) {
+                    IncomeAndExpenditure miningRewardEntry = new IncomeAndExpenditure(currentUser.publicKey, miningRewards, daemon.getSessionTime()/1000);
+                    list.add(0, miningRewardEntry);
+                }
                 logger.debug("queryWalletIncomeAndExpenditure pos::{}, pageSize::{}, size::{}", pos, pageSize, list.size());
 
             } catch (Exception e) {

@@ -91,6 +91,9 @@ public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, Tr
                     if (entry.txType == TxType.NEWS_TX.getType()) {
                         binding.tvName.setText(resources.getString(R.string.community_post_news));
                         binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.sender));
+                        stringBuilder.append("-");
+                        stringBuilder.append(FmtMicrometer.fmtMiningIncome(entry.fee));
+                        binding.tvAmount.setTextColor(resources.getColor(R.color.color_red));
                     } else if (entry.txType == TxType.WIRING_TX.getType()){
                         boolean isSendToSelf = StringUtil.isEquals(entry.senderOrMiner, entry.receiverPk);
                         //自己发给自己的交易, 显示交易费
