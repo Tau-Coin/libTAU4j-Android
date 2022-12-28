@@ -116,7 +116,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         long interimBalance = 0;
         long pendingAmount = 0;
         long paymentBalance = 0;
-        long miningRewards = 0;
+        long totalMiningRewards = 0;
         long power = 0;
         if (member != null) {
             power = member.power;
@@ -127,10 +127,11 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             paymentBalance = member.getPaymentBalance();
             paymentBalance = Math.max(0, paymentBalance);
 
-            miningRewards = member.getMiningRewards();
-            miningRewards = Math.max(0, miningRewards);
+            totalMiningRewards = member.getTotalMiningRewards();
 
             //pendingAmount分为两部分: mining + 交易额差
+            long miningRewards = 0;
+            miningRewards = member.getMiningRewards();
             pendingAmount = miningRewards + member.txIncomePending - member.txExpenditurePending;
 
             logger.debug("loadMemberData interimBalance::{}, pendingAmount::{}, paymentBalance::{}," +
@@ -141,7 +142,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         binding.itemInterimBalance.setRightText(FmtMicrometer.fmtLong(interimBalance));
         binding.itemPendingAmount.setRightText(FmtMicrometer.fmtLong(pendingAmount));
         binding.itemPaymentBalance.setRightText(FmtMicrometer.fmtLong(paymentBalance));
-        binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(miningRewards));
+        binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(totalMiningRewards));
         double showPower = Logarithm.log2(2 + power);
         String powerStr = "log2(2+%s)=%s";
         powerStr = String.format(powerStr, FmtMicrometer.fmtLong(power), FmtMicrometer.formatThreeDecimal(showPower));

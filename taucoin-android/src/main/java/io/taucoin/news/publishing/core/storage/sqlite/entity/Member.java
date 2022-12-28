@@ -111,4 +111,8 @@ public class Member implements Parcelable {
     public long getMiningRewards() {
         return Math.max(0, (power - consensusPower) * Constants.MINING_REWARDS.longValue());
     }
+
+    public long getTotalMiningRewards() {
+        return Math.max(0, power * Constants.MINING_REWARDS.longValue());
+    }
 }
