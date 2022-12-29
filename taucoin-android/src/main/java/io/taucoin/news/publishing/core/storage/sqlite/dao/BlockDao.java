@@ -43,7 +43,7 @@ public interface BlockDao {
 //            " AND (cc.tailBlock <= bb.blockNumber)" +
             ") AS c " +
             " ON a.chainID = c.chainID" +
-            " LEFT JOIN (SELECT mm.chainID, count(*) totalPeers, SUM(balance) AS totalCoin FROM Members mm" +
+            " LEFT JOIN (SELECT mm.chainID, count(*) totalPeers, SUM(consensusBalance) AS totalCoin FROM Members mm" +
             " WHERE mm.chainID = :chainID AND mm.publicKey IN (" + QUERY_COMMUNITY_PUBLIC_KEY_ORDER + " LIMIT :limit)" +
             ") AS d" +
             " ON a.chainID = d.chainID" +
