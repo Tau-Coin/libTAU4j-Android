@@ -229,7 +229,7 @@ public class TransactionCreateActivity extends ScanTriggerActivity implements Vi
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(member -> {
                     long balance = ViewUtils.getLongTag(binding.tvPaymentBalance);
-                    if (member != null && member.balance != balance) {
+                    if (member != null && member.getPaymentBalance() != balance) {
                         loadPaymentBalanceView(member.getPaymentBalance());
                     }
                 }, it -> {

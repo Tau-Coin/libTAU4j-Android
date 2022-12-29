@@ -11,6 +11,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.news.publishing.R;
+import io.taucoin.news.publishing.core.Constants;
 import io.taucoin.news.publishing.core.model.data.ChainStatus;
 import io.taucoin.news.publishing.core.model.data.MemberAndAmount;
 import io.taucoin.news.publishing.core.utils.ActivityUtil;
@@ -118,8 +119,10 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         long paymentBalance = 0;
         long totalMiningRewards = 0;
         long power = 0;
+        long consensusPower = 0;
         if (member != null) {
             power = member.power;
+            consensusPower = member.consensusPower;
             // 余额根据libTAU balance减去计算上链为100%的金额
             interimBalance = member.getInterimBalance();
             interimBalance = Math.max(0, interimBalance);
@@ -142,7 +145,10 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         binding.itemInterimBalance.setRightText(FmtMicrometer.fmtLong(interimBalance));
         binding.itemPendingAmount.setRightText(FmtMicrometer.fmtLong(pendingAmount));
         binding.itemPaymentBalance.setRightText(FmtMicrometer.fmtLong(paymentBalance));
-        binding.itemMiningIncomePending.setRightText(FmtMicrometer.fmtLong(totalMiningRewards));
+        String miningRewardsStr = "%sx%s(success)=%s";
+        miningRewardsStr = String.format(miningRewardsStr, Constants.MINING_REWARDS.longValue(),
+                FmtMicrometer.fmtLong(power), FmtMicrometer.fmtLong(totalMiningRewards));
+        binding.itemMiningIncomePending.setRightText(miningRewardsStr);
         double showPower = Logarithm.log2(2 + power);
         String powerStr = "log2(2+%s)=%s";
         powerStr = String.format(powerStr, FmtMicrometer.fmtLong(power), FmtMicrometer.formatThreeDecimal(showPower));
@@ -223,7 +229,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
 
     private void handleMemberTips(MemberAndAmount member) {
         boolean isShowTips = member != null && member.pendingTime > 0;
-		//Modified tc
+        //Modified tc
         binding.viewTips.setVisibility(isShowTips ? View.VISIBLE : View.GONE);
     }
 

@@ -22,6 +22,7 @@ class DatabaseMigration {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             // 添加共识点社区成员power
             database.execSQL("ALTER TABLE Members ADD COLUMN consensusPower INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE Members ADD COLUMN consensusNonce INTEGER NOT NULL DEFAULT 0");
         }
     };
 //

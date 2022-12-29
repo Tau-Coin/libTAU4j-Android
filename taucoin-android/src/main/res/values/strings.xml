@@ -3,6 +3,7 @@
     <string name="app_name_alpha_description">Freely Create Crypto Coins\nDecentral Serverless Network</string>
     <string name="app_name_alpha_desc">Open Source</string>
     <string name="app_share">Share app link via</string>
+    <string name="app_share_content">Please join TAU network, an unrestricted and serverless social media from https://taucoin.io</string>
     <string name="app_share_news">Share news</string>
     <string name="app_share_error">Can\'t find share component to share</string>
 
@@ -45,9 +46,9 @@
     <string name="common_resend">Resend</string>
     <string name="common_done">Done</string>
     <string name="common_post">Post</string>
-    <string name="common_retweet">Retwitt</string>
-    <string name="common_retweet_other">Retwitt to other community</string>
-    <string name="common_share_external">Shate to external</string>
+    <string name="common_retweet">Repost</string>
+    <string name="common_retweet_other">Repost to other TAU community</string>
+    <string name="common_share_external">Share to social media</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
@@ -188,7 +189,7 @@
     <string name="community_mining_online">Mining online</string>
 	<string name="community_interim_balance">Interim Balance</string>
 	<string name="community_pending_amount">Pending Amount</string>
-	<string name="community_payment_balance">Payment Balance</string>
+	<string name="community_payment_balance">Payable Balance</string>
     <string name="community_mining_income_pending">Mining Rewards</string>
     <string name="community_filter_all">All</string>
     <string name="community_chain_note">Messages</string>
@@ -450,7 +451,7 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_amount_hint">Amount</string>
     <string name="tx_memo_hint">Memo(optional)</string>
     <string name="tx_interim_balance">Interim Balance %1$s %2$s</string>
-    <string name="tx_payment_balance">Payment Balance %1$s %2$s</string>
+    <string name="tx_payment_balance">Payable Balance %1$s %2$s</string>
     <string name="tx_median_fee" formatted="false"><Data><![CDATA[Transaction fee:<font color="#f19322"><u>&nbsp;&nbsp;%1$s&nbsp;&nbsp;</u></font>%2$s]]></Data></string>
     <string name="tx_new_name">Nick Name(required)</string>
     <string name="tx_personal_profile">Personal profile(Optional)</string>
@@ -501,8 +502,8 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_error_invalid_free">Invalid Transaction free</string>
     <string name="tx_error_invalid_news">News cannot exceed %d bytes</string>
     <string name="tx_error_min_free">Transaction fee cannot be less than %1$s</string>
-    <string name="tx_error_add_members_no_enough_coins">Insufficient Balance :\ncoins + Fee > Payment Balance</string>
-    <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Payment Balance</string>
+    <string name="tx_error_add_members_no_enough_coins">Insufficient Balance :\ncoins + Fee > Payable Balance</string>
+    <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Payable Balance</string>
     <string name="tx_error_no_enough_coins_for_fee">Insufficient Balance :\nTransaction Fee > Interim Balance</string>
     <string name="tx_error_insufficient_balance">Insufficient Balance</string>
     <string name="tx_error_nonce_conflict">Invalidation: nonce conflict</string>
@@ -540,7 +541,7 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_sell_direct_talk">Connect</string>
     <string name="tx_sell_add_friend">Add\nFriend</string>
     <string name="tx_unknown">Unknown Transaction</string>
-    <string name="tx_community_creator_selling">I am creator of %s community.\nHello World.</string>
+    <string name="tx_community_creator_selling">I am the creator of %s community.\nHello World!</string>
 
     <string name="escrow_now">Escrow Now</string>
     <string name="escrow_tip">Need an escrow service for p2p trading?\nConnect to the largest holder.</string>

@@ -156,6 +156,17 @@
                         app:rightText="@string/drawer_new_community"/>
 
                     <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                        android:id="@+id/item_share_app"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/widget_size_5"
+                        android:gravity="center_vertical"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:onClick="onClick"
+                        app:leftImage="@mipmap/icon_share"
+                        app:rightText="@string/drawer_share"/>
+
+                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_wallet"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

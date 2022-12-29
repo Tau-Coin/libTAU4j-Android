@@ -234,12 +234,12 @@
 
                 <ImageView
                     android:id="@+id/iv_retweet"
-                    android:layout_width="@dimen/widget_size_28"
-                    android:layout_height="@dimen/widget_size_28"
+                    android:layout_width="@dimen/widget_size_26"
+                    android:layout_height="@dimen/widget_size_26"
                     android:padding="@dimen/widget_size_4"
                     android:layout_gravity="center_horizontal"
                     android:contentDescription="@null"
-                    android:src="@mipmap/icon_retwitt"/>
+                    android:src="@mipmap/icon_share_news"/>
 
             </FrameLayout>
 

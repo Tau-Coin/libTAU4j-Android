@@ -384,6 +384,9 @@ public class MainActivity extends ScanTriggerActivity {
             case R.id.item_paste_link:
                 ActivityUtil.startActivity(this, PasteLinkActivity.class);
                 break;
+            case R.id.item_share_app:
+                ActivityUtil.shareText(this, getString(R.string.app_share), getString(R.string.app_share_content));
+                break;
         }
         if (binding != null) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);

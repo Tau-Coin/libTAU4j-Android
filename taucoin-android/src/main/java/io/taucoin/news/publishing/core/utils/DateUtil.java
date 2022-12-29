@@ -483,6 +483,7 @@ public class DateUtil {
     public static CharSequence getNewsTime(long timestamp) {
         long currentTime = getMillisTime();
         int seconds = getSeconds(timestamp, currentTime);
+        int minute = seconds / 60 % 60;
         int hours = seconds / 60 / 60;
         int days = hours / 24;
         if (days > 7) {
@@ -490,7 +491,7 @@ public class DateUtil {
         } else if (days > 0) {
             return days + "day";
         } else if (hours <= 0) {
-            return "1h";
+            return minute + "mins";
         } else {
             return hours + "h";
         }

@@ -306,6 +306,7 @@
                         layout="@layout/view_line"/>
 
                     <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                        android:visibility="gone"
                         android:id="@+id/item_share"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
