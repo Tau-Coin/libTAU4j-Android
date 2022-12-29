@@ -114,13 +114,11 @@ public class TxUtils {
         }
 
         if (StringUtil.isNotEmpty(tx.memo)) {
-            msg.append("Description: ").setForegroundColor(titleColor)
-                .append(tx.memo);
+            msg.append(tx.memo);
         }
 
         if (StringUtil.isNotEmpty(tx.link)) {
-            msg.append("\n").append("Link: ").setForegroundColor(titleColor)
-                    .append(tx.link);
+            msg.append("\n").append(tx.link);
         }
         if (tab == CommunityTabFragment.TAB_CHAIN) {
             msg.append("\n").append("Nonce: ").setForegroundColor(titleColor)

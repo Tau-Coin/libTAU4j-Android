@@ -47,14 +47,12 @@ import io.taucoin.news.publishing.core.model.data.TxQueueAndStatus;
 import io.taucoin.news.publishing.core.model.data.message.NewsContent;
 import io.taucoin.news.publishing.core.model.data.message.NoteContent;
 import io.taucoin.news.publishing.core.model.data.message.TxContent;
-import io.taucoin.news.publishing.core.model.data.message.QueueOperation;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.news.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.news.publishing.core.utils.ChainIDUtil;
 import io.taucoin.news.publishing.core.utils.DateUtil;
 import io.taucoin.news.publishing.core.utils.FmtMicrometer;
-import io.taucoin.news.publishing.ui.chat.ChatViewModel;
 import io.taucoin.news.publishing.ui.constant.Page;
 import io.taucoin.news.publishing.core.model.data.message.TxType;
 import io.taucoin.news.publishing.MainApplication;
@@ -102,6 +100,7 @@ public class TxViewModel extends AndroidViewModel {
     private MutableLiveData<List<IncomeAndExpenditure>> walletTxs = new MutableLiveData<>();
     private MutableLiveData<Result> airdropState = new MutableLiveData<>();
     private MutableLiveData<String> addState = new MutableLiveData<>();
+    private MutableLiveData<String> deletedResult = new MutableLiveData<>();
     private CommonDialog editFeeDialog;
     public TxViewModel(@NonNull Application application) {
         super(application);
@@ -119,6 +118,10 @@ public class TxViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.io())
                 .filter((needStart) -> needStart)
                 .subscribe((needStart) -> daemon.start()));
+    }
+
+    public MutableLiveData<String> getDeletedResult() {
+        return deletedResult;
     }
 
     public MutableLiveData<String> getAddState() {
@@ -966,6 +969,7 @@ public class TxViewModel extends AndroidViewModel {
                 if( miningRewards > 0) {
                     IncomeAndExpenditure miningRewardEntry = new IncomeAndExpenditure(currentUser.publicKey, miningRewards, daemon.getSessionTime()/1000);
                     list.add(0, miningRewardEntry);
+                    miningRewardEntry.sender = userRepo.getCurrentUser();
                 }
                 logger.debug("queryWalletIncomeAndExpenditure pos::{}, pageSize::{}, size::{}", pos, pageSize, list.size());
 
@@ -997,5 +1001,16 @@ public class TxViewModel extends AndroidViewModel {
 
     public Flowable<UserAndTx> observeMaxChatNumNews() {
         return txRepo.observeMaxChatNumNews();
+    }
+
+    public void deleteThisNews(String txID) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<String>) emitter -> {
+            txRepo.deleteThisNews(txID);
+            emitter.onNext(txID);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(result -> deletedResult.postValue(result));
+        disposables.add(disposable);
     }
 }

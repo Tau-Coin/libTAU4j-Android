@@ -2,6 +2,7 @@ package io.taucoin.news.publishing.core.storage.sqlite.repo;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.news.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.news.publishing.core.model.data.DataChanged;
@@ -88,4 +89,6 @@ public interface ChatRepository {
      * @return 时间
      */
     long getLastSendTime(String senderPk, String receiverPk);
+
+    Flowable<Integer> observeUnreadFriendNews();
 }

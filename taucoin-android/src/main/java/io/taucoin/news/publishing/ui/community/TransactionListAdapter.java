@@ -85,8 +85,11 @@ public class TransactionListAdapter extends ListAdapter<IncomeAndExpenditure, Tr
             if (isMyself) {
                 //txType == -1是mining rewards
                 if (entry.txType == -1) {
-                    binding.tvName.setText(resources.getString(R.string.community_mining_rewards,
-                            FmtMicrometer.fmtLong(entry.amount)));
+                    binding.tvName.setText(resources.getString(R.string.community_mining_rewards));
+                    binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(entry.sender));
+                    stringBuilder.append("+");
+                    stringBuilder.append(FmtMicrometer.fmtMiningIncome(entry.amount));
+                    binding.tvAmount.setTextColor(resources.getColor(R.color.color_yellow));
                 } else {
                     if (entry.txType == TxType.NEWS_TX.getType()) {
                         binding.tvName.setText(resources.getString(R.string.community_post_news));

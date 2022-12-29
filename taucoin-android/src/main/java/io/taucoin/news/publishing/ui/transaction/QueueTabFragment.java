@@ -77,12 +77,12 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
      * 观察加入的社区列表
      */
     private void observeTxQueue() {
-        disposables.add(communityViewModel.observerCurrentMember(chainID)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(member -> {
-                    loadAccountInfo();
-                }, it -> {}));
+//        disposables.add(communityViewModel.observerCurrentMember(chainID)
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeOn(Schedulers.io())
+//                .subscribe(member -> {
+//                    loadAccountInfo();
+//                }, it -> {}));
 
         disposables.add(txViewModel.observeCommunityTxQueue(chainID)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -97,14 +97,14 @@ public class QueueTabFragment extends CommunityTabFragment implements QueueListA
 
     }
 
-    private void loadAccountInfo() {
-        TauDaemon daemon = TauDaemon.getInstance(activity.getApplicationContext());
-        String userPk = MainApplication.getInstance().getPublicKey();
-        Account account = daemon.getAccountInfo(ChainIDUtil.encode(chainID), userPk);
-        if (account != null) {
-            adapter.setAccount(account);
-        }
-    }
+//    private void loadAccountInfo() {
+//        TauDaemon daemon = TauDaemon.getInstance(activity.getApplicationContext());
+//        String userPk = MainApplication.getInstance().getPublicKey();
+//        Account account = daemon.getAccountInfo(ChainIDUtil.encode(chainID), userPk);
+//        if (account != null) {
+//            adapter.setAccount(account);
+//        }
+//    }
 
     @Override
     public void onDeleteClicked(TxQueueAndStatus tx) {

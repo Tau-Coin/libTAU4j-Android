@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.news.publishing.core.model.data.ChatMsgAndLog;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.ChatMsg;
@@ -48,6 +49,11 @@ public interface ChatDao {
             " WHERE senderPk = :senderPk AND receiverPk = :receiverPk" +
             " ORDER BY timestamp DESC" +
             " LIMIT 1";
+
+    String QUERY_UNREAD_NEWS = "SELECT SUM(msgUnread) FROM Friends f" +
+            " LEFT JOIN Users u ON f.friendPK = u.publicKey" +
+            " WHERE f.userPK = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
+            " AND u.isBanned = 0";
 
     /**
      * 添加聊天信息
@@ -107,4 +113,7 @@ public interface ChatDao {
      */
     @Query(QUERY_LAST_SEND_TIME)
     long getLastSendTime(String senderPk, String receiverPk);
+
+    @Query(QUERY_UNREAD_NEWS)
+    Flowable<Integer> observeUnreadFriendNews();
 }

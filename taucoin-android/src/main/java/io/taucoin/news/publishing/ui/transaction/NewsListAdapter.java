@@ -186,6 +186,11 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                     listener.onChatClicked(tx);
                 }
             });
+            binding.ivDelete.setOnClickListener(view -> {
+                if (listener != null) {
+                    listener.onDeleteClicked(tx);
+                }
+            });
             binding.ivLongPress.setOnClickListener(view -> {
                 if (listener != null) {
                     listener.onItemLongClicked(binding.tvMsg, tx);
@@ -226,6 +231,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
         void onRetweetClicked(UserAndTx tx);
         void onReplyClicked(UserAndTx tx);
         void onChatClicked(UserAndTx tx);
+        void onDeleteClicked(UserAndTx tx);
         void onItemClicked(UserAndTx tx);
         void onUserClicked(String publicKey);
         void onItemLongClicked(TextView view, UserAndTx tx);

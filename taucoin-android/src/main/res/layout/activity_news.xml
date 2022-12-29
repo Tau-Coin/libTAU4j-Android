@@ -171,14 +171,15 @@
         <io.taucoin.news.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_link"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_size_40"
+            android:layout_height="wrap_content"
+            android:maxHeight="@dimen/widget_size_60"
             android:layout_marginStart="@dimen/widget_size_20"
             android:layout_marginEnd="@dimen/widget_size_20"
             android:paddingTop="@dimen/widget_size_10"
             android:paddingBottom="@dimen/widget_size_10"
             android:autofillHints="@string/tx_link_http"
             android:hint="@string/tx_link_http"
-            android:inputType="text"
+            android:inputType="textMultiLine"
             android:background="@null"
             android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearanceBody1" />

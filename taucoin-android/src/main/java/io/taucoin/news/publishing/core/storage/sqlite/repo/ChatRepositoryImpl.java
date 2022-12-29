@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.taucoin.news.publishing.MainApplication;
@@ -152,5 +153,10 @@ public class ChatRepositoryImpl implements ChatRepository{
     @Override
     public long getLastSendTime(String senderPk, String receiverPk) {
         return db.chatDao().getLastSendTime(senderPk, receiverPk);
+    }
+
+    @Override
+    public Flowable<Integer> observeUnreadFriendNews() {
+        return db.chatDao().observeUnreadFriendNews();
     }
 }

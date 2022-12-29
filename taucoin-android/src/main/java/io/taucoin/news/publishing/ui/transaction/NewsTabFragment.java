@@ -250,6 +250,9 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                 loadData(0);
             }
         });
+        txViewModel.getDeletedResult().observe(this, isSuccess -> {
+            loadData(0);
+        });
 
         loadData(0);
 
@@ -452,6 +455,11 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
         intent.putExtra(IntentExtra.HASH, tx.txID);
         ActivityUtil.startActivity(intent, activity, CommunityChatActivity.class);
+    }
+
+    @Override
+    public void onDeleteClicked(UserAndTx tx) {
+        txViewModel.deleteThisNews(tx.txID);
     }
 
     @Override

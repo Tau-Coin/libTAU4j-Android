@@ -272,4 +272,9 @@ public class TxRepositoryImpl implements TxRepository{
     public Observable<UserAndTx> observeNewsDetail(String txID) {
         return db.txDao().observeNewsDetail(txID);
     }
+
+    @Override
+    public void deleteThisNews(String txID) {
+        db.txDao().deleteThisNews(txID);
+    }
 }

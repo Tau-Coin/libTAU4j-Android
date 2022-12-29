@@ -85,6 +85,10 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
     public void onStart() {
         super.onStart();
 
+        txViewModel.getDeletedResult().observe(this, isSuccess -> {
+            loadData();
+        });
+
         loadData();
 
         txViewModel.observerChainTxs().observe(this, txs -> {
@@ -221,6 +225,11 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
         intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
         intent.putExtra(IntentExtra.HASH, tx.txID);
         ActivityUtil.startActivity(intent, this, CommunityChatActivity.class);
+    }
+
+    @Override
+    public void onDeleteClicked(UserAndTx tx) {
+        txViewModel.deleteThisNews(tx.txID);
     }
 
     @Override

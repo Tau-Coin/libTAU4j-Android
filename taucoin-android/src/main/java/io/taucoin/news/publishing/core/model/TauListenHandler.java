@@ -442,6 +442,8 @@ public class TauListenHandler {
                 }
             }
         }
+        // 读取交易发送者的nickname和图标
+        daemon.requestFriendInfo(tx.senderPk);
     }
 
     /**

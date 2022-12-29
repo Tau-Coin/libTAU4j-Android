@@ -170,4 +170,6 @@ public interface TxRepository {
     Flowable<UserAndTx> observeMaxChatNumNews();
 
     Observable<UserAndTx> observeNewsDetail(String txID);
+
+    void deleteThisNews(String txID);
 }

@@ -311,6 +311,11 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
             intent.putExtra(IntentExtra.HASH, tx.txID);
             ActivityUtil.startActivity(intent, this, CommunityChatActivity.class);
         });
+
+        binding.ivDelete.setOnClickListener(view -> {
+            txViewModel.deleteThisNews(tx.txID);
+            this.finish();
+        });
     }
 
 

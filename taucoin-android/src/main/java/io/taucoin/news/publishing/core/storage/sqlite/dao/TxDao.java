@@ -95,6 +95,7 @@ public interface TxDao {
             " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
             QUERY_NEWS_REPLY_AND_CHAT_COUNT +
             " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
+            " AND tx.deleted = 0" +
             " AND tx.repliedHash IS NULL" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " AND c.isBanned = 0" +
@@ -108,6 +109,7 @@ public interface TxDao {
             " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
             QUERY_NEWS_REPLY_AND_CHAT_COUNT +
             " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
+            " AND tx.deleted = 0" +
             " AND tx.repliedHash IS NULL" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " AND c.isBanned = 0" +
@@ -120,6 +122,7 @@ public interface TxDao {
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             QUERY_NEWS_REPLY_AND_CHAT_COUNT +
             " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
+            " AND tx.deleted = 0" +
             " AND tx.repliedHash IS NULL" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " AND tx.chainID = :chainID";
@@ -254,6 +257,9 @@ public interface TxDao {
             " SELECT SUM(fee)+SUM(amount) from Txs" +
             " WHERE chainID = :chainID" +
             " AND txType IN (2, 3) AND senderPk = :userPk AND nonce > :nonce";
+
+
+    String DELETE_THIS_NEWS = "UPDATE Txs SET deleted = 1 WHERE txID = :txID";
     /**
      * 添加新的交易
      */
@@ -438,6 +444,9 @@ public interface TxDao {
      * @return
      */
     @Query(QUERY_GET_MARKET_MAX_CHAT_NUM_NEWS)
+    @Transaction
     Flowable<UserAndTx> observeMaxChatNumNews();
 
+    @Query(DELETE_THIS_NEWS)
+    void deleteThisNews(String txID);
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
@@ -20,6 +21,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.taucoin.news.publishing.BuildConfig;
 import io.taucoin.news.publishing.core.model.TauDaemon;
 import io.taucoin.news.publishing.core.model.data.CommunityAndFriend;
+import io.taucoin.news.publishing.core.storage.sqlite.repo.ChatRepository;
 import io.taucoin.news.publishing.core.storage.sqlite.repo.CommunityRepository;
 import io.taucoin.news.publishing.core.storage.RepositoryHelper;
 import io.taucoin.news.publishing.core.storage.sqlite.repo.TxRepository;
@@ -33,6 +35,7 @@ public class MainViewModel extends AndroidViewModel {
     private final static Logger logger = LoggerFactory.getLogger("MainViewModel");
     private final CommunityRepository communityRepo;
     private final TxRepository txRepository;
+    private final ChatRepository chatRepository;
     private final TauDaemon daemon;
     private MutableLiveData<ArrayList<CommunityAndFriend>> homeAllData = new MutableLiveData<>();
     private MutableLiveData<ArrayList<CommunityAndFriend>> homeCommunityData = new MutableLiveData<>();
@@ -43,6 +46,7 @@ public class MainViewModel extends AndroidViewModel {
         super(application);
         communityRepo = RepositoryHelper.getCommunityRepository(getApplication());
         txRepository = RepositoryHelper.getTxRepository(getApplication());
+        chatRepository = RepositoryHelper.getChatRepository(getApplication());
         daemon = TauDaemon.getInstance(application);
     }
 
@@ -135,4 +139,7 @@ public class MainViewModel extends AndroidViewModel {
         return txRepository.observeUnreadNews();
     }
 
+    public Flowable<Integer> observeUnreadFriendNews() {
+        return chatRepository.observeUnreadFriendNews();
+    }
 }

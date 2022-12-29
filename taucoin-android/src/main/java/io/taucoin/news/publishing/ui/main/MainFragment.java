@@ -127,6 +127,7 @@ MainFragment extends BaseFragment implements View.OnClickListener {
             }
         }
         updateTabBadgeDrawable(0, true, false);
+        updateTabBadgeDrawable(2, true, false);
 
         binding.viewPager.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
     }
@@ -183,6 +184,13 @@ MainFragment extends BaseFragment implements View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(msgUnread -> {
                     updateTabBadgeDrawable(0, false, msgUnread > 0);
+                }));
+
+        disposables.add(viewModel.observeUnreadFriendNews()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(msgUnread -> {
+                    updateTabBadgeDrawable(2, false, msgUnread > 0);
                 }));
     }
 

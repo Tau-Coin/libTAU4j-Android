@@ -229,6 +229,9 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
+        txViewModel.getDeletedResult().observe(this, isSuccess -> {
+            loadData(0);
+        });
         loadData(0);
         disposables.add(ObservableUtil.intervalSeconds(1)
                 .subscribeOn(Schedulers.io())
@@ -462,6 +465,11 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         intent.putExtra(IntentExtra.CHAIN_ID, tx.chainID);
         intent.putExtra(IntentExtra.HASH, tx.txID);
         ActivityUtil.startActivity(intent, activity, CommunityChatActivity.class);
+    }
+
+    @Override
+    public void onDeleteClicked(UserAndTx tx) {
+        txViewModel.deleteThisNews(tx.txID);
     }
 
     @Override
