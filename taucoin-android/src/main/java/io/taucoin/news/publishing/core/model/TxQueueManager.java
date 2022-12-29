@@ -184,7 +184,7 @@ class TxQueueManager {
         if (null == account) {
             return true;
         }
-        logger.info("sendTxQueue account nonce::{}, balance::{}", account.getNonce(), account.getBalance());
+        logger.info("sendTxQueue account nonce::{}", account.getNonce());
 		long nonce = account.getNonce() + 1;
         try {
 			//1. 先按照nonce搜索一遍, 没有则搜一个没有nonce的txQueue交易
@@ -213,11 +213,6 @@ class TxQueueManager {
                 txQueueRepos.updateQueue(txQueue);
                 isSendMessage = true;
             }
-        }
-        if (txQueue.amount + txQueue.fee > account.getBalance()) {
-            logger.debug("sendWiringTx amount({}) + fee({}) > balance({})", txQueue.amount,
-                    txQueue.fee, account.getBalance());
-            return false;
         }
         sendTxQueue(account, txQueue, true, 0, mode);
         return false;
