@@ -309,7 +309,7 @@
     <string name="community_transfer_to_self">Transfer To Self</string>
     <string name="community_transfer_from">Transfer from %s</string>
     <string name="community_post_news">News TX Fee</string>
-    <string name="community_mining_rewards">Rewards for Mining</string>
+    <string name="community_mining_rewards">Potential rewards for mining</string>
     <string name="community_tx_pending">Pending&#8230;</string>
     <string name="community_tx_confidence" formatted="false"><Data><![CDATA[Confidence <font color="#f19322">%1$d</font>]]></Data></string>
 
