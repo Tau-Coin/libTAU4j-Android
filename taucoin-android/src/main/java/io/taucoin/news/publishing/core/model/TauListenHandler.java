@@ -443,7 +443,15 @@ public class TauListenHandler {
             }
         }
         // 读取交易发送者的nickname和图标
-        daemon.requestFriendInfo(tx.senderPk);
+        UserAndFriend friend = userRepo.getFriend(tx.senderPk);
+        // 60分钟刷新请求一次
+        int refreshTime = 3600;
+        if (friend != null && DateUtil.getTime() - friend.updateNNTime > refreshTime) {
+            daemon.subFriendInfo(tx.senderPk);
+        }
+        if (friend != null && DateUtil.getTime() - friend.updateHPTime > refreshTime) {
+            daemon.subFriendHeadPic(tx.senderPk);
+        }
     }
 
     /**
