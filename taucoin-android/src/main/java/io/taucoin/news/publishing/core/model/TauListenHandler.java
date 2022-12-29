@@ -570,12 +570,6 @@ public class TauListenHandler {
             member.balUpdateTime = DateUtil.getTime();
             member.nonce = nonce;
             member.power = power;
-//            if (rewardTime > 0) {
-//                member.rewardTime = rewardTime;
-//            }
-//            if (incomeTime > 0) {
-//                member.incomeTime = incomeTime;
-//            }
             if (pendingTime > 0) {
                 member.pendingTime = pendingTime;
             }
@@ -593,18 +587,6 @@ public class TauListenHandler {
                 logger.info("Update Member's balance and power, chainID::{}, publicKey::{}, " +
                         "balance::{}", chainIDStr, publicKey, member.balance);
             }
-//            if (rewardTime > 0) {
-//                member.rewardTime = rewardTime;
-//                isUpdate = true;
-//                logger.info("Update Member's rewardTime chainID::{}, publicKey::{}, " +
-//                        "rewardTime::{}", chainIDStr, publicKey, member.rewardTime);
-//            }
-//            if (incomeTime > 0) {
-//                member.incomeTime = incomeTime;
-//                isUpdate = true;
-//                logger.info("Update Member's incomeTime chainID::{}, publicKey::{}, " +
-//                        "incomeTime::{}", chainIDStr, publicKey, member.incomeTime);
-//            }
             if (pendingTime > 0) {
                 member.pendingTime = pendingTime;
                 isUpdate = true;

@@ -48,10 +48,11 @@ public interface TxDao {
             " ON tx.txID = ncc.repliedHash";
 
     // SQL:查询user and tx，care repliesNum and chatsNum
-    String QUERY_USER_AND_TX_CARE_NUM_AND_STATE = "SELECT tx.*, nrc.repliesNum, ncc.chatsNum, (m.balance-m.totalOffchainCoins) as balance, m.power";
+    String QUERY_USER_AND_TX_CARE_NUM_AND_STATE = "SELECT tx.*, nrc.repliesNum, ncc.chatsNum, (m.consensusBalance-m.totalPendingCoins) as balance, m.power";
 
     // SQL:查询user and tx，care member's state
-    String QUERY_USER_AND_TX_CARE_STATE = "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, (m.balance-m.totalOffchainCoins) as balance, m.power";
+    String QUERY_USER_AND_TX_CARE_STATE =
+            "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, (m.consensusBalance-m.totalPendingCoins) as balance, m.power";
 
     // SQL:查询user and tx，only care tx
     String QUERY_USER_AND_TX = "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, 0 AS balance, 0 AS power";

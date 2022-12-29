@@ -27,6 +27,7 @@ public class Member implements Parcelable {
     public long consensusPower;         // 成员的consensusPower
     public long power;                  // 成员的power
     public long pendingTime;            // 成员收到朋友转账动作（未上链）
+    public long consensusNonce;         // 成员的consensusNonce
     public long nonce;                  // 成员的nonce
     public int airdropStatus;           // 发币开关状态
     public int airdropMembers;          // 总的发币成员数
@@ -101,7 +102,7 @@ public class Member implements Parcelable {
     }
 
     public long getInterimBalance() {
-        return balance + Constants.TX_MAX_OVERDRAFT - totalOffchainCoins;
+        return consensusBalance + Constants.TX_MAX_OVERDRAFT - totalPendingCoins;
     }
 
     public long getPaymentBalance() {

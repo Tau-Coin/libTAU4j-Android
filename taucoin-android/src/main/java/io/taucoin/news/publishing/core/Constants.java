@@ -65,7 +65,7 @@ public class Constants {
     public static int TX_MAX_BYTE_SIZE = 700;
 
     // 最大预支交易费
-    public static int TX_MAX_OVERDRAFT = 100;
+    public static final int TX_MAX_OVERDRAFT = 100;
 
     // news交易内容最大字节大小509，取整数500
     public static final int NEWS_TX_MAX_BYTE_SIZE = TX_MAX_BYTE_SIZE - 250;

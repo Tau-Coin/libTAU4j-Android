@@ -144,10 +144,10 @@ public abstract class TauDaemon {
                     logger.info("Tau start successfully");
                     isRunning = true;
                     // libTAU删除此限制
-//                    Constants.MAX_ACCOUNT_SIZE = sessionManager.getMaxAccountSize();
+                    // Constants.MAX_ACCOUNT_SIZE = sessionManager.getMaxAccountSize();
                     Constants.CHAIN_EPOCH_BLOCK_SIZE = sessionManager.getChainEpochBlockSize();
                     Constants.TX_MAX_BYTE_SIZE = sessionManager.getMaxTxEncodedSize();
-                    Constants.TX_MAX_OVERDRAFT = sessionManager.getMaxOverdraft();
+                    //Constants.TX_MAX_OVERDRAFT = sessionManager.getMaxOverdraft(); 
                     handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
                     // 更新当前用户自己的信息
                     updateCurrentUserInfo(true);

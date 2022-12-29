@@ -86,19 +86,13 @@ public class TxUtils {
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
                     .append(HashUtil.hashMiddleHide(tx.senderPk));
-//            if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
-//                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-//                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
-//            } else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
-//                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-//                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
-//            }
         } else {
             msg.append(tx.memo);
         }
         return msg.create();
     }
 
+    //Blockchain explorer -> tx history news tx细节展示
     private static SpannableStringBuilder createSpanNewsTx(Tx tx, int tab) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
@@ -118,13 +112,16 @@ public class TxUtils {
                         .append("\n");
             }
         }
-        msg.append("Description: ").setForegroundColor(titleColor)
+
+        if (StringUtil.isNotEmpty(tx.memo)) {
+            msg.append("Description: ").setForegroundColor(titleColor)
                 .append(tx.memo);
+        }
+
         if (StringUtil.isNotEmpty(tx.link)) {
             msg.append("\n").append("Link: ").setForegroundColor(titleColor)
                     .append(tx.link);
         }
-        msg.append(tx.memo);
         if (tab == CommunityTabFragment.TAB_CHAIN) {
             msg.append("\n").append("Nonce: ").setForegroundColor(titleColor)
                     .append(FmtMicrometer.fmtLong(tx.nonce));
@@ -135,17 +132,11 @@ public class TxUtils {
                     .append(" ").append(coinName)
                     .append("\n").append("From: ").setForegroundColor(titleColor)
                     .append(HashUtil.hashMiddleHide(tx.senderPk));
-//            if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN) {
-//                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-//                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
-//            } else if (tx.txStatus == Constants.TX_STATUS_SETTLED) {
-//                msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-//                        .append(FmtMicrometer.fmtLong(tx.blockNumber));
-//            }
         }
         return msg.create();
     }
 
+    //Blockchain explorer -> tx history wiring coins tx细节展示
     private static SpannableStringBuilder createSpanWiringTx(Tx tx, boolean showStatus) {
         Context context = MainApplication.getInstance();
         int titleColor = context.getResources().getColor(R.color.gray_dark);
@@ -176,17 +167,12 @@ public class TxUtils {
                 .append(HashUtil.hashMiddleHide(tx.receiverPk))
                 .append("\n").append("Hash: ").setForegroundColor(titleColor)
                 .append(HashUtil.hashMiddleHide(tx.txID));
-//        if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN && showStatus) {
-//            msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-//                    .append(FmtMicrometer.fmtLong(tx.blockNumber));
-//        } else if (tx.txStatus == Constants.TX_STATUS_SETTLED && showStatus) {
-//            msg.append("\n").append("Blocknumber: ").setForegroundColor(titleColor)
-//                    .append(FmtMicrometer.fmtLong(tx.blockNumber));
-//		}
         msg.append("\n").append("Nonce: ").setForegroundColor(titleColor)
-                .append(FmtMicrometer.fmtLong(tx.nonce))
-                .append("\n").append("Memo: ").setForegroundColor(titleColor)
-                .append(tx.memo);
+                .append(FmtMicrometer.fmtLong(tx.nonce));
+        if (StringUtil.isNotEmpty(tx.memo)) {
+           msg.append("\n").append("Memo: ").setForegroundColor(titleColor)
+              .append(tx.memo);
+        }
         return msg.create();
     }
 
@@ -194,7 +180,7 @@ public class TxUtils {
         return createSpanTxQueue(tx, tx.nonce, isShowNonce);
     }
 
-    //区块浏览器
+    //Blockchain explorer -> sent transactions tx细节展示
     private static SpannableStringBuilder createSpanTxQueue(TxQueue tx, long nonce, boolean isShowNonce) {
         String coinName = ChainIDUtil.getCoinName(tx.chainID);
         SpanUtils msg = new SpanUtils();
