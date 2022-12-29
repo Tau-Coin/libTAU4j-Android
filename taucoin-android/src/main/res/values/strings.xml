@@ -471,6 +471,7 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_invitation_title">Title</string>
     <string name="tx_communities_more">More&#8230;</string>
     <string name="tx_select_target_community">Select target community:</string>
+    <string name="tx_news_lines_limit">News cannot exceed 20 lines</string>
     <string name="tx_what_happening">What\'s happening?</string>
     <string name="tx_link_http">optional https or tau link &#8230;</string>
     <string name="tx_your_reply">Comments</string>
