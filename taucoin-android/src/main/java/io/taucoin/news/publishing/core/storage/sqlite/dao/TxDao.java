@@ -112,6 +112,7 @@ public interface TxDao {
             " AND tx.deleted = 0" +
             " AND tx.repliedHash IS NULL" +
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " AND datetime(tx.timestamp, 'unixepoch', 'localtime') > datetime('now','-24 hour','localtime')" +
             " AND c.isBanned = 0" +
             " ORDER BY ncc.chatsNum DESC, tx.timestamp DESC limit 1";
 

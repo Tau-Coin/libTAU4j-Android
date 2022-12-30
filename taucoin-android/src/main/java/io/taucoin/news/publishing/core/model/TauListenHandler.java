@@ -533,28 +533,6 @@ public class TauListenHandler {
     }
 
     /**
-     * 添加朋友任务
-     */
-    private void addFriendTask(String friendPk) {
-        // 更新libTAU朋友信息
-        boolean isSuccess = daemon.addNewFriend(friendPk);
-        if (isSuccess) {
-            // 发送默认消息
-            String userPk = MainApplication.getInstance().getPublicKey();
-            String msg = appContext.getString(R.string.contacts_have_added);
-            logger.info("AddFriendsLocally, syncSendMessageTask userPk::{}, friendPk::{}, msg::{}",
-                    userPk, friendPk, msg);
-            ChatViewModel.syncSendMessageTask(appContext, userPk, friendPk, msg, MessageType.TEXT.getType());
-            // 更新本地朋友关系
-            Friend friend = new Friend(userPk, friendPk);
-            friend.status = FriendStatus.ADDED.getStatus();
-            friendRepo.addFriend(friend);
-            // 更新朋友信息
-            daemon.requestFriendInfo(friendPk);
-        }
-    }
-
-    /**
      * 添加社区成员到本地
      * @param publicKey 公钥
      * @param chainID chainID
@@ -707,8 +685,6 @@ public class TauListenHandler {
 
             saveUserInfo(peer);
             addMemberInfo(ChainIDUtil.encode(chainID), peer);
-
-//            addFriendTask(url.getPeer());
         }
     }
 
