@@ -442,8 +442,8 @@ public class TauListenHandler {
                         Tx repliedTx = txRepo.getTxByTxID(tx.repliedHash);
                         SpannableStringBuilder news = TxUtils.createTxSpan(repliedTx, TxType.NOTE_TX.getType());
                         String friendName = UsersUtil.getShowName(friend);
-                        String msg = friendName + "-" + TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());;
-                        TauNotifier.getInstance().makeCommunityNotify(tx.chainID, tx.repliedHash, news, msg);
+                        String msg = friendName + "-" + TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
+                        TauNotifier.getInstance().makeCommunityNotify(tx.chainID, repliedTx.txID, news, msg);
                     } else {
                         SpannableStringBuilder news = TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
                         String newsHash = StringUtil.isNotEmpty(tx.repliedHash) ? tx.repliedHash : tx.txID;

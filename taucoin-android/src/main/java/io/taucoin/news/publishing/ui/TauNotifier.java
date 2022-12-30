@@ -168,13 +168,13 @@ public class TauNotifier {
         Bitmap bitmap = BitmapUtil.createLogoBitmap(bgColor, firstLettersName);
         // 点击通知后进入的活动
         Intent intent;
-        if (StringUtil.isNotEmpty(chatMsg)) {
+        if (StringUtil.isEmpty(chatMsg)) {
             intent = new Intent(appContext, NewsDetailActivity.class);
         } else {
             intent = new Intent(appContext, CommunityChatActivity.class);
         }
         // 解决PendingIntent的extra数据不准确问题
-        intent.setAction(chainID);
+        intent.setAction(chainID + newsHash);
         intent.putExtra(IntentExtra.CHAIN_ID, chainID);
         intent.putExtra(IntentExtra.HASH, newsHash);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
