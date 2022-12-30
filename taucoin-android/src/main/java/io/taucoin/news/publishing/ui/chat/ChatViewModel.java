@@ -390,12 +390,6 @@ public class ChatViewModel extends AndroidViewModel {
                                 ChatMsgStatus.CONFIRMED.getStatus(), daemon.getSessionTime());
                         chatRepo.addChatMsgLogs(chatMsg.receiverPk, chatMsgLog);
                     }
-//                    else {
-//                        ChatMsgLog chatMsgLog = new ChatMsgLog(chatMsg.hash,
-//                                ChatMsgStatus.ARRIVED_SWARM.getStatus(), daemon.getSessionTime());
-//                        chatRepo.addChatMsgLogs(chatMsg.receiverPk, chatMsgLog);
-//                        msg.logs.add(chatMsgLog);
-//                    }
                 } catch (SQLiteConstraintException ignore) {
                 }
             }
@@ -410,7 +404,7 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     /**
-     * 周期性重发消息，12小时，30分钟一次
+     * 周期性重发消息，12小时，30分钟一次，所有没有被confirm的消息
      */
 	public static void resendRegularMessages(Context context) {
         FriendRepository friendRepo = RepositoryHelper.getFriendsRepository(context);
@@ -426,9 +420,6 @@ public class ChatViewModel extends AndroidViewModel {
 					for(ChatMsgLog msgLog: msgLogs) {
 						ChatMsg chatMsg = chatRepo.queryChatMsg(msgLog.hash);
 						long timestamp = chatMsg.timestamp;
-						//12小时，30分钟一次
-						if(timestamp_now - timestamp >= 12*3600*1000)
-							continue;
 						String sender = chatMsg.senderPk;
 						String receiver = chatMsg.receiverPk;
 						String logicMsgHash = chatMsg.logicMsgHash;

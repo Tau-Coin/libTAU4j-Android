@@ -42,7 +42,9 @@ public interface ChatDao {
     String QUERY_MESSAGES_RESEND = "SELECT g.* FROM ChatMsgLogs AS g" +
 								   " LEFT JOIN ChatMessages AS m" +
 								   " ON g.hash = m.hash" +
-								   " WHERE m.senderPk = :senderPk AND m.receiverPk = :receiverPk AND g.status <= 1 ";
+								   " WHERE m.senderPk = :senderPk AND m.receiverPk = :receiverPk" +
+                                   " AND datetime(m.timestamp, 'unixepoch', 'localtime') > datetime('now','-12 hour','localtime')" + //12小时内
+                                   " AND g.status <= 1 "; //TODO TC
 
     // 获取发送的最后一条消息的时间
     String QUERY_LAST_SEND_TIME = "SELECT timestamp FROM ChatMessages" +
