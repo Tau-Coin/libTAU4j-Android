@@ -313,8 +313,10 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         });
 
         binding.ivDelete.setOnClickListener(view -> {
-            txViewModel.deleteThisNews(tx.txID);
-            this.finish();
+            txViewModel.deleteThisNews(this, tx.txID);
+        });
+        txViewModel.getDeletedResult().observe(this, isSuccess -> {
+            finish();
         });
     }
 

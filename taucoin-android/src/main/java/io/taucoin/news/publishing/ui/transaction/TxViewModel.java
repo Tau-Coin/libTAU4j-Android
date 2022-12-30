@@ -53,6 +53,7 @@ import io.taucoin.news.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucoin.news.publishing.core.utils.ChainIDUtil;
 import io.taucoin.news.publishing.core.utils.DateUtil;
 import io.taucoin.news.publishing.core.utils.FmtMicrometer;
+import io.taucoin.news.publishing.databinding.DeleteDialogBinding;
 import io.taucoin.news.publishing.ui.constant.Page;
 import io.taucoin.news.publishing.core.model.data.message.TxType;
 import io.taucoin.news.publishing.MainApplication;
@@ -102,6 +103,7 @@ public class TxViewModel extends AndroidViewModel {
     private MutableLiveData<String> addState = new MutableLiveData<>();
     private MutableLiveData<String> deletedResult = new MutableLiveData<>();
     private CommonDialog editFeeDialog;
+    private CommonDialog deleteDialog;
     public TxViewModel(@NonNull Application application) {
         super(application);
         this.application = application;
@@ -146,6 +148,9 @@ public class TxViewModel extends AndroidViewModel {
         disposables.clear();
         if(editFeeDialog != null){
             editFeeDialog.closeDialog();
+        }
+        if(deleteDialog != null){
+            deleteDialog.closeDialog();
         }
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
@@ -1003,7 +1008,30 @@ public class TxViewModel extends AndroidViewModel {
         return txRepo.observeMaxChatNumNews();
     }
 
-    public void deleteThisNews(String txID) {
+    /**
+     * 显示删除消息的对话框
+     */
+    public void deleteThisNews(BaseActivity activity, String txID) {
+        DeleteDialogBinding binding = DataBindingUtil.inflate(LayoutInflater.from(activity),
+                R.layout.delete_dialog, null, false);
+        binding.ivClose.setOnClickListener(v -> {
+            if (deleteDialog != null) {
+                deleteDialog.closeDialog();
+            }
+        });
+        binding.tvSubmit.setOnClickListener(v -> {
+            if (deleteDialog != null) {
+                deleteDialog.closeDialog();
+            }
+            deleteThisNews(txID);
+        });
+        deleteDialog = new CommonDialog.Builder(activity)
+                .setContentView(binding.getRoot())
+                .create();
+        deleteDialog.show();
+    }
+
+    private void deleteThisNews(String txID) {
         Disposable disposable = Observable.create((ObservableOnSubscribe<String>) emitter -> {
             txRepo.deleteThisNews(txID);
             emitter.onNext(txID);

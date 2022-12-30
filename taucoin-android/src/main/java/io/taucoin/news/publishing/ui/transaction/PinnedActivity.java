@@ -229,7 +229,7 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
 
     @Override
     public void onDeleteClicked(UserAndTx tx) {
-        txViewModel.deleteThisNews(tx.txID);
+        txViewModel.deleteThisNews(this, tx.txID);
     }
 
     @Override

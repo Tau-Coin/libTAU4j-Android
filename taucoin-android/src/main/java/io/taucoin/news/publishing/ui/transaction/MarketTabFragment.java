@@ -469,7 +469,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onDeleteClicked(UserAndTx tx) {
-        txViewModel.deleteThisNews(tx.txID);
+        txViewModel.deleteThisNews(activity, tx.txID);
     }
 
     @Override

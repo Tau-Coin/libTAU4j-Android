@@ -466,7 +466,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
 
     @Override
     public void onDeleteClicked(UserAndTx tx) {
-        txViewModel.deleteThisNews(tx.txID);
+        txViewModel.deleteThisNews(activity, tx.txID);
     }
 
     @Override

@@ -49,6 +49,7 @@
     <string name="common_retweet">Repost</string>
     <string name="common_retweet_other">Repost to other TAU community</string>
     <string name="common_share_external">Share to social media</string>
+    <string name="common_delete">Delete</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
@@ -445,6 +446,7 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="share_link_successfully">Share successfully</string>
 
     <!-- Strings used for transactions -->
+    <string name="tx_delete_message">Are you sure you want to delete this news?</string>
     <string name="tx_send">Send</string>
     <string name="tx_public_key_hint">Address</string>
     <string name="tx_address_hint">Address</string>
