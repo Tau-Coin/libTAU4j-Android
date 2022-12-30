@@ -298,13 +298,6 @@
                         app:leftImage="@mipmap/icon_version_updates"
                         app:rightText="@string/setting_check_updates"/>
 
-                    <include
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/widget_size_1"
-                        android:layout_marginStart="@dimen/widget_size_20"
-                        android:layout_marginEnd="@dimen/widget_size_10"
-                        layout="@layout/view_line"/>
-
                     <io.taucoin.news.publishing.ui.customviews.ItemLineView
                         android:visibility="gone"
                         android:id="@+id/item_share"

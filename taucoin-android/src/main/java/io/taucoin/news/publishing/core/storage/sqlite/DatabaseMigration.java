@@ -21,9 +21,6 @@ class DatabaseMigration {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             // 添加共识点社区成员power
-            database.execSQL("ALTER TABLE Members ADD COLUMN consensusBalance INTEGER NOT NULL DEFAULT 0");
-            database.execSQL("ALTER TABLE Members ADD COLUMN totalPendingCoins INTEGER NOT NULL DEFAULT 0");
-            database.execSQL("ALTER TABLE Members ADD COLUMN totalOffchainCoins INTEGER NOT NULL DEFAULT 0");
             database.execSQL("ALTER TABLE Members ADD COLUMN consensusPower INTEGER NOT NULL DEFAULT 0");
             database.execSQL("ALTER TABLE Members ADD COLUMN consensusNonce INTEGER NOT NULL DEFAULT 0");
             database.execSQL("ALTER TABLE Txs ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0");
