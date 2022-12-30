@@ -174,7 +174,7 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
     public void onItemClicked(UserAndTx tx) {
         KeyboardUtils.hideSoftInput(this);
         Intent intent = new Intent();
-        intent.putExtra(IntentExtra.ID, tx.txID);
+        intent.putExtra(IntentExtra.HASH, tx.txID);
         ActivityUtil.startActivity(intent, this, NewsDetailActivity.class);
     }
 

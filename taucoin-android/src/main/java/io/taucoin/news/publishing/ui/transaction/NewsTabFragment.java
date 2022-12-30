@@ -67,7 +67,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     private boolean isVisibleToUser;
     public static final int TX_REQUEST_CODE = 0x1002;
     public static final int CHOOSE_REQUEST_CODE = 0x1003;
-    protected BaseActivity activity;
+    private MainActivity activity;
     protected TxViewModel txViewModel;
     protected UserViewModel userViewModel;
     protected CommunityViewModel communityViewModel;
@@ -86,7 +86,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof BaseActivity)
-            activity = (BaseActivity)context;
+            activity = (MainActivity) context;
     }
 
     @Nullable
@@ -101,7 +101,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        activity = (BaseActivity) getActivity();
+        activity = (MainActivity) getActivity();
         assert activity != null;
         ViewModelProvider provider = new ViewModelProvider(this);
         txViewModel = provider.get(TxViewModel.class);
@@ -347,6 +347,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
             menuList.add(new OperationMenuItem(R.string.tx_operation_blacklist));
         }
         menuList.add(new OperationMenuItem(R.string.tx_operation_ban_community));
+        menuList.add(new OperationMenuItem(R.string.tx_operation_enter_community));
         menuList.add(new OperationMenuItem(tx.pinnedTime <= 0 ? R.string.tx_operation_pin : R.string.tx_operation_unpin));
         if (tx.favoriteTime <= 0) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_favorite));
@@ -386,6 +387,12 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                     String msgHash = tx.txID;
                     CopyManager.copyText(msgHash);
                     ToastUtils.showShortToast(R.string.copy_message_hash);
+                    break;
+                case R.string.tx_operation_enter_community:
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(IntentExtra.TYPE, 0);
+                    bundle.putString(IntentExtra.ID, tx.chainID);
+                    activity.updateMainRightFragment(bundle);
                     break;
 
             }
@@ -473,7 +480,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     public void onItemClicked(UserAndTx tx) {
         KeyboardUtils.hideSoftInput(activity);
         Intent intent = new Intent();
-        intent.putExtra(IntentExtra.ID, tx.txID);
+        intent.putExtra(IntentExtra.HASH, tx.txID);
         ActivityUtil.startActivity(intent, activity, NewsDetailActivity.class);
     }
 

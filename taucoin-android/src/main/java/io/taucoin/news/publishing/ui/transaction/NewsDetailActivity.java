@@ -91,7 +91,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
      */
     private void initParam() {
         if (getIntent() != null) {
-            txID = getIntent().getStringExtra(IntentExtra.ID);
+            txID = getIntent().getStringExtra(IntentExtra.HASH);
         }
     }
 

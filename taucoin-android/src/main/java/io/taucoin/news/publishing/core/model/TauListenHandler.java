@@ -47,6 +47,7 @@ import io.taucoin.news.publishing.core.utils.ChainIDUtil;
 import io.taucoin.news.publishing.core.utils.LinkUtil;
 import io.taucoin.news.publishing.core.utils.DateUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
+import io.taucoin.news.publishing.core.utils.UsersUtil;
 import io.taucoin.news.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.news.publishing.ui.TauNotifier;
 import io.taucoin.news.publishing.ui.chat.ChatViewModel;
@@ -437,8 +438,17 @@ public class TauListenHandler {
                 UserAndFriend friend = userRepo.getFriend(tx.senderPk);
                 if (friend != null && !friend.isMemBanned) {
                     // 发送社区新交易通知
-                    SpannableStringBuilder msg = TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
-                    TauNotifier.getInstance().makeCommunityNotify(tx.chainID, msg);
+                    if (tx.txType == Constants.NOTE_TX_TYPE) {
+                        Tx repliedTx = txRepo.getTxByTxID(tx.repliedHash);
+                        SpannableStringBuilder news = TxUtils.createTxSpan(repliedTx, TxType.NOTE_TX.getType());
+                        String friendName = UsersUtil.getShowName(friend);
+                        String msg = friendName + "-" + TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());;
+                        TauNotifier.getInstance().makeCommunityNotify(tx.chainID, tx.repliedHash, news, msg);
+                    } else {
+                        SpannableStringBuilder news = TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
+                        String newsHash = StringUtil.isNotEmpty(tx.repliedHash) ? tx.repliedHash : tx.txID;
+                        TauNotifier.getInstance().makeCommunityNotify(tx.chainID, newsHash, news, null);
+                    }
                 }
             }
         }

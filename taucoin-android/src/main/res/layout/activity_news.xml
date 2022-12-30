@@ -172,7 +172,7 @@
             android:id="@+id/et_link"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxHeight="@dimen/widget_size_60"
+            android:maxHeight="@dimen/widget_size_120"
             android:layout_marginStart="@dimen/widget_size_20"
             android:layout_marginEnd="@dimen/widget_size_20"
             android:paddingTop="@dimen/widget_size_10"

@@ -28,6 +28,8 @@ import io.taucoin.news.publishing.core.utils.UsersUtil;
 import io.taucoin.news.publishing.core.utils.Utils;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
 import io.taucoin.news.publishing.ui.main.MainActivity;
+import io.taucoin.news.publishing.ui.transaction.CommunityChatActivity;
+import io.taucoin.news.publishing.ui.transaction.NewsDetailActivity;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -155,24 +157,32 @@ public class TauNotifier {
     /**
      * 创建社区消息通知
      * @param chainID
-     * @param msg
+     * @param newsHash news hash
+     * @param news news或回复内容
+     * @param chatMsg news的chat讨论内容
      */
-    public void makeCommunityNotify(String chainID, CharSequence msg) {
+    public void makeCommunityNotify(String chainID, String newsHash, CharSequence news, CharSequence chatMsg) {
         String communityName = ChainIDUtil.getName(chainID);
         int bgColor = Utils.getGroupColor(chainID);
         String firstLettersName = StringUtil.getFirstLettersOfName(communityName);
         Bitmap bitmap = BitmapUtil.createLogoBitmap(bgColor, firstLettersName);
         // 点击通知后进入的活动
-        Intent intent = new Intent(appContext, MainActivity.class);
+        Intent intent;
+        if (StringUtil.isNotEmpty(chatMsg)) {
+            intent = new Intent(appContext, NewsDetailActivity.class);
+        } else {
+            intent = new Intent(appContext, CommunityChatActivity.class);
+        }
         // 解决PendingIntent的extra数据不准确问题
         intent.setAction(chainID);
         intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+        intent.putExtra(IntentExtra.HASH, newsHash);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(IntentExtra.TYPE, 0);
 //        // 这两句非常重要，使之前的活动不出栈
 //        intent.setAction(Intent.ACTION_MAIN);
 //        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        makeNotify(chainID.hashCode(), communityName, msg, bitmap, intent);
+        makeNotify(chainID.hashCode(), communityName + "-" + news,
+                chatMsg, bitmap, intent);
     }
 
     private void makeNotify(int id, CharSequence title, CharSequence text, Bitmap largeIcon, Intent intent) {
@@ -186,9 +196,11 @@ public class TauNotifier {
         }
         NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(appContext, MSG_NOTIFY_CHANNEL_ID)
                 .setAutoCancel(true)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setWhen(System.currentTimeMillis())
+                .setContentTitle(title);
+        if (StringUtil.isNotEmpty(text)) {
+            notifyBuilder.setContentText(text);
+        }
+        notifyBuilder.setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setDefaults(Notification.FLAG_ONLY_ALERT_ONCE)
                 // 悬浮框

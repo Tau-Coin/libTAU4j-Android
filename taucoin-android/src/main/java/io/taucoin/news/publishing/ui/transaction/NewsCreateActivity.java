@@ -198,7 +198,23 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
 
         @Override
         public void afterTextChanged(Editable s) {
-
+            int lines = binding.etLink.getLineCount();
+            // 限制最大输入行数
+            if (lines > 5) {
+                String str = s.toString();
+                int cursorStart = binding.etLink.getSelectionStart();
+                int cursorEnd = binding.etLink.getSelectionEnd();
+                if (cursorStart == cursorEnd && cursorStart < str.length() && cursorStart >= 1) {
+                    str = str.substring(0, cursorStart - 1) + str.substring(cursorStart);
+                } else {
+                    str = str.substring(0, s.length() - 1);
+                }
+                // setText会触发afterTextChanged的递归
+                binding.etLink.setText(str);
+                // setSelection用的索引不能使用str.length()否则会越界
+                binding.etLink.setSelection(binding.etLink.getText().length());
+                ToastUtils.showShortToast(R.string.tx_link_lines_limit);
+            }
         }
     };
 

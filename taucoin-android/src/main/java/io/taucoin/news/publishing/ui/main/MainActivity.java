@@ -485,7 +485,7 @@ public class MainActivity extends ScanTriggerActivity {
     /**
      * 更新主页右面Fragment
      */
-    protected void updateMainRightFragment(Bundle bundle) {
+    public void updateMainRightFragment(Bundle bundle) {
         // 创建修改实例
         BaseFragment newFragment = null;
         if (!bundle.isEmpty()) {

@@ -414,7 +414,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     public void onItemClicked(UserAndTx tx) {
         KeyboardUtils.hideSoftInput(activity);
         Intent intent = new Intent();
-        intent.putExtra(IntentExtra.ID, tx.txID);
+        intent.putExtra(IntentExtra.HASH, tx.txID);
         ActivityUtil.startActivity(intent, activity, NewsDetailActivity.class);
     }
 
