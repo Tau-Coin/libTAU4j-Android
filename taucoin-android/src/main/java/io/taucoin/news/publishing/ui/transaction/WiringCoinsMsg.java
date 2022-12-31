@@ -75,6 +75,10 @@ public class WiringCoinsMsg {
 
     public static String decodeContentStr(byte[] content) {
         String contentStr = Utils.textBytesToString(content);
-        return contentStr.substring(0, contentStr.indexOf("Tx Created Time: "));
+		int pos = contentStr.indexOf("Tx Created Time: ");
+		if (pos >= 0)
+			return contentStr.substring(0, pos);
+		else 
+			return contentStr;
     }
 }
