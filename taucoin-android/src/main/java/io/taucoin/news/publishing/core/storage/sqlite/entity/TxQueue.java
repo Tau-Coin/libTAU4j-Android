@@ -33,6 +33,11 @@ public class TxQueue implements Parcelable {
     public int txType;                      // 交易类型
 
     @Ignore
+    public int newsLineCount;               // 交易内容行数
+    @Ignore
+    public int linkLineCount;               // 交易link行数
+
+    @Ignore
     public TxQueue(@NonNull String chainID, @NonNull String senderPk, @NonNull String receiverPk,
                    long amount, long fee, TxType txType, byte[] content) {
         this(chainID, senderPk, receiverPk, amount, fee, 0, txType.getType(), content);

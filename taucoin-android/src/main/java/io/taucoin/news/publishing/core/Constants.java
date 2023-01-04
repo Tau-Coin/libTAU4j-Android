@@ -70,6 +70,9 @@ public class Constants {
     // news交易内容最大字节大小509，取整数500
     public static final int NEWS_TX_MAX_BYTE_SIZE = TX_MAX_BYTE_SIZE - 250;
 
+    // news内容最大行数限制
+    public static final int NEWS_MAX_LINE_COUNT = 20;
+
     // 消息最大字节大小
     public static final int MSG_MAX_BYTE_SIZE = 821;
 

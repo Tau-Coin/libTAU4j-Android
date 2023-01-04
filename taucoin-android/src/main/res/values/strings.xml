@@ -473,8 +473,6 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_invitation_title">Title</string>
     <string name="tx_communities_more">More&#8230;</string>
     <string name="tx_select_target_community">Select target community:</string>
-    <string name="tx_news_lines_limit">News cannot exceed 20 lines</string>
-    <string name="tx_link_lines_limit">Link cannot exceed 5 lines</string>
     <string name="tx_what_happening">What\'s happening?</string>
     <string name="tx_link_http">optional https or tau link &#8230;</string>
     <string name="tx_your_reply">Comments</string>
@@ -505,7 +503,7 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_error_invalid_amount">Invalid Transaction amount</string>
     <string name="tx_error_invalid_airdrop_link">Invalid airdrop link</string>
     <string name="tx_error_invalid_free">Invalid Transaction free</string>
-    <string name="tx_error_invalid_news">News cannot exceed %d bytes</string>
+    <string name="tx_error_invalid_news">Content needs to be below %d bytes and %d lines. </string>
     <string name="tx_error_min_free">Transaction fee cannot be less than %1$s</string>
     <string name="tx_error_add_members_no_enough_coins">Insufficient Balance :\ncoins + Fee > Payable Balance</string>
     <string name="tx_error_no_enough_coins">Insufficient Balance :\nAmount + Transaction Fee > Payable Balance</string>

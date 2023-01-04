@@ -423,13 +423,18 @@ public class TxViewModel extends AndroidViewModel {
             }
         } else {
             NewsContent content = new NewsContent(tx.content);
+            if (tx.newsLineCount + tx.linkLineCount > Constants.NEWS_MAX_LINE_COUNT) {
+                ToastUtils.showShortToast(getApplication().getString(R.string.tx_error_invalid_news,
+                        Constants.NEWS_TX_MAX_BYTE_SIZE, Constants.NEWS_MAX_LINE_COUNT));
+                return false;
+            }
             byte[] newsBytes = Utils.textStringToBytes(content.getMemo());
             byte[] linkBytes = Utils.textStringToBytes(content.getLinkStr());
             long bytesCount = newsBytes != null ? newsBytes.length : 0;
             bytesCount += linkBytes != null ? linkBytes.length : 0;
             if (bytesCount > Constants.NEWS_TX_MAX_BYTE_SIZE) {
                 ToastUtils.showShortToast(getApplication().getString(R.string.tx_error_invalid_news,
-                        Constants.NEWS_TX_MAX_BYTE_SIZE));
+                        Constants.NEWS_TX_MAX_BYTE_SIZE, Constants.NEWS_MAX_LINE_COUNT));
                 return false;
             }
             long minTxFee;
