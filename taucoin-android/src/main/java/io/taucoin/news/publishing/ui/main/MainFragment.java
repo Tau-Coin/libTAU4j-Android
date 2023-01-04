@@ -86,7 +86,7 @@ MainFragment extends BaseFragment implements View.OnClickListener {
         showProgressDialog();
         viewModel.getHomeAllData().observe(getViewLifecycleOwner(), list -> {
             closeProgressDialog();
-            showFragmentData();
+            showFragmentData(false);
         });
 
         //自定义的Adapter继承自FragmentPagerAdapter
@@ -141,7 +141,7 @@ MainFragment extends BaseFragment implements View.OnClickListener {
             if (currentTab != currentItem) {
                 binding.viewPager.setCurrentItem(currentTab);
             }
-            showFragmentData();
+            showFragmentData(true);
         }
 
         @Override
@@ -340,7 +340,7 @@ MainFragment extends BaseFragment implements View.OnClickListener {
 //        }
 //    }
 
-    private void showFragmentData() {
+    private void showFragmentData(boolean scrollToTop) {
         int pos = binding.tabLayout.getSelectedTabPosition();
         FragmentManager fragmentManager = getChildFragmentManager();
         List<Fragment> fragments = fragmentManager.getFragments();
@@ -353,8 +353,10 @@ MainFragment extends BaseFragment implements View.OnClickListener {
                         currentFragment.showDataList(getDataList(pos));
                     }
                 } else if (fragment instanceof NewsTabFragment) {
-                    NewsTabFragment currentFragment = (NewsTabFragment) fragment;
-                    currentFragment.scrollToTop();
+                    if (scrollToTop) {
+                        NewsTabFragment currentFragment = (NewsTabFragment) fragment;
+                        currentFragment.scrollToTop();
+                    }
                 }
             }
         }
