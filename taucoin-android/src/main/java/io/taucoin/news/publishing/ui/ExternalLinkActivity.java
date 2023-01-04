@@ -116,6 +116,7 @@ public class ExternalLinkActivity extends BaseActivity {
         dialogBinding.tvClose.setOnClickListener(v -> {
             if(linkDialog != null){
                 linkDialog.closeDialog();
+                this.finish();
             }
         });
         linkDialog = new CommonDialog.Builder(this)
