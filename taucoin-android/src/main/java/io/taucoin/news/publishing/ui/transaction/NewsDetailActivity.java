@@ -46,6 +46,7 @@ import io.taucoin.news.publishing.databinding.ActivityNewsDetailBinding;
 import io.taucoin.news.publishing.databinding.ItemNewsBinding;
 import io.taucoin.news.publishing.databinding.ItemNewsDetailHeaderBinding;
 import io.taucoin.news.publishing.ui.BaseActivity;
+import io.taucoin.news.publishing.ui.community.CommunityViewModel;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
 import io.taucoin.news.publishing.ui.constant.Page;
 import io.taucoin.news.publishing.ui.customviews.AutoLinkTextView;
@@ -61,6 +62,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
     private ActivityNewsDetailBinding binding;
     private TxViewModel txViewModel;
     private UserViewModel userViewModel;
+    private CommunityViewModel communityViewModel;
     private ReplyListAdapter adapter;
     private FloatMenu operationsMenu;
     private PopUpDialog retweetDialog;
@@ -79,6 +81,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         ViewModelProvider provider = new ViewModelProvider(this);
         userViewModel = provider.get(UserViewModel.class);
         txViewModel = provider.get(TxViewModel.class);
+        communityViewModel = provider.get(CommunityViewModel.class);
         txViewModel.observeNeedStartDaemon();
         binding = DataBindingUtil.setContentView(this, R.layout.activity_news_detail);
         initParam();
@@ -285,11 +288,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
                             intent.putExtra(IntentExtra.LINK, tx.link);
                             ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
                         } else if (code == R.mipmap.icon_share_gray) {
-                            String text = tx.memo;
-                            if (StringUtil.isNotEmpty(tx.link)) {
-                                text = tx.memo + "\n" + tx.link;
-                            }
-                            ActivityUtil.shareText(this, getString(R.string.app_share_news), text);
+                            loadChainLink(tx);
                         }
                     })
                     .create();
@@ -318,6 +317,23 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         txViewModel.getDeletedResult().observe(this, isSuccess -> {
             finish();
         });
+    }
+
+    private void loadChainLink(UserAndTx tx) {
+        disposables.add(communityViewModel.observeLatestMiner(tx.chainID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(miner -> {
+                    String userPk = MainApplication.getInstance().getPublicKey();
+                    String chainUrl = LinkUtil.encodeChain(userPk, tx.chainID, miner);
+                    logger.info("chainUrl::{}", chainUrl);
+                    String text = tx.memo;
+                    if (StringUtil.isNotEmpty(tx.link)) {
+                        text = tx.memo + "\n" + tx.link;
+                    }
+                    text += "\n" + chainUrl;
+                    ActivityUtil.shareText(this, getString(R.string.app_share_news), text);
+                }));
     }
 
 

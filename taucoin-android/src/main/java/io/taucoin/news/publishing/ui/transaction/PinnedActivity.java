@@ -15,17 +15,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucoin.news.publishing.MainApplication;
 import io.taucoin.news.publishing.R;
 import io.taucoin.news.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.news.publishing.core.model.data.UserAndTx;
 import io.taucoin.news.publishing.core.utils.ActivityUtil;
 import io.taucoin.news.publishing.core.utils.CopyManager;
 import io.taucoin.news.publishing.core.utils.KeyboardUtils;
+import io.taucoin.news.publishing.core.utils.LinkUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
 import io.taucoin.news.publishing.core.utils.UsersUtil;
 import io.taucoin.news.publishing.databinding.ActivityPinnedBinding;
 import io.taucoin.news.publishing.ui.BaseActivity;
+import io.taucoin.news.publishing.ui.community.CommunityViewModel;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
 import io.taucoin.news.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.news.publishing.ui.user.UserDetailActivity;
@@ -38,6 +41,7 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
     private ActivityPinnedBinding binding;
     private TxViewModel txViewModel;
     private UserViewModel userViewModel;
+    private CommunityViewModel communityViewModel;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private NewsListAdapter adapter;
     private String chainID;
@@ -50,6 +54,7 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
         ViewModelProvider provider = new ViewModelProvider(this);
         txViewModel = provider.get(TxViewModel.class);
         userViewModel = provider.get(UserViewModel.class);
+        communityViewModel = provider.get(CommunityViewModel.class);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_pinned);
         initParam();
         initView();
@@ -200,15 +205,28 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
                         intent.putExtra(IntentExtra.LINK, tx.link);
                         ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
                     } else if (code == R.mipmap.icon_share_gray) {
-                        String text = tx.memo;
-                        if (StringUtil.isNotEmpty(tx.link)) {
-                            text = tx.memo + "\n" + tx.link;
-                        }
-                        ActivityUtil.shareText(this, getString(R.string.app_share_news), text);
+                        loadChainLink(tx);
                     }
                 })
                 .create();
         retweetDialog.show();
+    }
+
+    private void loadChainLink(UserAndTx tx) {
+        disposables.add(communityViewModel.observeLatestMiner(tx.chainID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(miner -> {
+                    String userPk = MainApplication.getInstance().getPublicKey();
+                    String chainUrl = LinkUtil.encodeChain(userPk, tx.chainID, miner);
+                    logger.info("chainUrl::{}", chainUrl);
+                    String text = tx.memo;
+                    if (StringUtil.isNotEmpty(tx.link)) {
+                        text = tx.memo + "\n" + tx.link;
+                    }
+                    text += "\n" + chainUrl;
+                    ActivityUtil.shareText(this, getString(R.string.app_share_news), text);
+                }));
     }
 
     @Override

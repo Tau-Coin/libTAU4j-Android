@@ -352,6 +352,9 @@ MainFragment extends BaseFragment implements View.OnClickListener {
                     if (StringUtil.isEquals(currentFragment.getCustomTag(), String.valueOf(pos))) {
                         currentFragment.showDataList(getDataList(pos));
                     }
+                } else if (fragment instanceof NewsTabFragment) {
+                    NewsTabFragment currentFragment = (NewsTabFragment) fragment;
+                    currentFragment.scrollToTop();
                 }
             }
         }

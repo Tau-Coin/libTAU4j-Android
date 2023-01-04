@@ -37,6 +37,7 @@ import io.taucoin.news.publishing.core.model.data.UserAndTx;
 import io.taucoin.news.publishing.core.utils.ActivityUtil;
 import io.taucoin.news.publishing.core.utils.CopyManager;
 import io.taucoin.news.publishing.core.utils.KeyboardUtils;
+import io.taucoin.news.publishing.core.utils.LinkUtil;
 import io.taucoin.news.publishing.core.utils.ObservableUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
@@ -440,15 +441,28 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                         intent.putExtra(IntentExtra.LINK, tx.link);
                         ActivityUtil.startActivity(intent, activity, NewsCreateActivity.class);
                     } else if (code == R.mipmap.icon_share_gray) {
-                        String text = tx.memo;
-                        if (StringUtil.isNotEmpty(tx.link)) {
-                            text = tx.memo + "\n" + tx.link;
-                        }
-                        ActivityUtil.shareText(activity, getString(R.string.app_share_news), text);
+                        loadChainLink(tx);
                     }
                 })
                 .create();
         retweetDialog.show();
+    }
+
+    private void loadChainLink(UserAndTx tx) {
+        disposables.add(communityViewModel.observeLatestMiner(tx.chainID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(miner -> {
+                    String userPk = MainApplication.getInstance().getPublicKey();
+                    String chainUrl = LinkUtil.encodeChain(userPk, tx.chainID, miner);
+                    logger.info("chainUrl::{}", chainUrl);
+                    String text = tx.memo;
+                    if (StringUtil.isNotEmpty(tx.link)) {
+                        text = tx.memo + "\n" + tx.link;
+                    }
+                    text += "\n" + chainUrl;
+                    ActivityUtil.shareText(activity, getString(R.string.app_share_news), text);
+                }));
     }
 
     @Override

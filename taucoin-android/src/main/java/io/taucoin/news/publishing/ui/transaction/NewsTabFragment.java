@@ -17,9 +17,11 @@ import com.noober.menu.FloatMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.XMLReader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,11 +33,14 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.news.publishing.MainApplication;
 import io.taucoin.news.publishing.R;
+import io.taucoin.news.publishing.core.Constants;
 import io.taucoin.news.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.news.publishing.core.model.data.UserAndTx;
 import io.taucoin.news.publishing.core.utils.ActivityUtil;
 import io.taucoin.news.publishing.core.utils.CopyManager;
+import io.taucoin.news.publishing.core.utils.DrawablesUtil;
 import io.taucoin.news.publishing.core.utils.KeyboardUtils;
+import io.taucoin.news.publishing.core.utils.LinkUtil;
 import io.taucoin.news.publishing.core.utils.ObservableUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
@@ -51,6 +56,7 @@ import io.taucoin.news.publishing.ui.customviews.CommonDialog;
 import io.taucoin.news.publishing.ui.customviews.CustomXRefreshViewFooter;
 import io.taucoin.news.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.news.publishing.ui.main.MainActivity;
+import io.taucoin.news.publishing.ui.qrcode.CommunityQRCodeActivity;
 import io.taucoin.news.publishing.ui.user.UserDetailActivity;
 import io.taucoin.news.publishing.ui.user.UserViewModel;
 
@@ -436,15 +442,28 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                         ActivityUtil.startActivityForResult(intent, activity, NewsCreateActivity.class,
                                 CHOOSE_REQUEST_CODE);
                     } else if (code == R.mipmap.icon_share_gray) {
-                        String text = tx.memo;
-                        if (StringUtil.isNotEmpty(tx.link)) {
-                            text = tx.memo + "\n" + tx.link;
-                        }
-                        ActivityUtil.shareText(activity, getString(R.string.app_share_news), text);
+                        loadChainLink(tx);
                     }
                 })
                 .create();
         retweetDialog.show();
+    }
+
+    private void loadChainLink(UserAndTx tx) {
+        disposables.add(communityViewModel.observeLatestMiner(tx.chainID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(miner -> {
+                    String userPk = MainApplication.getInstance().getPublicKey();
+                    String chainUrl = LinkUtil.encodeChain(userPk, tx.chainID, miner);
+                    logger.info("chainUrl::{}", chainUrl);
+                    String text = tx.memo;
+                    if (StringUtil.isNotEmpty(tx.link)) {
+                        text = tx.memo + "\n" + tx.link;
+                    }
+                    text += "\n" + chainUrl;
+                    ActivityUtil.shareText(activity, getString(R.string.app_share_news), text);
+                }));
     }
 
     @Override
@@ -554,5 +573,13 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     @Override
     public void onHeaderMove(double v, int i) {
 
+    }
+
+    public void scrollToTop() {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) binding.txList.getLayoutManager();
+        if (layoutManager != null) {
+            logger.debug("handleUpdateAdapter scrollToPosition::{}", 0);
+            layoutManager.scrollToPositionWithOffset(0, Integer.MIN_VALUE);
+        }
     }
 }
