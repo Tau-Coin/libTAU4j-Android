@@ -64,8 +64,10 @@ public class CommunityChatActivity extends BaseActivity implements CommunityChat
     private final CompositeDisposable disposables = new CompositeDisposable();
     private String repliesHash;
     private String chainID;
-    int currentPos = 0;
-    boolean isScrollToBottom = true;
+    private int currentPos = 0;
+    private String newTxID;
+    private boolean isLocateTx = false;
+    private boolean isScrollToBottom = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +89,7 @@ public class CommunityChatActivity extends BaseActivity implements CommunityChat
         if (getIntent() != null) {
             repliesHash = getIntent().getStringExtra(IntentExtra.HASH);
             chainID = getIntent().getStringExtra(IntentExtra.CHAIN_ID);
+            newTxID = getIntent().getStringExtra(IntentExtra.ID);
         }
     }
 
@@ -141,6 +144,18 @@ public class CommunityChatActivity extends BaseActivity implements CommunityChat
         LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
         if (layoutManager != null) {
             logger.debug("handleUpdateAdapter isScrollToBottom::{}", isScrollToBottom);
+            if (isLocateTx && StringUtil.isNotEmpty(newTxID)) {
+                isScrollToBottom = false;
+                isLocateTx = false;
+                List<UserAndTx> currentList = adapter.getCurrentList();
+                for (int i = 0; i < currentList.size(); i++) {
+                    if (StringUtil.isEquals(newTxID, currentList.get(i).txID)) {
+                        layoutManager.scrollToPositionWithOffset(i, Integer.MIN_VALUE);
+                        break;
+                    }
+                }
+                return;
+            }
             if (isScrollToBottom) {
                 isScrollToBottom = false;
                 // 滚动到底部
@@ -251,6 +266,7 @@ public class CommunityChatActivity extends BaseActivity implements CommunityChat
             List<UserAndTx> currentList = new ArrayList<>(txs);
             if (currentPos == 0) {
                 initScrollToBottom();
+                isLocateTx = adapter.getCurrentList().size() == 0;
                 adapter.submitList(currentList, handleUpdateAdapter);
             } else {
                 currentList.addAll(adapter.getCurrentList());
@@ -331,7 +347,7 @@ public class CommunityChatActivity extends BaseActivity implements CommunityChat
 
     public void loadData(int pos) {
         currentPos = pos;
-        txViewModel.loadNotesData(repliesHash, pos, getItemCount());
+        txViewModel.loadNotesData(repliesHash, pos, getItemCount(), newTxID);
     }
 
     @Override
@@ -377,7 +393,7 @@ public class CommunityChatActivity extends BaseActivity implements CommunityChat
         if (tx.favoriteTime <= 0) {
             menuList.add(new OperationMenuItem(R.string.tx_operation_favorite));
         }
-        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
+//        menuList.add(new OperationMenuItem(R.string.tx_operation_msg_hash));
 
         operationsMenu = new FloatMenu(this);
         operationsMenu.items(menuList);

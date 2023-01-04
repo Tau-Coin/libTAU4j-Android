@@ -641,24 +641,33 @@ public class TxViewModel extends AndroidViewModel {
      * @param pos 分页位置
      * @param initSize 刷新时第一页数据大小
      */
-    void loadNotesData(String repliesHash, int pos, int initSize) {
+    void loadNotesData(String repliesHash, int pos, int initSize, String newTxID) {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
         loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
-            List<UserAndTx> txs = new ArrayList<>();
-            try {
-                long startTime = System.currentTimeMillis();
-                int pageSize = pos == 0 ? Page.PAGE_SIZE * 2 : Page.PAGE_SIZE;
-                if (pos == 0 && initSize > pageSize) {
-                    pageSize = initSize;
-                }
-                txs = txRepo.loadAllNotesData(repliesHash, pos, pageSize);
-                long getMessagesTime = System.currentTimeMillis();
-                logger.debug("loadNotesData repliesHash::{}, pos::{}, pageSize::{}, messages.size::{}",
-                        repliesHash, pos, pageSize, txs.size());
-                logger.debug("loadNotesData getMessagesTime::{}", getMessagesTime - startTime);
-                Collections.reverse(txs);
+                    List<UserAndTx> txs = new ArrayList<>();
+                    try {
+                        long startTime = System.currentTimeMillis();
+                        int pageSize = Page.PAGE_SIZE;
+                        int txPos = 0;
+                        if (StringUtil.isNotEmpty(newTxID)) {
+                            txPos = txRepo.getRepliesTxPosition(repliesHash, newTxID);
+                        }
+                        if (pos == 0) {
+                            if (initSize >= pageSize) {
+                                pageSize = initSize;
+                            } else {
+                                pageSize = txPos + Page.PAGE_SIZE - txPos % Page.PAGE_SIZE;
+                            }
+                        }
+                        logger.debug("loadNotesData txPos::{}, pageSize::{}", txPos, pageSize);
+                        txs = txRepo.loadAllNotesData(repliesHash, pos, pageSize);
+                        long getMessagesTime = System.currentTimeMillis();
+                        logger.debug("loadNotesData repliesHash::{}, pos::{}, pageSize::{}, messages.size::{}",
+                                repliesHash, pos, pageSize, txs.size());
+                        logger.debug("loadNotesData getMessagesTime::{}", getMessagesTime - startTime);
+                        Collections.reverse(txs);
 
                 for (UserAndTx tx : txs) {
                     if (tx.logs != null && tx.logs.size() > 0) {
@@ -717,7 +726,7 @@ public class TxViewModel extends AndroidViewModel {
      * @param pos 分页位置
      * @param initSize 刷新时第一页数据大小
      */
-    void loadNewsRepliesData(String txID, int pos, int initSize) {
+    void loadNewsRepliesData(String repliesHash, int pos, int initSize, String newTxID) {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
@@ -725,12 +734,21 @@ public class TxViewModel extends AndroidViewModel {
             List<UserAndTx> txs = new ArrayList<>();
             try {
                 int pageSize = Page.PAGE_SIZE;
-                if (pos == 0 && initSize > pageSize) {
-                    pageSize = initSize;
+                int txPos = 0;
+                if (StringUtil.isNotEmpty(newTxID)) {
+                    txPos = txRepo.getRepliesTxPosition(repliesHash, newTxID);
                 }
-                txs = txRepo.loadNewsRepliesData(txID, pos, pageSize);
+                if (pos == 0) {
+                    if (initSize >= pageSize) {
+                        pageSize = initSize;
+                    } else {
+                        pageSize = txPos + Page.PAGE_SIZE - txPos % Page.PAGE_SIZE;
+                    }
+                }
+                logger.debug("loadNewsRepliesData txPos::{}, pageSize::{}", txPos, pageSize);
+                txs = txRepo.loadNewsRepliesData(repliesHash, pos, pageSize);
                 logger.debug("loadNewsRepliesData txID::{}, pos::{}, pageSize::{}, messages.size::{}",
-                        txID, pos, pageSize, txs.size());
+                        repliesHash, pos, pageSize, txs.size());
             } catch (Exception e) {
                 logger.error("loadNewsRepliesData error::", e);
             }
@@ -856,7 +874,7 @@ public class TxViewModel extends AndroidViewModel {
         TauDaemon daemon = TauDaemon.getInstance(context);
 		//重发note tx
 		List<TxQueueAndStatus> txQueues =  txQueueRepo.getResendNoteTxQueue(MainApplication.getInstance().getPublicKey());
-		if (txQueues.size() > 0) { 
+		if (txQueues.size() > 0) {
 			for (TxQueueAndStatus txQueue : txQueues) {
 				txQueueRepo.updateQueue(txQueue);
 				logger.info("resend regular note tx queueID::{}", txQueue.queueID);
@@ -866,7 +884,7 @@ public class TxViewModel extends AndroidViewModel {
 
 		//重发news tx
 		txQueues =  txQueueRepo.getResendNewsTxQueue(MainApplication.getInstance().getPublicKey());
-		if (txQueues.size() > 0) { 
+		if (txQueues.size() > 0) {
 			for (TxQueueAndStatus txQueue : txQueues) {
 				txQueueRepo.updateQueue(txQueue);
 				logger.info("resend regular news tx queueID::{}", txQueue.queueID);

@@ -77,6 +77,11 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
+    public int getNoteTxPosition(String repliesHash, String txID) {
+        return db.txDao().getNoteTxPosition(repliesHash, txID);
+    }
+
+    @Override
     public List<UserAndTx> loadAllMarketData(String chainID, int startPos, int loadSize) {
         return db.txDao().loadAllMarketData(chainID, startPos, loadSize);
     }
@@ -94,6 +99,11 @@ public class TxRepositoryImpl implements TxRepository{
     @Override
     public List<UserAndTx> loadNewsRepliesData(String txID, int startPos, int loadSize) {
         return db.txDao().loadNewsRepliesData(txID, startPos, loadSize);
+    }
+
+    @Override
+    public int getRepliesTxPosition(String repliesHash, String txID) {
+        return db.txDao().getRepliesTxPosition(repliesHash, txID);
     }
 
     /**

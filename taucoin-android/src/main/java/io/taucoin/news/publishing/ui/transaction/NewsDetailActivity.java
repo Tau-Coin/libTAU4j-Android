@@ -74,6 +74,8 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
     private boolean isScrollToTop = true;
     private boolean isLoadMore = false;
     private boolean dataChanged = false;
+    private String newTxID;
+    private boolean isLocateTx = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +97,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
     private void initParam() {
         if (getIntent() != null) {
             txID = getIntent().getStringExtra(IntentExtra.HASH);
+            newTxID = getIntent().getStringExtra(IntentExtra.ID);
         }
     }
 
@@ -149,6 +152,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
             int size;
             if (currentPos == 0) {
                 initScrollToTop();
+                isLocateTx = adapter.getCurrentList().size() == 0;
                 adapter.submitList(currentList, handleUpdateAdapter);
                 size = currentList.size();
                 isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
@@ -344,6 +348,18 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         LinearLayoutManager layoutManager = (LinearLayoutManager) getRecyclerView().getLayoutManager();
         if (layoutManager != null) {
             logger.debug("handleUpdateAdapter isScrollToTop::{}", isScrollToTop);
+            if (isLocateTx && StringUtil.isNotEmpty(newTxID)) {
+                isScrollToTop = false;
+                isLocateTx = false;
+                List<UserAndTx> currentList = adapter.getCurrentList();
+                for (int i = 0; i < currentList.size(); i++) {
+                    if (StringUtil.isEquals(newTxID, currentList.get(i).txID)) {
+                        layoutManager.scrollToPositionWithOffset(i, Integer.MIN_VALUE);
+                        break;
+                    }
+                }
+                return;
+            }
             if (isScrollToTop) {
                 isScrollToTop = false;
                 logger.debug("handleUpdateAdapter scrollToPosition::{}", 0);
@@ -373,7 +389,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
 
     private void loadData(int pos) {
         currentPos = pos;
-        txViewModel.loadNewsRepliesData(txID, pos, getItemCount());
+        txViewModel.loadNewsRepliesData(txID, pos, getItemCount(), newTxID);
     }
 
     @Override

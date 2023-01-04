@@ -97,7 +97,7 @@ public interface TxRepository {
      */
     Flowable<List<UserAndTx>> observeLatestPinnedMsg(String chainID);
 
-    /** 
+    /**
      * 根据chainID获取社区中的有nonce交易(包括正需要上链的news and wiring coins)
      * @param chainID 社区链id
      */
@@ -111,9 +111,13 @@ public interface TxRepository {
 
     List<UserAndTx> loadAllNotesData(String repliesHash, int pos, int pageSize);
 
+    int getNoteTxPosition(String repliesHash, String txID);
+
     List<UserAndTx> loadAllMarketData(String chainID, int pos, int pageSize);
 
     List<UserAndTx> loadNewsRepliesData(String txID, int pos, int pageSize);
+
+    int getRepliesTxPosition(String repliesHash, String txID);
 
     DataSource.Factory<Integer, UserAndTx> queryFavorites();
 

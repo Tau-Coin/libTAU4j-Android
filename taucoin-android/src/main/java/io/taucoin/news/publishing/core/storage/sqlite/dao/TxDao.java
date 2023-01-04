@@ -39,11 +39,11 @@ public interface TxDao {
             " GROUP BY repliedHash) ncc";
 
     // SQL:联合查询news reply 和 news chat次数
-    String QUERY_NEWS_REPLY_AND_CHAT_COUNT = 
-            " LEFT JOIN" + 
+    String QUERY_NEWS_REPLY_AND_CHAT_COUNT =
+            " LEFT JOIN" +
             QUERY_NEWS_REPLY_COUNT +
             " ON tx.txID = nrc.repliedHash" +
-            " LEFT JOIN" + 
+            " LEFT JOIN" +
             QUERY_NEWS_CHAT_COUNT +
             " ON tx.txID = ncc.repliedHash";
 
@@ -58,7 +58,7 @@ public interface TxDao {
     String QUERY_USER_AND_TX = "SELECT tx.*, 0 AS repliesNum, 0 AS chatsNum, 0 AS balance, 0 AS power";
 
     // SQL:查询特定社区里的交易(包括未上链)
-    String QUERY_GET_CHAIN_ALL_TXS = 
+    String QUERY_GET_CHAIN_ALL_TXS =
             QUERY_USER_AND_TX +
             " FROM Txs AS tx" +
             " WHERE tx.chainID = :chainID AND tx.nonce >= 1" +
@@ -67,7 +67,7 @@ public interface TxDao {
             " limit :loadSize offset :startPosition";
 
     // SQL:查询社区news对应的notes交易
-    String QUERY_GET_ALL_NOTES = 
+    String QUERY_GET_ALL_NOTES =
             QUERY_USER_AND_TX +
             " FROM Txs AS tx" +
             " WHERE txType =" + Constants.NOTE_TX_TYPE +
@@ -76,8 +76,21 @@ public interface TxDao {
             " ORDER BY tx.timestamp DESC" +
             " limit :loadSize offset :startPosition";
 
+    String QUERY_NOTE_TX_POS = "SELECT pos FROM (SELECT tx.txID, count(tx1.timestamp) pos" +
+            " FROM Txs AS tx, Txs tx1" +
+            " WHERE tx.txType =" + Constants.NOTE_TX_TYPE +
+            " AND tx1.txType =" + Constants.NOTE_TX_TYPE +
+            " AND tx.repliedHash = :repiledHash" +
+            " AND tx1.repliedHash = :repiledHash" +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " AND tx1.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " AND tx.timestamp <= tx1.timestamp" +
+            " GROUP BY tx.txID" +
+            " ORDER BY tx.timestamp DESC)" +
+            " WHERE txID = :txID";
+
     // SQL:查询所有favorites
-    String QUERY_GET_FAVORITE_TXS = 
+    String QUERY_GET_FAVORITE_TXS =
             QUERY_USER_AND_TX +
             " FROM Txs AS tx" +
             " WHERE tx.favoriteTime > 0 " +
@@ -117,7 +130,7 @@ public interface TxDao {
             " ORDER BY ncc.chatsNum DESC, tx.timestamp DESC limit 1";
 
     // SQL:查询特定社区里的一级news tx
-    String QUERY_GET_CHAIN_MARKET = 
+    String QUERY_GET_CHAIN_MARKET =
             QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
@@ -141,14 +154,14 @@ public interface TxDao {
         " FROM Txs AS tx" +
         " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
         " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
-        QUERY_NEWS_REPLY_AND_CHAT_COUNT + 
+        QUERY_NEWS_REPLY_AND_CHAT_COUNT +
         " WHERE tx.txType =" + Constants.NEWS_TX_TYPE + " AND pinnedTime > 0" +
         " AND c.isBanned = 0" +
         " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
         " ORDER BY tx.pinnedTime DESC";
 
     // 查询钱包的收入和支出 onlineTime block时间，计算confidence
-    String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE = 
+    String QUERY_GET_WALLET_INCOME_AND_EXPENDITURE =
             " SELECT t.txID AS hash, t.senderPk AS senderOrMiner, t.receiverPk, -1 AS blockNumber, t.txType, t.amount, t.fee," +
             " t.timestamp / 1000 AS createTime, b.timestamp AS onlineTime, t.txStatus AS onlineStatus" +
             " FROM Txs AS t" +
@@ -158,11 +171,11 @@ public interface TxDao {
             " AND (t.senderPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + ")" +
             " OR t.receiverPk = (" + UserDao.QUERY_GET_CURRENT_USER_PK + "))" +
             " AND t.txType IN (" + Constants.WIRING_TX_TYPE + ", " + Constants.NEWS_TX_TYPE + ")" +
-            " AND t.txStatus <=" + Constants.TX_STATUS_ON_CHAIN + 
+            " AND t.txStatus <=" + Constants.TX_STATUS_ON_CHAIN +
             " ORDER BY createTime DESC" +
             " LIMIT :loadSize OFFSET :startPosition";
 
-    String QUERY_GET_ALL_NEWS_REPLIES = 
+    String QUERY_GET_ALL_NEWS_REPLIES =
             QUERY_USER_AND_TX_CARE_STATE +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
@@ -170,6 +183,19 @@ public interface TxDao {
             " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " ORDER BY tx.timestamp DESC" +
             " LIMIT :loadSize OFFSET :startPosition";
+
+    String QUERY_REPLIES_TX_POSITION = "SELECT pos FROM (SELECT tx.txID, count(tx1.timestamp) pos" +
+            " FROM Txs AS tx, Txs tx1" +
+            " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
+            " AND tx1.txType =" + Constants.NEWS_TX_TYPE +
+            " AND tx.repliedHash = :repiledHash" +
+            " AND tx1.repliedHash = :repiledHash" +
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " AND tx1.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " AND tx.timestamp <= tx1.timestamp" +
+            " GROUP BY tx.txID" +
+            " ORDER BY tx.timestamp DESC)" +
+            " WHERE txID = :txID";
 
     String QUERY_GET_NEWS_DETAIL =
             QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
@@ -357,6 +383,9 @@ public interface TxDao {
     @Query(QUERY_GET_ALL_NOTES)
     List<UserAndTx> loadAllNotesData(String repiledHash, int startPosition, int loadSize);
 
+    @Query(QUERY_NOTE_TX_POS)
+    int getNoteTxPosition(String repiledHash, String txID);
+
     /**
      * 查询favorites
      */
@@ -371,6 +400,9 @@ public interface TxDao {
     @Transaction
     @Query(QUERY_GET_ALL_NEWS_REPLIES)
     List<UserAndTx> loadNewsRepliesData(String txID, int startPosition, int loadSize);
+
+    @Query(QUERY_REPLIES_TX_POSITION)
+    int getRepliesTxPosition(String repiledHash, String txID);
 
     @Transaction
     @Query(QUERY_GET_NEWS_DETAIL)
