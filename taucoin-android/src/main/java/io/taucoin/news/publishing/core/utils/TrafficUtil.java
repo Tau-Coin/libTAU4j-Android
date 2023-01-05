@@ -129,7 +129,7 @@ public class TrafficUtil {
         logger.debug("resetTrafficInfo oldTrafficTime::{}, currentTrafficTime::{}",
                 DateUtil.format(oldTrafficTime, DateUtil.pattern6),
                 DateUtil.format(currentTrafficTime, DateUtil.pattern6));
-//        settingsRepo.setLongValue(TRAFFIC_TIME, currentTrafficTime);
+        settingsRepo.setLongValue(TRAFFIC_TIME, currentTrafficTime);
 //        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_DOWN, 0);
 //        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_UP, 0);
 //        settingsRepo.setLongValue(TRAFFIC_VALUE + TRAFFIC_METERED, 0);
