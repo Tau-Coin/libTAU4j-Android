@@ -17,11 +17,9 @@ import com.noober.menu.FloatMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.XMLReader;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,12 +31,11 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.news.publishing.MainApplication;
 import io.taucoin.news.publishing.R;
-import io.taucoin.news.publishing.core.Constants;
 import io.taucoin.news.publishing.core.model.data.OperationMenuItem;
 import io.taucoin.news.publishing.core.model.data.UserAndTx;
+import io.taucoin.news.publishing.core.model.data.UserAndTxReply;
 import io.taucoin.news.publishing.core.utils.ActivityUtil;
 import io.taucoin.news.publishing.core.utils.CopyManager;
-import io.taucoin.news.publishing.core.utils.DrawablesUtil;
 import io.taucoin.news.publishing.core.utils.KeyboardUtils;
 import io.taucoin.news.publishing.core.utils.LinkUtil;
 import io.taucoin.news.publishing.core.utils.ObservableUtil;
@@ -46,6 +43,7 @@ import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
 import io.taucoin.news.publishing.core.utils.UsersUtil;
 import io.taucoin.news.publishing.databinding.FragmentNewsTabBinding;
+import io.taucoin.news.publishing.databinding.ItemHomeNewsBinding;
 import io.taucoin.news.publishing.databinding.ItemNewsBinding;
 import io.taucoin.news.publishing.ui.BaseActivity;
 import io.taucoin.news.publishing.ui.BaseFragment;
@@ -56,18 +54,17 @@ import io.taucoin.news.publishing.ui.customviews.CommonDialog;
 import io.taucoin.news.publishing.ui.customviews.CustomXRefreshViewFooter;
 import io.taucoin.news.publishing.ui.customviews.PopUpDialog;
 import io.taucoin.news.publishing.ui.main.MainActivity;
-import io.taucoin.news.publishing.ui.qrcode.CommunityQRCodeActivity;
 import io.taucoin.news.publishing.ui.user.UserDetailActivity;
 import io.taucoin.news.publishing.ui.user.UserViewModel;
 
 /**
  * 主页所有上链news或notes, 以及自己发的未上链news Tab页
  */
-public class NewsTabFragment extends BaseFragment implements View.OnClickListener, NewsListAdapter.ClickListener,
+public class NewsTabFragment extends BaseFragment implements View.OnClickListener, HomeListAdapter.ClickListener,
         XRefreshView.XRefreshViewListener {
 
     protected static final Logger logger = LoggerFactory.getLogger("NewsTabFragment");
-    private NewsListAdapter adapter;
+    private HomeListAdapter adapter;
     private FragmentNewsTabBinding binding;
     protected CompositeDisposable disposables = new CompositeDisposable();
     private boolean isVisibleToUser;
@@ -80,7 +77,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     private FloatMenu operationsMenu;
     private PopUpDialog retweetDialog;
     private CommonDialog banCommunityDialog;
-    private ItemNewsBinding headerBinding;
+    private ItemHomeNewsBinding headerBinding;
     private UserAndTx headerData;
 
     private int currentPos = 0;
@@ -124,14 +121,14 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
 //      layoutManager.setStackFromEnd(true);
         binding.txList.setLayoutManager(layoutManager);
         binding.txList.setItemAnimator(null);
-        adapter = new NewsListAdapter(this);
+        adapter = new HomeListAdapter(this);
         binding.txList.setAdapter(adapter);
 
         initFabSpeedDial();
         initRefreshLayout();
 
-        txViewModel.observerChainTxs().observe(getViewLifecycleOwner(), txs -> {
-            List<UserAndTx> currentList = new ArrayList<>(txs);
+        txViewModel.observerTxsReply().observe(getViewLifecycleOwner(), txs -> {
+            List<UserAndTxReply> currentList = new ArrayList<>(txs);
             int size;
             if (currentPos == 0) {
                 size = currentList.size();
@@ -296,19 +293,19 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                 .subscribe(this::loadHomeHeaderView));
     }
 
-    private void loadHomeHeaderView(UserAndTx tx) {
+    private void loadHomeHeaderView(UserAndTxReply tx) {
         if (null == headerBinding) {
             headerBinding = DataBindingUtil.inflate(LayoutInflater.from(activity),
-                    R.layout.item_news, null, false);
+                    R.layout.item_home_news, null, false);
             binding.txList.addHeaderView(headerBinding.getRoot());
         }
-        NewsListAdapter.ViewHolder viewHolder = new NewsListAdapter.ViewHolder(headerBinding, this);
+        HomeListAdapter.ViewHolder viewHolder = new HomeListAdapter.ViewHolder(headerBinding, this);
         viewHolder.bind(tx);
         this.headerData = tx;
         int headerDataIndex = adapter.getCurrentList().indexOf(tx);
         logger.debug("headerDataIndex::{}", headerDataIndex);
         if (headerDataIndex >= 0) {
-            List<UserAndTx> list = new ArrayList<>(adapter.getCurrentList());
+            List<UserAndTxReply> list = new ArrayList<>(adapter.getCurrentList());
             list.remove(headerDataIndex);
             adapter.submitList(list);
         }
@@ -496,10 +493,10 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     }
 
     @Override
-    public void onItemClicked(UserAndTx tx) {
+    public void onItemClicked(String txID) {
         KeyboardUtils.hideSoftInput(activity);
         Intent intent = new Intent();
-        intent.putExtra(IntentExtra.HASH, tx.txID);
+        intent.putExtra(IntentExtra.HASH, txID);
         ActivityUtil.startActivity(intent, activity, NewsDetailActivity.class);
     }
 

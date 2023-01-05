@@ -15,6 +15,7 @@ import io.taucoin.news.publishing.core.Constants;
 import io.taucoin.news.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.news.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.news.publishing.core.model.data.UserAndTx;
+import io.taucoin.news.publishing.core.model.data.UserAndTxReply;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.TxLog;
 
@@ -100,12 +101,26 @@ public interface TxDao {
     // SQL: 页面展示(时间倒序, 有限数量)
     String QUERY_GET_TXS_ORDER = " ORDER BY tx.timestamp DESC limit :loadSize offset :startPosition";
 
+    String QUERY_NEWS_LATEST_REPLY = " LEFT JOIN (SELECT *, (m.consensusBalance-m.totalPendingCoins) as replyBalance, m.power AS replyPower" +
+            " FROM Txs AS a" +
+            " LEFT JOIN Members m ON a.chainID = m.chainID AND a.senderPk = m.publicKey" +
+            " WHERE a.txID IN" +
+            " (SELECT txID FROM Txs" +
+            " WHERE a.repliedHash = repliedHash AND txType = " + Constants.NEWS_TX_TYPE +
+            " AND repliedHash IS NOT NULL" +
+            " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " ORDER BY timestamp DESC limit 1)) AS reply" +
+            " ON tx.txID = reply.repliedHash";
+
     // SQL:查询所有社区中的一级news tx
     String QUERY_GET_ALL_MARKET =
             QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
+            " , reply.txID AS replyTxID, reply.senderPk AS replySenderPk, reply.memo AS replyMemo," +
+            " reply.link AS replyLink, reply.timestamp AS replyTimestamp, reply.replyBalance, reply.replyPower" +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
+            QUERY_NEWS_LATEST_REPLY +
             QUERY_NEWS_REPLY_AND_CHAT_COUNT +
             " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
             " AND tx.deleted = 0" +
@@ -117,9 +132,12 @@ public interface TxDao {
     // SQL:查询所有社区中的一级news tx
     String QUERY_GET_MARKET_MAX_CHAT_NUM_NEWS =
             QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
+            " , reply.txID AS replyTxID, reply.senderPk AS replySenderPk, reply.memo AS replyMemo," +
+            " reply.link AS replyLink, reply.timestamp AS replyTimestamp, reply.replyBalance, reply.replyPower" +
             " FROM Txs AS tx" +
             " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
             " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
+            QUERY_NEWS_LATEST_REPLY +
             QUERY_NEWS_REPLY_AND_CHAT_COUNT +
             " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
             " AND tx.deleted = 0" +
@@ -395,7 +413,7 @@ public interface TxDao {
 
     @Transaction
     @Query(QUERY_GET_ALL_MARKET)
-    List<UserAndTx> loadNewsData(int startPosition, int loadSize);
+    List<UserAndTxReply> loadNewsData(int startPosition, int loadSize);
 
     @Transaction
     @Query(QUERY_GET_ALL_NEWS_REPLIES)
@@ -478,7 +496,7 @@ public interface TxDao {
      */
     @Query(QUERY_GET_MARKET_MAX_CHAT_NUM_NEWS)
     @Transaction
-    Flowable<UserAndTx> observeMaxChatNumNews();
+    Flowable<UserAndTxReply> observeMaxChatNumNews();
 
     @Query(DELETE_THIS_NEWS)
     void deleteThisNews(String txID);

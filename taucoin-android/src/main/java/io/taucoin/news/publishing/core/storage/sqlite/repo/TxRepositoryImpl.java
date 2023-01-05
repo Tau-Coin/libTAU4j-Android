@@ -16,6 +16,7 @@ import io.taucoin.news.publishing.core.model.data.DataChanged;
 import io.taucoin.news.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.news.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.news.publishing.core.model.data.UserAndTx;
+import io.taucoin.news.publishing.core.model.data.UserAndTxReply;
 import io.taucoin.news.publishing.core.storage.sqlite.AppDatabase;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.TxLog;
@@ -92,7 +93,7 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public List<UserAndTx> loadNewsData(int startPos, int loadSize) {
+    public List<UserAndTxReply> loadNewsData(int startPos, int loadSize) {
         return db.txDao().loadNewsData(startPos, loadSize);
     }
 
@@ -274,7 +275,7 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
-    public Flowable<UserAndTx> observeMaxChatNumNews() {
+    public Flowable<UserAndTxReply> observeMaxChatNumNews() {
         return db.txDao().observeMaxChatNumNews();
     }
 

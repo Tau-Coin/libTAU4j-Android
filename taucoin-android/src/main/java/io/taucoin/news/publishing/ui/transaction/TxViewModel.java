@@ -44,6 +44,7 @@ import io.taucoin.news.publishing.core.model.data.Result;
 import io.taucoin.news.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.news.publishing.core.model.data.TxLogStatus;
 import io.taucoin.news.publishing.core.model.data.TxQueueAndStatus;
+import io.taucoin.news.publishing.core.model.data.UserAndTxReply;
 import io.taucoin.news.publishing.core.model.data.message.NewsContent;
 import io.taucoin.news.publishing.core.model.data.message.NoteContent;
 import io.taucoin.news.publishing.core.model.data.message.TxContent;
@@ -98,6 +99,7 @@ public class TxViewModel extends AndroidViewModel {
     private Disposable loadViewDisposable;
     private Disposable addTxDisposable;
     private MutableLiveData<List<UserAndTx>> chainTxs = new MutableLiveData<>();
+    private MutableLiveData<List<UserAndTxReply>> txsReply = new MutableLiveData<>();
     private MutableLiveData<List<IncomeAndExpenditure>> walletTxs = new MutableLiveData<>();
     private MutableLiveData<Result> airdropState = new MutableLiveData<>();
     private MutableLiveData<String> addState = new MutableLiveData<>();
@@ -136,6 +138,10 @@ public class TxViewModel extends AndroidViewModel {
      */
     public MutableLiveData<List<UserAndTx>> observerChainTxs() {
         return chainTxs;
+    }
+
+    public MutableLiveData<List<UserAndTxReply>> observerTxsReply() {
+        return txsReply;
     }
 
     public MutableLiveData<List<IncomeAndExpenditure>> getWalletTxs() {
@@ -695,8 +701,8 @@ public class TxViewModel extends AndroidViewModel {
         if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
             loadViewDisposable.dispose();
         }
-        loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
-            List<UserAndTx> txs = new ArrayList<>();
+        loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTxReply>>) emitter -> {
+            List<UserAndTxReply> txs = new ArrayList<>();
             try {
                 int pageSize = Page.PAGE_SIZE;
                 if (pos == 0 && initSize > pageSize) {
@@ -717,7 +723,7 @@ public class TxViewModel extends AndroidViewModel {
         }).subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(messages -> {
-            chainTxs.postValue(messages);
+            txsReply.postValue(messages);
         });
     }
 
@@ -1027,7 +1033,7 @@ public class TxViewModel extends AndroidViewModel {
         return txRepo.observeNewsDetail(txID);
     }
 
-    public Flowable<UserAndTx> observeMaxChatNumNews() {
+    public Flowable<UserAndTxReply> observeMaxChatNumNews() {
         return txRepo.observeMaxChatNumNews();
     }
 

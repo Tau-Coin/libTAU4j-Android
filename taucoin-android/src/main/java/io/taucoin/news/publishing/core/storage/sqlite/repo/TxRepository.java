@@ -9,6 +9,7 @@ import io.taucoin.news.publishing.core.model.data.DataChanged;
 import io.taucoin.news.publishing.core.model.data.IncomeAndExpenditure;
 import io.taucoin.news.publishing.core.model.data.TxFreeStatistics;
 import io.taucoin.news.publishing.core.model.data.UserAndTx;
+import io.taucoin.news.publishing.core.model.data.UserAndTxReply;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.TxLog;
 
@@ -105,9 +106,10 @@ public interface TxRepository {
 
     /**
      * 获取所有链的news消息
-     * @param chainID 社区链ID
+     * @param pos 开始位置
+     * @param pageSize 每页大小
      */
-    List<UserAndTx> loadNewsData(int pos, int pageSize);
+    List<UserAndTxReply> loadNewsData(int pos, int pageSize);
 
     List<UserAndTx> loadAllNotesData(String repliesHash, int pos, int pageSize);
 
@@ -171,7 +173,7 @@ public interface TxRepository {
      * 获取社区中最大chatnum的news
      * @return
      */
-    Flowable<UserAndTx> observeMaxChatNumNews();
+    Flowable<UserAndTxReply> observeMaxChatNumNews();
 
     Observable<UserAndTx> observeNewsDetail(String txID);
 

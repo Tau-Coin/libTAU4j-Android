@@ -264,5 +264,157 @@
             android:layout_height="@dimen/widget_size_1"
             android:background="@color/color_bg"/>
 
+        <LinearLayout
+            android:id="@+id/ll_bottom_reply"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/color_chat_bg"
+            android:gravity="end">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/widget_size_5"
+                android:layout_marginStart="@dimen/widget_size_5"
+                android:paddingStart="@dimen/widget_size_5"
+                android:paddingEnd="@dimen/widget_size_5"
+                android:paddingTop="@dimen/widget_size_5"
+                android:gravity="center_vertical">
+
+                <io.taucoin.news.publishing.ui.customviews.RoundImageView
+                    android:id="@+id/iv_reply_head_pic"
+                    android:layout_width="@dimen/widget_size_40"
+                    android:layout_height="@dimen/widget_size_40"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/primary_rect_round_bg"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_reply_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/widget_size_5"
+                        android:layout_marginEnd="@dimen/widget_size_1"
+                        android:includeFontPadding="false"
+                        android:singleLine="true"
+                        android:ellipsize="middle"
+                        android:textColor="@color/gray_dark"
+                        android:textAppearance="@style/TextAppearanceBody2"/>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginStart="@dimen/widget_size_5"
+                        android:layout_marginTop="@dimen/widget_size_5">
+
+                        <ImageView
+                            android:layout_width="@dimen/widget_size_16"
+                            android:layout_height="@dimen/widget_size_16"
+                            android:contentDescription="@null"
+                            android:src="@mipmap/icon_community_balance"/>
+
+                        <TextView
+                            android:id="@+id/tv_reply_balance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/widget_size_1"
+                            android:includeFontPadding="false"
+                            android:textColor="@color/color_yellow"
+                            android:textAppearance="@style/TextAppearanceBody2" />
+
+                        <ImageView
+                            android:layout_width="@dimen/widget_size_17"
+                            android:layout_height="@dimen/widget_size_17"
+                            android:layout_marginStart="@dimen/widget_size_10"
+                            android:contentDescription="@null"
+                            android:src="@mipmap/icon_power"/>
+
+                        <TextView
+                            android:id="@+id/tv_reply_power"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:textColor="@color/gray_dark"
+                            android:textAppearance="@style/TextAppearanceBody2" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:visibility="invisible"
+                    android:id="@+id/iv_reply_long_press"
+                    android:layout_width="@dimen/widget_size_30"
+                    android:layout_height="@dimen/widget_size_20"
+                    android:paddingStart="@dimen/widget_size_5"
+                    android:paddingEnd="@dimen/widget_size_5"
+                    android:layout_gravity="end"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_long_press"/>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/widget_size_40"
+                android:paddingBottom="@dimen/widget_size_10"
+                android:layout_marginEnd="@dimen/widget_size_5"
+                android:layout_marginStart="@dimen/widget_size_5">
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/tv_reply"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:layout_marginEnd="@dimen/widget_size_50"
+                    android:paddingTop="@dimen/widget_size_5"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/gray_dark"
+                    android:textAppearance="@style/TextAppearanceBody1" />
+
+                <io.taucoin.news.publishing.ui.customviews.AutoLinkTextView
+                    android:layout_below="@+id/tv_reply"
+                    android:id="@+id/tv_reply_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:layout_marginEnd="@dimen/widget_size_35"
+                    android:textColorLink="@color/color_blue_link"
+                    android:paddingTop="@dimen/widget_size_5"
+                    android:includeFontPadding="false"
+                    android:textAppearance="@style/TextAppearanceBody1" />
+
+                <TextView
+                    android:layout_below="@+id/tv_reply_msg"
+                    android:id="@+id/tv_reply_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/widget_size_50"
+                    android:layout_marginStart="@dimen/widget_size_10"
+                    android:textColor="@color/color_blue_link"
+                    android:textColorLink="@color/color_blue_link"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:drawablePadding="@dimen/widget_size_2"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:textAppearance="@style/TextAppearanceBody1" />
+
+            </RelativeLayout>
+        </LinearLayout>
+
     </LinearLayout>
 </layout>
