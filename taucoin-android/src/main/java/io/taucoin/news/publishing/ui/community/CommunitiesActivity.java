@@ -143,7 +143,7 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
         }
 		//Modified tc
         binding.itemInterimBalance.setRightText(FmtMicrometer.fmtLong(interimBalance));
-        binding.itemPendingAmount.setRightText(FmtMicrometer.fmtLong(pendingAmount));
+        binding.tvPendingAmount.setText(FmtMicrometer.fmtLong(pendingAmount));
         binding.itemPaymentBalance.setRightText(FmtMicrometer.fmtLong(paymentBalance));
         String miningRewardsStr = "%sx%s(success)=%s";
         miningRewardsStr = String.format(miningRewardsStr, Constants.MINING_REWARDS.longValue(),
@@ -184,10 +184,16 @@ public class CommunitiesActivity extends BaseActivity implements View.OnClickLis
             case R.id.tv_join:
                 viewModel.joinCommunity(chainID);
                 break;
-            case R.id.rl_transactions:
+            case R.id.rl_pending_amount:
                 Intent intent = new Intent();
                 intent.putExtra(IntentExtra.CHAIN_ID, chainID);
                 ActivityUtil.startActivity(intent, this, TransactionsActivity.class);
+                break;
+            case R.id.rl_transactions:
+                intent = new Intent();
+                intent.putExtra(IntentExtra.CHAIN_ID, chainID);
+                intent.putExtra(IntentExtra.IS_JOINED, true);
+                ActivityUtil.startActivity(intent, this, ChainExplorerActivity.class);
                 break;
             case R.id.rl_pay_people:
                 intent = new Intent();
