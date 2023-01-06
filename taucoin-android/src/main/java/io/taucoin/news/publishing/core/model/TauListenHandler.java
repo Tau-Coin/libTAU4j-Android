@@ -440,10 +440,12 @@ public class TauListenHandler {
                     // 发送社区新交易通知
                     if (tx.txType == Constants.NOTE_TX_TYPE) {
                         Tx repliedTx = txRepo.getTxByTxID(tx.repliedHash);
-                        SpannableStringBuilder news = TxUtils.createTxSpan(repliedTx, TxType.NOTE_TX.getType());
-                        String friendName = UsersUtil.getShowName(friend);
-                        String msg = friendName + "-" + TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
-                        TauNotifier.getInstance().makeCommunityNotify(tx.chainID, repliedTx.txID, tx.txID, news, msg);
+						if(repliedTx != null) {
+							SpannableStringBuilder news = TxUtils.createTxSpan(repliedTx, TxType.NOTE_TX.getType());
+							String friendName = UsersUtil.getShowName(friend);
+							String msg = friendName + "-" + TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
+							TauNotifier.getInstance().makeCommunityNotify(tx.chainID, repliedTx.txID, tx.txID, news, msg);
+						}
                     } else {
                         SpannableStringBuilder news = TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
                         String newsHash = StringUtil.isNotEmpty(tx.repliedHash) ? tx.repliedHash : tx.txID;
