@@ -129,6 +129,21 @@ public interface TxDao {
             " AND c.isBanned = 0" +
             QUERY_GET_TXS_ORDER;
 
+    // SQL:查询搜索所有社区中的一级news tx
+    String QUERY_GET_SEARCH_NEWS =
+            QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
+            " FROM Txs AS tx" +
+            " LEFT JOIN Members m ON tx.chainID = m.chainID AND tx.senderPk = m.publicKey" +
+            " LEFT JOIN Communities c ON tx.chainID = c.chainID" +
+            QUERY_NEWS_REPLY_AND_CHAT_COUNT +
+            " WHERE tx.txType =" + Constants.NEWS_TX_TYPE +
+            " AND tx.deleted = 0" +
+            " AND tx.repliedHash IS NULL" +
+			" AND (tx.txID LIKE '%' || :keywords || '%' OR tx.senderPk LIKE '%' || :keywords || '%' OR tx.memo LIKE '%' || :keywords || '%')" + 
+            " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " AND c.isBanned = 0" +
+            QUERY_GET_TXS_ORDER;
+
     // SQL:查询所有社区中的一级news tx
     String QUERY_GET_MARKET_MAX_CHAT_NUM_NEWS =
             QUERY_USER_AND_TX_CARE_NUM_AND_STATE +
@@ -414,6 +429,10 @@ public interface TxDao {
     @Transaction
     @Query(QUERY_GET_ALL_MARKET)
     List<UserAndTxReply> loadNewsData(int startPosition, int loadSize);
+
+    @Transaction
+    @Query(QUERY_GET_SEARCH_NEWS)
+    List<UserAndTx> loadSearchNewsData(String keywords, int startPosition, int loadSize);
 
     @Transaction
     @Query(QUERY_GET_ALL_NEWS_REPLIES)

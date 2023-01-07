@@ -728,6 +728,40 @@ public class TxViewModel extends AndroidViewModel {
     }
 
     /**
+     * 加载搜索的news交易分页数据
+     * @param pos 分页位置
+     * @param initSize 刷新时第一页数据大小
+     */
+    void loadSearchNewsData(String keywords, int pos, int initSize) {
+        if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
+            loadViewDisposable.dispose();
+        }
+        loadViewDisposable = Observable.create((ObservableOnSubscribe<List<UserAndTx>>) emitter -> {
+            List<UserAndTx> txs = new ArrayList<>();
+            try {
+                int pageSize = Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
+                long startTime = System.currentTimeMillis();
+                txs = txRepo.loadSearchNewsData(keywords, pos, pageSize);
+                long endTime = System.currentTimeMillis();
+                logger.debug("loadSearchNewsData time::{}ms", endTime - startTime);
+                logger.debug("loadSearchNewsData pos::{}, pageSize::{}, messages.size::{}",
+                        pos, pageSize, txs.size());
+            } catch (Exception e) {
+                logger.error("loadSearchNewsData error::", e);
+            }
+            emitter.onNext(txs);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(messages -> {
+            chainTxs.postValue(messages);
+        });
+    }
+
+    /**
      * 加载news的回复交易分页数据
      * @param pos 分页位置
      * @param initSize 刷新时第一页数据大小

@@ -98,6 +98,11 @@ public class TxRepositoryImpl implements TxRepository{
     }
 
     @Override
+    public List<UserAndTx> loadSearchNewsData(String keywords, int startPos, int loadSize) {
+        return db.txDao().loadSearchNewsData(keywords, startPos, loadSize);
+    }
+
+    @Override
     public List<UserAndTx> loadNewsRepliesData(String txID, int startPos, int loadSize) {
         return db.txDao().loadNewsRepliesData(txID, startPos, loadSize);
     }
