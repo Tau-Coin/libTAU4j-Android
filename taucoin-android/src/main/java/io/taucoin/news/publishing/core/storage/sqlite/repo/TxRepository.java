@@ -105,9 +105,14 @@ public interface TxRepository {
 
     /**
      * 获取所有链的news消息
-     * @param chainID 社区链ID
      */
     List<UserAndTx> loadNewsData(int pos, int pageSize);
+
+    /**
+     * 获取搜索的news消息
+     * @param keywords 搜索关键字 
+     */
+    List<UserAndTx> loadSearchNewsData(String keywords, int pos, int pageSize);
 
     List<UserAndTx> loadAllNotesData(String repliesHash, int pos, int pageSize);
 
