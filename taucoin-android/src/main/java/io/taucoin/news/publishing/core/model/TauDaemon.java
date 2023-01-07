@@ -150,7 +150,7 @@ public abstract class TauDaemon {
                     //Constants.TX_MAX_OVERDRAFT = sessionManager.getMaxOverdraft(); 
                     handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
                     // 更新当前用户自己的信息
-                    updateCurrentUserInfo(true);
+                    updateCurrentUserInfo(false);
                     // 启动在线信号定时任务
                     startOnlineTimer();
                     // 更新用户跟随的社区和其账户状态
@@ -434,7 +434,7 @@ public abstract class TauDaemon {
      */
     public void startOnlineTimer() {
         if (null == onlineTimer || onlineTimer.isDisposed()) {
-            onlineTimer = ObservableUtil.intervalSeconds(12 * 60 * 60)
+            onlineTimer = ObservableUtil.intervalSeconds(60 * 60)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe( l -> updateCurrentUserInfo(false));
