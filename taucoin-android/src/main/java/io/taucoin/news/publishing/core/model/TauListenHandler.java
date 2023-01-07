@@ -289,7 +289,7 @@ public class TauListenHandler {
                 previousBlockHash = ByteUtil.toHexString(block.getPreviousBlockHash());
             }
             String txID = isTransactionEmpty(transaction) ? null : transaction.getTxID().to_hex();
-            blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty, 
+            blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty,
                     status, timestamp, previousBlockHash, txID);
             blockRepo.addBlock(blockInfo);
             logger.info("Save Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}, " +
@@ -440,10 +440,12 @@ public class TauListenHandler {
                     // 发送社区新交易通知
                     if (tx.txType == Constants.NOTE_TX_TYPE) {
                         Tx repliedTx = txRepo.getTxByTxID(tx.repliedHash);
-                        SpannableStringBuilder news = TxUtils.createTxSpan(repliedTx, TxType.NOTE_TX.getType());
-                        String friendName = UsersUtil.getShowName(friend);
-                        String msg = friendName + "-" + TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
-                        TauNotifier.getInstance().makeCommunityNotify(tx.chainID, repliedTx.txID, news, msg);
+                        if(repliedTx != null) {
+                            SpannableStringBuilder news = TxUtils.createTxSpan(repliedTx, TxType.NOTE_TX.getType());
+                            String friendName = UsersUtil.getShowName(friend);
+                            String msg = friendName + "-" + TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
+                            TauNotifier.getInstance().makeCommunityNotify(tx.chainID, repliedTx.txID, news, msg);
+                        }
                     } else {
                         SpannableStringBuilder news = TxUtils.createTxSpan(tx, TxType.NOTE_TX.getType());
                         String newsHash = StringUtil.isNotEmpty(tx.repliedHash) ? tx.repliedHash : tx.txID;
@@ -479,7 +481,7 @@ public class TauListenHandler {
 
         if (txType == TxType.WIRING_TX.getType()) {
             saveUserInfo(txMsg.getReceiver());
-        } 
+        }
     }
 
     /**
