@@ -289,7 +289,7 @@ public class TauListenHandler {
                 previousBlockHash = ByteUtil.toHexString(block.getPreviousBlockHash());
             }
             String txID = isTransactionEmpty(transaction) ? null : transaction.getTxID().to_hex();
-            blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty, 
+            blockInfo = new BlockInfo(chainID, blockHash, blockNumber, miner, rewards, difficulty,
                     status, timestamp, previousBlockHash, txID);
             blockRepo.addBlock(blockInfo);
             logger.info("Save Block Info, chainID::{}, blockHash::{}, blockNumber::{}, rewards::{}, " +
@@ -482,7 +482,7 @@ public class TauListenHandler {
 
         if (txType == TxType.WIRING_TX.getType()) {
             saveUserInfo(txMsg.getReceiver());
-        } 
+        }
     }
 
     /**

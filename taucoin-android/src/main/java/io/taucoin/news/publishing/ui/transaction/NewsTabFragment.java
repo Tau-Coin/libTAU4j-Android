@@ -132,8 +132,9 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
             int size;
             if (currentPos == 0) {
                 size = currentList.size();
-                isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
-
+                if (size <= Page.PAGE_SIZE) {
+                    isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
+                }
                 int headerDataIndex = currentList.indexOf(headerData);
                 logger.debug("headerDataIndex::{}", headerDataIndex);
                 if (headerDataIndex >= 0) {
