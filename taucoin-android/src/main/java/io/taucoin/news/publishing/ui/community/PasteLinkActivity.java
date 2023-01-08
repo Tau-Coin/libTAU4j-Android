@@ -23,6 +23,7 @@ import io.taucoin.news.publishing.ui.constant.IntentExtra;
 import io.taucoin.news.publishing.ui.customviews.CommonDialog;
 import io.taucoin.news.publishing.ui.customviews.ConfirmDialog;
 import io.taucoin.news.publishing.ui.main.MainActivity;
+import io.taucoin.news.publishing.ui.search.SearchActivity;
 import io.taucoin.news.publishing.ui.user.UserViewModel;
 
 /**
@@ -133,7 +134,10 @@ public class PasteLinkActivity extends BaseActivity {
                 }
             });
         } else {
-            showErrorLinkDialog(false);
+            Intent intent = new Intent(this, SearchActivity.class);
+            intent.putExtra(IntentExtra.DATA, link);
+            startActivity(intent);
+//            showErrorLinkDialog(false);
         }
     }
 

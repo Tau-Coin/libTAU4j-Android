@@ -276,6 +276,7 @@
         Difficulty measures chain security level, the higher the better.</string>
     <string name="community_added_members_title">Add Members From Contacts</string>
     <string name="community_added_members">Add Members</string>
+    <string name="community_search_result">Search Result</string>
     <string name="community_added_members_empty">Please add or select friends first!</string>
     <string name="community_custom_airdrop_tips">Custom airdrop coins to friends</string>
     <string name="community_airdrop_peers">Peers/%1$d</string>
