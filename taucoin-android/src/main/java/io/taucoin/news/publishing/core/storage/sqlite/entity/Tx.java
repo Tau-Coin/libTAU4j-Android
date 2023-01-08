@@ -43,6 +43,7 @@ public class Tx implements Parcelable {
     public long pinnedTime;                 // 置顶固定时间
     public long favoriteTime;               // 收藏时间
     public int deleted;                     // news是否被删除 0：未删除； 1：已删除
+    public String picturePath;              // news图片路径；
 
     // wiring
     public Tx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo){

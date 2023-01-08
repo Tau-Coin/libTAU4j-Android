@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
@@ -18,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import cc.shinichi.library.ImagePreview;
 import io.taucoin.news.publishing.MainApplication;
 import io.taucoin.news.publishing.core.utils.MultimediaUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
@@ -105,8 +108,47 @@ public class MediaUtil {
             .forResult(PictureConfig.CHOOSE_REQUEST);
     }
 
+    public static void openGalleryAndCameraWithoutCrop(Activity activity) {
+        PictureSelector.create(activity)
+                .openGallery(PictureMimeType.ofImage())
+                .setLanguage(LanguageConfig.ENGLISH)
+                .imageEngine(GlideEngine.createGlideEngine())
+                .isWeChatStyle(true)
+                .selectionMode(PictureConfig.SINGLE)
+                .isSingleDirectReturn(true)
+                .isGif(false)
+                .isPreviewImage(true)
+                .isEnableCrop(false)
+                .isCompress(true)
+                .compressQuality(100)
+                .compressEngine(NewsImageCompressEngine.createCompressEngine())
+                .minimumCompressSize(1)
+                .forResult(PictureConfig.CHOOSE_REQUEST);
+    }
+
     public static void deleteAllCacheImageFile() {
         Context context = MainApplication.getInstance();
         PictureCacheManager.deleteCacheDirFile(context, PictureMimeType.ofImage());
+    }
+
+    public static void previewPicture(Context context, String imagePath) {
+        ImagePreview.getInstance()
+            // 上下文，必须是activity，不需要担心内存泄漏，本框架已经处理好；
+            .setContext(context)
+            // 设置从第几张开始看（索引从0开始）
+            .setIndex(0)
+            .setShowDownButton(true)// 是否显示下载按钮
+            .setImage(imagePath)
+            // 开启预览
+            .start();
+    }
+
+    public static void previewThumbnailPicture(Context context, ImageView targetView, String picturePath) {
+        Glide.with(context)
+            .asBitmap()
+            .load(picturePath)
+            .fitCenter()
+            .thumbnail(0.1f)
+            .into(targetView);
     }
 }

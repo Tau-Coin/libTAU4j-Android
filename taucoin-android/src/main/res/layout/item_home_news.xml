@@ -26,6 +26,7 @@
                 android:id="@+id/iv_head_pic"
                 android:layout_width="@dimen/widget_size_40"
                 android:layout_height="@dimen/widget_size_40"
+                android:src="@color/color_red"
                 android:scaleType="centerCrop"/>
 
             <TextView
@@ -102,10 +103,38 @@
             android:id="@+id/middle_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/widget_size_5"
-            android:layout_marginStart="@dimen/widget_size_45">
+            android:layout_marginEnd="@dimen/widget_size_5">
+
+            <LinearLayout
+                android:id="@+id/ll_left"
+                android:orientation="vertical"
+                android:layout_width="@dimen/widget_size_26"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_size_17">
+
+                <ImageView
+                    android:id="@+id/iv_picture"
+                    android:layout_width="@dimen/widget_size_26"
+                    android:layout_height="@dimen/widget_size_26"
+                    android:layout_marginTop="@dimen/widget_size_5"
+                    android:padding="@dimen/widget_size_4"
+                    android:layout_gravity="center_horizontal"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_picture"/>
+
+                <ImageView
+                    android:id="@+id/iv_ban"
+                    android:layout_width="@dimen/widget_size_26"
+                    android:layout_height="@dimen/widget_size_26"
+                    android:padding="@dimen/widget_size_4"
+                    android:layout_gravity="center_horizontal"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_ban"/>
+
+            </LinearLayout>
 
             <io.taucoin.news.publishing.ui.customviews.AutoLinkTextView
+                android:layout_toEndOf="@+id/ll_left"
                 android:id="@+id/tv_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -118,6 +147,7 @@
                 android:textAppearance="@style/TextAppearanceBody1" />
 
             <TextView
+                android:layout_toEndOf="@+id/ll_left"
                 android:layout_below="@+id/tv_msg"
                 android:id="@+id/tv_link"
                 android:layout_width="wrap_content"
@@ -160,22 +190,6 @@
             android:gravity="center_vertical"
             android:layout_marginStart="@dimen/widget_size_15"
             android:layout_marginEnd="@dimen/widget_size_15">
-
-            <FrameLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/iv_ban"
-                    android:layout_width="@dimen/widget_size_26"
-                    android:layout_height="@dimen/widget_size_26"
-                    android:padding="@dimen/widget_size_4"
-                    android:layout_gravity="center_horizontal"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/icon_ban_gray"/>
-
-            </FrameLayout>
 
             <LinearLayout
                 android:gravity="center_horizontal|center"

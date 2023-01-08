@@ -42,9 +42,9 @@ import io.taucoin.news.publishing.core.utils.ObservableUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
 import io.taucoin.news.publishing.core.utils.UsersUtil;
+import io.taucoin.news.publishing.core.utils.media.MediaUtil;
 import io.taucoin.news.publishing.databinding.FragmentNewsTabBinding;
 import io.taucoin.news.publishing.databinding.ItemHomeNewsBinding;
-import io.taucoin.news.publishing.databinding.ItemNewsBinding;
 import io.taucoin.news.publishing.ui.BaseActivity;
 import io.taucoin.news.publishing.ui.BaseFragment;
 import io.taucoin.news.publishing.ui.community.CommunityViewModel;
@@ -424,6 +424,11 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
 //    }
 
     @Override
+    public void onPicturePreview(String picturePath) {
+        MediaUtil.previewPicture(activity, picturePath);
+    }
+
+    @Override
     public void onRetweetClicked(UserAndTx tx) {
         if (retweetDialog != null && retweetDialog.isShowing()) {
             retweetDialog.closeDialog();
@@ -437,6 +442,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                         Intent intent = new Intent();
                         intent.putExtra(IntentExtra.DATA, tx.memo);
                         intent.putExtra(IntentExtra.LINK, tx.link);
+                        intent.putExtra(IntentExtra.PICTURE_PATH, tx.picturePath);
                         ActivityUtil.startActivityForResult(intent, activity, NewsCreateActivity.class,
                                 CHOOSE_REQUEST_CODE);
                     } else if (code == R.mipmap.icon_share_gray) {

@@ -39,6 +39,7 @@ import io.taucoin.news.publishing.core.storage.sqlite.repo.TxRepository;
 import io.taucoin.news.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.news.publishing.core.utils.ChainIDUtil;
 import io.taucoin.news.publishing.core.utils.DateUtil;
+import io.taucoin.news.publishing.core.utils.FileUtil;
 import io.taucoin.news.publishing.core.utils.ObservableUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.rlp.ByteUtil;
@@ -358,6 +359,8 @@ class TxQueueManager {
             if (pinnedTime > 0) {
                 tx.pinnedTime = pinnedTime;
             }
+            String picturePath = txQueue.picturePath;
+            tx.picturePath = FileUtil.copyNewsPicture(picturePath, tx.txID);
             txRepo.addTransaction(tx);
             logger.info("createTransaction in sendTxQueue chainID::{}, txID::{}, version::{}, senderPk::{}," +
                         "receiverPk::{}, nonce::{}, status::{}, memo::{}", 

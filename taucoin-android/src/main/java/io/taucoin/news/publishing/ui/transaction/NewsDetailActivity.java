@@ -42,6 +42,7 @@ import io.taucoin.news.publishing.core.utils.SpanUtils;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
 import io.taucoin.news.publishing.core.utils.UsersUtil;
+import io.taucoin.news.publishing.core.utils.media.MediaUtil;
 import io.taucoin.news.publishing.databinding.ActivityNewsDetailBinding;
 import io.taucoin.news.publishing.databinding.ItemNewsBinding;
 import io.taucoin.news.publishing.databinding.ItemNewsDetailHeaderBinding;
@@ -119,8 +120,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
 
         headerBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
                 R.layout.item_news_detail_header, null, false);
-        headerBinding.news.ivBan.setImageResource(R.mipmap.icon_ban_disabled);
-        headerBinding.news.ivBan.setEnabled(false);
+        headerBinding.news.ivBan.setVisibility(View.GONE);
         headerBinding.news.ivLongPress.setVisibility(View.INVISIBLE);
         headerBinding.news.ivArrow.setVisibility(View.INVISIBLE);
         binding.txList.addHeaderView(headerBinding.getRoot());
@@ -241,6 +241,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
                 int linkDrawableSize = binding.getRoot().getResources().getDimensionPixelSize(R.dimen.widget_size_14);
                 DrawablesUtil.setEndDrawable(headerBinding.news.tvLink, R.mipmap.icon_share_link, linkDrawableSize);
             }
+            headerBinding.news.ivPicture.setVisibility(StringUtil.isNotEmpty(tx.picturePath) ? View.VISIBLE : View.GONE);
             setClickListener(headerBinding.news, tx);
             setAutoLinkListener(headerBinding.news.tvMsg, tx);
         }
@@ -290,6 +291,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
                             Intent intent = new Intent();
                             intent.putExtra(IntentExtra.DATA, tx.memo);
                             intent.putExtra(IntentExtra.LINK, tx.link);
+                            intent.putExtra(IntentExtra.PICTURE_PATH, tx.picturePath);
                             ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
                         } else if (code == R.mipmap.icon_share_gray) {
                             loadChainLink(tx);
@@ -320,6 +322,9 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
         });
         txViewModel.getDeletedResult().observe(this, isSuccess -> {
             finish();
+        });
+        binding.ivPicture.setOnClickListener(view -> {
+            MediaUtil.previewPicture(this, tx.picturePath);
         });
     }
 

@@ -42,6 +42,7 @@ import io.taucoin.news.publishing.core.utils.ObservableUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
 import io.taucoin.news.publishing.core.utils.UsersUtil;
+import io.taucoin.news.publishing.core.utils.media.MediaUtil;
 import io.taucoin.news.publishing.databinding.FragmentTxsMarketTabBinding;
 import io.taucoin.news.publishing.ui.BaseActivity;
 import io.taucoin.news.publishing.ui.BaseFragment;
@@ -426,6 +427,11 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
+    public void onPicturePreview(String picturePath) {
+        MediaUtil.previewPicture(activity, picturePath);
+    }
+
+    @Override
     public void onRetweetClicked(UserAndTx tx) {
         if (retweetDialog != null && retweetDialog.isShowing()) {
             retweetDialog.closeDialog();
@@ -439,6 +445,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                         Intent intent = new Intent();
                         intent.putExtra(IntentExtra.DATA, tx.memo);
                         intent.putExtra(IntentExtra.LINK, tx.link);
+                        intent.putExtra(IntentExtra.PICTURE_PATH, tx.picturePath);
                         ActivityUtil.startActivity(intent, activity, NewsCreateActivity.class);
                     } else if (code == R.mipmap.icon_share_gray) {
                         loadChainLink(tx);

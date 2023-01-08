@@ -42,6 +42,7 @@ import io.taucoin.news.publishing.core.utils.ObservableUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
 import io.taucoin.news.publishing.core.utils.UsersUtil;
+import io.taucoin.news.publishing.core.utils.media.MediaUtil;
 import io.taucoin.news.publishing.databinding.FragmentTxsMarketTabBinding;
 import io.taucoin.news.publishing.ui.BaseActivity;
 import io.taucoin.news.publishing.ui.BaseFragment;
@@ -349,6 +350,11 @@ public class SearchNewsFragment extends BaseFragment implements View.OnClickList
     public void onLinkClick(String link) {
         KeyboardUtils.hideSoftInput(activity);
         ActivityUtil.openUri(activity, link);
+    }
+
+    @Override
+    public void onPicturePreview(String picturePath) {
+        MediaUtil.previewPicture(activity, picturePath);
     }
 
     @Override

@@ -95,8 +95,8 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             setClickListener(binding, tx);
 
             boolean isMyself = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
-            binding.ivBan.setImageResource(isMyself ? R.mipmap.icon_ban_disabled : R.mipmap.icon_ban_gray);
-            binding.ivBan.setEnabled(!isMyself);
+            binding.ivBan.setVisibility(isMyself ? View.GONE : View.VISIBLE);
+            binding.ivPicture.setVisibility(StringUtil.isEmpty(tx.picturePath) ? View.GONE : View.VISIBLE);
 
             double showPower = Logarithm.log2(2 + tx.power);
             String power = FmtMicrometer.formatThreeDecimal(showPower);
@@ -217,6 +217,11 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
                 }
                 return false;
             });
+            binding.ivPicture.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onPicturePreview(tx.picturePath);
+                }
+            });
         }
     }
 
@@ -228,6 +233,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
     }
 
     public interface ClickListener {
+        void onPicturePreview(String picturePath);
         void onRetweetClicked(UserAndTx tx);
         void onReplyClicked(UserAndTx tx);
         void onChatClicked(UserAndTx tx);
@@ -268,6 +274,9 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             }
             if (isSame && oldItem.favoriteTime != newItem.favoriteTime) {
                 isSame = false;
+            }
+            if (isSame && StringUtil.isNotEquals(oldItem.picturePath, newItem.picturePath)) {
+                return false;
             }
             return isSame;
         }

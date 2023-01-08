@@ -31,6 +31,7 @@ public class TxQueue implements Parcelable {
     public String memo;                     // 数据库版本为1字段，新版本无用
     public byte[] content;                  // 交易内容编码后内容
     public int txType;                      // 交易类型
+    public String picturePath;              // 图片存储路径
 
     @Ignore
     public int newsLineCount;               // 交易内容行数
@@ -66,6 +67,7 @@ public class TxQueue implements Parcelable {
         queueType = in.readInt();
         txType = in.readInt();
         queueTime = in.readLong();
+        picturePath = in.readString();
         int len = in.readInt();
         if (len > 0) {
             content = new byte[len];
@@ -84,6 +86,7 @@ public class TxQueue implements Parcelable {
         dest.writeInt(queueType);
         dest.writeInt(txType);
         dest.writeLong(queueTime);
+        dest.writeString(picturePath);
         dest.writeInt(content != null ? content.length : 0);
         dest.writeByteArray(content);
     }

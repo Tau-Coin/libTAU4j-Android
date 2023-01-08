@@ -39,6 +39,10 @@ public class MultimediaUtil {
     public static final int MAX_IMAGE_WIDTH = 100;              // px
     public static final int MAX_IMAGE_HEIGHT = 100;             // px
 
+    public static final int MAX_NEWS_IMAGE_SIZE = MAX_IMAGE_SIZE * 10; // byte
+    public static final int MAX_NEWS_IMAGE_WIDTH = 850;         // px
+    public static final int MAX_NEWS_IMAGE_HEIGHT = 480;        // px
+
     private static int calculateInSampleSize(BitmapFactory.Options options, int maxWidth, int maxHeight) {
         final int height = options.outHeight;
         final int width = options.outWidth;
@@ -74,10 +78,11 @@ public class MultimediaUtil {
 
     public static void compressImage(String originPath, String compressPath)
             throws IOException {
-        compressImage(originPath, compressPath, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
+        compressImage(originPath, compressPath, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT, MAX_IMAGE_SIZE, true);
     }
 
-    public static void compressImage(String originPath, String compressPath, int maxWidth, int maxHeight)
+    public static void compressImage(String originPath, String compressPath, int maxWidth,
+                                     int maxHeight, int maxImageSize, boolean isGzipCompress)
             throws IOException {
         logger.debug("compressImage length::{}", new File(originPath).length());
         Bitmap tagBitmap = getSmallBitmap(originPath, maxWidth, maxHeight);
@@ -86,8 +91,8 @@ public class MultimediaUtil {
         tagBitmap.compress(Bitmap.CompressFormat.WEBP, quality, baos);
         // 循环判断如果压缩后图片是否大于MAX_IMAGE_SIZE,大于继续压缩
         int minQuality = 20;
-        int gzipSize = baos.toByteArray().length;
-        while (gzipSize > MAX_IMAGE_SIZE) {
+        int imageSize = baos.toByteArray().length;
+        while (imageSize > maxImageSize) {
             quality -= 5;
 
             if (quality < minQuality) {
@@ -96,22 +101,30 @@ public class MultimediaUtil {
                 tagBitmap = imageScale(tagBitmap, width, height, true);
                 baos.reset();
                 tagBitmap.compress(Bitmap.CompressFormat.WEBP, minQuality, baos);
-                byte[] zipData = ZipUtil.gZip(baos.toByteArray());
-                if (zipData != null) {
-                    gzipSize = zipData.length;
+                if (isGzipCompress) {
+                    byte[] zipData = ZipUtil.gZip(baos.toByteArray());
+                    if (zipData != null) {
+                        imageSize = zipData.length;
+                    }
+                } else  {
+                    imageSize = baos.toByteArray().length;
                 }
-                logger.debug("compressImage width::{}, height::{}, bytesCount::{}, minQuality::{}, gzipSize::{}",
-                        width, height, baos.toByteArray().length, minQuality, gzipSize);
+                logger.debug("compressImage width::{}, height::{}, bytesCount::{}, minQuality::{}, imageSize::{}",
+                        width, height, baos.toByteArray().length, minQuality, imageSize);
                 continue;
             }
             baos.reset();
             tagBitmap.compress(Bitmap.CompressFormat.WEBP, quality, baos);
-            byte[] zipData = ZipUtil.gZip(baos.toByteArray());
-            if (zipData != null) {
-                gzipSize = zipData.length;
+            if (isGzipCompress) {
+                byte[] zipData = ZipUtil.gZip(baos.toByteArray());
+                if (zipData != null) {
+                    imageSize = zipData.length;
+                }
+            } else {
+                imageSize = baos.toByteArray().length;
             }
             logger.debug("compressImage width::{}, height::{}, bytesCount::{}, minQuality::{}, gzipSize::{}",
-                    tagBitmap.getWidth(), tagBitmap.getHeight(), baos.toByteArray().length, minQuality, gzipSize);
+                    tagBitmap.getWidth(), tagBitmap.getHeight(), baos.toByteArray().length, minQuality, imageSize);
         }
         tagBitmap.recycle();
 

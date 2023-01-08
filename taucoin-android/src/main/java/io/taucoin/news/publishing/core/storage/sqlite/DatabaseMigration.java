@@ -13,7 +13,8 @@ class DatabaseMigration {
 
     static Migration[] getMigrations(@NonNull Context appContext) {
         return new Migration[] {
-                MIGRATION_1_2
+                MIGRATION_1_2,
+                MIGRATION_2_3
         };
     }
 
@@ -26,14 +27,14 @@ class DatabaseMigration {
             database.execSQL("ALTER TABLE Txs ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0");
         }
     };
-//
-//    private static final Migration MIGRATION_2_3 = new Migration(2, 3) {
-//        @Override
-//        public void migrate(@NonNull SupportSQLiteDatabase database) {
-//            // 添加mining power
-//            database.execSQL("ALTER TABLE Members ADD COLUMN power INTEGER NOT NULL DEFAULT 0");
-//        }
-//    };
+
+    private static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE Txs ADD COLUMN picturePath TEXT");
+            database.execSQL("ALTER TABLE TxQueues ADD COLUMN picturePath TEXT");
+        }
+    };
 //
 //    private static final Migration MIGRATION_3_4 = new Migration(3, 4) {
 //        @Override

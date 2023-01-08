@@ -20,6 +20,7 @@ public class IntentExtra {
     public static final String COIN_NAME = "coinName";
     public static final String CRYPTO_KEY = "cryptoKey";
     public static final String DATA = "data";
+    public static final String PICTURE_PATH = "picturePath";
     public static final String SCAN_KEY_ONLY = "scanKeyOnly";
     public static final String AIRDROP_COIN = "airdropCoin";
     public static final String LINKS_SELECTOR = "airdropLinks";

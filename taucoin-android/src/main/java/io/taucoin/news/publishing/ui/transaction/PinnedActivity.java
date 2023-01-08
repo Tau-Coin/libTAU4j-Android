@@ -26,6 +26,7 @@ import io.taucoin.news.publishing.core.utils.LinkUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
 import io.taucoin.news.publishing.core.utils.UsersUtil;
+import io.taucoin.news.publishing.core.utils.media.MediaUtil;
 import io.taucoin.news.publishing.databinding.ActivityPinnedBinding;
 import io.taucoin.news.publishing.ui.BaseActivity;
 import io.taucoin.news.publishing.ui.community.CommunityViewModel;
@@ -190,6 +191,11 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
     }
 
     @Override
+    public void onPicturePreview(String picturePath) {
+        MediaUtil.previewPicture(this, picturePath);
+    }
+
+    @Override
     public void onRetweetClicked(UserAndTx tx) {
         if (retweetDialog != null && retweetDialog.isShowing()) {
             retweetDialog.closeDialog();
@@ -203,6 +209,7 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
                         Intent intent = new Intent();
                         intent.putExtra(IntentExtra.DATA, tx.memo);
                         intent.putExtra(IntentExtra.LINK, tx.link);
+                        intent.putExtra(IntentExtra.PICTURE_PATH, tx.picturePath);
                         ActivityUtil.startActivity(intent, this, NewsCreateActivity.class);
                     } else if (code == R.mipmap.icon_share_gray) {
                         loadChainLink(tx);

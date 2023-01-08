@@ -157,10 +157,54 @@
 
                 </LinearLayout>
 
+                <RelativeLayout
+                    android:id="@+id/rl_add_picture"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/color_bg"
+                    android:onClick="@{listener::onClick}"
+                    android:layout_marginStart="@dimen/widget_size_0"
+                    android:layout_marginEnd="@dimen/widget_size_0"
+                    android:layout_marginTop="@dimen/widget_size_2">
+
+                    <ImageView
+                        android:id="@+id/iv_add_logo"
+                        android:layout_width="@dimen/widget_size_50"
+                        android:layout_height="@dimen/widget_size_50"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
+                        android:contentDescription="@null"
+                        android:src="@mipmap/icon_add_gray"/>
+
+                    <ImageView
+                        android:id="@+id/iv_picture"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
+                        android:minHeight="@dimen/widget_size_120"
+                        android:contentDescription="@null"
+                        android:onClick="@{listener::onClick}"/>
+
+                    <ImageView
+                        android:visibility="invisible"
+                        android:id="@+id/iv_delete"
+                        android:layout_width="@dimen/widget_size_24"
+                        android:layout_height="@dimen/widget_size_24"
+                        android:layout_marginTop="@dimen/widget_size_10"
+                        android:layout_marginEnd="@dimen/widget_size_15"
+                        android:layout_alignParentEnd="true"
+                        android:contentDescription="@null"
+                        android:onClick="@{listener::onClick}"
+                        android:src="@mipmap/icon_close_drawer"/>
+
+                </RelativeLayout>
+
                 <io.taucoin.news.publishing.ui.customviews.FilterEditText
                     android:id="@+id/et_news"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/widget_size_205"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/widget_size_120"
                     android:layout_marginStart="@dimen/widget_size_20"
                     android:layout_marginTop="@dimen/widget_size_10"
                     android:layout_marginEnd="@dimen/widget_size_20"
@@ -181,7 +225,6 @@
                     android:id="@+id/et_link"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxHeight="@dimen/widget_size_120"
                     android:layout_marginStart="@dimen/widget_size_20"
                     android:layout_marginEnd="@dimen/widget_size_20"
                     android:paddingTop="@dimen/widget_size_10"
