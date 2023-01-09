@@ -46,6 +46,7 @@ import io.taucoin.news.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.news.publishing.core.utils.ChainIDUtil;
 import io.taucoin.news.publishing.core.utils.LinkUtil;
 import io.taucoin.news.publishing.core.utils.DateUtil;
+import io.taucoin.news.publishing.core.utils.PictureSplitUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.UsersUtil;
 import io.taucoin.news.publishing.core.utils.rlp.ByteUtil;
@@ -750,6 +751,26 @@ public class TauListenHandler {
                 return;
             }
         }
+    }
+
+    /**
+     * 上报图片内容
+     * @param alert libTAU上报
+     */
+    public void onPicSlice(byte[] chainID, byte[] newsHash, byte[] key, byte[] slice) {
+		String hash = ByteUtil.toHexString(newsHash);
+		//如果图片完成切片，直接return
+		if(PictureSplitUtil.isSlicesGetCompleted(hash))
+			return;
+		//图片未完成切片，看是否需要存储
+		String sliceName = ByteUtil.toHexString(key);
+		if(!PictureSplitUtil.isSliceExists(hash, sliceName)){
+			try {
+				PictureSplitUtil.savePictureSlices(hash, sliceName, slice);
+			} catch (Exception e) {
+				logger.error("pic slice alert save pic error::", e);
+			}
+		}
     }
 
     /**

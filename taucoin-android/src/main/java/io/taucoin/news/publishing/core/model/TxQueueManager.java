@@ -40,6 +40,7 @@ import io.taucoin.news.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.news.publishing.core.utils.ChainIDUtil;
 import io.taucoin.news.publishing.core.utils.DateUtil;
 import io.taucoin.news.publishing.core.utils.FileUtil;
+import io.taucoin.news.publishing.core.utils.PictureSplitUtil;
 import io.taucoin.news.publishing.core.utils.ObservableUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.rlp.ByteUtil;
@@ -297,7 +298,18 @@ class TxQueueManager {
 		if(mode == 2) {
 			Tx tx = txRepo.getTxByQueueID(txQueue.queueID);
 			transaction = createTransaction(account, txQueue, tx.timestamp, tx.nonce);
-			boolean isSubmitSuccess = daemon.submitTransaction(transaction);
+			boolean isSubmitSuccess = false;
+			if(txQueue.txType == Constants.NEWS_TX_TYPE) {
+				List<byte[]> slices = null;
+				try {
+					slices = PictureSplitUtil.splitPicture(txQueue.picturePath);
+                } catch (Exception e) {
+                    logger.error("Pic slices error::", e);
+                }
+				isSubmitSuccess = daemon.submitNewsTransaction(transaction, slices);
+			} else {
+				isSubmitSuccess = daemon.submitTransaction(transaction);
+			}
 			if (!isSubmitSuccess) {
 				return true;
 			}
@@ -317,7 +329,18 @@ class TxQueueManager {
 			timestamp = daemon.getSessionTime();
 			nonce = tx.nonce;
 			transaction = createTransaction(account, txQueue, timestamp, tx.nonce);
-			boolean isSubmitSuccess = daemon.submitTransaction(transaction);
+			boolean isSubmitSuccess = false;
+			if(txQueue.txType == Constants.NEWS_TX_TYPE) {
+				List<byte[]> slices = null;
+				try {
+					slices = PictureSplitUtil.splitPicture(txQueue.picturePath);
+                } catch (Exception e) {
+                    logger.error("Pic slices error::", e);
+                }
+				isSubmitSuccess = daemon.submitNewsTransaction(transaction, slices);
+			} else {
+				isSubmitSuccess = daemon.submitTransaction(transaction);
+			}
 			if (!isSubmitSuccess) {
 				return true;
 			}
@@ -329,7 +352,18 @@ class TxQueueManager {
 			timestamp = daemon.getSessionTime();
 			transaction = createTransaction(account, txQueue, timestamp, 0);
 			nonce = transaction.getNonce();
-			boolean isSubmitSuccess = daemon.submitTransaction(transaction);
+			boolean isSubmitSuccess = false;
+			if(txQueue.txType == Constants.NEWS_TX_TYPE) {
+				List<byte[]> slices = null;
+				try {
+					slices = PictureSplitUtil.splitPicture(txQueue.picturePath);
+                } catch (Exception e) {
+                    logger.error("Pic slices error::", e);
+                }
+				isSubmitSuccess = daemon.submitNewsTransaction(transaction, slices);
+			} else {
+				isSubmitSuccess = daemon.submitTransaction(transaction);
+			}
 			if (!isSubmitSuccess) {
 				return true;
 			}
@@ -359,9 +393,14 @@ class TxQueueManager {
             if (pinnedTime > 0) {
                 tx.pinnedTime = pinnedTime;
             }
-            String picturePath = txQueue.picturePath;
-            tx.picturePath = FileUtil.copyNewsPicture(picturePath, tx.txID);
-            txRepo.addTransaction(tx);
+			//如果是news交易，则需要复制图片到指定目录，并且修改PicPath(tx, txQueue)
+			if(txType == NEWS_TX.getType()) {
+				String picturePath = txQueue.picturePath;
+				tx.picturePath = FileUtil.copyNewsPicture(picturePath, tx.txID);
+				txQueue.picturePath = tx.picturePath;
+				txQueueRepos.updateQueue(txQueue);
+			}
+			txRepo.addTransaction(tx);
             logger.info("createTransaction in sendTxQueue chainID::{}, txID::{}, version::{}, senderPk::{}," +
                         "receiverPk::{}, nonce::{}, status::{}, memo::{}", 
                         tx.chainID, tx.txID, tx.version, tx.senderPk, tx.receiverPk, tx.nonce, tx.txStatus, tx.memo);

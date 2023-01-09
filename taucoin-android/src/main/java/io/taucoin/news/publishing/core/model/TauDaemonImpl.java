@@ -376,6 +376,20 @@ public class TauDaemonImpl extends TauDaemon {
     }
 
     /**
+     * 提交news交易到交易池
+     * @param tx 交易对象
+     * @param slices 图片内容
+     */
+    @Override
+    public boolean submitNewsTransaction(Transaction tx, List<byte[]> slices) {
+        if (isRunning) {
+            logger.info("submitNesTransaction txID::{}, nonce::{}", tx.getTxID().to_hex(), tx.getNonce());
+            return sessionManager.submitNewsTransaction(tx, slices);
+        }
+        return false;
+	}
+
+    /**
      * 跟随链
      * @param chainID 链ID
      * @param peers 链上peers

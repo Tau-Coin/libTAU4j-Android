@@ -15,6 +15,7 @@ import org.libTAU4j.alerts.BlockChainForkPointBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewHeadBlockAlert;
 import org.libTAU4j.alerts.BlockChainNewTransactionAlert;
 import org.libTAU4j.alerts.BlockChainOnlinePeerAlert;
+import org.libTAU4j.alerts.BlockChainPicSliceAlert;
 import org.libTAU4j.alerts.BlockChainRollbackBlockAlert;
 import org.libTAU4j.alerts.BlockChainStateArrayAlert;
 import org.libTAU4j.alerts.BlockChainSyncingBlockAlert;
@@ -169,6 +170,9 @@ public class TauDaemonAlertHandler {
                 break;
             case BLOCK_CHAIN_ONLINE_PEER:
                 onlinePeer(alert);
+                break;
+            case BLOCK_CHAIN_PIC_SLICE:
+                onPicSlice(alert);
                 break;
             default:
                 logger.warn("Unknown alert");
@@ -434,6 +438,20 @@ public class TauDaemonAlertHandler {
         byte[] chainId = a.get_chain_id();
         List<Account> accounts = a.get_accounts();
         tauListenHandler.onStateArray(chainId, accounts, false);
+    }
+
+    /**
+     * 上报图片内容
+     * @param alert libTAU上报
+     */
+    private void onPicSlice(Alert alert) {
+        BlockChainPicSliceAlert a = (BlockChainPicSliceAlert) alert;
+        logger.info(a.get_message());
+        byte[] chainId = a.get_chain_id();
+        byte[] newsHash = a.get_hash();
+        byte[] key = a.get_key();
+        byte[] slice = a.get_slice();
+        tauListenHandler.onPicSlice(chainId, newsHash, key, slice);
     }
 
     /**

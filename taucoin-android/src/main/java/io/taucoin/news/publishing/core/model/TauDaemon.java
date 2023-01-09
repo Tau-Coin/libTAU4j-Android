@@ -1012,6 +1012,13 @@ public abstract class TauDaemon {
     public abstract boolean submitTransaction(Transaction tx);
 
     /**
+     * 提交news交易到交易池
+     * @param tx 交易对象
+     * @param slices 图片内容
+     */
+    public abstract boolean submitNewsTransaction(Transaction tx, List<byte[]> slices);
+
+    /**
      * 跟随链
      * @param chainID 链ID
      * @param peers 链上peers
