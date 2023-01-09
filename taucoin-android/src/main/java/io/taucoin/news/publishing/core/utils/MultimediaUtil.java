@@ -35,11 +35,12 @@ import java.io.IOException;
  * */
 public class MultimediaUtil {
     private static final Logger logger = LoggerFactory.getLogger("MultimediaUtil");
-    private static final int MAX_IMAGE_SIZE = 988;              // byte
+    protected static final int MAX_IMAGE_SIZE = 988;              // byte
     public static final int MAX_IMAGE_WIDTH = 100;              // px
     public static final int MAX_IMAGE_HEIGHT = 100;             // px
 
-    public static final int MAX_NEWS_IMAGE_SIZE = MAX_IMAGE_SIZE * 10; // byte
+    public static final int IMAGE_SLICES_NUM = 10;
+    public static final int MAX_NEWS_IMAGE_SIZE = MAX_IMAGE_SIZE * IMAGE_SLICES_NUM; // byte
     public static final int MAX_NEWS_IMAGE_WIDTH = 850;         // px
     public static final int MAX_NEWS_IMAGE_HEIGHT = 480;        // px
 
