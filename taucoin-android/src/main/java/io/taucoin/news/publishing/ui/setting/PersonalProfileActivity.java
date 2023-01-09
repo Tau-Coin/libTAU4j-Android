@@ -81,14 +81,14 @@ public class PersonalProfileActivity extends BaseActivity {
     public void onStart() {
         super.onStart();
         disposables.add(viewModel.observeCurrentUser()
-            .observeOn(Schedulers.io())
-            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(user -> {
                 String profile = ViewUtils.getText(binding.etPersonalProfile);
                 if (StringUtil.isEmpty(profile)) {
                     binding.etPersonalProfile.setText(user.profile);
                 }
-            }));
+            }, it -> {}));
     }
 
 
