@@ -301,11 +301,13 @@ class TxQueueManager {
 			boolean isSubmitSuccess = false;
 			if(txQueue.txType == Constants.NEWS_TX_TYPE) {
 				List<byte[]> slices = null;
-				try {
-					slices = PictureSplitUtil.splitPicture(txQueue.picturePath);
-                } catch (Exception e) {
-                    logger.error("Pic slices error::", e);
-                }
+				if(StringUtil.isNotEmpty(txQueue.picturePath)) {
+					try {
+						slices = PictureSplitUtil.splitPicture(txQueue.picturePath);
+					} catch (Exception e) {
+						logger.error("Pic slices error::", e);
+					}
+				}
 				isSubmitSuccess = daemon.submitNewsTransaction(transaction, slices);
 			} else {
 				isSubmitSuccess = daemon.submitTransaction(transaction);
@@ -332,10 +334,12 @@ class TxQueueManager {
 			boolean isSubmitSuccess = false;
 			if(txQueue.txType == Constants.NEWS_TX_TYPE) {
 				List<byte[]> slices = null;
-				try {
-					slices = PictureSplitUtil.splitPicture(txQueue.picturePath);
-                } catch (Exception e) {
-                    logger.error("Pic slices error::", e);
+				if(StringUtil.isNotEmpty(txQueue.picturePath)) {
+					try {
+						slices = PictureSplitUtil.splitPicture(txQueue.picturePath);
+					} catch (Exception e) {
+						logger.error("Pic slices error::", e);
+					}
                 }
 				isSubmitSuccess = daemon.submitNewsTransaction(transaction, slices);
 			} else {
@@ -355,10 +359,12 @@ class TxQueueManager {
 			boolean isSubmitSuccess = false;
 			if(txQueue.txType == Constants.NEWS_TX_TYPE) {
 				List<byte[]> slices = null;
-				try {
-					slices = PictureSplitUtil.splitPicture(txQueue.picturePath);
-                } catch (Exception e) {
-                    logger.error("Pic slices error::", e);
+				if(StringUtil.isNotEmpty(txQueue.picturePath)) {
+					try {
+						slices = PictureSplitUtil.splitPicture(txQueue.picturePath);
+					} catch (Exception e) {
+						logger.error("Pic slices error::", e);
+					}
                 }
 				isSubmitSuccess = daemon.submitNewsTransaction(transaction, slices);
 			} else {
@@ -394,7 +400,7 @@ class TxQueueManager {
                 tx.pinnedTime = pinnedTime;
             }
 			//如果是news交易，则需要复制图片到指定目录，并且修改PicPath(tx, txQueue)
-			if(txType == NEWS_TX.getType()) {
+			if(txType == NEWS_TX.getType()&&StringUtil.isNotEmpty(txQueue.picturePath)) {
 				String pictureTempPath = txQueue.picturePath;
 				tx.picturePath = FileUtil.copyNewsPicture(pictureTempPath, tx.txID);
 				txQueue.picturePath = tx.picturePath;

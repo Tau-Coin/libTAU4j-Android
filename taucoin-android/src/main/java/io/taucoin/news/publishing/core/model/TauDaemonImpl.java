@@ -383,7 +383,7 @@ public class TauDaemonImpl extends TauDaemon {
     @Override
     public boolean submitNewsTransaction(Transaction tx, List<byte[]> slices) {
         if (isRunning) {
-            logger.info("submitNesTransaction txID::{}, nonce::{}", tx.getTxID().to_hex(), tx.getNonce());
+            logger.info("submitNewsTransaction txID::{}, nonce::{}", tx.getTxID().to_hex(), tx.getNonce());
             return sessionManager.submitNewsTransaction(tx, slices);
         }
         return false;
