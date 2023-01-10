@@ -109,8 +109,15 @@ public class MultimediaUtil {
                 }
             }
             if (quality < minQuality) {
-                int width = (int) (tagBitmap.getWidth() * 0.90);
-                int height = (int) (tagBitmap.getHeight() * 0.90);
+                float scale;
+                int times = imageSize / maxImageSize;
+                if (times > 1) {
+                    scale = 0.8f;
+                } else {
+                    scale = 0.9f;
+                }
+                int width = (int) (tagBitmap.getWidth() * scale);
+                int height = (int) (tagBitmap.getHeight() * scale);
                 tagBitmap = imageScale(tagBitmap, width, height, true);
                 baos.reset();
                 tagBitmap.compress(Bitmap.CompressFormat.WEBP, minQuality, baos);

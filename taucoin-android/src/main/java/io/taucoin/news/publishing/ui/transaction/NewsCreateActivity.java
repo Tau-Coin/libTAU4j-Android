@@ -466,7 +466,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         if (compressDisposable != null && !compressDisposable.isDisposed()) {
             compressDisposable.dispose();
         }
-        showProgressDialog("Compression...");
+        showProgressDialog("  Compression...  ");
         compressDisposable = Observable.create((ObservableOnSubscribe<String>) emitter -> {
             String compressPath = MultimediaUtil.newsImageCompress(media);
             emitter.onNext(compressPath);
