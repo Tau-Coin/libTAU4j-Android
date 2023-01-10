@@ -235,40 +235,4 @@ public class FileUtil {
     public static String getDumpFileName() {
         return "Dump" + DateUtil.getMillisTime() +".txt";
     }
-
-    public static String copyNewsPicture(String originalPic, String newPicName) {
-        String dataDir = MainApplication.getInstance().getApplicationInfo().dataDir;
-        dataDir += "/pic/" + newPicName;
-        File file = new File(dataDir);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        String newsPicturePath = dataDir + File.separator + newPicName + ".webp";
-        logger.debug("newsPicturePath::{}", newsPicturePath);
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        try {
-            fis = new FileInputStream(originalPic);
-            fos = new FileOutputStream(newsPicturePath);
-            int index;
-            byte[] bytes = new byte[1024];
-            while((index = fis.read(bytes))!=-1) {
-                fos.write(bytes, 0, index);
-            }
-            fos.flush();
-        } catch (IOException e) {
-            logger.error("copyNewsPicture error", e);
-        } finally {
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-                if (fis != null) {
-                    fis.close();
-                }
-            } catch (IOException e) {
-            }
-        }
-        return newsPicturePath;
-    }
 }

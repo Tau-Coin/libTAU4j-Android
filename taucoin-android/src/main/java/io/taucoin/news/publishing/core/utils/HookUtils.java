@@ -31,7 +31,6 @@ class HookUtils {
 
             return (Field) dMethod.invoke(cls, name);
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return null;
     }
@@ -45,7 +44,6 @@ class HookUtils {
             field.setAccessible(true);
             return obj == null ? dMethod.invoke(field, obj) : dMethod.invoke(field, obj);
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return null;
     }

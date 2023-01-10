@@ -28,12 +28,21 @@ public class PictureSplitUtil {
         List<byte[]> list = new ArrayList<>();
         long startTime = System.currentTimeMillis();
         File file = new File(picturePath);
-        logger.debug("splitPicture pictureSize::{}", file.length());
+        if (file.length() > MultimediaUtil.MAX_NEWS_IMAGE_SIZE) {
+            return null;
+        }
+        long fileSize = file.length();
+        int sliceSize = (int) (fileSize / MultimediaUtil.IMAGE_SLICES_NUM);
+        int bigSliceNum = (int) (fileSize % MultimediaUtil.IMAGE_SLICES_NUM);
+        logger.debug("splitPicture pictureSize::{}, picturePath::{}", file.length(), picturePath);
         FileInputStream fis = new FileInputStream(file);
-        byte[] buffer = new byte[MultimediaUtil.MAX_IMAGE_SIZE];
+        byte[] buffer = new byte[sliceSize + 1];
         int num;
         byte[] msg;
         while (true) {
+            if (list.size() >= bigSliceNum && buffer.length != sliceSize) {
+                buffer = new byte[sliceSize];
+            }
             num = fis.read(buffer);
             if (num != -1) {
                 msg = new byte[num];
@@ -46,15 +55,6 @@ public class PictureSplitUtil {
         fis.close();
         long endTime = System.currentTimeMillis();
         logger.debug("splitPicture size::{}, end times::{}ms", list.size(), endTime - startTime);
-        if (list.size() < MultimediaUtil.IMAGE_SLICES_NUM) {
-            for (int i = list.size(); i < MultimediaUtil.IMAGE_SLICES_NUM; i ++) {
-                list.add(new byte[]{});
-            }
-            logger.debug("splitPicture add size::{}", list.size());
-        }
-        for (int i = 0; i < list.size(); i++) {
-            logger.debug("splitPicture slices {}::{}", i + 1, list.get(i).length);
-        }
         return list;
     }
 
@@ -89,7 +89,7 @@ public class PictureSplitUtil {
             return false;
         }
         File[] files = fileDir.listFiles();
-        return files != null && files.length >= MultimediaUtil.IMAGE_SLICES_NUM;
+        return files != null && files.length == MultimediaUtil.IMAGE_SLICES_NUM;
     }
 
     /**
@@ -136,7 +136,7 @@ public class PictureSplitUtil {
                 return fileName1.compareTo(fileName2);
             });
             if (fileList.size() > 0) {
-                String outFileName = filePath + File.separator + sliceDirName + ".webp";
+                String outFileName = filePath + ".webp";
                 FileOutputStream fileOutputStream = new FileOutputStream(outFileName);
                 for (File file : fileList) {
                     logger.debug("fileName::{}", file.getName());
@@ -162,5 +162,41 @@ public class PictureSplitUtil {
             }
         }
         return null;
+    }
+
+    public static String copyNewsPicture(String originalPic, String newPicName) {
+        String dataDir = MainApplication.getInstance().getApplicationInfo().dataDir;
+        dataDir += "/pic";
+        File file = new File(dataDir);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        String newsPicturePath = dataDir + File.separator + newPicName + ".webp";
+        logger.debug("newsPicturePath::{}", newsPicturePath);
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        try {
+            fis = new FileInputStream(originalPic);
+            fos = new FileOutputStream(newsPicturePath);
+            int index;
+            byte[] bytes = new byte[1024];
+            while((index = fis.read(bytes))!=-1) {
+                fos.write(bytes, 0, index);
+            }
+            fos.flush();
+        } catch (IOException e) {
+            logger.error("copyNewsPicture error", e);
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+                if (fis != null) {
+                    fis.close();
+                }
+            } catch (IOException e) {
+            }
+        }
+        return newsPicturePath;
     }
 }

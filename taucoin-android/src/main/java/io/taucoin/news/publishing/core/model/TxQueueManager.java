@@ -402,7 +402,7 @@ class TxQueueManager {
 			//如果是news交易，则需要复制图片到指定目录，并且修改PicPath(tx, txQueue)
 			if(txType == NEWS_TX.getType()&&StringUtil.isNotEmpty(txQueue.picturePath)) {
 				String pictureTempPath = txQueue.picturePath;
-				tx.picturePath = FileUtil.copyNewsPicture(pictureTempPath, tx.txID);
+				tx.picturePath = PictureSplitUtil.copyNewsPicture(pictureTempPath, tx.txID);
 				txQueue.picturePath = tx.picturePath;
 				txQueueRepos.updateQueue(txQueue);
 				//删除临时文件
