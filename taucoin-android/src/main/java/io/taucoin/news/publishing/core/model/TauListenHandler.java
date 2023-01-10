@@ -760,6 +760,7 @@ public class TauListenHandler {
      */
     public void onPicSlice(byte[] chainID, byte[] newsHash, byte[] key, byte[] slice) {
 		String hash = ByteUtil.toHexString(newsHash);
+		logger.info("pic slice alert coming, news hash::{}", hash);
 		//如果图片完成切片，直接return
 		if(PictureSplitUtil.isSlicesGetCompleted(hash))
 			return;
@@ -767,9 +768,11 @@ public class TauListenHandler {
 		String sliceName = ByteUtil.toHexString(key);
 		if(!PictureSplitUtil.isSliceExists(hash, sliceName)){
 			try {
+				logger.info("save pic slice alert news hash::{}, key::{}", hash, sliceName);
 				PictureSplitUtil.savePictureSlices(hash, sliceName, slice);
 				//看以下是否完成图片内容，更新txQueue, tx
 				if(PictureSplitUtil.isSlicesGetCompleted(hash)) {
+					logger.info("save pic slice successfully, news hash::{}", hash);
 					Tx tx = txRepo.getTxByTxID(hash);
 					if(tx != null) {
 						tx.picturePath = hash;
@@ -782,7 +785,7 @@ public class TauListenHandler {
 					}
 				}
 			} catch (Exception e) {
-				logger.error("pic slice alert save pic error::", e);
+				logger.error("pic slice alert save pic error::{}", e);
 			}
 		}
     }
