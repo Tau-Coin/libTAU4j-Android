@@ -400,7 +400,8 @@ class TxQueueManager {
                 tx.pinnedTime = pinnedTime;
             }
 			//如果是news交易，则需要复制图片到指定目录，并且修改PicPath(tx, txQueue)
-			if(txType == NEWS_TX.getType()&&StringUtil.isNotEmpty(txQueue.picturePath)) {
+			//news交易、txQueue不为空-说明带图片交易、tx为空-说明第一次发送
+			if(txType == NEWS_TX.getType()&&StringUtil.isNotEmpty(txQueue.picturePath)&&StringUtil.isEmpty(tx.picturePath)) {
 				String pictureTempPath = txQueue.picturePath;
 				tx.picturePath = PictureSplitUtil.copyNewsPicture(pictureTempPath, tx.txID);
 				txQueue.picturePath = tx.picturePath;
