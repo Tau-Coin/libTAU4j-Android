@@ -119,10 +119,10 @@ public class MediaUtil {
                 .isGif(false)
                 .isPreviewImage(true)
                 .isEnableCrop(false)
-                .isCompress(true)
-                .compressQuality(100)
-                .compressEngine(NewsImageCompressEngine.createCompressEngine())
-                .minimumCompressSize(1)
+                .isCompress(false)
+//                .compressQuality(100)
+//                .compressEngine(NewsImageCompressEngine.createCompressEngine())
+//                .minimumCompressSize(1)
                 .forResult(PictureConfig.CHOOSE_REQUEST);
     }
 

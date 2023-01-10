@@ -20,8 +20,11 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.taucoin.news.publishing.MainApplication;
 import io.taucoin.news.publishing.R;
@@ -34,6 +37,7 @@ import io.taucoin.news.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.news.publishing.core.utils.ChainIDUtil;
 import io.taucoin.news.publishing.core.utils.FileUtil;
 import io.taucoin.news.publishing.core.utils.FmtMicrometer;
+import io.taucoin.news.publishing.core.utils.MultimediaUtil;
 import io.taucoin.news.publishing.core.utils.ObservableUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
@@ -46,6 +50,7 @@ import io.taucoin.news.publishing.ui.community.CommunityListAdapter;
 import io.taucoin.news.publishing.ui.community.CommunityViewModel;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
 import io.taucoin.news.publishing.ui.customviews.CommunitiesPopUpDialog;
+import io.taucoin.news.publishing.ui.customviews.ProgressManager;
 import io.taucoin.news.publishing.ui.setting.FontSizeActivity;
 
 /**
@@ -58,6 +63,7 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     private CommunityListAdapter adapter;
     private CommunityViewModel communityViewModel;
     private final CompositeDisposable disposables = new CompositeDisposable();
+    private Disposable compressDisposable;
     private final List<Member> communityList = new ArrayList<>();
     private CommunitiesPopUpDialog popUpDialog;
     private String chainID;
@@ -324,6 +330,9 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     protected void onStop() {
         super.onStop();
         disposables.clear();
+        if (compressDisposable != null && !compressDisposable.isDisposed()) {
+            compressDisposable.dispose();
+        }
     }
 
     @Override
@@ -444,14 +453,32 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                     List<LocalMedia> result = PictureSelector.obtainMultipleResult(data);
                     if (result != null && result.size() > 0) {
                         LocalMedia media = result.get(0);
-                        loadNewsImageView(media.getCompressPath());
+                        compressNewsImage(media);
                     }
-                    MediaUtil.deleteAllCacheImageFile();
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    private void compressNewsImage(LocalMedia media) {
+        if (compressDisposable != null && !compressDisposable.isDisposed()) {
+            compressDisposable.dispose();
+        }
+        showProgressDialog("Compression...");
+        compressDisposable = Observable.create((ObservableOnSubscribe<String>) emitter -> {
+            String compressPath = MultimediaUtil.newsImageCompress(media);
+            emitter.onNext(compressPath);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(compressPath -> {
+                closeProgressDialog();
+                loadNewsImageView(compressPath);
+                MediaUtil.deleteAllCacheImageFile();
+            }, it -> {});
+
     }
 
     private void loadNewsImageView(String imagePath) {

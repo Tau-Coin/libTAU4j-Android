@@ -15,9 +15,12 @@
  */
 package io.taucoin.news.publishing.core.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+
+import com.luck.picture.lib.entity.LocalMedia;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +29,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import io.taucoin.news.publishing.MainApplication;
+import io.taucoin.news.publishing.core.utils.media.MediaUtil;
 
 /**
  *
@@ -94,11 +100,17 @@ public class MultimediaUtil {
         int minQuality = 20;
         int imageSize = baos.toByteArray().length;
         while (imageSize > maxImageSize) {
-            quality -= 5;
-
+            if (quality >= minQuality) {
+                int times = imageSize / maxImageSize;
+                if (times > 1) {
+                    quality -= 15;
+                } else {
+                    quality -= 5;
+                }
+            }
             if (quality < minQuality) {
-                int width = (int) (tagBitmap.getWidth() * 0.98);
-                int height = (int) (tagBitmap.getHeight() * 0.98);
+                int width = (int) (tagBitmap.getWidth() * 0.90);
+                int height = (int) (tagBitmap.getHeight() * 0.90);
                 tagBitmap = imageScale(tagBitmap, width, height, true);
                 baos.reset();
                 tagBitmap.compress(Bitmap.CompressFormat.WEBP, minQuality, baos);
@@ -110,8 +122,8 @@ public class MultimediaUtil {
                 } else  {
                     imageSize = baos.toByteArray().length;
                 }
-                logger.debug("compressImage width::{}, height::{}, bytesCount::{}, minQuality::{}, imageSize::{}",
-                        width, height, baos.toByteArray().length, minQuality, imageSize);
+                logger.debug("compressImage width::{}, height::{}, bytesCount::{}, quality::{}, minQuality::{}, imageSize::{}",
+                        width, height, baos.toByteArray().length, quality, minQuality, imageSize);
                 continue;
             }
             baos.reset();
@@ -124,8 +136,8 @@ public class MultimediaUtil {
             } else {
                 imageSize = baos.toByteArray().length;
             }
-            logger.debug("compressImage width::{}, height::{}, bytesCount::{}, minQuality::{}, gzipSize::{}",
-                    tagBitmap.getWidth(), tagBitmap.getHeight(), baos.toByteArray().length, minQuality, imageSize);
+            logger.debug("compressImage width::{}, height::{}, bytesCount::{}, quality::{}, minQuality::{}, imageSize::{}",
+                    tagBitmap.getWidth(), tagBitmap.getHeight(), baos.toByteArray().length, quality, minQuality, imageSize);
         }
         tagBitmap.recycle();
 
@@ -155,5 +167,47 @@ public class MultimediaUtil {
             bitmap.recycle();
         }
         return options;
+    }
+
+    public static String newsImageCompress(LocalMedia media) {
+        String path = MediaUtil.getImagePath(media);
+        Context context = MainApplication.getInstance();
+        String compressPath = context.getApplicationInfo().dataDir + "/pic_temp/compress_" + DateUtil.getMillisTime() + ".webp";
+        try {
+            File file = new File(compressPath);
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdir();
+            }
+            MultimediaUtil.compressImage(path, compressPath, MultimediaUtil.MAX_NEWS_IMAGE_WIDTH,
+                    MultimediaUtil.MAX_NEWS_IMAGE_HEIGHT, MultimediaUtil.MAX_NEWS_IMAGE_SIZE, false);
+            media.setCompressed(true);
+            media.setCompressPath(compressPath);
+            logger.debug("path::{}", path);
+
+            logger.debug("是否压缩:" + media.isCompressed());
+            logger.debug("压缩路径:" + media.getCompressPath());
+            long compressSize = 0;
+            if (media.isCompressed()) {
+                BitmapFactory.Options options = MultimediaUtil.getBitmapOption(media.getCompressPath());
+                logger.debug("压缩宽高: " + options.outWidth + "x" + options.outHeight);
+                compressSize = new File(media.getCompressPath()).length();
+                logger.debug("压缩Size: " + compressSize);
+            }
+            logger.debug("原图:" + media.getPath());
+            logger.debug("绝对路径:" + media.getRealPath());
+
+            logger.debug("是否开启原图:" + media.isOriginal());
+            logger.debug("原图路径:" + media.getOriginalPath());
+            logger.debug("Android Q 特有Path:" + media.getAndroidQToPath());
+            logger.debug("宽高: " + media.getWidth() + "x" + media.getHeight());
+            logger.debug("Size: " + media.getSize());
+            if (media.getSize() > 0) {
+                logger.debug("压缩率: {}%", FmtMicrometer.formatTwoDecimal(compressSize * 100.0 / media.getSize()));
+            }
+            return compressPath;
+        } catch (IOException e) {
+            logger.error("compress error::" + path, e);
+        }
+        return "";
     }
 }
