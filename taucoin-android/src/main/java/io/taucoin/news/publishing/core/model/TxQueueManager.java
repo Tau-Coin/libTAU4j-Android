@@ -395,10 +395,12 @@ class TxQueueManager {
             }
 			//如果是news交易，则需要复制图片到指定目录，并且修改PicPath(tx, txQueue)
 			if(txType == NEWS_TX.getType()) {
-				String picturePath = txQueue.picturePath;
-				tx.picturePath = FileUtil.copyNewsPicture(picturePath, tx.txID);
+				String pictureTempPath = txQueue.picturePath;
+				tx.picturePath = FileUtil.copyNewsPicture(pictureTempPath, tx.txID);
 				txQueue.picturePath = tx.picturePath;
 				txQueueRepos.updateQueue(txQueue);
+				//删除临时文件
+				FileUtil.deleteFile(pictureTempPath);
 			}
 			txRepo.addTransaction(tx);
             logger.info("createTransaction in sendTxQueue chainID::{}, txID::{}, version::{}, senderPk::{}," +

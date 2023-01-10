@@ -43,6 +43,7 @@ import io.taucoin.news.publishing.core.storage.sqlite.repo.UserRepository;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.Community;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.Tx;
+import io.taucoin.news.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.news.publishing.core.utils.ChainIDUtil;
 import io.taucoin.news.publishing.core.utils.LinkUtil;
 import io.taucoin.news.publishing.core.utils.DateUtil;
@@ -767,6 +768,19 @@ public class TauListenHandler {
 		if(!PictureSplitUtil.isSliceExists(hash, sliceName)){
 			try {
 				PictureSplitUtil.savePictureSlices(hash, sliceName, slice);
+				//看以下是否完成图片内容，更新txQueue, tx
+				if(PictureSplitUtil.isSlicesGetCompleted(hash)) {
+					Tx tx = txRepo.getTxByTxID(hash);
+					if(tx != null) {
+						tx.picturePath = hash;
+						TxQueue txqueue = txQueueRepo.getTxQueueByID(tx.queueID);
+						if(txqueue != null) {
+							txqueue.picturePath = hash;
+							txQueueRepo.updateQueue(txqueue);
+						}
+						txRepo.updateTransaction(tx);
+					}
+				}
 			} catch (Exception e) {
 				logger.error("pic slice alert save pic error::", e);
 			}
