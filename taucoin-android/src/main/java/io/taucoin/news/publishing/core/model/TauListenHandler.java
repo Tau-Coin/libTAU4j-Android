@@ -774,7 +774,7 @@ public class TauListenHandler {
 				if(PictureSplitUtil.isSlicesGetCompleted(hash)) {
 					logger.info("save pic slice successfully, news hash::{}", hash);
 					Tx tx = txRepo.getTxByTxID(hash);
-					if(tx != null) {
+					if(tx != null && StringUtil.isNotEmpty(picturePath)) {
 						tx.picturePath = picturePath;
 						TxQueue txqueue = txQueueRepo.getTxQueueByID(tx.queueID);
 						if(txqueue != null) {
