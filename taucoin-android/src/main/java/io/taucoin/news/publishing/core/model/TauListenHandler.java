@@ -345,13 +345,7 @@ public class TauListenHandler {
             if (tx != null) {
                 // 由于第一次同步共识区块
                 // 如果是同步，并且已经是上链状态了, 则保持上链状态
-                int status;
-                if (tx.txStatus == Constants.TX_STATUS_ON_CHAIN && blockStatus == BlockStatus.SYNCING) {
-                    status = Constants.TX_STATUS_ON_CHAIN;
-                } else {
-                    status = blockStatus == BlockStatus.ON_CHAIN || blockStatus == BlockStatus.NEW_BLOCK ? 1 : 0;
-                }
-                tx.txStatus = status;
+                tx.txStatus = Constants.TX_STATUS_ON_CHAIN;
                 //之所以要更新这么多，是因为P2P点对点转账有部分交易要补全信息
                 tx.version = txMsg.getVersion();
                 tx.blockNumber = block.getBlockNumber();
@@ -384,7 +378,7 @@ public class TauListenHandler {
             logger.info("handleTransactionData transaction empty");
             return;
         }
-        boolean onChain = status == BlockStatus.ON_CHAIN || status == BlockStatus.NEW_BLOCK;
+        boolean newTx = status == BlockStatus.NEW_TX;
         String txID = txMsg.getTxID().to_hex();
         String chainID = ChainIDUtil.decode(txMsg.getChainID());
         long fee = txMsg.getFee();
@@ -393,7 +387,7 @@ public class TauListenHandler {
         tx.txType = txContent.getType();
         tx.memo = txContent.getMemo();
         tx.senderPk = ByteUtil.toHexString(txMsg.getSender());
-        tx.txStatus = onChain ? Constants.TX_STATUS_ON_CHAIN : Constants.TX_STATUS_PENDING;
+        tx.txStatus = newTx ? Constants.TX_STATUS_PENDING : Constants.TX_STATUS_ON_CHAIN;
         tx.version = txMsg.getVersion();
         tx.previousHash = txMsg.getPreviousHash().to_hex();
         tx.blockNumber = blockNumber;
@@ -716,8 +710,10 @@ public class TauListenHandler {
                     offchainCoins = txRepo.getChainTotalCoinsByNonce(chainID, peer, account.getNonce());
 
                 //Update txs
-                txRepo.updateAllOffChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Pending
-                txRepo.updateAllOnChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Settled
+				if(reset) {
+					txRepo.updateAllOffChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Pending
+					txRepo.updateAllOnChainTxs(chainID, peer, account.getNonce()); //该链所有的交易 -> Settled
+				}
 
                 Member member = memberRepo.getMemberByChainIDAndPk(chainID, peer);
                 if (member != null) {
