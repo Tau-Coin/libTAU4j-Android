@@ -112,16 +112,6 @@
                 android:layout_marginStart="@dimen/widget_size_17">
 
                 <ImageView
-                    android:id="@+id/iv_picture"
-                    android:layout_width="@dimen/widget_size_26"
-                    android:layout_height="@dimen/widget_size_26"
-                    android:layout_marginTop="@dimen/widget_size_5"
-                    android:padding="@dimen/widget_size_4"
-                    android:layout_gravity="center_horizontal"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/icon_picture"/>
-
-                <ImageView
                     android:id="@+id/iv_ban"
                     android:layout_width="@dimen/widget_size_26"
                     android:layout_height="@dimen/widget_size_26"
@@ -189,6 +179,22 @@
             android:gravity="center_vertical"
             android:layout_marginStart="@dimen/widget_size_15"
             android:layout_marginEnd="@dimen/widget_size_15">
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_picture"
+                    android:layout_width="@dimen/widget_size_26"
+                    android:layout_height="@dimen/widget_size_26"
+                    android:padding="@dimen/widget_size_4"
+                    android:layout_gravity="center_horizontal"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/icon_picture_gray"/>
+
+            </FrameLayout>
 
             <LinearLayout
                 android:gravity="center_horizontal|center"

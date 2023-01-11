@@ -241,7 +241,9 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
                 int linkDrawableSize = binding.getRoot().getResources().getDimensionPixelSize(R.dimen.widget_size_14);
                 DrawablesUtil.setEndDrawable(headerBinding.news.tvLink, R.mipmap.icon_share_link, linkDrawableSize);
             }
-            headerBinding.news.ivPicture.setVisibility(StringUtil.isNotEmpty(tx.picturePath) ? View.VISIBLE : View.GONE);
+            boolean isHavePicture = StringUtil.isNotEmpty(tx.picturePath);
+            headerBinding.news.ivPicture.setEnabled(isHavePicture);
+            headerBinding.news.ivPicture.setImageResource(isHavePicture ? R.mipmap.icon_picture_gray : R.mipmap.icon_picture_white);
             setClickListener(headerBinding.news, tx);
             setAutoLinkListener(headerBinding.news.tvMsg, tx);
         }

@@ -109,6 +109,16 @@ public class MediaUtil {
     }
 
     public static void openGalleryAndCameraWithoutCrop(Activity activity) {
+        UCrop.Options options = new UCrop.Options();
+        // 圆形头像模式
+        options.setCircleDimmedLayer(false);
+        options.setHideBottomControls(true);
+        options.setShowCropFrame(false);
+        options.setShowCropGrid(false);
+        options.withAspectRatio(16, 9);
+        options.withMaxResultSize(MultimediaUtil.MAX_NEWS_IMAGE_WIDTH, MultimediaUtil.MAX_NEWS_IMAGE_HEIGHT);
+        options.setCompressionQuality(100);
+
         PictureSelector.create(activity)
                 .openGallery(PictureMimeType.ofImage())
                 .setLanguage(LanguageConfig.ENGLISH)
@@ -118,11 +128,13 @@ public class MediaUtil {
                 .isSingleDirectReturn(true)
                 .isGif(false)
                 .isPreviewImage(true)
-                .isEnableCrop(false)
+                .isEnableCrop(true)
+                .basicUCropConfig(options)
+                .freeStyleCropMode(OverlayView.DEFAULT_FREESTYLE_CROP_MODE)// 裁剪框拖动模式
+                .isCropDragSmoothToCenter(true)// 裁剪框拖动时图片自动跟随居中
+                .withAspectRatio(16, 9)
+                .cropImageWideHigh(MultimediaUtil.MAX_NEWS_IMAGE_WIDTH, MultimediaUtil.MAX_NEWS_IMAGE_HEIGHT)
                 .isCompress(false)
-//                .compressQuality(100)
-//                .compressEngine(NewsImageCompressEngine.createCompressEngine())
-//                .minimumCompressSize(1)
                 .forResult(PictureConfig.CHOOSE_REQUEST);
     }
 

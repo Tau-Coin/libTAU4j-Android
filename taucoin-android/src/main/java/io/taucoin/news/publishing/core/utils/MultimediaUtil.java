@@ -47,8 +47,8 @@ public class MultimediaUtil {
 
     public static final int IMAGE_SLICES_NUM = 10;
     public static final int MAX_NEWS_IMAGE_SIZE = MAX_IMAGE_SIZE * IMAGE_SLICES_NUM; // byte
-    public static final int MAX_NEWS_IMAGE_WIDTH = 850;         // px
-    public static final int MAX_NEWS_IMAGE_HEIGHT = 480;        // px
+    public static final int MAX_NEWS_IMAGE_WIDTH = 960;         // px
+    public static final int MAX_NEWS_IMAGE_HEIGHT = 540;        // px
 
     private static int calculateInSampleSize(BitmapFactory.Options options, int maxWidth, int maxHeight) {
         final int height = options.outHeight;
