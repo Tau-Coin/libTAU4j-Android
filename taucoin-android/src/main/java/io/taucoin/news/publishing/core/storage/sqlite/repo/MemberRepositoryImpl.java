@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
-import androidx.paging.DataSource;
+import androidx.room.RxRoom;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -90,11 +90,10 @@ public class MemberRepositoryImpl implements MemberRepository {
     /**
      * 查询社区成员
      * @param chainID 社区链ID
-     * @return DataSource.Factory
      */
     @Override
-    public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID){
-        return db.memberDao().queryCommunityMembers(chainID, Constants.MAX_ACCOUNT_SIZE);
+    public List<MemberAndFriend> queryCommunityMembers(String chainID, int pos, int pageSize){
+        return db.memberDao().queryCommunityMembers(chainID, pos, pageSize, Constants.MAX_ACCOUNT_SIZE);
     }
 
     /**
@@ -171,5 +170,11 @@ public class MemberRepositoryImpl implements MemberRepository {
     @Override
     public void clearNewsUnread() {
         db.memberDao().clearNewsUnread();
+    }
+
+    @Override
+    public Flowable<Object> observeMembersDataSetChanged() {
+        String[] tables = new String[]{"Members"};
+        return RxRoom.createFlowable(db, tables);
     }
 }

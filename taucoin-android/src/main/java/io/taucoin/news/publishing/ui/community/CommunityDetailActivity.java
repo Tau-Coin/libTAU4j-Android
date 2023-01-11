@@ -3,10 +3,16 @@ package io.taucoin.news.publishing.ui.community;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
+
+import com.andview.refreshview.XRefreshView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -22,12 +28,16 @@ import io.taucoin.news.publishing.core.model.data.message.AirdropStatus;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.news.publishing.core.utils.ActivityUtil;
 import io.taucoin.news.publishing.core.utils.ChainIDUtil;
+import io.taucoin.news.publishing.core.utils.ObservableUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.ToastUtils;
 import io.taucoin.news.publishing.databinding.ActivityCommunityDetailBinding;
+import io.taucoin.news.publishing.databinding.CommunityDetailHeaderBinding;
 import io.taucoin.news.publishing.ui.BaseActivity;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
+import io.taucoin.news.publishing.ui.constant.Page;
 import io.taucoin.news.publishing.ui.customviews.CommonDialog;
+import io.taucoin.news.publishing.ui.customviews.CustomXRefreshViewFooter;
 import io.taucoin.news.publishing.ui.friends.AirdropDetailActivity;
 import io.taucoin.news.publishing.ui.friends.AirdropSetupActivity;
 import io.taucoin.news.publishing.ui.friends.FriendsActivity;
@@ -38,7 +48,8 @@ import io.taucoin.news.publishing.ui.user.UserDetailActivity;
 /**
  * 社区详情页面
  */
-public class CommunityDetailActivity extends BaseActivity implements MemberListAdapter.ClickListener {
+public class CommunityDetailActivity extends BaseActivity implements MemberListAdapter.ClickListener,
+        XRefreshView.XRefreshViewListener {
 
     private static final Logger logger = LoggerFactory.getLogger("CommunityDetailActivity");
     private ActivityCommunityDetailBinding binding;
@@ -50,6 +61,9 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
     private CommonDialog blacklistDialog;
     private boolean isJoined;
     private boolean noBalance;
+    private int currentPos = 0;
+    private boolean isLoadMore;
+    private boolean dataChanged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +74,7 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
         binding = DataBindingUtil.setContentView(this, R.layout.activity_community_detail);
         initParameter();
         initLayout();
+        initRefreshLayout();
     }
 
     /**
@@ -98,11 +113,52 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
         binding.recyclerView.setItemAnimator(null);
         binding.recyclerView.setAdapter(adapter);
 
-        communityViewModel.observerCommunityMembers(chainID).observe(this, members -> {
-            adapter.submitList(members);
-            logger.debug("adapter.size::{}, newSize::{}", adapter.getItemCount(), members.size());
+        communityViewModel.getMemberList().observe(this, members -> {
+            List<MemberAndFriend> currentList = new ArrayList<>(members);
+            int size;
+            if (currentPos == 0) {
+                size = currentList.size();
+                if (size <= Page.PAGE_SIZE) {
+                    isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
+                } else {
+                    if (size % Page.PAGE_SIZE == 0) {
+                        isLoadMore = true;
+                    }
+                }
+                adapter.submitList(currentList);
+            } else {
+                currentList.addAll(0, adapter.getCurrentList());
+                isLoadMore = members.size() != 0 && members.size() % Page.PAGE_SIZE == 0;
+                adapter.submitList(currentList, handlePullAdapter);
+            }
+
+            binding.refreshLayout.setLoadComplete(!isLoadMore);
+            binding.refreshLayout.stopLoadMore();
         });
 
+        CommunityDetailHeaderBinding headerBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
+                R.layout.community_detail_header, null, false);
+        binding.recyclerView.addHeaderView(headerBinding.getRoot());
+
+    }
+
+    private final Runnable handlePullAdapter = () -> {
+        int dx = binding.recyclerView.getScrollX();
+        int dy = binding.recyclerView.getScrollY();
+        int offset = getResources().getDimensionPixelSize(R.dimen.widget_size_50);
+        binding.recyclerView.smoothScrollBy(dx, dy + offset);
+    };
+
+    private void initRefreshLayout() {
+        binding.refreshLayout.setXRefreshViewListener(this);
+        binding.refreshLayout.setPullRefreshEnable(false);
+        binding.refreshLayout.setPullLoadEnable(true);
+        binding.refreshLayout.setAutoLoadMore(true);
+        binding.refreshLayout.setMoveForHorizontal(true);
+        binding.refreshLayout.enableRecyclerViewPullUp(true);
+
+        CustomXRefreshViewFooter footer = new CustomXRefreshViewFooter(this);
+        binding.refreshLayout.setCustomFooterView(footer);
     }
 
     /**
@@ -182,6 +238,37 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
                 ToastUtils.showShortToast(R.string.blacklist_failed);
             }
         });
+        loadData(0);
+
+        disposables.add(ObservableUtil.intervalSeconds(2)
+                .subscribeOn(Schedulers.io())
+                .subscribe(o -> {
+                    if (dataChanged) {
+                        loadData(0);
+                        dataChanged = false;
+                    }
+                }));
+
+        disposables.add(communityViewModel.observeMembersDataSetChanged()
+                .subscribeOn(Schedulers.io())
+                .subscribe(result -> {
+                    if (result != null) {
+                        // 立即执行刷新
+                        dataChanged = true;
+                    }
+                }));
+    }
+
+    private void loadData(int pos) {
+        this.currentPos = pos;
+        communityViewModel.loadCommunityMembers(chainID, pos, getItemCount());
+    }
+
+    private int getItemCount() {
+        if (adapter != null) {
+            return adapter.getItemCount();
+        }
+        return 0;
     }
 
     @Override
@@ -199,5 +286,25 @@ public class CommunityDetailActivity extends BaseActivity implements MemberListA
         if (memberDisposable != null && !memberDisposable.isDisposed()) {
             memberDisposable.dispose();
         }
+    }
+
+    @Override
+    public void onRefresh(boolean isPullDown) {
+
+    }
+
+    @Override
+    public void onLoadMore(boolean isSilence) {
+        loadData(getItemCount());
+    }
+
+    @Override
+    public void onRelease(float direction) {
+
+    }
+
+    @Override
+    public void onHeaderMove(double headerMovePercent, int offsetY) {
+
     }
 }

@@ -20,110 +20,17 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar_group_left" />
 
-        <androidx.core.widget.NestedScrollView
-            android:fillViewport="true"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <com.andview.refreshview.XRefreshView
+            android:id="@+id/refresh_layout"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent">
 
-            <LinearLayout
-                android:orientation="vertical"
+            <com.yanzhenjie.recyclerview.SwipeRecyclerView
+                android:background="@color/color_white"
+                android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content" />
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_chain_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    android:onClick="onClick"
-                    app:lineLeftText="@string/community_chain_status"
-                    app:lineRightImage="@mipmap/icon_arrow"/>
-
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_chain_explorer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    android:onClick="onClick"
-                    app:lineLeftText="@string/community_chain_explorer"
-                    app:lineRightImage="@mipmap/icon_arrow"/>
-
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_pay_people"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    android:onClick="onClick"
-                    app:lineLeftText="@string/community_transaction"
-                    app:lineRightImage="@mipmap/icon_arrow"/>
-
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_add_member"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    android:onClick="onClick"
-                    app:lineLeftText="@string/community_added_members_title"
-                    app:lineRightImage="@mipmap/icon_arrow"/>
-
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
-                    android:visibility="gone"
-                    android:id="@+id/item_airdrop_coins"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    android:onClick="onClick"
-                    app:lineLeftText="@string/drawer_airdrop_links"
-                    app:lineRightImage="@mipmap/icon_arrow"/>
-
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_qr_code"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    android:onClick="onClick"
-                    app:lineLeftText="@string/community_qr_code"
-                    app:lineRightImage="@mipmap/icon_arrow"/>
-
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
-                    android:id="@+id/item_blacklist"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="@dimen/widget_size_44"
-                    android:gravity="center_vertical"
-                    android:onClick="onClick"
-                    app:lineLeftTextColor="@color/color_red"
-                    app:lineLeftText="@string/community_blacklist" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/community_members"
-                    android:gravity="center_vertical"
-                    android:paddingStart="@dimen/widget_size_20"
-                    android:paddingEnd="@dimen/widget_size_20"
-                    android:paddingTop="@dimen/widget_size_8"
-                    android:paddingBottom="@dimen/widget_size_8"
-                    android:background="@color/color_bg"
-                    android:textColor="@color/gray_dark"
-                    android:textAppearance="@style/TextAppearanceBody2"/>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:scrollbars="vertical"
-                    android:focusable="true"
-                    android:scrollbarStyle="outsideOverlay" />
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+        </com.andview.refreshview.XRefreshView>
     </LinearLayout>
 </layout>

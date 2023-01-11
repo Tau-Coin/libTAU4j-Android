@@ -39,6 +39,7 @@ import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
@@ -122,6 +123,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private UserRepository userRepo;
     private TauDaemon daemon;
     private CompositeDisposable disposables = new CompositeDisposable();
+    private Disposable loadViewDisposable;
     private MutableLiveData<Result> addCommunityState = new MutableLiveData<>();
     private MutableLiveData<Boolean> setBlacklistState = new MutableLiveData<>();
     private MutableLiveData<Result> airdropResult = new MutableLiveData<>();
@@ -132,6 +134,7 @@ public class CommunityViewModel extends AndroidViewModel {
     private MutableLiveData<Bitmap> qrBitmap = new MutableLiveData<>();
     private MutableLiveData<UserAndFriend> largestCoinHolder = new MutableLiveData<>();
     private MutableLiveData<List<BlockAndTx>> chainBlocks = new MutableLiveData<>();
+    private MutableLiveData<List<MemberAndFriend>> memberList = new MutableLiveData<>();
     private Disposable clearDisposable;
 
     public CommunityViewModel(@NonNull Application application) {
@@ -166,6 +169,10 @@ public class CommunityViewModel extends AndroidViewModel {
 
     public MutableLiveData<List<MemberAndTime>> getJoinedCommunity() {
         return joinedCommunity;
+    }
+
+    public MutableLiveData<List<MemberAndFriend>> getMemberList() {
+        return memberList;
     }
 
     /**
@@ -416,6 +423,9 @@ public class CommunityViewModel extends AndroidViewModel {
         if (clearDisposable != null && !clearDisposable.isDisposed()) {
             clearDisposable.dispose();
         }
+        if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
+            loadViewDisposable.dispose();
+        }
     }
 
     /**
@@ -614,15 +624,6 @@ public class CommunityViewModel extends AndroidViewModel {
     }
 
     /**
-     * 查询社区成员
-     * @param chainID
-     * @return DataSource.Factory
-     */
-    public DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID) {
-        return memberRepo.queryCommunityMembers(chainID);
-    }
-
-    /**
      * 获取社区limit个成员
      * @param chainID
      * @param limit
@@ -675,9 +676,33 @@ public class CommunityViewModel extends AndroidViewModel {
         return communityRepo.observerCommunityTopBlocks(chainID, num);
     }
 
-    LiveData<PagedList<MemberAndFriend>> observerCommunityMembers(String chainID) {
-        return new LivePagedListBuilder<>(queryCommunityMembers(chainID),
-                Page.getPageListConfig()).build();
+    void loadCommunityMembers(String chainID, int pos, int initSize) {
+        if (loadViewDisposable != null && !loadViewDisposable.isDisposed()) {
+            loadViewDisposable.dispose();
+        }
+        loadViewDisposable = Observable.create((ObservableOnSubscribe<List<MemberAndFriend>>) emitter -> {
+            List<MemberAndFriend> txs = new ArrayList<>();
+            try {
+                int pageSize = Page.PAGE_SIZE;
+                if (pos == 0 && initSize > pageSize) {
+                    pageSize = initSize;
+                }
+                long startTime = System.currentTimeMillis();
+                txs = memberRepo.queryCommunityMembers(chainID, pos, pageSize);
+                long endTime = System.currentTimeMillis();
+                logger.debug("loadCommunityMembers time::{}ms", endTime - startTime);
+                logger.debug("loadCommunityMembers pos::{}, pageSize::{}, messages.size::{}",
+                        pos, pageSize, txs.size());
+            } catch (Exception e) {
+                logger.error("loadCommunityMembers error::", e);
+            }
+            emitter.onNext(txs);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(messages -> {
+            memberList.postValue(messages);
+        });
     }
 
     /**
@@ -1305,5 +1330,9 @@ public class CommunityViewModel extends AndroidViewModel {
 
     public Observable<HomeStatistics> observeCommunitiesAndContacts() {
         return communityRepo.observeCommunitiesAndContacts();
+    }
+
+    public Flowable<Object> observeMembersDataSetChanged() {
+        return memberRepo.observeMembersDataSetChanged();
     }
 }

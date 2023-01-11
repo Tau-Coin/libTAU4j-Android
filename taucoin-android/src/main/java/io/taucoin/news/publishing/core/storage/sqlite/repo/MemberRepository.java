@@ -3,7 +3,6 @@ package io.taucoin.news.publishing.core.storage.sqlite.repo;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.paging.DataSource;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.taucoin.news.publishing.core.model.data.BlockStatistics;
@@ -44,7 +43,7 @@ public interface MemberRepository {
 
     Flowable<Member> observeCommunityAirdropDetail(String chainID);
 
-    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID);
+    List<MemberAndFriend> queryCommunityMembers(String chainID, int pos, int pageSize);
 
     /**
      * 获取社区limit个成员
@@ -95,4 +94,6 @@ public interface MemberRepository {
     void addPendingAndOffchainCoins(String chainID, String publicKey, long amount);
     
     void clearNewsUnread();
+
+    Flowable<Object> observeMembersDataSetChanged();
 }

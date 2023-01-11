@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import io.taucoin.news.publishing.R;
 import io.taucoin.news.publishing.core.model.data.MemberAndFriend;
@@ -18,7 +18,7 @@ import io.taucoin.news.publishing.databinding.ItemMemberListBinding;
 /**
  * 显示的联系人列表的Adapter
  */
-public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberListAdapter.ViewHolder> {
+public class MemberListAdapter extends ListAdapter<MemberAndFriend, MemberListAdapter.ViewHolder> {
     private ClickListener listener;
 
     MemberListAdapter(ClickListener listener) {
@@ -66,7 +66,8 @@ public class MemberListAdapter extends PagedListAdapter<MemberAndFriend, MemberL
             holder.binding.tvName.setText(showName);
             holder.binding.leftView.setImageBitmap(UsersUtil.getHeadPic(member.user));
 
-            holder.binding.tvNonMember.setVisibility(!member.onChain() ? View.VISIBLE : View.GONE);
+            holder.binding.tvNonMember.setVisibility(View.GONE);
+//            holder.binding.tvNonMember.setVisibility(!member.onChain() ? View.VISIBLE : View.GONE);
 
             holder.binding.getRoot().setOnClickListener(v -> {
                 if (listener != null) {

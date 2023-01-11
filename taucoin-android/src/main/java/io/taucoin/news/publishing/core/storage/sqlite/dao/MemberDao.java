@@ -32,7 +32,8 @@ public interface MemberDao {
             " LEFT JOIN (" + CommunityDao.QUERY_COMMUNITY_ACCOUNT_ORDER + " LIMIT :limit) AS rank" +
             " ON m.chainID = rank.chainID AND m.publicKey = rank.publicKey" +
             " WHERE m.chainID = :chainID" +
-            " ORDER BY m.balance DESC";
+            " ORDER BY m.balance DESC" +
+            " limit :pageSize offset :pos";
 
     String QUERY_COMMUNITY_MEMBERS_LIMIT = "SELECT m.publicKey FROM Members m" +
             " LEFT JOIN Communities c ON m.chainID = c.chainID" +
@@ -123,7 +124,7 @@ public interface MemberDao {
      */
     @Query(QUERY_GET_MEMBERS_IN_COMMUNITY)
     @Transaction
-    DataSource.Factory<Integer, MemberAndFriend> queryCommunityMembers(String chainID, int limit);
+    List<MemberAndFriend> queryCommunityMembers(String chainID, int pos, int pageSize, int limit);
 
     /**
      * 获取社区limit个成员
