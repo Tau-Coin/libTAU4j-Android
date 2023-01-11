@@ -133,6 +133,7 @@ public class TauDaemonImpl extends TauDaemon {
                     return new int[]{
                         AlertType.PORTMAP.swig(),
                         AlertType.PORTMAP_ERROR.swig(),
+                        AlertType.PORTMAP_CLOSED_ALERT.swig(),
                         AlertType.LISTEN_SUCCEEDED.swig(),
                         AlertType.LISTEN_FAILED.swig(),
                         AlertType.COMM_NEW_MSG.swig(),

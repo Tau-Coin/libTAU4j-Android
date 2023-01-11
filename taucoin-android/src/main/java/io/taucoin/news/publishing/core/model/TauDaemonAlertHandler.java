@@ -30,6 +30,7 @@ import org.libTAU4j.alerts.CommUserInfoAlert;
 import org.libTAU4j.alerts.ListenFailedAlert;
 import org.libTAU4j.alerts.ListenSucceededAlert;
 import org.libTAU4j.alerts.PortmapAlert;
+import org.libTAU4j.alerts.PortmapClosedAlert;
 import org.libTAU4j.alerts.PortmapErrorAlert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,9 +105,13 @@ public class TauDaemonAlertHandler {
                 // 端口映射
                 onPortMapped(alert);
                 break;
+            case PORTMAP_CLOSED_ALERT:
+                // 端口映射关闭
+                onPortMappedClosed(alert);
+                break;
             case PORTMAP_ERROR:
                 // 端口映射出错
-                onPortUnmapped(alert);
+                onPortMappedError(alert);
                 break;
             case LISTEN_SUCCEEDED:
                 // 端口监听成功
@@ -297,10 +302,25 @@ public class TauDaemonAlertHandler {
     }
 
     /**
-     * 端口未映射
+     * 端口映射关闭
      * @param alert libTAU上报
      */
-    private void onPortUnmapped(Alert alert) {
+    private void onPortMappedClosed(Alert alert) {
+        PortmapClosedAlert a = (PortmapClosedAlert) alert;
+        if (a.mapTransport() == PortmapTransport.UPNP) {
+            logger.info("UPnP mapped closed::{}", false);
+            settingsRepo.setUPnpMapped(false);
+        } else if (a.mapTransport() == PortmapTransport.NAT_PMP) {
+            logger.info("Nat-PMP mapped closed::{}", false);
+            settingsRepo.setNATPMPMapped(false);
+        }
+    }
+
+    /**
+     * 端口映射出错
+     * @param alert libTAU上报
+     */
+    private void onPortMappedError(Alert alert) {
         PortmapErrorAlert a = (PortmapErrorAlert) alert;
         if (a.mapTransport() == PortmapTransport.UPNP) {
             logger.info("UPnP mapped::{}", false);
