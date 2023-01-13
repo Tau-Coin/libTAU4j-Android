@@ -139,7 +139,6 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
             boolean isHaveReply = StringUtil.isNotEmpty(tx.replyTxID);
             binding.llBottomReply.setVisibility(isHaveReply ? View.VISIBLE : View.GONE);
             if (isHaveReply) {
-                binding.ivReplyHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.replySender));
                 String replyUserName = UsersUtil.getShowName(tx.replySender);
                 replyUserName = null == replyUserName ? "" : replyUserName;
                 SpanUtils replyName = new SpanUtils()
@@ -220,11 +219,6 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
             binding.ivHeadPic.setOnClickListener(view ->{
                 if (listener != null) {
                     listener.onUserClicked(tx.senderPk);
-                }
-            });
-            binding.ivReplyHeadPic.setOnClickListener(view ->{
-                if (listener != null) {
-                    listener.onUserClicked(tx.replySenderPk);
                 }
             });
 
