@@ -7,8 +7,8 @@ android {
         applicationId "io.taucoin.news.publishing"
         minSdkVersion 24
         targetSdkVersion 31
-        versionCode 5
-        versionName "1.0.4"
+        versionCode 6
+        versionName "1.0.5"
         flavorDimensions("default", "id")
 
         vectorDrawables.useSupportLibrary = true
