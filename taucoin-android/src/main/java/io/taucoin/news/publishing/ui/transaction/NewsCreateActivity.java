@@ -50,7 +50,6 @@ import io.taucoin.news.publishing.ui.community.CommunityListAdapter;
 import io.taucoin.news.publishing.ui.community.CommunityViewModel;
 import io.taucoin.news.publishing.ui.constant.IntentExtra;
 import io.taucoin.news.publishing.ui.customviews.CommunitiesPopUpDialog;
-import io.taucoin.news.publishing.ui.customviews.ProgressManager;
 import io.taucoin.news.publishing.ui.setting.FontSizeActivity;
 
 /**
@@ -150,7 +149,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         binding.joinedList.setOnItemClickListener((view, adapterPosition) -> {
             Member member = adapter.getCurrentList().get(adapterPosition);
             this.chainID = member.chainID;
-            enabledOrDisabledPost();
             adapter.setChainID(member.chainID);
             List<Member> list = new ArrayList<>(adapter.getCurrentList());
             list.remove(member);
@@ -182,7 +180,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            enabledOrDisabledPost();
             loadBytesCount();
         }
 
@@ -190,11 +187,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
         public void afterTextChanged(Editable s) {
         }
     };
-
-    private void enabledOrDisabledPost() {
-        boolean isEmpty = StringUtil.isEmpty(ViewUtils.getText(binding.etNews));
-        binding.tvPost.setEnabled(!isEmpty && StringUtil.isNotEmpty(chainID));
-    }
 
     private final TextWatcher linkWatcher = new TextWatcher() {
         @Override
@@ -425,7 +417,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                         }
                     }
                     this.chainID = member.chainID;
-                    enabledOrDisabledPost();
                     adapter.setChainID(member.chainID);
                     adapter.notifyDataSetChanged();
                     loadAverageTxFee();

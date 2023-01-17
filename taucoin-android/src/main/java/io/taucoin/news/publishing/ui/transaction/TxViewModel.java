@@ -429,6 +429,10 @@ public class TxViewModel extends AndroidViewModel {
             }
         } else {
             NewsContent content = new NewsContent(tx.content);
+            if (StringUtil.isEmpty(content.getMemo())) {
+                ToastUtils.showShortToast(getApplication().getString(R.string.tx_error_empty_news));
+                return false;
+            }
             if (tx.newsLineCount + tx.linkLineCount > Constants.NEWS_MAX_LINE_COUNT) {
                 ToastUtils.showShortToast(getApplication().getString(R.string.tx_error_invalid_news,
                         Constants.NEWS_TX_MAX_BYTE_SIZE, Constants.NEWS_MAX_LINE_COUNT));
