@@ -151,6 +151,7 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
                         .append("(").append(communityCode).append(")")
                         .append(" · ").append(DateUtil.getNewsTime(tx.replyTimestamp));
                 binding.tvReplyName.setText(replyName.create());
+                binding.ivReplyHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.replySender));
 
                 String replyPower = FmtMicrometer.formatThreeDecimal(Logarithm.log2(2 + tx.replyPower));
                 String replyBalance = FmtMicrometer.fmtBalance(tx.getReplyInterimBalance());
