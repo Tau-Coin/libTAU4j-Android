@@ -22,8 +22,7 @@
 
                 <RelativeLayout
                     android:id="@+id/rl_main_left"
-                    android:layout_width="0dp"
-                    android:layout_weight="3.5"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                     <include
@@ -49,8 +48,7 @@
                 <androidx.fragment.app.FragmentContainerView
                     android:name="io.taucoin.news.publishing.ui.main.EmptyFragment"
                     android:id="@+id/main_right_fragment"
-                    android:layout_width="0dp"
-                    android:layout_weight="6.5"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
             </LinearLayout>
