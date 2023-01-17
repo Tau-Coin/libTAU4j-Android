@@ -242,8 +242,7 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
                 DrawablesUtil.setEndDrawable(headerBinding.news.tvLink, R.mipmap.icon_share_link, linkDrawableSize);
             }
             boolean isHavePicture = StringUtil.isNotEmpty(tx.picturePath);
-            headerBinding.news.ivPicture.setEnabled(isHavePicture);
-            headerBinding.news.ivPicture.setImageResource(isHavePicture ? R.mipmap.icon_picture_gray : R.mipmap.icon_picture_white);
+            headerBinding.news.ivPicture.setVisibility(isHavePicture ? View.VISIBLE : View.INVISIBLE);
             setClickListener(headerBinding.news, tx);
             setAutoLinkListener(headerBinding.news.tvMsg, tx);
         }

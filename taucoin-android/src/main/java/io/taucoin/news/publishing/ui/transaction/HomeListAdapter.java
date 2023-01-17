@@ -98,8 +98,7 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
             boolean isMyself = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
             binding.ivBan.setVisibility(isMyself ? View.GONE : View.VISIBLE);
             boolean isHavePicture = StringUtil.isNotEmpty(tx.picturePath);
-            binding.ivPicture.setEnabled(isHavePicture);
-            binding.ivPicture.setImageResource(isHavePicture ? R.mipmap.icon_picture_gray : R.mipmap.icon_picture_white);
+            binding.ivPicture.setVisibility(isHavePicture ? View.VISIBLE : View.INVISIBLE);
 
             double showPower = Logarithm.log2(2 + tx.power);
             String power = FmtMicrometer.formatThreeDecimal(showPower);
@@ -310,60 +309,54 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
     private static final DiffUtil.ItemCallback<UserAndTxReply> diffCallback = new DiffUtil.ItemCallback<>() {
         @Override
         public boolean areContentsTheSame(@NonNull UserAndTxReply oldItem, @NonNull UserAndTxReply newItem) {
-            boolean isSame = false;
-            if (null == oldItem.sender && null == newItem.sender) {
-                isSame = true;
-            } else if(null != oldItem.sender && null != newItem.sender) {
-                isSame =  StringUtil.isEquals(oldItem.sender.nickname, newItem.sender.nickname);
-                if (isSame) {
-                    isSame = StringUtil.isEquals(oldItem.sender.remark, newItem.sender.remark);
+            if (null == oldItem.sender && newItem.sender != null) {
+                return false;
+            } else if (oldItem.sender != null && null == newItem.sender) {
+                return false;
+            } else if (oldItem.sender != null && newItem.sender != null){
+                if (StringUtil.isNotEquals(oldItem.sender.nickname, newItem.sender.nickname)) {
+                    return false;
+                } else if (StringUtil.isNotEquals(oldItem.sender.remark, newItem.sender.remark)) {
+                    return false;
                 }
             }
-            if (isSame && oldItem.balance != newItem.balance) {
+
+            if (null == oldItem.replySender && newItem.replySender != null) {
                 return false;
-            }
-            if (isSame && oldItem.power != newItem.power) {
+            } else if (oldItem.replySender != null && null == newItem.replySender) {
                 return false;
-            }
-            if (isSame && oldItem.repliesNum != newItem.repliesNum) {
-                return false;
-            }
-            if (isSame && oldItem.chatsNum != newItem.chatsNum) {
-                return false;
-            }
-            if (isSame && oldItem.pinnedTime != newItem.pinnedTime) {
-                return false;
-            }
-            if (isSame && oldItem.favoriteTime != newItem.favoriteTime) {
-                return false;
-            }
-            if (isSame && StringUtil.isNotEquals(oldItem.replyTxID, newItem.replyTxID)) {
-                return false;
-            }
-            if (isSame && oldItem.replyBalance != newItem.replyBalance) {
-                return false;
-            }
-            if (isSame && oldItem.replyPower != newItem.replyPower) {
-                return false;
-            }
-            if (isSame && oldItem.replyTimestamp != newItem.replyTimestamp) {
-                return false;
-            }
-            if (isSame && StringUtil.isNotEquals(oldItem.picturePath, newItem.picturePath)) {
-                return false;
-            }
-            if (null == oldItem.replySender && null == newItem.replySender) {
-                return true;
-            }
-            if(null != oldItem.replySender && null != newItem.replySender) {
-                isSame =  StringUtil.isEquals(oldItem.replySender.nickname, newItem.replySender.nickname);
-                if (isSame) {
-                    isSame = StringUtil.isEquals(oldItem.replySender.remark, newItem.replySender.remark);
+            } else if (oldItem.replySender != null && newItem.replySender != null){
+                if (StringUtil.isNotEquals(oldItem.replySender.nickname, newItem.replySender.nickname)) {
+                    return false;
+                } else if (StringUtil.isNotEquals(oldItem.replySender.remark, newItem.replySender.remark)) {
+                    return false;
                 }
-                return isSame;
-            } else {
+            }
+
+            if (oldItem.balance != newItem.balance) {
+                return false;
+            } else if (oldItem.power != newItem.power) {
+                return false;
+            } else if (oldItem.repliesNum != newItem.repliesNum) {
+                return false;
+            } else if (oldItem.chatsNum != newItem.chatsNum) {
+                return false;
+            } else if (oldItem.pinnedTime != newItem.pinnedTime) {
+                return false;
+            } else if (oldItem.favoriteTime != newItem.favoriteTime) {
+                return false;
+            } else if (StringUtil.isNotEquals(oldItem.replyTxID, newItem.replyTxID)) {
+                return false;
+            } else if (oldItem.replyBalance != newItem.replyBalance) {
+                return false;
+            } else if (oldItem.replyPower != newItem.replyPower) {
+                return false;
+            } else if (oldItem.replyTimestamp != newItem.replyTimestamp) {
+                return false;
+            } else if (StringUtil.isNotEquals(oldItem.picturePath, newItem.picturePath)) {
                 return false;
             }
+            return true;
         }
 
         @Override

@@ -97,8 +97,7 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             boolean isMyself = StringUtil.isEquals(tx.senderPk, MainApplication.getInstance().getPublicKey());
             binding.ivBan.setVisibility(isMyself ? View.GONE : View.VISIBLE);
             boolean isHavePicture = StringUtil.isNotEmpty(tx.picturePath);
-            binding.ivPicture.setEnabled(isHavePicture);
-            binding.ivPicture.setImageResource(isHavePicture ? R.mipmap.icon_picture_gray : R.mipmap.icon_picture_white);
+            binding.ivPicture.setVisibility(isHavePicture ? View.VISIBLE : View.INVISIBLE);
 
             double showPower = Logarithm.log2(2 + tx.power);
             String power = FmtMicrometer.formatThreeDecimal(showPower);
