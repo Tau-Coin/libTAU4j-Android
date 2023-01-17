@@ -9,6 +9,7 @@ import io.taucoin.news.publishing.core.Constants;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.Tx;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.User;
+import io.taucoin.news.publishing.core.utils.DateUtil;
 
 /**
  * Room: 包含被回复的交易信息的实体类
@@ -30,6 +31,9 @@ public class UserAndTx extends Tx {
     @Relation(parentColumn = "txID",
             entityColumn = "hash")
     public List<TxLog> logs;
+
+    @Ignore
+    public long currentTime = DateUtil.getTime() / 60;
 
     public UserAndTx(@NonNull String chainID, String receiverPk, long amount, long fee, int txType, String memo) {
         super(chainID, receiverPk, amount, fee, txType, memo);

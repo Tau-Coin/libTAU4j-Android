@@ -82,6 +82,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     private boolean isScrollToTop = true;
     private boolean isLoadMore = false;
     private boolean dataChanged = false;
+    private int dataTimeCount = 0;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -238,10 +239,12 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         disposables.add(ObservableUtil.intervalSeconds(1)
                 .subscribeOn(Schedulers.io())
                 .subscribe(o -> {
-                    if (dataChanged) {
+                    if (dataChanged || dataTimeCount == 60) {
                         loadData(0);
                         dataChanged = false;
+                        dataTimeCount = 0;
                     }
+                    dataTimeCount ++;
                 }));
 
         disposables.add(txViewModel.observeDataSetChanged()

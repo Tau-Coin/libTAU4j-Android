@@ -279,6 +279,9 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             if (isSame && StringUtil.isNotEquals(oldItem.picturePath, newItem.picturePath)) {
                 return false;
             }
+            if (isSame && oldItem.currentTime != newItem.currentTime) {
+                return false;
+            }
             return isSame;
         }
 

@@ -355,6 +355,8 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
                 return false;
             } else if (StringUtil.isNotEquals(oldItem.picturePath, newItem.picturePath)) {
                 return false;
+            } else if (oldItem.currentTime != newItem.currentTime) {
+                return false;
             }
             return true;
         }

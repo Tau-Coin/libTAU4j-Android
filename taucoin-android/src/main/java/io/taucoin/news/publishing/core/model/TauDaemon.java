@@ -705,6 +705,8 @@ public abstract class TauDaemon {
                     logger.debug("resendRegularMessages...");
                     ChatViewModel.resendRegularMessages(appContext);
                     TxViewModel.resendRegularTxs(appContext);
+                }, it -> {
+                    logger.error("resendRegularMessages error", it);
                 });
     }
 

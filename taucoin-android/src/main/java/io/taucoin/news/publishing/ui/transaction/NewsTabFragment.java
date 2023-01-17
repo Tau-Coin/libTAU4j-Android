@@ -84,6 +84,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     private boolean isScrollToTop = true;
     private boolean isLoadMore = false;
     private boolean dataChanged = false;
+    private int dataTimeCount = 0;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -263,10 +264,12 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         disposables.add(ObservableUtil.intervalSeconds(1)
                 .subscribeOn(Schedulers.io())
                 .subscribe(o -> {
-                    if (dataChanged) {
+                    if (dataChanged || dataTimeCount == 60) {
                         loadData(0);
                         dataChanged = false;
+                        dataTimeCount = 0;
                     }
+                    dataTimeCount ++;
                 }));
 
         disposables.add(txViewModel.observeDataSetChanged()
@@ -584,6 +587,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         if (layoutManager != null) {
             logger.debug("handleUpdateAdapter scrollToPosition::{}", 0);
             layoutManager.scrollToPositionWithOffset(0, Integer.MIN_VALUE);
+            dataChanged = true;
         }
     }
 }
