@@ -218,13 +218,6 @@ public class SearchNewsFragment extends BaseFragment implements View.OnClickList
                 }));
     }
 
-    public void showOrHideLowLinkedView(boolean show) {
-        if (null == binding) {
-            return;
-        }
-        binding.llLowLinked.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
     private void closeAllDialog() {
         if (operationsMenu != null) {
             operationsMenu.setOnItemClickListener(null);

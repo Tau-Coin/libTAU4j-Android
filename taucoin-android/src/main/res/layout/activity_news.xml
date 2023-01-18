@@ -56,50 +56,6 @@
             android:layout_height="@dimen/widget_size_1"
             android:layout_marginTop="@dimen/widget_size_5" />
 
-        <LinearLayout
-            android:visibility="gone"
-            android:id="@+id/ll_low_linked"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingStart="@dimen/widget_size_10"
-                android:paddingEnd="@dimen/widget_size_10"
-                android:paddingTop="@dimen/widget_size_8"
-                android:paddingBottom="@dimen/widget_size_8"
-                android:background="@color/color_white">
-
-                <ImageView
-                    android:layout_width="@dimen/widget_size_16"
-                    android:layout_height="@dimen/widget_size_16"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/icon_warning_orange"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/widget_size_5"
-                    android:includeFontPadding="false"
-                    android:text="@string/community_low_linked"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    android:textAppearance="@style/TextAppearanceBody2"
-                    android:textColor="@color/color_yellow" />
-
-            </LinearLayout>
-
-            <View
-                android:background="@color/color_bg"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/widget_size_1" />
-
-        </LinearLayout>
-
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

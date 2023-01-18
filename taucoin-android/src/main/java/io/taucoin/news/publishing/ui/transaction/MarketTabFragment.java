@@ -269,13 +269,6 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                 }));
     }
 
-    public void showOrHideLowLinkedView(boolean show) {
-        if (null == binding) {
-            return;
-        }
-        binding.llLowLinked.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
     private void closeAllDialog() {
         if (operationsMenu != null) {
             operationsMenu.setOnItemClickListener(null);

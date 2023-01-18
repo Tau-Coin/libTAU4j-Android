@@ -72,7 +72,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     private CharSequence msg;
     private String picturePath;
     private String link;
-    private int onlinePeers = -1;
     private boolean isReteitt = false;
     private boolean isShowCommunities;
 
@@ -233,21 +232,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onStart() {
         super.onStart();
-        if (StringUtil.isNotEmpty(chainID)) {
-            TauDaemon tauDaemon = TauDaemon.getInstance(getApplicationContext());
-            disposables.add(ObservableUtil.intervalSeconds(2, true)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(l -> {
-                        List<String> activeList = tauDaemon.getActiveList(chainID);
-                        int activeListSize = activeList != null ? activeList.size() : 0;
-                        if (onlinePeers != activeListSize) {
-                            onlinePeers = activeListSize;
-                            showOrHideLowLinkedView(activeListSize < 3);
-                        }
-                    }));
-        }
-
         txViewModel.getAddState().observe(this, result -> {
             if (StringUtil.isNotEmpty(result)) {
                 ToastUtils.showShortToast(result);
@@ -302,13 +286,6 @@ public class NewsCreateActivity extends BaseActivity implements View.OnClickList
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::loadFeeView));
-    }
-
-    public void showOrHideLowLinkedView(boolean show) {
-        if (null == binding) {
-            return;
-        }
-        binding.llLowLinked.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void loadInterimBalanceView(long interimBalance) {

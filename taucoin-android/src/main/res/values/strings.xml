@@ -197,7 +197,6 @@
     <string name="community_chain_market">News</string>
     <string name="community_on_chain">Transactions</string>
     <string name="community_pinned_message">Pinned News</string>
-    <string name="community_low_linked">Low linked peers, slow messaging.</string>
     <string name="community_chain_note_title">Note Transaction</string>
     <string name="community_sell_coins">Sale</string>
     <string name="community_airdrop">Airdrop</string>

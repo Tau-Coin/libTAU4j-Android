@@ -233,7 +233,6 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     int activeListSize = activeList != null ? activeList.size() : 0;
                     if (this.onlinePeers != activeListSize) {
                         this.onlinePeers = activeListSize;
-                        currentFragment.showOrHideLowLinkedView(activeListSize < 3);
                     }
                 }));
 
