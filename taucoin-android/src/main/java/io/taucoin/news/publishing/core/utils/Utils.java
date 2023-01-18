@@ -11,10 +11,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
@@ -63,6 +61,9 @@ import javax.net.ssl.X509TrustManager;
 
 public class Utils {
     public static final String HASH_PATTERN = "\\b[0-9a-fA-F]{5,40}\\b";
+    private static final int[] CHAIN_LOGO_ARRAY = new int[]{
+            R.mipmap.icon_cbd_logo, R.mipmap.icon_thailand, R.mipmap.icon_malaysia,
+            R.mipmap.icon_philippines, R.mipmap.icon_indonesia, R.mipmap.icon_vietnam};
 
     public static boolean isHash(@NonNull String hash) {
         if (TextUtils.isEmpty(hash))
@@ -533,15 +534,17 @@ public class Utils {
         return false;
     }
 
-    public static Drawable getConfigChainLogo(String chainID) {
-        Drawable drawable = null;
-        int index = BuildConfig.CHAIN_ARRAY.indexOf(chainID);
-        Resources resources = MainApplication.getInstance().getResources();
-        TypedArray logos = resources.obtainTypedArray(R.array.chain_logos);
-        if (index >= 0 && index < logos.length()) {
-            drawable = logos.getDrawable(index);
+    public static int getConfigChainLogo(String chainID) {
+        int index = 0;
+        ArrayList<String> chainList = BuildConfig.CHAIN_ARRAY;
+        for (int i = 0; i < chainList.size(); i++) {
+            if (StringUtil.isEquals(chainID, chainList.get(i))) {
+                index = i;
+            }
         }
-        logos.recycle();
-        return drawable;
+        if (index < CHAIN_LOGO_ARRAY.length) {
+            return CHAIN_LOGO_ARRAY[index];
+        }
+        return CHAIN_LOGO_ARRAY[0];
     }
 }

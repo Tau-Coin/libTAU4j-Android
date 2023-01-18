@@ -38,8 +38,7 @@
                     android:layout_height="@dimen/widget_size_50"
                     android:layout_marginStart="@dimen/widget_size_1"
                     android:layout_marginEnd="@dimen/widget_size_7"
-                    android:layout_marginTop="@dimen/widget_size_5"
-                    android:src="@drawable/icon_vietnam"/>
+                    android:layout_marginTop="@dimen/widget_size_5"/>
 
 <!--                <ImageView-->
 <!--                    android:id="@+id/iv_group1"-->

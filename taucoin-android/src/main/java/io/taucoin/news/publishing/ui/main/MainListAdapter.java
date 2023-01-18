@@ -138,7 +138,7 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 binding.leftView.setVisibility(isConfigChain ? View.GONE : View.VISIBLE);
                 binding.ivGroup.setVisibility(isConfigChain ? View.VISIBLE : View.GONE);
                 if (isConfigChain) {
-                    binding.ivGroup.setImageDrawable(Utils.getConfigChainLogo(bean.ID));
+                    binding.ivGroup.setImageRes(Utils.getConfigChainLogo(bean.ID));
                 }
             } else if (holder.binding instanceof ItemChatListBinding) {
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;

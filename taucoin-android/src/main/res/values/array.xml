@@ -74,13 +74,4 @@
         <item>446,MO</item> <!-- 澳门 -->
         <item>036,AU</item> <!-- 澳洲 -->
     </string-array>
-
-    <array name="chain_logos">
-        <item>@drawable/icon_cbd_logo</item>
-        <item>@drawable/icon_thailand</item>
-        <item>@drawable/icon_malaysia</item>
-        <item>@drawable/icon_philippines</item>
-        <item>@drawable/icon_indonesia</item>
-        <item>@drawable/icon_vietnam</item>
-    </array>
 </resources>
