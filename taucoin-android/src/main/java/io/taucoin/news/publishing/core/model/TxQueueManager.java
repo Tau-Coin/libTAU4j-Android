@@ -316,10 +316,12 @@ class TxQueueManager {
 				return true;
 			}
             //为了重发交易的时候兼容版本的更新
-            tx.txID = transaction.getTxID().to_hex();
-            tx.version = transaction.getVersion();
-			txRepo.deleteTxByQueueID(txQueue.queueID);
-            txRepo.addTransaction(tx);
+			if(tx.version != transaction.getVersion()) {
+				tx.txID = transaction.getTxID().to_hex();
+				tx.version = transaction.getVersion();
+				txRepo.deleteTxByQueueID(txQueue.queueID);
+				txRepo.addTransaction(tx);
+			}
 			return true; //已发送的交易，直接退出
 		}
 		//以下需要构建新的tx
