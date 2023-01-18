@@ -110,10 +110,18 @@ android {
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "10000"             // Level.DEBUG
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "7"
             // TauLogLevel.DEBUG
-            buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://6e6170b970bae896803ecb1051653" +
-                    "7aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:19881\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"9312f21430303030CBD\""
-            buildConfigField "String", "TEST_CHAIN_PEER", "\"602bc2c65f2c6e77c7e359339de7eb3d6d243a5eac4842d97b92e583d472690a\""
+            buildConfigField "String", "DHT_BOOTSTRAP_NODES",
+                    "\"tau://6e6170b970bae896803ecb10516537aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:19881," +
+                      "tau://c0b02f09be8712c9195373f41f0f76a8c3a75303c060927622c39bfdc570917f@18.133.58.91:29881\""
+            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_ARRAY", "new java.util.ArrayList() {{" +
+                    "add(\"9312f21430303030CBD\");" +
+                    "add(\"7f660b6030303030Thailand\");" +
+                    "add(\"ea7fc57030303030Malaysia\");" +
+                    "add(\"a31fb2d630303030Philippines\");" +
+                    "add(\"883258f330303030Indonesia\");" +
+                    "add(\"14916ed130303030Vietnam\");" +
+                    "}}"
+            buildConfigField "String", "CHAIN_PEER",  "\"602bc2c65f2c6e77c7e359339de7eb3d6d243a5eac4842d97b92e583d472690a\""
             signingConfig signingConfigs.debugConfig
         }
 
@@ -124,10 +132,18 @@ android {
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "20000"             // Level.INFO
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "6"
             // TauLogLevel.INFO
-            buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://a0105869108acecdb416953e803b8" +
-                    "80591815f22dde8ba95243276c607842109@13.229.53.249:23882\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"a532079e30303030CBD\""
-            buildConfigField "String", "TEST_CHAIN_PEER", "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
+            buildConfigField "String", "DHT_BOOTSTRAP_NODES",
+                    "\"tau://a0105869108acecdb416953e803b880591815f22dde8ba95243276c607842109@13.229.53.249:23882," +
+                      "tau://8f07019ab04f14ca346398bd603a1bd042859c03d80bc1d3dd7c382e6d71d8a2@18.133.58.91:14882\""
+            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_ARRAY", "new java.util.ArrayList() {{" +
+                    "add(\"a532079e30303030CBD\");" +
+                    "add(\"44979ddb30303030Thailand\");" +
+                    "add(\"d5aac75930303030Malaysia\");" +
+                    "add(\"42cfa71730303030Philippines\");" +
+                    "add(\"364c7e3330303030Indonesia\");" +
+                    "add(\"f646a06330303030Vietnam\");" +
+                    "}}"
+            buildConfigField "String", "CHAIN_PEER",  "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
             signingConfig signingConfigs.releaseConfig
         }
 
@@ -138,10 +154,18 @@ android {
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "30000"             // Level.WARN
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "4"
             // TauLogLevel.WARN
-            buildConfigField "String", "DHT_BOOTSTRAP_NODES", "\"tau://a0105869108acecdb416953e803b8" +
-                    "80591815f22dde8ba95243276c607842109@13.229.53.249:23882\""
-            buildConfigField "String", "TEST_CHAIN_ID", "\"a532079e30303030CBD\""
-            buildConfigField "String", "TEST_CHAIN_PEER", "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
+            buildConfigField "String", "DHT_BOOTSTRAP_NODES",
+                    "\"tau://a0105869108acecdb416953e803b880591815f22dde8ba95243276c607842109@13.229.53.249:23882," +
+                      "tau://8f07019ab04f14ca346398bd603a1bd042859c03d80bc1d3dd7c382e6d71d8a2@18.133.58.91:14882\""
+            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_ARRAY", "new java.util.ArrayList() {{" +
+                    "add(\"a532079e30303030CBD\");" +
+                    "add(\"44979ddb30303030Thailand\");" +
+                    "add(\"d5aac75930303030Malaysia\");" +
+                    "add(\"42cfa71730303030Philippines\");" +
+                    "add(\"364c7e3330303030Indonesia\");" +
+                    "add(\"f646a06330303030Vietnam\");" +
+                    "}}"
+            buildConfigField "String", "CHAIN_PEER", "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
             signingConfig signingConfigs.releaseConfig
         }
 
@@ -150,13 +174,13 @@ android {
             applicationId "io.taucoin.news.publishing"
             resValue "string", "app_name", "TAU"
         }
-        /*
+
         id01 {
             dimension 'id'
             applicationId "io.taucoin.news.publishing01"
             resValue "string", "app_name", "TAU01"
         }
-
+/*
         id02 {
             dimension 'id'
             applicationId "io.taucoin.news.publishing02"

@@ -134,11 +134,11 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 binding.msgUnread.setVisibility(bean.msgUnread > 0 ? View.VISIBLE : View.GONE);
                 ivLongPress = binding.ivLongPress;
 
-                boolean isSanFrancisco = StringUtil.isEquals(bean.ID, BuildConfig.TEST_CHAIN_ID);
-                binding.leftView.setVisibility(isSanFrancisco ? View.GONE : View.VISIBLE);
-                binding.ivGroup.setVisibility(isSanFrancisco ? View.VISIBLE : View.GONE);
-                if (isSanFrancisco) {
-                    binding.ivGroup.setImageRes(R.mipmap.icon_cbd_logo);
+                boolean isConfigChain = BuildConfig.CHAIN_ARRAY.contains(bean.ID);
+                binding.leftView.setVisibility(isConfigChain ? View.GONE : View.VISIBLE);
+                binding.ivGroup.setVisibility(isConfigChain ? View.VISIBLE : View.GONE);
+                if (isConfigChain) {
+                    binding.ivGroup.setImageDrawable(Utils.getConfigChainLogo(bean.ID));
                 }
             } else if (holder.binding instanceof ItemChatListBinding) {
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;

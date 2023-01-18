@@ -11,8 +11,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
@@ -27,6 +29,7 @@ import org.libTAU4j.Pair;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
+import io.taucoin.news.publishing.BuildConfig;
 import io.taucoin.news.publishing.MainApplication;
 import io.taucoin.news.publishing.R;
 import io.taucoin.news.publishing.core.Constants;
@@ -528,5 +531,17 @@ public class Utils {
             }
         } catch (Exception ignore) {}
         return false;
+    }
+
+    public static Drawable getConfigChainLogo(String chainID) {
+        Drawable drawable = null;
+        int index = BuildConfig.CHAIN_ARRAY.indexOf(chainID);
+        Resources resources = MainApplication.getInstance().getResources();
+        TypedArray logos = resources.obtainTypedArray(R.array.chain_logos);
+        if (index >= 0 && index < logos.length()) {
+            drawable = logos.getDrawable(index);
+        }
+        logos.recycle();
+        return drawable;
     }
 }

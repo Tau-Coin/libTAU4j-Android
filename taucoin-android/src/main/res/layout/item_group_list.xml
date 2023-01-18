@@ -39,7 +39,7 @@
                     android:layout_marginStart="@dimen/widget_size_1"
                     android:layout_marginEnd="@dimen/widget_size_7"
                     android:layout_marginTop="@dimen/widget_size_5"
-                    android:src="@mipmap/icon_london_pmc"/>
+                    android:src="@drawable/icon_vietnam"/>
 
 <!--                <ImageView-->
 <!--                    android:id="@+id/iv_group1"-->

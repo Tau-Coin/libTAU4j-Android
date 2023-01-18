@@ -39,7 +39,8 @@ public class ChainIDUtil {
     public static String getCoinName(String chainID) {
         String name = getName(chainID);
         String firstLetters;
-        if (StringUtil.isEquals(chainID, BuildConfig.TEST_CHAIN_ID)) {
+        String cbdChain = BuildConfig.CHAIN_ARRAY.get(0);
+        if (StringUtil.isEquals(chainID, cbdChain)) {
             firstLetters = name;
         } else {
             firstLetters = StringUtil.getFirstLettersOfName(name);
