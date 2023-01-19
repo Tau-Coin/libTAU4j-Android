@@ -230,6 +230,21 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        this.isVisibleToUser = true;
+        if (communityViewModel != null && isVisibleToUser) {
+            communityViewModel.clearNewsUnread(chainID);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        this.isVisibleToUser = false;
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         txViewModel.getDeletedResult().observe(this, isSuccess -> {

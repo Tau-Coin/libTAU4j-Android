@@ -233,6 +233,16 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        this.isVisibleToUser = isVisibleToUser;
+        logger.debug("setUserVisibleHint1::{}", isVisibleToUser);
+        if (communityViewModel != null && isVisibleToUser) {
+            communityViewModel.clearNewsUnread();
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         this.isVisibleToUser = true;
