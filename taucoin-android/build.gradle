@@ -127,7 +127,7 @@ android {
 
         beta {
             dimension 'default'
-            buildConfigField "String", "SPLASH_APP_NAME", "\"TAU<br/>Social Media\""        // 启动页文案
+            buildConfigField "String", "SPLASH_APP_NAME", "\"CBD Social Media\""        // 启动页文案
             buildConfigField "Boolean", "DISPLAY_DEBUG_VIEW", "false"
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "20000"             // Level.INFO
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "6"
@@ -149,7 +149,7 @@ android {
 
         official {
             dimension 'default'
-            buildConfigField "String", "SPLASH_APP_NAME", "\"TAU<br/>Social Media\""             // 启动页文案
+            buildConfigField "String", "SPLASH_APP_NAME", "\"CBD Social Media\""             // 启动页文案
             buildConfigField "Boolean", "DISPLAY_DEBUG_VIEW", "false"
             buildConfigField "Integer", "UI_RELEASE_LOG_LEVEL", "30000"             // Level.WARN
             buildConfigField "Integer", "TAU_RELEASE_LOG_LEVEL", "4"
