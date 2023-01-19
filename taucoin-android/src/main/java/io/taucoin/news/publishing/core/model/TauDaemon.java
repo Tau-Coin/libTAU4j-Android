@@ -505,12 +505,10 @@ public abstract class TauDaemon {
                 // 0、添加默认San Francisco
                 ArrayList<String> chainArray = BuildConfig.CHAIN_ARRAY;
                 for (String chainID : chainArray) {
-                    Community community2 = communityRepo.getCommunityByChainID(chainID);
-                    if (null == community2) {
-                        String peer = BuildConfig.CHAIN_PEER;
-                        String tauTesting = LinkUtil.encodeChain(peer, chainID, peer);
-                        tauDaemonAlertHandler.addCommunity(tauTesting);
-                    }
+                    String peer = BuildConfig.CHAIN_PEER;
+                    String tauTesting = LinkUtil.encodeChain(peer, chainID, peer);
+                    tauDaemonAlertHandler.addCommunity(tauTesting);
+                    logger.info("checkAllChains addCommunity chainID::{}", chainID);
                 }
                 // 1、处理本地跟随的chains, libTAU未跟随的情况
                 for (String chainID : localChains) {

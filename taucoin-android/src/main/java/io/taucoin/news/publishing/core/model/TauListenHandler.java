@@ -17,20 +17,16 @@ import java.util.Set;
 
 import androidx.annotation.NonNull;
 import io.taucoin.news.publishing.MainApplication;
-import io.taucoin.news.publishing.R;
 import io.taucoin.news.publishing.core.Constants;
 import io.taucoin.news.publishing.core.model.data.ForkPoint;
-import io.taucoin.news.publishing.core.model.data.FriendStatus;
 import io.taucoin.news.publishing.core.model.data.TxLogStatus;
 import io.taucoin.news.publishing.core.model.data.UserAndFriend;
 import io.taucoin.news.publishing.core.model.data.message.NewsContent;
 import io.taucoin.news.publishing.core.model.data.message.NoteContent;
-import io.taucoin.news.publishing.core.model.data.message.MessageType;
 import io.taucoin.news.publishing.core.model.data.message.TxContent;
 import io.taucoin.news.publishing.core.model.data.message.TxType;
 import io.taucoin.news.publishing.core.storage.RepositoryHelper;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.BlockInfo;
-import io.taucoin.news.publishing.core.storage.sqlite.entity.Friend;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.TxLog;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.news.publishing.core.storage.sqlite.repo.BlockRepository;
@@ -52,7 +48,6 @@ import io.taucoin.news.publishing.core.utils.StringUtil;
 import io.taucoin.news.publishing.core.utils.UsersUtil;
 import io.taucoin.news.publishing.core.utils.rlp.ByteUtil;
 import io.taucoin.news.publishing.ui.TauNotifier;
-import io.taucoin.news.publishing.ui.chat.ChatViewModel;
 import io.taucoin.news.publishing.ui.transaction.TxUtils;
 
 /**
@@ -667,23 +662,31 @@ public class TauListenHandler {
         if (url.getMiner() != null) {
             peers.add(url.getMiner());
         }
+        Community community = communityRepo.getCommunityByChainID(chainID);
+        if (community != null && community.isBanned) {
+            logger.info("addCommunity chainID::{}, Banned::true", chainID);
+            return;
+        }
         boolean isSuccess = daemon.followChain(chainID, peers);
         if (isSuccess) {
-            Community community = new Community(chainID, ChainIDUtil.getName(chainID));
-            communityRepo.addCommunity(community);
-
-            String userPK = MainApplication.getInstance().getPublicKey();
-            saveUserInfo(userPK);
-            addMemberInfo(ChainIDUtil.encode(chainID), userPK);
-            // 默认置顶
-            Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPK);
-            if (member != null) {
-                member.stickyTop = 0;
-                memberRepo.updateMember(member);
+            if (null == community) {
+                community = new Community(chainID, ChainIDUtil.getName(chainID));
+                communityRepo.addCommunity(community);
             }
-
-            saveUserInfo(peer);
-            addMemberInfo(ChainIDUtil.encode(chainID), peer);
+            String userPK = MainApplication.getInstance().getPublicKey();
+            Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPK);
+            if (null == member) {
+                saveUserInfo(userPK);
+                addMemberInfo(ChainIDUtil.encode(chainID), userPK);
+                // 默认置顶
+                member = memberRepo.getMemberByChainIDAndPk(chainID, userPK);
+                if (member != null) {
+                    member.stickyTop = 0;
+                    memberRepo.updateMember(member);
+                }
+                saveUserInfo(peer);
+                addMemberInfo(ChainIDUtil.encode(chainID), peer);
+            }
         }
     }
 
@@ -752,7 +755,6 @@ public class TauListenHandler {
 
     /**
      * 上报图片内容
-     * @param alert libTAU上报
      */
     public void onPicSlice(byte[] chainID, byte[] newsHash, byte[] key, byte[] slice) {
 		String hash = ByteUtil.toHexString(newsHash);
