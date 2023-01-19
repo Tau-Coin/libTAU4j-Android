@@ -245,7 +245,9 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
     @Override
     public void onResume() {
         super.onResume();
-        this.isVisibleToUser = true;
+        if (getUserVisibleHint()) {
+            this.isVisibleToUser = true;
+        }
         if (communityViewModel != null && isVisibleToUser) {
             communityViewModel.clearNewsUnread();
         }
