@@ -89,6 +89,7 @@ public abstract class TauDaemon {
     private Disposable onlineTimer;                  // 触发在线信号定时任务
     private Disposable chargingTimer;                // 触发充电5分钟计时任务
     private Disposable serviceDisposable;            // libTAU服务计时任务
+    private Disposable checkChainsDisposable;        // 检查本地和libTAU链的同步
     private int serviceResetCount = 0;               // libTAU服务暂停和恢复策略方案计数器
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
     private final TxQueueManager txQueueManager;     // 交易队列管理
@@ -143,24 +144,26 @@ public abstract class TauDaemon {
             @Override
             public void alert(Alert<?> alert) {
                 if (alert != null && alert.type() == AlertType.SES_START_OVER) {
-                    logger.info("Tau start successfully");
-                    isRunning = true;
-                    // libTAU删除此限制
-                    // Constants.MAX_ACCOUNT_SIZE = sessionManager.getMaxAccountSize();
-                    Constants.CHAIN_EPOCH_BLOCK_SIZE = sessionManager.getChainEpochBlockSize();
-                    Constants.TX_MAX_BYTE_SIZE = sessionManager.getMaxTxEncodedSize();
-                    //Constants.TX_MAX_OVERDRAFT = sessionManager.getMaxOverdraft(); 
-                    handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
-                    // 更新当前用户自己的信息
-                    updateCurrentUserInfo(false);
-                    // 启动在线信号定时任务
-                    startOnlineTimer();
-                    // 更新用户跟随的社区和其账户状态
-                    updateChainsAndAccountInfo();
-                    // 防止Crash后重启 初始化来不及设置新的日志等级
-                    setLogLevel(LogUtil.getTauLogLevel());
-                    // 重发点对点消息
-                    startDataResend();
+                    if (!isRunning) {
+                        logger.info("Tau start successfully");
+                        isRunning = true;
+                        // libTAU删除此限制
+                        // Constants.MAX_ACCOUNT_SIZE = sessionManager.getMaxAccountSize();
+                        Constants.CHAIN_EPOCH_BLOCK_SIZE = sessionManager.getChainEpochBlockSize();
+                        Constants.TX_MAX_BYTE_SIZE = sessionManager.getMaxTxEncodedSize();
+                        //Constants.TX_MAX_OVERDRAFT = sessionManager.getMaxOverdraft();
+                        handleSettingsChanged(appContext.getString(R.string.pref_key_foreground_running));
+                        // 更新当前用户自己的信息
+                        updateCurrentUserInfo(false);
+                        // 启动在线信号定时任务
+                        startOnlineTimer();
+                        // 更新用户跟随的社区和其账户状态
+                        updateChainsAndAccountInfo();
+                        // 防止Crash后重启 初始化来不及设置新的日志等级
+                        setLogLevel(LogUtil.getTauLogLevel());
+                        // 重发点对点消息
+                        startDataResend();
+                    }
                 }
             }
         });
@@ -278,6 +281,9 @@ public abstract class TauDaemon {
         }
         if (serviceDisposable != null && !serviceDisposable.isDisposed()) {
             serviceDisposable.dispose();
+        }
+        if (checkChainsDisposable != null && !checkChainsDisposable.isDisposed()) {
+            checkChainsDisposable.dispose();
         }
         TauNotifier.getInstance().cancelAllNotify();
         locationManager.stopLocation();
@@ -479,7 +485,11 @@ public abstract class TauDaemon {
      * 更新用户跟随的社区和其账户状态
      */
     private void updateChainsAndAccountInfo() {
-        Disposable disposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
+        if (checkChainsDisposable != null) {
+            logger.info("checkAllChains...");
+            return;
+        }
+        checkChainsDisposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             UserRepository userRepo = RepositoryHelper.getUserRepository(appContext);
             MemberRepository memberRepo = RepositoryHelper.getMemberRepository(appContext);
             CommunityRepository communityRepo = RepositoryHelper.getCommunityRepository(appContext);
@@ -525,7 +535,6 @@ public abstract class TauDaemon {
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .subscribe();
-        disposables.add(disposable);
     }
 
     /**
