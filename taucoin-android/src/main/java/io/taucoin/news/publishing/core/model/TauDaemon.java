@@ -39,7 +39,7 @@ import io.taucoin.news.publishing.core.model.data.AlertAndUser;
 import io.taucoin.news.publishing.core.model.data.message.DataKey;
 import io.taucoin.news.publishing.core.storage.RepositoryHelper;
 import io.taucoin.news.publishing.core.storage.sp.SettingsRepository;
-import io.taucoin.news.publishing.core.storage.sqlite.entity.Community;
+import io.taucoin.news.publishing.core.storage.sqlite.entity.Member;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.TxQueue;
 import io.taucoin.news.publishing.core.storage.sqlite.entity.User;
 import io.taucoin.news.publishing.core.storage.sqlite.repo.CommunityRepository;
@@ -502,9 +502,10 @@ public abstract class TauDaemon {
                 logger.info("checkAllChains localChain::{}, tauChains::{}",
                         localChains.size(), tauChains.size());
 
-                // 0、添加默认San Francisco
+                // 0、添加默认配置链
                 ArrayList<String> chainArray = BuildConfig.CHAIN_ARRAY;
-                for (String chainID : chainArray) {
+                for (int i = 0; i < 1; i++) {
+                    String chainID = chainArray.get(i);
                     String peer = BuildConfig.CHAIN_PEER;
                     String tauTesting = LinkUtil.encodeChain(peer, chainID, peer);
                     tauDaemonAlertHandler.addCommunity(tauTesting);
@@ -528,6 +529,18 @@ public abstract class TauDaemon {
                     // libTAU unfollowChain
                     boolean success = unfollowChain(chainID);
                     logger.debug("checkAllChains unfollowChain chainID::{}, success::{}", chainID, success);
+                }
+                // 3、unfollow线上国家社区
+                for (int i = 1; i < chainArray.size(); i++) {
+                    String chainID = chainArray.get(i);
+                    Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
+                    if (member != null) {
+                        boolean success = unfollowChain(chainID);
+                        if (success) {
+                            memberRepo.deleteCommunityMember(chainID, userPk);
+                        }
+                    }
+                    logger.info("checkAllChains unfollow chainID::{}, delete member", chainID);
                 }
             }
             emitter.onComplete();

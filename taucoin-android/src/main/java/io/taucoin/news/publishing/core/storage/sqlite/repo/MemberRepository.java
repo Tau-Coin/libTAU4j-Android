@@ -70,6 +70,8 @@ public interface MemberRepository {
      */
     void deleteCommunityMembers(String chainID);
 
+    public void deleteCommunityMember(String chainID, String userPk);
+
     Observable<String> observeDataSetChanged();
 
     void submitDataSetChanged();

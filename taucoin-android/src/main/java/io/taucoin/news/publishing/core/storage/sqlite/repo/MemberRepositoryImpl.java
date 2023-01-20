@@ -129,6 +129,12 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
+    public void deleteCommunityMember(String chainID, String userPk) {
+        db.memberDao().deleteCommunityMembers(chainID, userPk);
+        submitDataSetChanged();
+    }
+
+    @Override
     public Observable<String> observeDataSetChanged() {
         return dataSetChangedPublish;
     }

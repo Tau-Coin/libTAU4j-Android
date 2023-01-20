@@ -53,6 +53,8 @@ public interface MemberDao {
 
     String QUERY_DELETE_COMMUNITY_MEMBERS = "DELETE FROM Members where chainID =:chainID";
 
+    String QUERY_DELETE_COMMUNITY_MEMBER = "DELETE FROM Members where chainID =:chainID AND publicKey =:publicKey";
+
     // 获取跟随的社区列表
     String QUERY_FOLLOWED_COMMUNITIES = "SELECT m.chainID" +
             " FROM Members m" +
@@ -139,6 +141,9 @@ public interface MemberDao {
 
     @Query(QUERY_DELETE_COMMUNITY_MEMBERS)
     void deleteCommunityMembers(String chainID);
+
+    @Query(QUERY_DELETE_COMMUNITY_MEMBER)
+    void deleteCommunityMembers(String chainID, String publicKey);
 
     /**
      * 获取跟随的社区列表
