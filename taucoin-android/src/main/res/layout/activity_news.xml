@@ -113,6 +113,7 @@
                 </LinearLayout>
 
                 <RelativeLayout
+                    android:visibility="gone"
                     android:id="@+id/rl_add_picture"
                     android:layout_width="@dimen/widget_size_240"
                     android:layout_height="@dimen/widget_size_135"

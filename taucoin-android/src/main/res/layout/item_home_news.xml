@@ -181,6 +181,7 @@
             android:layout_marginEnd="@dimen/widget_size_15">
 
             <FrameLayout
+                android:visibility="gone"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content">
