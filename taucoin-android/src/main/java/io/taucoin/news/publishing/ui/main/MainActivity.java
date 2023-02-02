@@ -182,6 +182,17 @@ public class MainActivity extends ScanTriggerActivity {
         checkCurrentUser();
     }
 
+    private void initRightFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.add(R.id.main_right_fragment, chatFragment);
+        transaction.hide(chatFragment);
+        transaction.add(R.id.main_right_fragment, communityFragment);
+        transaction.hide(communityFragment);
+        transaction.commitAllowingStateLoss();
+
+    }
+
     private void refreshLeftFragment() {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
@@ -236,6 +247,7 @@ public class MainActivity extends ScanTriggerActivity {
                 getResources().getDimensionPixelSize(R.dimen.widget_size_22));
         DrawablesUtil.setStartDrawable(binding.drawer.tvContacts, R.mipmap.icon_contacts,
                 getResources().getDimensionPixelSize(R.dimen.widget_size_18));
+        initRightFragment();
     }
 
     @Override

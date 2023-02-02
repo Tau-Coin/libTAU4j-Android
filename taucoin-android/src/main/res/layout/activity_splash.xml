@@ -40,7 +40,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:lineSpacingExtra="@dimen/widget_size_5"
-            android:textSize="@dimen/splash_size_alpha"
+            android:textSize="@dimen/widget_size_20"
             android:textStyle="bold"
             android:gravity="center_horizontal|bottom"
             android:textColor="@color/color_logo"

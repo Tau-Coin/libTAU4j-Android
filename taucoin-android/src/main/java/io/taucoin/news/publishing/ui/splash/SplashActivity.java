@@ -71,7 +71,7 @@ public class SplashActivity extends BaseActivity {
             requestWriteLogPermissions();
 
             // delay 3 seconds jump
-            disposables.add(Observable.timer(1500, TimeUnit.MILLISECONDS)
+            disposables.add(Observable.timer(1000, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(aLong -> splashJump()));

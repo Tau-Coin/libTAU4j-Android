@@ -96,13 +96,13 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
             if (getArguments() != null) {
                 String chainID = getArguments().getString(IntentExtra.ID);
                 if (StringUtil.isNotEquals(this.chainID, chainID)) {
-                    this.chainID = chainID;
                     isConnectChain = true;
                     TauDaemonAlertHandler tauDaemonHandler = TauDaemon.getInstance(activity.getApplicationContext())
                             .getTauDaemonHandler();
                     tauDaemonHandler.getChainStoppedData().removeObserver(chainStoppedObserver);
                     tauDaemonHandler.getChainStoppedData().observe(this.getViewLifecycleOwner(), chainStoppedObserver);
                 }
+                this.chainID = chainID;
                 subscribeCommunityViewModel();
             }
         } else {
@@ -267,6 +267,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
      * 订阅社区相关的被观察者
      */
     private void subscribeCommunityViewModel() {
+        if (StringUtil.isEmpty(chainID)) {
+            return;
+        }
         TauDaemon tauDaemon = TauDaemon.getInstance(activity.getApplicationContext());
         disposables.add(ObservableUtil.intervalSeconds(2, true)
                 .subscribeOn(Schedulers.io())

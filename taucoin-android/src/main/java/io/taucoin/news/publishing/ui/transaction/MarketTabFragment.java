@@ -344,6 +344,9 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     }
 
     public void loadData(int pos) {
+        if (StringUtil.isEmpty(chainID)) {
+            return;
+        }
         currentPos = pos;
         txViewModel.loadMarketData(chainID, pos, getItemCount());
     }
@@ -535,20 +538,20 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     }
 
     public void onHiddenChanged(boolean hidden, String chainID) {
-        logger.debug("onHiddenChanged::{}", hidden);
+        logger.debug("onHiddenChanged::{}, chainID::{}", hidden, chainID);
         if (!hidden) {
             isScrollToTop = true;
             isVisibleToUser = true;
             if (StringUtil.isNotEquals(this.chainID, chainID)) {
-                this.chainID = chainID;
                 adapter.submitList(new ArrayList<>());
             }
+            this.chainID = chainID;
             subscribeCommunityViewModel();
         } else {
             isVisibleToUser = false;
             disposables.clear();
             closeAllDialog();
-            binding.refreshLayout.setVisibility(View.GONE);
+            binding.refreshLayout.setVisibility(View.INVISIBLE);
         }
     }
 }

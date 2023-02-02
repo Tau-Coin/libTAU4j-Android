@@ -311,16 +311,19 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
      * 订阅社区相关的被观察者
      */
     private void subscribeChatViewModel() {
-        disposables.add(userViewModel.observeFriend(friendPK)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(friend -> {
-                    updateFriendInfo(friend.user);
-                    binding.llBottomInput.setVisibility(friend.status != FriendStatus.DISCOVERED.getStatus()
-                            ? View.VISIBLE : View.GONE);
-                    binding.llShareQr.setVisibility(friend.status != FriendStatus.CONNECTED.getStatus()
-                            ? View.VISIBLE : View.GONE);
-                }));
+        if (StringUtil.isNotEmpty(friendPK)) {
+            disposables.add(userViewModel.observeFriend(friendPK)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(friend -> {
+                        updateFriendInfo(friend.user);
+                        binding.llBottomInput.setVisibility(friend.status != FriendStatus.DISCOVERED.getStatus()
+                                ? View.VISIBLE : View.GONE);
+                        binding.llShareQr.setVisibility(friend.status != FriendStatus.CONNECTED.getStatus()
+                                ? View.VISIBLE : View.GONE);
+                    }));
+        }
+
 
         disposables.add(chatViewModel.observeDataSetChanged()
                 .subscribeOn(Schedulers.io())
@@ -482,6 +485,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     }
 
     private void loadData(int pos) {
+        if (StringUtil.isEmpty(friendPK)) {
+            return;
+        }
         currentPos = pos;
         chatViewModel.loadMessagesData(friendPK, pos);
     }
@@ -494,11 +500,11 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             if (getArguments() != null) {
                 String friendPK = getArguments().getString(IntentExtra.ID);
                 if (StringUtil.isNotEquals(this.friendPK, friendPK)) {
-                    this.friendPK = friendPK;
                     adapter.submitList(new ArrayList<>());
                     userViewModel.requestFriendInfo(friendPK);
                     userViewModel.focusFriend(friendPK);
                 }
+                this.friendPK = friendPK;
                 loadData(0);
                 subscribeChatViewModel();
             }
@@ -510,7 +516,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             binding.etMessage.getText().clear();
             binding.etMessage.clearFocus();
             binding.chatAdd.setVisibility(View.GONE);
-            binding.refreshLayout.setVisibility(View.GONE);
+            binding.refreshLayout.setVisibility(View.INVISIBLE);
             chatViewModel.disposables.clear();
         }
     }
