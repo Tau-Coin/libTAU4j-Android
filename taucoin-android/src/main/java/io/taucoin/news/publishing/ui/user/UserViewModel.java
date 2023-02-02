@@ -1330,9 +1330,11 @@ public class UserViewModel extends AndroidViewModel {
 
     /**
      * 请求更新朋友信息
+     * 排除请求自己的信息（防止移除社区，重新加入）
      */
     public void requestFriendInfo(String friendPk) {
-        if (StringUtil.isNotEmpty(friendPk)) {
+        if (StringUtil.isNotEmpty(friendPk) && StringUtil.isNotEquals(friendPk,
+                MainApplication.getInstance().getPublicKey())) {
             daemon.requestFriendInfo(friendPk);
         }
     }

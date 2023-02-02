@@ -133,7 +133,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
             getRecyclerView().setLayoutManager(layoutManager);
             getRecyclerView().setItemAnimator(null);
         }
-        adapter = new NewsListAdapter(this);
+        adapter = new NewsListAdapter(this, binding.txList);
         binding.txList.setAdapter(adapter);
         initFabSpeedDial();
         binding.refreshLayout.setXRefreshViewListener(this);
@@ -165,6 +165,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
             logger.debug("txs.size::{}", txs.size());
             closeProgressDialog();
             TauNotifier.getInstance().cancelNotify(chainID);
+            binding.refreshLayout.setVisibility(View.VISIBLE);
         });
     }
 
@@ -249,6 +250,13 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
+        subscribeCommunityViewModel();
+    }
+
+    /**
+     * 订阅社区相关的被观察者
+     */
+    private void subscribeCommunityViewModel() {
         txViewModel.getDeletedResult().observe(this, isSuccess -> {
             loadData(0);
         });
@@ -524,5 +532,23 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onHeaderMove(double v, int i) {
 
+    }
+
+    public void onHiddenChanged(boolean hidden, String chainID) {
+        logger.debug("onHiddenChanged::{}", hidden);
+        if (!hidden) {
+            isScrollToTop = true;
+            isVisibleToUser = true;
+            if (StringUtil.isNotEquals(this.chainID, chainID)) {
+                this.chainID = chainID;
+                adapter.submitList(new ArrayList<>());
+            }
+            subscribeCommunityViewModel();
+        } else {
+            isVisibleToUser = false;
+            disposables.clear();
+            closeAllDialog();
+            binding.refreshLayout.setVisibility(View.GONE);
+        }
     }
 }

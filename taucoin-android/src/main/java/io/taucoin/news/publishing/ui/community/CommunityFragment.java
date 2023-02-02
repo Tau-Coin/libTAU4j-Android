@@ -8,12 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -30,6 +32,7 @@ import io.taucoin.news.publishing.core.utils.FmtMicrometer;
 import io.taucoin.news.publishing.core.utils.KeyboardUtils;
 import io.taucoin.news.publishing.core.utils.ObservableUtil;
 import io.taucoin.news.publishing.core.utils.StringUtil;
+import io.taucoin.news.publishing.core.utils.ToastUtils;
 import io.taucoin.news.publishing.databinding.ExternalAirdropLinkDialogBinding;
 import io.taucoin.news.publishing.databinding.FragmentCommunityBinding;
 import io.taucoin.news.publishing.ui.BaseFragment;
@@ -85,6 +88,42 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         loadNewsFragment();
         communityViewModel.touchChain(chainID);
     }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            if (getArguments() != null) {
+                String chainID = getArguments().getString(IntentExtra.ID);
+                if (StringUtil.isNotEquals(this.chainID, chainID)) {
+                    this.chainID = chainID;
+                    isConnectChain = true;
+                    TauDaemonAlertHandler tauDaemonHandler = TauDaemon.getInstance(activity.getApplicationContext())
+                            .getTauDaemonHandler();
+                    tauDaemonHandler.getChainStoppedData().removeObserver(chainStoppedObserver);
+                    tauDaemonHandler.getChainStoppedData().observe(this.getViewLifecycleOwner(), chainStoppedObserver);
+                }
+                subscribeCommunityViewModel();
+            }
+        } else {
+            disposables.clear();
+            closeAllDialog();
+        }
+        if (currentFragment != null) {
+            currentFragment.onHiddenChanged(hidden, chainID);
+        }
+    }
+
+    private final Observer<CopyOnWriteArraySet<String>> chainStoppedObserver = new Observer<>() {
+        @Override
+        public void onChanged(CopyOnWriteArraySet<String> set) {
+            boolean chainStopped = set != null && set.contains(chainID);
+            if (CommunityFragment.this.chainStopped != chainStopped) {
+                CommunityFragment.this.chainStopped = chainStopped;
+                showWarningView();
+            }
+        }
+    };
 
     /**
      * 初始化参数
@@ -212,12 +251,16 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         disposables.clear();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    private void closeAllDialog() {
         if (chainStoppedDialog != null && chainStoppedDialog.isShowing()) {
             chainStoppedDialog.closeDialog();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        closeAllDialog();
     }
 
     /**

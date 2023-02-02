@@ -130,7 +130,7 @@ public class SearchNewsFragment extends BaseFragment implements View.OnClickList
             getRecyclerView().setLayoutManager(layoutManager);
             getRecyclerView().setItemAnimator(null);
         }
-        adapter = new NewsListAdapter(this);
+        adapter = new NewsListAdapter(this, binding.txList);
         binding.txList.setAdapter(adapter);
         binding.refreshLayout.setXRefreshViewListener(this);
         binding.refreshLayout.setPullRefreshEnable(false);

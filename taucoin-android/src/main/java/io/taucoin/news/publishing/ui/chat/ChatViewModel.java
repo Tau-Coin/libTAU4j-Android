@@ -63,7 +63,7 @@ public class ChatViewModel extends AndroidViewModel {
     private static final Logger logger = LoggerFactory.getLogger("ChatViewModel");
     private ChatRepository chatRepo;
     private UserRepository userRepo;
-    private CompositeDisposable disposables = new CompositeDisposable();
+    protected CompositeDisposable disposables = new CompositeDisposable();
     private MutableLiveData<Result> chatResult = new MutableLiveData<>();
     private MutableLiveData<Result> resentResult = new MutableLiveData<>();
     private MutableLiveData<List<ChatMsgAndLog>> chatMessages = new MutableLiveData<>();

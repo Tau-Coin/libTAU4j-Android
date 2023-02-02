@@ -8,6 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
@@ -33,19 +39,42 @@ import io.taucoin.news.publishing.ui.customviews.AutoLinkTextView;
  * Market 列表显示的Adapter
  */
 public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.ViewHolder> {
+    private Logger logger = LoggerFactory.getLogger("NewsListAdapter");
     private final ClickListener listener;
+    private List<ItemNewsBinding> viewList = new ArrayList<>();
+    private int viewPos = 0;
 
     NewsListAdapter(ClickListener listener) {
         super(diffCallback);
         this.listener = listener;
     }
 
+    NewsListAdapter(ClickListener listener, ViewGroup parent) {
+        super(diffCallback);
+        this.listener = listener;
+
+        for (int i = 0; i < 5; i++) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            ItemNewsBinding binding = DataBindingUtil.inflate(inflater,
+                    R.layout.item_news, parent, false);
+            viewList.add(binding);
+        }
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        ItemNewsBinding binding = DataBindingUtil.inflate(inflater,
-                R.layout.item_news, parent, false);
+        ItemNewsBinding binding;
+        if (viewPos >= viewList.size()) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            binding = DataBindingUtil.inflate(inflater,
+                    R.layout.item_news, parent, false);
+            logger.debug("list create new, total::{}", viewPos, getCurrentList().size());
+        } else {
+            binding = viewList.get(viewPos);
+            viewPos++;
+            logger.debug("list pos::{}, total::{}", viewPos, getCurrentList().size());
+        }
         return new ViewHolder(binding, listener);
     }
 

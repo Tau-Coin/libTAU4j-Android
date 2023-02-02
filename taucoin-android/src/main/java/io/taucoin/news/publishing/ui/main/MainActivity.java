@@ -98,6 +98,9 @@ public class MainActivity extends ScanTriggerActivity {
     private BaseFragment currentFragment;
     private SettingsRepository settingsRepo;
     private boolean isFriendLink = false;
+    private CommunityFragment communityFragment = new CommunityFragment();
+    private ChatFragment chatFragment = new ChatFragment();
+    private EmptyFragment emptyFragment = new EmptyFragment();
 //    private BadgeActionProvider badgeProvider;
 
     @Override
@@ -159,13 +162,37 @@ public class MainActivity extends ScanTriggerActivity {
 
     @Override
     protected void refreshAllView() {
+        FragmentManager fm = getSupportFragmentManager();
+        List<Fragment> fragments = fm.getFragments();
+        FragmentTransaction transaction = fm.beginTransaction();
+        for (Fragment fragment : fragments) {
+            if (fragment instanceof CommunityFragment || fragment instanceof ChatFragment) {
+                transaction.remove(fragment);
+            }
+        }
+        transaction.commitAllowingStateLoss();
+        communityFragment = new CommunityFragment();
+        chatFragment = new ChatFragment();
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_drawer);
-        loadFragmentView(R.id.main_left_fragment, new MainFragment());
-        currentFragment = new EmptyFragment();
-        loadFragmentView(R.id.main_right_fragment, currentFragment);
+        refreshLeftFragment();
+//        loadFragmentView(R.id.main_left_fragment, new MainFragment());
+        loadFragmentView(emptyFragment);
         initLayout();
         checkCurrentUser();
     }
+
+    private void refreshLeftFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        // Replace whatever is in the fragment container view with this fragment,
+        // and add the transaction to the back stack
+        transaction.replace(R.id.main_left_fragment, new MainFragment());
+        // 执行此方法后，fragment的onDestroy()方法和ViewModel的onCleared()方法都不执行
+        // transaction.addToBackStack(null);
+        transaction.commitAllowingStateLoss();
+    }
+
 
     /**
      * 检查当前用户
@@ -491,32 +518,51 @@ public class MainActivity extends ScanTriggerActivity {
         if (!bundle.isEmpty()) {
             int type = bundle.getInt(IntentExtra.TYPE, -1);
             if (type == 0) {
-                newFragment = new CommunityFragment();
+                newFragment = communityFragment;
             } else if (type == 1) {
-                newFragment = new ChatFragment();
+                newFragment = chatFragment;
             }
         }
-        currentFragment = newFragment;
+        boolean isEmptyFragment = false;
         if (null == newFragment) {
-            newFragment = new EmptyFragment();
+            newFragment = emptyFragment;
+            isEmptyFragment = true;
         }
         newFragment.setArguments(bundle);
-        loadFragmentView(R.id.main_right_fragment, newFragment);
+        loadFragmentView(newFragment);
+        if (isEmptyFragment) {
+            currentFragment = null;
+        }
         updateViewChanged();
     }
 
     /**
      * 加载Fragment视图
      */
-    private void loadFragmentView(int containerViewId, Fragment fragment) {
+    private void loadFragmentView(BaseFragment rightFragment) {
         FragmentManager fm = getSupportFragmentManager();
+        List<Fragment> fragments = fm.getFragments();
+        Fragment oldFragment = null;
+        for (Fragment fragment : fragments) {
+            if (StringUtil.isEquals(fragment.getClass().getSimpleName(),
+                    rightFragment.getClass().getSimpleName())) {
+                logger.debug("loadFragmentView::{}", rightFragment.getClass().getSimpleName());
+                oldFragment = fragment;
+                break;
+            }
+        }
         FragmentTransaction transaction = fm.beginTransaction();
-        // Replace whatever is in the fragment container view with this fragment,
-        // and add the transaction to the back stack
-        transaction.replace(containerViewId, fragment);
-        // 执行此方法后，fragment的onDestroy()方法和ViewModel的onCleared()方法都不执行
-        // transaction.addToBackStack(null);
+        if (currentFragment != null) {
+            transaction.hide(currentFragment);
+        }
+        if (null == oldFragment) {
+            transaction.add(R.id.main_right_fragment, rightFragment);
+            transaction.show(rightFragment);
+        } else {
+            transaction.show(oldFragment);
+        }
         transaction.commitAllowingStateLoss();
+        currentFragment = rightFragment;
     }
 
     /**

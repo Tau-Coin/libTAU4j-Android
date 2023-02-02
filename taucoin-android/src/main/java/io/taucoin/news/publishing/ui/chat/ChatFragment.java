@@ -79,6 +79,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     private Handler handler = new Handler();
     private MsgLogsDialog msgLogsDialog;
     private FloatMenu operationsMenu;
+    private boolean isVisibleToUser;
 
     private int currentPos = 0;
 
@@ -196,10 +197,14 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             binding.refreshLayout.setRefreshing(false);
             binding.refreshLayout.setEnabled(messages.size() != 0 && messages.size() % Page.PAGE_SIZE == 0);
 
-            userViewModel.clearMsgUnread(friendPK);
+            if (isVisibleToUser) {
+                userViewModel.clearMsgUnread(friendPK);
+            }
             logger.debug("messages.size::{}", messages.size());
             closeProgressDialog();
             TauNotifier.getInstance().cancelNotify(friendPK);
+            binding.refreshLayout.setVisibility(View.VISIBLE);
+
         });
 
         chatViewModel.getChatResult().observe(this.getViewLifecycleOwner(), result -> {
@@ -479,5 +484,61 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     private void loadData(int pos) {
         currentPos = pos;
         chatViewModel.loadMessagesData(friendPK, pos);
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            isVisibleToUser = true;
+            if (getArguments() != null) {
+                String friendPK = getArguments().getString(IntentExtra.ID);
+                if (StringUtil.isNotEquals(this.friendPK, friendPK)) {
+                    this.friendPK = friendPK;
+                    adapter.submitList(new ArrayList<>());
+                    userViewModel.requestFriendInfo(friendPK);
+                    userViewModel.focusFriend(friendPK);
+                }
+                loadData(0);
+                subscribeChatViewModel();
+            }
+        } else {
+            isVisibleToUser = false;
+            disposables.clear();
+            closeAllDialog();
+            // 关闭键盘和加号视图窗口
+            binding.etMessage.getText().clear();
+            binding.etMessage.clearFocus();
+            binding.chatAdd.setVisibility(View.GONE);
+            binding.refreshLayout.setVisibility(View.GONE);
+            chatViewModel.disposables.clear();
+        }
+    }
+
+    private void closeAllDialog() {
+        if (msgLogsDialog != null) {
+            msgLogsDialog.closeDialog();
+        }
+        if (operationsMenu != null) {
+            operationsMenu.setOnItemClickListener(null);
+            operationsMenu.dismiss();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getUserVisibleHint()) {
+            this.isVisibleToUser = true;
+        }
+        if (userViewModel != null && isVisibleToUser) {
+            userViewModel.clearMsgUnread(friendPK);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        this.isVisibleToUser = false;
     }
 }

@@ -10,7 +10,6 @@ import android.widget.LinearLayout;
 
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 
 import org.slf4j.LoggerFactory;
 
@@ -191,6 +190,7 @@ MainFragment extends BaseFragment implements View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(msgUnread -> {
                     updateTabBadgeDrawable(2, false, msgUnread > 0);
+                    LoggerFactory.getLogger("updateTabBadgeDrawable").debug("updateTabBadgeDrawable::{}", msgUnread);
                 }));
     }
 
@@ -282,9 +282,13 @@ MainFragment extends BaseFragment implements View.OnClickListener {
                 badgeDrawable.setVerticalOffset(badgeOffset);
                 badgeDrawable.setBackgroundColor(getResources().getColor(R.color.color_red));
             }
-            // 红点显示并且不在当前tab页
-            badgeDrawable.setVisible(true);
-            badgeDrawable.setVisible(visible && binding.tabLayout.getSelectedTabPosition() != index);
+            if (index == 0) {
+                // 红点显示并且不在当前tab页
+                badgeDrawable.setVisible(visible && (binding.tabLayout.getSelectedTabPosition() != index));
+            } else {
+                badgeDrawable.setVisible(visible);
+            }
+
         }
     }
 

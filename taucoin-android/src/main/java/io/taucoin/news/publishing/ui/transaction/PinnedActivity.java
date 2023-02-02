@@ -78,7 +78,7 @@ public class PinnedActivity extends BaseActivity implements NewsListAdapter.Clic
         binding.toolbarInclude.toolbar.setTitle(R.string.community_pinned_message);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        adapter = new NewsListAdapter(this);
+        adapter = new NewsListAdapter(this, binding.recyclerView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 //        layoutManager.setStackFromEnd(true);
