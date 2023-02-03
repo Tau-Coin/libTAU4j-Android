@@ -62,8 +62,7 @@ import javax.net.ssl.X509TrustManager;
 public class Utils {
     public static final String HASH_PATTERN = "\\b[0-9a-fA-F]{5,40}\\b";
     private static final int[] CHAIN_LOGO_ARRAY = new int[]{
-            R.mipmap.icon_cbd_logo, R.mipmap.icon_thailand, R.mipmap.icon_malaysia,
-            R.mipmap.icon_philippines, R.mipmap.icon_indonesia, R.mipmap.icon_vietnam};
+            R.mipmap.icon_bangkok, R.mipmap.icon_chiang_mai};
 
     public static boolean isHash(@NonNull String hash) {
         if (TextUtils.isEmpty(hash))

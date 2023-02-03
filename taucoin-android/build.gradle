@@ -114,7 +114,8 @@ android {
                     "\"tau://6e6170b970bae896803ecb10516537aba6ab974ac6aad7b898f609117fbafe2b@13.229.53.249:19881," +
                       "tau://c0b02f09be8712c9195373f41f0f76a8c3a75303c060927622c39bfdc570917f@18.133.58.91:29881\""
             buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_ARRAY", "new java.util.ArrayList() {{" +
-                    "add(\"b3f492f930303030CBD\");" +
+                    "add(\"483add9230303030Bangkok\");" +
+                    "add(\"1ae8bd0b30303030Chiang Mai\");" +
                     "}}"
             buildConfigField "String", "CHAIN_PEER",  "\"602bc2c65f2c6e77c7e359339de7eb3d6d243a5eac4842d97b92e583d472690a\""
             signingConfig signingConfigs.debugConfig
