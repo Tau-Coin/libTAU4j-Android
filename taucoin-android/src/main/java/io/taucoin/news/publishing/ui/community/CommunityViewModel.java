@@ -1325,6 +1325,9 @@ public class CommunityViewModel extends AndroidViewModel {
     }
 
     public void touchChain(String chainID) {
+        if (StringUtil.isEmpty(chainID)) {
+            return;
+        }
         daemon.touchChain(chainID);
     }
 

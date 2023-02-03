@@ -1,6 +1,7 @@
 package io.taucoin.news.publishing.ui.transaction;
 
 import android.graphics.drawable.Drawable;
+import android.os.Looper;
 import android.text.SpannableStringBuilder;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -53,12 +54,16 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
         super(diffCallback);
         this.listener = listener;
 
-        for (int i = 0; i < 5; i++) {
+        Looper.myQueue().addIdleHandler(() -> {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            ItemNewsBinding binding = DataBindingUtil.inflate(inflater,
-                    R.layout.item_news, parent, false);
-            viewList.add(binding);
-        }
+            for (int i = 0; i < 5; i++) {
+                ItemNewsBinding binding = DataBindingUtil.inflate(inflater,
+                        R.layout.item_news, parent, false);
+                viewList.add(binding);
+                logger.debug("addIdleHandler::{}", i);
+            }
+            return false;
+        });
     }
 
     @NonNull
