@@ -485,7 +485,6 @@ public abstract class TauDaemon {
         checkChainsDisposable = Observable.create((ObservableOnSubscribe<Void>) emitter -> {
             UserRepository userRepo = RepositoryHelper.getUserRepository(appContext);
             MemberRepository memberRepo = RepositoryHelper.getMemberRepository(appContext);
-            CommunityRepository communityRepo = RepositoryHelper.getCommunityRepository(appContext);
             User user = userRepo.getCurrentUser();
             if (user != null) {
                 String userPk = user.publicKey;
@@ -497,7 +496,7 @@ public abstract class TauDaemon {
 
                 // 0、添加默认配置链
                 ArrayList<String> chainArray = BuildConfig.CHAIN_ARRAY;
-                for (int i = 0; i < 1; i++) {
+                for (int i = 0; i < chainArray.size(); i++) {
                     String chainID = chainArray.get(i);
                     String peer = BuildConfig.CHAIN_PEER;
                     String tauTesting = LinkUtil.encodeChain(peer, chainID, peer);
@@ -522,18 +521,6 @@ public abstract class TauDaemon {
                     // libTAU unfollowChain
                     boolean success = unfollowChain(chainID);
                     logger.debug("checkAllChains unfollowChain chainID::{}, success::{}", chainID, success);
-                }
-                // 3、unfollow线上国家社区
-                for (int i = 1; i < chainArray.size(); i++) {
-                    String chainID = chainArray.get(i);
-                    Member member = memberRepo.getMemberByChainIDAndPk(chainID, userPk);
-                    if (member != null) {
-                        boolean success = unfollowChain(chainID);
-                        if (success) {
-                            memberRepo.deleteCommunityMember(chainID, userPk);
-                        }
-                    }
-                    logger.info("checkAllChains unfollow chainID::{}, delete member", chainID);
                 }
             }
             emitter.onComplete();

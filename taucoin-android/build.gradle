@@ -115,11 +115,6 @@ android {
                       "tau://c0b02f09be8712c9195373f41f0f76a8c3a75303c060927622c39bfdc570917f@18.133.58.91:29881\""
             buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_ARRAY", "new java.util.ArrayList() {{" +
                     "add(\"b3f492f930303030CBD\");" +
-                    "add(\"7f660b6030303030Thailand\");" +
-                    "add(\"ea7fc57030303030Malaysia\");" +
-                    "add(\"a31fb2d630303030Philippines\");" +
-                    "add(\"883258f330303030Indonesia\");" +
-                    "add(\"14916ed130303030Vietnam\");" +
                     "}}"
             buildConfigField "String", "CHAIN_PEER",  "\"602bc2c65f2c6e77c7e359339de7eb3d6d243a5eac4842d97b92e583d472690a\""
             signingConfig signingConfigs.debugConfig
@@ -137,11 +132,6 @@ android {
                       "tau://8f07019ab04f14ca346398bd603a1bd042859c03d80bc1d3dd7c382e6d71d8a2@18.133.58.91:14882\""
             buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_ARRAY", "new java.util.ArrayList() {{" +
                     "add(\"a532079e30303030CBD\");" +
-                    "add(\"44979ddb30303030Thailand\");" +
-                    "add(\"d5aac75930303030Malaysia\");" +
-                    "add(\"42cfa71730303030Philippines\");" +
-                    "add(\"364c7e3330303030Indonesia\");" +
-                    "add(\"f646a06330303030Vietnam\");" +
                     "}}"
             buildConfigField "String", "CHAIN_PEER",  "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
             signingConfig signingConfigs.releaseConfig
@@ -159,11 +149,6 @@ android {
                       "tau://8f07019ab04f14ca346398bd603a1bd042859c03d80bc1d3dd7c382e6d71d8a2@18.133.58.91:14882\""
             buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_ARRAY", "new java.util.ArrayList() {{" +
                     "add(\"a532079e30303030CBD\");" +
-                    "add(\"44979ddb30303030Thailand\");" +
-                    "add(\"d5aac75930303030Malaysia\");" +
-                    "add(\"42cfa71730303030Philippines\");" +
-                    "add(\"364c7e3330303030Indonesia\");" +
-                    "add(\"f646a06330303030Vietnam\");" +
                     "}}"
             buildConfigField "String", "CHAIN_PEER", "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
             signingConfig signingConfigs.releaseConfig
