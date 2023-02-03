@@ -30,7 +30,7 @@ public class CryptoCitiesActivity extends BaseActivity {
                 .append("TAU Communities are public places for chats and news. These communities have logos.  The coins economics is as following:")
                 .append("\n\n")
                 .append("- Initial Volume: ")
-                .append("1,000,000")
+                .append("10,000,000")
                 .setForegroundColor(getResources().getColor(R.color.color_yellow))
                 .setBold()
                 .setFontSize(20, true)
@@ -40,9 +40,7 @@ public class CryptoCitiesActivity extends BaseActivity {
                 .setForegroundColor(getResources().getColor(R.color.color_yellow))
                 .setBold()
                 .setFontSize(20, true)
-                .append(" coins each 5 minutes for winner.").append("\n")
-                .append("\n")
-                .append("The first community is CBD community.")
+                .append(" coins each 5 minutes for winner.")
                 .create();
         binding.tvLondonPmcDesc.setText(spannableStringBuilder);
     }
