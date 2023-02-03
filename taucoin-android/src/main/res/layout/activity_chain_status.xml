@@ -191,7 +191,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                    <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/item_mining_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -218,14 +218,14 @@
 
                 </LinearLayout>
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_total_blocks"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     app:lineLeftText="@string/chain_total_blocks" />
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:visibility="gone"
                     android:id="@+id/item_on_chain_blocks"
                     android:layout_width="match_parent"
@@ -233,14 +233,14 @@
                     android:gravity="center_vertical"
                     app:lineLeftText="@string/chain_on_chain_blocks" />
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_difficulty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     app:lineLeftText="@string/chain_difficulty" />
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:visibility="gone"
                     android:id="@+id/item_total_peers"
                     android:layout_width="match_parent"
@@ -248,7 +248,7 @@
                     android:gravity="center_vertical"
                     app:lineLeftText="@string/chain_total_peers" />
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:visibility="gone"
                     android:id="@+id/item_peers_blocks"
                     android:layout_width="match_parent"
@@ -256,28 +256,28 @@
                     android:gravity="center_vertical"
                     app:lineLeftText="@string/chain_peers_blocks" />
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_balance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     app:lineLeftText="@string/chain_pending_balance" />
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_power"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     app:lineLeftText="@string/drawer_power" />
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_total_coins"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     app:lineLeftText="@string/chain_total_coins" />
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_access_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -286,7 +286,7 @@
                     app:lineLeftText="@string/chain_access_list"
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_all_peers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -295,7 +295,7 @@
                     app:lineLeftText="@string/community_all_peers"
                     app:lineRightImage="@mipmap/icon_arrow"/>
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:visibility="gone"
                     android:id="@+id/item_sync_status"
                     android:layout_width="match_parent"
@@ -320,7 +320,7 @@
                         android:layout_marginStart="@dimen/widget_size_20"
                         android:textAppearance="@style/TextAppearanceBody1"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                    <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/item_fork_block_num"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -330,7 +330,7 @@
                         app:lineLeftTextColor="@color/gray_dark"
                         app:lineLeftText="@string/chain_block_number"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                    <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/item_fork_block_hash"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -348,7 +348,7 @@
 
                 </LinearLayout>
 
-                <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_reload_chain"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

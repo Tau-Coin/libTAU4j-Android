@@ -18,7 +18,7 @@
             layout="@layout/toolbar" />
 
 
-        <io.taucoin.news.publishing.ui.customviews.FilterEditText
+        <io.taucbd.news.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_old_name"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_50"
@@ -31,7 +31,7 @@
             android:inputType="text"
             android:textAppearance="@style/TextAppearanceBody1" />
 
-        <io.taucoin.news.publishing.ui.customviews.FilterEditText
+        <io.taucbd.news.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_name"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_50"
@@ -44,7 +44,7 @@
             android:textAppearance="@style/TextAppearanceBody1"
             android:autofillHints="@string/tx_new_name" />
 
-        <io.taucoin.news.publishing.ui.customviews.FilterEditText
+        <io.taucbd.news.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_personal_profile"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_50"
@@ -83,7 +83,7 @@
                 android:src="@mipmap/icon_arrow"/>
 
         </LinearLayout>
-        <io.taucoin.news.publishing.ui.customviews.FilterEditText
+        <io.taucbd.news.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_contact_id"
             android:layout_width="match_parent"
             android:layout_height="@dimen/widget_size_50"

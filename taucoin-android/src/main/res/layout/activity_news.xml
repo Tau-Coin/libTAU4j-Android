@@ -155,7 +155,7 @@
 
                 </RelativeLayout>
 
-                <io.taucoin.news.publishing.ui.customviews.FilterEditText
+                <io.taucbd.news.publishing.ui.customviews.FilterEditText
                     android:id="@+id/et_news"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -176,7 +176,7 @@
                     android:layout_height="@dimen/widget_size_1"
                     android:layout_marginTop="@dimen/widget_size_5" />
 
-                <io.taucoin.news.publishing.ui.customviews.FilterEditText
+                <io.taucbd.news.publishing.ui.customviews.FilterEditText
                     android:id="@+id/et_link"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

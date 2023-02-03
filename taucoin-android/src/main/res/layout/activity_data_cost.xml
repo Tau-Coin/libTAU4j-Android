@@ -38,38 +38,38 @@
                     android:background="@color/color_white"
                     android:layout_marginTop="@dimen/widget_size_10">
 
-                    <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                    <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_reset_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:lineLeftText="@string/setting_data_reset_time"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                    <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_fore_running_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:lineLeftText="@string/setting_fore_running_time"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                    <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_fore_doze_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:lineLeftText="@string/setting_fore_doze_time"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                    <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_bg_running_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:lineLeftText="@string/setting_bg_running_time"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                    <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_android_doze"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:lineVisibility="true"
                         app:lineLeftText="@string/setting_doze_running_time"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                    <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/tv_back_doze_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

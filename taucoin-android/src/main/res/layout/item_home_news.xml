@@ -22,7 +22,7 @@
             android:paddingEnd="@dimen/widget_size_5"
             android:paddingTop="@dimen/widget_size_5">
 
-            <io.taucoin.news.publishing.ui.customviews.RoundImageView
+            <io.taucbd.news.publishing.ui.customviews.RoundImageView
                 android:id="@+id/iv_head_pic"
                 android:layout_width="@dimen/widget_size_40"
                 android:layout_height="@dimen/widget_size_40"
@@ -122,7 +122,7 @@
 
             </LinearLayout>
 
-            <io.taucoin.news.publishing.ui.customviews.AutoLinkTextView
+            <io.taucbd.news.publishing.ui.customviews.AutoLinkTextView
                 android:layout_toEndOf="@+id/ll_left"
                 android:id="@+id/tv_msg"
                 android:layout_width="match_parent"
@@ -302,7 +302,7 @@
                 android:paddingTop="@dimen/widget_size_5"
                 android:gravity="center_vertical">
 
-                <io.taucoin.news.publishing.ui.customviews.RoundImageView
+                <io.taucbd.news.publishing.ui.customviews.RoundImageView
                     android:id="@+id/iv_reply_head_pic"
                     android:layout_width="@dimen/widget_size_30"
                     android:layout_height="@dimen/widget_size_30"
@@ -402,7 +402,7 @@
                     android:textColor="@color/gray_dark"
                     android:textAppearance="@style/TextAppearanceBody1" />
 
-                <io.taucoin.news.publishing.ui.customviews.AutoLinkTextView
+                <io.taucbd.news.publishing.ui.customviews.AutoLinkTextView
                     android:layout_below="@+id/tv_reply"
                     android:id="@+id/tv_reply_msg"
                     android:layout_width="match_parent"

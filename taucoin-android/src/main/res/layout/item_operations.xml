@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <io.taucoin.news.publishing.ui.customviews.ItemLineView
+        <io.taucbd.news.publishing.ui.customviews.ItemLineView
             android:id="@+id/copy"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/widget_size_50"
@@ -21,7 +21,7 @@
             app:leftImage="@mipmap/icon_copy"
             app:rightText="@string/tx_operation_copy"/>
 
-        <io.taucoin.news.publishing.ui.customviews.ItemLineView
+        <io.taucbd.news.publishing.ui.customviews.ItemLineView
             android:id="@+id/copy_link"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/widget_size_50"
@@ -29,7 +29,7 @@
             app:leftImage="@mipmap/icon_copy_link"
             app:rightText="@string/tx_operation_copy_link"/>
 
-        <io.taucoin.news.publishing.ui.customviews.ItemLineView
+        <io.taucbd.news.publishing.ui.customviews.ItemLineView
             android:id="@+id/blacklist"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/widget_size_50"
@@ -37,7 +37,7 @@
             app:leftImage="@mipmap/icon_blacklist"
             app:rightText="@string/tx_operation_blacklist"/>
 
-        <io.taucoin.news.publishing.ui.customviews.ItemLineView
+        <io.taucbd.news.publishing.ui.customviews.ItemLineView
             android:id="@+id/favourite"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/widget_size_50"
@@ -45,7 +45,7 @@
             app:leftImage="@mipmap/icon_favourite_news"
             app:rightText="@string/tx_operation_favorite"/>
 
-        <io.taucoin.news.publishing.ui.customviews.ItemLineView
+        <io.taucbd.news.publishing.ui.customviews.ItemLineView
             android:id="@+id/msg_hash"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/widget_size_50"

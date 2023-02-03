@@ -82,7 +82,7 @@
                     android:layout_marginBottom="@dimen/widget_size_20"
                     android:background="@drawable/white_rect_round_bg_no_border">
 
-                    <io.taucoin.news.publishing.ui.customviews.RaeSeekBar
+                    <io.taucbd.news.publishing.ui.customviews.RaeSeekBar
                         android:id="@+id/seek_bar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

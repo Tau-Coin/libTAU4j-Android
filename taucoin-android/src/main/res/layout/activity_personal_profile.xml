@@ -18,7 +18,7 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <io.taucoin.news.publishing.ui.customviews.FilterEditText
+        <io.taucbd.news.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_personal_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -18,7 +18,7 @@
             android:paddingStart="@dimen/widget_size_10"
             android:paddingEnd="@dimen/widget_size_10">
 
-            <io.taucoin.news.publishing.ui.customviews.RoundImageView
+            <io.taucbd.news.publishing.ui.customviews.RoundImageView
                 android:id="@+id/iv_head_pic"
                 android:layout_width="@dimen/widget_size_40"
                 android:layout_height="@dimen/widget_size_40"

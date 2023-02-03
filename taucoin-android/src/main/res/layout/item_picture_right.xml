@@ -51,14 +51,14 @@
                 android:indeterminateDrawable="@drawable/progressbar_round"
                 android:layout_gravity="center_vertical"/>
 
-            <io.taucoin.news.publishing.ui.customviews.HashImageView
+            <io.taucbd.news.publishing.ui.customviews.HashImageView
                 android:id="@+id/tv_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/widget_size_10"
                 android:textAppearance="@style/TextAppearanceBody2" />
 
-            <io.taucoin.news.publishing.ui.customviews.RoundButton
+            <io.taucbd.news.publishing.ui.customviews.RoundButton
                 android:id="@+id/round_button"
                 android:layout_width="@dimen/widget_size_40"
                 android:layout_height="@dimen/widget_size_40"

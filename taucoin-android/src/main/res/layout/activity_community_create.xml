@@ -44,7 +44,7 @@
                 android:paddingEnd="@dimen/widget_size_15"
                 android:layout_marginTop="@dimen/widget_size_10">
 
-                <io.taucoin.news.publishing.ui.customviews.RoundButton
+                <io.taucbd.news.publishing.ui.customviews.RoundButton
                     android:id="@+id/round_button"
                     android:layout_width="@dimen/widget_size_60"
                     android:layout_height="@dimen/widget_size_60"

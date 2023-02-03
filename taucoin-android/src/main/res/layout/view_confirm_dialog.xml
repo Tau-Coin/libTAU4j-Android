@@ -24,7 +24,7 @@
             android:textColor="@color/gray_dark"
             android:text="@string/community_custom_airdrop_tips"/>
 
-        <io.taucoin.news.publishing.ui.customviews.EmptyRecyclerView
+        <io.taucbd.news.publishing.ui.customviews.EmptyRecyclerView
             android:background="@color/color_white"
             android:id="@+id/recycler_list"
             android:layout_width="match_parent"

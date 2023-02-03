@@ -13,7 +13,7 @@
         android:gravity="center_horizontal"
         android:background="@color/color_white">
 
-        <io.taucoin.news.publishing.ui.customviews.CompletedView
+        <io.taucbd.news.publishing.ui.customviews.CompletedView
             android:id="@+id/cv_progress"
             android:layout_width="@dimen/widget_size_90"
             android:layout_height="@dimen/widget_size_90"

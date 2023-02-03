@@ -45,7 +45,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <io.taucoin.news.publishing.ui.customviews.RoundImageView
+                        <io.taucbd.news.publishing.ui.customviews.RoundImageView
                             android:id="@+id/iv_head_pic"
                             android:layout_width="@dimen/widget_size_50"
                             android:layout_height="@dimen/widget_size_50"
@@ -139,7 +139,7 @@
                     android:paddingTop="@dimen/widget_size_0"
                     android:paddingBottom="@dimen/widget_size_0">
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_personal_profile"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -173,7 +173,7 @@
                     android:paddingTop="@dimen/widget_size_0"
                     android:paddingBottom="@dimen/widget_size_0">
 
-                    <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+                    <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                         android:id="@+id/ll_favorites"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -204,7 +204,7 @@
                     android:paddingTop="@dimen/widget_size_0"
                     android:paddingBottom="@dimen/widget_size_0">
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_privacy_security"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -224,7 +224,7 @@
                         android:layout_marginEnd="@dimen/widget_size_10"
                         layout="@layout/view_line"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_dash_board"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -245,7 +245,7 @@
                         android:layout_marginEnd="@dimen/widget_size_10"
                         layout="@layout/view_line"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:visibility="gone"
                         android:id="@+id/item_data_cost"
                         android:layout_width="match_parent"
@@ -266,7 +266,7 @@
                         android:layout_marginEnd="@dimen/widget_size_10"
                         layout="@layout/view_line"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_font_size"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -286,7 +286,7 @@
                         android:layout_marginEnd="@dimen/widget_size_10"
                         layout="@layout/view_line"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_updates"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -298,7 +298,7 @@
                         app:leftImage="@mipmap/icon_version_updates"
                         app:rightText="@string/setting_check_updates"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:visibility="gone"
                         android:id="@+id/item_share"
                         android:layout_width="match_parent"
@@ -316,7 +316,7 @@
                         android:layout_marginEnd="@dimen/widget_size_10"
                         layout="@layout/view_line"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_official_telegram"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -334,7 +334,7 @@
                         android:layout_marginEnd="@dimen/widget_size_10"
                         layout="@layout/view_line"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_help"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -360,7 +360,7 @@
                             android:layout_marginEnd="@dimen/widget_size_10"
                             layout="@layout/view_line"/>
 
-                        <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                        <io.taucbd.news.publishing.ui.customviews.ItemLineView
                             android:id="@+id/item_debug"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

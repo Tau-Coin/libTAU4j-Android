@@ -9,6 +9,6 @@
 
     <item android:id="@+id/menu_alert"
         app:showAsAction="always"
-        app:actionProviderClass="io.taucoin.news.publishing.ui.customviews.BadgeActionProvider"
+        app:actionProviderClass="io.taucbd.news.publishing.ui.customviews.BadgeActionProvider"
         android:title="@string/menu_alert" />
 </menu>

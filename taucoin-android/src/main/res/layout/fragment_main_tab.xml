@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:layout_width="match_parent">
 
-        <io.taucoin.news.publishing.ui.customviews.EmptyRecyclerView
+        <io.taucbd.news.publishing.ui.customviews.EmptyRecyclerView
             android:background="@color/color_bg"
             android:id="@+id/group_list"
             android:layout_width="match_parent"

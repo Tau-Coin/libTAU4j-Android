@@ -36,7 +36,7 @@
                     android:layout_marginTop="@dimen/widget_size_20"
                     android:orientation="vertical">
 
-                    <io.taucoin.news.publishing.ui.customviews.RoundImageView
+                    <io.taucbd.news.publishing.ui.customviews.RoundImageView
                         android:id="@+id/round_button"
                         android:layout_width="@dimen/widget_size_40"
                         android:layout_height="@dimen/widget_size_40"
@@ -133,7 +133,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:visibility="gone"
                         android:id="@+id/item_airdrop_coins"
                         android:layout_width="match_parent"
@@ -144,7 +144,7 @@
                         app:leftImage="@mipmap/icon_airdrop_coins"
                         app:rightText="@string/drawer_send_and_airdrop_coins"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:visibility="gone"
                         android:id="@+id/item_new_community"
                         android:layout_width="match_parent"
@@ -155,7 +155,7 @@
                         app:leftImage="@mipmap/icon_new_community"
                         app:rightText="@string/drawer_new_community"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_share_app"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -166,7 +166,7 @@
                         app:leftImage="@mipmap/icon_share"
                         app:rightText="@string/drawer_share"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_wallet"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -177,7 +177,7 @@
                         app:leftImage="@mipmap/icon_wallet"
                         app:rightText="@string/drawer_wallet"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_crypto_cities"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -188,7 +188,7 @@
                         app:leftImageSize="@dimen/widget_size_22"
                         app:rightText="@string/drawer_tau_communities"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:visibility="gone"
                         android:id="@+id/item_paste_link"
                         android:layout_width="match_parent"
@@ -199,7 +199,7 @@
                         app:leftImage="@mipmap/icon_copy_link"
                         app:rightText="@string/drawer_paste_link"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_contacts"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -209,7 +209,7 @@
                         app:leftImage="@mipmap/icon_contacts"
                         app:rightText="@string/drawer_peers"/>
 
-                    <io.taucoin.news.publishing.ui.customviews.ItemLineView
+                    <io.taucbd.news.publishing.ui.customviews.ItemLineView
                         android:id="@+id/item_setting"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

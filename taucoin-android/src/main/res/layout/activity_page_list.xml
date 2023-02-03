@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <io.taucoin.news.publishing.ui.customviews.EmptyRecyclerView
+                <io.taucbd.news.publishing.ui.customviews.EmptyRecyclerView
                     android:id="@+id/recycler_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

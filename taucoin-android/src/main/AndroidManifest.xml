@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="io.taucoin.news.publishing"
+    package="io.taucbd.news.publishing"
     android:installLocation="auto">
 
     <!-- 访问网络权限 -->
@@ -38,7 +38,7 @@
         android:required="false" />
 
     <application
-        android:name="io.taucoin.news.publishing.MainApplication"
+        android:name="io.taucbd.news.publishing.MainApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -50,7 +50,7 @@
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android:allowBackup, android:supportsRtl">
         <activity
-            android:name="io.taucoin.news.publishing.ui.splash.SplashActivity"
+            android:name="io.taucbd.news.publishing.ui.splash.SplashActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/AppTheme.Launcher"
             android:exported="true">
@@ -62,149 +62,149 @@
         </activity>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.main.MainActivity"
+            android:name="io.taucbd.news.publishing.ui.main.MainActivity"
             android:launchMode="singleTop"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.search.SearchActivity"
+            android:name="io.taucbd.news.publishing.ui.search.SearchActivity"
             android:launchMode="singleTop"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.CommunityCreateActivity"
+            android:name="io.taucbd.news.publishing.ui.community.CommunityCreateActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.WalletActivity"
+            android:name="io.taucbd.news.publishing.ui.community.WalletActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.CommunityJoinActivity"
+            android:name="io.taucbd.news.publishing.ui.community.CommunityJoinActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.CommunitiesActivity"
+            android:name="io.taucbd.news.publishing.ui.community.CommunitiesActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.TransactionsActivity"
+            android:name="io.taucbd.news.publishing.ui.community.TransactionsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.CommunityDetailActivity"
+            android:name="io.taucbd.news.publishing.ui.community.CommunityDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.MembersAddActivity"
+            android:name="io.taucbd.news.publishing.ui.community.MembersAddActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.ChainStatusActivity"
+            android:name="io.taucbd.news.publishing.ui.community.ChainStatusActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.SyncStatusActivity"
+            android:name="io.taucbd.news.publishing.ui.community.SyncStatusActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.AccessListActivity"
+            android:name="io.taucbd.news.publishing.ui.community.AccessListActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.ChainTopActivity"
+            android:name="io.taucbd.news.publishing.ui.community.ChainTopActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.BalanceActivity"
+            android:name="io.taucbd.news.publishing.ui.community.BalanceActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.PasteLinkActivity"
+            android:name="io.taucbd.news.publishing.ui.community.PasteLinkActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.community.ChainExplorerActivity"
+            android:name="io.taucbd.news.publishing.ui.community.ChainExplorerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.friends.FriendsActivity"
+            android:name="io.taucbd.news.publishing.ui.friends.FriendsActivity"
             android:launchMode="singleTop"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.SettingActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.SettingActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.PrivacySecurityActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.PrivacySecurityActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.DebugActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.DebugActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.BlacklistActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.BlacklistActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.DataCostActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.DataCostActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.WorkingConditionActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.WorkingConditionActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.user.SeedActivity"
+            android:name="io.taucbd.news.publishing.ui.user.SeedActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.transaction.EscrowServiceActivity"
+            android:name="io.taucbd.news.publishing.ui.transaction.EscrowServiceActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.transaction.TransactionCreateActivity"
+            android:name="io.taucbd.news.publishing.ui.transaction.TransactionCreateActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.transaction.NewsCreateActivity"
+            android:name="io.taucbd.news.publishing.ui.transaction.NewsCreateActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.transaction.NewsDetailActivity"
+            android:name="io.taucbd.news.publishing.ui.transaction.NewsDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.transaction.CommunityChatActivity"
+            android:name="io.taucbd.news.publishing.ui.transaction.CommunityChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.transaction.CoinsChooseActivity"
+            android:name="io.taucbd.news.publishing.ui.transaction.CoinsChooseActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.transaction.SellDetailActivity"
+            android:name="io.taucbd.news.publishing.ui.transaction.SellDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.transaction.TrustMoreActivity"
+            android:name="io.taucbd.news.publishing.ui.transaction.TrustMoreActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.transaction.PinnedActivity"
+            android:name="io.taucbd.news.publishing.ui.transaction.PinnedActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.transaction.NoteCreateActivity"
+            android:name="io.taucbd.news.publishing.ui.transaction.NoteCreateActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <service
-            android:name="io.taucoin.news.publishing.service.TauService" />
+            android:name="io.taucbd.news.publishing.service.TauService" />
 
         <receiver
-            android:name="io.taucoin.news.publishing.receiver.NotificationReceiver"
+            android:name="io.taucbd.news.publishing.receiver.NotificationReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="${applicationId}.receiver.NotificationReceiver.NOTIFY_ACTION_SHUTDOWN_APP" />
@@ -212,7 +212,7 @@
         </receiver>
 
         <receiver
-            android:name="io.taucoin.news.publishing.receiver.BootReceiver"
+            android:name="io.taucbd.news.publishing.receiver.BootReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -229,7 +229,7 @@
         </receiver>
 
         <receiver
-            android:name="io.taucoin.news.publishing.receiver.DownloadCompleteReceiver"
+            android:name="io.taucbd.news.publishing.receiver.DownloadCompleteReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
@@ -237,7 +237,7 @@
         </receiver>
 
         <receiver
-            android:name="io.taucoin.news.publishing.receiver.SchedulerReceiver" />
+            android:name="io.taucbd.news.publishing.receiver.SchedulerReceiver" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -250,33 +250,33 @@
         </provider>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.qrcode.CommunityQRCodeActivity"
+            android:name="io.taucbd.news.publishing.ui.qrcode.CommunityQRCodeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.qrcode.UserQRCodeActivity"
+            android:name="io.taucbd.news.publishing.ui.qrcode.UserQRCodeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.qrcode.KeyQRCodeActivity"
+            android:name="io.taucbd.news.publishing.ui.qrcode.KeyQRCodeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.qrcode.ScanQRCodeActivity" />
+            android:name="io.taucbd.news.publishing.ui.qrcode.ScanQRCodeActivity" />
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.user.UserDetailActivity"
+            android:name="io.taucbd.news.publishing.ui.user.UserDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.FavoritesActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.FavoritesActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.JournalActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.JournalActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
-        <activity android:name="io.taucoin.news.publishing.ui.SendTextToClipboard"
+        <activity android:name="io.taucbd.news.publishing.ui.SendTextToClipboard"
             android:label="@string/send_text_to_clipboard"
             android:icon="@drawable/icon_share_copy"
             android:theme="@android:style/Theme.NoDisplay"
@@ -290,7 +290,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="io.taucoin.news.publishing.ui.ExternalLinkActivity"
+        <activity android:name="io.taucbd.news.publishing.ui.ExternalLinkActivity"
             android:label="@string/app_name"
             android:icon="@drawable/icon_share_tau"
             android:theme="@style/transparent"
@@ -304,7 +304,7 @@
         </activity>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.download.UpgradeActivity"
+            android:name="io.taucbd.news.publishing.ui.download.UpgradeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/transparent"/>
 
@@ -324,59 +324,59 @@
         </provider>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.TrafficTipsActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.TrafficTipsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/transparent"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.DevicesActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.DevicesActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.DataStatisticsActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.DataStatisticsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.MemoryStatisticsActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.MemoryStatisticsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.CpuStatisticsActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.CpuStatisticsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.PeersAndInvokedActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.PeersAndInvokedActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.setting.FontSizeActivity"
+            android:name="io.taucbd.news.publishing.ui.setting.FontSizeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
-        <activity android:name="io.taucoin.news.publishing.ui.setting.PersonalProfileActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
-
-        <activity
-            android:name="io.taucoin.news.publishing.ui.friends.BotsActivity"
+        <activity android:name="io.taucbd.news.publishing.ui.setting.PersonalProfileActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.friends.AirdropCommunityActivity"
+            android:name="io.taucbd.news.publishing.ui.friends.BotsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.friends.AirdropDetailActivity"
+            android:name="io.taucbd.news.publishing.ui.friends.AirdropCommunityActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.friends.AirdropSetupActivity"
+            android:name="io.taucbd.news.publishing.ui.friends.AirdropDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.friends.AirdropHistoryActivity"
+            android:name="io.taucbd.news.publishing.ui.friends.AirdropSetupActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
-            android:name="io.taucoin.news.publishing.ui.main.CryptoCitiesActivity"
+            android:name="io.taucbd.news.publishing.ui.friends.AirdropHistoryActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity
+            android:name="io.taucbd.news.publishing.ui.main.CryptoCitiesActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
 
     </application>

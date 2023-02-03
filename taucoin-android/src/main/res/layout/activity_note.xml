@@ -17,7 +17,7 @@
             android:id="@+id/toolbar_include"
             layout="@layout/toolbar" />
 
-        <io.taucoin.news.publishing.ui.customviews.FilterEditText
+        <io.taucbd.news.publishing.ui.customviews.FilterEditText
             android:id="@+id/et_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
                 android:onClick="@{listener::onClick}"
                 android:src="@mipmap/icon_choose_contact"/>
 
-            <io.taucoin.news.publishing.ui.customviews.FilterEditText
+            <io.taucbd.news.publishing.ui.customviews.FilterEditText
                 android:id="@+id/et_community"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

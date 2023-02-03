@@ -19,7 +19,7 @@
             android:layout_marginTop="@dimen/widget_size_5"
             android:layout_marginBottom="@dimen/widget_size_5">
 
-            <io.taucoin.news.publishing.ui.customviews.RoundImageView
+            <io.taucbd.news.publishing.ui.customviews.RoundImageView
                 android:id="@+id/left_view"
                 android:layout_width="@dimen/widget_size_40"
                 android:layout_height="@dimen/widget_size_40"

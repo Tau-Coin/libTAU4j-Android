@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true">
 
-            <io.taucoin.news.publishing.ui.customviews.RoundImageView
+            <io.taucbd.news.publishing.ui.customviews.RoundImageView
                 android:id="@+id/left_view"
                 android:layout_width="@dimen/widget_size_50"
                 android:layout_height="@dimen/widget_size_50"

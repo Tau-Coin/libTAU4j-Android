@@ -37,7 +37,7 @@
                 android:layout_marginStart="@dimen/widget_size_0"
                 android:layout_marginEnd="@dimen/widget_size_5">
 
-                <io.taucoin.news.publishing.ui.customviews.RoundImageView
+                <io.taucbd.news.publishing.ui.customviews.RoundImageView
                     android:id="@+id/iv_head_pic"
                     android:layout_width="@dimen/widget_size_45"
                     android:layout_height="@dimen/widget_size_45"
@@ -72,7 +72,7 @@
                     android:textAppearance="@style/TextAppearanceBody3"/>
 
 
-                <io.taucoin.news.publishing.ui.customviews.AutoLinkTextView
+                <io.taucbd.news.publishing.ui.customviews.AutoLinkTextView
                     android:id="@+id/tv_msg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+        <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
             android:id="@+id/item_chain_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
             app:lineLeftText="@string/community_chain_status"
             app:lineRightImage="@mipmap/icon_arrow"/>
 
-        <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+        <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
             android:id="@+id/item_chain_explorer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
             app:lineLeftText="@string/community_chain_explorer"
             app:lineRightImage="@mipmap/icon_arrow"/>
 
-        <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+        <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
             android:id="@+id/item_pay_people"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
             app:lineLeftText="@string/community_transaction"
             app:lineRightImage="@mipmap/icon_arrow"/>
 
-        <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+        <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
             android:id="@+id/item_add_member"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
             app:lineLeftText="@string/community_added_members_title"
             app:lineRightImage="@mipmap/icon_arrow"/>
 
-        <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+        <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
             android:visibility="gone"
             android:id="@+id/item_airdrop_coins"
             android:layout_width="match_parent"
@@ -66,7 +66,7 @@
             app:lineLeftText="@string/drawer_airdrop_links"
             app:lineRightImage="@mipmap/icon_arrow"/>
 
-        <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+        <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
             android:id="@+id/item_qr_code"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -76,7 +76,7 @@
             app:lineLeftText="@string/community_qr_code"
             app:lineRightImage="@mipmap/icon_arrow"/>
 
-        <io.taucoin.news.publishing.ui.customviews.LeftRightLineView
+        <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
             android:id="@+id/item_blacklist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

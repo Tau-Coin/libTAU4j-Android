@@ -18,7 +18,7 @@
             android:layout_width="@dimen/widget_size_37"
             android:layout_height="wrap_content"/>
 
-        <io.taucoin.news.publishing.ui.customviews.RoundImageView
+        <io.taucbd.news.publishing.ui.customviews.RoundImageView
             android:layout_toEndOf="@+id/cb_select"
             android:id="@+id/left_view"
             android:layout_width="@dimen/widget_size_40"
