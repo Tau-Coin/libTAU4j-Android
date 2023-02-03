@@ -135,6 +135,9 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         }
         adapter = new NewsListAdapter(this, binding.txList);
         binding.txList.setAdapter(adapter);
+//        binding.txList.setItemViewCacheSize(20);
+        binding.txList.setDrawingCacheEnabled(true);
+        binding.txList.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         initFabSpeedDial();
         binding.refreshLayout.setXRefreshViewListener(this);
         binding.refreshLayout.setPullRefreshEnable(false);
@@ -552,6 +555,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
             disposables.clear();
             closeAllDialog();
             binding.refreshLayout.setVisibility(View.INVISIBLE);
+            binding.llPinnedMessage.setVisibility(View.GONE);
         }
     }
 }
