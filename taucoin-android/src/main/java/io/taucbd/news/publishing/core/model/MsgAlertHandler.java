@@ -205,7 +205,12 @@ class MsgAlertHandler {
                 // 创建通知栏消息
                 User friendUser = userRepo.getUserByPublicKey(senderPk);
                 if (friendUser != null && !friendUser.isBanned && contentStr.length() > 0) {
-                    TauNotifier.getInstance().makeChatNotify(friendUser, contentStr.substring(0, contentStr.indexOf(timeTag)));
+                    int index = contentStr.indexOf(timeTag);
+                    if (index > 0) {
+                        TauNotifier.getInstance().makeChatNotify(friendUser, contentStr.substring(0, index));
+                    } else {
+                        TauNotifier.getInstance().makeChatNotify(friendUser, contentStr);
+                    }
                 }
             }
         } catch (Exception e) {
