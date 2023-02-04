@@ -7,8 +7,8 @@ android {
         applicationId "io.taucbd.news.publishing"
         minSdkVersion 24
         targetSdkVersion 31
-        versionCode 11
-        versionName "1.0.10"
+        versionCode 1
+        versionName "1.0.0"
         flavorDimensions("default", "id")
 
         vectorDrawables.useSupportLibrary = true
@@ -132,7 +132,8 @@ android {
                     "\"tau://a0105869108acecdb416953e803b880591815f22dde8ba95243276c607842109@13.229.53.249:23882," +
                       "tau://8f07019ab04f14ca346398bd603a1bd042859c03d80bc1d3dd7c382e6d71d8a2@18.133.58.91:14882\""
             buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_ARRAY", "new java.util.ArrayList() {{" +
-                    "add(\"a532079e30303030CBD\");" +
+                    "add(\"171dab3230303030Bangkok\");" +
+                    "add(\"4e16af7130303030Chiang Mai\");" +
                     "}}"
             buildConfigField "String", "CHAIN_PEER",  "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
             signingConfig signingConfigs.releaseConfig
@@ -149,7 +150,8 @@ android {
                     "\"tau://a0105869108acecdb416953e803b880591815f22dde8ba95243276c607842109@13.229.53.249:23882," +
                       "tau://8f07019ab04f14ca346398bd603a1bd042859c03d80bc1d3dd7c382e6d71d8a2@18.133.58.91:14882\""
             buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_ARRAY", "new java.util.ArrayList() {{" +
-                    "add(\"a532079e30303030CBD\");" +
+                    "add(\"171dab3230303030Bangkok\");" +
+                    "add(\"4e16af7130303030Chiang Mai\");" +
                     "}}"
             buildConfigField "String", "CHAIN_PEER", "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
             signingConfig signingConfigs.releaseConfig
