@@ -340,7 +340,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                             // 立即执行刷新
                             loadData(0);
                         }
-                    }));
+                    }, it -> {}));
         }
     }
 
