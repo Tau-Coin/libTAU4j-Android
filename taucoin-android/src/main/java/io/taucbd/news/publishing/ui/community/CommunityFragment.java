@@ -116,7 +116,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private final Observer<CopyOnWriteArraySet<String>> chainStoppedObserver = new Observer<>() {
         @Override
         public void onChanged(CopyOnWriteArraySet<String> set) {
-            boolean chainStopped = set != null && set.contains(chainID);
+            boolean chainStopped = set != null && StringUtil.isNotEmpty(chainID) && set.contains(chainID);
             if (CommunityFragment.this.chainStopped != chainStopped) {
                 CommunityFragment.this.chainStopped = chainStopped;
                 showWarningView();
@@ -162,7 +162,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         // 检测区块链是否因为获取数据失败而停止
         tauDaemonHandler.getChainStoppedData()
                 .observe(this.getViewLifecycleOwner(), set -> {
-                    boolean chainStopped = set != null && set.contains(chainID);
+                    boolean chainStopped = set != null && StringUtil.isNotEmpty(chainID) && set.contains(chainID);
                     if (this.chainStopped != chainStopped) {
                         this.chainStopped = chainStopped;
                         showWarningView();

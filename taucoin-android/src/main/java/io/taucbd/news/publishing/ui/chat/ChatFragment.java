@@ -102,8 +102,10 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         chatViewModel.observeNeedStartDaemon();
         initParameter();
         initLayout();
-        userViewModel.requestFriendInfo(friendPK);
-        userViewModel.focusFriend(friendPK);
+        if (StringUtil.isNotEmpty(friendPK)) {
+            userViewModel.requestFriendInfo(friendPK);
+            userViewModel.focusFriend(friendPK);
+        }
     }
 
     /**
@@ -187,6 +189,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         });
 
         chatViewModel.observerChatMessages().observe(this.getViewLifecycleOwner(), messages -> {
+            if (StringUtil.isEmpty(friendPK)) {
+                return;
+            }
             List<ChatMsgAndLog> currentList = new ArrayList<>(messages);
             if (currentPos == 0) {
                 adapter.submitList(currentList, handleUpdateAdapter);
@@ -322,22 +327,21 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                         binding.llShareQr.setVisibility(friend.status != FriendStatus.CONNECTED.getStatus()
                                 ? View.VISIBLE : View.GONE);
                     }));
+
+            disposables.add(chatViewModel.observeDataSetChanged()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(result -> {
+                        // 跟当前用户有关系的才触发刷新
+                        if (result != null && StringUtil.isNotEmpty(result.getMsg()) &&
+                                StringUtil.isNotEmpty(friendPK) && result.getMsg().contains(friendPK)) {
+                            binding.refreshLayout.setRefreshing(false);
+                            binding.refreshLayout.setEnabled(false);
+                            // 立即执行刷新
+                            loadData(0);
+                        }
+                    }));
         }
-
-
-        disposables.add(chatViewModel.observeDataSetChanged()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
-                    // 跟当前用户有关系的才触发刷新
-                    if (result != null && StringUtil.isNotEmpty(result.getMsg())
-                            && result.getMsg().contains(friendPK)) {
-                        binding.refreshLayout.setRefreshing(false);
-                        binding.refreshLayout.setEnabled(false);
-                        // 立即执行刷新
-                        loadData(0);
-                    }
-                }));
     }
 
     @Override
@@ -537,7 +541,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
         if (getUserVisibleHint()) {
             this.isVisibleToUser = true;
         }
-        if (userViewModel != null && isVisibleToUser) {
+        if (userViewModel != null && isVisibleToUser && StringUtil.isNotEmpty(friendPK)) {
             userViewModel.clearMsgUnread(friendPK);
         }
     }

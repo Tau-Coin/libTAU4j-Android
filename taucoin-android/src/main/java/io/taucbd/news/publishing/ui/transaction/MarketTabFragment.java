@@ -149,6 +149,9 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         binding.refreshLayout.setCustomFooterView(footer);
 
         txViewModel.observerChainTxs().observe(getViewLifecycleOwner(), txs -> {
+            if (StringUtil.isEmpty(chainID)) {
+                return;
+            }
             List<UserAndTx> currentList = new ArrayList<>(txs);
             int size;
             if (currentPos == 0) {
@@ -228,7 +231,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         super.setUserVisibleHint(isVisibleToUser);
         this.isVisibleToUser = isVisibleToUser;
         logger.debug("setUserVisibleHint1::{}", isVisibleToUser);
-        if (communityViewModel != null && isVisibleToUser) {
+        if (communityViewModel != null && isVisibleToUser && StringUtil.isNotEmpty(chainID)) {
             communityViewModel.clearNewsUnread(chainID);
         }
     }
@@ -239,7 +242,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
         if (getUserVisibleHint()) {
             this.isVisibleToUser = true;
         }
-        if (communityViewModel != null && isVisibleToUser) {
+        if (communityViewModel != null && isVisibleToUser && StringUtil.isNotEmpty(chainID)) {
             communityViewModel.clearNewsUnread(chainID);
         }
     }
@@ -260,6 +263,9 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
      * 订阅社区相关的被观察者
      */
     private void subscribeCommunityViewModel() {
+        if (StringUtil.isEmpty(chainID)) {
+            return;
+        }
         txViewModel.getDeletedResult().observe(this, isSuccess -> {
             loadData(0);
         });
