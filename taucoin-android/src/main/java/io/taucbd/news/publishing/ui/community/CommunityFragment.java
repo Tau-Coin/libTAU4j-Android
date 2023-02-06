@@ -241,6 +241,9 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
+        if (isHidden()) {
+            return;
+        }
         subscribeCommunityViewModel();
     }
 

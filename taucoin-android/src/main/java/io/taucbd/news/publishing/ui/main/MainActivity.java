@@ -2,7 +2,6 @@ package io.taucbd.news.publishing.ui.main;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -100,7 +99,6 @@ public class MainActivity extends ScanTriggerActivity {
     private boolean isFriendLink = false;
     private CommunityFragment communityFragment = new CommunityFragment();
     private ChatFragment chatFragment = new ChatFragment();
-    private EmptyFragment emptyFragment = new EmptyFragment();
 //    private BadgeActionProvider badgeProvider;
 
     @Override
@@ -156,6 +154,7 @@ public class MainActivity extends ScanTriggerActivity {
             Bundle bundle = new Bundle();
             bundle.putString(IntentExtra.ID, intent.getStringExtra(IntentExtra.CHAIN_ID));
             bundle.putInt(IntentExtra.TYPE, intent.getIntExtra(IntentExtra.TYPE, -1));
+            logger.info("MainActivity:: open community::{}", intent.getStringExtra(IntentExtra.CHAIN_ID));
             updateMainRightFragment(bundle);
         }
     }
@@ -177,7 +176,8 @@ public class MainActivity extends ScanTriggerActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main_drawer);
         refreshLeftFragment();
 //        loadFragmentView(R.id.main_left_fragment, new MainFragment());
-        loadFragmentView(emptyFragment);
+//        loadFragmentView(null);
+        nextAndBackChange(true);
         initLayout();
         checkCurrentUser();
     }
@@ -236,12 +236,7 @@ public class MainActivity extends ScanTriggerActivity {
 
         binding.drawerLayout.addDrawerListener(toggle);
 
-        if (Utils.isTablet(this)) {
-            updateViewChanged();
-        } else {
-            binding.mainRightFragment.setVisibility(View.GONE);
-//            ViewUtils.updateViewWeight(binding.mainRightFragment, 0);
-        }
+        binding.mainRightFragment.setVisibility(View.GONE);
 
         DrawablesUtil.setStartDrawable(binding.drawer.tvCommunities, R.mipmap.icon_community,
                 getResources().getDimensionPixelSize(R.dimen.widget_size_22));
@@ -445,37 +440,8 @@ public class MainActivity extends ScanTriggerActivity {
         joinDialog.setOnCancelListener(l -> joinDialog = null);
     }
 
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-//        updateViewChanged();
-    }
-
     private boolean isEmptyView() {
         return null == currentFragment;
-    }
-
-    private void updateViewChanged() {
-        if (Utils.isTablet(this)) {
-            if (Utils.isLandscape()) {
-                float leftWeight = calculateLeftWeight();
-                ViewUtils.updateViewWeight(binding.rlMainLeft, leftWeight);
-                ViewUtils.updateViewWeight(binding.mainRightFragment, 10 - leftWeight);
-                binding.rlMainLeft.setVisibility(View.VISIBLE);
-                binding.mainRightFragment.setVisibility(View.VISIBLE);
-            } else {
-                if (isEmptyView()) {
-                    nextAndBackChange(true);
-                } else {
-                    binding.rlMainLeft.setVisibility(View.GONE);
-                    binding.mainRightFragment.setVisibility(View.VISIBLE);
-//                    ViewUtils.updateViewWeight(binding.rlMainLeft, 0F);
-//                    ViewUtils.updateViewWeight(binding.mainRightFragment, 1.0F);
-                }
-            }
-        } else {
-            nextAndBackChange(isEmptyView());
-        }
     }
 
     /**
@@ -496,7 +462,7 @@ public class MainActivity extends ScanTriggerActivity {
     }
 
     private void nextAndBackChange(boolean isBack) {
-
+        logger.debug("updateMainRightFragment isBack::{}", isBack);
        binding.rlMainLeft.setVisibility(isBack ? View.VISIBLE : View.GONE);
        binding.mainRightFragment.setVisibility(isBack ? View.GONE : View.VISIBLE);
 //       ViewUtils.updateViewWeight(binding.rlMainLeft, isBack ? 1F : 0F);
@@ -525,6 +491,16 @@ public class MainActivity extends ScanTriggerActivity {
      * 更新主页右面Fragment
      */
     public void updateMainRightFragment(Bundle bundle) {
+        if (currentFragment != null) {
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction transaction = fm.beginTransaction();
+            // Replace whatever is in the fragment container view with this fragment,
+            // and add the transaction to the back stack
+            transaction.hide(currentFragment);
+            // 执行此方法后，fragment的onDestroy()方法和ViewModel的onCleared()方法都不执行
+            // transaction.addToBackStack(null);
+            transaction.commitAllowingStateLoss();
+        }
         // 创建修改实例
         BaseFragment newFragment = null;
         if (!bundle.isEmpty()) {
@@ -535,17 +511,15 @@ public class MainActivity extends ScanTriggerActivity {
                 newFragment = chatFragment;
             }
         }
-        boolean isEmptyFragment = false;
-        if (null == newFragment) {
-            newFragment = emptyFragment;
-            isEmptyFragment = true;
-        }
-        newFragment.setArguments(bundle);
-        loadFragmentView(newFragment);
-        if (isEmptyFragment) {
+        if (newFragment != null) {
+            newFragment.setArguments(bundle);
+            loadFragmentView(newFragment);
+            logger.debug("updateMainRightFragment::{}", bundle.getString(IntentExtra.ID));
+            nextAndBackChange(false);
+        } else {
+            nextAndBackChange(true);
             currentFragment = null;
         }
-        updateViewChanged();
     }
 
     /**

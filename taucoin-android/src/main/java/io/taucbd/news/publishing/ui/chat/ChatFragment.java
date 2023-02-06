@@ -256,6 +256,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void onStart() {
         super.onStart();
+        if (isHidden()) {
+            return;
+        }
         showProgressDialog();
         loadData(0);
         subscribeChatViewModel();
