@@ -259,10 +259,10 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
-        if (isHidden()) {
-            return;
-        }
-        subscribeCommunityViewModel();
+//        if (isHidden()) {
+//            return;
+//        }
+//        subscribeCommunityViewModel();
     }
 
     /**
@@ -566,6 +566,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
             isVisibleToUser = false;
             disposables.clear();
             closeAllDialog();
+            this.chainID = null;
             binding.refreshLayout.setVisibility(View.INVISIBLE);
             binding.llPinnedMessage.setVisibility(View.GONE);
         }

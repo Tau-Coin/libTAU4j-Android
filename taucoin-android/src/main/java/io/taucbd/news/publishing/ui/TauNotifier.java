@@ -224,6 +224,9 @@ public class TauNotifier {
      * @param id 通知id
      */
     public void cancelNotify(String id) {
+        if (StringUtil.isEmpty(id)) {
+            return;
+        }
         cancelNotify(id.hashCode());
     }
 

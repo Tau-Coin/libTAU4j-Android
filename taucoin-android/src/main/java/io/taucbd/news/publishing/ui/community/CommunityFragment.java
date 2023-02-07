@@ -7,6 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -44,7 +47,7 @@ import io.taucbd.news.publishing.ui.transaction.MarketTabFragment;
  * 单个群组页面
  */
 public class CommunityFragment extends BaseFragment implements View.OnClickListener {
-
+    private static final Logger logger = LoggerFactory.getLogger("CommunityFragment");
     public static final int MEMBERS_REQUEST_CODE = 0x100;
     private MainActivity activity;
     private FragmentCommunityBinding binding;
@@ -63,6 +66,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private long miningTime = -1;
     private boolean isConnectChain = true;
     private ConfirmDialog chainStoppedDialog;
+    private boolean isVisibleToUser;
 
     @Nullable
     @Override
@@ -91,6 +95,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
+        logger.debug("onHiddenChanged...hidden::{}", hidden);
         if (!hidden) {
             if (getArguments() != null) {
                 String chainID = getArguments().getString(IntentExtra.ID);
@@ -107,6 +112,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
         } else {
             disposables.clear();
             closeAllDialog();
+            this.chainID = null;
         }
         if (currentFragment != null) {
             currentFragment.onHiddenChanged(hidden, chainID);
@@ -241,10 +247,11 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
-        if (isHidden()) {
-            return;
-        }
-        subscribeCommunityViewModel();
+//        if (isHidden()) {
+//            return;
+//        }
+//        logger.debug("onStart...");
+//        subscribeCommunityViewModel();
     }
 
     @Override

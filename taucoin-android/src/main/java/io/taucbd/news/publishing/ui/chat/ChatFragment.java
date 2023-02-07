@@ -256,12 +256,12 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void onStart() {
         super.onStart();
-        if (isHidden()) {
-            return;
-        }
-        showProgressDialog();
-        loadData(0);
-        subscribeChatViewModel();
+//        if (isHidden()) {
+//            return;
+//        }
+//        showProgressDialog();
+//        loadData(0);
+//        subscribeChatViewModel();
     }
 
     @Override
@@ -525,6 +525,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
             binding.chatAdd.setVisibility(View.GONE);
             binding.refreshLayout.setVisibility(View.INVISIBLE);
             chatViewModel.disposables.clear();
+            this.friendPK = null;
         }
     }
 
