@@ -140,6 +140,13 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                 logger.debug("headerDataIndex::{}", headerDataIndex);
                 if (headerDataIndex >= 0) {
                     currentList.remove(headerDataIndex);
+                    if (headerBinding != null) {
+                        headerBinding.getRoot().setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    if (headerBinding != null) {
+                        headerBinding.getRoot().setVisibility(View.GONE);
+                    }
                 }
                 adapter.submitList(currentList, handleUpdateAdapter);
             } else {
@@ -150,6 +157,13 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                 logger.debug("headerDataIndex::{}", headerDataIndex);
                 if (headerDataIndex >= 0) {
                     currentList.remove(headerDataIndex);
+                    if (headerBinding != null) {
+                        headerBinding.getRoot().setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    if (headerBinding != null) {
+                        headerBinding.getRoot().setVisibility(View.GONE);
+                    }
                 }
                 adapter.submitList(currentList, handlePullAdapter);
             }
@@ -298,6 +312,7 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(list -> {
                     boolean isHavePinnedMsg = list != null && list.size() > 0;
+                    logger.debug("observeLatestPinnedMsg::{}", isHavePinnedMsg);
                     binding.llPinnedMessage.setVisibility(isHavePinnedMsg ? View.VISIBLE : View.GONE);
                     if (isHavePinnedMsg) {
                         binding.tvPinnedContent.setText(list.get(0).memo);
@@ -319,8 +334,9 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
         viewHolder.bind(tx);
         this.headerData = tx;
         int headerDataIndex = adapter.getCurrentList().indexOf(tx);
-        logger.debug("headerDataIndex::{}", headerDataIndex);
+        logger.debug("headerDataIndex::{}, {}", headerDataIndex, tx.chainID);
         if (headerDataIndex >= 0) {
+            headerBinding.getRoot().setVisibility(View.VISIBLE);
             List<UserAndTxReply> list = new ArrayList<>(adapter.getCurrentList());
             list.remove(headerDataIndex);
             adapter.submitList(list);
