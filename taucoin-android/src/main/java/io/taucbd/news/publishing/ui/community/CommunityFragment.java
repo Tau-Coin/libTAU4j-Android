@@ -66,7 +66,7 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     private long miningTime = -1;
     private boolean isConnectChain = true;
     private ConfirmDialog chainStoppedDialog;
-    private boolean isVisibleToUser;
+    private boolean isLoadData = false;
 
     @Nullable
     @Override
@@ -107,9 +107,13 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
                     tauDaemonHandler.getChainStoppedData().observe(this.getViewLifecycleOwner(), chainStoppedObserver);
                 }
                 this.chainID = chainID;
-                subscribeCommunityViewModel();
+                if (!isLoadData) {
+                    subscribeCommunityViewModel();
+                    isLoadData = true;
+                }
             }
         } else {
+            isLoadData = false;
             disposables.clear();
             closeAllDialog();
             this.chainID = null;
@@ -247,16 +251,16 @@ public class CommunityFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
-//        if (isHidden()) {
-//            return;
-//        }
-//        logger.debug("onStart...");
-//        subscribeCommunityViewModel();
+        if (!isLoadData && StringUtil.isNotEmpty(chainID)) {
+            isLoadData = true;
+            subscribeCommunityViewModel();
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        isLoadData = false;
         disposables.clear();
     }
 

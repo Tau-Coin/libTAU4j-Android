@@ -82,6 +82,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     private boolean isVisibleToUser;
 
     private int currentPos = 0;
+    private boolean isLoadData = false;
 
     @Nullable
     @Override
@@ -256,18 +257,19 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
     @Override
     public void onStart() {
         super.onStart();
-//        if (isHidden()) {
-//            return;
-//        }
-//        showProgressDialog();
-//        loadData(0);
-//        subscribeChatViewModel();
+        if (!isLoadData && StringUtil.isNotEmpty(friendPK)) {
+            showProgressDialog();
+            loadData(0);
+            subscribeChatViewModel();
+            isLoadData = true;
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
         disposables.clear();
+        this.isLoadData = false;
         // 关闭键盘和加号视图窗口
         binding.etMessage.clearFocus();
         binding.chatAdd.setVisibility(View.GONE);
@@ -512,10 +514,14 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener,
                     userViewModel.focusFriend(friendPK);
                 }
                 this.friendPK = friendPK;
-                loadData(0);
-                subscribeChatViewModel();
+                if (!isLoadData) {
+                    isLoadData = true;
+                    loadData(0);
+                    subscribeChatViewModel();
+                }
             }
         } else {
+            isLoadData = false;
             isVisibleToUser = false;
             disposables.clear();
             closeAllDialog();

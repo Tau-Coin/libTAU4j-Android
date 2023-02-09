@@ -83,6 +83,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     private boolean isLoadMore = false;
     private boolean dataChanged = false;
     private int dataTimeCount = 0;
+    private boolean isLoadData = false;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -259,10 +260,10 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
-//        if (isHidden()) {
-//            return;
-//        }
-//        subscribeCommunityViewModel();
+        if (!isLoadData && StringUtil.isNotEmpty(chainID)) {
+            isLoadData = true;
+            subscribeCommunityViewModel();
+        }
     }
 
     /**
@@ -323,6 +324,7 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     public void onStop() {
         super.onStop();
         disposables.clear();
+        isLoadData = false;
     }
 
     @Override
@@ -561,8 +563,12 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
                 adapter.submitList(new ArrayList<>());
             }
             this.chainID = chainID;
-            subscribeCommunityViewModel();
+            if (!isLoadData) {
+                isLoadData = true;
+                subscribeCommunityViewModel();
+            }
         } else {
+            isLoadData = false;
             isVisibleToUser = false;
             disposables.clear();
             closeAllDialog();
