@@ -559,8 +559,8 @@ public abstract class TauDaemon {
                 if (latitude > 0 && longitude > 0) {
                     String[] nearestCommunity = new String[1];
                     double[] nearestDistance = new double[1];
-                    checkNearestCommunity(BuildConfig.CHAIN_MAP1, localChains, nearestCommunity, nearestDistance);
-                    checkNearestCommunity(BuildConfig.CHAIN_MAP2, localChains, nearestCommunity, nearestDistance);
+                    checkNearestCommunity(BuildConfig.CHAIN_LIST1, localChains, nearestCommunity, nearestDistance);
+                    checkNearestCommunity(BuildConfig.CHAIN_LIST2, localChains, nearestCommunity, nearestDistance);
                     logger.debug("loadFirstLocationCommunity: nearestCommunity::{}, nearestDistance::{}",
                             nearestCommunity, nearestDistance);
                     if (StringUtil.isNotEmpty(nearestCommunity[0])) {

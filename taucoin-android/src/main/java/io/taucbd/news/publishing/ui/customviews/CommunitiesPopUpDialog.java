@@ -115,11 +115,12 @@ public class CommunitiesPopUpDialog extends Dialog{
                 int bgColor = Utils.getGroupColor(member.chainID);
                 holder.binding.rbCommunity.setBgColor(bgColor);
 
-                boolean isConfigChain = BuildConfig.CHAIN_ARRAY.contains(member.chainID);
+                int configChainLogo = Utils.getConfigChainLogo(member.chainID);
+                boolean isConfigChain = configChainLogo != 0;
                 holder.binding.rbCommunity.setVisibility(isConfigChain ? View.GONE : View.VISIBLE);
                 holder.binding.ivCommunity.setVisibility(isConfigChain ? View.VISIBLE : View.GONE);
                 if (isConfigChain) {
-                    holder.binding.ivCommunity.setImageRes(Utils.getConfigChainLogo(member.chainID));
+                    holder.binding.ivCommunity.setImageRes(configChainLogo);
                 }
                 String communityCode = ChainIDUtil.getCode(member.chainID);
                 String balance = FmtMicrometer.fmtBalance(member.getInterimBalance());

@@ -61,8 +61,14 @@ import javax.net.ssl.X509TrustManager;
 
 public class Utils {
     public static final String HASH_PATTERN = "\\b[0-9a-fA-F]{5,40}\\b";
-    private static final int[] CHAIN_LOGO_ARRAY = new int[]{
-            R.mipmap.icon_bangkok, R.mipmap.icon_chiang_mai};
+    private static final int[] CHAIN_LOGO_ARRAY1 = new int[]{
+            R.mipmap.icon_bangkok, R.mipmap.icon_bangkok1, R.mipmap.icon_bangkok2, R.mipmap.icon_bangkok3
+            , R.mipmap.icon_bangkok4, R.mipmap.icon_bangkok5, R.mipmap.icon_bangkok6, R.mipmap.icon_bangkok7
+            , R.mipmap.icon_bangkok8, R.mipmap.icon_bangkok9};
+
+    private static final int[] CHAIN_LOGO_ARRAY2 = new int[]{
+            R.mipmap.icon_chiang_mai, R.mipmap.icon_chiang_mai1, R.mipmap.icon_chiang_mai2
+            , R.mipmap.icon_chiang_mai3, R.mipmap.icon_chiang_mai4};
 
     public static boolean isHash(@NonNull String hash) {
         if (TextUtils.isEmpty(hash))
@@ -534,16 +540,24 @@ public class Utils {
     }
 
     public static int getConfigChainLogo(String chainID) {
-        int index = 0;
-        ArrayList<String> chainList = BuildConfig.CHAIN_ARRAY;
-        for (int i = 0; i < chainList.size(); i++) {
-            if (StringUtil.isEquals(chainID, chainList.get(i))) {
-                index = i;
+        int logo = getConfigChainLogo(chainID, BuildConfig.CHAIN_LIST1, CHAIN_LOGO_ARRAY1);
+        if (logo == 0) {
+            logo = getConfigChainLogo(chainID, BuildConfig.CHAIN_LIST2, CHAIN_LOGO_ARRAY2);
+        }
+        return logo;
+    }
+
+    private static int getConfigChainLogo(String chainID, ArrayList<String> chainList, int[] chainLogoArray) {
+        if (chainList != null && chainList.size() > 0) {
+            for (int i = 0; i < chainList.size(); i++) {
+                String chainData = chainList.get(i);
+                if (chainData.contains(chainID)) {
+                    if (chainLogoArray != null && i < chainLogoArray.length) {
+                        return chainLogoArray[i];
+                    }
+                }
             }
         }
-        if (index < CHAIN_LOGO_ARRAY.length) {
-            return CHAIN_LOGO_ARRAY[index];
-        }
-        return CHAIN_LOGO_ARRAY[0];
+        return 0;
     }
 }

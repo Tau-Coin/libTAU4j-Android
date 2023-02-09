@@ -118,13 +118,13 @@ android {
                     "add(\"213c592330303030ShangHai\");" +
                     "}}"
             buildConfigField "String", "CHAIN_PEER",  "\"602bc2c65f2c6e77c7e359339de7eb3d6d243a5eac4842d97b92e583d472690a\""
-            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_MAP1", "new java.util.ArrayList() {{" +
+            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_LIST1", "new java.util.ArrayList() {{" +
                     "add(\"2c1d516030303030BeiJing,39.909323,116.397474\");" +  // 天安门
                     "add(\"4767235530303030HaiDian District,39.999986,116.326421\");" + // 清华大学
                     "add(\"5717504d30303030ChaoYang District,39.945093,116.471974\");" + // 朝阳公园
                     "add(\"4a286c1830303030FengTai District,39.895459,116.320912\");" + // 北京西站
                     "}}"
-            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_MAP2", "new java.util.ArrayList() {{" +
+            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_LIST2", "new java.util.ArrayList() {{" +
                     "add(\"213c592330303030ShangHai,31.230117,121.476255\");" +  // 人民广场
                     "add(\"12522e4330303030HuangPu District,31.233161,121.487227\");" + // 外滩
                     "add(\"7853457830303030XuHui District,31.193341,121.438495\");" + // 徐家汇
@@ -148,14 +148,16 @@ android {
                     "add(\"4e16af7130303030Chiang Mai\");" +
                     "}}"
             buildConfigField "String", "CHAIN_PEER",  "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
-            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_MAP1", "new java.util.ArrayList() {{" +
-                    "add(\"2c1d516030303030BeiJing,39.909323,116.397474\");" +  // 天安门
+            // 曼谷
+            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_LIST1", "new java.util.ArrayList() {{" +
+                    "add(\"171dab3230303030Bangkok,39.909323,116.397474\");" +  // 天安门
                     "add(\"4767235530303030HaiDian District,39.999986,116.326421\");" + // 清华大学
                     "add(\"5717504d30303030ChaoYang District,39.945093,116.471974\");" + // 朝阳公园
                     "add(\"4a286c1830303030FengTai District,39.895459,116.320912\");" + // 北京西站
                     "}}"
-            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_MAP2", "new java.util.ArrayList() {{" +
-                    "add(\"213c592330303030ShangHai,31.230117,121.476255\");" +  // 人民广场
+            // 清迈
+            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_LIST2", "new java.util.ArrayList() {{" +
+                    "add(\"4e16af7130303030Chiang Mai,31.230117,121.476255\");" +  // 人民广场
                     "add(\"12522e4330303030HuangPu District,31.233161,121.487227\");" + // 外滩
                     "add(\"7853457830303030XuHui District,31.193341,121.438495\");" + // 徐家汇
                     "add(\"1155172e30303030PuDong New Area,31.240057,121.499801\");" + // 东方明珠
@@ -178,14 +180,16 @@ android {
                     "add(\"4e16af7130303030Chiang Mai\");" +
                     "}}"
             buildConfigField "String", "CHAIN_PEER", "\"cb78b3b53b15c2bb557a7a25a08fd8c664cbd97ee06b513921c1b6cc094d28df\""
-            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_MAP1", "new java.util.ArrayList() {{" +
-                    "add(\"2c1d516030303030BeiJing,39.909323,116.397474\");" +  // 天安门
+            // 曼谷
+            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_LIST1", "new java.util.ArrayList() {{" +
+                    "add(\"171dab3230303030Bangkok,39.909323,116.397474\");" +  // 天安门
                     "add(\"4767235530303030HaiDian District,39.999986,116.326421\");" + // 清华大学
                     "add(\"5717504d30303030ChaoYang District,39.945093,116.471974\");" + // 朝阳公园
                     "add(\"4a286c1830303030FengTai District,39.895459,116.320912\");" + // 北京西站
                     "}}"
-            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_MAP2", "new java.util.ArrayList() {{" +
-                    "add(\"213c592330303030ShangHai,31.230117,121.476255\");" +  // 人民广场
+            // 清迈
+            buildConfigField "java.util.ArrayList<java.lang.String>", "CHAIN_LIST2", "new java.util.ArrayList() {{" +
+                    "add(\"4e16af7130303030Chiang Mai,31.230117,121.476255\");" +  // 人民广场
                     "add(\"12522e4330303030HuangPu District,31.233161,121.487227\");" + // 外滩
                     "add(\"7853457830303030XuHui District,31.193341,121.438495\");" + // 徐家汇
                     "add(\"1155172e30303030PuDong New Area,31.240057,121.499801\");" + // 东方明珠

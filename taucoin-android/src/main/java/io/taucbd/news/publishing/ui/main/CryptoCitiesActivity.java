@@ -68,8 +68,8 @@ public class CryptoCitiesActivity extends BaseActivity {
         binding.tvLondonPmcDesc.setText(spannableStringBuilder);
 
         List<GroupItem> groupItems = new ArrayList<>();
-        combinedCommunityData(groupItems, BuildConfig.CHAIN_MAP1);
-        combinedCommunityData(groupItems, BuildConfig.CHAIN_MAP2);
+        combinedCommunityData(groupItems, BuildConfig.CHAIN_LIST1);
+        combinedCommunityData(groupItems, BuildConfig.CHAIN_LIST2);
 
         adapter = new MyExpandableListAdapter(groupItems, communityViewModel);
         binding.listView.setAdapter(adapter);

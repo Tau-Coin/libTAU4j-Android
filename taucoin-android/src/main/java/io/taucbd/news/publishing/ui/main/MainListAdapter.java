@@ -134,11 +134,12 @@ public class MainListAdapter extends ListAdapter<CommunityAndFriend, MainListAda
                 binding.msgUnread.setVisibility(bean.msgUnread > 0 ? View.VISIBLE : View.GONE);
                 ivLongPress = binding.ivLongPress;
 
-                boolean isConfigChain = BuildConfig.CHAIN_ARRAY.contains(bean.ID);
+                int configChainLogo = Utils.getConfigChainLogo(bean.ID);
+                boolean isConfigChain = configChainLogo != 0;
                 binding.leftView.setVisibility(isConfigChain ? View.GONE : View.VISIBLE);
                 binding.ivGroup.setVisibility(isConfigChain ? View.VISIBLE : View.GONE);
                 if (isConfigChain) {
-                    binding.ivGroup.setImageRes(Utils.getConfigChainLogo(bean.ID));
+                    binding.ivGroup.setImageRes(configChainLogo);
                 }
             } else if (holder.binding instanceof ItemChatListBinding) {
                 ItemChatListBinding binding = (ItemChatListBinding) holder.binding;
