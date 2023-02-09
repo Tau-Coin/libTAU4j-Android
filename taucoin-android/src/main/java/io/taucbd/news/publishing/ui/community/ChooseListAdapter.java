@@ -65,9 +65,8 @@ public class ChooseListAdapter extends ListAdapter<Member, ChooseListAdapter.Vie
             binding.tvName.setText(context.getString(R.string.main_community_name, communityName, communityCode));
 
             String balance = FmtMicrometer.fmtBalance(member.getInterimBalance());
-//            String time = DateUtil.formatTime(member.balUpdateTime, DateUtil.pattern14);
             String balanceAndTime = context.getResources().getString(R.string.drawer_balance_time_color_no_title,
-                    balance);
+                    balance, ChainIDUtil.getCoinName(member.chainID));
             binding.tvBalance.setText(Html.fromHtml(balanceAndTime));
             binding.tvBalancePending.setVisibility(View.GONE);
 

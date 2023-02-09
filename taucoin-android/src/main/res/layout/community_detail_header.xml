@@ -16,6 +16,16 @@
         android:layout_height="wrap_content">
 
         <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
+            android:id="@+id/item_pay_people"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_size_44"
+            android:gravity="center_vertical"
+            android:onClick="onClick"
+            app:lineLeftText="@string/community_transaction"
+            app:lineRightImage="@mipmap/icon_arrow"/>
+
+        <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
             android:id="@+id/item_chain_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,16 +43,6 @@
             android:gravity="center_vertical"
             android:onClick="onClick"
             app:lineLeftText="@string/community_chain_explorer"
-            app:lineRightImage="@mipmap/icon_arrow"/>
-
-        <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
-            android:id="@+id/item_pay_people"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/widget_size_44"
-            android:gravity="center_vertical"
-            android:onClick="onClick"
-            app:lineLeftText="@string/community_transaction"
             app:lineRightImage="@mipmap/icon_arrow"/>
 
         <io.taucbd.news.publishing.ui.customviews.LeftRightLineView

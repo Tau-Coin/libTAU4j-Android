@@ -147,43 +147,43 @@ public class NewsDetailActivity extends BaseActivity implements ReplyListAdapter
             .subscribe(this::showNewsDetail);
         disposables.add(disposable);
 
-        txViewModel.observerChainTxs().observe(this, txs -> {
-            List<UserAndTx> currentList = new ArrayList<>(txs);
-            int size;
-            if (currentPos == 0) {
-                initScrollToTop();
-                isLocateTx = adapter.getCurrentList().size() == 0;
-                adapter.submitList(currentList, handleUpdateAdapter);
-                size = currentList.size();
-                isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
-            } else {
-                currentList.addAll(0, adapter.getCurrentList());
-                adapter.submitList(currentList, handlePullAdapter);
-                isLoadMore = txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0;
-            }
-            binding.refreshLayout.endLoadingMore();
-        });
-        loadData(0);
-
-        disposables.add(ObservableUtil.intervalSeconds(1)
-                .subscribeOn(Schedulers.io())
-                .subscribe(o -> {
-                    if (dataChanged) {
-                        loadData(0);
-                        dataChanged = false;
-                    }
-                }));
-
-        disposables.add(txViewModel.observeDataSetChanged()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
-                    // 跟当前用户有关系的才触发刷新
-                    if (result != null && StringUtil.isNotEmpty(result.getMsg())) {
-                        // 立即执行刷新
-                        dataChanged = true;
-                    }
-                }));
+//        txViewModel.observerChainTxs().observe(this, txs -> {
+//            List<UserAndTx> currentList = new ArrayList<>(txs);
+//            int size;
+//            if (currentPos == 0) {
+//                initScrollToTop();
+//                isLocateTx = adapter.getCurrentList().size() == 0;
+//                adapter.submitList(currentList, handleUpdateAdapter);
+//                size = currentList.size();
+//                isLoadMore = size != 0 && size % Page.PAGE_SIZE == 0;
+//            } else {
+//                currentList.addAll(0, adapter.getCurrentList());
+//                adapter.submitList(currentList, handlePullAdapter);
+//                isLoadMore = txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0;
+//            }
+//            binding.refreshLayout.endLoadingMore();
+//        });
+//        loadData(0);
+//
+//        disposables.add(ObservableUtil.intervalSeconds(1)
+//                .subscribeOn(Schedulers.io())
+//                .subscribe(o -> {
+//                    if (dataChanged) {
+//                        loadData(0);
+//                        dataChanged = false;
+//                    }
+//                }));
+//
+//        disposables.add(txViewModel.observeDataSetChanged()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(result -> {
+//                    // 跟当前用户有关系的才触发刷新
+//                    if (result != null && StringUtil.isNotEmpty(result.getMsg())) {
+//                        // 立即执行刷新
+//                        dataChanged = true;
+//                    }
+//                }));
     }
 
     @Override

@@ -222,6 +222,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:visibility="gone"
                 android:gravity="center_horizontal|center"
                 android:layout_width="0dp"
                 android:layout_weight="1"

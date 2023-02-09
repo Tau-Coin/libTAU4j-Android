@@ -114,10 +114,10 @@
     <string name="drawer_balance_time_color" formatted="false"><Data><![CDATA[Interim Balance <font color="#f19322"><b>%1$s</b></font> Power %2$s]]></Data></string>
     <string name="drawer_balance_name_color" formatted="false"><Data><![CDATA[%1$s <font color="#f19322">%2$s</font>]]></Data></string>
     <string name="drawer_balance_time_no_title">%1$s on %2$s</string>
-    <string name="drawer_balance_time_color_no_title" formatted="false"><Data><![CDATA[Interim Balance <font color="#f19322"><b>%1$s</b></font>]]></Data></string>
+    <string name="drawer_balance_time_color_no_title" formatted="false"><Data><![CDATA[<font color="#f19322"><b>%1$s</b></font> %2$s]]></Data></string>
     <string name="drawer_community_coin">Community Coin</string>
     <string name="drawer_peers">Contacts</string>
-    <string name="drawer_wallet">Wallet and Pay</string>
+    <string name="drawer_wallet">Wallet</string>
     <string name="drawer_paste_link">Paste Link</string>
     <string name="drawer_setting">Settings</string>
     <string name="drawer_official_telegram">Official Telegram</string>

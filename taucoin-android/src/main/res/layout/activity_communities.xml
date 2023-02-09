@@ -29,14 +29,52 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <RelativeLayout
+                    android:id="@+id/rl_pay_people"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:background="@color/color_white"
+                    android:layout_height="@dimen/widget_size_40"
+                    android:onClick="@{listener::onClick}">
+
+                    <TextView
+                        android:id="@+id/menu_pay_people"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/widget_size_44"
+                        android:layout_marginStart="@dimen/widget_size_20"
+                        android:gravity="center_vertical"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_centerVertical="true"
+                        android:text="@string/community_transaction"
+                        android:textAppearance="@style/TextAppearanceBody1" />
+
+                    <ImageView
+                        android:layout_width="@dimen/widget_size_14"
+                        android:layout_height="@dimen/widget_size_14"
+                        android:layout_marginEnd="@dimen/widget_size_10"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:contentDescription="@null"
+                        android:src="@mipmap/icon_arrow"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="@color/color_bg" />
+
+                </RelativeLayout>
+
                 <io.taucbd.news.publishing.ui.customviews.LeftRightLineView
                     android:id="@+id/item_interim_balance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/widget_size_10"
+                    android:layout_marginTop="@dimen/widget_size_0"
                     android:minHeight="@dimen/widget_size_44"
                     android:gravity="center_vertical"
-                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftTextColor="@color/color_black"
                     app:lineLeftText="@string/community_interim_balance"
                     app:lineRightTextColor="@color/color_yellow"
                     app:lineVisibility="false"/>
@@ -68,7 +106,7 @@
                             android:ellipsize="end"
                             android:gravity="center_vertical"
                             android:singleLine="true"
-                            android:textColor="@color/gray_dark"
+                            android:textColor="@color/color_black"
                             android:text="@string/community_pending_amount"
                             android:textAppearance="@style/TextAppearanceBody1" />
 
@@ -126,7 +164,7 @@
                     android:minHeight="@dimen/widget_size_44"
                     android:onClick="@{listener::onClick}"
                     android:gravity="center_vertical"
-                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftTextColor="@color/color_black"
                     app:lineRightTextColor="@color/color_yellow"
                     app:lineLeftText="@string/community_payment_balance"
                     app:lineVisibility="false"/>
@@ -137,7 +175,7 @@
                     android:layout_height="wrap_content"
                     android:minHeight="@dimen/widget_size_44"
                     android:gravity="center_vertical"
-                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftTextColor="@color/color_black"
                     app:lineRightTextColor="@color/color_yellow"
                     app:lineLeftText="@string/community_mining_income_pending"
                     app:lineVisibility="false"/>
@@ -148,7 +186,7 @@
                     android:layout_height="wrap_content"
                     android:minHeight="@dimen/widget_size_44"
                     android:gravity="center_vertical"
-                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftTextColor="@color/color_black"
                     app:lineLeftText="@string/community_mining_power"
                     app:lineVisibility="false"/>
 
@@ -158,7 +196,7 @@
                     android:layout_height="wrap_content"
                     android:minHeight="@dimen/widget_size_44"
                     android:gravity="center_vertical"
-                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftTextColor="@color/color_black"
                     app:lineLeftText="@string/community_head_block"
                     app:lineVisibility="false"/>
 
@@ -168,7 +206,7 @@
                     android:layout_height="wrap_content"
                     android:minHeight="@dimen/widget_size_44"
                     android:gravity="center_vertical"
-                    app:lineLeftTextColor="@color/gray_dark"
+                    app:lineLeftTextColor="@color/color_black"
                     app:lineLeftText="@string/chain_difficulty"
                     app:lineVisibility="false"/>
 
@@ -195,43 +233,6 @@
                         android:ellipsize="end"
                         android:layout_centerVertical="true"
                         android:text="@string/menu_transactions"
-                        android:textAppearance="@style/TextAppearanceBody1" />
-
-                    <ImageView
-                        android:layout_width="@dimen/widget_size_14"
-                        android:layout_height="@dimen/widget_size_14"
-                        android:layout_marginEnd="@dimen/widget_size_10"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentEnd="true"
-                        android:contentDescription="@null"
-                        android:src="@mipmap/icon_arrow"/>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_alignParentBottom="true"
-                        android:background="@color/color_bg" />
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/rl_pay_people"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:background="@color/color_white"
-                    android:layout_height="@dimen/widget_size_40"
-                    android:onClick="@{listener::onClick}">
-
-                    <TextView
-                        android:id="@+id/menu_pay_people"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/widget_size_20"
-                        android:gravity="center_vertical"
-                        android:singleLine="true"
-                        android:ellipsize="end"
-                        android:layout_centerVertical="true"
-                        android:text="@string/community_transaction"
                         android:textAppearance="@style/TextAppearanceBody1" />
 
                     <ImageView

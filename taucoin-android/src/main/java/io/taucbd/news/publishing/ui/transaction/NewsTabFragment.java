@@ -461,27 +461,27 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
 
     @Override
     public void onRetweetClicked(UserAndTx tx) {
-        if (retweetDialog != null && retweetDialog.isShowing()) {
-            retweetDialog.closeDialog();
-        }
-        retweetDialog = new PopUpDialog.Builder(activity)
-                .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet_other))
-                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share_external))
-                .setOnItemClickListener((dialog, name, code) -> {
-                    dialog.cancel();
-                    if (code == R.mipmap.icon_retwitt) {
+//        if (retweetDialog != null && retweetDialog.isShowing()) {
+//            retweetDialog.closeDialog();
+//        }
+//        retweetDialog = new PopUpDialog.Builder(activity)
+//                .addItems(R.mipmap.icon_retwitt, getString(R.string.common_retweet_other))
+//                .addItems(R.mipmap.icon_share_gray, getString(R.string.common_share_external))
+//                .setOnItemClickListener((dialog, name, code) -> {
+//                    dialog.cancel();
+//                    if (code == R.mipmap.icon_retwitt) {
                         Intent intent = new Intent();
                         intent.putExtra(IntentExtra.DATA, tx.memo);
                         intent.putExtra(IntentExtra.LINK, tx.link);
                         intent.putExtra(IntentExtra.PICTURE_PATH, tx.picturePath);
                         ActivityUtil.startActivityForResult(intent, activity, NewsCreateActivity.class,
                                 CHOOSE_REQUEST_CODE);
-                    } else if (code == R.mipmap.icon_share_gray) {
-                        loadChainLink(tx);
-                    }
-                })
-                .create();
-        retweetDialog.show();
+//                    } else if (code == R.mipmap.icon_share_gray) {
+//                        loadChainLink(tx);
+//                    }
+//                })
+//                .create();
+//        retweetDialog.show();
     }
 
     private void loadChainLink(UserAndTx tx) {
