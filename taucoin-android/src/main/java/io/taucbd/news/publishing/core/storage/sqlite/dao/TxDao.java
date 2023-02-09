@@ -190,6 +190,7 @@ public interface TxDao {
         QUERY_NEWS_REPLY_AND_CHAT_COUNT +
         " WHERE tx.txType =" + Constants.NEWS_TX_TYPE + " AND pinnedTime > 0" +
         " AND c.isBanned = 0" +
+        " AND tx.deleted = 0" +
         " AND tx.senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
         " ORDER BY tx.pinnedTime DESC";
 
