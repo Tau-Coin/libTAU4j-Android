@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/widget_size_40"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/widget_size_30"
+        android:paddingEnd="@dimen/widget_size_15">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:textColor="@color/gray_dark"
+            android:textAppearance="@style/TextAppearanceBody1"/>
+
+        <TextView
+            android:id="@+id/tv_joined"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/common_joined"
+            android:textColor="@color/gray_dark"
+            android:includeFontPadding="false"
+            android:textAppearance="@style/TextAppearanceBody2"/>
+
+        <TextView
+            android:id="@+id/tv_join"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/common_join"
+            android:paddingTop="@dimen/widget_size_5"
+            android:paddingBottom="@dimen/widget_size_5"
+            android:paddingStart="@dimen/widget_size_10"
+            android:paddingEnd="@dimen/widget_size_10"
+            android:background="@drawable/blue_rect_round_bg"
+            android:textColor="@color/color_white"
+            android:includeFontPadding="false"
+            android:textAppearance="@style/TextAppearanceBody2"/>
+
+    </LinearLayout>
+</layout>

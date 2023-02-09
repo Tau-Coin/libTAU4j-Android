@@ -35,5 +35,6 @@
     <string name="pref_key_dump_times" translatable="false">pref_key_dump_times</string>
 
     <string name="pref_key_set_nickname" translatable="false">pref_key_set_nickname</string>
+    <string name="pref_key_add_location_community" translatable="false">pref_key_add_location_community</string>
 
 </resources>

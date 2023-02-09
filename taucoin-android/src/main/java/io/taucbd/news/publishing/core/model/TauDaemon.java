@@ -47,6 +47,7 @@ import io.taucbd.news.publishing.core.utils.ChainIDUtil;
 import io.taucbd.news.publishing.core.utils.DateUtil;
 import io.taucbd.news.publishing.core.utils.DeviceUtils;
 import io.taucbd.news.publishing.core.utils.FileUtil;
+import io.taucbd.news.publishing.core.utils.GeoUtils;
 import io.taucbd.news.publishing.core.utils.LinkUtil;
 import io.taucbd.news.publishing.core.utils.LocationManagerUtil;
 import io.taucbd.news.publishing.core.utils.NetworkSetting;
@@ -462,6 +463,9 @@ public abstract class TauDaemon {
                         user.updateLocationTime = getSessionTime() / 1000;
                         userRepo.updateUser(user);
                     }
+                    if (isRunning) {
+                        loadFirstLocationCommunity();
+                    }
                 } else {
                     updateUserInfo(user);
                 }
@@ -520,10 +524,77 @@ public abstract class TauDaemon {
                     boolean success = unfollowChain(chainID);
                     logger.debug("checkAllChains unfollowChain chainID::{}, success::{}", chainID, success);
                 }
+                loadFirstLocationCommunity();
             }
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .subscribe();
+    }
+
+    /**
+     * 加载第一次定位最近社区
+     */
+    private void loadFirstLocationCommunity() {
+        String addLocationCommunity = appContext.getString(R.string.pref_key_add_location_community);
+        if (settingsRepo.getBooleanValue(addLocationCommunity, false)) {
+            logger.debug("loadFirstLocationCommunity: already added");
+            return;
+        }
+        UserRepository userRepo = RepositoryHelper.getUserRepository(appContext);
+        MemberRepository memberRepo = RepositoryHelper.getMemberRepository(appContext);
+        User user = userRepo.getCurrentUser();
+        if (user != null) {
+            String userPk = user.publicKey;
+            List<String> localChains = memberRepo.queryFollowedCommunities(userPk);
+            if (locationManager != null) {
+                double latitude = locationManager.getLatitude();
+                double longitude = locationManager.getLongitude();
+                if (latitude > 0 && longitude > 0) {
+                    String[] nearestCommunity = new String[1];
+                    double[] nearestDistance = new double[1];
+                    checkNearestCommunity(BuildConfig.CHAIN_MAP1, localChains, nearestCommunity, nearestDistance);
+                    checkNearestCommunity(BuildConfig.CHAIN_MAP2, localChains, nearestCommunity, nearestDistance);
+                    logger.debug("loadFirstLocationCommunity: nearestCommunity::{}, nearestDistance::{}",
+                            nearestCommunity, nearestDistance);
+                    if (StringUtil.isNotEmpty(nearestCommunity[0])) {
+                        String chainID = nearestCommunity[0];
+                        String peer = BuildConfig.CHAIN_PEER;
+                        String tauLink = LinkUtil.encodeChain(peer, chainID, peer);
+                        tauDaemonAlertHandler.addCommunity(tauLink);
+                        settingsRepo.setBooleanValue(addLocationCommunity, true);
+                    }
+                } else {
+                    logger.debug("loadFirstLocationCommunity: no location info");
+                }
+            }
+        }
+    }
+
+    private void checkNearestCommunity(List<String> chainList, List<String> localChains,
+                                       String[] nearestCommunity, double[] nearestDistance) {
+        double latitude = locationManager.getLatitude();
+        double longitude = locationManager.getLongitude();
+        for (String chain : chainList) {
+            String[] chainData = chain.split(",");
+            if (chainData.length != 3) {
+                continue;
+            }
+            String chainID = chainData[0];
+            if (localChains != null && localChains.contains(chainID)) {
+                logger.debug("loadFirstLocationCommunity: chainID::{}, already exists", chainID);
+                continue;
+            }
+            double lat = Double.parseDouble(chainData[1]);
+            double lon = Double.parseDouble(chainData[2]);
+            double distance = GeoUtils.getDistance(longitude, latitude, lat, lon);
+            if (StringUtil.isEmpty(nearestCommunity[0]) || distance < nearestDistance[0]) {
+                nearestCommunity[0] = chainID;
+                nearestDistance[0] = distance;
+            }
+            logger.debug("loadFirstLocationCommunity: chainID::{}, distance::{}m", chainID,
+                    GeoUtils.getDistance(longitude, latitude, lat, lon));
+
+        }
     }
 
     /**

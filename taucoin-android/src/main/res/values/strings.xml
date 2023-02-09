@@ -31,6 +31,7 @@
     <string name="common_start">Start</string>
     <string name="common_yes">Yes</string>
     <string name="common_join">Join</string>
+    <string name="common_joined">Joined</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="exit">Exit</string>
@@ -50,6 +51,7 @@
     <string name="common_retweet_other">Repost to other TAU community</string>
     <string name="common_share_external">Share to social media</string>
     <string name="common_delete">Delete</string>
+    <string name="common_open">Open</string>
 
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
@@ -71,6 +73,7 @@
     <string name="main_open_link">Open the link?</string>
     <string name="main_airdrop_link_peer" formatted="false"><Data><![CDATA[<font color="#000000">%1$s</font> sends you an airdrop link to receive free coins.]]></Data></string>
     <string name="main_chain_join_success" formatted="false"><Data><![CDATA[Welcome to join us. I\'m <font color="#000000">%1$s</font>, the creator of this community.]]></Data></string>
+    <string name="main_system_positioning_switch">The system positioning switch needs to be turned on.</string>
     <string name="main_airdrop_link_share">Share link to airdrop to friends.</string>
     <string name="main_referral_link_create">Copy Link</string>
     <string name="main_referral_link_copy">Referral and Bonus Link copied</string>

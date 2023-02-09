@@ -51,7 +51,6 @@ import io.taucbd.news.publishing.core.utils.RootUtil;
 import io.taucbd.news.publishing.core.utils.StringUtil;
 import io.taucbd.news.publishing.core.utils.ToastUtils;
 import io.taucbd.news.publishing.core.utils.UsersUtil;
-import io.taucbd.news.publishing.core.utils.Utils;
 import io.taucbd.news.publishing.core.utils.ViewUtils;
 import io.taucbd.news.publishing.core.utils.media.MediaUtil;
 import io.taucbd.news.publishing.databinding.ActivityMainDrawerBinding;
@@ -93,6 +92,7 @@ public class MainActivity extends ScanTriggerActivity {
     private final CompositeDisposable disposables = new CompositeDisposable();
     private final Subject<Integer> mBackClick = PublishSubject.create();
     private CommonDialog joinDialog;
+    private CommonDialog locationDialog;
     private User user;
     private BaseFragment currentFragment;
     private SettingsRepository settingsRepo;
@@ -116,7 +116,11 @@ public class MainActivity extends ScanTriggerActivity {
         checkCurrentUser();
         initExitApp();
         subscribeAddCommunity();
-        LocationManagerUtil.requestLocationPermissions(this);
+        if (LocationManagerUtil.isLocServiceEnable()) {
+            LocationManagerUtil.requestLocationPermissions(this);
+        } else {
+            showLocationDialog();
+        }
         WorkloadManager.startWakeUpWorker(getApplicationContext());
         RootUtil.checkRoot();
     }
@@ -368,6 +372,9 @@ public class MainActivity extends ScanTriggerActivity {
         if (joinDialog != null) {
             joinDialog.closeDialog();
         }
+        if (locationDialog != null) {
+            locationDialog.closeDialog();
+        }
         if (currentFragment != null) {
             FragmentManager fm = getSupportFragmentManager();
             if (!fm.isDestroyed()) {
@@ -599,6 +606,32 @@ public class MainActivity extends ScanTriggerActivity {
         }
     }
 
+    private void showLocationDialog() {
+        String addLocationCommunity = getString(R.string.pref_key_add_location_community);
+        if (settingsRepo.getBooleanValue(addLocationCommunity, false)) {
+            logger.debug("showLocationDialog: not need");
+            return;
+        }
+        if (locationDialog != null && locationDialog.isShowing()) {
+            return;
+        }
+        PromptDialogBinding joinBinding = DataBindingUtil.inflate(LayoutInflater.from(this),
+                R.layout.prompt_dialog, null, false);
+        String joinSuccess = getString(R.string.main_system_positioning_switch);
+        joinBinding.tvTitle.setText(joinSuccess);
+        locationDialog = new CommonDialog.Builder(this)
+                .setContentView(joinBinding.getRoot())
+                .setCanceledOnTouchOutside(false)
+                .setPositiveButton(R.string.common_setup, (dialog, which) -> {
+                    dialog.dismiss();
+                    LocationManagerUtil.openSetting(MainActivity.this);
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .create();
+        locationDialog.setOnCancelListener(l -> locationDialog = null);
+        locationDialog.show();
+    }
+
     /**
      *  创建右上角Menu
      */
@@ -681,11 +714,15 @@ public class MainActivity extends ScanTriggerActivity {
         } else if (resultCode == RESULT_OK && requestCode == FontSizeActivity.REQUEST_CODE_FONT_SIZE) {
             refreshAllView();
         } else if (resultCode == RESULT_OK && requestCode == PictureConfig.CHOOSE_REQUEST) {
-                List<LocalMedia> result = PictureSelector.obtainMultipleResult(data);
-                if (result != null && result.size() > 0) {
-                    LocalMedia media = result.get(0);
-                    userViewModel.updateHeadPic(media);
-                }
+            List<LocalMedia> result = PictureSelector.obtainMultipleResult(data);
+            if (result != null && result.size() > 0) {
+                LocalMedia media = result.get(0);
+                userViewModel.updateHeadPic(media);
+            }
+        } else if (requestCode == LocationManagerUtil.LOCATION_OPEN_REQUEST_CODE) {
+            if (LocationManagerUtil.isLocServiceEnable()) {
+                LocationManagerUtil.requestLocationPermissions(this);
+            }
         }
     }
 

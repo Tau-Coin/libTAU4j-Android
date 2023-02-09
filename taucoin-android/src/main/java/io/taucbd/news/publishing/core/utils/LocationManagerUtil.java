@@ -2,13 +2,16 @@ package io.taucbd.news.publishing.core.utils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +22,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import io.taucbd.news.publishing.MainApplication;
 import io.taucbd.news.publishing.R;
 import io.taucbd.news.publishing.core.model.TauDaemon;
 import io.taucbd.news.publishing.ui.customviews.permission.EasyPermissions;
@@ -28,6 +32,7 @@ import io.taucbd.news.publishing.ui.customviews.permission.EasyPermissions;
  */
 public class LocationManagerUtil {
     private static final Logger logger = LoggerFactory.getLogger("LocationManagerUtil");
+    public static final int LOCATION_OPEN_REQUEST_CODE = 0x104;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private Context appContext;
@@ -157,6 +162,39 @@ public class LocationManagerUtil {
         if (locationListener != null) {
             locationListener = null;
         }
+    }
+
+    /**
+     * 手机是否开启位置服务，如果没有开启那么所有app将不能使用定位功能
+     */
+    public static boolean isLocServiceEnable() {
+        Context appContext = MainApplication.getInstance();
+        LocationManager locationManager = (LocationManager) appContext.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean network = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        return gps || network;
+//
+//        int locationMode;
+//        try {
+//            locationMode = Settings.Secure.getInt(appContext.getContentResolver(), Settings.Secure.LOCATION_MODE);
+//        } catch (Settings.SettingNotFoundException e) {
+//            return false;
+//        }
+//        return locationMode != Settings.Secure.LOCATION_MODE_OFF;
+    }
+
+    public static void openSetting(@NonNull Activity activity) {
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        try {
+            activity.startActivityForResult(intent, LOCATION_OPEN_REQUEST_CODE);
+        } catch (ActivityNotFoundException ex) {
+            intent.setAction(Settings.ACTION_SETTINGS);
+            try {
+                activity.startActivityForResult(intent, LOCATION_OPEN_REQUEST_CODE);
+            } catch (Exception e) {}
+        }
+
     }
 
     /**
