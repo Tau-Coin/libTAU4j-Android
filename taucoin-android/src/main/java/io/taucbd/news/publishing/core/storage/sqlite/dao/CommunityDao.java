@@ -65,7 +65,7 @@ public interface CommunityDao {
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
             " LEFT JOIN (SELECT timestamp, memo, chainID FROM (SELECT timestamp, memo, chainID FROM Txs" +
-            " WHERE txType = " + Constants.NEWS_TX_TYPE + " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " WHERE deleted = 0 AND txType = " + Constants.NEWS_TX_TYPE + " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " ORDER BY timestamp) GROUP BY chainID) AS c" +
             " ON a.chainID = c.chainID" +
             " WHERE isBanned == 0";
@@ -80,7 +80,7 @@ public interface CommunityDao {
             " LEFT JOIN Members AS b ON a.chainID = b.chainID" +
             " AND b.publicKey = " + QUERY_GET_CURRENT_USER_PK +
             " LEFT JOIN (SELECT timestamp, memo, chainID FROM (SELECT timestamp, memo, chainID FROM Txs" +
-            " WHERE txType = " + Constants.NEWS_TX_TYPE + " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
+            " WHERE deleted = 0 AND txType = " + Constants.NEWS_TX_TYPE + " AND senderPk NOT IN " + UserDao.QUERY_GET_COMMUNITY_USER_PKS_IN_BAN_LIST +
             " ORDER BY timestamp DESC) GROUP BY chainID) AS c" +
             " ON a.chainID = c.chainID" +
             " WHERE isBanned == 0";
