@@ -111,6 +111,36 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
                     .append(" ");
             binding.tvMsg.setText(msg);
 
+            binding.tvMsg.setMaxLines(5);
+            binding.tvMsg.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (binding.tvMsg.getLineCount() >= 5){
+                        int lineEndIndex4 = binding.tvMsg.getLayout().getLineEnd(4);
+                        if (lineEndIndex4 < msg.length()) {
+                            int lineEndIndex3 = binding.tvMsg.getLayout().getLineEnd(3);
+                            String text = binding.tvMsg.getText().toString().substring(0, lineEndIndex4);
+                            String lineBreak = "\n";
+                            String ellipsis = "......";
+                            boolean suffix = text.endsWith(lineBreak);
+                            if (lineEndIndex4 - lineEndIndex3 > 7) {
+                                if (suffix) {
+                                    text = text.substring(0, text.length() - ellipsis.length() - lineBreak.length());
+                                } else {
+                                    text = text.substring(0, text.length() - ellipsis.length());
+                                }
+                            } else {
+                                if (suffix) {
+                                    text = text.substring(0, text.length() - lineBreak.length());
+                                }
+                            }
+                            text += ellipsis;
+                            binding.tvMsg.setText(text);
+                        }
+                    }
+                }
+            });
+
             boolean isShowLink = StringUtil.isNotEmpty(tx.link);
             binding.tvLink.setText(tx.link);
             binding.tvLink.setVisibility(isShowLink ? View.VISIBLE : View.GONE);
