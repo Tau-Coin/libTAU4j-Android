@@ -36,6 +36,7 @@ import io.taucbd.news.publishing.core.model.data.OperationMenuItem;
 import io.taucbd.news.publishing.core.model.data.UserAndTx;
 import io.taucbd.news.publishing.core.utils.ActivityUtil;
 import io.taucbd.news.publishing.core.utils.CopyManager;
+import io.taucbd.news.publishing.core.utils.FixMemLeak;
 import io.taucbd.news.publishing.core.utils.KeyboardUtils;
 import io.taucbd.news.publishing.core.utils.LinkUtil;
 import io.taucbd.news.publishing.core.utils.ObservableUtil;
@@ -331,6 +332,10 @@ public class MarketTabFragment extends BaseFragment implements View.OnClickListe
     public void onDestroy() {
         super.onDestroy();
         closeAllDialog();
+        if (adapter != null) {
+            adapter.onCleared();
+        }
+        binding.refreshLayout.setXRefreshViewListener(null);
     }
 
     @Override

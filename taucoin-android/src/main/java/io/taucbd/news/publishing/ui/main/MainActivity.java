@@ -187,14 +187,20 @@ public class MainActivity extends ScanTriggerActivity {
     }
 
     private void initRightFragment() {
+        logger.debug("CommunityFragment::initRightFragment");
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
+        List<Fragment> fragments = fm.getFragments();
+        for (Fragment fragment : fragments) {
+            if (fragment instanceof CommunityFragment || fragment instanceof ChatFragment) {
+                transaction.remove(fragment);
+            }
+        }
         transaction.add(R.id.main_right_fragment, chatFragment);
         transaction.hide(chatFragment);
         transaction.add(R.id.main_right_fragment, communityFragment);
         transaction.hide(communityFragment);
         transaction.commitAllowingStateLoss();
-
     }
 
     private void refreshLeftFragment() {
@@ -378,7 +384,10 @@ public class MainActivity extends ScanTriggerActivity {
         if (currentFragment != null) {
             FragmentManager fm = getSupportFragmentManager();
             if (!fm.isDestroyed()) {
-                fm.beginTransaction().remove(currentFragment).commit();
+                FragmentTransaction transaction = fm.beginTransaction();
+                transaction.remove(chatFragment);
+                transaction.remove(communityFragment);
+                transaction.commit();
             }
         }
     }

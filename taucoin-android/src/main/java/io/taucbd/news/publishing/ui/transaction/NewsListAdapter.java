@@ -40,9 +40,9 @@ import io.taucbd.news.publishing.ui.customviews.AutoLinkTextView;
  * Market 列表显示的Adapter
  */
 public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.ViewHolder> {
-    private Logger logger = LoggerFactory.getLogger("NewsListAdapter");
-    private final ClickListener listener;
-    private List<ItemNewsBinding> viewList = new ArrayList<>();
+    private final static Logger logger = LoggerFactory.getLogger("NewsListAdapter");
+    private ClickListener listener;
+    private final List<ItemNewsBinding> viewList = new ArrayList<>();
     private int viewPos = 0;
 
     NewsListAdapter(ClickListener listener) {
@@ -64,6 +64,12 @@ public class NewsListAdapter extends ListAdapter<UserAndTx, NewsListAdapter.View
             }
             return false;
         });
+    }
+
+    public void onCleared() {
+        this.listener = null;
+        this.viewList.clear();
+
     }
 
     @NonNull
