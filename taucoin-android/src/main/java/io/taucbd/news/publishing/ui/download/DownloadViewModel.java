@@ -20,6 +20,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.taucbd.news.publishing.BuildConfig;
 import io.taucbd.news.publishing.R;
 import io.taucbd.news.publishing.core.model.data.DataResult;
 import io.taucbd.news.publishing.core.model.data.Version;
@@ -92,6 +93,7 @@ public class DownloadViewModel extends AndroidViewModel {
             int versionCode = AppUtil.getVersionCode();
             Map<String, Integer> map = Maps.newHashMap();
             map.put("version", versionCode);
+            map.put("id", BuildConfig.TAU_LANGUAGE);
             try {
                 Response response = HttpUtil.httpPost(CHECK_VERSION_URL, map);
                 if (response.isSuccessful() && response.code() == 200) {
@@ -102,15 +104,23 @@ public class DownloadViewModel extends AndroidViewModel {
                             logger.info("Response data::{}", dataResult.getData());
                             String data = new Gson().toJson(dataResult.getData());
                             Version version = new Gson().fromJson(data, Version.class);
-                            emitter.onNext(version);
+                            if (!emitter.isDisposed()) {
+                                emitter.onNext(version);
+                            }
                         } else {
-                            emitter.onError(new Throwable("response body Gson error"));
+                            if (!emitter.isDisposed()) {
+                                emitter.onError(new Throwable("response body Gson error"));
+                            }
                         }
                     } else {
-                        emitter.onError(new Throwable("response body empty"));
+                        if (!emitter.isDisposed()) {
+                            emitter.onError(new Throwable("response body empty"));
+                        }
                     }
                 } else {
-                    emitter.onError(new Throwable("response code != 200"));
+                    if (!emitter.isDisposed()) {
+                        emitter.onError(new Throwable("response code != 200"));
+                    }
                 }
             } catch (Exception e) {
                 logger.error("Error::Check app version::{}", e.getMessage());
@@ -118,7 +128,9 @@ public class DownloadViewModel extends AndroidViewModel {
                 if (null == throwable) {
                     throwable = new Throwable("Error::" + e.getMessage());
                 }
-                emitter.onError(throwable);
+                if (!emitter.isDisposed()) {
+                    emitter.onError(throwable);
+                }
             }
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
