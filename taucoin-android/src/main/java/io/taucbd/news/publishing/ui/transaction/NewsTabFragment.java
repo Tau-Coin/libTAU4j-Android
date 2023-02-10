@@ -140,15 +140,12 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                 logger.debug("headerDataIndex::{}", headerDataIndex);
                 if (headerDataIndex >= 0) {
                     currentList.remove(headerDataIndex);
-                    if (headerBinding != null) {
-                        headerBinding.getRoot().setVisibility(View.VISIBLE);
-                    }
-                } else {
-                    if (headerBinding != null) {
-                        headerBinding.getRoot().setVisibility(View.GONE);
-                    }
                 }
                 adapter.submitList(currentList, handleUpdateAdapter);
+                if (headerBinding != null) {
+                    headerBinding.getRoot().setVisibility(txs.size() > 0 ? View.VISIBLE : View.GONE);
+                }
+
             } else {
                 currentList.addAll(0, adapter.getCurrentList());
                 isLoadMore = txs.size() != 0 && txs.size() % Page.PAGE_SIZE == 0;
@@ -157,13 +154,6 @@ public class NewsTabFragment extends BaseFragment implements View.OnClickListene
                 logger.debug("headerDataIndex::{}", headerDataIndex);
                 if (headerDataIndex >= 0) {
                     currentList.remove(headerDataIndex);
-                    if (headerBinding != null) {
-                        headerBinding.getRoot().setVisibility(View.VISIBLE);
-                    }
-                } else {
-                    if (headerBinding != null) {
-                        headerBinding.getRoot().setVisibility(View.GONE);
-                    }
                 }
                 adapter.submitList(currentList, handlePullAdapter);
             }
