@@ -109,19 +109,24 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
             SpannableStringBuilder msg = new SpannableStringBuilder()
                     .append(tx.memo)
                     .append(" ");
-            binding.tvMsg.setText(msg);
-
-            binding.tvMsg.setMaxLines(5);
-            binding.tvMsg.post(new Runnable() {
-                @Override
-                public void run() {
+            // 防止省略号闪烁
+            UserAndTxReply oldTx = (UserAndTxReply) binding.tvMsg.getTag();
+            if (null == oldTx || StringUtil.isNotEquals(oldTx.txID, tx.txID)) {
+                binding.tvMsg.setText(msg);
+                binding.tvMsg.setMaxLines(5);
+                binding.tvMsg.post(() -> {
                     if (binding.tvMsg.getLineCount() >= 5){
+                        String text = binding.tvMsg.getText().toString();
+                        String ellipsis = "......";
+                        if (binding.tvMsg.getLineCount() == 5 && text.endsWith(ellipsis)) {
+                            return;
+                        }
                         int lineEndIndex4 = binding.tvMsg.getLayout().getLineEnd(4);
                         if (lineEndIndex4 < msg.length()) {
                             int lineEndIndex3 = binding.tvMsg.getLayout().getLineEnd(3);
-                            String text = binding.tvMsg.getText().toString().substring(0, lineEndIndex4);
+                            text = text.substring(0, lineEndIndex4);
                             String lineBreak = "\n";
-                            String ellipsis = "......";
+
                             boolean suffix = text.endsWith(lineBreak);
                             if (lineEndIndex4 - lineEndIndex3 > 7) {
                                 if (suffix) {
@@ -138,8 +143,8 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
                             binding.tvMsg.setText(text);
                         }
                     }
-                }
-            });
+                });
+            }
 
             boolean isShowLink = StringUtil.isNotEmpty(tx.link);
             binding.tvLink.setText(tx.link);
