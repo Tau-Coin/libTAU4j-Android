@@ -9,6 +9,7 @@ import android.os.BatteryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.taucbd.news.publishing.core.model.TauDaemon;
 import io.taucbd.news.publishing.core.storage.sp.SettingsRepository;
 import io.taucbd.news.publishing.core.storage.RepositoryHelper;
 
@@ -18,7 +19,6 @@ import io.taucbd.news.publishing.core.storage.RepositoryHelper;
 
 public class PowerReceiver extends BroadcastReceiver {
     private static final Logger logger = LoggerFactory.getLogger("PowerReceiver");
-    private int level = 100;
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
@@ -36,9 +36,14 @@ public class PowerReceiver extends BroadcastReceiver {
                 break;
             case Intent.ACTION_BATTERY_CHANGED:
                 int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-                if (this.level != level) {
-                    logger.debug("battery changed::{}", level);
-                }
+                logger.debug("battery changed::{}", level);
+                TauDaemon.getInstance(appContext).getTauDozeManager().setBatteryLevel(level);
+                break;
+            case Intent.ACTION_SCREEN_ON:
+                TauDaemon.getInstance(appContext).getTauDozeManager().setScreenState(true);
+                break;
+            case Intent.ACTION_SCREEN_OFF:
+                TauDaemon.getInstance(appContext).getTauDozeManager().setScreenState(false);
                 break;
         }
     }
@@ -48,6 +53,8 @@ public class PowerReceiver extends BroadcastReceiver {
         filter.addAction(Intent.ACTION_POWER_CONNECTED);
         filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
         return filter;
     }
 }

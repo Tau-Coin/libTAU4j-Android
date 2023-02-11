@@ -60,6 +60,7 @@ import io.taucbd.news.publishing.core.utils.rlp.ByteUtil;
 import io.taucbd.news.publishing.receiver.ConnectionReceiver;
 import io.taucbd.news.publishing.receiver.PowerReceiver;
 import io.taucbd.news.publishing.service.SystemServiceManager;
+import io.taucbd.news.publishing.service.TauDozeManager;
 import io.taucbd.news.publishing.service.TauService;
 import io.taucbd.news.publishing.ui.TauNotifier;
 import io.taucbd.news.publishing.ui.chat.ChatViewModel;
@@ -88,11 +89,10 @@ public abstract class TauDaemon {
     private Disposable onlineTimer;                  // 触发在线信号定时任务
     private Disposable chargingTimer;                // 触发充电5分钟计时任务
     private Disposable checkChainsDisposable;        // 检查本地和libTAU链的同步
-    private Disposable serviceDisposable;            // libTAU服务计时任务
-    private int serviceResetCount = 0;               // libTAU服务暂停和恢复策略方案计数器
     TauDaemonAlertHandler tauDaemonAlertHandler;     // libTAU上报的Alert处理程序
     private final TxQueueManager txQueueManager;     // 交易队列管理
     private final MyAccountManager myAccountManager; // 社区我的账户管理
+    private final TauDozeManager tauDozeManager;     // TAU Doze管理
     volatile boolean isRunning = false;
     volatile String seed;
     String deviceID;
@@ -126,6 +126,7 @@ public abstract class TauDaemon {
         sessionManager = new SessionManager(true);
         txQueueManager = new TxQueueManager(this);
         myAccountManager = new MyAccountManager();
+        tauDozeManager = new TauDozeManager(this);
 
         observeTauDaemon();
         initLocalParam();
@@ -281,9 +282,6 @@ public abstract class TauDaemon {
         if (checkChainsDisposable != null && !checkChainsDisposable.isDisposed()) {
             checkChainsDisposable.dispose();
         }
-        if (serviceDisposable != null && !serviceDisposable.isDisposed()) {
-            serviceDisposable.dispose();
-        }
         TauNotifier.getInstance().cancelAllNotify();
         locationManager.stopLocation();
         appContext.unregisterReceiver(powerReceiver);
@@ -292,6 +290,7 @@ public abstract class TauDaemon {
         tauDaemonAlertHandler.onCleared();
         txQueueManager.onCleared();
         myAccountManager.onCleared();
+        tauDozeManager.onCleared();
         sessionStopOver();
     }
 
@@ -366,7 +365,6 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_charging_state))) {
             logger.info("SettingsChanged, charging state::{}", settingsRepo.chargingState());
             startChargingTiming();
-            resetLibTAUService();
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
             logger.info("isMeteredNetwork::{}", NetworkSetting.isMeteredNetwork());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_wifi_network))) {
@@ -374,7 +372,6 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_foreground_running))) {
             boolean isForeground = settingsRepo.getBooleanValue(key);
             logger.info("foreground running::{}", isForeground);
-            resetLibTAUService();
         } else if (key.equals(appContext.getString(R.string.pref_key_nat_pmp_mapped))) {
             logger.info("SettingsChanged, Nat-PMP mapped::{}", settingsRepo.isNATPMPMapped());
         } else if (key.equals(appContext.getString(R.string.pref_key_upnp_mapped))) {
@@ -696,6 +693,10 @@ public abstract class TauDaemon {
         return myAccountManager;
     }
 
+    public TauDozeManager getTauDozeManager() {
+        return tauDozeManager;
+    }
+
     /**
      * 请求peer发布区块数据
      * @param publicKey 公钥
@@ -909,37 +910,6 @@ public abstract class TauDaemon {
             sessionManager.setLogLevel(level);
         }
         logger.info("setLogLevel level::{}, isRunning::{}", level, isRunning);
-    }
-
-    /**
-     * 重置libTAU服务
-     */
-    private void resetLibTAUService() {
-        if (serviceDisposable != null && !serviceDisposable.isDisposed()) {
-            serviceDisposable.dispose();
-        }
-        String foregroundRunningKey = appContext.getString(R.string.pref_key_foreground_running);
-        boolean isForeground = settingsRepo.getBooleanValue(foregroundRunningKey, true);
-        if (isForeground || settingsRepo.chargingState()) {
-            logger.debug("resetLibTAUService:: resume");
-            resumeService();
-            return;
-        }
-        serviceDisposable = ObservableUtil.intervalSeconds(30, true)
-                .subscribeOn(Schedulers.io())
-                .subscribe(l -> {
-                    if (serviceResetCount % 3 == 0) {
-                        logger.debug("resetLibTAUService{}:: resume", serviceResetCount);
-                        resumeService();
-                    } else {
-                        logger.debug("resetLibTAUService{}:: pause", serviceResetCount);
-                        pauseService();
-                    }
-                    serviceResetCount ++;
-                    if (serviceResetCount >= 3) {
-                        serviceResetCount = 0;
-                    }
-                });
     }
 
     /**
