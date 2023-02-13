@@ -171,7 +171,7 @@ public class CryptoCitiesActivity extends BaseActivity {
             binding.tvJoined.setVisibility(isJoined ? View.VISIBLE : View.GONE);
             binding.tvJoin.setVisibility(!isJoined? View.VISIBLE : View.GONE);
             binding.tvJoin.setOnClickListener(v -> {
-                String chainLink = LinkUtil.encodeChain(BuildConfig.CHAIN_PEER, group.data, BuildConfig.CHAIN_PEER);
+                String chainLink = LinkUtil.encodeChain(BuildConfig.CHAIN_PEER1, group.data, BuildConfig.CHAIN_PEER1);
                 communityViewModel.addCommunity(group.data, LinkUtil.decode(chainLink));
             });
             return convertView;
@@ -194,7 +194,13 @@ public class CryptoCitiesActivity extends BaseActivity {
             binding.tvJoined.setVisibility(isJoined ? View.VISIBLE : View.GONE);
             binding.tvJoin.setVisibility(!isJoined? View.VISIBLE : View.GONE);
             binding.tvJoin.setOnClickListener(v -> {
-                String chainLink = LinkUtil.encodeChain(BuildConfig.CHAIN_PEER, child, BuildConfig.CHAIN_PEER);
+                String peer;
+                if (groupPosition == 0) {
+                    peer = BuildConfig.CHAIN_PEER1;
+                } else {
+                    peer = BuildConfig.CHAIN_PEER2;
+                }
+                String chainLink = LinkUtil.encodeChain(peer, child, peer);
                 communityViewModel.addCommunity(child, LinkUtil.decode(chainLink));
             });
             return convertView;

@@ -506,7 +506,7 @@ public abstract class TauDaemon {
                 ArrayList<String> chainArray = BuildConfig.CHAIN_ARRAY;
                 for (int i = 0; i < chainArray.size(); i++) {
                     String chainID = chainArray.get(i);
-                    String peer = BuildConfig.CHAIN_PEER;
+                    String peer = BuildConfig.CHAIN_PEER1;
                     String tauTesting = LinkUtil.encodeChain(peer, chainID, peer);
                     tauDaemonAlertHandler.addCommunity(tauTesting);
                     logger.info("checkAllChains addCommunity chainID::{}", chainID);
@@ -556,15 +556,15 @@ public abstract class TauDaemon {
                 double latitude = locationManager.getLatitude();
                 double longitude = locationManager.getLongitude();
                 if (latitude > 0 && longitude > 0) {
-                    String[] nearestCommunity = new String[1];
+                    String[] nearestCommunity = new String[2];
                     double[] nearestDistance = new double[1];
-                    checkNearestCommunity(BuildConfig.CHAIN_LIST1, localChains, nearestCommunity, nearestDistance);
-                    checkNearestCommunity(BuildConfig.CHAIN_LIST2, localChains, nearestCommunity, nearestDistance);
+                    checkNearestCommunity(BuildConfig.CHAIN_LIST1, BuildConfig.CHAIN_PEER1, localChains, nearestCommunity, nearestDistance);
+                    checkNearestCommunity(BuildConfig.CHAIN_LIST2, BuildConfig.CHAIN_PEER2, localChains, nearestCommunity, nearestDistance);
                     logger.debug("loadFirstLocationCommunity: nearestCommunity::{}, nearestDistance::{}",
                             nearestCommunity, nearestDistance);
                     if (StringUtil.isNotEmpty(nearestCommunity[0])) {
                         String chainID = nearestCommunity[0];
-                        String peer = BuildConfig.CHAIN_PEER;
+                        String peer = nearestCommunity[1];
                         String tauLink = LinkUtil.encodeChain(peer, chainID, peer);
                         tauDaemonAlertHandler.addCommunity(tauLink);
                         settingsRepo.setBooleanValue(addLocationCommunity, true);
@@ -576,7 +576,7 @@ public abstract class TauDaemon {
         }
     }
 
-    private void checkNearestCommunity(List<String> chainList, List<String> localChains,
+    private void checkNearestCommunity(List<String> chainList, String peer, List<String> localChains,
                                        String[] nearestCommunity, double[] nearestDistance) {
         double latitude = locationManager.getLatitude();
         double longitude = locationManager.getLongitude();
@@ -595,6 +595,11 @@ public abstract class TauDaemon {
             double distance = GeoUtils.getDistance(longitude, latitude, lat, lon);
             if (StringUtil.isEmpty(nearestCommunity[0]) || distance < nearestDistance[0]) {
                 nearestCommunity[0] = chainID;
+                if (BuildConfig.CHAIN_ARRAY.contains(chainID)) {
+                    nearestCommunity[1] = BuildConfig.CHAIN_PEER1;
+                } else {
+                    nearestCommunity[1] = peer;
+                }
                 nearestDistance[0] = distance;
             }
             logger.debug("loadFirstLocationCommunity: chainID::{}, distance::{}m", chainID,
