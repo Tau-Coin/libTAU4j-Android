@@ -2,19 +2,24 @@ package io.taucbd.news.publishing.ui.customviews;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Rect;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
+import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import io.taucbd.news.publishing.core.utils.LinkUtil;
+import io.taucbd.news.publishing.core.utils.StringUtil;
 
 @SuppressLint("AppCompatCustomView")
 public class AutoLinkTextView extends TextView {
@@ -130,5 +135,94 @@ public class AutoLinkTextView extends TextView {
         void onLongClick(AutoLinkTextView view);
 
         void onLinkClick(String link);
+    }
+
+    private final int maxLineCount = 5;
+    private String mText;
+    private StaticLayout sl;
+    final String ellipsizeText = "......";
+    public void setEllipsizeText(String text) {
+        mText = text;
+        // 设置要显示的文字，这一行必须要，否则 onMeasure 宽度测量不正确
+        setText(text);
+    }
+
+    @SuppressLint("DrawAllocation")
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (StringUtil.isEmpty(mText)) {
+            return;
+        }
+        // 文字计算辅助工具
+        sl = new StaticLayout(mText, getPaint(), getMeasuredWidth() - getPaddingLeft() - getPaddingRight()
+                , Layout.Alignment.ALIGN_CENTER, 1, 0, true);
+        // 总计行数
+        int lineCount = sl.getLineCount();
+        if (lineCount > maxLineCount) {
+                lineCount = maxLineCount;
+                // 省略文字的宽度
+                float dotWidth = getPaint().measureText(ellipsizeText);
+                // 找出第 showLineCount 行的文字
+                int start = sl.getLineStart(lineCount - 1);
+                int end = sl.getLineEnd(lineCount - 1);
+                String lineText = mText.substring(start, end);
+                lineText = lineText.replaceAll("\n", "");
+                if (lineText.length() > 6) {
+                    // 将第 showLineCount 行最后的文字替换为 ellipsizeText
+                    char[] charArray = lineText.toCharArray();
+                    StringBuilder str = new StringBuilder();
+                    int endIndex = 0;
+                    for (int i = charArray.length - 1; i >= 0; i--) {
+                        str.append(charArray[i]);
+                        if (getPaint().measureText(str.toString()) >= dotWidth) {
+                            endIndex = i;
+                            break;
+                        }
+                    }
+                    str = new StringBuilder();
+                    for (int i = 0; i <  endIndex; i++) {
+                        str.append(charArray[i]);
+                    }
+                    lineText = str + ellipsizeText;
+//                    int endIndex = 0;
+//                    for (int i = lineText.length() - 1; i >= 0; i--) {
+//                        String str = lineText.substring(i);
+//                        // 找出文字宽度大于 ellipsizeText 的字符
+//                        if (getPaint().measureText(str) >= dotWidth) {
+//                            endIndex = i;
+//                            break;
+//                        }
+//                    }
+                    // 新的第 showLineCount 的文字
+//                    lineText = lineText.substring(0, endIndex) + ellipsizeText;
+                } else {
+                    lineText = lineText + ellipsizeText;
+                }
+                // 最终显示的文字
+                setText(mText.substring(0, start) + lineText);
+        } else {
+            setText(mText);
+        }
+
+        // 重新计算高度
+        int lineHeight = 0;
+        for (int i = 0; i < lineCount; i++) {
+            Rect lineBound = new Rect();
+            sl.getLineBounds(i, lineBound);
+            lineHeight += lineBound.height();
+        }
+        lineHeight += getPaddingTop() + getPaddingBottom();
+        setMeasuredDimension(getMeasuredWidth(), lineHeight);
+        addAutoLinks();
+    }
+
+    private void addAutoLinks() {
+        setAutoLinkMask(0);
+        Linkify.addLinks(this, Linkify.WEB_URLS);
+        Linkify.addLinks(this, LinkUtil.REFERRAL, null);
+        Linkify.addLinks(this, LinkUtil.AIRDROP, null);
+        Linkify.addLinks(this, LinkUtil.CHAIN, null);
+        Linkify.addLinks(this, LinkUtil.FRIEND, null);
     }
 }

@@ -1,7 +1,6 @@
 package io.taucbd.news.publishing.ui.transaction;
 
 import android.graphics.drawable.Drawable;
-import android.text.SpannableStringBuilder;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -106,45 +105,46 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
             binding.tvBalance.setText(balance);
             binding.tvPower.setText(power);
 
-            SpannableStringBuilder msg = new SpannableStringBuilder()
-                    .append(tx.memo)
-                    .append(" ");
-            // 防止省略号闪烁
-            UserAndTxReply oldTx = (UserAndTxReply) binding.tvMsg.getTag();
-            if (null == oldTx || StringUtil.isNotEquals(oldTx.txID, tx.txID)) {
-                binding.tvMsg.setText(msg);
-                binding.tvMsg.setMaxLines(5);
-                binding.tvMsg.post(() -> {
-                    if (binding.tvMsg.getLineCount() >= 5){
-                        String text = binding.tvMsg.getText().toString();
-                        String ellipsis = "......";
-                        if (binding.tvMsg.getLineCount() == 5 && text.endsWith(ellipsis)) {
-                            return;
-                        }
-                        int lineEndIndex4 = binding.tvMsg.getLayout().getLineEnd(4);
-                        if (lineEndIndex4 < msg.length()) {
-                            int lineEndIndex3 = binding.tvMsg.getLayout().getLineEnd(3);
-                            text = text.substring(0, lineEndIndex4);
-                            String lineBreak = "\n";
-
-                            boolean suffix = text.endsWith(lineBreak);
-                            if (lineEndIndex4 - lineEndIndex3 > 7) {
-                                if (suffix) {
-                                    text = text.substring(0, text.length() - ellipsis.length() - lineBreak.length());
-                                } else {
-                                    text = text.substring(0, text.length() - ellipsis.length());
-                                }
-                            } else {
-                                if (suffix) {
-                                    text = text.substring(0, text.length() - lineBreak.length());
-                                }
-                            }
-                            text += ellipsis;
-                            binding.tvMsg.setText(text);
-                        }
-                    }
-                });
-            }
+//            SpannableStringBuilder msg = new SpannableStringBuilder()
+//                    .append(tx.memo);
+//                    .append(" ");
+            binding.tvMsg.setEllipsizeText(tx.memo);
+//            // 防止省略号闪烁
+//            UserAndTxReply oldTx = (UserAndTxReply) binding.tvMsg.getTag();
+//            if (null == oldTx || StringUtil.isNotEquals(oldTx.txID, tx.txID)) {
+//                binding.tvMsg.setText(msg);
+//                binding.tvMsg.setMaxLines(5);
+//                binding.tvMsg.post(() -> {
+//                    if (binding.tvMsg.getLineCount() >= 5){
+//                        String text = binding.tvMsg.getText().toString();
+//                        String ellipsis = "......";
+//                        if (binding.tvMsg.getLineCount() == 5 && text.endsWith(ellipsis)) {
+//                            return;
+//                        }
+//                        int lineEndIndex4 = binding.tvMsg.getLayout().getLineEnd(4);
+//                        if (lineEndIndex4 < msg.length()) {
+//                            int lineEndIndex3 = binding.tvMsg.getLayout().getLineEnd(3);
+//                            text = text.substring(0, lineEndIndex4);
+//                            String lineBreak = "\n";
+//
+//                            boolean suffix = text.endsWith(lineBreak);
+//                            if (lineEndIndex4 - lineEndIndex3 > 7) {
+//                                if (suffix) {
+//                                    text = text.substring(0, text.length() - ellipsis.length() - lineBreak.length());
+//                                } else {
+//                                    text = text.substring(0, text.length() - ellipsis.length());
+//                                }
+//                            } else {
+//                                if (suffix) {
+//                                    text = text.substring(0, text.length() - lineBreak.length());
+//                                }
+//                            }
+//                            text += ellipsis;
+//                            binding.tvMsg.setText(text);
+//                        }
+//                    }
+//                });
+//            }
 
             boolean isShowLink = StringUtil.isNotEmpty(tx.link);
             binding.tvLink.setText(tx.link);
@@ -160,7 +160,7 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
             Linkify.addLinks(binding.tvMsg, LinkUtil.AIRDROP, null);
             Linkify.addLinks(binding.tvMsg, LinkUtil.CHAIN, null);
             Linkify.addLinks(binding.tvMsg, LinkUtil.FRIEND, null);
-            binding.tvMsg.requestLayout();
+//            binding.tvMsg.requestLayout();
 
             if (isShowLink) {
                 DrawablesUtil.setUnderLine(binding.tvLink);
