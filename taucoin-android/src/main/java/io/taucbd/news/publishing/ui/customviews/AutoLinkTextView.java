@@ -3,6 +3,7 @@ package io.taucbd.news.publishing.ui.customviews;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Build;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
@@ -57,6 +58,13 @@ public class AutoLinkTextView extends TextView {
 
         // 此setMovementMethod可被修改
         setMovementMethod(new LinkMovementMethodInterceptor());
+
+        //android9和10的行高问题的解决暂时解决方案
+        //会造成开销，最好还是想办法把中英文的行高固定下来(降低中文行高)
+        // @see https://www.jianshu.com/p/f8e69ffa0c13
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            setFallbackLineSpacing(false);
+        }
     }
 
     /**
@@ -208,9 +216,11 @@ public class AutoLinkTextView extends TextView {
         // 重新计算高度
         int lineHeight = 0;
         for (int i = 0; i < lineCount; i++) {
-            Rect lineBound = new Rect();
-            sl.getLineBounds(i, lineBound);
-            lineHeight += lineBound.height();
+//            Rect lineBound = new Rect();
+//            sl.getLineBounds(i, lineBound);
+//            lineHeight += lineBound.height();
+            // 上面方法也可以
+            lineHeight += sl.getLineDescent(i) - sl.getLineAscent(i);
         }
         lineHeight += getPaddingTop() + getPaddingBottom();
         setMeasuredDimension(getMeasuredWidth(), lineHeight);
