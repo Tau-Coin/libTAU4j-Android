@@ -20,6 +20,7 @@ public class TauDozeManager {
     private Disposable serviceDisposable;
     private final TauDaemon daemon;
     private boolean screenState = true;
+    private boolean chargeState = true;
     private int intervalSeconds = 0;
 
     public TauDozeManager(TauDaemon daemon) {
@@ -40,7 +41,7 @@ public class TauDozeManager {
             intervalSeconds = 3 * 60;
         }
         if (intervalSeconds > 0) {
-            if (this.intervalSeconds != intervalSeconds && !screenState) {
+            if (this.intervalSeconds != intervalSeconds && !screenState && !chargeState) {
                 this.intervalSeconds = intervalSeconds;
                 logger.debug("batteryLevel::{}, intervalSeconds::{}, screenState::false, resetLibTAUService",
                         batteryLevel, intervalSeconds);
@@ -55,6 +56,23 @@ public class TauDozeManager {
         }
     }
 
+    public void setChargeState(boolean chargeState) {
+        this.chargeState = chargeState;
+        logger.debug("setChargeState::{}", chargeState);
+        if (chargeState) {
+            disposeServiceDisposable();
+            daemon.resumeService();
+            logger.debug("setChargeState resumeService");
+        } else {
+            if (intervalSeconds > 0 && !screenState) {
+                logger.debug("setChargeState resetLibTAUService");
+                resetLibTAUService();
+            } else {
+                logger.debug("setChargeState waiting");
+            }
+        }
+    }
+
     public void setScreenState(boolean screenState) {
         this.screenState = screenState;
         logger.debug("setScreenState::{}", screenState);
@@ -63,7 +81,7 @@ public class TauDozeManager {
             daemon.resumeService();
             logger.debug("setScreenState resumeService");
         } else {
-            if (intervalSeconds > 0) {
+            if (intervalSeconds > 0 && !chargeState) {
                 logger.debug("setScreenState resetLibTAUService");
                 resetLibTAUService();
             } else {

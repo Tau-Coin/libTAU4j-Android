@@ -325,6 +325,7 @@ public abstract class TauDaemon {
     private void switchPowerReceiver() {
         boolean chargingState = systemServiceManager.isPlugged();
         settingsRepo.chargingState(chargingState);
+        tauDozeManager.setChargeState(chargingState);
         if (chargingState) {
             startChargingTiming();
         }
@@ -365,6 +366,7 @@ public abstract class TauDaemon {
         } else if (key.equals(appContext.getString(R.string.pref_key_charging_state))) {
             logger.info("SettingsChanged, charging state::{}", settingsRepo.chargingState());
             startChargingTiming();
+            tauDozeManager.setChargeState(settingsRepo.chargingState());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_metered_network))) {
             logger.info("isMeteredNetwork::{}", NetworkSetting.isMeteredNetwork());
         } else if (key.equals(appContext.getString(R.string.pref_key_is_wifi_network))) {
