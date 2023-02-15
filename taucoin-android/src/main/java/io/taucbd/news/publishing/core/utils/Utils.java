@@ -61,12 +61,12 @@ import javax.net.ssl.X509TrustManager;
 
 public class Utils {
     public static final String HASH_PATTERN = "\\b[0-9a-fA-F]{5,40}\\b";
-    private static final int[] CHAIN_LOGO_ARRAY1 = new int[]{
+    private static final int[] CHAIN_LOGO_ARRAY2 = new int[]{
             R.mipmap.icon_bangkok, R.mipmap.icon_bangkok1, R.mipmap.icon_bangkok2, R.mipmap.icon_bangkok3
             , R.mipmap.icon_bangkok4, R.mipmap.icon_bangkok5, R.mipmap.icon_bangkok6, R.mipmap.icon_bangkok7
             , R.mipmap.icon_bangkok8, R.mipmap.icon_bangkok9};
 
-    private static final int[] CHAIN_LOGO_ARRAY2 = new int[]{
+    private static final int[] CHAIN_LOGO_ARRAY1 = new int[]{
             R.mipmap.icon_chiang_mai, R.mipmap.icon_chiang_mai1, R.mipmap.icon_chiang_mai2
             , R.mipmap.icon_chiang_mai3, R.mipmap.icon_chiang_mai4};
 
