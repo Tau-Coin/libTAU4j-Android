@@ -14,7 +14,7 @@ android {
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-        resConfigs "en-rUS"
+//        resConfigs "en-rUS" 去掉此配置，防止多语言(如：泰语)切换无法切换到默认英语版本
         renderscriptTargetApi 22
         renderscriptSupportModeEnabled true
 
@@ -36,12 +36,6 @@ android {
         debug {
             assets.srcDirs = ['assets', 'src/main/assets/debug']
         }
-
-        main {
-            res.srcDirs = ['src/main/res']
-        }
-        thai.res.srcDirs = ['src/main/res-thai']
-
     }
 
     signingConfigs {
@@ -223,18 +217,11 @@ android {
             signingConfig signingConfigs.releaseConfig
         }
 
-        english {
+        id {
             dimension 'id'
             applicationId "io.taucbd.news.publishing"
             resValue "string", "app_name", "TAU"
             buildConfigField "Integer", "TAU_LANGUAGE", "0"
-        }
-
-        thai {
-            dimension 'id'
-            applicationId "io.tauthai.news.publishing"
-            resValue "string", "app_name", "TAU"
-            buildConfigField "Integer", "TAU_LANGUAGE", "1"
         }
     }
 

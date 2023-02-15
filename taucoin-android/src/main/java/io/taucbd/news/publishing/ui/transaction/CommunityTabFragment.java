@@ -40,7 +40,6 @@ import io.taucbd.news.publishing.core.utils.KeyboardUtils;
 import io.taucbd.news.publishing.core.utils.StringUtil;
 import io.taucbd.news.publishing.core.utils.ToastUtils;
 import io.taucbd.news.publishing.core.utils.UsersUtil;
-import io.taucbd.news.publishing.databinding.DialogTrustBinding;
 import io.taucbd.news.publishing.ui.BaseActivity;
 import io.taucbd.news.publishing.ui.BaseFragment;
 import io.taucbd.news.publishing.ui.community.CommunityViewModel;

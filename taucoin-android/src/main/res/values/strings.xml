@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name_alpha">TAU App Beta</string>
-    <string name="app_name_alpha_description">Freely Create Crypto Coins\nDecentral Serverless Network</string>
     <string name="app_name_alpha_desc">Open Source\n&amp; Blockchain Technology</string>
     <string name="app_share">Share app link via</string>
     <string name="app_share_content">Please join TAU network, an unrestricted and serverless social media from https://taucoin.io</string>
@@ -79,9 +77,6 @@
     <string name="main_referral_link_copy">Referral and Bonus Link copied</string>
     <string name="main_referral_link_text">Please send to your friends. When they click, you will receive %1$s coins as bonus, up to %2$s coins.</string>
 
-    <string name="main_publish_video">Publish Video</string>
-    <string name="main_community_settings">Community Settings</string>
-    <string name="main_other_transaction">Other Transaction</string>
     <string name="main_no_messages">[No messages]</string>
     <string name="main_network_unavailable">Network connection unavailable</string>
     <string name="main_connecting">Connecting&#8230;</string>
@@ -145,12 +140,7 @@
     <string name="community_chain_explorer">Blockchain Explorer</string>
     <string name="community_blacklist">Ban This Community</string>
     <string name="community_members">Engaged People in chat/tx</string>
-    <string name="community_sync_rate">Sync Rate</string>
-    <string name="community_miners_online">Miners Online</string>
-    <string name="community_total_blocks">Total Blocks</string>
     <string name="community_mining_power">Mining Power</string>
-    <string name="community_expiry_date">Expiry Date</string>
-    <string name="community_renewal_date">Auto Renewal Date</string>
     <string name="community_info">Info</string>
     <string name="community_invite_link">Invite Link</string>
     <string name="community_qr_code">Share This Community</string>
@@ -180,17 +170,10 @@
     <string name="community_coin_name">Coin Name(optional)</string>
     <string name="community_announce">Announce on TAU</string>
     <string name="community_total_coin">Total Coins</string>
-    <string name="community_avg_block">Avg Block</string>
     <string name="community_avg_block_time">%1$d min</string>
-    <string name="community_intro">Introduction(optional)</string>
-    <string name="community_more_settings">More Settings</string>
-    <string name="community_bootstrap_node">DHT Bootstrap Node</string>
     <string name="community_transaction">Pay People</string>
     <string name="community_transaction_queue">Wiring Transaction Queue</string>
-    <string name="community_nickname">Community Nickname</string>
     <string name="community_choose_coin">Choose Coin</string>
-    <string name="community_mining_status">Mining Status</string>
-    <string name="community_mining_online">Mining online</string>
 	<string name="community_interim_balance">Interim Balance</string>
 	<string name="community_pending_amount">Pending Amount</string>
 	<string name="community_payment_balance">Payable Balance</string>
@@ -200,11 +183,6 @@
     <string name="community_chain_market">News</string>
     <string name="community_on_chain">Transactions</string>
     <string name="community_pinned_message">Pinned News</string>
-    <string name="community_chain_note_title">Note Transaction</string>
-    <string name="community_sell_coins">Sale</string>
-    <string name="community_airdrop">Airdrop</string>
-    <string name="community_leader_invitation">Announcement</string>
-    <string name="community_sell_detail">Sell Detail</string>
     <string name="community_creation_failed">Community creation failed, please try again later!</string>
     <string name="community_create_success" formatted="false"><Data><![CDATA[Keep on <strong>WIFI</strong> and <strong>charging battery</strong> to best exchange data.]]></Data></string>
     <string name="community_paste_here">Paste link here</string>
@@ -213,13 +191,9 @@
     <string name="community_join_failed">Failed to join the community!</string>
 
     <string name="community_view_all">All</string>
-    <string name="community_view_airdrop">Airdrop</string>
-    <string name="community_view_sell">Sale</string>
-    <string name="community_view_trust">Trust</string>
     <string name="community_view_wiring">Wiring</string>
     <string name="community_view_note">Note</string>
     <string name="community_view_unknown">Unknown</string>
-    <string name="community_view_announcement">Announcement</string>
     <string name="community_view_news">News</string>
     <string name="community_view_own_txs">Sent Transactions</string>
     <string name="community_view_tx_history">Transaction History</string>
@@ -257,10 +231,8 @@
 
     <string name="error_community_name_empty">Community name cannot be empty!</string>
     <string name="error_community_name_too_long">Community name is too long!</string>
-    <string name="error_coin_name_empty">Coin name cannot be empty!</string>
     <string name="error_airdrop_coins_empty">Airdrop coin is invalid!</string>
     <string name="error_airdrop_coins_too_greater">Airdrop coins cannot be greater than total coins!</string>
-    <string name="error_telegram_id_illegal">Telegram ID is illegal!</string>
     <string name="community_pinned_successfully">Pinned successfully</string>
     <string name="community_unpinned_successfully">Unpinned successfully</string>
     <string name="community_favorite_add_successfully">Add favorites successfully</string>
@@ -363,8 +335,6 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="setting_bg_running_time">Background Run</string>
     <string name="setting_doze_running_time">Android Doze</string>
     <string name="setting_back_doze_time">Data Saving Background Pause</string>
-    <string name="setting_survival_mode">Survival Mode</string>
-    <string name="setting_doze_time">Doze time: %1$s</string>
     <string name="setting_running_time_hours">%1$s h</string>
     <string name="setting_running_time_minutes">%1$s m</string>
     <string name="setting_running_time_seconds">%1$s s</string>
@@ -374,7 +344,6 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="setting_network_current_speed">Speed</string>
     <string name="setting_network_available_data">Today Remaining Data</string>
     <string name="setting_metered_network_limit_speed">%1$s/s</string>
-    <string name="setting_master_node">Master node</string>
     <string name="setting_charging">Charging</string>
     <string name="setting_internet">Internet</string>
     <string name="setting_network_type">Network Type</string>
@@ -382,8 +351,6 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="setting_processors">Processors</string>
     <string name="setting_dht_invoke">DHT Invoked Requests</string>
     <string name="setting_peers">Peers</string>
-    <string name="setting_download">Total Daily Download</string>
-    <string name="setting_upload">Total Daily Upload</string>
     <string name="setting_cpu">CPU/Processors</string>
     <string name="setting_memory">Memory</string>
     <string name="setting_heap_size">Heap Size</string>
@@ -444,8 +411,6 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="blacklist_failed">Blacklist failed</string>
     <string name="ban_successfully">Ban successfully</string>
     <string name="ban_failed">Ban failed</string>
-    <string name="ban_member_msg">Ban Member: %s</string>
-    <string name="favourite_successfully">Added favourite successfully</string>
     <string name="share_link_successfully">Share successfully</string>
 
     <!-- Strings used for transactions -->
@@ -463,7 +428,6 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_message">Message(required)</string>
     <string name="tx_contact_id">%1$s(Optional)</string>
     <string name="tx_bootstrap_node">Bootstrap node(required)</string>
-    <string name="tx_comment">Comment(required)</string>
     <string name="tx_item_name">Item Name</string>
     <string name="tx_link">Link - optional</string>
     <string name="tx_airdrop_link">Airdrop Link</string>
@@ -486,9 +450,7 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_operation_copy_previous_hash">Copy Previous Hash</string>
     <string name="tx_operation_copy_miner">Copy Miner</string>
     <string name="tx_operation_copy_transaction_hash">Copy Transaction Hash</string>
-    <string name="tx_operation_select_all">Select All</string>
     <string name="tx_operation_copy_link">Copy Link</string>
-    <string name="tx_operation_forward">Forward</string>
     <string name="tx_operation_blacklist">Ban Sender</string>
     <string name="tx_operation_ban_community">Ban Community</string>
     <string name="tx_operation_enter_community">Enter Community</string>
@@ -497,7 +459,6 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_operation_msg_hash">Message Hash</string>
     <string name="tx_operation_pin">Pin</string>
     <string name="tx_operation_unpin">Unpin</string>
-    <string name="tx_error_type">No such transaction type!</string>
     <string name="tx_on_chain_msg">On-Chain Message</string>
     <string name="tx_fee_hint">Fee</string>
     <string name="tx_median_fee_tips">Median fee:%1$s %2$s</string>
@@ -539,10 +500,6 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="tx_memo_airdrop_finished">This round of airdrop finished.</string>
     <string name="tx_memo_airdrop">Airdrop coins</string>
     <string name="tx_memo_referral">Referral bonus</string>
-    <string name="tx_give_trust">Give a trust</string>
-    <string name="tx_give_trust_tip" formatted="false"><Data><![CDATA[<font color="#000000">%1$s</font> is happy to receive your trust.]]></Data></string>
-    <string name="tx_give_trust_info">%s %s give %s a trust</string>
-    <string name="tx_give_trust_notes">Give %s a trust</string>
     <string name="tx_sell_detail_trust">Trust %s</string>
     <string name="tx_sell_detail_trust_hash">Trust Onchain Hash</string>
     <string name="tx_sell_direct_talk">Connect</string>
@@ -579,7 +536,6 @@ download the app and paste the following link to app search box and receive %2$d
     <string name="contacts_discovered">Discovered</string>
     <string name="contacts_added">Added</string>
     <string name="contacts_share_qr_code">Share QR Code to</string>
-    <string name="contacts_empty">No contacts！</string>
     <string name="contacts_last_seen">Last seen %1$s</string>
     <string name="contacts_last_communication">Last comm %1$s</string>
     <string name="contacts_share_link_via">Share community link via</string>
@@ -625,7 +581,6 @@ download the app and paste the following link to app search box and receive %2$d
     <!-- Strings used for QRCode -->
     <string name="qr_code_title">Address QR Code</string>
     <string name="key_qr_code_title">Key QR Code</string>
-    <string name="qr_code_two_steps">Two steps to connect a friend</string>
     <string name="qr_code_step_one">Share QR code to friends</string>
     <string name="qr_code_step_two">Scan friend’s QR code</string>
     <string name="qr_code_scan_community_qr">Scan QR Code</string>

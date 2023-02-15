@@ -69,7 +69,7 @@ public class SellDetailActivity extends BaseActivity implements View.OnClickList
      */
     private void initView() {
         binding.toolbarInclude.toolbar.setNavigationIcon(R.mipmap.icon_back);
-        binding.toolbarInclude.toolbar.setTitle(R.string.community_sell_detail);
+//        binding.toolbarInclude.toolbar.setTitle(R.string.community_sell_detail);
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         adapter = new TrustListAdapter();

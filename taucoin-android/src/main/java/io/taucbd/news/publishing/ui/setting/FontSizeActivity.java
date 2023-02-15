@@ -48,6 +48,7 @@ public class FontSizeActivity extends BaseActivity {
         binding.toolbarInclude.toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         String[] scaleTitles = getResources().getStringArray(R.array.font_scale_title);
+        scaleTitles[1] = getResources().getString(R.string.common_default);
         String[] scaleSizes = getResources().getStringArray(R.array.font_scale_size);
 
         binding.seekBar.setFontScaleSizes(scaleSizes);

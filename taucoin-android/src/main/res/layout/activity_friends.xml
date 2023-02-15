@@ -98,6 +98,7 @@
                 android:textAppearance="@style/TextAppearanceBody1"/>
 
             <ImageView
+                android:visibility="gone"
                 android:id="@+id/iv_bot"
                 android:layout_width="@dimen/widget_size_30"
                 android:layout_height="@dimen/widget_size_30"
