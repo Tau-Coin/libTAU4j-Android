@@ -18,6 +18,8 @@ public class UserAndTxReply extends UserAndTx {
     public long replyTimestamp;
     public long replyBalance;
     public long replyPower;
+    @Ignore
+    public boolean isShow = true;
 
     @Relation(parentColumn = "replySenderPk",
             entityColumn = "publicKey")
@@ -42,5 +44,13 @@ public class UserAndTxReply extends UserAndTx {
 
     public long getReplyInterimBalance() {
         return replyBalance + Constants.TX_MAX_OVERDRAFT;
+    }
+
+    public boolean isShow() {
+        return isShow;
+    }
+
+    public void setShow(boolean show) {
+        isShow = show;
     }
 }

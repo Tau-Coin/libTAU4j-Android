@@ -54,6 +54,7 @@ import io.taucbd.news.publishing.core.storage.sqlite.repo.TxQueueRepository;
 import io.taucbd.news.publishing.core.utils.ChainIDUtil;
 import io.taucbd.news.publishing.core.utils.DateUtil;
 import io.taucbd.news.publishing.core.utils.FmtMicrometer;
+import io.taucbd.news.publishing.core.utils.HashUtil;
 import io.taucbd.news.publishing.databinding.DeleteDialogBinding;
 import io.taucbd.news.publishing.ui.constant.Page;
 import io.taucbd.news.publishing.core.model.data.message.TxType;
@@ -106,6 +107,7 @@ public class TxViewModel extends AndroidViewModel {
     private MutableLiveData<String> deletedResult = new MutableLiveData<>();
     private CommonDialog editFeeDialog;
     private CommonDialog deleteDialog;
+    private List<String> msgHashList = new ArrayList<>();
     public TxViewModel(@NonNull Application application) {
         super(application);
         this.application = application;
@@ -151,6 +153,7 @@ public class TxViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
+        msgHashList.clear();
         disposables.clear();
         if(editFeeDialog != null){
             editFeeDialog.closeDialog();
@@ -718,7 +721,24 @@ public class TxViewModel extends AndroidViewModel {
                 logger.debug("loadNewsData time::{}ms", endTime - startTime);
                 logger.debug("loadNewsData pos::{}, pageSize::{}, messages.size::{}",
                         pos, pageSize, txs.size());
-//                        Collections.reverse(txs);
+                if (pos == 0) {
+                    msgHashList.clear();
+                }
+                for (UserAndTxReply tx : txs) {
+                    String msg = "" + tx.memo + tx.link;
+                    String hash = HashUtil.makeSha256Hash(msg);
+                    if (!msgHashList.contains(hash)) {
+                        msgHashList.add(hash);
+                        tx.setShow(true);
+                        logger.debug("loadNewsData true msg::{}", tx.txID);
+                    } else {
+                        tx.setShow(false);
+                        logger.debug("loadNewsData false msg::{}", tx.txID);
+                    }
+
+                }
+                long hashEndTime = System.currentTimeMillis();
+                logger.debug("loadNewsData hashTime::{}ms", hashEndTime - endTime);
             } catch (Exception e) {
                 logger.error("loadNewsData error::", e);
             }

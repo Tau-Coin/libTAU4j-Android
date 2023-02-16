@@ -5,6 +5,7 @@ import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -71,10 +72,32 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
                     R.mipmap.icon_share_link, linkDrawableSize, linkDrawableSize);
         }
 
+        public void setVisibility(View itemView, boolean isVisible) {
+            RecyclerView.LayoutParams param = (RecyclerView.LayoutParams) itemView.getLayoutParams();
+            if (null == param) {
+                return;
+            }
+            if (isVisible) {
+                param.height = LinearLayout.LayoutParams.WRAP_CONTENT;// 这里注意使用自己布局的根布局类型
+                param.width = LinearLayout.LayoutParams.MATCH_PARENT;// 这里注意使用自己布局的根布局类型
+                itemView.setVisibility(View.VISIBLE);
+            } else {
+                itemView.setVisibility(View.GONE);
+                param.height = 0;
+                param.width = 0;
+            }
+            itemView.setLayoutParams(param);
+        }
+
         void bind(UserAndTxReply tx) {
             if(null == binding || null == tx){
                 return;
             }
+            if (!tx.isShow) {
+                setVisibility(binding.getRoot(), false);
+                return;
+            }
+            setVisibility(binding.getRoot(), true);
             binding.ivHeadPic.setImageBitmap(UsersUtil.getHeadPic(tx.sender));
 
             String userName = UsersUtil.getShowName(tx.sender);
@@ -392,6 +415,8 @@ public class HomeListAdapter extends ListAdapter<UserAndTxReply, HomeListAdapter
             } else if (StringUtil.isNotEquals(oldItem.picturePath, newItem.picturePath)) {
                 return false;
             } else if (oldItem.currentTime != newItem.currentTime) {
+                return false;
+            } else if (oldItem.isShow != newItem.isShow) {
                 return false;
             }
             return true;
