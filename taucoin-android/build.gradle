@@ -325,4 +325,8 @@ dependencies {
     implementation 'org.apache.commons:commons-compress:1.18'
 
     implementation 'com.huxq17.xrefreshview:xrefreshview:3.6.9'
+
+//    openai-gpt3-java
+//    implementation 'com.theokanning.openai-gpt3-java:<api|client|service>:<version>'
+    implementation 'com.theokanning.openai-gpt3-java:service:0.10.0'
 }
