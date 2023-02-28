@@ -65,15 +65,16 @@
                 String  mId;            // meetup id, sha1 hash(mOrganizer, mTopic, timestamp of created for this meetup)
                 String  mOrganizer;     // 发起人公钥
                 String  mTopic;         // meetup主题
-                Date    mData;          // meetup具体时间日期
+                long    mData;          // meetup具体时间日期
                 String  mLocation;      // 位置信息
                 int     mPtcpNumber;    // The number of participants
                 String  mExtraInfo;     // 附加条件
+		long    mSchemeDate;    // mScheme产生的日期时间
 
         meetup_scheme table, 字段如下：
 
                 String  mId;            // 与meetup table相同
-                Date    mSchemeDate;    // mScheme产生的日期时间
+                long    mSchemeDate;    // mScheme产生的日期时间
                 String  mPrompt;        // 本次scheme对应的prompt
                 String  mScheme;        // open ai产生的meetup具体方案
 
