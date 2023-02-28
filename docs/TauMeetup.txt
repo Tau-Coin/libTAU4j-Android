@@ -1,0 +1,96 @@
+1. News交易构建时的修改:
+   
+	增加聚会属性相关选项，最好是选择的形式
+	
+	主题：
+		1. 自定义
+		
+	时间：
+		1. 3天内
+        2. 7天内
+	   	3. 自定义
+		
+	地点（二级定位）：
+		1. 根据定位选择到城市
+		2. 自定义具体地点（没有就写无）
+	
+	人数：
+		1. 5人内
+		2. 10人内
+		3. 20人内
+		4. 自定义
+	
+	附加条件：
+		1. 是否吃饭
+		2. 时长要求
+		3. 场地要求
+
+	一般交互流程：
+	
+		1. 聚会发起者描述聚会要求，支付交易费，发送news交易，该news交易当做该次聚会的首条信息;
+		
+		2. 社区创建者收到合法news请求，根据news交易携带的信息以及该话题下的历史回复信息（第一次发起的news无回复），询问AI的策略;
+		
+		3. 社区创建者将AI策略以chat的形式发送到该聚会首条news的话题下;
+		
+		4. 社区可能会产生一些相关讨论，包括有些人满意不满意等意见;
+		
+		5. 聚会发起者对AI的方案给出意见，自己也不满意，可以回到1重新描述news交易, 该news交易以回复的形式在首条news下面;
+		
+		6. 如果聚会发起者觉得可以接受，则发送news回复确认聚会成行，可以终结讨论；
+
+2. 用户反馈数据的整合（是否参加，参加者信息），利用TAUMeetupManger类的方法来整合数据，涉及到Prompt engine的模板
+
+3. TAUMeetupManger类方法及其相关组件设计
+
+	创建新的meetup packet, 包含4个类
+
+	1) Meetup: 包含topic, 截止日期，人数，补充信息等，以及相应的 get & set方法。
+	
+		Meetup，主要数据成员包括：
+        String  mId;            // meetup id, sha1 hash(mOrganizer, mTopic, timestamp of created for this meetup)
+        String  mOrganizer;     // 发起人公钥
+        String  mTopic;         // meetup主题
+        Date    mData;          // meetup具体时间日期
+        String  mLocation;      // 位置信息
+        int     mPtcpNumber;    // The number of participants
+        String  mExtraInfo;     // 附加条件
+        String  mScheme;        // open ai产生的meetup具体方案
+        Date    mSchemeDate;    // mScheme产生的日期时间
+
+	2) MeetupDatabase: 持久化存储, 需要两个表设计
+
+        meetup table, 字段如下：
+
+                String  mId;            // meetup id, sha1 hash(mOrganizer, mTopic, timestamp of created for this meetup)
+                String  mOrganizer;     // 发起人公钥
+                String  mTopic;         // meetup主题
+                Date    mData;          // meetup具体时间日期
+                String  mLocation;      // 位置信息
+                int     mPtcpNumber;    // The number of participants
+                String  mExtraInfo;     // 附加条件
+
+        meetup_scheme table, 字段如下：
+
+                String  mId;            // 与meetup table相同
+                Date    mSchemeDate;    // mScheme产生的日期时间
+                String  mPrompt;        // 本次scheme对应的prompt
+                String  mScheme;        // open ai产生的meetup具体方案
+
+	3) MeetupManager: 如之前讨论包括addMeetup()等方法。管理Meetup，包含对象MeetupDatabase & OpenAIImpl.
+	
+		3.1 addMeetup - 添加新的聚会
+		
+		3.2 addReply - 给某个特定聚会添加反馈
+		
+		3.3 createCompletion - 和openai请求某个聚会的方案
+		
+		3.4 getMeetupPrompt - 获取某个Meetup现在的prompt数据
+		
+		3.5 getMeetupScheme - 获取某个Meetup现有的方案
+		
+		3.6 ...
+		
+	4) AIInterface接口：getCompletionByPromot()方法声明。
+
+	5) OpenAIImpl 实现接口AIInterface.
